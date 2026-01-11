@@ -520,27 +520,35 @@ const Product5000 = () => {
         items={[
           {
             question: "¿Quién es el autor del libro?",
-            answer: "Respuesta 1 - Edita este texto con tu contenido.",
+            answer: "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
           },
           {
-            question: "¿Pregunta 2?",
-            answer: "Respuesta 2 - Edita este texto con tu contenido.",
+            question: "¿INGLÉS RELAX es un libro físico o digital?",
+            answer: "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico (tapa blanda pegada) está previsto para junio de 2026. En algunas promociones futuras, el libro físico podrá incluir la versión digital (PDF) como bono.",
           },
           {
-            question: "¿Pregunta 3?",
-            answer: "Respuesta 3 - Edita este texto con tu contenido.",
+            question: "¿Cuántas páginas tiene INGLÉS RELAX?",
+            answer: "El libro digital tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
           },
           {
-            question: "¿Pregunta 4?",
-            answer: "Respuesta 4 - Edita este texto con tu contenido.",
+            question: "¿Es adecuado para estudiar solo/a?",
+            answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
           },
           {
-            question: "¿Pregunta 5?",
-            answer: "Respuesta 5 - Edita este texto con tu contenido.",
+            question: "¿Necesito saber inglés antes de usar el libro?",
+            answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
+          },
+          {
+            question: "¿El libro incluye pronunciación?",
+            answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
+          },
+          {
+            question: "¿Cómo realizo el pago?",
+            answer: "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
           },
         ]}
         title="Preguntas Frecuentes"
-        subtitle="Resolvemos tus dudas sobre el producto"
+        subtitle="Resolvemos tus dudas sobre INGLÉS RELAX"
       />
 
       {/* Final CTA */}

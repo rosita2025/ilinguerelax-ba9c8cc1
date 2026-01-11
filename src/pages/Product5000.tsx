@@ -310,7 +310,7 @@ const Product5000 = () => {
               Mira lo que contiene el libro
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Estas son algunas páginas de muestra del contenido que recibirás
+              ¡APROVECHA Y RECIBE 4 BONUS GRATUITAS!
             </p>
           </div>
 

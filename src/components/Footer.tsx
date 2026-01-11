@@ -1,6 +1,5 @@
 export const Footer = () => {
-  return (
-    <footer className="py-12 bg-foreground">
+  return <footer className="py-12 bg-foreground">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
@@ -28,10 +27,9 @@ export const Footer = () => {
           </nav>
 
           <p className="text-sm text-primary-foreground/50">
-            © 2025 iLingue Relax. Todos los derechos reservados.
+            © 2026 iLingue Relax. Todos los derechos reservados.
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };

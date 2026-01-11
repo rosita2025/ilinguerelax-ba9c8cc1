@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
+import { motion } from "framer-motion";
 import {
   BookOpen,
   Globe,
@@ -81,13 +82,18 @@ const FAQPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20">
+      <motion.main
+        className="pt-20"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <FAQ
           items={faqItems}
           title="Preguntas Frecuentes"
           subtitle="Todo lo que necesitas saber sobre iLingue Relax"
         />
-      </main>
+      </motion.main>
       <Footer />
     </div>
   );

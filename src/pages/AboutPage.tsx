@@ -1,6 +1,21 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookOpen, Heart, Target, Users, Award, Globe } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
 const AboutPage = () => {
   return (
@@ -8,25 +23,41 @@ const AboutPage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 gradient-hero">
+      <motion.section
+        className="pt-32 pb-16 gradient-hero"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4">
               Sobre Nosotros
             </h1>
             <p className="text-lg text-primary-foreground/90">
               Conoce la historia detrás de iLingue Relax
             </p>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Main Content */}
       <section className="py-20 md:py-28">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             {/* About Section */}
-            <div className="text-center mb-16">
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
                 <Heart className="w-4 h-4" />
                 Nuestra Historia
@@ -41,11 +72,20 @@ const AboutPage = () => {
                 ofrece materiales prácticos, organizados y accesibles, diseñados especialmente para 
                 autodidactas y principiantes.
               </p>
-            </div>
+            </motion.div>
 
             {/* Mission & Vision */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-              <div className="bg-card rounded-2xl border border-border shadow-card p-8">
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+            >
+              <motion.div
+                className="bg-card rounded-2xl border border-border shadow-card p-8"
+                variants={fadeInUp}
+              >
                 <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-6">
                   <Target className="w-7 h-7 text-primary-foreground" />
                 </div>
@@ -55,9 +95,12 @@ const AboutPage = () => {
                   sin métodos complicados ni estrés innecesario. Queremos que cada estudiante disfrute 
                   del proceso de aprendizaje.
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="bg-card rounded-2xl border border-border shadow-card p-8">
+              <motion.div
+                className="bg-card rounded-2xl border border-border shadow-card p-8"
+                variants={fadeInUp}
+              >
                 <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-6">
                   <BookOpen className="w-7 h-7 text-primary-foreground" />
                 </div>
@@ -66,14 +109,29 @@ const AboutPage = () => {
                   Convertir a iLingue Relax en una marca educativa reconocida a nivel mundial por 
                   enseñar idiomas sin estrés, de manera clara y amigable para hispanohablantes.
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Values */}
-            <div className="mb-16">
+            <motion.div
+              className="mb-16"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
               <h3 className="text-2xl font-bold text-foreground text-center mb-8">Nuestros Valores</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-card rounded-2xl border border-border shadow-card p-6 text-center hover:shadow-hero transition-all duration-300">
+              <motion.div
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+              >
+                <motion.div
+                  className="bg-card rounded-2xl border border-border shadow-card p-6 text-center hover:shadow-hero transition-all duration-300"
+                  variants={fadeInUp}
+                >
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Heart className="w-6 h-6 text-primary" />
                   </div>
@@ -81,9 +139,12 @@ const AboutPage = () => {
                   <p className="text-sm text-muted-foreground">
                     Entendemos las dificultades de aprender un nuevo idioma
                   </p>
-                </div>
+                </motion.div>
 
-                <div className="bg-card rounded-2xl border border-border shadow-card p-6 text-center hover:shadow-hero transition-all duration-300">
+                <motion.div
+                  className="bg-card rounded-2xl border border-border shadow-card p-6 text-center hover:shadow-hero transition-all duration-300"
+                  variants={fadeInUp}
+                >
                   <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
                     <Award className="w-6 h-6 text-accent" />
                   </div>
@@ -91,9 +152,12 @@ const AboutPage = () => {
                   <p className="text-sm text-muted-foreground">
                     Contenido cuidadosamente diseñado y verificado
                   </p>
-                </div>
+                </motion.div>
 
-                <div className="bg-card rounded-2xl border border-border shadow-card p-6 text-center hover:shadow-hero transition-all duration-300">
+                <motion.div
+                  className="bg-card rounded-2xl border border-border shadow-card p-6 text-center hover:shadow-hero transition-all duration-300"
+                  variants={fadeInUp}
+                >
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Globe className="w-6 h-6 text-primary" />
                   </div>
@@ -101,27 +165,39 @@ const AboutPage = () => {
                   <p className="text-sm text-muted-foreground">
                     Materiales accesibles para todos los presupuestos
                   </p>
-                </div>
-              </div>
-            </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
 
             {/* Stats */}
-            <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-8 md:p-12">
+            <motion.div
+              className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-8 md:p-12"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
               <h3 className="text-2xl font-bold text-foreground text-center mb-8">Nuestros Logros</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <motion.div
+                className="grid grid-cols-2 md:grid-cols-4 gap-6"
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+              >
                 {[
                   { number: "10,000+", label: "Estudiantes" },
                   { number: "8,000", label: "Palabras" },
                   { number: "4.9/5", label: "Valoración" },
                   { number: "20+", label: "Países" },
                 ].map((stat) => (
-                  <div key={stat.label} className="text-center">
+                  <motion.div key={stat.label} className="text-center" variants={fadeInUp}>
                     <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.number}</div>
                     <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>

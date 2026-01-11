@@ -134,12 +134,12 @@ const Product8000 = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$47</span>
+                <span className="text-5xl font-bold text-foreground">$27</span>
                 <span className="text-2xl text-muted-foreground line-through">
                   $197
                 </span>
                 <span className="px-3 py-1 rounded-full gradient-accent text-accent-foreground text-sm font-bold">
-                  AHORRA 76%
+                  AHORRA 86%
                 </span>
               </div>
 
@@ -277,7 +277,7 @@ const Product8000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$47</span>
+                <span className="text-5xl font-bold text-foreground">$27</span>
                 <span className="text-2xl text-muted-foreground line-through">
                   $197
                 </span>
@@ -346,7 +346,7 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$47"
+        price="$27"
         originalPrice="$197"
         rating={4.9}
         reviewCount={10000}

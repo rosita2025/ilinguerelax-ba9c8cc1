@@ -1,13 +1,22 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 import logoIlingue from "@/assets/logo-ilingue.png";
 
 export const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
+    setIsMenuOpen(false);
+  };
+
+  const handleLinkClick = () => {
+    setIsMenuOpen(false);
   };
 
   return (
@@ -23,7 +32,7 @@ export const Navbar = () => {
             />
           </Link>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link
               to="/"
@@ -51,13 +60,65 @@ export const Navbar = () => {
             </button>
           </div>
 
-          {/* CTA */}
-          <Link to="/productos">
-            <Button variant="hero" size="default">
-              Ver Productos
-            </Button>
-          </Link>
+          {/* Desktop CTA */}
+          <div className="hidden md:block">
+            <Link to="/productos">
+              <Button variant="hero" size="default">
+                Ver Productos
+              </Button>
+            </Link>
+          </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-2 bg-card/95 backdrop-blur-lg rounded-2xl border border-border shadow-card p-4 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col gap-2">
+              <Link
+                to="/"
+                onClick={handleLinkClick}
+                className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              >
+                Home
+              </Link>
+              <Link
+                to="/productos"
+                onClick={handleLinkClick}
+                className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              >
+                Productos
+              </Link>
+              <button
+                onClick={() => scrollToSection("sobre-mi")}
+                className="px-4 py-3 text-left text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              >
+                Sobre Mí
+              </button>
+              <button
+                onClick={() => scrollToSection("contacto")}
+                className="px-4 py-3 text-left text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              >
+                Contacto
+              </button>
+              <div className="pt-2 border-t border-border mt-2">
+                <Link to="/productos" onClick={handleLinkClick}>
+                  <Button variant="hero" size="default" className="w-full">
+                    Ver Productos
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

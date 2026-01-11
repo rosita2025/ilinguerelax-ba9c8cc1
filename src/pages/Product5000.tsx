@@ -331,8 +331,8 @@ const Product5000 = () => {
         {/* Bottom - Logo Ticker */}
         <div className="overflow-hidden border-t border-border pt-6">
           <div className="flex animate-ticker">
-            {[...Array(3)].map((_, setIndex) => (
-              <div key={setIndex} className="flex items-center gap-12 md:gap-20 whitespace-nowrap px-8">
+            {[...Array(2)].map((_, setIndex) => (
+              <div key={setIndex} className="flex items-center gap-24 md:gap-40 whitespace-nowrap px-16 md:px-24">
                 {partnerLogos.map((logo, index) => (
                   <img
                     key={`${setIndex}-${index}`}
@@ -396,8 +396,8 @@ const Product5000 = () => {
           {/* Collaboration Ticker - Bottom with Logos */}
           <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
             <div className="py-4 flex animate-ticker">
-              {[...Array(3)].map((_, setIndex) => (
-                <div key={setIndex} className="flex items-center gap-10 md:gap-16 whitespace-nowrap px-6">
+              {[...Array(2)].map((_, setIndex) => (
+                <div key={setIndex} className="flex items-center gap-20 md:gap-32 whitespace-nowrap px-12 md:px-20">
                   {partnerLogos.map((logo, index) => (
                     <img
                       key={`bottom-${setIndex}-${index}`}

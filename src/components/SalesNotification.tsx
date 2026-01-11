@@ -36,14 +36,13 @@ const salesData: Sale[] = [
 ];
 
 const SalesNotification = () => {
-  const [currentSale, setCurrentSale] = useState<Sale | null>(null);
+  const [currentSale, setCurrentSale] = useState<Sale>(salesData[0]);
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
 
   useEffect(() => {
     // Show first notification after 2 seconds
     const initialTimeout = setTimeout(() => {
-      setCurrentSale(salesData[0]);
       setIsVisible(true);
     }, 2000);
 
@@ -51,32 +50,30 @@ const SalesNotification = () => {
   }, []);
 
   useEffect(() => {
-    if (!isVisible) return;
-
-    // Hide notification after 3 seconds
-    const hideTimeout = setTimeout(() => {
+    // Cycle through notifications
+    const interval = setInterval(() => {
+      // Hide current notification
       setIsVisible(false);
-    }, 3000);
+      
+      // After 500ms (fade out), show next notification
+      setTimeout(() => {
+        setSaleIndex(prev => {
+          const nextIndex = (prev + 1) % salesData.length;
+          setCurrentSale(salesData[nextIndex]);
+          return nextIndex;
+        });
+        setIsVisible(true);
+      }, 500);
+    }, 4000); // Show each notification for 4 seconds total (3.5s visible + 0.5s transition)
 
-    // Show next notification after 6 seconds (3s visible + 3s hidden)
-    const nextTimeout = setTimeout(() => {
-      const nextIndex = (saleIndex + 1) % salesData.length;
-      setSaleIndex(nextIndex);
-      setCurrentSale(salesData[nextIndex]);
-      setIsVisible(true);
-    }, 6000);
-
-    return () => {
-      clearTimeout(hideTimeout);
-      clearTimeout(nextTimeout);
-    };
-  }, [isVisible, saleIndex]);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
+    // Resume after 3 seconds
+    setTimeout(() => setIsVisible(true), 3000);
   };
-
-  if (!currentSale || !isVisible) return null;
 
   return (
     <div 

@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { Testimonials } from "@/components/Testimonials";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -223,6 +224,9 @@ const Product8000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <Testimonials variant="dark" />
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 gradient-hero">

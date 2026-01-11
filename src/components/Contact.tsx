@@ -135,11 +135,12 @@ export const Contact = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-foreground mb-1">Email</h3>
-                    <p className="text-muted-foreground">contacto@ilinguerelax.com</p>
+                    <p className="text-muted-foreground">hola@ilinguerelax.com</p>
                     <p className="text-sm text-muted-foreground mt-1">Respondemos en 24-48 horas</p>
                   </div>
                 </div>
               </div>
+
 
               <div className="bg-card rounded-2xl border border-border shadow-card p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-4">Síguenos</h3>

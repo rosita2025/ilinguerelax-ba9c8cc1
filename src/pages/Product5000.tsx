@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
+import { CountdownTimer } from "@/components/CountdownTimer";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -197,6 +198,9 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Countdown Timer */}
+      <CountdownTimer hoursFromNow={24} />
 
       {/* Demo Banner */}
       <section className="py-8 gradient-hero">

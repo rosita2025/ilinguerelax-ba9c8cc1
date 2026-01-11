@@ -329,7 +329,7 @@ const Product5000 = () => {
         </div>
 
         {/* Bottom - Logo Ticker */}
-        <div className="overflow-hidden border-t border-border pt-6">
+        <div className="overflow-hidden bg-gradient-to-r from-primary/5 via-white to-primary/5 py-6 mt-6 rounded-xl">
           <div className="flex animate-ticker">
             {[...Array(2)].map((_, setIndex) => (
               <div key={setIndex} className="flex items-center gap-24 md:gap-40 whitespace-nowrap px-16 md:px-24">
@@ -338,7 +338,7 @@ const Product5000 = () => {
                     key={`${setIndex}-${index}`}
                     src={logo.src}
                     alt={logo.alt}
-                    className={`${logo.height} w-auto object-contain opacity-80 hover:opacity-100 transition-opacity`}
+                    className={`${logo.height} w-auto object-contain`}
                   />
                 ))}
               </div>

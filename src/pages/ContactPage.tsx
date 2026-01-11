@@ -6,6 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageSquare, Send, Instagram, Facebook, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -52,18 +67,28 @@ const ContactPage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 gradient-hero">
+      <motion.section
+        className="pt-32 pb-16 gradient-hero"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4">
               Contáctanos
             </h1>
             <p className="text-lg text-primary-foreground/90">
               Estamos aquí para ayudarte con cualquier duda
             </p>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Main Content */}
       <section className="py-20 md:py-28">
@@ -71,7 +96,12 @@ const ContactPage = () => {
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Contact Form */}
-              <div className="bg-card rounded-3xl border border-border shadow-card p-8 md:p-10">
+              <motion.div
+                className="bg-card rounded-3xl border border-border shadow-card p-8 md:p-10"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
                 <div className="mb-8">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
                     <MessageSquare className="w-4 h-4" />
@@ -168,12 +198,20 @@ const ContactPage = () => {
                     )}
                   </Button>
                 </form>
-              </div>
+              </motion.div>
 
               {/* Contact Info */}
-              <div className="space-y-6">
+              <motion.div
+                className="space-y-6"
+                variants={staggerContainer}
+                initial="initial"
+                animate="animate"
+              >
                 {/* Email */}
-                <div className="bg-card rounded-2xl border border-border shadow-card p-6">
+                <motion.div
+                  className="bg-card rounded-2xl border border-border shadow-card p-6"
+                  variants={fadeInUp}
+                >
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
                       <Mail className="w-7 h-7 text-primary-foreground" />
@@ -184,10 +222,13 @@ const ContactPage = () => {
                       <p className="text-sm text-muted-foreground mt-1">Respondemos en 24-48 horas</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Response Time */}
-                <div className="bg-card rounded-2xl border border-border shadow-card p-6">
+                <motion.div
+                  className="bg-card rounded-2xl border border-border shadow-card p-6"
+                  variants={fadeInUp}
+                >
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
                       <Clock className="w-7 h-7 text-primary-foreground" />
@@ -198,10 +239,13 @@ const ContactPage = () => {
                       <p className="text-sm text-muted-foreground mt-1">9:00 AM - 6:00 PM (GMT-5)</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Social Media */}
-                <div className="bg-card rounded-2xl border border-border shadow-card p-6">
+                <motion.div
+                  className="bg-card rounded-2xl border border-border shadow-card p-6"
+                  variants={fadeInUp}
+                >
                   <h3 className="text-lg font-semibold text-foreground mb-4">Síguenos en Redes</h3>
                   <div className="flex gap-4">
                     <a
@@ -223,19 +267,22 @@ const ContactPage = () => {
                       <Facebook className="w-6 h-6 text-white" />
                     </a>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* FAQ Link */}
-                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border border-primary/20">
+                <motion.div
+                  className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border border-primary/20"
+                  variants={fadeInUp}
+                >
                   <h3 className="text-lg font-semibold text-foreground mb-2">¿Preguntas Frecuentes?</h3>
                   <p className="text-muted-foreground text-sm mb-4">
                     Consulta nuestras preguntas frecuentes para respuestas inmediatas sobre nuestros productos.
                   </p>
                   <Button variant="outline" size="sm" asChild>
-                    <a href="/productos/5000-palabras#faq">Ver FAQ</a>
+                    <a href="/faq">Ver FAQ</a>
                   </Button>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
         </div>

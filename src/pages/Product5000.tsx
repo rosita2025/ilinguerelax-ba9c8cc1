@@ -5,6 +5,7 @@ import { Testimonials } from "@/components/Testimonials";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
+import SalesNotification from "@/components/SalesNotification";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -596,6 +597,9 @@ const Product5000 = () => {
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />
+
+      {/* Sales Notification Popup */}
+      <SalesNotification />
     </main>
   );
 };

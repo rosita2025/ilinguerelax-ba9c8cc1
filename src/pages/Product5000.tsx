@@ -36,6 +36,21 @@ import previewArticles from "@/assets/preview-articles.png";
 import previewIndex from "@/assets/preview-index.png";
 import previewGrammar from "@/assets/preview-grammar.png";
 
+// Partner logos
+import logoAmazon from "@/assets/logo-amazon.png";
+import logoEtsy from "@/assets/logo-etsy.png";
+import logoHotmart from "@/assets/logo-hotmart.svg";
+import logoShopify from "@/assets/logo-shopify.png";
+import logoKindle from "@/assets/logo-kindle.png";
+
+const partnerLogos = [
+  { src: logoAmazon, alt: "Amazon", height: "h-8 md:h-10" },
+  { src: logoEtsy, alt: "Etsy", height: "h-8 md:h-10" },
+  { src: logoShopify, alt: "Shopify", height: "h-8 md:h-10" },
+  { src: logoHotmart, alt: "Hotmart", height: "h-6 md:h-8" },
+  { src: logoKindle, alt: "Amazon Kindle", height: "h-6 md:h-8" },
+];
+
 const previewImages = [
   { src: previewVocab, title: "Vocabulario Temático", subtitle: "Palabras organizadas por categorías con pronunciación" },
   { src: previewArticles, title: "Artículos A/AN/THE", subtitle: "Reglas claras con ejemplos prácticos" },
@@ -298,28 +313,37 @@ const Product5000 = () => {
       {/* Countdown Timer */}
       <CountdownTimer hoursFromNow={24} />
 
-      {/* Collaboration Ticker - Horizontal */}
-      <section className="py-4 bg-card border-y border-border overflow-hidden">
-        <div className="flex animate-ticker">
-          {/* Duplicated content for seamless loop */}
-          {[...Array(2)].map((_, setIndex) => (
-            <div key={setIndex} className="flex items-center gap-8 md:gap-12 whitespace-nowrap px-4">
-              <span className="text-muted-foreground font-medium">📚 ¡Muy pronto libro físico! Junio 2026</span>
-              <span className="text-foreground font-semibold">•</span>
-              <span className="text-foreground font-semibold">En colaboración con:</span>
-              <span className="text-2xl font-bold text-[#FF9900]">amazon</span>
-              <span className="text-2xl font-bold text-[#F56400]">Etsy</span>
-              <span className="text-2xl font-bold text-[#F04E23]">Hotmart</span>
-              <span className="text-foreground font-semibold">•</span>
-              <span className="text-muted-foreground font-medium">📚 ¡Muy pronto libro físico! Junio 2026</span>
-              <span className="text-foreground font-semibold">•</span>
-              <span className="text-foreground font-semibold">En colaboración con:</span>
-              <span className="text-2xl font-bold text-[#FF9900]">amazon</span>
-              <span className="text-2xl font-bold text-[#F56400]">Etsy</span>
-              <span className="text-2xl font-bold text-[#F04E23]">Hotmart</span>
-              <span className="text-foreground font-semibold">•</span>
-            </div>
-          ))}
+      {/* Collaboration Section */}
+      <section className="py-10 md:py-14 bg-card border-y border-border">
+        <div className="container px-4 md:px-6">
+          {/* Top - Static text */}
+          <div className="text-center mb-8">
+            <p className="text-primary font-semibold text-sm md:text-base uppercase tracking-wider mb-2">
+              En colaboración
+            </p>
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground">
+              📚 ¡Libro Físico Muy Pronto!
+            </h2>
+            <p className="text-muted-foreground mt-2">Junio 2026</p>
+          </div>
+        </div>
+
+        {/* Bottom - Logo Ticker */}
+        <div className="overflow-hidden border-t border-border pt-6">
+          <div className="flex animate-ticker">
+            {[...Array(3)].map((_, setIndex) => (
+              <div key={setIndex} className="flex items-center gap-12 md:gap-20 whitespace-nowrap px-8">
+                {partnerLogos.map((logo, index) => (
+                  <img
+                    key={`${setIndex}-${index}`}
+                    src={logo.src}
+                    alt={logo.alt}
+                    className={`${logo.height} w-auto object-contain opacity-80 hover:opacity-100 transition-opacity`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -369,21 +393,19 @@ const Product5000 = () => {
             ))}
           </div>
 
-          {/* Collaboration Ticker - Bottom */}
+          {/* Collaboration Ticker - Bottom with Logos */}
           <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="py-3 flex animate-ticker">
-              {[...Array(2)].map((_, setIndex) => (
-                <div key={setIndex} className="flex items-center gap-6 whitespace-nowrap px-4">
-                  <span className="text-foreground font-medium">🌍 Disponible próximamente en formato físico</span>
-                  <span className="px-3 py-1 bg-[#FF9900]/20 text-[#FF9900] rounded-full text-sm font-bold">Amazon</span>
-                  <span className="px-3 py-1 bg-[#F56400]/20 text-[#F56400] rounded-full text-sm font-bold">Etsy</span>
-                  <span className="px-3 py-1 bg-[#F04E23]/20 text-[#F04E23] rounded-full text-sm font-bold">Hotmart</span>
-                  <span className="text-muted-foreground">•</span>
-                  <span className="text-foreground font-medium">🌍 Disponible próximamente en formato físico</span>
-                  <span className="px-3 py-1 bg-[#FF9900]/20 text-[#FF9900] rounded-full text-sm font-bold">Amazon</span>
-                  <span className="px-3 py-1 bg-[#F56400]/20 text-[#F56400] rounded-full text-sm font-bold">Etsy</span>
-                  <span className="px-3 py-1 bg-[#F04E23]/20 text-[#F04E23] rounded-full text-sm font-bold">Hotmart</span>
-                  <span className="text-muted-foreground">•</span>
+            <div className="py-4 flex animate-ticker">
+              {[...Array(3)].map((_, setIndex) => (
+                <div key={setIndex} className="flex items-center gap-10 md:gap-16 whitespace-nowrap px-6">
+                  {partnerLogos.map((logo, index) => (
+                    <img
+                      key={`bottom-${setIndex}-${index}`}
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="h-6 md:h-8 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                    />
+                  ))}
                 </div>
               ))}
             </div>

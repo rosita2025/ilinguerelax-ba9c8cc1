@@ -17,6 +17,22 @@ const salesData: Sale[] = [
   { name: "José Hernández", country: "Perú", product: "5,000 Palabras en Inglés", timeAgo: "hace 18 min" },
   { name: "Carmen Díaz", country: "Ecuador", product: "5,000 Palabras en Inglés", timeAgo: "hace 22 min" },
   { name: "Miguel Torres", country: "Venezuela", product: "5,000 Palabras en Inglés", timeAgo: "hace 25 min" },
+  { name: "Sofía Ramírez", country: "Guatemala", product: "5,000 Palabras en Inglés", timeAgo: "hace 28 min" },
+  { name: "Diego Morales", country: "Costa Rica", product: "5,000 Palabras en Inglés", timeAgo: "hace 32 min" },
+  { name: "Valentina Ruiz", country: "Uruguay", product: "5,000 Palabras en Inglés", timeAgo: "hace 35 min" },
+  { name: "Fernando Castro", country: "Panamá", product: "5,000 Palabras en Inglés", timeAgo: "hace 38 min" },
+  { name: "Isabella Vargas", country: "Honduras", product: "5,000 Palabras en Inglés", timeAgo: "hace 42 min" },
+  { name: "Andrés Mendoza", country: "Bolivia", product: "5,000 Palabras en Inglés", timeAgo: "hace 45 min" },
+  { name: "Lucía Flores", country: "El Salvador", product: "5,000 Palabras en Inglés", timeAgo: "hace 48 min" },
+  { name: "Roberto Jiménez", country: "Paraguay", product: "5,000 Palabras en Inglés", timeAgo: "hace 52 min" },
+  { name: "Camila Ortega", country: "Nicaragua", product: "5,000 Palabras en Inglés", timeAgo: "hace 55 min" },
+  { name: "Alejandro Reyes", country: "Puerto Rico", product: "5,000 Palabras en Inglés", timeAgo: "hace 58 min" },
+  { name: "Paula Vega", country: "República Dominicana", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
+  { name: "Javier Navarro", country: "Cuba", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
+  { name: "Daniela Molina", country: "Estados Unidos", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
+  { name: "Martín Aguirre", country: "Brasil", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
+  { name: "Gabriela Peña", country: "Canadá", product: "5,000 Palabras en Inglés", timeAgo: "hace 2 horas" },
+  { name: "Ricardo Salazar", country: "Alemania", product: "5,000 Palabras en Inglés", timeAgo: "hace 2 horas" },
 ];
 
 const SalesNotification = () => {

@@ -37,7 +37,7 @@ export const AboutMe = () => {
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-3">Nuestro Método</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Utilizamos pronunciación adaptada al español y fonética UK-USA para que puedas aprender a hablar correctamente desde el primer día.
+                Convertir a iLingue Relax en una marca educativa reconocida por enseñar idiomas sin estrés, de manera clara y amigable.
               </p>
             </div>
           </div>

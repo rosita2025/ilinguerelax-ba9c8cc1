@@ -1,57 +1,76 @@
-import { Headphones, BookOpen, Sparkles, CheckCircle2 } from "lucide-react";
+import { Headphones, BookOpen, Sparkles, Heart, Globe, Coffee } from "lucide-react";
 
 const benefits = [
   {
-    icon: Headphones,
-    title: "Pronunciación Perfecta",
-    description: "Audio nativo diseñado especialmente para hispanohablantes",
-  },
-  {
-    icon: BookOpen,
-    title: "8,000 Palabras",
-    description: "Vocabulario esencial organizado por frecuencia de uso",
-  },
-  {
     icon: Sparkles,
     title: "Sin Estrés",
-    description: "Metodología relajada que respeta tu ritmo de aprendizaje",
+    description: "Metodología relajada que respeta tu ritmo, sin presiones ni exámenes estresantes",
+    highlight: true,
   },
   {
-    icon: CheckCircle2,
-    title: "Paso a Paso",
-    description: "Sin diccionarios, sin confusión. Solo aprendizaje fluido",
+    icon: Heart,
+    title: "Claro y Amigable",
+    description: "Explicaciones simples y directas, sin términos complicados que confundan",
+    highlight: false,
+  },
+  {
+    icon: Globe,
+    title: "Aprende Idiomas",
+    description: "Enfocado en lo que realmente necesitas para comunicarte con confianza",
+    highlight: false,
+  },
+  {
+    icon: Coffee,
+    title: "A Tu Ritmo",
+    description: "Estudia cuando quieras, donde quieras. Sin horarios fijos ni compromisos",
+    highlight: false,
   },
 ];
 
 export const Benefits = () => {
   return (
-    <section className="py-20 md:py-28 bg-background">
-      <div className="container px-4 md:px-6">
+    <section id="beneficios" className="py-20 md:py-28 bg-background relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2" />
+      
+      <div className="container px-4 md:px-6 relative">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            ¿Por qué elegir{" "}
-            <span className="text-gradient">iLingue Relax</span>?
+          <span className="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+            ¿Por qué iLingue Relax?
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
+            Aprender idiomas debería ser
+            <br />
+            <span className="text-gradient">relajado y accesible</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Un método revolucionario diseñado para que aprendas inglés de forma
-            natural, sin frustración
+            Diseñado para personas que quieren aprender sin la presión de los métodos tradicionales
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {benefits.map((benefit, index) => (
             <div
               key={benefit.title}
-              className="group p-6 md:p-8 rounded-2xl bg-card gradient-card border border-border/50 shadow-card hover:shadow-hero transition-all duration-500 hover:-translate-y-2"
+              className={`group p-8 rounded-3xl transition-all duration-500 hover:-translate-y-1 ${
+                benefit.highlight 
+                  ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-hero' 
+                  : 'bg-card border border-border/50 shadow-card hover:shadow-hero'
+              }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                <benefit.icon className="w-7 h-7 text-primary-foreground" />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 ${
+                benefit.highlight 
+                  ? 'bg-primary-foreground/20' 
+                  : 'gradient-hero'
+              }`}>
+                <benefit.icon className={`w-7 h-7 ${benefit.highlight ? 'text-primary-foreground' : 'text-primary-foreground'}`} />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
+              <h3 className={`text-xl font-semibold mb-3 ${benefit.highlight ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {benefit.title}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className={`leading-relaxed ${benefit.highlight ? 'text-primary-foreground/90' : 'text-muted-foreground'}`}>
                 {benefit.description}
               </p>
             </div>

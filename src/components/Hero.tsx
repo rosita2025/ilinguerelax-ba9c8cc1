@@ -1,6 +1,7 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Smile, Brain, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
+import logoIlingue from "@/assets/logo-ilingue.png";
 
 export const Hero = () => {
   return (
@@ -10,24 +11,27 @@ export const Hero = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-primary/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/75 to-primary/90" />
       </div>
+
+      {/* Floating Elements */}
+      <div className="absolute top-1/4 left-10 w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-primary-foreground/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       {/* Content */}
       <div className="relative container px-4 md:px-6 py-20 md:py-32">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm font-medium mb-8 animate-fade-in-up">
-            <Sparkle className="w-4 h-4" />
-            <span>Método probado por +10,000 estudiantes</span>
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Logo Badge */}
+          <div className="inline-flex items-center gap-3 mb-8 animate-fade-in">
+            <img src={logoIlingue} alt="iLingue" className="h-10 md:h-12" />
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-            Aprende Inglés
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
+            Estudia Idiomas
             <br />
-            <span className="relative">
-              Sin Estrés
+            <span className="relative inline-block">
+              <span className="text-accent">Sin Estrés</span>
               <svg
                 className="absolute -bottom-2 left-0 w-full"
                 viewBox="0 0 300 12"
@@ -36,7 +40,7 @@ export const Hero = () => {
               >
                 <path
                   d="M2 10C50 4 150 2 298 6"
-                  stroke="hsl(15 85% 55%)"
+                  stroke="hsl(var(--accent))"
                   strokeWidth="4"
                   strokeLinecap="round"
                 />
@@ -45,15 +49,31 @@ export const Hero = () => {
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg md:text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            Domina <strong>8,000 palabras</strong> en inglés con pronunciación
-            perfecta. Diseñado especialmente para hispanohablantes.{" "}
-            <strong>Sin diccionarios. Paso a paso.</strong>
+          <p className="text-lg md:text-2xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto font-light animate-fade-in" style={{ animationDelay: "200ms" }}>
+            Aprende de forma <strong className="font-semibold">relajada, práctica y accesible</strong>.
+            <br className="hidden md:block" />
+            Sin métodos complicados. A tu propio ritmo.
           </p>
 
+          {/* Feature Pills */}
+          <div className="flex flex-wrap justify-center gap-3 mb-10 animate-fade-in" style={{ animationDelay: "250ms" }}>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
+              <Smile className="w-4 h-4 text-accent" />
+              <span>Aprendizaje relajado</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
+              <Brain className="w-4 h-4 text-accent" />
+              <span>Método claro y amigable</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
+              <Clock className="w-4 h-4 text-accent" />
+              <span>Sin presiones</span>
+            </div>
+          </div>
+
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-            <Button variant="hero" size="xl">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "300ms" }}>
+            <Button variant="hero" size="xl" className="shadow-xl hover:shadow-2xl transition-shadow">
               Comenzar Ahora
               <ArrowRight className="w-5 h-5" />
             </Button>
@@ -64,7 +84,8 @@ export const Hero = () => {
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-12 pt-8 border-t border-primary-foreground/20 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+          <div className="mt-14 pt-8 border-t border-primary-foreground/20 animate-fade-in" style={{ animationDelay: "400ms" }}>
+            <p className="text-primary-foreground/60 text-sm mb-4">Confiado por estudiantes en todo el mundo</p>
             <div className="flex flex-wrap justify-center gap-8 text-primary-foreground/80 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">⭐</span>
@@ -72,7 +93,7 @@ export const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🎯</span>
-                <span>Sin suscripciones</span>
+                <span>+10,000 estudiantes</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🔒</span>
@@ -88,9 +109,3 @@ export const Hero = () => {
     </section>
   );
 };
-
-const Sparkle = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-  </svg>
-);

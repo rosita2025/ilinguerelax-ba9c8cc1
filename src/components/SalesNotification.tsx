@@ -4,39 +4,46 @@ import { X } from 'lucide-react';
 interface Sale {
   name: string;
   country: string;
-  product: string;
   timeAgo: string;
 }
 
-const salesData: Sale[] = [
-  { name: "María García", country: "México", product: "5,000 Palabras en Inglés", timeAgo: "hace 2 min" },
-  { name: "Carlos López", country: "España", product: "5,000 Palabras en Inglés", timeAgo: "hace 5 min" },
-  { name: "Ana Martínez", country: "Argentina", product: "5,000 Palabras en Inglés", timeAgo: "hace 8 min" },
-  { name: "Pedro Sánchez", country: "Colombia", product: "5,000 Palabras en Inglés", timeAgo: "hace 12 min" },
-  { name: "Laura Rodríguez", country: "Chile", product: "5,000 Palabras en Inglés", timeAgo: "hace 15 min" },
-  { name: "José Hernández", country: "Perú", product: "5,000 Palabras en Inglés", timeAgo: "hace 18 min" },
-  { name: "Carmen Díaz", country: "Ecuador", product: "5,000 Palabras en Inglés", timeAgo: "hace 22 min" },
-  { name: "Miguel Torres", country: "Venezuela", product: "5,000 Palabras en Inglés", timeAgo: "hace 25 min" },
-  { name: "Sofía Ramírez", country: "Guatemala", product: "5,000 Palabras en Inglés", timeAgo: "hace 28 min" },
-  { name: "Diego Morales", country: "Costa Rica", product: "5,000 Palabras en Inglés", timeAgo: "hace 32 min" },
-  { name: "Valentina Ruiz", country: "Uruguay", product: "5,000 Palabras en Inglés", timeAgo: "hace 35 min" },
-  { name: "Fernando Castro", country: "Panamá", product: "5,000 Palabras en Inglés", timeAgo: "hace 38 min" },
-  { name: "Isabella Vargas", country: "Honduras", product: "5,000 Palabras en Inglés", timeAgo: "hace 42 min" },
-  { name: "Andrés Mendoza", country: "Bolivia", product: "5,000 Palabras en Inglés", timeAgo: "hace 45 min" },
-  { name: "Lucía Flores", country: "El Salvador", product: "5,000 Palabras en Inglés", timeAgo: "hace 48 min" },
-  { name: "Roberto Jiménez", country: "Paraguay", product: "5,000 Palabras en Inglés", timeAgo: "hace 52 min" },
-  { name: "Camila Ortega", country: "Nicaragua", product: "5,000 Palabras en Inglés", timeAgo: "hace 55 min" },
-  { name: "Alejandro Reyes", country: "Puerto Rico", product: "5,000 Palabras en Inglés", timeAgo: "hace 58 min" },
-  { name: "Paula Vega", country: "República Dominicana", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
-  { name: "Javier Navarro", country: "Cuba", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
-  { name: "Daniela Molina", country: "Estados Unidos", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
-  { name: "Martín Aguirre", country: "Brasil", product: "5,000 Palabras en Inglés", timeAgo: "hace 1 hora" },
-  { name: "Gabriela Peña", country: "Canadá", product: "5,000 Palabras en Inglés", timeAgo: "hace 2 horas" },
-  { name: "Ricardo Salazar", country: "Alemania", product: "5,000 Palabras en Inglés", timeAgo: "hace 2 horas" },
+const salesPeople: Sale[] = [
+  { name: "María García", country: "México", timeAgo: "hace 2 min" },
+  { name: "Carlos López", country: "España", timeAgo: "hace 5 min" },
+  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 8 min" },
+  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 12 min" },
+  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 15 min" },
+  { name: "José Hernández", country: "Perú", timeAgo: "hace 18 min" },
+  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 22 min" },
+  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 25 min" },
+  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 28 min" },
+  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 32 min" },
+  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 35 min" },
+  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 38 min" },
+  { name: "Isabella Vargas", country: "Honduras", timeAgo: "hace 42 min" },
+  { name: "Andrés Mendoza", country: "Bolivia", timeAgo: "hace 45 min" },
+  { name: "Lucía Flores", country: "El Salvador", timeAgo: "hace 48 min" },
+  { name: "Roberto Jiménez", country: "Paraguay", timeAgo: "hace 52 min" },
+  { name: "Camila Ortega", country: "Nicaragua", timeAgo: "hace 55 min" },
+  { name: "Alejandro Reyes", country: "Puerto Rico", timeAgo: "hace 58 min" },
+  { name: "Paula Vega", country: "República Dominicana", timeAgo: "hace 1 hora" },
+  { name: "Javier Navarro", country: "Cuba", timeAgo: "hace 1 hora" },
+  { name: "Daniela Molina", country: "Estados Unidos", timeAgo: "hace 1 hora" },
+  { name: "Martín Aguirre", country: "Brasil", timeAgo: "hace 1 hora" },
+  { name: "Gabriela Peña", country: "Canadá", timeAgo: "hace 2 horas" },
+  { name: "Ricardo Salazar", country: "Alemania", timeAgo: "hace 2 horas" },
 ];
 
-const SalesNotification = () => {
-  const [currentSale, setCurrentSale] = useState<Sale>(salesData[0]);
+interface SalesNotificationProps {
+  productName?: string;
+  productLabel?: string;
+}
+
+const SalesNotification = ({ 
+  productName = "5,000 Palabras en Inglés",
+  productLabel = "5,000"
+}: SalesNotificationProps) => {
+  const [currentSale, setCurrentSale] = useState<Sale>(salesPeople[0]);
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
 
@@ -58,8 +65,8 @@ const SalesNotification = () => {
       // After 500ms (fade out), show next notification
       setTimeout(() => {
         setSaleIndex(prev => {
-          const nextIndex = (prev + 1) % salesData.length;
-          setCurrentSale(salesData[nextIndex]);
+          const nextIndex = (prev + 1) % salesPeople.length;
+          setCurrentSale(salesPeople[nextIndex]);
           return nextIndex;
         });
         setIsVisible(true);
@@ -92,7 +99,7 @@ const SalesNotification = () => {
         {/* Product thumbnail */}
         <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
           <span className="text-[5px] md:text-[6px] font-bold text-black text-center leading-tight">
-            5,000<br/>PALABRAS
+            {productLabel}<br/>PALABRAS
           </span>
         </div>
         
@@ -108,7 +115,7 @@ const SalesNotification = () => {
             </p>
           </div>
           <p className="text-[9px] md:text-xs text-gray-600 truncate">
-            Compró {currentSale.product}
+            Compró {productName}
           </p>
           <div className="flex items-center gap-1 mt-0.5">
             <span className="text-[8px] md:text-[10px] text-green-600 font-medium">✓ Verificado</span>

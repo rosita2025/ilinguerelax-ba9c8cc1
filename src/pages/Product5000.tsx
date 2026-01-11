@@ -314,7 +314,7 @@ const Product5000 = () => {
       <CountdownTimer hoursFromNow={24} />
 
       {/* Collaboration Section */}
-      <section className="py-10 md:py-14 bg-card border-y border-border">
+      <section className="py-10 md:py-14 bg-secondary/20 border-y border-border">
         <div className="container px-4 md:px-6">
           {/* Top - Static text */}
           <div className="text-center mb-8">

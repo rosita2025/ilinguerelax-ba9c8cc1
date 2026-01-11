@@ -159,4 +159,22 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Ticker/Marquee Animation */
+  @keyframes ticker {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-ticker {
+    animation: ticker 20s linear infinite;
+  }
+
+  .animate-ticker:hover {
+    animation-play-state: paused;
+  }
 }

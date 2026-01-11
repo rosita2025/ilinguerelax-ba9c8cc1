@@ -4,11 +4,17 @@ import { Clock, Flame } from "lucide-react";
 interface CountdownTimerProps {
   endDate?: Date;
   hoursFromNow?: number;
+  currentPrice?: string;
+  originalPrice?: string;
+  storageKey?: string;
 }
 
 export const CountdownTimer = ({ 
   endDate, 
-  hoursFromNow = 24 
+  hoursFromNow = 24,
+  currentPrice = "$14 USD",
+  originalPrice = "$100 USD",
+  storageKey = "countdown_target"
 }: CountdownTimerProps) => {
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
@@ -20,7 +26,6 @@ export const CountdownTimer = ({
     const targetDate = endDate || new Date(Date.now() + hoursFromNow * 60 * 60 * 1000);
     
     // Store the target date in sessionStorage to persist across page refreshes
-    const storageKey = "countdown_target";
     let savedTarget = sessionStorage.getItem(storageKey);
     
     let finalTarget: Date;
@@ -54,63 +59,63 @@ export const CountdownTimer = ({
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, [endDate, hoursFromNow]);
+  }, [endDate, hoursFromNow, storageKey]);
 
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
-      <div className="bg-foreground text-background font-bold text-2xl md:text-4xl rounded-lg w-16 md:w-20 h-16 md:h-20 flex items-center justify-center shadow-lg">
+      <div className="bg-[#1a2332] text-white font-bold text-3xl md:text-5xl rounded-xl w-20 md:w-28 h-20 md:h-28 flex items-center justify-center shadow-2xl">
         {value.toString().padStart(2, "0")}
       </div>
-      <span className="text-xs md:text-sm text-primary-foreground/80 mt-2 font-medium uppercase tracking-wide">
+      <span className="text-xs md:text-sm text-white/80 mt-3 font-medium uppercase tracking-widest">
         {label}
       </span>
     </div>
   );
 
   return (
-    <section className="py-6 gradient-accent relative overflow-hidden">
+    <section className="py-10 md:py-14 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 left-1/4 w-40 h-40 bg-white/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-yellow-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
       </div>
 
       <div className="container px-4 md:px-6 relative">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto text-center">
           {/* Urgency Header */}
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-primary-foreground animate-pulse" />
-            <span className="text-primary-foreground font-bold text-sm md:text-base uppercase tracking-wider">
+            <Flame className="w-6 h-6 text-white animate-pulse" />
+            <span className="text-white font-bold text-base md:text-lg uppercase tracking-wider">
               ¡Oferta por tiempo limitado!
             </span>
-            <Flame className="w-5 h-5 text-primary-foreground animate-pulse" />
+            <Flame className="w-6 h-6 text-white animate-pulse" />
           </div>
 
           {/* Main Message */}
-          <h3 className="text-xl md:text-2xl font-bold text-primary-foreground text-center mb-6">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-8">
             El precio sube cuando el contador llegue a cero
           </h3>
 
           {/* Countdown */}
-          <div className="flex items-center justify-center gap-3 md:gap-6 mb-6">
+          <div className="flex items-center justify-center gap-4 md:gap-8 mb-8">
             <TimeBox value={timeLeft.hours} label="Horas" />
-            <span className="text-3xl md:text-4xl font-bold text-primary-foreground/60">:</span>
+            <span className="text-4xl md:text-5xl font-bold text-white/60 mt-[-20px]">:</span>
             <TimeBox value={timeLeft.minutes} label="Minutos" />
-            <span className="text-3xl md:text-4xl font-bold text-primary-foreground/60">:</span>
+            <span className="text-4xl md:text-5xl font-bold text-white/60 mt-[-20px]">:</span>
             <TimeBox value={timeLeft.seconds} label="Segundos" />
           </div>
 
-          {/* Discount Badge */}
+          {/* Price Badges */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-              <Clock className="w-4 h-4 text-primary-foreground" />
-              <span className="text-primary-foreground font-medium text-sm">
-                Precio actual: <span className="font-bold">$14 USD</span>
+            <div className="flex items-center gap-2 bg-[#1a2332] rounded-full px-5 py-3 shadow-lg">
+              <Clock className="w-4 h-4 text-orange-400" />
+              <span className="text-white font-medium text-sm md:text-base">
+                Precio actual: <span className="font-bold text-orange-400">{currentPrice}</span>
               </span>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-              <span className="text-primary-foreground/80 text-sm">
-                Después: <span className="line-through">$100 USD</span>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-5 py-3">
+              <span className="text-white text-sm md:text-base">
+                Después: <span className="line-through font-medium">{originalPrice}</span>
               </span>
             </div>
           </div>

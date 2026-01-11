@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -445,6 +446,34 @@ const Product5000 = () => {
 
       {/* Testimonials */}
       <Testimonials variant="light" />
+
+      {/* FAQ Section */}
+      <FAQ
+        items={[
+          {
+            question: "¿Pregunta 1?",
+            answer: "Respuesta 1 - Edita este texto con tu contenido.",
+          },
+          {
+            question: "¿Pregunta 2?",
+            answer: "Respuesta 2 - Edita este texto con tu contenido.",
+          },
+          {
+            question: "¿Pregunta 3?",
+            answer: "Respuesta 3 - Edita este texto con tu contenido.",
+          },
+          {
+            question: "¿Pregunta 4?",
+            answer: "Respuesta 4 - Edita este texto con tu contenido.",
+          },
+          {
+            question: "¿Pregunta 5?",
+            answer: "Respuesta 5 - Edita este texto con tu contenido.",
+          },
+        ]}
+        title="Preguntas Frecuentes"
+        subtitle="Resolvemos tus dudas sobre el producto"
+      />
 
       {/* Final CTA */}
       <section className="py-20 md:py-28">

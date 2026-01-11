@@ -17,7 +17,6 @@ import {
   Check,
   BookOpen,
   Globe,
-  Headphones,
   ArrowRight,
   ShoppingCart,
   Clock,
@@ -33,7 +32,6 @@ import {
   FileText,
   GraduationCap,
   Lightbulb,
-  Volume2,
   CreditCard,
   X,
 } from "lucide-react";
@@ -61,7 +59,7 @@ const partnerLogos = [
 ];
 
 const previewImages = [
-  { src: previewVocab, title: "Vocabulario Temático", subtitle: "Palabras organizadas por categorías con pronunciación" },
+  { src: previewVocab, title: "Vocabulario Temático", subtitle: "Palabras organizadas por categorías" },
   { src: previewArticles, title: "Artículos A/AN/THE", subtitle: "Reglas claras con ejemplos prácticos" },
   { src: previewIndex, title: "Índice Completo", subtitle: "52 capítulos temáticos organizados" },
   { src: previewGrammar, title: "Estructura Gramatical", subtitle: "Fórmulas para construir frases correctas" },
@@ -92,7 +90,7 @@ const bonuses = [
       "5,000 palabras organizadas alfabéticamente con pronunciación adaptada. Ideal para consultas rápidas.",
   },
   {
-    icon: Headphones,
+    icon: BookOpen,
     title: "Bonus 3: Verbo To Be y Más",
     description:
       "Tablas prácticas del verbo To Be, artículos (a/an/the) y preposiciones (in/on/at) con ejemplos.",
@@ -527,7 +525,7 @@ const Product5000 = () => {
           {
             question: "¿El libro incluye pronunciación?",
             answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
-            icon: Volume2,
+            icon: BookOpen,
           },
           {
             question: "¿Cómo realizo el pago?",

@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Star,
   Check,
-  Headphones,
   BookOpen,
   Sparkles,
   ArrowRight,
@@ -22,7 +21,6 @@ import {
   FileText,
   GraduationCap,
   Lightbulb,
-  Volume2,
   CreditCard,
 } from "lucide-react";
 
@@ -46,7 +44,7 @@ const partnerLogos = [
 
 const features = [
   "8,000 palabras esenciales del inglés",
-  "Audio con pronunciación nativa",
+  "Pronunciación en español incluida",
   "Diseñado para hispanohablantes",
   "Sin necesidad de diccionarios",
   "Metodología paso a paso sin estrés",
@@ -57,10 +55,10 @@ const features = [
 
 const benefits = [
   {
-    icon: Headphones,
-    title: "Pronunciación Perfecta",
+    icon: BookOpen,
+    title: "Pronunciación en Español",
     description:
-      "Audio nativo diseñado especialmente para que hispanohablantes pronuncien correctamente desde el primer día.",
+      "Cada palabra incluye su pronunciación adaptada al español para que aprendas correctamente desde el primer día.",
   },
   {
     icon: BookOpen,
@@ -111,7 +109,7 @@ const Product8000 = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Inglés Relax - 8,000 Palabras con Audio Nativo
+                Inglés Relax - 8,000 Palabras con Pronunciación Español y Fonética UK/USA
               </h1>
 
               <p className="text-lg text-muted-foreground mb-6">
@@ -204,7 +202,7 @@ const Product8000 = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               ¿Por qué elegir el{" "}
-              <span className="text-gradient">Curso Completo</span>?
+              <span className="text-gradient">Libro Digital Completo</span>?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Todo lo que necesitas para dominar el inglés en un solo paquete
@@ -330,7 +328,7 @@ const Product8000 = () => {
           {
             question: "¿El libro incluye pronunciación?",
             answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
-            icon: Volume2,
+            icon: BookOpen,
           },
           {
             question: "¿Cómo realizo el pago?",

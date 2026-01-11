@@ -7,7 +7,6 @@ const languages = [
   { 
     name: "Inglés", 
     flag: "🇬🇧", 
-    available: true, 
     link: "/productos",
     image: product5000,
     description: "5,000 y 8,000 palabras"
@@ -15,30 +14,15 @@ const languages = [
   { 
     name: "Español", 
     flag: "🇪🇸", 
-    available: true, 
     link: "/productos",
     image: product8000,
     description: "Aprende español fácil"
   },
-  { 
-    name: "Italiano", 
-    flag: "🇮🇹", 
-    available: true, 
-    link: "/productos",
-    image: product5000,
-    description: "Italiano sin estrés"
-  },
-  { 
-    name: "Portugués", 
-    flag: "🇧🇷", 
-    available: true, 
-    link: "/productos",
-    image: product8000,
-    description: "Portugués brasileño"
-  },
 ];
 
 const comingSoon = [
+  { name: "Italiano", flag: "🇮🇹" },
+  { name: "Portugués", flag: "🇧🇷" },
   { name: "Francés", flag: "🇫🇷" },
   { name: "Alemán", flag: "🇩🇪" },
 ];

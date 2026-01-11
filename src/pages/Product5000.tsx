@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -345,6 +346,18 @@ const Product5000 = () => {
       </section>
 
       <Footer />
+
+      {/* Sticky Buy Bar */}
+      <StickyBuyBar
+        price="$14"
+        originalPrice="$100"
+        rating={4.65}
+        reviewCount={800}
+        buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true"
+      />
+
+      {/* Spacer for sticky bar */}
+      <div className="h-20 md:h-16" />
     </main>
   );
 };

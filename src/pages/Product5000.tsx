@@ -16,7 +16,21 @@ import {
   Gift,
   Download,
   RefreshCw,
+  Eye,
 } from "lucide-react";
+
+// Preview images
+import previewVocab from "@/assets/preview-vocab.png";
+import previewArticles from "@/assets/preview-articles.png";
+import previewIndex from "@/assets/preview-index.png";
+import previewGrammar from "@/assets/preview-grammar.png";
+
+const previewImages = [
+  { src: previewVocab, title: "Vocabulario Temático", subtitle: "Palabras organizadas por categorías con pronunciación" },
+  { src: previewArticles, title: "Artículos A/AN/THE", subtitle: "Reglas claras con ejemplos prácticos" },
+  { src: previewIndex, title: "Índice Completo", subtitle: "52 capítulos temáticos organizados" },
+  { src: previewGrammar, title: "Estructura Gramatical", subtitle: "Fórmulas para construir frases correctas" },
+];
 
 const features = [
   "5,000+ palabras más utilizadas en inglés",
@@ -202,6 +216,47 @@ const Product5000 = () => {
 
       {/* Countdown Timer */}
       <CountdownTimer hoursFromNow={24} />
+
+      {/* Demo/Preview Section */}
+      <section className="py-16 md:py-20 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-4">
+              <Eye className="w-4 h-4" />
+              DEMO / VISTA PREVIA
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Mira lo que contiene el libro
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Estas son algunas páginas de muestra del contenido que recibirás
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
+            {previewImages.map((image, index) => (
+              <div
+                key={index}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1"
+              >
+                <div className="p-3 text-center bg-primary/5">
+                  <h3 className="font-semibold text-foreground text-sm md:text-base">{image.title}</h3>
+                </div>
+                <div className="relative aspect-[3/4] overflow-hidden">
+                  <img
+                    src={image.src}
+                    alt={image.title}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <div className="p-3 text-center bg-secondary/50">
+                  <p className="text-xs md:text-sm text-muted-foreground">{image.subtitle}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Demo Banner */}
       <section className="py-8 gradient-hero">

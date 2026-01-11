@@ -171,7 +171,7 @@
   }
 
   .animate-ticker {
-    animation: ticker 3s linear infinite;
+    animation: ticker 15s linear infinite;
   }
 
   .animate-ticker:hover {

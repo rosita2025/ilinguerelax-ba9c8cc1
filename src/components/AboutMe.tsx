@@ -35,7 +35,7 @@ export const AboutMe = () => {
               <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center mb-4">
                 <BookOpen className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Nuestro Método</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Nuestra Visión</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Convertir a iLingue Relax en una marca educativa reconocida por enseñar idiomas sin estrés, de manera clara y amigable.
               </p>

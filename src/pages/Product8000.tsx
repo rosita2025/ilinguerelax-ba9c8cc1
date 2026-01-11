@@ -26,6 +26,21 @@ import {
   CreditCard,
 } from "lucide-react";
 
+// Partner logos
+import logoAmazon from "@/assets/logo-amazon.png";
+import logoEtsy from "@/assets/logo-etsy.png";
+import logoShopify from "@/assets/logo-shopify.png";
+import logoHotmart from "@/assets/logo-hotmart.svg";
+import logoKindle from "@/assets/logo-kindle.png";
+
+const partnerLogos = [
+  { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
+  { src: logoEtsy, alt: "Etsy", height: "h-10 md:h-14" },
+  { src: logoShopify, alt: "Shopify", height: "h-10 md:h-14" },
+  { src: logoHotmart, alt: "Hotmart", height: "h-8 md:h-12" },
+  { src: logoKindle, alt: "Amazon Kindle", height: "h-8 md:h-12" },
+];
+
 const features = [
   "8,000 palabras esenciales del inglés",
   "Audio con pronunciación nativa",
@@ -176,6 +191,28 @@ const Product8000 = () => {
 
       {/* Countdown Timer */}
       <CountdownTimer hoursFromNow={24} />
+
+      {/* Partner Logos Ticker */}
+      <section className="py-6">
+        <div className="container px-4 md:px-6">
+          <div className="overflow-hidden bg-gray-900 py-8 md:py-10 rounded-2xl">
+            <div className="flex animate-ticker" style={{ width: 'max-content' }}>
+              {[...Array(4)].map((_, setIndex) => (
+                <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
+                  {partnerLogos.map((logo, index) => (
+                    <img
+                      key={`${setIndex}-${index}`}
+                      src={logo.src}
+                      alt={logo.alt}
+                      className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-90`}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Benefits */}
       <section className="py-20 md:py-28 bg-secondary/30">

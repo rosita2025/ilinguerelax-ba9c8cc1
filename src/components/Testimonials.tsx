@@ -41,7 +41,7 @@ const testimonials: Testimonial[] = [
     name: "Patricia López",
     location: "Perú",
     rating: 5,
-    text: "Después de probar muchos cursos caros, encontré este y fue la mejor decisión. Simple, efectivo y sin el estrés de los métodos tradicionales. ¡100% recomendado!",
+    text: "Después de probar muchos métodos caros, encontré este libro y fue la mejor decisión. Simple, efectivo y sin el estrés de los métodos tradicionales. ¡100% recomendado!",
     product: "8,000 palabras",
   },
   {

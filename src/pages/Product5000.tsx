@@ -298,22 +298,28 @@ const Product5000 = () => {
       {/* Countdown Timer */}
       <CountdownTimer hoursFromNow={24} />
 
-      {/* Collaboration Banner - Top */}
-      <section className="py-8 bg-card border-y border-border">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-            <p className="text-muted-foreground text-sm md:text-base font-medium">
-              📚 ¡Muy pronto libro físico! Junio 2026
-            </p>
-            <div className="flex items-center gap-6 md:gap-8">
-              <span className="text-foreground font-semibold text-lg">En colaboración con:</span>
-              <div className="flex items-center gap-4 md:gap-6">
-                <span className="text-xl md:text-2xl font-bold text-[#FF9900]">amazon</span>
-                <span className="text-xl md:text-2xl font-bold text-[#F56400]">Etsy</span>
-                <span className="text-xl md:text-2xl font-bold text-[#F04E23]">Hotmart</span>
-              </div>
+      {/* Collaboration Ticker - Horizontal */}
+      <section className="py-4 bg-card border-y border-border overflow-hidden">
+        <div className="flex animate-ticker">
+          {/* Duplicated content for seamless loop */}
+          {[...Array(2)].map((_, setIndex) => (
+            <div key={setIndex} className="flex items-center gap-8 md:gap-12 whitespace-nowrap px-4">
+              <span className="text-muted-foreground font-medium">📚 ¡Muy pronto libro físico! Junio 2026</span>
+              <span className="text-foreground font-semibold">•</span>
+              <span className="text-foreground font-semibold">En colaboración con:</span>
+              <span className="text-2xl font-bold text-[#FF9900]">amazon</span>
+              <span className="text-2xl font-bold text-[#F56400]">Etsy</span>
+              <span className="text-2xl font-bold text-[#F04E23]">Hotmart</span>
+              <span className="text-foreground font-semibold">•</span>
+              <span className="text-muted-foreground font-medium">📚 ¡Muy pronto libro físico! Junio 2026</span>
+              <span className="text-foreground font-semibold">•</span>
+              <span className="text-foreground font-semibold">En colaboración con:</span>
+              <span className="text-2xl font-bold text-[#FF9900]">amazon</span>
+              <span className="text-2xl font-bold text-[#F56400]">Etsy</span>
+              <span className="text-2xl font-bold text-[#F04E23]">Hotmart</span>
+              <span className="text-foreground font-semibold">•</span>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -363,15 +369,23 @@ const Product5000 = () => {
             ))}
           </div>
 
-          {/* Collaboration Banner - Bottom */}
-          <div className="mt-12 text-center">
-            <div className="inline-flex flex-col md:flex-row items-center gap-3 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-2xl px-6 py-4 border border-border">
-              <span className="text-foreground font-medium">🌍 Disponible próximamente en formato físico</span>
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 bg-[#FF9900]/20 text-[#FF9900] rounded-full text-sm font-bold">Amazon</span>
-                <span className="px-3 py-1 bg-[#F56400]/20 text-[#F56400] rounded-full text-sm font-bold">Etsy</span>
-                <span className="px-3 py-1 bg-[#F04E23]/20 text-[#F04E23] rounded-full text-sm font-bold">Hotmart</span>
-              </div>
+          {/* Collaboration Ticker - Bottom */}
+          <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="py-3 flex animate-ticker">
+              {[...Array(2)].map((_, setIndex) => (
+                <div key={setIndex} className="flex items-center gap-6 whitespace-nowrap px-4">
+                  <span className="text-foreground font-medium">🌍 Disponible próximamente en formato físico</span>
+                  <span className="px-3 py-1 bg-[#FF9900]/20 text-[#FF9900] rounded-full text-sm font-bold">Amazon</span>
+                  <span className="px-3 py-1 bg-[#F56400]/20 text-[#F56400] rounded-full text-sm font-bold">Etsy</span>
+                  <span className="px-3 py-1 bg-[#F04E23]/20 text-[#F04E23] rounded-full text-sm font-bold">Hotmart</span>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-foreground font-medium">🌍 Disponible próximamente en formato físico</span>
+                  <span className="px-3 py-1 bg-[#FF9900]/20 text-[#FF9900] rounded-full text-sm font-bold">Amazon</span>
+                  <span className="px-3 py-1 bg-[#F56400]/20 text-[#F56400] rounded-full text-sm font-bold">Etsy</span>
+                  <span className="px-3 py-1 bg-[#F04E23]/20 text-[#F04E23] rounded-full text-sm font-bold">Hotmart</span>
+                  <span className="text-muted-foreground">•</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

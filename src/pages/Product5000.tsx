@@ -330,15 +330,15 @@ const Product5000 = () => {
 
         {/* Bottom - Logo Ticker */}
         <div className="overflow-hidden bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400 py-6 mt-6 rounded-xl">
-          <div className="flex animate-ticker">
-            {[...Array(2)].map((_, setIndex) => (
-              <div key={setIndex} className="flex items-center gap-24 md:gap-40 whitespace-nowrap px-16 md:px-24">
+          <div className="flex animate-ticker" style={{ width: 'max-content' }}>
+            {[...Array(4)].map((_, setIndex) => (
+              <div key={setIndex} className="flex items-center shrink-0 gap-16 md:gap-24 px-8 md:px-12">
                 {partnerLogos.map((logo, index) => (
                   <img
                     key={`${setIndex}-${index}`}
                     src={logo.src}
                     alt={logo.alt}
-                    className={`${logo.height} w-auto object-contain`}
+                    className={`${logo.height} w-auto object-contain shrink-0`}
                   />
                 ))}
               </div>

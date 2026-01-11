@@ -64,58 +64,57 @@ const SalesNotification = () => {
         });
         setIsVisible(true);
       }, 500);
-    }, 4000); // Show each notification for 4 seconds total (3.5s visible + 0.5s transition)
+    }, 8000); // Show each notification for 8 seconds
 
     return () => clearInterval(interval);
   }, []);
 
   const handleClose = () => {
     setIsVisible(false);
-    // Resume after 3 seconds
-    setTimeout(() => setIsVisible(true), 3000);
+    // Resume after 5 seconds
+    setTimeout(() => setIsVisible(true), 5000);
   };
 
   return (
     <div 
-      className={`fixed bottom-4 left-4 z-50 bg-white rounded-lg shadow-2xl border border-gray-200 p-3 max-w-xs transform transition-all duration-500 ${
+      className={`fixed top-4 left-4 z-50 bg-white rounded-lg shadow-2xl border border-gray-200 p-2 md:p-3 max-w-[280px] md:max-w-xs transform transition-all duration-500 ${
         isVisible ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
       }`}
     >
       <button 
         onClick={handleClose}
-        className="absolute -top-2 -right-2 bg-gray-100 hover:bg-gray-200 rounded-full p-1 transition-colors"
+        className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-gray-100 hover:bg-gray-200 rounded-full p-0.5 md:p-1 transition-colors"
       >
-        <X className="w-3 h-3 text-gray-500" />
+        <X className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-500" />
       </button>
       
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         {/* Product thumbnail */}
-        <div className="w-12 h-12 bg-yellow-400 rounded-md flex items-center justify-center shrink-0">
-          <span className="text-[6px] font-bold text-black text-center leading-tight">
+        <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
+          <span className="text-[5px] md:text-[6px] font-bold text-black text-center leading-tight">
             5,000<br/>PALABRAS
           </span>
         </div>
         
-        {/* Sale info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-xs text-gray-500">
-            Comprado en {currentSale.country}
+        {/* Sale info - horizontal layout */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex items-center gap-1 flex-wrap">
+            <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">
+              {currentSale.name}
+            </p>
+            <span className="text-[9px] md:text-[10px] text-gray-400">•</span>
+            <p className="text-[9px] md:text-[10px] text-gray-500 truncate">
+              {currentSale.country}
+            </p>
+          </div>
+          <p className="text-[9px] md:text-xs text-gray-600 truncate">
+            Compró {currentSale.product}
           </p>
-          <p className="text-sm font-semibold text-gray-800 truncate">
-            {currentSale.name}
-          </p>
-          <p className="text-xs text-gray-600 truncate">
-            {currentSale.product}
-          </p>
-          <p className="text-[10px] text-gray-400 mt-0.5">
-            {currentSale.timeAgo}
-          </p>
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="text-[8px] md:text-[10px] text-green-600 font-medium">✓ Verificado</span>
+            <span className="text-[8px] md:text-[9px] text-gray-400">{currentSale.timeAgo}</span>
+          </div>
         </div>
-      </div>
-      
-      {/* Verified badge */}
-      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-gray-100">
-        <span className="text-[10px] text-green-600 font-medium">✓ Compra verificada</span>
       </div>
     </div>
   );

@@ -519,7 +519,7 @@ const Product5000 = () => {
       <FAQ
         items={[
           {
-            question: "¿Pregunta 1?",
+            question: "¿Quién es el autor del libro?",
             answer: "Respuesta 1 - Edita este texto con tu contenido.",
           },
           {

@@ -1,10 +1,41 @@
 import { Check, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
+import product5000 from "@/assets/product-5000.png";
+import product8000 from "@/assets/product-8000.png";
 
 const languages = [
-  { name: "Inglés", flag: "🇬🇧", available: true },
-  { name: "Español", flag: "🇪🇸", available: true },
-  { name: "Italiano", flag: "🇮🇹", available: true },
-  { name: "Portugués", flag: "🇧🇷", available: true },
+  { 
+    name: "Inglés", 
+    flag: "🇬🇧", 
+    available: true, 
+    link: "/productos",
+    image: product5000,
+    description: "5,000 y 8,000 palabras"
+  },
+  { 
+    name: "Español", 
+    flag: "🇪🇸", 
+    available: true, 
+    link: "/productos",
+    image: product8000,
+    description: "Aprende español fácil"
+  },
+  { 
+    name: "Italiano", 
+    flag: "🇮🇹", 
+    available: true, 
+    link: "/productos",
+    image: product5000,
+    description: "Italiano sin estrés"
+  },
+  { 
+    name: "Portugués", 
+    flag: "🇧🇷", 
+    available: true, 
+    link: "/productos",
+    image: product8000,
+    description: "Portugués brasileño"
+  },
 ];
 
 const comingSoon = [
@@ -29,21 +60,38 @@ export const Languages = () => {
         </div>
 
         {/* Available Languages */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto mb-10">
           {languages.map((lang) => (
-            <div
+            <Link
               key={lang.name}
-              className="group relative bg-card rounded-2xl p-6 border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-1 text-center"
+              to={lang.link}
+              className="group relative bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-2"
             >
+              {/* Product Image */}
+              <div className="aspect-square bg-gradient-to-br from-primary/5 to-accent/5 p-4 flex items-center justify-center">
+                <img 
+                  src={lang.image} 
+                  alt={`Curso de ${lang.name}`}
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              
+              {/* Info */}
+              <div className="p-4 text-center border-t border-border/50">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <span className="text-2xl">{lang.flag}</span>
+                  <h3 className="text-lg font-semibold text-foreground">{lang.name}</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">{lang.description}</p>
+              </div>
+
+              {/* Available Badge */}
               <div className="absolute top-3 right-3">
-                <div className="w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
                   <Check className="w-4 h-4 text-green-500" />
                 </div>
               </div>
-              <span className="text-5xl mb-4 block">{lang.flag}</span>
-              <h3 className="text-lg font-semibold text-foreground">{lang.name}</h3>
-              <span className="text-sm text-green-600 font-medium">Disponible</span>
-            </div>
+            </Link>
           ))}
         </div>
 

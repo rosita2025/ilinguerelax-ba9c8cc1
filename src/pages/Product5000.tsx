@@ -226,7 +226,7 @@ const Product5000 = () => {
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
                 <Gift className="w-4 h-4" />
-                <span>¡4 BONUS GRATUITAS INCLUIDAS!</span>
+                <span>Incluye 4 Bonus</span>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">

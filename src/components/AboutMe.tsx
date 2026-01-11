@@ -27,7 +27,7 @@ export const AboutMe = () => {
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-3">Nuestra Misión</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Hacer que el aprendizaje del inglés sea accesible, práctico y libre de estrés para todos los hispanohablantes, sin importar su nivel inicial.
+                Ayudar a las personas a aprender idiomas de forma relajada, práctica y accesible, sin métodos complicados.
               </p>
             </div>
 

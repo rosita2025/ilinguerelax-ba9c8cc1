@@ -71,10 +71,10 @@ export const Languages = () => {
             Nuestros Productos
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Elige tu curso de <span className="text-gradient">Inglés</span>
+            Elige tu libro digital de <span className="text-gradient">Inglés</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Cursos diseñados con el método iLingue Relax para aprender sin estrés
+            Libros digitales diseñados con el método iLingue Relax para aprender sin estrés
           </p>
         </div>
 

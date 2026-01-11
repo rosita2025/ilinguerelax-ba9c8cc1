@@ -2,20 +2,20 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, BookOpen, Headphones } from "lucide-react";
+import { ArrowRight, Star, BookOpen } from "lucide-react";
 
 const products = [
   {
     id: "8000-palabras",
     title: "Inglés Relax - 8,000 Palabras",
-    subtitle: "El curso completo",
-    description: "Domina 8,000 palabras en inglés con pronunciación perfecta para hispanohablantes",
-    price: 47,
+    subtitle: "Libro Digital Completo",
+    description: "Domina 8,000 palabras en inglés con pronunciación en español para hispanohablantes",
+    price: 27,
     originalPrice: 197,
     rating: 4.9,
     reviews: 800,
     badge: "MÁS VENDIDO",
-    features: ["8,000 palabras", "Audio nativo", "Fonética UK/USA"],
+    features: ["8,000 palabras", "Pronunciación español", "Fonética UK/USA"],
   },
   {
     id: "5000-palabras",
@@ -44,7 +44,7 @@ const Products = () => {
               Nuestros Productos
             </h1>
             <p className="text-lg text-primary-foreground/90">
-              Elige el curso perfecto para tu nivel y comienza a aprender inglés sin estrés
+              Elige el libro digital perfecto para tu nivel y comienza a aprender inglés sin estrés
             </p>
           </div>
         </div>
@@ -70,7 +70,6 @@ const Products = () => {
                 <div className="relative h-48 gradient-hero flex items-center justify-center">
                   <div className="flex items-center gap-4">
                     <BookOpen className="w-16 h-16 text-primary-foreground/80" />
-                    <Headphones className="w-12 h-12 text-primary-foreground/60" />
                   </div>
                 </div>
 

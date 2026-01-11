@@ -60,6 +60,14 @@ export const Navbar = () => {
             </button>
           </div>
 
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link to="/productos">
+              <Button variant="hero" size="default">
+                Comenzar Ahora
+              </Button>
+            </Link>
+          </div>
 
           {/* Mobile Hamburger Button */}
           <button
@@ -101,6 +109,13 @@ export const Navbar = () => {
               >
                 Contacto
               </button>
+              <div className="pt-2 border-t border-border mt-2">
+                <Link to="/productos" onClick={handleLinkClick}>
+                  <Button variant="hero" size="default" className="w-full">
+                    Comenzar Ahora
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         )}

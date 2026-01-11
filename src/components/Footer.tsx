@@ -1,14 +1,15 @@
+import logoIlingueRelax from "@/assets/logo-ilingue-relax.png";
+
 export const Footer = () => {
   return <footer className="py-12 bg-foreground">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">i</span>
-            </div>
-            <span className="text-primary-foreground font-semibold text-lg">
-              iLingue Relax
-            </span>
+            <img 
+              src={logoIlingueRelax} 
+              alt="iLingue Relax" 
+              className="h-10 w-auto"
+            />
           </div>
 
           <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/70">

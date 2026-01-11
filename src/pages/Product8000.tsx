@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import SalesNotification from "@/components/SalesNotification";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -282,6 +283,12 @@ const Product8000 = () => {
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />
+
+      {/* Sales Notification Popup */}
+      <SalesNotification 
+        productName="8,000 Palabras en Inglés" 
+        productLabel="8,000" 
+      />
     </main>
   );
 };

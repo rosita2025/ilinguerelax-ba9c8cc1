@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Star,
   Check,
@@ -17,6 +23,10 @@ import {
   Download,
   RefreshCw,
   Eye,
+  ZoomIn,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 
 // Preview images
@@ -90,6 +100,22 @@ const chapters = [
 ];
 
 const Product5000 = () => {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % previewImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + previewImages.length) % previewImages.length);
+  };
+
   const handleBuy = () => {
     window.open(
       "https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true",
@@ -99,6 +125,60 @@ const Product5000 = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      {/* Lightbox Dialog */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-4xl w-full p-0 bg-black/95 border-none">
+          <DialogTitle className="sr-only">
+            {previewImages[currentImageIndex]?.title}
+          </DialogTitle>
+          <div className="relative flex items-center justify-center min-h-[80vh]">
+            {/* Close button */}
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Previous button */}
+            <button
+              onClick={prevImage}
+              className="absolute left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronLeft className="w-8 h-8 text-white" />
+            </button>
+
+            {/* Image */}
+            <div className="flex flex-col items-center px-16">
+              <img
+                src={previewImages[currentImageIndex]?.src}
+                alt={previewImages[currentImageIndex]?.title}
+                className="max-h-[70vh] w-auto object-contain rounded-lg"
+              />
+              <div className="mt-4 text-center">
+                <h3 className="text-xl font-bold text-white">
+                  {previewImages[currentImageIndex]?.title}
+                </h3>
+                <p className="text-white/70 mt-1">
+                  {previewImages[currentImageIndex]?.subtitle}
+                </p>
+                <p className="text-white/50 text-sm mt-2">
+                  {currentImageIndex + 1} / {previewImages.length}
+                </p>
+              </div>
+            </div>
+
+            {/* Next button */}
+            <button
+              onClick={nextImage}
+              className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronRight className="w-8 h-8 text-white" />
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Navbar />
 
       {/* Hero Section */}
@@ -237,7 +317,8 @@ const Product5000 = () => {
             {previewImages.map((image, index) => (
               <div
                 key={index}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1"
+                onClick={() => openLightbox(index)}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1 cursor-pointer group"
               >
                 <div className="p-3 text-center bg-primary/5">
                   <h3 className="font-semibold text-foreground text-sm md:text-base">{image.title}</h3>
@@ -246,8 +327,14 @@ const Product5000 = () => {
                   <img
                     src={image.src}
                     alt={image.title}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                   />
+                  {/* Zoom overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
+                      <ZoomIn className="w-6 h-6 text-foreground" />
+                    </div>
+                  </div>
                 </div>
                 <div className="p-3 text-center bg-secondary/50">
                   <p className="text-xs md:text-sm text-muted-foreground">{image.subtitle}</p>

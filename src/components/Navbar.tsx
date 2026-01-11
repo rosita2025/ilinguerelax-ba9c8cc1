@@ -46,18 +46,18 @@ export const Navbar = () => {
             >
               Productos
             </Link>
-            <button
-              onClick={() => scrollToSection("sobre-mi")}
+            <Link
+              to="/sobre-nosotros"
               className="text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Sobre Mí
-            </button>
-            <button
-              onClick={() => scrollToSection("contacto")}
+              Sobre Nosotros
+            </Link>
+            <Link
+              to="/contacto"
               className="text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Contacto
-            </button>
+            </Link>
           </div>
 
           {/* Desktop CTA */}
@@ -97,18 +97,20 @@ export const Navbar = () => {
               >
                 Productos
               </Link>
-              <button
-                onClick={() => scrollToSection("sobre-mi")}
-                className="px-4 py-3 text-left text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              <Link
+                to="/sobre-nosotros"
+                onClick={handleLinkClick}
+                className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                Sobre Mí
-              </button>
-              <button
-                onClick={() => scrollToSection("contacto")}
-                className="px-4 py-3 text-left text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+                Sobre Nosotros
+              </Link>
+              <Link
+                to="/contacto"
+                onClick={handleLinkClick}
+                className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
                 Contacto
-              </button>
+              </Link>
               <div className="pt-2 border-t border-border mt-2">
                 <Link to="/productos" onClick={handleLinkClick}>
                   <Button variant="hero" size="default" className="w-full">

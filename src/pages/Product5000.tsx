@@ -52,11 +52,11 @@ import logoShopify from "@/assets/logo-shopify.png";
 import logoKindle from "@/assets/logo-kindle.png";
 
 const partnerLogos = [
-  { src: logoAmazon, alt: "Amazon", height: "h-8 md:h-10" },
-  { src: logoEtsy, alt: "Etsy", height: "h-8 md:h-10" },
-  { src: logoShopify, alt: "Shopify", height: "h-8 md:h-10" },
-  { src: logoHotmart, alt: "Hotmart", height: "h-6 md:h-8" },
-  { src: logoKindle, alt: "Amazon Kindle", height: "h-6 md:h-8" },
+  { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
+  { src: logoEtsy, alt: "Etsy", height: "h-10 md:h-14" },
+  { src: logoShopify, alt: "Shopify", height: "h-10 md:h-14" },
+  { src: logoHotmart, alt: "Hotmart", height: "h-8 md:h-12" },
+  { src: logoKindle, alt: "Amazon Kindle", height: "h-8 md:h-12" },
 ];
 
 const previewImages = [
@@ -337,16 +337,16 @@ const Product5000 = () => {
         </div>
 
         {/* Bottom - Logo Ticker */}
-        <div className="overflow-hidden bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400 py-6 mt-6 rounded-xl">
+        <div className="overflow-hidden bg-gray-900 py-8 md:py-10 mt-6 rounded-2xl">
           <div className="flex animate-ticker" style={{ width: 'max-content' }}>
             {[...Array(4)].map((_, setIndex) => (
-              <div key={setIndex} className="flex items-center shrink-0 gap-16 md:gap-24 px-8 md:px-12">
+              <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
                 {partnerLogos.map((logo, index) => (
                   <img
                     key={`${setIndex}-${index}`}
                     src={logo.src}
                     alt={logo.alt}
-                    className={`${logo.height} w-auto object-contain shrink-0`}
+                    className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-90`}
                   />
                 ))}
               </div>

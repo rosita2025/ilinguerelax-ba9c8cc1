@@ -4,11 +4,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, LucideIcon } from "lucide-react";
 
 interface FAQItem {
   question: string;
   answer: string;
+  icon?: LucideIcon;
 }
 
 interface FAQProps {
@@ -38,20 +39,30 @@ export const FAQ = ({
           </div>
 
           <Accordion type="single" collapsible className="w-full space-y-4">
-            {items.map((item, index) => (
-              <AccordionItem
-                key={index}
-                value={`item-${index}`}
-                className="bg-card border border-border rounded-2xl px-6 shadow-card"
-              >
-                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+            {items.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="bg-card border border-border rounded-2xl px-6 shadow-card"
+                >
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5">
+                    <span className="flex items-center gap-3">
+                      {Icon && (
+                        <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-primary" />
+                        </span>
+                      )}
+                      {item.question}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
           </Accordion>
         </div>
       </div>

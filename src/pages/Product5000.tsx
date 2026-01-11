@@ -43,6 +43,7 @@ import previewVocab from "@/assets/preview-vocab.png";
 import previewArticles from "@/assets/preview-articles.png";
 import previewIndex from "@/assets/preview-index.png";
 import previewGrammar from "@/assets/preview-grammar.png";
+import product5000Image from "@/assets/product-5000.png";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -212,39 +213,12 @@ const Product5000 = () => {
             {/* Product Image */}
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
-              <div className="relative bg-gradient-to-br from-amber-400 to-amber-500 rounded-3xl p-8 shadow-hero">
-                <div className="text-center text-foreground">
-                  <h2 className="text-4xl md:text-5xl font-bold mb-2">
-                    5,000 PALABRAS
-                  </h2>
-                  <p className="text-xl mb-4">MAS UTILIZADAS EN INGLES</p>
-                  <div className="bg-card/90 rounded-2xl p-6 mb-4">
-                    <p className="font-medium mb-2">
-                      con pronunciación en español y fonética UK-USA
-                    </p>
-                    <div className="grid grid-cols-4 gap-2 text-sm">
-                      <div className="bg-secondary rounded p-2">
-                        <div className="font-bold">Español</div>
-                        <div className="text-xs text-muted-foreground">Casa</div>
-                      </div>
-                      <div className="bg-secondary rounded p-2">
-                        <div className="font-bold">Inglés</div>
-                        <div className="text-xs text-muted-foreground">House</div>
-                      </div>
-                      <div className="bg-secondary rounded p-2">
-                        <div className="font-bold">Pronun.</div>
-                        <div className="text-xs text-muted-foreground">jáus</div>
-                      </div>
-                      <div className="bg-secondary rounded p-2">
-                        <div className="font-bold">Fonética</div>
-                        <div className="text-xs text-muted-foreground">/haʊs/</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold">
-                    BÁSICO - INTERMEDIO
-                  </div>
-                </div>
+              <div className="relative">
+                <img
+                  src={product5000Image}
+                  alt="Inglés Relax - 5,000 Palabras"
+                  className="w-full h-auto rounded-2xl shadow-hero"
+                />
               </div>
             </div>
 

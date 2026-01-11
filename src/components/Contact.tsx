@@ -145,16 +145,20 @@ export const Contact = () => {
                 <h3 className="text-lg font-semibold text-foreground mb-4">Síguenos</h3>
                 <div className="flex gap-4">
                   <a 
-                    href="#" 
+                    href="https://www.instagram.com/ilinguerelax/" 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center transition-colors"
-                    aria-label="Instagram"
+                    aria-label="Instagram @ilinguerelax"
                   >
                     <Instagram className="w-5 h-5 text-foreground" />
                   </a>
                   <a 
-                    href="#" 
+                    href="https://web.facebook.com/ilinguerelax/" 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center transition-colors"
-                    aria-label="Facebook"
+                    aria-label="Facebook iLingue Relax"
                   >
                     <Facebook className="w-5 h-5 text-foreground" />
                   </a>

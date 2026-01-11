@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { Testimonials } from "@/components/Testimonials";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -294,6 +295,9 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <Testimonials variant="light" />
 
       {/* Final CTA */}
       <section className="py-20 md:py-28">

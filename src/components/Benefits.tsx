@@ -1,4 +1,4 @@
-import { Headphones, BookOpen, Sparkles, Heart, Globe, Coffee } from "lucide-react";
+import { BookOpen, Sparkles, Heart, Globe, Coffee } from "lucide-react";
 
 const benefits = [
   {

@@ -1,11 +1,11 @@
-import { Headphones, RefreshCw, Award } from "lucide-react";
+import { BookOpen, RefreshCw, Award } from "lucide-react";
 
 const steps = [
   {
     number: "01",
-    icon: Headphones,
-    title: "Escucha y Relájate",
-    description: "Escucha contenido diseñado para que aprendas de forma natural, sin prisa ni presión",
+    icon: BookOpen,
+    title: "Lee y Relájate",
+    description: "Estudia contenido diseñado para que aprendas de forma natural, sin prisa ni presión",
   },
   {
     number: "02",

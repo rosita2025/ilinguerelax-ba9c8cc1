@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const features = [
   "8,000 palabras esenciales del inglés",
-  "Pronunciación con audio nativo",
+  "Pronunciación en español incluida",
   "Diseñado para hispanohablantes",
   "Sin necesidad de diccionarios",
   "Metodología paso a paso",
@@ -19,13 +19,13 @@ export const Pricing = () => {
       <div className="container px-4 md:px-6">
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            Nuestros Cursos
+            Nuestros Libros Digitales
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Elige tu <span className="text-gradient">camino</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Cursos diseñados para aprender sin estrés
+            Libros digitales diseñados para aprender sin estrés
           </p>
         </div>
 

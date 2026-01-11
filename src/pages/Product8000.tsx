@@ -26,6 +26,9 @@ import {
   CreditCard,
 } from "lucide-react";
 
+// Product image
+import product8000Image from "@/assets/product-8000.png";
+
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
 import logoEtsy from "@/assets/logo-etsy.png";
@@ -91,31 +94,12 @@ const Product8000 = () => {
             {/* Product Image */}
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
-              <div className="relative gradient-hero rounded-3xl p-8 shadow-hero">
-                <div className="text-center text-primary-foreground">
-                  <h2 className="text-4xl md:text-5xl font-bold mb-2">
-                    8,000 PALABRAS
-                  </h2>
-                  <p className="text-xl mb-4">EL CURSO COMPLETO</p>
-                  <div className="bg-card/90 rounded-2xl p-6 mb-4">
-                    <p className="font-medium text-foreground mb-2">
-                      Con audio nativo y pronunciación para hispanohablantes
-                    </p>
-                    <div className="flex justify-center gap-4 text-foreground">
-                      <div className="flex items-center gap-2">
-                        <Headphones className="w-5 h-5 text-primary" />
-                        <span className="text-sm">Audio HD</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <BookOpen className="w-5 h-5 text-primary" />
-                        <span className="text-sm">PDF</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="inline-block bg-accent text-accent-foreground px-4 py-2 rounded-xl font-bold">
-                    MÁS VENDIDO
-                  </div>
-                </div>
+              <div className="relative">
+                <img
+                  src={product8000Image}
+                  alt="Inglés Relax - 8,000 Palabras"
+                  className="w-full h-auto rounded-2xl shadow-hero"
+                />
               </div>
             </div>
 

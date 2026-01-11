@@ -1,6 +1,8 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { CountdownTimer } from "@/components/CountdownTimer";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -163,6 +165,9 @@ const Product8000 = () => {
         </div>
       </section>
 
+      {/* Countdown Timer */}
+      <CountdownTimer hoursFromNow={24} />
+
       {/* Benefits */}
       <section className="py-20 md:py-28 bg-secondary/30">
         <div className="container px-4 md:px-6">
@@ -265,6 +270,18 @@ const Product8000 = () => {
       </section>
 
       <Footer />
+
+      {/* Sticky Buy Bar */}
+      <StickyBuyBar
+        price="$47"
+        originalPrice="$197"
+        rating={4.9}
+        reviewCount={10000}
+        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+      />
+
+      {/* Spacer for sticky bar */}
+      <div className="h-20 md:h-16" />
     </main>
   );
 };

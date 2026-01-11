@@ -1,5 +1,6 @@
-import { Check, Clock, Star, Sparkles } from "lucide-react";
+import { Clock, Star, Sparkles, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import product5000 from "@/assets/product-5000.png";
 import product8000 from "@/assets/product-8000.png";
 
@@ -80,9 +81,8 @@ export const Languages = () => {
         {/* Products */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
           {products.map((product) => (
-            <Link
+            <div
               key={product.id}
-              to={product.link}
               className="group relative bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-2"
             >
               {/* Discount Badge */}
@@ -100,14 +100,16 @@ export const Languages = () => {
                 </div>
               </div>
 
-              {/* Product Image */}
-              <div className="aspect-[4/3] bg-gradient-to-br from-primary/5 to-accent/5 p-6 flex items-center justify-center">
-                <img 
-                  src={product.image} 
-                  alt={product.title}
-                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
+              {/* Product Image - Clickable */}
+              <Link to={product.link}>
+                <div className="aspect-[4/3] bg-gradient-to-br from-primary/5 to-accent/5 p-6 flex items-center justify-center cursor-pointer">
+                  <img 
+                    src={product.image} 
+                    alt={product.title}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              </Link>
               
               {/* Info */}
               <div className="p-5 border-t border-border/50">
@@ -118,7 +120,9 @@ export const Languages = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-foreground mb-1">{product.title}</h3>
+                <Link to={product.link}>
+                  <h3 className="text-xl font-bold text-foreground mb-1 hover:text-primary transition-colors">{product.title}</h3>
+                </Link>
                 <p className="text-sm text-muted-foreground mb-3">{product.description}</p>
 
                 {/* Reviews */}
@@ -130,13 +134,23 @@ export const Languages = () => {
                   <span className="text-sm text-muted-foreground">({product.reviews.toLocaleString()} reseñas)</span>
                 </div>
 
-                {/* Pricing */}
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-bold text-primary">${product.price}</span>
-                  <span className="text-lg text-muted-foreground line-through">${product.originalPrice}</span>
+                {/* Pricing & Buy Button */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold text-primary">${product.price}</span>
+                    <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => window.open(product.link, '_self')}
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    Comprar
+                  </Button>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 

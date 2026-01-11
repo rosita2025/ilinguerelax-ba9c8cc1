@@ -15,7 +15,7 @@ export const AboutMe = () => {
               Sobre <span className="text-gradient">iLingue Relax</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Creamos recursos educativos diseñados especialmente para hispanohablantes que quieren aprender inglés de forma natural y sin estrés.
+              iLingue Relax es una marca educativa enfocada en el aprendizaje de idiomas sin estrés, pensada para personas que desean aprender de forma simple, clara y a su propio ritmo. Creemos que aprender un idioma no debe ser difícil ni frustrante. Por eso, iLingue Relax ofrece materiales prácticos, organizados y accesibles, diseñados especialmente para autodidactas y principiantes.
             </p>
           </div>
 

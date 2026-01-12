@@ -7,7 +7,6 @@ import { Pricing } from "@/components/Pricing";
 import { OnlineStore } from "@/components/OnlineStore";
 import { AboutMe } from "@/components/AboutMe";
 import { Contact } from "@/components/Contact";
-import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 
 // Partner logos
@@ -58,7 +57,6 @@ const Index = () => {
       <OnlineStore />
       <AboutMe />
       <Contact />
-      <CTA />
       <Footer />
     </main>
   );

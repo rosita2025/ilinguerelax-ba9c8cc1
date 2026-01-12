@@ -5,6 +5,8 @@ import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { LiveViewers } from "@/components/LiveViewers";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
@@ -124,6 +126,11 @@ const ProductSpanish5000 = () => {
 
             {/* Product Info */}
             <div>
+              {/* Live Viewers */}
+              <div className="mb-4">
+                <LiveViewers minViewers={8} maxViewers={22} lang="en" />
+              </div>
+
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium mb-4">
                 <Globe className="w-4 h-4" />
                 <span>LEARN SPANISH - For English Speakers</span>
@@ -199,6 +206,7 @@ const ProductSpanish5000 = () => {
         currentPrice="$29.99 USD"
         originalPrice="$40 USD"
         storageKey="countdown_spanish_book"
+        lang="en"
       />
 
       {/* Benefits */}
@@ -381,6 +389,14 @@ const ProductSpanish5000 = () => {
         productName="Spanish 5,000 Words" 
         productLabel="5,000" 
         variant="international"
+      />
+
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup 
+        onBuyClick={handleBuyNow}
+        discount="15%"
+        lang="en"
+        storageKey="exit_intent_spanish"
       />
     </main>
   );

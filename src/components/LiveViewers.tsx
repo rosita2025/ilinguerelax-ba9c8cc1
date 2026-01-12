@@ -4,9 +4,10 @@ import { Eye } from "lucide-react";
 interface LiveViewersProps {
   minViewers?: number;
   maxViewers?: number;
+  lang?: "es" | "en";
 }
 
-export const LiveViewers = ({ minViewers = 12, maxViewers = 28 }: LiveViewersProps) => {
+export const LiveViewers = ({ minViewers = 12, maxViewers = 28, lang = "es" }: LiveViewersProps) => {
   const [viewers, setViewers] = useState(0);
 
   useEffect(() => {
@@ -26,6 +27,10 @@ export const LiveViewers = ({ minViewers = 12, maxViewers = 28 }: LiveViewersPro
     return () => clearInterval(interval);
   }, [minViewers, maxViewers]);
 
+  const text = lang === "en" 
+    ? `${viewers} people viewing this now`
+    : `${viewers} personas viendo esto ahora`;
+
   return (
     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
       <div className="relative">
@@ -33,7 +38,7 @@ export const LiveViewers = ({ minViewers = 12, maxViewers = 28 }: LiveViewersPro
         <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
       </div>
       <span className="text-sm font-medium text-green-700">
-        {viewers} personas viendo esto ahora
+        {text}
       </span>
     </div>
   );

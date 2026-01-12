@@ -275,7 +275,7 @@ const Product5000 = () => {
               <div className="flex items-baseline gap-3 mb-6">
                 <span className="text-5xl font-bold text-foreground">$17</span>
                 <span className="text-2xl text-muted-foreground line-through">
-                  $100
+                  $54
                 </span>
                 <span className="px-3 py-1 rounded-full gradient-accent text-accent-foreground text-sm font-bold">
                   AHORRA 86%
@@ -629,7 +629,7 @@ const Product5000 = () => {
       {/* Sticky Buy Bar */}
       <StickyBuyBar
         price="$17"
-        originalPrice="$100"
+        originalPrice="$54"
         rating={4.65}
         reviewCount={800}
         buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true"

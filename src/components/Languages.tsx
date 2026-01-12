@@ -17,7 +17,7 @@ const products = [
     rating: 4.8,
     reviews: 1247,
     price: 17.00,
-    originalPrice: 29.99,
+    originalPrice: 54.00,
     discount: 67,
     badge: "Más Vendido"
   },
@@ -33,7 +33,7 @@ const products = [
     rating: 4.9,
     reviews: 892,
     price: 24.00,
-    originalPrice: 49.99,
+    originalPrice: 76.00,
     discount: 70,
     badge: "Premium"
   },

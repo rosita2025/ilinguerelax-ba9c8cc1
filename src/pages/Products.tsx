@@ -10,8 +10,8 @@ const Products = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Productos - Libros Digitales de Inglés"
-        description="Explora nuestra colección de libros digitales para aprender inglés. 5,000 y 8,000 palabras con pronunciación para hispanohablantes. Descarga inmediata."
+        title="Productos - Libros Digitales de Idiomas"
+        description="Explora nuestra colección de libros digitales para aprender idiomas. Inglés, Español y más con pronunciación. Descarga inmediata."
         canonicalUrl="https://ilinguerelax.com/productos"
       />
       <Navbar />

@@ -13,6 +13,7 @@ interface StickyBuyBarProps {
   disabled?: boolean;
   showReviews?: boolean;
   isLoading?: boolean;
+  lang?: "es" | "en";
 }
 
 export const StickyBuyBar = ({
@@ -27,6 +28,7 @@ export const StickyBuyBar = ({
   disabled = false,
   showReviews = true,
   isLoading = false,
+  lang = "es",
 }: StickyBuyBarProps) => {
   const handleBuy = () => {
     if (!disabled && !isLoading) {
@@ -121,13 +123,13 @@ export const StickyBuyBar = ({
               <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
               </div>
-              <span className="text-muted-foreground">Compra Verificada</span>
+              <span className="text-muted-foreground">{lang === "en" ? "Verified Purchase" : "Compra Verificada"}</span>
             </div>
 
             {/* Secure Badge */}
             <div className="flex items-center gap-1.5 text-sm">
               <Shield className="w-4 h-4 text-primary" />
-              <span className="text-muted-foreground">Pago Seguro</span>
+              <span className="text-muted-foreground">{lang === "en" ? "Secure Payment" : "Pago Seguro"}</span>
             </div>
 
             {/* Reviews */}
@@ -135,7 +137,7 @@ export const StickyBuyBar = ({
               <div className="flex items-center gap-1.5 text-sm">
                 {renderStars()}
                 <span className="text-foreground font-medium">{rating}</span>
-                <span className="text-muted-foreground">({reviewCount} reseñas)</span>
+                <span className="text-muted-foreground">({reviewCount} {lang === "en" ? "reviews" : "reseñas"})</span>
               </div>
             )}
           </div>
@@ -153,7 +155,7 @@ export const StickyBuyBar = ({
               </div>
               {!disabled && (
                 <p className="text-xs text-muted-foreground">
-                  Puedes cambiar la moneda de tu país en el checkout
+                  {lang === "en" ? "You can change your country's currency at checkout" : "Puedes cambiar la moneda de tu país en el checkout"}
                 </p>
               )}
             </div>

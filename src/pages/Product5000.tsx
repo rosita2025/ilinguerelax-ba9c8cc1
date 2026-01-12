@@ -387,38 +387,74 @@ const Product5000 = () => {
               </div>
             </div>
 
-            {/* Benefits Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
-              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-primary-foreground" />
+            {/* Benefits Grid with Preview Images */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={previewVocab} 
+                    alt="Vocabulario Temático" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
-                <h4 className="text-2xl font-bold text-foreground mb-1">5,000+</h4>
-                <p className="text-sm text-muted-foreground">Palabras con pronunciación</p>
+                <div className="p-4 text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">Vocabulario Temático</h4>
+                  <p className="text-sm text-muted-foreground">Palabras organizadas por categorías</p>
+                </div>
               </div>
               
-              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
-                  <Globe className="w-6 h-6 text-primary-foreground" />
+              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={previewArticles} 
+                    alt="Artículos A/AN/THE" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
-                <h4 className="text-xl font-bold text-foreground mb-1">UK & USA</h4>
-                <p className="text-sm text-muted-foreground">Dos acentos incluidos</p>
+                <div className="p-4 text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">Artículos A/AN/THE</h4>
+                  <p className="text-sm text-muted-foreground">Reglas claras con ejemplos prácticos</p>
+                </div>
               </div>
               
-              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
-                  <Download className="w-6 h-6 text-primary-foreground" />
+              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={previewIndex} 
+                    alt="Índice Completo" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
-                <h4 className="text-2xl font-bold text-foreground mb-1">Fonética</h4>
-                <p className="text-sm text-muted-foreground">Pronunciación hispanohablante</p>
+                <div className="p-4 text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
+                    <Download className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">Índice Completo</h4>
+                  <p className="text-sm text-muted-foreground">52 capítulos temáticos organizados</p>
+                </div>
               </div>
               
-              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-primary-foreground" />
+              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={previewGrammar} 
+                    alt="Estructura Gramatical" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
-                <h4 className="text-2xl font-bold text-foreground mb-1">Acceso</h4>
-                <p className="text-sm text-muted-foreground">Descarga inmediata</p>
+                <div className="p-4 text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">Estructura Gramatical</h4>
+                  <p className="text-sm text-muted-foreground">Fórmulas para construir frases correctas</p>
+                </div>
               </div>
             </div>
 

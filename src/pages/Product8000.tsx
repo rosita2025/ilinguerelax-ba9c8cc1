@@ -87,7 +87,7 @@ const Product8000 = () => {
       <SEO
         title="8,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA"
         description="Domina 8,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Método sin estrés, sin diccionarios, paso a paso. Fonética UK/USA incluida."
-        canonicalUrl="https://ilinguerelax.com/productos/8000-palabras"
+        canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         type="product"
         price="27"
         rating="4.9"

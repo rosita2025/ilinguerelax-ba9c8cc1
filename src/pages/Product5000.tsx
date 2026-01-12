@@ -445,7 +445,7 @@ const Product5000 = () => {
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
                   <Globe className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h4 className="text-2xl font-bold text-foreground mb-1">UK & USA</h4>
+                <h4 className="text-xl font-bold text-foreground mb-1">UK & USA</h4>
                 <p className="text-sm text-muted-foreground">Dos acentos incluidos</p>
               </div>
               

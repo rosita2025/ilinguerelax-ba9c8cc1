@@ -3,7 +3,6 @@ import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
@@ -100,7 +99,7 @@ const Product5000 = () => {
     content_ids: ["product-5000"],
     content_type: "product",
     value: 17,
-    currency: "USD",
+    currency: "USD"
   }), []);
   useMetaPixelViewContent(pixelParams);
   const openLightbox = (index: number) => {
@@ -296,22 +295,9 @@ const Product5000 = () => {
 
           {/* Store Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-8">
-            <StoreSubscriptionCard
-              logo={logoAmazon}
-              storeName="Amazon"
-              type="coming-soon"
-            />
-            <StoreSubscriptionCard
-              logo={logoEbay}
-              storeName="eBay"
-              type="coming-soon"
-            />
-            <StoreSubscriptionCard
-              logo={logoShopify}
-              storeName="Shopify"
-              type="available"
-              buyLink="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
-            />
+            <StoreSubscriptionCard logo={logoAmazon} storeName="Amazon" type="coming-soon" />
+            <StoreSubscriptionCard logo={logoEbay} storeName="eBay" type="coming-soon" />
+            <StoreSubscriptionCard logo={logoShopify} storeName="Shopify" type="available" buyLink="https://ilinguerelax.com/products/8-000-palabras-libro-fisico" />
           </div>
         </div>
 
@@ -377,16 +363,7 @@ const Product5000 = () => {
       </section>
 
       {/* Demo Banner */}
-      <section className="py-8 gradient-hero">
-        <div className="container px-4 md:px-6 text-center">
-          <p className="text-primary-foreground/80 text-lg mb-2">
-            VISTA PREVIA DISPONIBLE
-          </p>
-          <h2 className="text-2xl md:text-3xl font-bold text-primary-foreground">
-            ¡APROVECHA Y RECIBE 4 BONUS GRATUITAS!
-          </h2>
-        </div>
-      </section>
+      
 
       {/* What's Included */}
       <section className="py-20 md:py-28">
@@ -531,15 +508,7 @@ const Product5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar 
-        price="$17" 
-        originalPrice="$54" 
-        productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)"
-        rating={4.8} 
-        reviewCount={800} 
-        showReviews={true}
-        buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true" 
-      />
+      <StickyBuyBar price="$17" originalPrice="$54" productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)" rating={4.8} reviewCount={800} showReviews={true} buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true" />
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />

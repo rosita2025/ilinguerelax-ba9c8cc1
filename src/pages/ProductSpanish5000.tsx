@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,6 +7,8 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   Check,
   BookOpen,
@@ -20,7 +23,7 @@ import {
   Lightbulb,
   CreditCard,
   Package,
-  Clock,
+  Loader2,
   Globe,
 } from "lucide-react";
 
@@ -66,6 +69,30 @@ const benefits = [
 ];
 
 const ProductSpanish5000 = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleBuyNow = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-spanish-payment");
+      
+      if (error) {
+        console.error("Payment error:", error);
+        toast.error("Error creating payment session. Please try again.");
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -138,13 +165,28 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* CTA */}
-              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-purple-500/50 cursor-not-allowed" disabled>
-                COMING SOON
-                <Clock className="w-5 h-5" />
+              <Button 
+                variant="hero" 
+                size="xl" 
+                className="w-full md:w-auto mb-4"
+                onClick={handleBuyNow}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    BUY NOW
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </Button>
 
               <p className="text-sm text-muted-foreground">
-                🔒 100% secure payment • Shipping June 2026 • PDF version included
+                🔒 100% secure payment • PDF version included
               </p>
             </div>
           </div>
@@ -240,9 +282,24 @@ const ProductSpanish5000 = () => {
               <p className="text-muted-foreground mb-6">
                 One-time payment • Shipping included* • Digital PDF included
               </p>
-              <Button variant="hero" size="xl" className="w-full bg-purple-500/50 cursor-not-allowed" disabled>
-                COMING SOON
-                <Clock className="w-5 h-5" />
+              <Button 
+                variant="hero" 
+                size="xl" 
+                className="w-full"
+                onClick={handleBuyNow}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    BUY NOW
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </Button>
               <p className="text-xs text-muted-foreground mt-4">
                 *Check shipping costs based on your location
@@ -316,10 +373,11 @@ const ProductSpanish5000 = () => {
         price="$29.99"
         originalPrice="$40"
         productName="SPANISH RELAX v1.0 - 5,000 Spanish Words with English Pronunciation - Physical Book"
-        buyUrl="#"
-        ctaText="COMING SOON"
-        disabled={true}
+        onBuyClick={handleBuyNow}
+        ctaText="BUY NOW"
+        disabled={false}
         showReviews={false}
+        isLoading={isLoading}
       />
 
       {/* Spacer for sticky bar */}

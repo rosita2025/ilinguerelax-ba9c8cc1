@@ -24,7 +24,7 @@ const Products = () => {
               Nuestros Productos
             </h1>
             <p className="text-lg text-primary-foreground/90">
-              Elige el libro digital perfecto para tu nivel y comienza a aprender inglés sin estrés
+              Elige el libro digital perfecto para tu nivel y comienza a aprender idiomas sin estrés
             </p>
           </div>
         </div>

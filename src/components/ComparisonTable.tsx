@@ -31,15 +31,15 @@ export const ComparisonTable = () => {
           <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
             {/* Header */}
             <div className="grid grid-cols-3 bg-muted/50 border-b border-border">
-              <div className="p-4 md:p-6 font-semibold text-foreground">
+              <div className="p-3 md:p-4 font-semibold text-foreground text-xs md:text-sm">
                 Características
               </div>
-              <div className="p-4 md:p-6 text-center border-l border-border">
-                <div className="inline-block px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-bold">
+              <div className="p-3 md:p-4 text-center border-l border-border">
+                <div className="inline-block px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
                   iLingue Relax
                 </div>
               </div>
-              <div className="p-4 md:p-6 text-center border-l border-border font-semibold text-muted-foreground">
+              <div className="p-3 md:p-4 text-center border-l border-border font-semibold text-muted-foreground text-xs md:text-sm">
                 Otros cursos
               </div>
             </div>
@@ -50,28 +50,28 @@ export const ComparisonTable = () => {
                 key={index}
                 className={`grid grid-cols-3 ${index !== comparisonData.length - 1 ? 'border-b border-border' : ''}`}
               >
-                <div className="p-4 md:p-5 text-sm md:text-base text-foreground">
+                <div className="p-3 md:p-4 text-xs md:text-sm text-foreground">
                   {row.feature}
                 </div>
-                <div className="p-4 md:p-5 flex justify-center items-center border-l border-border bg-green-500/5">
+                <div className="p-3 md:p-4 flex justify-center items-center border-l border-border bg-green-500/5">
                   {row.us ? (
-                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
                     </div>
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
-                      <X className="w-4 h-4 text-white" />
+                    <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                      <X className="w-3 h-3 text-white" />
                     </div>
                   )}
                 </div>
-                <div className="p-4 md:p-5 flex justify-center items-center border-l border-border">
+                <div className="p-3 md:p-4 flex justify-center items-center border-l border-border">
                   {row.others ? (
-                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
                     </div>
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center">
-                      <X className="w-4 h-4 text-red-500" />
+                    <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center">
+                      <X className="w-3 h-3 text-red-500" />
                     </div>
                   )}
                 </div>

@@ -290,6 +290,45 @@ const Product5000 = () => {
             </h2>
             <p className="text-muted-foreground mt-2">Junio 2026</p>
           </div>
+
+          {/* Store Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-8">
+            {/* Amazon Card */}
+            <div className="bg-card rounded-2xl border border-border p-6 text-center shadow-card">
+              <img src={logoAmazon} alt="Amazon" className="h-10 mx-auto mb-4 object-contain" />
+              <span className="inline-block px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-xs font-medium mb-3">
+                📦 Próximamente
+              </span>
+              <p className="text-sm text-muted-foreground mb-3">Suscríbete para ser notificado</p>
+              <a href="mailto:ilinguerelax@gmail.com?subject=Notificarme%20Amazon%20Libro%20Físico" className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium">
+                📧 Notificarme
+              </a>
+            </div>
+
+            {/* eBay Card */}
+            <div className="bg-card rounded-2xl border border-border p-6 text-center shadow-card">
+              <img src={logoEtsy} alt="eBay" className="h-10 mx-auto mb-4 object-contain" />
+              <span className="inline-block px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-xs font-medium mb-3">
+                📦 Próximamente
+              </span>
+              <p className="text-sm text-muted-foreground mb-3">Suscríbete para ser notificado</p>
+              <a href="mailto:ilinguerelax@gmail.com?subject=Notificarme%20eBay%20Libro%20Físico" className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium">
+                📧 Notificarme
+              </a>
+            </div>
+
+            {/* Shopify Card */}
+            <div className="bg-card rounded-2xl border border-primary/30 p-6 text-center shadow-card ring-2 ring-primary/20">
+              <img src={logoShopify} alt="Shopify" className="h-10 mx-auto mb-4 object-contain" />
+              <span className="inline-block px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-xs font-medium mb-3">
+                🛒 Compra Anticipada
+              </span>
+              <p className="text-sm text-muted-foreground mb-3">¡Disponible ahora!</p>
+              <a href="https://ilinguerelax.com/products/8-000-palabras-libro-fisico" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                Comprar Ahora <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Bottom - Logo Ticker */}

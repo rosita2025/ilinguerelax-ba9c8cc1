@@ -389,8 +389,9 @@ const ProductSpanish5000 = () => {
 
       {/* Sales Notification Popup */}
       <SalesNotification 
-        productName="Spanish 5,000 Words Book" 
-        productLabel="Physical Book" 
+        productName="Spanish 5,000 Words" 
+        productLabel="5,000" 
+        variant="international"
       />
     </main>
   );

@@ -3,6 +3,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { ProductReviews } from "@/components/ProductReviews";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -262,6 +263,9 @@ const ProductSpanish5000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Customer Reviews */}
+      <ProductReviews productType="spanish" />
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 bg-purple-500">

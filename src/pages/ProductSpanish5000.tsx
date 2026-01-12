@@ -165,9 +165,10 @@ const ProductSpanish5000 = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$29.99</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
+                <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="px-3 py-1 rounded-full bg-purple-500 text-white text-sm font-bold">
-                  LAUNCH PRICE
+                  SAVE 67%
                 </span>
               </div>
 
@@ -219,8 +220,8 @@ const ProductSpanish5000 = () => {
       {/* Countdown Timer */}
       <CountdownTimer 
         hoursFromNow={48} 
-        currentPrice="$29.99 USD"
-        originalPrice="$40 USD"
+        currentPrice="$17 USD"
+        originalPrice="$54 USD"
         storageKey="countdown_spanish_book"
         lang="en"
       />
@@ -303,7 +304,8 @@ const ProductSpanish5000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$29.99</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
+                <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="text-purple-600 font-bold">USD</span>
               </div>
               <p className="text-muted-foreground mb-6">
@@ -384,8 +386,8 @@ const ProductSpanish5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$29.99"
-        originalPrice="$40"
+        price="$17"
+        originalPrice="$54"
         productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)"
         onBuyClick={handleBuyNow}
         ctaText="BUY NOW"

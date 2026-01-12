@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook } from "lucide-react";
-import logoIlingueRelax from "@/assets/logo-ilingue-relax.png";
+import logoIlingueRelaxWhite from "@/assets/logo-ilingue-relax-white.png";
 
 export const Footer = () => {
   return (
@@ -9,9 +9,9 @@ export const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link to="/" className="flex items-center gap-3">
             <img 
-              src={logoIlingueRelax} 
+              src={logoIlingueRelaxWhite} 
               alt="iLingue Relax" 
-              className="h-10 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
 

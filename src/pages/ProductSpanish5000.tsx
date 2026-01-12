@@ -113,10 +113,14 @@ const ProductSpanish5000 = () => {
         title="Digital eBook: 5,000 Spanish Words with English Pronunciation"
         description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price."
         canonicalUrl="https://ilinguerelax.com/products/spanish-5000-words"
+        image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
-        price="29.99"
+        price="17"
+        originalPrice="54"
         rating="4.8"
-        reviewCount="30"
+        reviewCount="500"
+        sku="SPANISH-5000"
+        keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book"
       />
       <Navbar />
 

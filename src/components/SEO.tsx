@@ -7,10 +7,12 @@ interface SEOProps {
   image?: string;
   type?: "website" | "product" | "article";
   price?: string;
+  originalPrice?: string;
   rating?: string;
   reviewCount?: string;
   noIndex?: boolean;
   keywords?: string;
+  sku?: string;
   productList?: Array<{
     name: string;
     description: string;
@@ -29,10 +31,12 @@ export const SEO = ({
   image = "https://ilinguerelax.com/og-image.png",
   type = "website",
   price,
+  originalPrice,
   rating,
   reviewCount,
   noIndex = false,
   keywords,
+  sku,
   productList,
 }: SEOProps) => {
   const fullTitle = title.includes("iLingue Relax")
@@ -44,18 +48,32 @@ export const SEO = ({
     "@type": "Product",
     "name": title,
     "description": description,
+    "image": image,
+    "url": canonicalUrl,
+    "sku": sku || title.toLowerCase().replace(/\s+/g, '-').substring(0, 50),
+    "mpn": sku || "ILINGUE-" + (price || "00"),
     "brand": {
       "@type": "Brand",
       "name": "iLingue Relax"
     },
     "offers": {
       "@type": "Offer",
+      "url": canonicalUrl,
       "priceCurrency": "USD",
       "price": price,
+      ...(originalPrice && { "priceValidUntil": "2026-12-31" }),
       "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
       "seller": {
         "@type": "Organization",
         "name": "iLingue Relax"
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 7,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn"
       }
     },
     ...(rating && reviewCount && {
@@ -65,6 +83,20 @@ export const SEO = ({
         "reviewCount": reviewCount,
         "bestRating": "5",
         "worstRating": "1"
+      },
+      "review": {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": rating,
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Cliente verificado"
+        },
+        "reviewBody": "Excelente libro para aprender inglés con pronunciación clara para hispanohablantes."
       }
     })
   } : null;

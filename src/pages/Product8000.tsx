@@ -101,10 +101,14 @@ const Product8000 = () => {
         title="8,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA"
         description="Domina 8,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Método sin estrés, sin diccionarios, paso a paso. Fonética UK/USA incluida."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
+        image="https://ilinguerelax.com/product-8000.png"
         type="product"
         price="24"
+        originalPrice="76"
         rating="4.9"
-        reviewCount="10000"
+        reviewCount="892"
+        sku="ILINGUE-8000"
+        keywords="aprender inglés, vocabulario inglés 8000 palabras, pronunciación inglés hispanohablantes, libro digital inglés avanzado"
       />
       <Navbar />
 

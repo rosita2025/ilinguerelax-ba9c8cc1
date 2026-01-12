@@ -114,7 +114,7 @@ const Product5000 = () => {
     window.open("https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true", "_blank");
   };
   return <main className="min-h-screen bg-background">
-      <SEO title="5,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA" description="Aprende 5,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Incluye fonética UK/USA, 52 capítulos temáticos y 4 bonus gratis. Descarga inmediata." canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" type="product" price="17" rating="4.8" reviewCount="800" />
+      <SEO title="5,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA" description="Aprende 5,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Incluye fonética UK/USA, 52 capítulos temáticos y 4 bonus gratis. Descarga inmediata." canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" image="https://ilinguerelax.com/product-5000.png" type="product" price="17" originalPrice="54" rating="4.8" reviewCount="800" sku="ILINGUE-5000" keywords="aprender inglés, vocabulario inglés 5000 palabras, pronunciación inglés hispanohablantes, libro digital inglés" />
       {/* Lightbox Dialog */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="max-w-4xl w-full p-0 bg-black/95 border-none">

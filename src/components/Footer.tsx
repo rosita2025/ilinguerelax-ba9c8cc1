@@ -1,18 +1,15 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook } from "lucide-react";
-import logoIlingueRelaxWhite from "@/assets/logo-ilingue-relax-white.png";
 
 export const Footer = () => {
   return (
     <footer className="py-12 bg-foreground">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <Link to="/" className="flex items-center gap-3">
-            <img 
-              src={logoIlingueRelaxWhite} 
-              alt="iLingue Relax" 
-              className="h-12 w-auto"
-            />
+          <Link to="/" className="flex items-center">
+            <span className="text-xl font-bold text-primary-foreground tracking-tight">
+              iLingue <span className="font-light">Relax</span>
+            </span>
           </Link>
 
           <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/70">

@@ -6,6 +6,9 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { LiveViewers } from "@/components/LiveViewers";
+import { ComparisonTable } from "@/components/ComparisonTable";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -242,6 +245,11 @@ const Product5000 = () => {
                   ))}
                 </div>
                 <span className="text-muted-foreground">(800 Reseñas)</span>
+              </div>
+
+              {/* Live Viewers */}
+              <div className="mb-4">
+                <LiveViewers minViewers={15} maxViewers={32} />
               </div>
 
               {/* Urgency Banner */}
@@ -551,6 +559,9 @@ const Product5000 = () => {
         </div>
       </section>
 
+      {/* Comparison Table */}
+      <ComparisonTable />
+
       {/* Testimonials */}
       <Testimonials variant="light" />
 
@@ -654,6 +665,12 @@ const Product5000 = () => {
 
       {/* Sales Notification Popup */}
       <SalesNotification />
+
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup 
+        buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true"
+        discount="15%"
+      />
     </main>
   );
 };

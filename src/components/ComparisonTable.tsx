@@ -7,7 +7,7 @@ const comparisonData = [
   { feature: "Acceso de por vida", us: true, others: true },
   { feature: "Actualizaciones gratuitas", us: true, others: false },
   { feature: "4 Bonus gratuitas incluidas", us: true, others: false },
-  { feature: "Garantía de devolución 30 días", us: true, others: false },
+  { feature: "Garantía de devolución 7 días", us: true, others: false },
   { feature: "Precio accesible", us: true, others: false },
 ];
 

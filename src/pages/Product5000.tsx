@@ -283,7 +283,7 @@ const Product5000 = () => {
                 </div>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
                   <RefreshCw className="w-4 h-4 text-purple-600" />
-                  <span className="text-xs font-medium text-purple-700">Garantía 30 días</span>
+                  <span className="text-xs font-medium text-purple-700">Garantía 7 días</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
                   <Star className="w-4 h-4 text-amber-600" />
@@ -324,7 +324,7 @@ const Product5000 = () => {
                   <RefreshCw className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-green-700">Garantía de Devolución 30 Días</p>
+                  <p className="text-sm font-semibold text-green-700">Garantía de Devolución 7 Días</p>
                   <p className="text-xs text-green-600">Si no estás satisfecho, te devolvemos el 100% de tu dinero</p>
                 </div>
               </div>

@@ -47,6 +47,7 @@ const Index = () => {
                     key={`${setIndex}-${index}`}
                     src={logo.src}
                     alt={logo.alt}
+                    loading="lazy"
                     className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-80`}
                   />
                 ))}

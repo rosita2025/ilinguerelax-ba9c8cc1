@@ -68,7 +68,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send notification to business
     const businessEmail = await resend.emails.send({
       from: "iLingue Relax <onboarding@resend.dev>",
-      to: ["ilinguerelax@gmail.com"],
+      to: ["hola@ilinguerelax.com"],
       subject: `📬 Nueva suscripción para ${storeName}`,
       html: `
         <h2>Nueva suscripción de notificación</h2>

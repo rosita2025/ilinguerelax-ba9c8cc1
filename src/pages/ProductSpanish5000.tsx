@@ -15,17 +15,16 @@ import {
   BookOpen,
   Sparkles,
   ArrowRight,
-  Gift,
-  Truck,
   Brain,
   User,
   FileText,
   GraduationCap,
   Lightbulb,
   CreditCard,
-  Package,
   Loader2,
   Globe,
+  Download,
+  Zap,
 } from "lucide-react";
 
 // Product image
@@ -38,22 +37,22 @@ const features = [
   "No dictionary needed",
   "Stress-free step-by-step method",
   "UK & USA phonetics included",
-  "High-quality softcover book",
-  "Between 250-300 pages",
+  "Instant PDF download",
+  "Study on any device",
 ];
 
 const benefits = [
   {
-    icon: BookOpen,
-    title: "Premium Physical Book",
+    icon: Download,
+    title: "Instant Download",
     description:
-      "High-quality softcover, professional printing. Perfect for studying without screens and taking notes.",
+      "Get immediate access to your PDF right after purchase. Start learning Spanish in minutes!",
   },
   {
-    icon: Package,
-    title: "Delivered to Your Door",
+    icon: Zap,
+    title: "Learn Anywhere",
     description:
-      "Receive your physical book directly at home. Shipping available to multiple countries.",
+      "Study on your phone, tablet, or computer. Your Spanish vocabulary is always with you.",
   },
   {
     icon: Sparkles,
@@ -97,13 +96,13 @@ const ProductSpanish5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Physical Book: 5,000 Spanish Words with English Pronunciation"
-        description="Get the physical book of 5,000 Spanish words with English pronunciation. Premium softcover, home delivery. Special pre-order price."
+        title="Digital eBook: 5,000 Spanish Words with English Pronunciation"
+        description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price."
         canonicalUrl="https://ilinguerelax.com/products/spanish-5000-words"
         type="product"
         price="29.99"
         rating="4.8"
-        reviewCount="500"
+        reviewCount="30"
       />
       <Navbar />
 
@@ -117,7 +116,7 @@ const ProductSpanish5000 = () => {
               <div className="relative">
                 <img
                   src={productSpanish5000Image}
-                  alt="Spanish Relax - 5,000 Words Physical Book"
+                  alt="Spanish Relax - 5,000 Words Digital eBook"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
               </div>
@@ -137,31 +136,31 @@ const ProductSpanish5000 = () => {
               </h1>
 
               <p className="text-lg text-muted-foreground mb-6">
-                The complete stress-free method to learn Spanish, now in premium physical book format. 
-                Perfect for studying without screens.
+                The complete stress-free method to learn Spanish. Digital PDF format - 
+                download instantly and start learning today!
               </p>
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
                 <span className="text-5xl font-bold text-foreground">$29.99</span>
                 <span className="px-3 py-1 rounded-full bg-purple-500 text-white text-sm font-bold">
-                  PRE-ORDER PRICE
+                  LAUNCH PRICE
                 </span>
               </div>
 
               {/* Delivery Info */}
               <div className="flex flex-wrap gap-4 mb-8 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-purple-600" />
-                  <span>Physical softcover book</span>
+                  <Download className="w-4 h-4 text-purple-600" />
+                  <span>Instant PDF download</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-purple-600" />
-                  <span>Home delivery</span>
+                  <Zap className="w-4 h-4 text-purple-600" />
+                  <span>Start learning today</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-purple-600" />
-                  <span>Digital bonus included</span>
+                  <Globe className="w-4 h-4 text-purple-600" />
+                  <span>Works on any device</span>
                 </div>
               </div>
 
@@ -187,7 +186,7 @@ const ProductSpanish5000 = () => {
               </Button>
 
               <p className="text-sm text-muted-foreground">
-                🔒 100% secure payment • PDF version included
+                🔒 100% secure payment • Instant download after purchase
               </p>
             </div>
           </div>
@@ -207,11 +206,11 @@ const ProductSpanish5000 = () => {
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Why Choose the{" "}
-              <span className="text-purple-600">Physical Book</span>?
+              Why Choose{" "}
+              <span className="text-purple-600">Spanish Relax</span>?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              The best learning experience without screens
+              The easiest way to learn Spanish vocabulary
             </p>
           </div>
 
@@ -272,10 +271,10 @@ const ProductSpanish5000 = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Pre-order your physical book now!
+              Get Your Digital Copy Now!
             </h2>
             <p className="text-lg text-white/90 mb-8">
-              Special pre-order price. Shipping scheduled for June 2026.
+              Instant download. Start learning Spanish today!
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
@@ -284,7 +283,7 @@ const ProductSpanish5000 = () => {
                 <span className="text-purple-600 font-bold">USD</span>
               </div>
               <p className="text-muted-foreground mb-6">
-                One-time payment • Shipping included* • Digital PDF included
+                One-time payment • Instant PDF download • Lifetime access
               </p>
               <Button 
                 variant="hero" 
@@ -305,9 +304,6 @@ const ProductSpanish5000 = () => {
                   </>
                 )}
               </Button>
-              <p className="text-xs text-muted-foreground mt-4">
-                *Check shipping costs based on your location
-              </p>
             </div>
 
             <p className="text-sm text-white/70">
@@ -321,29 +317,19 @@ const ProductSpanish5000 = () => {
       <FAQ
         items={[
           {
-            question: "Who is the author of the book?",
+            question: "Who is the author of this eBook?",
             answer: "SPANISH RELAX is a work by iLingue Relax, an educational brand focused on learning Spanish in a simple, practical, and stress-free way.",
             icon: User,
           },
           {
-            question: "When will I receive my physical book?",
-            answer: "The physical book is on pre-order. Shipments are scheduled to begin in June 2026. You will receive email updates about your order status.",
-            icon: Truck,
+            question: "How do I receive the eBook?",
+            answer: "Immediately after your purchase, you'll receive an email with a download link to your PDF. You can start studying right away!",
+            icon: Download,
           },
           {
-            question: "How many pages does the book have?",
-            answer: "The book has between 250 and 300 pages of practical, organized, and easy-to-study content.",
+            question: "What format is the eBook?",
+            answer: "The eBook is in PDF format, which works on any device - phone, tablet, computer, or e-reader.",
             icon: FileText,
-          },
-          {
-            question: "Does it include the digital version?",
-            answer: "Yes. When you purchase the physical book on pre-order, you will immediately receive access to the digital version (PDF) so you can start studying while waiting for your book.",
-            icon: Gift,
-          },
-          {
-            question: "Do you ship internationally?",
-            answer: "Yes, we ship to multiple countries. Shipping costs may vary depending on your location.",
-            icon: Package,
           },
           {
             question: "Is it suitable for self-study?",
@@ -351,23 +337,23 @@ const ProductSpanish5000 = () => {
             icon: GraduationCap,
           },
           {
-            question: "Do I need to know Spanish before using the book?",
+            question: "Do I need to know Spanish before using this?",
             answer: "No. You can start from scratch, with no prior knowledge of Spanish.",
             icon: Lightbulb,
           },
           {
-            question: "Does the book include pronunciation?",
-            answer: "Yes. All words include pronunciation adapted for English speakers.",
+            question: "Does the eBook include pronunciation?",
+            answer: "Yes. All 5,000 words include pronunciation adapted for English speakers with UK and USA phonetics.",
             icon: BookOpen,
           },
           {
             question: "How do I make the payment?",
-            answer: "You can pay securely using an international credit or debit card.",
+            answer: "You can pay securely using an international credit or debit card. We accept Visa, Mastercard, American Express, and more.",
             icon: CreditCard,
           },
         ]}
         title="Frequently Asked Questions"
-        subtitle="We answer your questions about the physical book"
+        subtitle="We answer your questions about the digital eBook"
       />
 
       <Footer />
@@ -376,7 +362,7 @@ const ProductSpanish5000 = () => {
       <StickyBuyBar
         price="$29.99"
         originalPrice="$40"
-        productName="SPANISH RELAX v1.0 - 5,000 Spanish Words with English Pronunciation"
+        productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)"
         onBuyClick={handleBuyNow}
         ctaText="BUY NOW"
         disabled={false}

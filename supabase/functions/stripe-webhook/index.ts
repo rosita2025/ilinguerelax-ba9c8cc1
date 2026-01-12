@@ -81,20 +81,13 @@ serve(async (req) => {
                 </p>
                 
                 <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin-bottom: 24px;">
-                  Your digital PDF is ready for immediate download. Start learning Spanish right away while your physical book is on its way!
+                  Your digital PDF is ready for immediate download. Click the button below to get your eBook!
                 </p>
                 
                 <div style="text-align: center; margin: 32px 0;">
                   <a href="${downloadUrl}" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); color: white; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);">
                     📚 Download Your PDF Now
                   </a>
-                </div>
-                
-                <div style="background: #f9fafb; border-radius: 12px; padding: 24px; margin: 32px 0;">
-                  <h3 style="color: #1f2937; margin: 0 0 16px 0; font-size: 16px;">📦 Physical Book Shipping</h3>
-                  <p style="color: #6b7280; margin: 0; font-size: 14px; line-height: 1.6;">
-                    Your physical book will be shipped to your address soon. You'll receive a separate email with tracking information once it's on its way.
-                  </p>
                 </div>
                 
                 <div style="background: #fef3c7; border-radius: 12px; padding: 24px; margin: 32px 0;">
@@ -130,13 +123,13 @@ serve(async (req) => {
       const notificationEmailResponse = await resend.emails.send({
         from: "iLingue Relax <hola@ilinguerelax.com>",
         to: ["hola@ilinguerelax.com"],
-        subject: `🛒 New Purchase! Spanish Relax - ${customerEmail}`,
+        subject: `🛒 New Purchase! Spanish Relax Digital - ${customerEmail}`,
         html: `
           <!DOCTYPE html>
           <html>
           <body style="font-family: Arial, sans-serif; padding: 20px;">
             <h2 style="color: #8b5cf6;">🎉 New Purchase Alert!</h2>
-            <p><strong>Product:</strong> Spanish Relax v1.0 - 5,000 Words</p>
+            <p><strong>Product:</strong> Spanish Relax - 5,000 Words (Digital PDF)</p>
             <p><strong>Customer Email:</strong> ${customerEmail}</p>
             <p><strong>Customer Name:</strong> ${customerName}</p>
             <p><strong>Amount:</strong> $${(session.amount_total / 100).toFixed(2)} ${session.currency?.toUpperCase()}</p>

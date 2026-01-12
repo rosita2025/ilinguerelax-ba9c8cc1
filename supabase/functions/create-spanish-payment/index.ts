@@ -30,7 +30,7 @@ serve(async (req) => {
       }
     }
 
-    // Create a one-time payment session for Spanish Relax book
+    // Create a one-time payment session for Spanish Relax digital eBook
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : email || undefined,
@@ -43,10 +43,6 @@ serve(async (req) => {
       mode: "payment",
       success_url: `${req.headers.get("origin")}/payment-success`,
       cancel_url: `${req.headers.get("origin")}/products/spanish-5000-words?payment=canceled`,
-      billing_address_collection: "required",
-      shipping_address_collection: {
-        allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "ES", "IT", "NL", "BE", "AT", "CH", "MX", "BR", "AR", "CL", "CO", "PE"],
-      },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {

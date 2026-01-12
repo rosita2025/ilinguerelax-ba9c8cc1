@@ -7,6 +7,7 @@ interface CountdownTimerProps {
   currentPrice?: string;
   originalPrice?: string;
   storageKey?: string;
+  lang?: "es" | "en";
 }
 
 export const CountdownTimer = ({ 
@@ -14,7 +15,8 @@ export const CountdownTimer = ({
   hoursFromNow = 24,
   currentPrice = "$14 USD",
   originalPrice = "$100 USD",
-  storageKey = "countdown_target"
+  storageKey = "countdown_target",
+  lang = "es"
 }: CountdownTimerProps) => {
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
@@ -61,6 +63,10 @@ export const CountdownTimer = ({
     return () => clearInterval(timer);
   }, [endDate, hoursFromNow, storageKey]);
 
+  const labels = lang === "en" 
+    ? { hours: "Hours", minutes: "Minutes", seconds: "Seconds", header: "Limited time offer!", message: "Price increases when the counter reaches zero", current: "Current price:", after: "After:" }
+    : { hours: "Horas", minutes: "Minutos", seconds: "Segundos", header: "¡Oferta por tiempo limitado!", message: "El precio sube cuando el contador llegue a cero", current: "Precio actual:", after: "Después:" };
+
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
       <div className="bg-[#1a2332] text-white font-bold text-3xl md:text-5xl rounded-xl w-20 md:w-28 h-20 md:h-28 flex items-center justify-center shadow-2xl">
@@ -86,23 +92,23 @@ export const CountdownTimer = ({
           <div className="flex items-center justify-center gap-2 mb-4">
             <Flame className="w-6 h-6 text-white animate-pulse" />
             <span className="text-white font-bold text-base md:text-lg uppercase tracking-wider">
-              ¡Oferta por tiempo limitado!
+              {labels.header}
             </span>
             <Flame className="w-6 h-6 text-white animate-pulse" />
           </div>
 
           {/* Main Message */}
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-8">
-            El precio sube cuando el contador llegue a cero
+            {labels.message}
           </h3>
 
           {/* Countdown */}
           <div className="flex items-center justify-center gap-4 md:gap-8 mb-8">
-            <TimeBox value={timeLeft.hours} label="Horas" />
+            <TimeBox value={timeLeft.hours} label={labels.hours} />
             <span className="text-4xl md:text-5xl font-bold text-white/60 mt-[-20px]">:</span>
-            <TimeBox value={timeLeft.minutes} label="Minutos" />
+            <TimeBox value={timeLeft.minutes} label={labels.minutes} />
             <span className="text-4xl md:text-5xl font-bold text-white/60 mt-[-20px]">:</span>
-            <TimeBox value={timeLeft.seconds} label="Segundos" />
+            <TimeBox value={timeLeft.seconds} label={labels.seconds} />
           </div>
 
           {/* Price Badges */}
@@ -110,12 +116,12 @@ export const CountdownTimer = ({
             <div className="flex items-center gap-2 bg-[#1a2332] rounded-full px-5 py-3 shadow-lg">
               <Clock className="w-4 h-4 text-orange-400" />
               <span className="text-white font-medium text-sm md:text-base">
-                Precio actual: <span className="font-bold text-orange-400">{currentPrice}</span>
+                {labels.current} <span className="font-bold text-orange-400">{currentPrice}</span>
               </span>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-5 py-3">
               <span className="text-white text-sm md:text-base">
-                Después: <span className="line-through font-medium">{originalPrice}</span>
+                {labels.after} <span className="line-through font-medium">{originalPrice}</span>
               </span>
             </div>
           </div>

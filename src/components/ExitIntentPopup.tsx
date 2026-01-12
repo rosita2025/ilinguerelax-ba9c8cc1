@@ -3,17 +3,26 @@ import { X, Gift, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ExitIntentPopupProps {
-  buyUrl: string;
+  buyUrl?: string;
+  onBuyClick?: () => void;
   discount?: string;
+  lang?: "es" | "en";
+  storageKey?: string;
 }
 
-export const ExitIntentPopup = ({ buyUrl, discount = "10%" }: ExitIntentPopupProps) => {
+export const ExitIntentPopup = ({ 
+  buyUrl, 
+  onBuyClick,
+  discount = "10%", 
+  lang = "es",
+  storageKey = "exit_intent_shown"
+}: ExitIntentPopupProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
     // Check if popup was already shown in this session
-    const alreadyShown = sessionStorage.getItem("exit_intent_shown");
+    const alreadyShown = sessionStorage.getItem(storageKey);
     if (alreadyShown) {
       setHasShown(true);
       return;
@@ -23,24 +32,42 @@ export const ExitIntentPopup = ({ buyUrl, discount = "10%" }: ExitIntentPopupPro
       if (e.clientY <= 0 && !hasShown) {
         setIsVisible(true);
         setHasShown(true);
-        sessionStorage.setItem("exit_intent_shown", "true");
+        sessionStorage.setItem(storageKey, "true");
       }
     };
 
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
-  }, [hasShown]);
+  }, [hasShown, storageKey]);
 
   const handleClose = () => {
     setIsVisible(false);
   };
 
   const handleBuy = () => {
-    window.open(buyUrl, "_blank");
+    if (onBuyClick) {
+      onBuyClick();
+    } else if (buyUrl) {
+      window.open(buyUrl, "_blank");
+    }
     setIsVisible(false);
   };
 
   if (!isVisible) return null;
+
+  const content = lang === "en" ? {
+    title: "Wait! Don't leave yet 🎁",
+    description: `We're offering you a special ${discount} discount if you complete your purchase now`,
+    urgency: "⏰ This offer expires in 10 minutes",
+    cta: "Get my discount",
+    decline: "No thanks, I prefer to pay full price"
+  } : {
+    title: "¡Espera! No te vayas todavía 🎁",
+    description: `Te ofrecemos un descuento especial del ${discount} si completas tu compra ahora`,
+    urgency: "⏰ Esta oferta expira en 10 minutos",
+    cta: "Obtener mi descuento",
+    decline: "No gracias, prefiero pagar precio completo"
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -68,16 +95,18 @@ export const ExitIntentPopup = ({ buyUrl, discount = "10%" }: ExitIntentPopupPro
         {/* Content */}
         <div className="text-center">
           <h3 className="text-2xl font-bold text-foreground mb-2">
-            ¡Espera! No te vayas todavía 🎁
+            {content.title}
           </h3>
           <p className="text-muted-foreground mb-6">
-            Te ofrecemos un descuento especial del <span className="font-bold text-primary">{discount}</span> si completas tu compra ahora
+            {content.description.split(discount)[0]}
+            <span className="font-bold text-primary">{discount}</span>
+            {content.description.split(discount)[1]}
           </p>
 
           {/* Urgency */}
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6">
             <p className="text-sm text-red-600 font-medium">
-              ⏰ Esta oferta expira en 10 minutos
+              {content.urgency}
             </p>
           </div>
 
@@ -88,7 +117,7 @@ export const ExitIntentPopup = ({ buyUrl, discount = "10%" }: ExitIntentPopupPro
             className="w-full mb-3"
             onClick={handleBuy}
           >
-            Obtener mi descuento
+            {content.cta}
             <ArrowRight className="w-5 h-5" />
           </Button>
 
@@ -96,7 +125,7 @@ export const ExitIntentPopup = ({ buyUrl, discount = "10%" }: ExitIntentPopupPro
             onClick={handleClose}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            No gracias, prefiero pagar precio completo
+            {content.decline}
           </button>
         </div>
       </div>

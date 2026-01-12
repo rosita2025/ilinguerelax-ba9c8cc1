@@ -311,13 +311,16 @@ const Product8000Book = () => {
 
       <Footer />
 
-      {/* Sticky Buy Bar - Hidden until payment URL is ready */}
-      {/* <StickyBuyBar
+      {/* Sticky Buy Bar */}
+      <StickyBuyBar
         price="$32.99"
-        originalPrice=""
-        buyUrl="URL_AQUI"
-        ctaText="RESERVAR LIBRO FÍSICO"
-      /> */}
+        originalPrice="$45"
+        productName="Libro Físico 8,000 Palabras"
+        buyUrl="#"
+        ctaText="PRÓXIMAMENTE"
+        disabled={true}
+        showReviews={false}
+      />
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />

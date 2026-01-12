@@ -89,7 +89,7 @@ const Product8000 = () => {
         description="Domina 8,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Método sin estrés, sin diccionarios, paso a paso. Fonética UK/USA incluida."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         type="product"
-        price="27"
+        price="24"
         rating="4.9"
         reviewCount="10000"
       />
@@ -142,7 +142,7 @@ const Product8000 = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$27</span>
+                <span className="text-5xl font-bold text-foreground">$24</span>
                 <span className="text-2xl text-muted-foreground line-through">
                   $197
                 </span>
@@ -285,7 +285,7 @@ const Product8000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$27</span>
+                <span className="text-5xl font-bold text-foreground">$24</span>
                 <span className="text-2xl text-muted-foreground line-through">
                   $197
                 </span>
@@ -354,7 +354,7 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$27"
+        price="$24"
         originalPrice="$197"
         rating={4.9}
         reviewCount={10000}

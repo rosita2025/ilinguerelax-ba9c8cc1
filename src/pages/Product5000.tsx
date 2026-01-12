@@ -321,10 +321,8 @@ const Product5000 = () => {
               <Eye className="w-4 h-4" />
               DEMO / VISTA PREVIA
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Mira lo que contiene el libro
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Mira lo que contiene el libro digital</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
               ¡APROVECHA Y RECIBE 4 BONUS GRATUITAS!
             </p>
           </div>

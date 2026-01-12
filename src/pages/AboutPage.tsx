@@ -1,3 +1,4 @@
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookOpen, Heart, Target, Users, Award, Globe } from "lucide-react";
@@ -20,6 +21,11 @@ const staggerContainer = {
 const AboutPage = () => {
   return (
     <main className="min-h-screen bg-background">
+      <SEO
+        title="Sobre Nosotros - Nuestra Historia y Misión"
+        description="Conoce iLingue Relax, marca educativa enfocada en el aprendizaje de idiomas sin estrés. Nuestra misión es ayudar a hispanohablantes a aprender inglés de forma relajada."
+        canonicalUrl="https://ilinguerelax.com/sobre-nosotros"
+      />
       <Navbar />
 
       {/* Hero Section */}

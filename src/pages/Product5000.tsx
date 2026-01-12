@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
@@ -152,6 +153,15 @@ const Product5000 = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <SEO
+        title="5,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA"
+        description="Aprende 5,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Incluye fonética UK/USA, 52 capítulos temáticos y 4 bonus gratis. Descarga inmediata."
+        canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
+        type="product"
+        price="17"
+        rating="4.8"
+        reviewCount="800"
+      />
       {/* Lightbox Dialog */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="max-w-4xl w-full p-0 bg-black/95 border-none">

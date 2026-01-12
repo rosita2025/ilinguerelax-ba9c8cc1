@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,11 @@ const products = [
 const Products = () => {
   return (
     <main className="min-h-screen bg-background">
+      <SEO
+        title="Productos - Libros Digitales de Inglés"
+        description="Explora nuestra colección de libros digitales para aprender inglés. 5,000 y 8,000 palabras con pronunciación para hispanohablantes. Descarga inmediata."
+        canonicalUrl="https://ilinguerelax.com/productos"
+      />
       <Navbar />
       
       {/* Hero Section */}

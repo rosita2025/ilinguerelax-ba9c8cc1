@@ -1,3 +1,4 @@
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
@@ -83,6 +84,15 @@ const benefits = [
 const Product8000 = () => {
   return (
     <main className="min-h-screen bg-background">
+      <SEO
+        title="8,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA"
+        description="Domina 8,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Método sin estrés, sin diccionarios, paso a paso. Fonética UK/USA incluida."
+        canonicalUrl="https://ilinguerelax.com/productos/8000-palabras"
+        type="product"
+        price="27"
+        rating="4.9"
+        reviewCount="10000"
+      />
       <Navbar />
 
       {/* Hero Section */}

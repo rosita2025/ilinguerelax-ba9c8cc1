@@ -1,3 +1,4 @@
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
@@ -81,6 +82,11 @@ const faqItems = [
 const FAQPage = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Preguntas Frecuentes - Todo lo que Necesitas Saber"
+        description="Resuelve tus dudas sobre iLingue Relax. Información sobre productos, métodos de pago, pronunciación, garantía y soporte."
+        canonicalUrl="https://ilinguerelax.com/faq"
+      />
       <Navbar />
       <motion.main
         className="pt-20"

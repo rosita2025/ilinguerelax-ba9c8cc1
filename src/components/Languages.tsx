@@ -153,9 +153,11 @@ export const Languages = () => {
                     <span className="text-2xl font-bold text-primary">${product.price}</span>
                     {product.originalPrice && <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>}
                   </div>
-                  <Button size="sm" className="gap-2" onClick={() => window.open(product.link, '_self')}>
-                    <ShoppingCart className="w-4 h-4" />
-                    Comprar
+                  <Button size="sm" className="gap-2" asChild>
+                    <Link to={product.link}>
+                      <ShoppingCart className="w-4 h-4" />
+                      Comprar
+                    </Link>
                   </Button>
                 </div>
               </div>

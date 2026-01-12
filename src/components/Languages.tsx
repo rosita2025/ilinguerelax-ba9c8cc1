@@ -32,7 +32,7 @@ const products = [
     description: "Vocabulario completo + gramática",
     rating: 4.9,
     reviews: 892,
-    price: 14.99,
+    price: 27.00,
     originalPrice: 49.99,
     discount: 70,
     badge: "Premium"

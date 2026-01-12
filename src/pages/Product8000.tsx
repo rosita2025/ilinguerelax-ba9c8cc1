@@ -144,7 +144,7 @@ const Product8000 = () => {
               <div className="flex items-baseline gap-3 mb-6">
                 <span className="text-5xl font-bold text-foreground">$24</span>
                 <span className="text-2xl text-muted-foreground line-through">
-                  $197
+                  $76
                 </span>
                 <span className="px-3 py-1 rounded-full gradient-accent text-accent-foreground text-sm font-bold">
                   AHORRA 86%
@@ -287,7 +287,7 @@ const Product8000 = () => {
               <div className="flex items-baseline justify-center gap-3 mb-4">
                 <span className="text-5xl font-bold text-foreground">$24</span>
                 <span className="text-2xl text-muted-foreground line-through">
-                  $197
+                  $76
                 </span>
                 <span className="text-accent font-bold">USD</span>
               </div>
@@ -355,7 +355,7 @@ const Product8000 = () => {
       {/* Sticky Buy Bar */}
       <StickyBuyBar
         price="$24"
-        originalPrice="$197"
+        originalPrice="$76"
         rating={4.9}
         reviewCount={10000}
         buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"

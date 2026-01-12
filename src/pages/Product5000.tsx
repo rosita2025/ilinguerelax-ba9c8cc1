@@ -608,46 +608,7 @@ const Product5000 = () => {
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX"
       />
 
-      {/* Final CTA */}
-      <section className="py-20 md:py-28">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              ¿Listo para dominar el inglés?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Únete a más de 800 estudiantes satisfechos que ya están aprendiendo
-              con Inglés Relax
-            </p>
 
-            <div className="bg-card rounded-3xl border border-border shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$17</span>
-                <span className="text-2xl text-muted-foreground line-through">
-                  $100
-                </span>
-                <span className="text-accent font-bold">USD</span>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                Pago único • Acceso de por vida • 4 Bonus incluidos
-              </p>
-              <Button
-                variant="hero"
-                size="xl"
-                className="w-full"
-                onClick={handleBuy}
-              >
-                QUIERO COMPRAR AHORA
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </div>
-
-            <p className="text-sm text-muted-foreground">
-              🔒 Pago 100% seguro con Hotmart • Entrega digital inmediata
-            </p>
-          </div>
-        </div>
-      </section>
 
       <Footer />
 

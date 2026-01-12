@@ -10,6 +10,16 @@ interface SEOProps {
   rating?: string;
   reviewCount?: string;
   noIndex?: boolean;
+  keywords?: string;
+  productList?: Array<{
+    name: string;
+    description: string;
+    price: number;
+    image: string;
+    url: string;
+    rating?: number;
+    reviewCount?: number;
+  }>;
 }
 
 export const SEO = ({
@@ -22,12 +32,14 @@ export const SEO = ({
   rating,
   reviewCount,
   noIndex = false,
+  keywords,
+  productList,
 }: SEOProps) => {
   const fullTitle = title.includes("iLingue Relax")
     ? title
     : `${title} | iLingue Relax`;
 
-  const structuredData = type === "product" && price ? {
+  const productStructuredData = type === "product" && price ? {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": title,
@@ -57,13 +69,54 @@ export const SEO = ({
     })
   } : null;
 
+  const itemListStructuredData = productList && productList.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": title,
+    "description": description,
+    "numberOfItems": productList.length,
+    "itemListElement": productList.map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": product.name,
+        "description": product.description,
+        "image": product.image,
+        "url": product.url,
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "USD",
+          "price": product.price,
+          "availability": "https://schema.org/InStock"
+        },
+        ...(product.rating && product.reviewCount && {
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": product.rating,
+            "reviewCount": product.reviewCount,
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        })
+      }
+    }))
+  } : null;
+
   return (
     <Helmet>
       {/* Primary Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="title" content={fullTitle} />
       <meta name="description" content={description} />
+      {keywords && <meta name="keywords" content={keywords} />}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
+      
+      {/* Additional Meta Tags */}
+      <meta name="author" content="iLingue Relax" />
+      <meta name="language" content="es" />
+      <meta name="revisit-after" content="7 days" />
+      <meta name="distribution" content="global" />
 
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
@@ -85,9 +138,16 @@ export const SEO = ({
       <meta name="twitter:image" content={image} />
 
       {/* Structured Data for Products */}
-      {structuredData && (
+      {productStructuredData && (
         <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
+          {JSON.stringify(productStructuredData)}
+        </script>
+      )}
+
+      {/* Structured Data for Product List */}
+      {itemListStructuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(itemListStructuredData)}
         </script>
       )}
     </Helmet>

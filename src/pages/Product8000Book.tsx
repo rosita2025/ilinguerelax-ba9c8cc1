@@ -315,7 +315,7 @@ const Product8000Book = () => {
       <StickyBuyBar
         price="$32.99"
         originalPrice="$45"
-        productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
+        productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés con pronunciación en español y fonética USA/UK - Libro físico"
         buyUrl="#"
         ctaText="PRÓXIMAMENTE"
         disabled={true}

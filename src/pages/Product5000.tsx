@@ -16,10 +16,10 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Star, Check, BookOpen, Globe, ArrowRight, ShoppingCart, Clock, Gift, Download, RefreshCw, Eye, ZoomIn, ChevronLeft, ChevronRight, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, X } from "lucide-react";
 
 // Preview images
-import previewVocab from "@/assets/preview-vocab.png";
-import previewArticles from "@/assets/preview-articles.png";
-import previewIndex from "@/assets/preview-index.png";
-import previewGrammar from "@/assets/preview-grammar.png";
+import previewIndice from "@/assets/preview-indice.png";
+import previewGramatica from "@/assets/preview-gramatica.png";
+import previewFrases from "@/assets/preview-frases.jpg";
+import previewVocabulario from "@/assets/preview-vocabulario.png";
 import product5000Image from "@/assets/product-5000.png";
 
 // Partner logos
@@ -53,21 +53,21 @@ const partnerLogos = [{
   height: "h-8 md:h-12"
 }];
 const previewImages = [{
-  src: previewVocab,
-  title: "Vocabulario Temático",
-  subtitle: "Palabras organizadas por categorías"
-}, {
-  src: previewArticles,
-  title: "Artículos A/AN/THE",
-  subtitle: "Reglas claras con ejemplos prácticos"
-}, {
-  src: previewIndex,
+  src: previewIndice,
   title: "Índice Completo",
   subtitle: "52 capítulos temáticos organizados"
 }, {
-  src: previewGrammar,
+  src: previewGramatica,
   title: "Estructura Gramatical",
-  subtitle: "Fórmulas para construir frases correctas"
+  subtitle: "Fórmulas para construir frases A1-C1"
+}, {
+  src: previewFrases,
+  title: "Frases con Ejemplos",
+  subtitle: "Verbos profesionales y académicos"
+}, {
+  src: previewVocabulario,
+  title: "Vocabulario 5,000 Palabras",
+  subtitle: "Palabras con pronunciación y fonética"
 }];
 const features = ["5,000+ palabras más utilizadas en inglés", "Pronunciación adaptada para hispanohablantes", "Fonética internacional UK/USA incluida", "Nivel básico a intermedio", "52 capítulos temáticos organizados", "Significado en español de cada palabra", "Entrega digital inmediata", "Acceso de por vida"];
 const bonuses = [{
@@ -347,48 +347,14 @@ const Product5000 = () => {
               <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img 
-                    src={previewVocab} 
-                    alt="Vocabulario Temático" 
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-                <div className="p-4 text-center">
-                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-1">Vocabulario Temático</h4>
-                  <p className="text-sm text-muted-foreground">Palabras organizadas por categorías</p>
-                </div>
-              </div>
-              
-              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={previewArticles} 
-                    alt="Artículos A/AN/THE" 
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-                <div className="p-4 text-center">
-                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-1">Artículos A/AN/THE</h4>
-                  <p className="text-sm text-muted-foreground">Reglas claras con ejemplos prácticos</p>
-                </div>
-              </div>
-              
-              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={previewIndex} 
+                    src={previewIndice} 
                     alt="Índice Completo" 
                     className="w-full h-full object-cover object-top"
                   />
                 </div>
                 <div className="p-4 text-center">
                   <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <Download className="w-5 h-5 text-primary-foreground" />
+                    <BookOpen className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <h4 className="font-bold text-foreground mb-1">Índice Completo</h4>
                   <p className="text-sm text-muted-foreground">52 capítulos temáticos organizados</p>
@@ -398,17 +364,51 @@ const Product5000 = () => {
               <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img 
-                    src={previewGrammar} 
+                    src={previewGramatica} 
                     alt="Estructura Gramatical" 
                     className="w-full h-full object-cover object-top"
                   />
                 </div>
                 <div className="p-4 text-center">
                   <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-primary-foreground" />
+                    <Globe className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <h4 className="font-bold text-foreground mb-1">Estructura Gramatical</h4>
-                  <p className="text-sm text-muted-foreground">Fórmulas para construir frases correctas</p>
+                  <p className="text-sm text-muted-foreground">Fórmulas para construir frases A1-C1</p>
+                </div>
+              </div>
+              
+              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={previewFrases} 
+                    alt="Frases con Ejemplos" 
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">Frases con Ejemplos</h4>
+                  <p className="text-sm text-muted-foreground">Verbos profesionales y académicos</p>
+                </div>
+              </div>
+              
+              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={previewVocabulario} 
+                    alt="Vocabulario 5,000 Palabras" 
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">Vocabulario 5,000 Palabras</h4>
+                  <p className="text-sm text-muted-foreground">Palabras con pronunciación y fonética</p>
                 </div>
               </div>
             </div>

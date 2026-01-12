@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageSquare, Send, Instagram, Facebook, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -54,12 +55,28 @@ const ContactPage = () => {
 
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject.trim() || undefined,
+          message: formData.message.trim(),
+        },
+      });
 
-    toast.success("¡Mensaje enviado! Te responderemos pronto.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setIsSubmitting(false);
+      if (error) {
+        throw error;
+      }
+
+      toast.success("¡Mensaje enviado! Te responderemos pronto.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      toast.error("Error al enviar el mensaje. Por favor intenta de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

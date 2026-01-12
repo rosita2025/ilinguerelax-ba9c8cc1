@@ -9,6 +9,7 @@ import SalesNotification from "@/components/SalesNotification";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { LiveViewers } from "@/components/LiveViewers";
 import { ComparisonTable } from "@/components/ComparisonTable";
+import { ProductReviews } from "@/components/ProductReviews";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -561,6 +562,9 @@ const Product5000 = () => {
 
       {/* Comparison Table */}
       <ComparisonTable />
+
+      {/* Product Reviews Carousel */}
+      <ProductReviews productType="english" />
 
       {/* Testimonials */}
       <Testimonials variant="light" />

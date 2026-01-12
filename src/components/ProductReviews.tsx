@@ -1,0 +1,299 @@
+import { useState, useEffect } from "react";
+import { Star, ChevronLeft, ChevronRight, Quote, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Review {
+  id: string;
+  nickname: string;
+  review: string;
+  rating: number;
+  img?: string;
+  date: string;
+  verified: boolean;
+}
+
+// Reviews for English product (5000 palabras)
+const englishReviews: Review[] = [
+  {
+    id: "1",
+    nickname: "Alejandra M.",
+    review: "Inglés Relax me ayuda muchísimos! Las palabras son muy útiles! Es mejor!!!",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",
+    date: "2025-11-23",
+    verified: true,
+  },
+  {
+    id: "2",
+    nickname: "Rosa A.",
+    review: "Excelente Material Inglés Relax, esa la pronunciación más fácil y me ayudó muchísimo! Lo aprendí más rápido en inglés, porque soy una persona con discapacidad auditiva. Gracias por salvar lo mejor 100% Inglés Relax",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/IiDiyw9-U.jpg",
+    date: "2025-11-23",
+    verified: true,
+  },
+  {
+    id: "3",
+    nickname: "Daniela",
+    review: "La pronunciación escrita me ayuda un montón. Es como tener un profesor, pero sin gastar tanto dinero.",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/GcNv27Ltw.jpg",
+    date: "2025-09-21",
+    verified: true,
+  },
+  {
+    id: "4",
+    nickname: "Oscar",
+    review: "En pocos días ya podía leer y pronunciar palabras que antes me costaban mucho. Perfecto para principiantes como yo.",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/6IAXeCS3b.jpg",
+    date: "2025-09-21",
+    verified: true,
+  },
+  {
+    id: "5",
+    nickname: "Rosangela",
+    review: "Me encantó porque todo está organizado por categorías y con la pronunciación en español. No me siento perdido como con otros libros o apps.",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/mJSaAZynx.jpg",
+    date: "2025-09-21",
+    verified: true,
+  },
+  {
+    id: "6",
+    nickname: "Rosa",
+    review: "Lo mejor me recomiendo 100%, lo más fácil inglés y también pronuncia hispanohablantes. Gracias Inglés Relax!",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/BWXo4KTI7Q.jpg",
+    date: "2025-08-28",
+    verified: true,
+  },
+  {
+    id: "7",
+    nickname: "Francisco Javier Z.",
+    review: "El nuevo ebook está en excelente estado, muy contento con mi compra.",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/r5UcoWJcpE.jpg",
+    date: "2025-08-02",
+    verified: true,
+  },
+  {
+    id: "8",
+    nickname: "Eduardo Peña",
+    review: "Llegó muy rápido PDF y en perfecto estado 😊",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/-dLV0FCgkX.jpg",
+    date: "2025-07-12",
+    verified: true,
+  },
+  {
+    id: "9",
+    nickname: "Adam Rentería",
+    review: "Notebook de trabajo legendario para el ebook de texto legendario. Aprender es luz, no aprender es oscuridad.",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/O3AgBj_If.jpg",
+    date: "2025-04-22",
+    verified: true,
+  },
+  {
+    id: "10",
+    nickname: "Valeria Rey",
+    review: "Buen precio, más barato y en perfecto estado.",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/smyzA3a5t.jpg",
+    date: "2025-03-14",
+    verified: true,
+  },
+];
+
+interface ProductReviewsProps {
+  productType?: "english" | "spanish";
+}
+
+export const ProductReviews = ({ productType = "english" }: ProductReviewsProps) => {
+  const reviews = productType === "english" ? englishReviews : englishReviews;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  
+  // Reviews to show based on screen size
+  const reviewsPerPage = 3;
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % totalPages);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, totalPages]);
+
+  const goToPrev = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
+  const goToNext = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev + 1) % totalPages);
+  };
+
+  const goToPage = (index: number) => {
+    setIsAutoPlaying(false);
+    setCurrentIndex(index);
+  };
+
+  const currentReviews = reviews.slice(
+    currentIndex * reviewsPerPage,
+    currentIndex * reviewsPerPage + reviewsPerPage
+  );
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  return (
+    <section className="py-16 md:py-20 bg-gradient-to-b from-secondary/30 to-background">
+      <div className="container px-4 md:px-6">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-bold mb-4">
+            <Star className="w-4 h-4 fill-accent" />
+            RESEÑAS VERIFICADAS
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Lo que dicen nuestros clientes
+          </h2>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-6 h-6 fill-accent text-accent" />
+              ))}
+            </div>
+            <span className="text-lg font-semibold text-foreground">5.0</span>
+            <span className="text-muted-foreground">({reviews.length}+ reseñas)</span>
+          </div>
+        </div>
+
+        {/* Reviews Carousel */}
+        <div className="relative max-w-6xl mx-auto">
+          {/* Navigation Arrows */}
+          <button
+            onClick={goToPrev}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 z-10 p-3 rounded-full bg-card border border-border shadow-lg hover:bg-secondary transition-colors"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="w-6 h-6 text-foreground" />
+          </button>
+          
+          <button
+            onClick={goToNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 z-10 p-3 rounded-full bg-card border border-border shadow-lg hover:bg-secondary transition-colors"
+            aria-label="Siguiente"
+          >
+            <ChevronRight className="w-6 h-6 text-foreground" />
+          </button>
+
+          {/* Reviews Grid */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              {currentReviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-300"
+                >
+                  {/* Quote Icon */}
+                  <Quote className="w-8 h-8 text-primary/30 mb-4" />
+                  
+                  {/* Review Text */}
+                  <p className="text-foreground/90 text-sm md:text-base leading-relaxed mb-6 line-clamp-4">
+                    "{review.review}"
+                  </p>
+                  
+                  {/* Rating */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(review.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                    ))}
+                  </div>
+                  
+                  {/* Author */}
+                  <div className="flex items-center gap-3">
+                    {review.img ? (
+                      <img
+                        src={review.img}
+                        alt={review.nickname}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-primary font-bold text-lg">
+                          {review.nickname.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground">{review.nickname}</p>
+                      <div className="flex items-center gap-2">
+                        {review.verified && (
+                          <span className="inline-flex items-center gap-1 text-xs text-green-600">
+                            <CheckCircle className="w-3 h-3" />
+                            Compra verificada
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Date */}
+                  <p className="text-xs text-muted-foreground mt-3">
+                    {formatDate(review.date)}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Pagination Dots */}
+          <div className="flex items-center justify-center gap-2 mt-8">
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToPage(index)}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  index === currentIndex
+                    ? "bg-primary w-8"
+                    : "bg-primary/30 hover:bg-primary/50"
+                }`}
+                aria-label={`Ir a página ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Trust Badge */}
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-green-500/10 border border-green-500/20">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <span className="text-sm font-medium text-green-700">
+              Todas las reseñas son de clientes reales verificados
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};

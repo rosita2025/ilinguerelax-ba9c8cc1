@@ -1,0 +1,347 @@
+import { SEO } from "@/components/SEO";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { CountdownTimer } from "@/components/CountdownTimer";
+import SalesNotification from "@/components/SalesNotification";
+import { FAQ } from "@/components/FAQ";
+import { Button } from "@/components/ui/button";
+import {
+  Star,
+  Check,
+  BookOpen,
+  Sparkles,
+  ArrowRight,
+  Gift,
+  Truck,
+  Brain,
+  User,
+  FileText,
+  GraduationCap,
+  Lightbulb,
+  CreditCard,
+  Package,
+  Clock,
+} from "lucide-react";
+
+// Product image (reusing the same one for now)
+import product8000Image from "@/assets/product-8000.png";
+
+const features = [
+  "8,000 palabras esenciales del inglés",
+  "Pronunciación en español incluida",
+  "Diseñado para hispanohablantes",
+  "Sin necesidad de diccionarios",
+  "Metodología paso a paso sin estrés",
+  "Fonética UK y USA incluida",
+  "Libro físico tapa blanda de alta calidad",
+  "Entre 300-350 páginas",
+];
+
+const benefits = [
+  {
+    icon: BookOpen,
+    title: "Libro Físico Premium",
+    description:
+      "Tapa blanda de alta calidad, impresión profesional. Perfecto para estudiar sin pantallas y tomar notas.",
+  },
+  {
+    icon: Package,
+    title: "Envío a Tu Puerta",
+    description:
+      "Recibe tu libro físico directamente en casa. Envío disponible a múltiples países.",
+  },
+  {
+    icon: Sparkles,
+    title: "Método Sin Estrés",
+    description:
+      "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
+  },
+  {
+    icon: Brain,
+    title: "Sin Diccionarios",
+    description:
+      "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
+  },
+];
+
+const Product8000Book = () => {
+  return (
+    <main className="min-h-screen bg-background">
+      <SEO
+        title="Libro Físico: 8,000 Palabras en Inglés - Compra Anticipada"
+        description="Reserva el libro físico de 8,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium, envío a domicilio. Precio especial de compra anticipada."
+        canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
+        type="product"
+        price="32.99"
+        rating="4.9"
+        reviewCount="10000"
+      />
+      <Navbar />
+
+      {/* Hero Section */}
+      <section className="pt-28 pb-16 md:pt-32 md:pb-20">
+        <div className="container px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Product Image */}
+            <div className="relative">
+              <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
+              <div className="relative">
+                <img
+                  src={product8000Image}
+                  alt="Inglés Relax - 8,000 Palabras Libro Físico"
+                  className="w-full h-auto rounded-2xl shadow-hero"
+                />
+                {/* Physical Book Badge */}
+                <div className="absolute top-4 left-4 px-4 py-2 rounded-full bg-amber-500 text-white text-sm font-bold shadow-lg">
+                  📖 LIBRO FÍSICO
+                </div>
+              </div>
+            </div>
+
+            {/* Product Info */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium mb-4">
+                <Clock className="w-4 h-4 fill-current" />
+                <span>COMPRA ANTICIPADA - Envío Junio 2026</span>
+              </div>
+
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Inglés Relax - 8,000 Palabras
+                <br />
+                <span className="text-amber-600">Libro Físico Tapa Blanda</span>
+              </h1>
+
+              <p className="text-lg text-muted-foreground mb-6">
+                El mismo método completo para aprender inglés sin estrés, ahora en formato libro físico premium. 
+                Perfecto para estudiar sin pantallas.
+              </p>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-accent text-accent"
+                    />
+                  ))}
+                </div>
+                <span className="text-muted-foreground">4.9/5 (Basado en versión digital)</span>
+              </div>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-3 mb-6">
+                <span className="text-5xl font-bold text-foreground">$32.99</span>
+                <span className="px-3 py-1 rounded-full bg-amber-500 text-white text-sm font-bold">
+                  PRECIO ANTICIPADO
+                </span>
+              </div>
+
+              {/* Delivery Info */}
+              <div className="flex flex-wrap gap-4 mb-8 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Package className="w-4 h-4 text-amber-600" />
+                  <span>Libro físico tapa blanda</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Truck className="w-4 h-4 text-amber-600" />
+                  <span>Envío a domicilio</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Gift className="w-4 h-4 text-amber-600" />
+                  <span>Bonus digital incluido</span>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-amber-500 hover:bg-amber-600">
+                RESERVAR AHORA - $32.99
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+
+              <p className="text-sm text-muted-foreground">
+                🔒 Pago 100% seguro • Envío Junio 2026 • Incluye versión PDF
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Countdown Timer */}
+      <CountdownTimer hoursFromNow={48} />
+
+      {/* Benefits */}
+      <section className="py-20 md:py-28 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              ¿Por qué elegir el{" "}
+              <span className="text-amber-600">Libro Físico</span>?
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              La mejor experiencia de aprendizaje sin pantallas
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {benefits.map((benefit) => (
+              <div
+                key={benefit.title}
+                className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0">
+                    <benefit.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {benefit.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What's Included */}
+      <section className="py-20 md:py-28">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+              Todo lo que incluye
+            </h2>
+
+            <div className="bg-card rounded-3xl border border-border shadow-card p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {features.map((feature) => (
+                  <div key={feature} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-foreground">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 md:py-28 bg-amber-500">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              ¡Reserva tu libro físico ahora!
+            </h2>
+            <p className="text-lg text-white/90 mb-8">
+              Precio especial de compra anticipada. Envío programado para Junio 2026.
+            </p>
+
+            <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
+              <div className="flex items-baseline justify-center gap-3 mb-4">
+                <span className="text-5xl font-bold text-foreground">$32.99</span>
+                <span className="text-amber-600 font-bold">USD</span>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                Pago único • Envío incluido* • Incluye PDF digital
+              </p>
+              <Button variant="hero" size="xl" className="w-full bg-amber-500 hover:bg-amber-600">
+                RESERVAR AHORA
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+              <p className="text-xs text-muted-foreground mt-4">
+                *Consulta costos de envío según tu ubicación
+              </p>
+            </div>
+
+            <p className="text-sm text-white/70">
+              🔒 Pago 100% seguro • Garantía de satisfacción
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <FAQ
+        items={[
+          {
+            question: "¿Quién es el autor del libro?",
+            answer: "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
+            icon: User,
+          },
+          {
+            question: "¿Cuándo recibiré mi libro físico?",
+            answer: "El libro físico está en compra anticipada. Los envíos están programados para comenzar en Junio de 2026. Recibirás actualizaciones por email sobre el estado de tu pedido.",
+            icon: Truck,
+          },
+          {
+            question: "¿Cuántas páginas tiene el libro?",
+            answer: "El libro tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
+            icon: FileText,
+          },
+          {
+            question: "¿Incluye la versión digital?",
+            answer: "Sí. Al comprar el libro físico en compra anticipada, recibirás inmediatamente acceso a la versión digital (PDF) para que puedas comenzar a estudiar mientras esperas tu libro.",
+            icon: Gift,
+          },
+          {
+            question: "¿Hacen envíos internacionales?",
+            answer: "Sí, realizamos envíos a múltiples países. Los costos de envío pueden variar según tu ubicación.",
+            icon: Package,
+          },
+          {
+            question: "¿Es adecuado para estudiar solo/a?",
+            answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
+            icon: GraduationCap,
+          },
+          {
+            question: "¿Necesito saber inglés antes de usar el libro?",
+            answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
+            icon: Lightbulb,
+          },
+          {
+            question: "¿El libro incluye pronunciación?",
+            answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
+            icon: BookOpen,
+          },
+          {
+            question: "¿Cómo realizo el pago?",
+            answer: "Puedes pagar de forma segura mediante tarjeta de crédito o débito internacional.",
+            icon: CreditCard,
+          },
+        ]}
+        title="Preguntas Frecuentes"
+        subtitle="Resolvemos tus dudas sobre el libro físico"
+      />
+
+      <Footer />
+
+      {/* Sticky Buy Bar */}
+      <StickyBuyBar
+        price="$32.99"
+        originalPrice=""
+        rating={4.9}
+        reviewCount={10000}
+        buyUrl="#"
+        ctaText="RESERVAR LIBRO FÍSICO"
+      />
+
+      {/* Spacer for sticky bar */}
+      <div className="h-20 md:h-16" />
+
+      {/* Sales Notification Popup */}
+      <SalesNotification 
+        productName="Libro Físico 8,000 Palabras" 
+        productLabel="Libro Físico" 
+      />
+    </main>
+  );
+};
+
+export default Product8000Book;

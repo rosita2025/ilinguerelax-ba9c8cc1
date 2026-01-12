@@ -100,7 +100,7 @@ export const Languages = () => {
         </div>
 
         {/* Products */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
           {products.map(product => <div key={product.id} className="group relative bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-2">
               {/* Discount Badge */}
               {product.discount && <div className="absolute top-3 left-3 z-10">

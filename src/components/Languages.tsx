@@ -16,7 +16,7 @@ const products = [
     description: "Vocabulario esencial con pronunciación",
     rating: 4.8,
     reviews: 1247,
-    price: 9.99,
+    price: 17.00,
     originalPrice: 29.99,
     discount: 67,
     badge: "Más Vendido"

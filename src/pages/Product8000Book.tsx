@@ -138,12 +138,10 @@ const Product8000Book = () => {
               </div>
 
               {/* CTA */}
-              <a href="https://pay.hotmart.com/O100578526P?checkoutMode=10" target="_blank" rel="noopener noreferrer">
-                <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-amber-500 hover:bg-amber-600">
-                  RESERVAR AHORA - $32.99
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </a>
+              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-amber-500/50 cursor-not-allowed" disabled>
+                PRÓXIMAMENTE
+                <Clock className="w-5 h-5" />
+              </Button>
 
               <p className="text-sm text-muted-foreground">
                 🔒 Pago 100% seguro • Envío Junio 2026 • Incluye versión PDF
@@ -237,9 +235,9 @@ const Product8000Book = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Envío incluido* • Incluye PDF digital
               </p>
-              <Button variant="hero" size="xl" className="w-full bg-amber-500 hover:bg-amber-600">
-                RESERVAR AHORA
-                <ArrowRight className="w-5 h-5" />
+              <Button variant="hero" size="xl" className="w-full bg-amber-500/50 cursor-not-allowed" disabled>
+                PRÓXIMAMENTE
+                <Clock className="w-5 h-5" />
               </Button>
               <p className="text-xs text-muted-foreground mt-4">
                 *Consulta costos de envío según tu ubicación
@@ -308,13 +306,13 @@ const Product8000Book = () => {
 
       <Footer />
 
-      {/* Sticky Buy Bar */}
-      <StickyBuyBar
+      {/* Sticky Buy Bar - Hidden until payment URL is ready */}
+      {/* <StickyBuyBar
         price="$32.99"
         originalPrice=""
-        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+        buyUrl="URL_AQUI"
         ctaText="RESERVAR LIBRO FÍSICO"
-      />
+      /> */}
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />

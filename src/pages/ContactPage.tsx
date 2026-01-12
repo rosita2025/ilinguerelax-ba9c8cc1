@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,11 @@ const ContactPage = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <SEO
+        title="Contacto - Estamos Aquí para Ayudarte"
+        description="¿Tienes preguntas sobre nuestros libros de inglés? Contáctanos por email o redes sociales. Respondemos en 24-48 horas."
+        canonicalUrl="https://ilinguerelax.com/contacto"
+      />
       <Navbar />
 
       {/* Hero Section */}

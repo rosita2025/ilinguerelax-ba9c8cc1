@@ -1,3 +1,4 @@
+import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Benefits } from "@/components/Benefits";
@@ -27,6 +28,11 @@ const partnerLogos = [
 const Index = () => {
   return (
     <main className="min-h-screen">
+      <SEO
+        title="iLingue Relax - Aprende Inglés con Pronunciación para Hispanohablantes"
+        description="Domina el inglés sin estrés con iLingue Relax. Libro digital con 5,000+ palabras en inglés con pronunciación fonética para hispanohablantes. Acentos UK y USA incluidos."
+        canonicalUrl="https://ilinguerelax.com/"
+      />
       <Navbar />
       <Hero />
       

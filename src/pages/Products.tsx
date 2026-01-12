@@ -45,6 +45,19 @@ const products = [
     features: ["Tapa blanda", "300-350 páginas", "Incluye PDF"],
     isPhysical: true,
   },
+  {
+    id: "5-000-palabras-en-espanol-con-pronunciacion-inglesa",
+    title: "Spanish Relax - 5,000 Palabras",
+    subtitle: "Español para Angloparlantes",
+    description: "5,000 palabras en español con pronunciación inglesa para hablantes de inglés",
+    price: 17,
+    originalPrice: 54,
+    rating: 4.8,
+    reviews: 500,
+    badge: "🇪🇸 NUEVO",
+    features: ["5,000 palabras", "Pronunciación inglesa", "Para angloparlantes"],
+    isPhysical: false,
+  },
 ];
 
 const Products = () => {

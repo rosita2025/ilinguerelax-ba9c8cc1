@@ -7,7 +7,7 @@ import { ArrowRight, Star, BookOpen } from "lucide-react";
 
 const products = [
   {
-    id: "8000-palabras",
+    id: "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
     title: "Inglés Relax - 8,000 Palabras",
     subtitle: "Libro Digital Completo",
     description: "Domina 8,000 palabras en inglés con pronunciación en español para hispanohablantes",
@@ -19,7 +19,7 @@ const products = [
     features: ["8,000 palabras", "Pronunciación español", "Fonética UK/USA"],
   },
   {
-    id: "5000-palabras",
+    id: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
     title: "Inglés Relax - 5,000 Palabras",
     subtitle: "Nivel Básico a Intermedio",
     description: "5,000 palabras más utilizadas con pronunciación español y fonética UK/USA",
@@ -129,7 +129,7 @@ const Products = () => {
                   </div>
 
                   {/* CTA */}
-                  <Link to={`/productos/${product.id}`}>
+                  <Link to={`/products/${product.id}`}>
                     <Button variant="hero" size="lg" className="w-full">
                       Ver Detalles
                       <ArrowRight className="w-4 h-4" />

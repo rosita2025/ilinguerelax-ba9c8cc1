@@ -159,7 +159,7 @@ const Product5000 = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-28 pb-16 md:pt-32 md:pb-20">
+      <section className="pt-20 pb-12 md:pt-24 md:pb-16">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Product Image */}

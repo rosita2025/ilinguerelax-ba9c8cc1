@@ -20,8 +20,8 @@ export const Navbar = () => {
 
   return (
     <header className="relative z-50">
-      <div className="container px-4 md:px-6 py-4">
-        <nav className="flex items-center justify-between bg-card/80 backdrop-blur-lg rounded-2xl px-6 py-3 border border-border shadow-card">
+      <div className="container px-4 md:px-6 py-2">
+        <nav className="flex items-center justify-between bg-card/80 backdrop-blur-lg rounded-2xl px-4 py-2 border border-border shadow-card">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <span className="text-xl font-bold text-foreground tracking-tight">

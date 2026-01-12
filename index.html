@@ -84,6 +84,13 @@
         "price": "17.00",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 7,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        },
         "seller": {
           "@type": "Organization",
           "name": "iLingue Relax"
@@ -96,6 +103,48 @@
         "bestRating": "5",
         "worstRating": "1"
       }
+    }
+    </script>
+    
+    <!-- Structured Data - FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿INGLÉS RELAX es un libro físico o digital?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico está previsto para junio de 2026."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuál es la garantía de devolución?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ofrecemos una garantía de devolución de 7 días. Si no estás satisfecho con el producto, te devolvemos el 100% de tu dinero sin preguntas."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo recibo el libro después de comprarlo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Después de completar tu compra, recibirás un enlace de descarga inmediata por correo electrónico. Podrás acceder al contenido en segundos."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Incluye pronunciación para hispanohablantes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí, cada palabra incluye pronunciación fonética especialmente diseñada para hispanohablantes, facilitando el aprendizaje del inglés con acentos UK y USA."
+          }
+        }
+      ]
     }
     </script>
     

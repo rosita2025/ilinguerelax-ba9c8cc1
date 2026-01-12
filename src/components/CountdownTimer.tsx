@@ -13,8 +13,8 @@ interface CountdownTimerProps {
 export const CountdownTimer = ({ 
   endDate, 
   hoursFromNow = 24,
-  currentPrice = "$14 USD",
-  originalPrice = "$100 USD",
+  currentPrice = "$17 USD",
+  originalPrice = "$54 USD",
   storageKey = "countdown_target",
   lang = "es"
 }: CountdownTimerProps) => {

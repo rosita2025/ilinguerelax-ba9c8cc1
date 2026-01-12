@@ -376,12 +376,15 @@ const ProductSpanish5000 = () => {
       <StickyBuyBar
         price="$29.99"
         originalPrice="$40"
-        productName="SPANISH RELAX v1.0 - 5,000 Spanish Words with English Pronunciation - Physical Book"
+        productName="SPANISH RELAX v1.0 - 5,000 Spanish Words with English Pronunciation"
         onBuyClick={handleBuyNow}
         ctaText="BUY NOW"
         disabled={false}
-        showReviews={false}
+        showReviews={true}
+        rating={4.8}
+        reviewCount={30}
         isLoading={isLoading}
+        lang="en"
       />
 
       {/* Spacer for sticky bar */}

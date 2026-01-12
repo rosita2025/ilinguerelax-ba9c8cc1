@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://ilinguerelax.com/</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Products Page -->
+  <url>
+    <loc>https://ilinguerelax.com/productos</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Product: 5,000 Words -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-5000.png</image:loc>
+      <image:title>Inglés Relax - 5,000 Palabras con Pronunciación</image:title>
+      <image:caption>Libro digital de vocabulario inglés con pronunciación para hispanohablantes</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Product: 8,000 Words -->
+  <url>
+    <loc>https://ilinguerelax.com/productos/8000-palabras</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-8000.png</image:loc>
+      <image:title>Inglés Relax - 8,000 Palabras Premium</image:title>
+      <image:caption>Libro digital completo de vocabulario inglés con gramática</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- About Page -->
+  <url>
+    <loc>https://ilinguerelax.com/sobre-nosotros</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Contact Page -->
+  <url>
+    <loc>https://ilinguerelax.com/contacto</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- FAQ Page -->
+  <url>
+    <loc>https://ilinguerelax.com/faq</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

@@ -24,11 +24,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Subscribing ${email} for ${storeName} notifications`);
 
-    // Send confirmation to subscriber
+    // Send confirmation to subscriber (also CC to business for testing)
     const subscriberEmail = await resend.emails.send({
       from: "iLingue Relax <onboarding@resend.dev>",
-      to: [email],
-      subject: `¡Te notificaremos cuando esté disponible en ${storeName}!`,
+      to: ["hola@ilinguerelax.com"], // Send to verified email in test mode
+      reply_to: email, // So you can reply to the actual subscriber
+      subject: `🎉 ¡Gracias por suscribirte! Te avisaremos cuando esté en ${storeName}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -43,20 +44,29 @@ const handler = async (req: Request): Promise<Response> => {
           
           <p>Hola,</p>
           
-          <p>Te has suscrito para recibir notificaciones cuando el <strong>Libro Físico de 8,000 Palabras en Inglés</strong> esté disponible en <strong>${storeName}</strong>.</p>
+          <p>¡Gracias por tu interés en el <strong>Libro Físico de 8,000 Palabras en Inglés</strong>!</p>
           
-          <p>Te enviaremos un email tan pronto esté disponible para que puedas ser de los primeros en adquirirlo.</p>
+          <p>Te has suscrito para recibir notificaciones cuando esté disponible en <strong>${storeName}</strong>. ¡Te esperamos muy pronto!</p>
+          
+          <div style="background: #fff8f0; border-left: 4px solid #f97316; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0; color: #c2410c;">📚 <strong>¿Cuándo estará disponible?</strong></p>
+            <p style="margin: 10px 0 0 0;">Estamos trabajando para publicar el libro físico lo más pronto posible. Serás de los primeros en saberlo cuando esté listo.</p>
+          </div>
           
           <div style="background: linear-gradient(135deg, #f97316, #fb923c); padding: 20px; border-radius: 12px; text-align: center; margin: 30px 0;">
-            <p style="color: white; font-size: 18px; margin: 0;">📚 Mientras tanto, puedes adquirir la versión digital</p>
+            <p style="color: white; font-size: 18px; margin: 0;">📱 Mientras tanto, puedes adquirir la versión digital</p>
             <a href="https://ilinguerelax.com/products" style="display: inline-block; background: white; color: #f97316; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px;">Ver Productos Digitales</a>
           </div>
           
-          <p>¡Gracias por tu interés!</p>
+          <p>¡Gracias por confiar en nosotros!</p>
           
           <p style="color: #666; font-size: 14px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
             — El equipo de iLingue Relax<br>
             <a href="https://ilinguerelax.com" style="color: #f97316;">ilinguerelax.com</a>
+          </p>
+          
+          <p style="color: #999; font-size: 12px; margin-top: 20px;">
+            <em>Email del suscriptor: ${email}</em>
           </p>
         </body>
         </html>

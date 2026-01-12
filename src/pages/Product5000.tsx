@@ -431,20 +431,6 @@ const Product5000 = () => {
               </div>
             </div>
 
-            {/* Chapters Preview */}
-            <h3 className="text-2xl font-bold text-center text-foreground mb-6">
-              52 Capítulos Temáticos
-            </h3>
-            <div className="flex flex-wrap justify-center gap-2 mb-12">
-              {chapters.map((chapter) => (
-                <span
-                  key={chapter}
-                  className="px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm"
-                >
-                  {chapter}
-                </span>
-              ))}
-            </div>
           </div>
         </div>
       </section>

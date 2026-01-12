@@ -2,7 +2,7 @@ import { useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Testimonials } from "@/components/Testimonials";
+
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
@@ -459,8 +459,6 @@ const Product5000 = () => {
       {/* Product Reviews Carousel */}
       <ProductReviews productType="english" />
 
-      {/* Testimonials */}
-      <Testimonials variant="light" />
 
       {/* FAQ Section */}
       <FAQ items={[{

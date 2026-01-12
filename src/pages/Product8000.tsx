@@ -1,7 +1,7 @@
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Testimonials } from "@/components/Testimonials";
+
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
@@ -268,8 +268,6 @@ const Product8000 = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <Testimonials variant="dark" />
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 gradient-hero">

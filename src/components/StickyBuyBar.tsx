@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { Check, Shield, Star, ArrowRight, Clock } from "lucide-react";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2 } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;
   originalPrice?: string;
   rating?: number;
   reviewCount?: number;
-  buyUrl: string;
+  buyUrl?: string;
+  onBuyClick?: () => void;
   ctaText?: string;
   productName?: string;
   disabled?: boolean;
   showReviews?: boolean;
+  isLoading?: boolean;
 }
 
 export const StickyBuyBar = ({
@@ -19,14 +21,20 @@ export const StickyBuyBar = ({
   rating = 4.65,
   reviewCount = 800,
   buyUrl,
+  onBuyClick,
   ctaText = "COMPRAR AHORA",
   productName,
   disabled = false,
   showReviews = true,
+  isLoading = false,
 }: StickyBuyBarProps) => {
   const handleBuy = () => {
-    if (!disabled) {
-      window.open(buyUrl, "_blank");
+    if (!disabled && !isLoading) {
+      if (onBuyClick) {
+        onBuyClick();
+      } else if (buyUrl) {
+        window.open(buyUrl, "_blank");
+      }
     }
   };
 
@@ -82,10 +90,19 @@ export const StickyBuyBar = ({
             size="default"
             className={`w-full shadow-lg text-sm py-2.5 h-auto ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
             onClick={handleBuy}
-            disabled={disabled}
+            disabled={disabled || isLoading}
           >
-            {ctaText}
-            {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                {ctaText}
+                {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+              </>
+            )}
           </Button>
         </div>
 
@@ -147,10 +164,19 @@ export const StickyBuyBar = ({
               size="default"
               className={`whitespace-nowrap shadow-lg text-sm px-4 py-2 h-auto ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
               onClick={handleBuy}
-              disabled={disabled}
+              disabled={disabled || isLoading}
             >
-              {ctaText}
-              {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {ctaText}
+                  {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+                </>
+              )}
             </Button>
           </div>
         </div>

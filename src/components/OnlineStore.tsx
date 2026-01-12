@@ -6,6 +6,7 @@ import logoKindle from "@/assets/logo-kindle.png";
 import logoShopify from "@/assets/logo-shopify.png";
 
 const storeLinks = [
+  // Digitales disponibles
   {
     name: "Amazon Kindle",
     logo: logoKindle,
@@ -38,6 +39,7 @@ const storeLinks = [
     price: "$17",
     priceNote: "+ impuestos",
   },
+  // Libro físico próximamente
   {
     name: "Amazon",
     logo: logoAmazon,

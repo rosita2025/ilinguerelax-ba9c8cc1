@@ -23,7 +23,7 @@ const products = [
     title: "Inglés Relax - 5,000 Palabras",
     subtitle: "Nivel Básico a Intermedio",
     description: "5,000 palabras más utilizadas con pronunciación español y fonética UK/USA",
-    price: 14,
+    price: 17,
     originalPrice: 100,
     rating: 4.8,
     reviews: 800,

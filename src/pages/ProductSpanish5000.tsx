@@ -125,7 +125,7 @@ const ProductSpanish5000 = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-16 pb-8 md:pt-20 md:pb-12">
+      <section className="pt-4 pb-6 md:pt-8 md:pb-10">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Product Image */}

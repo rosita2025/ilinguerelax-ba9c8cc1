@@ -97,7 +97,7 @@ export const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🔒</span>
-                <span>Garantía 30 días</span>
+                <span>Garantía 7 días</span>
               </div>
             </div>
           </div>

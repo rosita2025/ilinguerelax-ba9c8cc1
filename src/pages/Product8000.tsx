@@ -164,7 +164,7 @@ const Product8000 = () => {
               </Button>
 
               <p className="text-sm text-muted-foreground">
-                🔒 Pago 100% seguro • Garantía de 30 días • Acceso de por vida
+                🔒 Pago 100% seguro • Garantía de 7 días • Acceso de por vida
               </p>
             </div>
           </div>
@@ -291,7 +291,7 @@ const Product8000 = () => {
             </div>
 
             <p className="text-sm text-primary-foreground/70">
-              🔒 Pago 100% seguro • Garantía de satisfacción de 30 días
+              🔒 Pago 100% seguro • Garantía de satisfacción de 7 días
             </p>
           </div>
         </div>

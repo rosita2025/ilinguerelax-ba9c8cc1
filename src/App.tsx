@@ -9,6 +9,7 @@ import Products from "./pages/Products";
 import Product5000 from "./pages/Product5000";
 import Product8000 from "./pages/Product8000";
 import Product8000Book from "./pages/Product8000Book";
+import ProductSpanish5000 from "./pages/ProductSpanish5000";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import FAQPage from "./pages/FAQPage";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product5000 />} />
           <Route path="/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product8000 />} />
           <Route path="/products/8-000-palabras-libro-fisico" element={<Product8000Book />} />
+          <Route path="/products/spanish-5000-words" element={<ProductSpanish5000 />} />
           <Route path="/sobre-nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/faq" element={<FAQPage />} />

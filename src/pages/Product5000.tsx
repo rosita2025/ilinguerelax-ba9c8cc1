@@ -431,6 +431,41 @@ const Product5000 = () => {
               </div>
             </div>
 
+            {/* Benefits Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h4 className="text-2xl font-bold text-foreground mb-1">5,000+</h4>
+                <p className="text-sm text-muted-foreground">Palabras con pronunciación</p>
+              </div>
+              
+              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
+                  <Globe className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h4 className="text-2xl font-bold text-foreground mb-1">UK & USA</h4>
+                <p className="text-sm text-muted-foreground">Dos acentos incluidos</p>
+              </div>
+              
+              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
+                  <Download className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h4 className="text-2xl font-bold text-foreground mb-1">Fonética</h4>
+                <p className="text-sm text-muted-foreground">Pronunciación hispanohablante</p>
+              </div>
+              
+              <div className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full gradient-hero flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h4 className="text-2xl font-bold text-foreground mb-1">Acceso</h4>
+                <p className="text-sm text-muted-foreground">Descarga inmediata</p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

@@ -168,6 +168,11 @@ const Product5000 = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
+                {/* Vista Previa Label */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-4">
+                  <Eye className="w-4 h-4" />
+                  VISTA PREVIA O DEMO
+                </div>
                 <img src={product5000Image} alt="Inglés Relax - 5,000 Palabras" className="w-full h-auto rounded-2xl shadow-hero" />
               </div>
             </div>

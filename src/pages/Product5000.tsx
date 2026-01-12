@@ -582,7 +582,7 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$14"
+        price="$17"
         originalPrice="$100"
         rating={4.65}
         reviewCount={800}

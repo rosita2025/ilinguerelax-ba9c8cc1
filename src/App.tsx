@@ -23,7 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/productos" element={<Products />} />
-          <Route path="/productos/5000-palabras" element={<Product5000 />} />
+          <Route path="/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product5000 />} />
           <Route path="/productos/8000-palabras" element={<Product8000 />} />
           <Route path="/sobre-nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />

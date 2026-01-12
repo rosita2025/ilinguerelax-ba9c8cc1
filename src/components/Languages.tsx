@@ -1,8 +1,10 @@
-import { Clock, Star, Sparkles, ShoppingCart } from "lucide-react";
+import { Clock, Star, Sparkles, ShoppingCart, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import product5000 from "@/assets/product-5000.png";
 import product8000 from "@/assets/product-8000.png";
+import productSpanish5000 from "@/assets/product-spanish-5000.png";
+import product8000Book from "@/assets/product-8000-book.png";
 
 const products = [
   { 
@@ -37,10 +39,41 @@ const products = [
     discount: 70,
     badge: "Premium"
   },
+  { 
+    id: "8000-book",
+    name: "8,000 Palabras Libro", 
+    flag: "🇬🇧",
+    country: "Inglés UK / USA", 
+    link: "/products/8-000-palabras-libro-fisico",
+    image: product8000Book,
+    title: "Inglés Relax - 8,000 Palabras",
+    description: "Libro físico tapa blanda premium",
+    rating: 4.9,
+    reviews: 800,
+    price: 32.99,
+    originalPrice: null,
+    discount: null,
+    badge: "📖 Libro Físico"
+  },
+  { 
+    id: "spanish-5000",
+    name: "5,000 Palabras Español", 
+    flag: "🇪🇸",
+    country: "Español para Angloparlantes", 
+    link: "/products/5-000-palabras-en-espanol-con-pronunciacion-inglesa",
+    image: productSpanish5000,
+    title: "Spanish Relax - 5,000 Palabras",
+    description: "Español con pronunciación inglesa",
+    rating: 4.8,
+    reviews: 500,
+    price: 17.00,
+    originalPrice: 54.00,
+    discount: 67,
+    badge: "🆕 Nuevo"
+  },
 ];
 
 const comingSoon = [
-  { name: "Español", flag: "🇪🇸" },
   { name: "Italiano", flag: "🇮🇹" },
   { name: "Portugués", flag: "🇧🇷" },
   { name: "Francés", flag: "🇫🇷" },
@@ -86,12 +119,14 @@ export const Languages = () => {
               className="group relative bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-2"
             >
               {/* Discount Badge */}
-              <div className="absolute top-3 left-3 z-10">
-                <div className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  -{product.discount}% OFF
+              {product.discount && (
+                <div className="absolute top-3 left-3 z-10">
+                  <div className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    -{product.discount}% OFF
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Product Badge */}
               <div className="absolute top-3 right-3 z-10">
@@ -138,7 +173,9 @@ export const Languages = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl font-bold text-primary">${product.price}</span>
-                    <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
+                    {product.originalPrice && (
+                      <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
+                    )}
                   </div>
                   <Button 
                     size="sm" 

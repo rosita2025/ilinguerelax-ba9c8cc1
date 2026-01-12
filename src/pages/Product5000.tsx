@@ -374,16 +374,16 @@ const Product5000 = () => {
           </div>
 
           {/* Collaboration Ticker - Bottom with Logos */}
-          <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="py-4 flex animate-ticker">
-              {[...Array(2)].map((_, setIndex) => (
-                <div key={setIndex} className="flex items-center gap-20 md:gap-32 whitespace-nowrap px-12 md:px-20">
+          <div className="mt-12 py-6 bg-foreground rounded-2xl overflow-hidden">
+            <div className="flex animate-ticker" style={{ width: 'max-content' }}>
+              {[...Array(4)].map((_, setIndex) => (
+                <div key={setIndex} className="flex items-center shrink-0 gap-16 md:gap-24 px-8 md:px-12">
                   {partnerLogos.map((logo, index) => (
                     <img
                       key={`bottom-${setIndex}-${index}`}
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-6 md:h-8 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                      className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-80`}
                     />
                   ))}
                 </div>

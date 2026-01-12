@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to customer with download link
     const customerEmailResponse = await resend.emails.send({
-      from: "iLingue Relax <hello@ilinguerelax.com>",
+      from: "iLingue Relax <hola@ilinguerelax.com>",
       to: [customerEmail],
       subject: "🎉 Thank You for Your Purchase! Here's Your Digital Download",
       html: `
@@ -76,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin-bottom: 8px;">
-                If you have any questions, just reply to this email or contact us at <a href="mailto:hello@ilinguerelax.com" style="color: #8b5cf6;">hello@ilinguerelax.com</a>
+                If you have any questions, just reply to this email or contact us at <a href="mailto:hola@ilinguerelax.com" style="color: #8b5cf6;">hola@ilinguerelax.com</a>
               </p>
               
               <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin-top: 32px;">
@@ -99,8 +99,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification email to the business
     const notificationEmailResponse = await resend.emails.send({
-      from: "iLingue Relax <hello@ilinguerelax.com>",
-      to: ["hello@ilinguerelax.com"],
+      from: "iLingue Relax <hola@ilinguerelax.com>",
+      to: ["hola@ilinguerelax.com"],
       subject: `🛒 New Purchase! Spanish Relax - ${customerEmail}`,
       html: `
         <!DOCTYPE html>

@@ -7,6 +7,7 @@ interface StickyBuyBarProps {
   rating?: number;
   reviewCount?: number;
   buyUrl: string;
+  ctaText?: string;
 }
 
 export const StickyBuyBar = ({
@@ -15,6 +16,7 @@ export const StickyBuyBar = ({
   rating = 4.65,
   reviewCount = 800,
   buyUrl,
+  ctaText = "COMPRAR AHORA",
 }: StickyBuyBarProps) => {
   const handleBuy = () => {
     window.open(buyUrl, "_blank");
@@ -94,8 +96,8 @@ export const StickyBuyBar = ({
               className="whitespace-nowrap shadow-lg"
               onClick={handleBuy}
             >
-              <span className="hidden sm:inline">COMPRAR AHORA</span>
-              <span className="sm:hidden">COMPRAR</span>
+              <span className="hidden sm:inline">{ctaText}</span>
+              <span className="sm:hidden">{ctaText.split(' ')[0]}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>

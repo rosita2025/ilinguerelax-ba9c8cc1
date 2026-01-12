@@ -17,6 +17,7 @@ const products = [
     reviews: 800,
     badge: "MÁS VENDIDO",
     features: ["8,000 palabras", "Pronunciación español", "Fonética UK/USA"],
+    isPhysical: false,
   },
   {
     id: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
@@ -29,6 +30,20 @@ const products = [
     reviews: 800,
     badge: "OFERTA 86%",
     features: ["5,000 palabras", "4 Bonus gratis", "Acceso de por vida"],
+    isPhysical: false,
+  },
+  {
+    id: "8-000-palabras-libro-fisico",
+    title: "Inglés Relax - 8,000 Palabras",
+    subtitle: "Libro Físico Tapa Blanda",
+    description: "El mismo método completo ahora en libro físico premium. Compra anticipada.",
+    price: 32.99,
+    originalPrice: null,
+    rating: 4.9,
+    reviews: 800,
+    badge: "📖 LIBRO FÍSICO",
+    features: ["Tapa blanda", "300-350 páginas", "Incluye PDF"],
+    isPhysical: true,
   },
 ];
 
@@ -122,9 +137,11 @@ const Products = () => {
                     <span className="text-3xl font-bold text-foreground">
                       ${product.price}
                     </span>
-                    <span className="text-lg text-muted-foreground line-through">
-                      ${product.originalPrice}
-                    </span>
+                    {product.originalPrice && (
+                      <span className="text-lg text-muted-foreground line-through">
+                        ${product.originalPrice}
+                      </span>
+                    )}
                     <span className="text-sm text-accent font-medium">USD</span>
                   </div>
 

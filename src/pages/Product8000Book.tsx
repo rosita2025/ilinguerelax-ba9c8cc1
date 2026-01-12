@@ -7,7 +7,6 @@ import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import {
-  Star,
   Check,
   BookOpen,
   Sparkles,
@@ -24,8 +23,8 @@ import {
   Clock,
 } from "lucide-react";
 
-// Product image (reusing the same one for now)
-import product8000Image from "@/assets/product-8000.png";
+// Product image
+import product8000BookImage from "@/assets/product-8000-book.png";
 
 const features = [
   "8,000 palabras esenciales del inglés",
@@ -88,14 +87,10 @@ const Product8000Book = () => {
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
                 <img
-                  src={product8000Image}
+                  src={product8000BookImage}
                   alt="Inglés Relax - 8,000 Palabras Libro Físico"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
-                {/* Physical Book Badge */}
-                <div className="absolute top-4 left-4 px-4 py-2 rounded-full bg-amber-500 text-white text-sm font-bold shadow-lg">
-                  📖 LIBRO FÍSICO
-                </div>
               </div>
             </div>
 
@@ -117,17 +112,6 @@ const Product8000Book = () => {
                 Perfecto para estudiar sin pantallas.
               </p>
 
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-5 h-5 fill-accent text-accent"
-                    />
-                  ))}
-                </div>
-                <span className="text-muted-foreground">4.9/5 (Basado en versión digital)</span>
-              </div>
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
@@ -154,10 +138,12 @@ const Product8000Book = () => {
               </div>
 
               {/* CTA */}
-              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-amber-500 hover:bg-amber-600">
-                RESERVAR AHORA - $32.99
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              <a href="https://pay.hotmart.com/O100578526P?checkoutMode=10" target="_blank" rel="noopener noreferrer">
+                <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-amber-500 hover:bg-amber-600">
+                  RESERVAR AHORA - $32.99
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </a>
 
               <p className="text-sm text-muted-foreground">
                 🔒 Pago 100% seguro • Envío Junio 2026 • Incluye versión PDF
@@ -326,9 +312,7 @@ const Product8000Book = () => {
       <StickyBuyBar
         price="$32.99"
         originalPrice=""
-        rating={4.9}
-        reviewCount={10000}
-        buyUrl="#"
+        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
         ctaText="RESERVAR LIBRO FÍSICO"
       />
 

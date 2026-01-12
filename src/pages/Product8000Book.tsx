@@ -317,11 +317,11 @@ const Product8000Book = () => {
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />
 
-      {/* Sales Notification Popup */}
-      <SalesNotification 
+      {/* Sales Notification Popup - Disabled until product is available */}
+      {/* <SalesNotification 
         productName="Libro Físico 8,000 Palabras" 
         productLabel="Libro Físico" 
-      />
+      /> */}
     </main>
   );
 };

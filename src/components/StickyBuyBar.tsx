@@ -55,13 +55,13 @@ export const StickyBuyBar = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
-      <div className="container px-3 sm:px-4 py-2 sm:py-3">
-        {/* Mobile: Vertical Stack Layout */}
-        <div className="flex sm:hidden flex-col gap-2">
+      <div className="container px-3 sm:px-4 py-2 lg:py-3">
+        {/* Mobile & Tablet: Vertical Stack Layout */}
+        <div className="flex lg:hidden flex-col gap-2">
           {/* Row 1: Product Name */}
           {productName && (
             <div className="text-center">
-              <span className="text-sm font-semibold text-foreground">
+              <span className="text-xs sm:text-sm font-semibold text-foreground line-clamp-2">
                 {productName}
               </span>
             </div>
@@ -89,33 +89,33 @@ export const StickyBuyBar = ({
           </Button>
         </div>
 
-        {/* Desktop/Tablet: Horizontal Layout */}
-        <div className="hidden sm:flex items-center justify-between gap-3">
+        {/* Desktop: Horizontal Layout */}
+        <div className="hidden lg:flex items-center justify-between gap-3">
           {/* Product Name & Trust Badges */}
-          <div className="flex items-center gap-2 md:gap-4 flex-wrap justify-center md:justify-start">
+          <div className="flex items-center gap-4 flex-wrap">
             {productName && (
-              <span className="text-sm md:text-base font-semibold text-foreground truncate max-w-[150px] md:max-w-none">
+              <span className="text-base font-semibold text-foreground truncate max-w-[300px]">
                 {productName}
               </span>
             )}
 
-            {/* Verified Badge - Hidden on tablet */}
-            <div className="hidden lg:flex items-center gap-1.5 text-sm">
+            {/* Verified Badge */}
+            <div className="flex items-center gap-1.5 text-sm">
               <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
               </div>
               <span className="text-muted-foreground">Compra Verificada</span>
             </div>
 
-            {/* Secure Badge - Hidden on tablet */}
-            <div className="hidden lg:flex items-center gap-1.5 text-sm">
+            {/* Secure Badge */}
+            <div className="flex items-center gap-1.5 text-sm">
               <Shield className="w-4 h-4 text-primary" />
               <span className="text-muted-foreground">Pago Seguro</span>
             </div>
 
             {/* Reviews */}
             {showReviews && (
-              <div className="hidden md:flex items-center gap-1.5 text-sm">
+              <div className="flex items-center gap-1.5 text-sm">
                 {renderStars()}
                 <span className="text-foreground font-medium">{rating}</span>
                 <span className="text-muted-foreground">({reviewCount} reseñas)</span>
@@ -128,14 +128,14 @@ export const StickyBuyBar = ({
             {/* Price */}
             <div className="text-right">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl md:text-3xl font-bold text-foreground">{price}</span>
+                <span className="text-2xl font-bold text-foreground">{price}</span>
                 {originalPrice && (
                   <span className="text-sm text-muted-foreground line-through">{originalPrice}</span>
                 )}
                 <span className="text-sm text-muted-foreground">USD</span>
               </div>
               {!disabled && (
-                <p className="hidden md:block text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Puedes cambiar la moneda de tu país en el checkout
                 </p>
               )}

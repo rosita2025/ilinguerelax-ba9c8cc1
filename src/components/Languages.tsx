@@ -66,19 +66,18 @@ const products = [{
   discount: 67,
   badge: "🆕 Nuevo"
 }];
-const comingSoon = [{
-  name: "Italiano",
-  flag: "🇮🇹"
-}, {
-  name: "Portugués",
-  flag: "🇧🇷"
-}, {
-  name: "Francés",
-  flag: "🇫🇷"
-}, {
-  name: "Alemán",
-  flag: "🇩🇪"
-}];
+const comingSoon = [
+  { name: "Italiano", flag: "🇮🇹" },
+  { name: "Portugués", flag: "🇧🇷" },
+  { name: "Francés", flag: "🇫🇷" },
+  { name: "Alemán", flag: "🇩🇪" },
+  { name: "Japonés", flag: "🇯🇵" },
+  { name: "Chino", flag: "🇨🇳" },
+  { name: "Coreano", flag: "🇰🇷" },
+  { name: "Ruso", flag: "🇷🇺" },
+  { name: "Árabe", flag: "🇸🇦" },
+  { name: "Hindi", flag: "🇮🇳" },
+];
 export const Languages = () => {
   const renderStars = (rating: number) => {
     return Array.from({

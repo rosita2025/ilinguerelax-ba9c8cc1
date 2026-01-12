@@ -319,7 +319,7 @@ const Product5000 = () => {
       </section>
 
       {/* What's Included */}
-      <section className="py-12 md:py-16">
+      <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
@@ -418,7 +418,7 @@ const Product5000 = () => {
       </section>
 
       {/* Bonuses */}
-      <section className="py-20 md:py-28 bg-secondary/30">
+      <section className="py-12 md:py-16 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full gradient-accent text-accent-foreground text-sm font-bold mb-4">

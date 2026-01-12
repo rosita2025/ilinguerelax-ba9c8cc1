@@ -24,10 +24,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Subscribing ${email} for ${storeName} notifications`);
 
-    // Send confirmation to subscriber (also CC to business for testing)
+    // Send confirmation to subscriber AND business
     const subscriberEmail = await resend.emails.send({
       from: "iLingue Relax <onboarding@resend.dev>",
-      to: ["hola@ilinguerelax.com"], // Send to verified email in test mode
+      to: [email, "hola@ilinguerelax.com"], // Send to both subscriber and business
       reply_to: email, // So you can reply to the actual subscriber
       subject: `🎉 ¡Gracias por suscribirte! Te avisaremos cuando esté en ${storeName}`,
       html: `

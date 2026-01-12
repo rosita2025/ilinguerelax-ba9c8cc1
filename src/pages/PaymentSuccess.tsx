@@ -189,7 +189,7 @@ const PaymentSuccess = () => {
                   Back to Home
                 </Button>
               </Link>
-              <Link to="/productos">
+              <Link to="/products">
                 <Button variant="hero" size="lg">
                   Explore More Products
                   <ArrowRight className="w-4 h-4 ml-2" />

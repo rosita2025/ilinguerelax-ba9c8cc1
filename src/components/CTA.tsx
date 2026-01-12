@@ -16,7 +16,7 @@ export const CTA = () => {
             variant="hero" 
             size="xl" 
             className="bg-white text-primary hover:bg-white/90"
-            onClick={() => window.location.href = "/productos"}
+            onClick={() => window.location.href = "/products"}
           >
             VER PRODUCTOS
             <ArrowRight className="w-5 h-5" />

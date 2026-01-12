@@ -38,7 +38,7 @@ export const Navbar = () => {
               Home
             </Link>
             <Link
-              to="/productos"
+              to="/products"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Productos
@@ -65,7 +65,7 @@ export const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link to="/productos">
+            <Link to="/products">
               <Button variant="hero" size="default" className="text-sm xl:text-base px-4 xl:px-6">
                 Comenzar Ahora
               </Button>
@@ -94,7 +94,7 @@ export const Navbar = () => {
                 Home
               </Link>
               <Link
-                to="/productos"
+                to="/products"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
@@ -122,7 +122,7 @@ export const Navbar = () => {
                 FAQ
               </Link>
               <div className="pt-2 border-t border-border mt-2">
-                <Link to="/productos" onClick={handleLinkClick}>
+                <Link to="/products" onClick={handleLinkClick}>
                   <Button variant="hero" size="default" className="w-full">
                     Comenzar Ahora
                   </Button>

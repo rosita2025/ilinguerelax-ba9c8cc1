@@ -172,7 +172,7 @@ export const Contact = () => {
                   Consulta nuestras preguntas frecuentes para respuestas inmediatas.
                 </p>
                 <Button variant="outline" size="sm" asChild>
-                  <a href="/productos">Ver FAQ</a>
+                  <a href="/faq">Ver FAQ</a>
                 </Button>
               </div>
             </div>

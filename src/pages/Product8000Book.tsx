@@ -315,7 +315,7 @@ const Product8000Book = () => {
       <StickyBuyBar
         price="$32.99"
         originalPrice="$45"
-        productName="Libro Físico 8,000 Palabras"
+        productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
         buyUrl="#"
         ctaText="PRÓXIMAMENTE"
         disabled={true}

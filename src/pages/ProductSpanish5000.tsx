@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -72,6 +73,17 @@ const benefits = [
 
 const ProductSpanish5000 = () => {
   const [isLoading, setIsLoading] = useState(false);
+
+  // Meta Pixel ViewContent event
+  const pixelParams = useMemo(() => ({
+    content_name: "Spanish Relax - 5,000 Words",
+    content_category: "Digital Book",
+    content_ids: ["product-spanish-5000"],
+    content_type: "product",
+    value: 29.99,
+    currency: "USD",
+  }), []);
+  useMetaPixelViewContent(pixelParams);
 
   const handleBuyNow = async () => {
     setIsLoading(true);

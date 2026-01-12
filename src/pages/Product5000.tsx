@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -88,6 +89,17 @@ const chapters = ["Casa y Hogar", "Comidas y Bebidas", "Transportes", "Profesion
 const Product5000 = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Meta Pixel ViewContent event
+  const pixelParams = useMemo(() => ({
+    content_name: "Inglés Relax - 5,000 Palabras",
+    content_category: "Digital Book",
+    content_ids: ["product-5000"],
+    content_type: "product",
+    value: 17,
+    currency: "USD",
+  }), []);
+  useMetaPixelViewContent(pixelParams);
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
     setLightboxOpen(true);

@@ -41,7 +41,7 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/products/spanish-5000-words?payment=success`,
+      success_url: `${req.headers.get("origin")}/payment-success`,
       cancel_url: `${req.headers.get("origin")}/products/spanish-5000-words?payment=canceled`,
       billing_address_collection: "required",
       shipping_address_collection: {

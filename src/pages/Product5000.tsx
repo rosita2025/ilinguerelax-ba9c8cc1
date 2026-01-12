@@ -313,39 +313,8 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Demo/Preview Section */}
-      <section className="py-16 md:py-20 bg-secondary/30">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-4">
-              <Eye className="w-4 h-4" />
-              DEMO / VISTA PREVIA
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Mira lo que contiene el libro digital</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
-              ¡APROVECHA Y RECIBE 4 BONUS GRATUITAS!
-            </p>
-          </div>
-
-
-          {/* Collaboration Ticker - Bottom with Logos */}
-          <div className="mt-12 py-6 bg-foreground rounded-2xl overflow-hidden">
-            <div className="flex animate-ticker" style={{
-            width: 'max-content'
-          }}>
-              {[...Array(4)].map((_, setIndex) => <div key={setIndex} className="flex items-center shrink-0 gap-16 md:gap-24 px-8 md:px-12">
-                  {partnerLogos.map((logo, index) => <img key={`bottom-${setIndex}-${index}`} src={logo.src} alt={logo.alt} className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-80`} />)}
-                </div>)}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Banner */}
-      
-
       {/* What's Included */}
-      <section className="py-20 md:py-28">
+      <section className="py-12 md:py-16">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">

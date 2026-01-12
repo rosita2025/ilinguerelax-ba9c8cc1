@@ -246,7 +246,7 @@ const Product5000 = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$14</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
                 <span className="text-2xl text-muted-foreground line-through">
                   $100
                 </span>

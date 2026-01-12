@@ -11,7 +11,7 @@ const products = [
     title: "Inglés Relax - 8,000 Palabras",
     subtitle: "Libro Digital Completo",
     description: "Domina 8,000 palabras en inglés con pronunciación en español para hispanohablantes",
-    price: 27,
+    price: 24,
     originalPrice: 197,
     rating: 4.9,
     reviews: 800,

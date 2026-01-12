@@ -13,6 +13,16 @@ const Products = () => {
         title="Productos - Libros Digitales de Idiomas"
         description="Explora nuestra colección de libros digitales para aprender idiomas. Inglés, Español y más con pronunciación. Descarga inmediata."
         canonicalUrl="https://ilinguerelax.com/productos"
+        keywords="libros digitales idiomas, aprender inglés, aprender español, vocabulario inglés, pronunciación inglés, Spanish for English speakers, English vocabulary"
+        productList={products.map((product) => ({
+          name: product.title,
+          description: product.description,
+          price: product.price,
+          image: `https://ilinguerelax.com${product.image}`,
+          url: `https://ilinguerelax.com/products/${product.slug}`,
+          rating: product.rating,
+          reviewCount: product.reviews,
+        }))}
       />
       <Navbar />
 
@@ -51,6 +61,7 @@ const Products = () => {
                   <img
                     src={product.image}
                     alt={product.title}
+                    loading="lazy"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

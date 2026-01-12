@@ -77,7 +77,16 @@ export const StickyBuyBar = ({
             </div>
           )}
           
-          {/* Row 2: Price */}
+          {/* Row 2: Reviews */}
+          {showReviews && (
+            <div className="flex items-center justify-center gap-1.5 text-sm">
+              {renderStars()}
+              <span className="text-foreground font-medium">{rating}</span>
+              <span className="text-muted-foreground">({reviewCount} {lang === "en" ? "reviews" : "reseñas"})</span>
+            </div>
+          )}
+          
+          {/* Row 3: Price */}
           <div className="flex items-center justify-center gap-2">
             <span className="text-xl font-bold text-foreground">{price}</span>
             {originalPrice && (

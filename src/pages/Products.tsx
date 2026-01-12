@@ -3,62 +3,8 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, BookOpen } from "lucide-react";
-
-const products = [
-  {
-    id: "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
-    title: "Inglés Relax - 8,000 Palabras",
-    subtitle: "Libro Digital Completo",
-    description: "Domina 8,000 palabras en inglés con pronunciación en español para hispanohablantes",
-    price: 24,
-    originalPrice: 76,
-    rating: 4.9,
-    reviews: 800,
-    badge: "MÁS VENDIDO",
-    features: ["8,000 palabras", "Pronunciación español", "Fonética UK/USA"],
-    isPhysical: false,
-  },
-  {
-    id: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
-    title: "Inglés Relax - 5,000 Palabras",
-    subtitle: "Nivel Básico a Intermedio",
-    description: "5,000 palabras más utilizadas con pronunciación español y fonética UK/USA",
-    price: 17,
-    originalPrice: 54,
-    rating: 4.8,
-    reviews: 800,
-    badge: "OFERTA 86%",
-    features: ["5,000 palabras", "4 Bonus gratis", "Acceso de por vida"],
-    isPhysical: false,
-  },
-  {
-    id: "8-000-palabras-libro-fisico",
-    title: "Inglés Relax - 8,000 Palabras",
-    subtitle: "Libro Físico Tapa Blanda",
-    description: "El mismo método completo ahora en libro físico premium. Compra anticipada.",
-    price: 32.99,
-    originalPrice: null,
-    rating: 4.9,
-    reviews: 800,
-    badge: "📖 LIBRO FÍSICO",
-    features: ["Tapa blanda", "300-350 páginas", "Incluye PDF"],
-    isPhysical: true,
-  },
-  {
-    id: "5-000-palabras-en-espanol-con-pronunciacion-inglesa",
-    title: "Spanish Relax - 5,000 Palabras",
-    subtitle: "Español para Angloparlantes",
-    description: "5,000 palabras en español con pronunciación inglesa para hablantes de inglés",
-    price: 17,
-    originalPrice: 54,
-    rating: 4.8,
-    reviews: 500,
-    badge: "🇪🇸 NUEVO",
-    features: ["5,000 palabras", "Pronunciación inglesa", "Para angloparlantes"],
-    isPhysical: false,
-  },
-];
+import { ArrowRight, Star } from "lucide-react";
+import { products, getProductLink } from "@/data/products";
 
 const Products = () => {
   return (
@@ -69,7 +15,7 @@ const Products = () => {
         canonicalUrl="https://ilinguerelax.com/productos"
       />
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 gradient-hero">
         <div className="container px-4 md:px-6">
@@ -101,14 +47,21 @@ const Products = () => {
                 </div>
 
                 {/* Product Image Area */}
-                <div className="relative h-48 gradient-hero flex items-center justify-center">
-                  <div className="flex items-center gap-4">
-                    <BookOpen className="w-16 h-16 text-primary-foreground/80" />
-                  </div>
+                <div className="relative h-48 bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center p-6">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
 
                 {/* Content */}
                 <div className="p-6 md:p-8">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">{product.flag}</span>
+                    <span className="text-sm text-muted-foreground">{product.country}</span>
+                  </div>
+
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -159,7 +112,7 @@ const Products = () => {
                   </div>
 
                   {/* CTA */}
-                  <Link to={`/products/${product.id}`}>
+                  <Link to={getProductLink(product)}>
                     <Button variant="hero" size="lg" className="w-full">
                       Ver Detalles
                       <ArrowRight className="w-4 h-4" />

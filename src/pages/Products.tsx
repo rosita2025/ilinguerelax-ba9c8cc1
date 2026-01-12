@@ -47,7 +47,7 @@ const Products = () => {
                 </div>
 
                 {/* Product Image Area */}
-                <div className="relative h-48 bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center p-6">
+                <div className="relative h-72 bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center p-8">
                   <img
                     src={product.image}
                     alt={product.title}

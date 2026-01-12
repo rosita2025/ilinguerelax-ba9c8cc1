@@ -8,11 +8,10 @@ export const WhatsAppButton = () => {
       href={WHATSAPP_LINK}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-24 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white shadow-lg hover:scale-105 transition-transform duration-300 group"
+      className="fixed bottom-32 md:bottom-28 right-4 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:scale-110 hover:bg-green-600 transition-all duration-300"
       aria-label="Contactar por WhatsApp"
     >
-      <MessageCircle className="w-6 h-6 fill-green-500 text-green-500" />
-      <span className="font-medium hidden sm:inline">Chat</span>
+      <MessageCircle className="w-7 h-7 fill-white" />
     </a>
   );
 };

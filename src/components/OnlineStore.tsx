@@ -14,6 +14,7 @@ const storeLinks = [
     available: true,
     price: "$22",
     priceNote: "impuestos incluidos",
+    type: "📖 Libro Digital",
   },
   {
     name: "Etsy",
@@ -22,6 +23,7 @@ const storeLinks = [
     available: true,
     price: "$22",
     priceNote: "impuestos incluidos",
+    type: "📖 Libro Digital",
   },
   {
     name: "Hotmart",
@@ -30,6 +32,7 @@ const storeLinks = [
     available: true,
     price: "$17",
     priceNote: "",
+    type: "📖 Libro Digital",
   },
   {
     name: "Shopify",
@@ -38,6 +41,7 @@ const storeLinks = [
     available: true,
     price: "$17",
     priceNote: "+ impuestos",
+    type: "📖 Libro Digital",
   },
   // Libro físico próximamente
   {
@@ -98,6 +102,10 @@ export const OnlineStore = () => {
               }`}>
                 {store.name}
               </span>
+
+              {store.available && store.type && (
+                <span className="text-xs text-muted-foreground mt-1">{store.type}</span>
+              )}
 
               {store.available && store.price && (
                 <div className="mt-2 text-center">

@@ -551,7 +551,7 @@ const Product5000 = () => {
 
             <div className="bg-card rounded-3xl border border-border shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$14</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
                 <span className="text-2xl text-muted-foreground line-through">
                   $100
                 </span>

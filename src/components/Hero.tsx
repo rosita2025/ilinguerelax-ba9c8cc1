@@ -1,7 +1,6 @@
 import { ArrowRight, Play, Smile, Brain, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
-import logoIlingue from "@/assets/logo-ilingue.png";
 
 export const Hero = () => {
   return (
@@ -23,7 +22,9 @@ export const Hero = () => {
         <div className="max-w-4xl mx-auto text-center">
           {/* Logo Badge */}
           <div className="inline-flex items-center gap-3 mb-8 animate-fade-in">
-            <img src={logoIlingue} alt="iLingue" className="h-10 md:h-12" />
+            <span className="text-2xl md:text-3xl font-bold text-primary-foreground tracking-tight">
+              iLingue <span className="font-light">Relax</span>
+            </span>
           </div>
 
           {/* Main Heading */}

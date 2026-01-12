@@ -11,6 +11,7 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { LiveViewers } from "@/components/LiveViewers";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { ProductReviews } from "@/components/ProductReviews";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Star, Check, BookOpen, Globe, ArrowRight, ShoppingCart, Clock, Gift, Download, RefreshCw, Eye, ZoomIn, ChevronLeft, ChevronRight, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, X } from "lucide-react";
@@ -507,6 +508,9 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true" discount="15%" />
+
+      {/* WhatsApp Support Button */}
+      <WhatsAppButton />
     </main>;
 };
 export default Product5000;

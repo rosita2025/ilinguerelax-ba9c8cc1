@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -82,6 +84,17 @@ const benefits = [
 ];
 
 const Product8000 = () => {
+  // Meta Pixel ViewContent event
+  const pixelParams = useMemo(() => ({
+    content_name: "Inglés Relax - 8,000 Palabras Digital",
+    content_category: "Digital Book",
+    content_ids: ["product-8000"],
+    content_type: "product",
+    value: 24,
+    currency: "USD",
+  }), []);
+  useMetaPixelViewContent(pixelParams);
+
   return (
     <main className="min-h-screen bg-background">
       <SEO

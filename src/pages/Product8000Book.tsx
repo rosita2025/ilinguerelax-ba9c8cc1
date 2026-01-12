@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -65,6 +67,17 @@ const benefits = [
 ];
 
 const Product8000Book = () => {
+  // Meta Pixel ViewContent event
+  const pixelParams = useMemo(() => ({
+    content_name: "Inglés Relax - 8,000 Palabras Libro Físico",
+    content_category: "Physical Book",
+    content_ids: ["product-8000-book"],
+    content_type: "product",
+    value: 32.99,
+    currency: "USD",
+  }), []);
+  useMetaPixelViewContent(pixelParams);
+
   return (
     <main className="min-h-screen bg-background">
       <SEO

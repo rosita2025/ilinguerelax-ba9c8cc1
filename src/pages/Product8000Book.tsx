@@ -152,7 +152,12 @@ const Product8000Book = () => {
       </section>
 
       {/* Countdown Timer */}
-      <CountdownTimer hoursFromNow={48} />
+      <CountdownTimer 
+        hoursFromNow={48} 
+        currentPrice="$32.99 USD"
+        originalPrice="$45 USD"
+        storageKey="countdown_book_physical"
+      />
 
       {/* Benefits */}
       <section className="py-20 md:py-28 bg-secondary/30">

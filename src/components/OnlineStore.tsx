@@ -3,6 +3,7 @@ import logoAmazon from "@/assets/logo-amazon.png";
 import logoEtsy from "@/assets/logo-etsy.png";
 import logoHotmart from "@/assets/logo-hotmart.svg";
 import logoKindle from "@/assets/logo-kindle.png";
+import logoShopify from "@/assets/logo-shopify.png";
 
 const storeLinks = [
   {
@@ -30,8 +31,23 @@ const storeLinks = [
     priceNote: "",
   },
   {
+    name: "Shopify",
+    logo: logoShopify,
+    url: "https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+    available: true,
+    price: "$17",
+    priceNote: "+ impuestos",
+  },
+  {
     name: "Amazon",
     logo: logoAmazon,
+    url: "#",
+    available: false,
+    comingSoon: "📚 Libro Físico - Muy Pronto",
+  },
+  {
+    name: "Shopify",
+    logo: logoShopify,
     url: "#",
     available: false,
     comingSoon: "📚 Libro Físico - Muy Pronto",
@@ -54,7 +70,7 @@ export const OnlineStore = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {storeLinks.map((store, index) => (
             <a
               key={index}

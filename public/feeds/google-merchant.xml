@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>Inglés Relax - Productos</title>
+    <link>https://inglesrelax.com</link>
+    <description>Libros digitales para aprender idiomas con pronunciación</description>
+    
+    <item>
+      <g:id>5000</g:id>
+      <g:title>Inglés Relax - 5,000 Palabras en Inglés con Pronunciación</g:title>
+      <g:description>Vocabulario esencial con pronunciación en español y fonética UK/USA. Nivel Básico a Intermedio. Incluye 4 Bonus gratis y acceso de por vida.</g:description>
+      <g:link>https://inglesrelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:link>
+      <g:image_link>https://inglesrelax.com/assets/product-5000.png</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>17.00 USD</g:price>
+      <g:sale_price>17.00 USD</g:sale_price>
+      <g:brand>Inglés Relax</g:brand>
+      <g:gtin></g:gtin>
+      <g:mpn>IR-5000-EN</g:mpn>
+      <g:google_product_category>Media > Books > E-books</g:google_product_category>
+      <g:product_type>Libros Digitales > Idiomas > Inglés</g:product_type>
+    </item>
+    
+    <item>
+      <g:id>8000</g:id>
+      <g:title>Inglés Relax - 8,000 Palabras en Inglés con Pronunciación</g:title>
+      <g:description>Vocabulario completo + gramática con pronunciación en español y fonética UK/USA. Libro Digital Completo Premium.</g:description>
+      <g:link>https://inglesrelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:link>
+      <g:image_link>https://inglesrelax.com/assets/product-8000.png</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>24.00 USD</g:price>
+      <g:sale_price>24.00 USD</g:sale_price>
+      <g:brand>Inglés Relax</g:brand>
+      <g:gtin></g:gtin>
+      <g:mpn>IR-8000-EN</g:mpn>
+      <g:google_product_category>Media > Books > E-books</g:google_product_category>
+      <g:product_type>Libros Digitales > Idiomas > Inglés</g:product_type>
+    </item>
+    
+    <item>
+      <g:id>8000-book</g:id>
+      <g:title>Inglés Relax - 8,000 Palabras Libro Físico Tapa Blanda</g:title>
+      <g:description>Libro físico tapa blanda premium con 300-350 páginas. Incluye versión PDF digital gratis.</g:description>
+      <g:link>https://inglesrelax.com/products/8-000-palabras-libro-fisico</g:link>
+      <g:image_link>https://inglesrelax.com/assets/product-8000-book.png</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>32.99 USD</g:price>
+      <g:brand>Inglés Relax</g:brand>
+      <g:gtin></g:gtin>
+      <g:mpn>IR-8000-BOOK</g:mpn>
+      <g:google_product_category>Media > Books</g:google_product_category>
+      <g:product_type>Libros Físicos > Idiomas > Inglés</g:product_type>
+      <g:shipping>
+        <g:country>US</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0 USD</g:price>
+      </g:shipping>
+    </item>
+    
+    <item>
+      <g:id>spanish-5000</g:id>
+      <g:title>Spanish Relax - 5,000 Words with English Pronunciation</g:title>
+      <g:description>Essential Spanish vocabulary with English pronunciation for English speakers. Includes lifetime access.</g:description>
+      <g:link>https://inglesrelax.com/products/spanish-5000-words</g:link>
+      <g:image_link>https://inglesrelax.com/assets/product-spanish-5000.png</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>17.00 USD</g:price>
+      <g:sale_price>17.00 USD</g:sale_price>
+      <g:brand>Inglés Relax</g:brand>
+      <g:gtin></g:gtin>
+      <g:mpn>IR-5000-ES</g:mpn>
+      <g:google_product_category>Media > Books > E-books</g:google_product_category>
+      <g:product_type>Digital Books > Languages > Spanish</g:product_type>
+    </item>
+    
+  </channel>
+</rss>

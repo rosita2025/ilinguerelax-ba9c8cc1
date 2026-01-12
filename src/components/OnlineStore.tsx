@@ -10,18 +10,24 @@ const storeLinks = [
     logo: logoKindle,
     url: "https://www.amazon.com/vocabulario-pronunciaci%C3%B3n-hispano-hablantes-espa%C3%B1ol-ebook/dp/B0FMPNWH14",
     available: true,
+    price: "$22",
+    priceNote: "impuestos incluidos",
   },
   {
     name: "Etsy",
     logo: logoEtsy,
     url: "https://www.etsy.com/listing/4349268621/5000-english-words-with-spanish",
     available: true,
+    price: "$22",
+    priceNote: "impuestos incluidos",
   },
   {
     name: "Hotmart",
     logo: logoHotmart,
     url: "https://hotmart.com/es/marketplace/productos/10-categorias-de-ingles-con-pronunciacion-hispanohablantes-espanol-1000-palabras/O100578526P",
     available: true,
+    price: "$17",
+    priceNote: "",
   },
   {
     name: "Amazon",
@@ -75,8 +81,17 @@ export const OnlineStore = () => {
                 {store.name}
               </span>
 
+              {store.available && store.price && (
+                <div className="mt-2 text-center">
+                  <span className="text-2xl font-bold text-primary">{store.price}</span>
+                  {store.priceNote && (
+                    <span className="block text-xs text-muted-foreground">{store.priceNote}</span>
+                  )}
+                </div>
+              )}
+
               {store.available ? (
-                <span className="flex items-center gap-1 mt-2 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="flex items-center gap-1 mt-3 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                   Comprar ahora <ExternalLink className="w-3 h-3" />
                 </span>
               ) : (

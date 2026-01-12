@@ -10,7 +10,7 @@ const products = [
     name: "5,000 Palabras", 
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    link: "/productos/5000-palabras",
+    link: "/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
     image: product5000,
     title: "Inglés Relax - 5,000 Palabras",
     description: "Vocabulario esencial con pronunciación",

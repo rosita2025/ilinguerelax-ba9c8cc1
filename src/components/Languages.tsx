@@ -55,7 +55,7 @@ const products = [{
   name: "5,000 Palabras Español",
   flag: "🇪🇸",
   country: "Español para Angloparlantes",
-  link: "/products/5-000-palabras-en-espanol-con-pronunciacion-inglesa",
+  link: "/products/spanish-5000-words",
   image: productSpanish5000,
   title: "Spanish Relax - 5,000 Palabras",
   description: "Español con pronunciación inglesa",

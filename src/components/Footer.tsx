@@ -13,7 +13,7 @@ export const Footer = () => {
           </Link>
 
           <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/70">
-            <Link to="/productos" className="hover:text-primary-foreground transition-colors">
+            <Link to="/products" className="hover:text-primary-foreground transition-colors">
               Productos
             </Link>
             <Link to="/sobre-nosotros" className="hover:text-primary-foreground transition-colors">

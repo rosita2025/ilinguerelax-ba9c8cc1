@@ -12,7 +12,7 @@ const Products = () => {
       <SEO
         title="Productos - Libros Digitales de Idiomas"
         description="Explora nuestra colección de libros digitales para aprender idiomas. Inglés, Español y más con pronunciación. Descarga inmediata."
-        canonicalUrl="https://ilinguerelax.com/productos"
+        canonicalUrl="https://ilinguerelax.com/products"
         keywords="libros digitales idiomas, aprender inglés, aprender español, vocabulario inglés, pronunciación inglés, Spanish for English speakers, English vocabulary"
         productList={products.map((product) => ({
           name: product.title,

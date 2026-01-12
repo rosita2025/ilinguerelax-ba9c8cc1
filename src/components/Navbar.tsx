@@ -30,43 +30,43 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
             <Link
               to="/"
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Home
             </Link>
             <Link
               to="/productos"
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Productos
             </Link>
             <Link
               to="/sobre-nosotros"
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Sobre Nosotros
             </Link>
             <Link
               to="/contacto"
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Contacto
             </Link>
             <Link
               to="/faq"
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               FAQ
             </Link>
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <Link to="/productos">
-              <Button variant="hero" size="default">
+              <Button variant="hero" size="default" className="text-sm xl:text-base px-4 xl:px-6">
                 Comenzar Ahora
               </Button>
             </Link>
@@ -75,7 +75,7 @@ export const Navbar = () => {
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+            className="lg:hidden p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
             aria-label="Toggle menu"
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -84,7 +84,7 @@ export const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden mt-2 bg-card/95 backdrop-blur-lg rounded-2xl border border-border shadow-card p-4 animate-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden mt-2 bg-card/95 backdrop-blur-lg rounded-2xl border border-border shadow-card p-4 animate-in slide-in-from-top-2 duration-200">
             <div className="flex flex-col gap-2">
               <Link
                 to="/"

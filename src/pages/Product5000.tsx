@@ -327,25 +327,6 @@ const Product5000 = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
-            {previewImages.map((image, index) => <div key={index} onClick={() => openLightbox(index)} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1 cursor-pointer group">
-                <div className="p-3 text-center bg-primary/5">
-                  <h3 className="font-semibold text-foreground text-sm md:text-base">{image.title}</h3>
-                </div>
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <img src={image.src} alt={image.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
-                  {/* Zoom overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
-                      <ZoomIn className="w-6 h-6 text-foreground" />
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3 text-center bg-secondary/50">
-                  <p className="text-xs md:text-sm text-muted-foreground">{image.subtitle}</p>
-                </div>
-              </div>)}
-          </div>
 
           {/* Collaboration Ticker - Bottom with Logos */}
           <div className="mt-12 py-6 bg-foreground rounded-2xl overflow-hidden">

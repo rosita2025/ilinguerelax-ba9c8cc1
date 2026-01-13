@@ -9,6 +9,7 @@ import { Mail, MessageSquare, Send, Instagram, Facebook, MapPin, Clock } from "l
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -312,6 +313,12 @@ const ContactPage = () => {
       </section>
 
       <Footer />
+      <ExitIntentPopup 
+        discount="10%"
+        couponCode="NEW10"
+        lang="es"
+        storageKey="exit_intent_contact"
+      />
     </main>
   );
 };

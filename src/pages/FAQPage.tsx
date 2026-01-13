@@ -15,6 +15,7 @@ import {
   MapPin,
   HeadphonesIcon,
 } from "lucide-react";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const faqItems = [
   {
@@ -101,6 +102,12 @@ const FAQPage = () => {
         />
       </motion.main>
       <Footer />
+      <ExitIntentPopup 
+        discount="10%"
+        couponCode="NEW10"
+        lang="es"
+        storageKey="exit_intent_faq"
+      />
     </div>
   );
 };

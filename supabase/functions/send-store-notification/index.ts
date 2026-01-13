@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation to subscriber AND business
     const subscriberEmail = await resend.emails.send({
-      from: "iLingue Relax <onboarding@resend.dev>",
+      from: "iLingue Relax <hola@ilinguerelax.com>",
       to: [email, "hola@ilinguerelax.com"], // Send to both subscriber and business
       reply_to: email, // So you can reply to the actual subscriber
       subject: `🎉 ¡Gracias por suscribirte! Te avisaremos cuando esté en ${storeName}`,
@@ -77,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification to business
     const businessEmail = await resend.emails.send({
-      from: "iLingue Relax <onboarding@resend.dev>",
+      from: "iLingue Relax <hola@ilinguerelax.com>",
       to: ["hola@ilinguerelax.com"],
       subject: `📬 Nueva suscripción para ${storeName}`,
       html: `

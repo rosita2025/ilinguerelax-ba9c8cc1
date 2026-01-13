@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookOpen, Heart, Target, Users, Award, Globe } from "lucide-react";
 import { motion } from "framer-motion";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -209,6 +210,12 @@ const AboutPage = () => {
       </section>
 
       <Footer />
+      <ExitIntentPopup 
+        discount="10%"
+        couponCode="NEW10"
+        lang="es"
+        storageKey="exit_intent_about"
+      />
     </main>
   );
 };

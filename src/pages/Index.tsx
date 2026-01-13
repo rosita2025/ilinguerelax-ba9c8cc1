@@ -9,6 +9,7 @@ import { OnlineStore } from "@/components/OnlineStore";
 import { AboutMe } from "@/components/AboutMe";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -65,6 +66,12 @@ const Index = () => {
       <AboutMe />
       <Contact />
       <Footer />
+      <ExitIntentPopup 
+        discount="10%"
+        couponCode="NEW10"
+        lang="es"
+        storageKey="exit_intent_home"
+      />
     </main>
   );
 };

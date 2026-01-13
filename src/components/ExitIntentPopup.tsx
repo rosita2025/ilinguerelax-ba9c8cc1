@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { X, Gift, ArrowRight, Copy, Check } from "lucide-react";
+import { X, Gift, ArrowRight, Mail, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ExitIntentPopupProps {
   buyUrl?: string;
@@ -13,7 +15,7 @@ interface ExitIntentPopupProps {
 }
 
 export const ExitIntentPopup = ({ 
-  buyUrl, 
+  buyUrl = "https://ilinguerelax.com/products", 
   onBuyClick,
   discount = "10%",
   couponCode = "NEW10",
@@ -22,7 +24,9 @@ export const ExitIntentPopup = ({
 }: ExitIntentPopupProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [hasShown, setHasShown] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -49,25 +53,52 @@ export const ExitIntentPopup = ({
     setIsVisible(false);
   };
 
-  const handleCopyCoupon = async () => {
-    try {
-      await navigator.clipboard.writeText(couponCode);
-      setCopied(true);
-      toast({
-        title: lang === "en" ? "Coupon copied!" : "¡Cupón copiado!",
-        description: lang === "en" 
-          ? `Use code ${couponCode} at checkout` 
-          : `Usa el código ${couponCode} al pagar`,
-      });
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+  const handleSubmitEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes("@")) {
       toast({
         title: lang === "en" ? "Error" : "Error",
         description: lang === "en" 
-          ? "Could not copy coupon" 
-          : "No se pudo copiar el cupón",
+          ? "Please enter a valid email" 
+          : "Por favor ingresa un email válido",
         variant: "destructive",
       });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.functions.invoke("send-coupon-email", {
+        body: {
+          email,
+          couponCode,
+          discount,
+          lang,
+        },
+      });
+
+      if (error) throw error;
+
+      setIsSubscribed(true);
+      toast({
+        title: lang === "en" ? "Coupon sent!" : "¡Cupón enviado!",
+        description: lang === "en" 
+          ? `Check your email for your ${discount} discount code` 
+          : `Revisa tu correo para obtener tu código de ${discount} de descuento`,
+      });
+    } catch (error) {
+      console.error("Error sending coupon:", error);
+      toast({
+        title: lang === "en" ? "Error" : "Error",
+        description: lang === "en" 
+          ? "Could not send coupon. Please try again." 
+          : "No se pudo enviar el cupón. Intenta de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,20 +115,24 @@ export const ExitIntentPopup = ({
 
   const content = lang === "en" ? {
     title: "Wait! Don't leave yet 🎁",
-    description: `We're offering you a special ${discount} discount if you complete your purchase now`,
-    couponLabel: "Your exclusive coupon:",
-    copyButton: copied ? "Copied!" : "Copy",
-    urgency: "⏰ This offer expires in 10 minutes",
-    cta: "Buy now with discount",
-    decline: "No thanks, I prefer to pay full price"
+    description: `Get an exclusive ${discount} discount on all our digital products`,
+    emailLabel: "Enter your email to receive your coupon:",
+    emailPlaceholder: "your@email.com",
+    submitButton: "Send me the coupon",
+    successTitle: "🎉 Coupon sent!",
+    successDescription: "Check your email inbox",
+    cta: "View Products",
+    decline: "No thanks, I'll pass"
   } : {
     title: "¡Espera! No te vayas todavía 🎁",
-    description: `Te ofrecemos un descuento especial del ${discount} si completas tu compra ahora`,
-    couponLabel: "Tu cupón exclusivo:",
-    copyButton: copied ? "¡Copiado!" : "Copiar",
-    urgency: "⏰ Esta oferta expira en 10 minutos",
-    cta: "Comprar ahora con descuento",
-    decline: "No gracias, prefiero pagar precio completo"
+    description: `Obtén un descuento exclusivo del ${discount} en todos nuestros productos digitales`,
+    emailLabel: "Ingresa tu email para recibir tu cupón:",
+    emailPlaceholder: "tu@email.com",
+    submitButton: "Envíame el cupón",
+    successTitle: "🎉 ¡Cupón enviado!",
+    successDescription: "Revisa tu bandeja de entrada",
+    cta: "Ver Productos",
+    decline: "No gracias, paso"
   };
 
   return (
@@ -128,55 +163,74 @@ export const ExitIntentPopup = ({
           <h3 className="text-2xl font-bold text-foreground mb-2">
             {content.title}
           </h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-6">
             {content.description.split(discount)[0]}
             <span className="font-bold text-primary">{discount}</span>
             {content.description.split(discount)[1]}
           </p>
 
-          {/* Coupon Code */}
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground mb-2">{content.couponLabel}</p>
-            <div className="flex items-center justify-center gap-2">
-              <div className="bg-primary/10 border-2 border-dashed border-primary rounded-lg px-6 py-3">
-                <span className="text-2xl font-bold text-primary tracking-wider">{couponCode}</span>
+          {isSubscribed ? (
+            <div className="space-y-4">
+              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6">
+                <div className="flex items-center justify-center gap-2 text-green-600 mb-2">
+                  <Check className="w-6 h-6" />
+                  <span className="text-xl font-bold">{content.successTitle}</span>
+                </div>
+                <p className="text-muted-foreground">{content.successDescription}</p>
               </div>
+              
               <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopyCoupon}
-                className="flex items-center gap-1"
+                variant="hero"
+                size="xl"
+                className="w-full"
+                onClick={handleBuy}
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {content.copyButton}
+                {content.cta}
+                <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
-          </div>
+          ) : (
+            <form onSubmit={handleSubmitEmail} className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">{content.emailLabel}</p>
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    placeholder={content.emailPlaceholder}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
 
-          {/* Urgency */}
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6">
-            <p className="text-sm text-red-600 font-medium">
-              {content.urgency}
-            </p>
-          </div>
+              <Button
+                type="submit"
+                variant="hero"
+                size="xl"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Mail className="w-5 h-5 mr-2" />
+                    {content.submitButton}
+                  </>
+                )}
+              </Button>
 
-          {/* CTA */}
-          <Button
-            variant="hero"
-            size="xl"
-            className="w-full mb-3"
-            onClick={handleBuy}
-          >
-            {content.cta}
-            <ArrowRight className="w-5 h-5" />
-          </Button>
-
-          <button
-            onClick={handleClose}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {content.decline}
-          </button>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {content.decline}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

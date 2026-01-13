@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Star } from "lucide-react";
 import { products, getProductLink } from "@/data/products";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const Products = () => {
   return (
@@ -137,6 +138,12 @@ const Products = () => {
       </section>
 
       <Footer />
+      <ExitIntentPopup 
+        discount="10%"
+        couponCode="NEW10"
+        lang="es"
+        storageKey="exit_intent_products"
+      />
     </main>
   );
 };

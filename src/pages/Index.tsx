@@ -10,6 +10,7 @@ import { AboutMe } from "@/components/AboutMe";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { useSpanishRelaxPixelPageView } from "@/hooks/useMetaPixel";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -27,6 +28,9 @@ const partnerLogos = [
 ];
 
 const Index = () => {
+  // Spanish Relax Pixel - PageView only
+  useSpanishRelaxPixelPageView();
+
   return (
     <main className="min-h-screen">
       <SEO

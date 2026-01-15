@@ -10,13 +10,13 @@ interface CountdownTimerProps {
   lang?: "es" | "en";
 }
 
-export const CountdownTimer = ({ 
-  endDate, 
+export const CountdownTimer = ({
+  endDate,
   hoursFromNow = 24,
-  currentPrice = "$17 USD",
+  currentPrice = "$10 USD",
   originalPrice = "$54 USD",
   storageKey = "countdown_target",
-  lang = "es"
+  lang = "es",
 }: CountdownTimerProps) => {
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
@@ -26,10 +26,10 @@ export const CountdownTimer = ({
 
   useEffect(() => {
     const targetDate = endDate || new Date(Date.now() + hoursFromNow * 60 * 60 * 1000);
-    
+
     // Store the target date in sessionStorage to persist across page refreshes
     let savedTarget = sessionStorage.getItem(storageKey);
-    
+
     let finalTarget: Date;
     if (savedTarget) {
       finalTarget = new Date(savedTarget);
@@ -45,7 +45,7 @@ export const CountdownTimer = ({
 
     const calculateTimeLeft = () => {
       const difference = finalTarget.getTime() - Date.now();
-      
+
       if (difference > 0) {
         setTimeLeft({
           hours: Math.floor((difference / (1000 * 60 * 60)) % 24) + Math.floor(difference / (1000 * 60 * 60 * 24)) * 24,
@@ -63,18 +63,33 @@ export const CountdownTimer = ({
     return () => clearInterval(timer);
   }, [endDate, hoursFromNow, storageKey]);
 
-  const labels = lang === "en" 
-    ? { hours: "Hours", minutes: "Minutes", seconds: "Seconds", header: "Limited time offer!", message: "Price increases when the counter reaches zero", current: "Current price:", after: "After:" }
-    : { hours: "Horas", minutes: "Minutos", seconds: "Segundos", header: "¡Oferta por tiempo limitado!", message: "El precio sube cuando el contador llegue a cero", current: "Precio actual:", after: "Después:" };
+  const labels =
+    lang === "en"
+      ? {
+          hours: "Hours",
+          minutes: "Minutes",
+          seconds: "Seconds",
+          header: "Limited time offer!",
+          message: "Price increases when the counter reaches zero",
+          current: "Current price:",
+          after: "After:",
+        }
+      : {
+          hours: "Horas",
+          minutes: "Minutos",
+          seconds: "Segundos",
+          header: "¡Oferta por tiempo limitado!",
+          message: "El precio sube cuando el contador llegue a cero",
+          current: "Precio actual:",
+          after: "Después:",
+        };
 
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
       <div className="bg-[#1a2332] text-white font-bold text-3xl md:text-5xl rounded-xl w-20 md:w-28 h-20 md:h-28 flex items-center justify-center shadow-2xl">
         {value.toString().padStart(2, "0")}
       </div>
-      <span className="text-xs md:text-sm text-white/80 mt-3 font-medium uppercase tracking-widest">
-        {label}
-      </span>
+      <span className="text-xs md:text-sm text-white/80 mt-3 font-medium uppercase tracking-widest">{label}</span>
     </div>
   );
 
@@ -83,7 +98,10 @@ export const CountdownTimer = ({
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 left-1/4 w-40 h-40 bg-white/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-yellow-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div
+          className="absolute bottom-0 right-1/4 w-48 h-48 bg-yellow-300/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
       </div>
 
       <div className="container px-4 md:px-6 relative">
@@ -91,16 +109,12 @@ export const CountdownTimer = ({
           {/* Urgency Header */}
           <div className="flex items-center justify-center gap-2 mb-4">
             <Flame className="w-6 h-6 text-white animate-pulse" />
-            <span className="text-white font-bold text-base md:text-lg uppercase tracking-wider">
-              {labels.header}
-            </span>
+            <span className="text-white font-bold text-base md:text-lg uppercase tracking-wider">{labels.header}</span>
             <Flame className="w-6 h-6 text-white animate-pulse" />
           </div>
 
           {/* Main Message */}
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-8">
-            {labels.message}
-          </h3>
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-8">{labels.message}</h3>
 
           {/* Countdown */}
           <div className="flex items-center justify-center gap-4 md:gap-8 mb-8">

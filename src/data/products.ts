@@ -83,7 +83,7 @@ export const products: Product[] = [
   },
   {
     id: "spanish-5000",
-    slug: "spanish-5000-words",
+    slug: "5-000-spanish-words-with-english-pronunciation",
     name: "5,000 Words",
     flag: "🇪🇸",
     country: "Spanish for English Speakers",

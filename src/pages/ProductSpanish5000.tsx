@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useSpanishRelaxPixel } from "@/hooks/useMetaPixel";
+import { useSpanishRelaxPixel, trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -88,18 +88,16 @@ const ProductSpanish5000 = () => {
   const handleBuyNow = async () => {
     setIsLoading(true);
     
-    // Track InitiateCheckout event with Meta Pixel
-    if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "InitiateCheckout", {
-        content_name: "Spanish Relax - 5,000 Words",
-        content_category: "Digital Book",
-        content_ids: ["product-spanish-5000"],
-        content_type: "product",
-        value: 10,
-        currency: "USD",
-        num_items: 1,
-      });
-    }
+    // Track InitiateCheckout event with Meta Pixel (with eventID for deduplication)
+    trackSpanishRelaxEvent("InitiateCheckout", {
+      content_name: "Spanish Relax - 5,000 Words",
+      content_category: "Digital Book",
+      content_ids: ["product-spanish-5000"],
+      content_type: "product",
+      value: 10,
+      currency: "USD",
+      num_items: 1,
+    });
     
     try {
       const { data, error } = await supabase.functions.invoke("create-spanish-payment");

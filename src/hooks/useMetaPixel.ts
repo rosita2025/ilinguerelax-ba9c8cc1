@@ -15,13 +15,15 @@ interface ViewContentParams {
   currency?: string;
 }
 
-// Default pixel (original)
-const DEFAULT_PIXEL_ID = ""; // Original pixel ID if any
-
 // Spanish Relax pixel
 const SPANISH_PIXEL_ID = "1844523252813381";
 
-// Initialize a specific pixel
+// Generate unique event ID for deduplication
+const generateEventId = (): string => {
+  return `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+};
+
+// Initialize a specific pixel (without PageView to avoid duplication)
 const initPixel = (pixelId: string) => {
   if (typeof window === "undefined" || !pixelId) return;
   
@@ -39,7 +41,6 @@ const initPixel = (pixelId: string) => {
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
       fbq('init', '${pixelId}');
-      fbq('track', 'PageView');
     `;
     document.head.appendChild(script);
     
@@ -51,35 +52,82 @@ const initPixel = (pixelId: string) => {
   }
 };
 
-// Hook for ViewContent event with specific pixel
+// Hook specifically for Spanish Relax pixel - ViewContent event with deduplication
+export const useSpanishRelaxPixel = (params: ViewContentParams) => {
+  useEffect(() => {
+    initPixel(SPANISH_PIXEL_ID);
+    
+    if (typeof window !== "undefined" && window.fbq) {
+      const eventId = generateEventId();
+      window.fbq("track", "ViewContent", {
+        ...params,
+        eventID: eventId,
+      });
+    }
+  }, [params.content_name]);
+};
+
+// Hook for PageView only (Home page) with deduplication
+export const useSpanishRelaxPixelPageView = () => {
+  useEffect(() => {
+    initPixel(SPANISH_PIXEL_ID);
+    
+    if (typeof window !== "undefined" && window.fbq) {
+      const eventId = generateEventId();
+      window.fbq("track", "PageView", {
+        eventID: eventId,
+      });
+    }
+  }, []);
+};
+
+// Hook for Contact page with deduplication
+export const useSpanishRelaxPixelContact = () => {
+  useEffect(() => {
+    initPixel(SPANISH_PIXEL_ID);
+    
+    if (typeof window !== "undefined" && window.fbq) {
+      const eventId = generateEventId();
+      window.fbq("track", "ViewContent", {
+        content_name: "Contact Page",
+        content_category: "Page",
+        eventID: eventId,
+      });
+    }
+  }, []);
+};
+
+// Export for use in other components (InitiateCheckout, Purchase, etc.)
+export const trackSpanishRelaxEvent = (
+  eventName: string,
+  params: Record<string, unknown> = {}
+) => {
+  initPixel(SPANISH_PIXEL_ID);
+  
+  if (typeof window !== "undefined" && window.fbq) {
+    const eventId = generateEventId();
+    window.fbq("track", eventName, {
+      ...params,
+      eventID: eventId,
+    });
+  }
+};
+
+// Legacy exports for backwards compatibility
 export const useMetaPixelViewContent = (params: ViewContentParams, pixelId?: string) => {
   useEffect(() => {
-    const targetPixelId = pixelId || DEFAULT_PIXEL_ID;
+    const targetPixelId = pixelId || SPANISH_PIXEL_ID;
     
     if (targetPixelId) {
       initPixel(targetPixelId);
     }
     
     if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "ViewContent", params);
+      const eventId = generateEventId();
+      window.fbq("track", "ViewContent", {
+        ...params,
+        eventID: eventId,
+      });
     }
   }, [params.content_name, pixelId]);
-};
-
-// Hook specifically for Spanish Relax pixel
-export const useSpanishRelaxPixel = (params: ViewContentParams) => {
-  useEffect(() => {
-    initPixel(SPANISH_PIXEL_ID);
-    
-    if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "ViewContent", params);
-    }
-  }, [params.content_name]);
-};
-
-// Hook for PageView only (Home page)
-export const useSpanishRelaxPixelPageView = () => {
-  useEffect(() => {
-    initPixel(SPANISH_PIXEL_ID);
-  }, []);
 };

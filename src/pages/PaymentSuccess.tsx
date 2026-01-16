@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
 import {
   CheckCircle,
   Mail,
@@ -15,57 +16,21 @@ import {
   BookOpen,
 } from "lucide-react";
 
-// Spanish Relax pixel ID
-const SPANISH_PIXEL_ID = "1844523252813381";
-
-// Initialize Meta Pixel
-const initPixel = (pixelId: string) => {
-  if (typeof window === "undefined" || !pixelId) return;
-  
-  if (!document.getElementById(`fb-pixel-${pixelId}`)) {
-    const script = document.createElement('script');
-    script.id = `fb-pixel-${pixelId}`;
-    script.innerHTML = `
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '${pixelId}');
-    `;
-    document.head.appendChild(script);
-  }
-};
-
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
-  }
-}
-
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [confetti, setConfetti] = useState(true);
 
   useEffect(() => {
-    // Initialize pixel and track Purchase event
-    initPixel(SPANISH_PIXEL_ID);
-    
-    // Fire Purchase event for Meta Pixel
-    if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "Purchase", {
-        content_name: "Spanish Relax - 5,000 Words",
-        content_category: "Digital Book",
-        content_ids: ["product-spanish-5000"],
-        content_type: "product",
-        value: 10,
-        currency: "USD",
-        num_items: 1,
-      });
-    }
+    // Fire Purchase event for Meta Pixel (with eventID for deduplication)
+    trackSpanishRelaxEvent("Purchase", {
+      content_name: "Spanish Relax - 5,000 Words",
+      content_category: "Digital Book",
+      content_ids: ["product-spanish-5000"],
+      content_type: "product",
+      value: 10,
+      currency: "USD",
+      num_items: 1,
+    });
 
     // Hide confetti after animation
     const timer = setTimeout(() => setConfetti(false), 5000);

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { useSpanishRelaxPixelContact } from "@/hooks/useMetaPixel";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -26,6 +27,9 @@ const staggerContainer = {
 };
 
 const ContactPage = () => {
+  // Meta Pixel tracking for Contact page
+  useSpanishRelaxPixelContact();
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",

@@ -80,13 +80,27 @@ const ProductSpanish5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 29.99,
+    value: 10,
     currency: "USD",
   }), []);
   useSpanishRelaxPixel(pixelParams);
 
   const handleBuyNow = async () => {
     setIsLoading(true);
+    
+    // Track InitiateCheckout event with Meta Pixel
+    if (typeof window !== "undefined" && window.fbq) {
+      window.fbq("track", "InitiateCheckout", {
+        content_name: "Spanish Relax - 5,000 Words",
+        content_category: "Digital Book",
+        content_ids: ["product-spanish-5000"],
+        content_type: "product",
+        value: 10,
+        currency: "USD",
+        num_items: 1,
+      });
+    }
+    
     try {
       const { data, error } = await supabase.functions.invoke("create-spanish-payment");
       
@@ -115,7 +129,7 @@ const ProductSpanish5000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"
         image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
-        price="17"
+        price="10"
         originalPrice="54"
         rating="4.8"
         reviewCount="500"
@@ -165,10 +179,10 @@ const ProductSpanish5000 = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$17</span>
+                <span className="text-5xl font-bold text-foreground">$10</span>
                 <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="px-3 py-1 rounded-full bg-purple-500 text-white text-sm font-bold">
-                  SAVE 67%
+                  SAVE 81%
                 </span>
               </div>
 
@@ -220,7 +234,7 @@ const ProductSpanish5000 = () => {
       {/* Countdown Timer */}
       <CountdownTimer 
         hoursFromNow={48} 
-        currentPrice="$17 USD"
+        currentPrice="$10 USD"
         originalPrice="$54 USD"
         storageKey="countdown_spanish_book"
         lang="en"
@@ -304,7 +318,7 @@ const ProductSpanish5000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$17</span>
+                <span className="text-5xl font-bold text-foreground">$10</span>
                 <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="text-purple-600 font-bold">USD</span>
               </div>
@@ -386,7 +400,7 @@ const ProductSpanish5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$17"
+        price="$10"
         originalPrice="$54"
         productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)"
         onBuyClick={handleBuyNow}

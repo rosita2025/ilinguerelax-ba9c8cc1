@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Sale {
   name: string;
@@ -116,47 +117,58 @@ const SalesNotification = ({
   };
 
   return (
-    <div 
-      className={`fixed top-4 left-4 z-50 bg-white rounded-lg shadow-2xl border border-gray-200 p-2 md:p-3 max-w-[280px] md:max-w-xs transform transition-all duration-500 ${
-        isVisible ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
-      }`}
-    >
-      <button 
-        onClick={handleClose}
-        className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-gray-100 hover:bg-gray-200 rounded-full p-0.5 md:p-1 transition-colors"
-      >
-        <X className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-500" />
-      </button>
-      
-      <div className="flex items-center gap-2 md:gap-3">
-        {/* Product thumbnail */}
-        <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
-          <span className="text-[5px] md:text-[6px] font-bold text-black text-center leading-tight">
-            {productLabel}<br/>{variant === "international" ? "WORDS" : "PALABRAS"}
-          </span>
-        </div>
-        
-        {/* Sale info - horizontal layout */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex items-center gap-1 flex-wrap">
-            <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">
-              {currentSale.name}
-            </p>
-            <span className="text-[9px] md:text-[10px] text-gray-400">•</span>
-            <p className="text-[9px] md:text-[10px] text-gray-500 truncate">
-              {currentSale.country}
-            </p>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div 
+          initial={{ x: -100, opacity: 0, scale: 0.8 }}
+          animate={{ x: 0, opacity: 1, scale: 1 }}
+          exit={{ x: -100, opacity: 0, scale: 0.8 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 300, 
+            damping: 25,
+            duration: 0.5 
+          }}
+          className="fixed top-4 left-4 z-50 bg-white rounded-lg shadow-2xl border border-gray-200 p-2 md:p-3 max-w-[280px] md:max-w-xs"
+        >
+          <button 
+            onClick={handleClose}
+            className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-gray-100 hover:bg-gray-200 rounded-full p-0.5 md:p-1 transition-colors"
+          >
+            <X className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-500" />
+          </button>
+          
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Product thumbnail */}
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
+              <span className="text-[5px] md:text-[6px] font-bold text-black text-center leading-tight">
+                {productLabel}<br/>{variant === "international" ? "WORDS" : "PALABRAS"}
+              </span>
+            </div>
+            
+            {/* Sale info - horizontal layout */}
+            <div className="flex-1 min-w-0 flex flex-col">
+              <div className="flex items-center gap-1 flex-wrap">
+                <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">
+                  {currentSale.name}
+                </p>
+                <span className="text-[9px] md:text-[10px] text-gray-400">•</span>
+                <p className="text-[9px] md:text-[10px] text-gray-500 truncate">
+                  {currentSale.country}
+                </p>
+              </div>
+              <p className="text-[9px] md:text-xs text-gray-600 truncate">
+                {variant === "international" ? `Purchased ${productName}` : `Compró ${productName}`}
+              </p>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className="text-[8px] md:text-[10px] text-green-600 font-medium">{variant === "international" ? "✓ Verified" : "✓ Verificado"}</span>
+                <span className="text-[8px] md:text-[9px] text-gray-400">{currentSale.timeAgo}</span>
+              </div>
+            </div>
           </div>
-          <p className="text-[9px] md:text-xs text-gray-600 truncate">
-            {variant === "international" ? `Purchased ${productName}` : `Compró ${productName}`}
-          </p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className="text-[8px] md:text-[10px] text-green-600 font-medium">{variant === "international" ? "✓ Verified" : "✓ Verificado"}</span>
-            <span className="text-[8px] md:text-[9px] text-gray-400">{currentSale.timeAgo}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

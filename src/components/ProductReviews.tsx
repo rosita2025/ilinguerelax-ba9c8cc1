@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Star, ChevronLeft, ChevronRight, Quote, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import reviewEnglishFrases from "@/assets/review-english-frases.jpg";
+import reviewEnglishIpad from "@/assets/review-english-ipad.png";
 
 interface Review {
   id: string;
@@ -102,6 +104,24 @@ const englishReviews: Review[] = [
     rating: 5,
     img: "https://images.loox.io/uploads/2025/11/23/smyzA3a5t.jpg",
     date: "2025-03-14",
+    verified: true,
+  },
+  {
+    id: "11",
+    nickname: "María Elena G.",
+    review: "Me encanta cómo están organizados los verbos profesionales y académicos. La pronunciación escrita es muy clara y fácil de seguir. ¡Excelente material!",
+    rating: 5,
+    img: reviewEnglishFrases,
+    date: "2025-01-10",
+    verified: true,
+  },
+  {
+    id: "12",
+    nickname: "Carlos Hernández",
+    review: "Lo uso en mi iPad todos los días. Las categorías de compras, amistad, trabajo y tecnología son muy útiles. La pronunciación UK y US es perfecta para aprender.",
+    rating: 5,
+    img: reviewEnglishIpad,
+    date: "2025-01-08",
     verified: true,
   },
 ];

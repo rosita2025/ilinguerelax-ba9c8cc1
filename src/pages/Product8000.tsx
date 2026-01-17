@@ -3,12 +3,12 @@ import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
   Star,
   Check,
@@ -25,6 +25,9 @@ import {
   GraduationCap,
   Lightbulb,
   CreditCard,
+  Zap,
+  Shield,
+  ShoppingCart,
 } from "lucide-react";
 
 // Product image
@@ -36,6 +39,14 @@ import logoEtsy from "@/assets/logo-etsy.png";
 import logoShopify from "@/assets/logo-shopify.png";
 import logoHotmart from "@/assets/logo-hotmart.svg";
 import logoKindle from "@/assets/logo-kindle.png";
+
+// Conversion components
+import { PurchaseCounter } from "@/components/PurchaseCounter";
+import { StockCounter } from "@/components/StockCounter";
+import { TrustBadges } from "@/components/TrustBadges";
+import { VideoTestimonial } from "@/components/VideoTestimonial";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { LiveViewers } from "@/components/LiveViewers";
 
 const partnerLogos = [
   { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
@@ -130,69 +141,128 @@ const Product8000 = () => {
 
             {/* Product Info */}
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
-                <Star className="w-4 h-4 fill-current" />
-                <span>Incluye 4 Bonus</span>
+              {/* Trending & Bonus Badge */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>🔥 PREMIUM</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
+                >
+                  <Gift className="w-4 h-4" />
+                  <span>4 Bonus Gratis</span>
+                </motion.div>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Inglés Relax - 8,000 Palabras con Pronunciación Español y Fonética UK/USA
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-lg text-muted-foreground mb-4">
                 El método completo para aprender inglés sin estrés, sin
                 diccionarios, paso a paso. Diseñado exclusivamente para
                 hispanohablantes.
               </p>
 
-              <div className="flex items-center gap-3 mb-6">
+              {/* Reviews - More Prominent */}
+              <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-5 h-5 fill-accent text-accent"
-                    />
-                  ))}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
                 </div>
-                <span className="text-muted-foreground">4.9/5 (10,000+ estudiantes)</span>
+                <span className="font-bold text-foreground">4.9/5</span>
+                <span className="text-muted-foreground">(10,000+ Estudiantes Satisfechos)</span>
               </div>
 
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$24</span>
-                <span className="text-2xl text-muted-foreground line-through">
-                  $76
-                </span>
-                <span className="px-3 py-1 rounded-full gradient-accent text-accent-foreground text-sm font-bold">
-                  AHORRA 86%
-                </span>
+              {/* Purchase Counter - Social Proof */}
+              <div className="mb-4">
+                <PurchaseCounter baseCount={892} lang="es" />
               </div>
 
-              {/* Delivery Info */}
-              <div className="flex flex-wrap gap-4 mb-8 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Download className="w-4 h-4 text-primary" />
-                  <span>Descarga inmediata</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RefreshCw className="w-4 h-4 text-primary" />
-                  <span>Actualizaciones gratis</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-primary" />
-                  <span>Bonus incluidos</span>
-                </div>
+              {/* Live Viewers */}
+              <div className="mb-4">
+                <LiveViewers minViewers={12} maxViewers={35} />
               </div>
 
-              {/* CTA */}
-              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4">
-                OBTENER ACCESO AHORA
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              {/* Price Section - More Impactful */}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-green-600" />
+                  <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
+                </div>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$24</span>
+                  <span className="text-2xl text-muted-foreground line-through">$76</span>
+                  <motion.span 
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
+                  >
+                    AHORRA 68%
+                  </motion.span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  💳 Pago único • Sin suscripciones • Acceso de por vida
+                </p>
+              </motion.div>
 
-              <p className="text-sm text-muted-foreground">
-                🔒 Pago 100% seguro • Garantía de 7 días • Acceso de por vida
+              {/* Stock Counter - Scarcity */}
+              <div className="mb-6">
+                <StockCounter totalStock={50} remainingStock={8} lang="es" />
+              </div>
+
+              {/* CTA Button - More Impactful */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="w-full mb-4 text-lg py-6 shadow-2xl"
+                  onClick={() => window.open("https://pay.hotmart.com/O100578526P?checkoutMode=10", "_blank")}
+                >
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                  ¡OBTENER ACCESO AHORA!
+                  <ArrowRight className="w-6 h-6 ml-2" />
+                </Button>
+              </motion.div>
+
+              <p className="text-center text-sm text-muted-foreground mb-6">
+                👆 Haz clic para asegurar tu copia al precio de oferta
               </p>
+
+              {/* Trust Badges */}
+              <TrustBadges lang="es" variant="grid" />
+
+              {/* Money Back Guarantee - Enhanced */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
+              >
+                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-green-700">🛡️ Garantía de Devolución 100% - 7 Días</p>
+                  <p className="text-sm text-green-600">Si no estás satisfecho, te devolvemos TODO tu dinero. Sin preguntas.</p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -384,6 +454,18 @@ const Product8000 = () => {
         productName="8,000 Palabras en Inglés" 
         productLabel="8,000" 
       />
+
+      {/* Video Testimonial */}
+      <VideoTestimonial 
+        videoUrl="https://youtu.be/bG35t0x3GkU"
+        customerName="Cliente Verificado"
+        customerLocation="Latinoamérica"
+        testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
+        lang="es"
+      />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop showAfter={500} />
     </main>
   );
 };

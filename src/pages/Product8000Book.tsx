@@ -8,6 +8,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
   Check,
   BookOpen,
@@ -23,10 +24,20 @@ import {
   CreditCard,
   Package,
   Clock,
+  Star,
+  Shield,
+  ShoppingCart,
 } from "lucide-react";
 
 // Product image
 import product8000BookImage from "@/assets/product-8000-book.png";
+
+// Conversion components
+import { PurchaseCounter } from "@/components/PurchaseCounter";
+import { TrustBadges } from "@/components/TrustBadges";
+import { VideoTestimonial } from "@/components/VideoTestimonial";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { LiveViewers } from "@/components/LiveViewers";
 
 const features = [
   "8,000 palabras esenciales del inglés",
@@ -112,9 +123,26 @@ const Product8000Book = () => {
 
             {/* Product Info */}
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium mb-4">
-                <Clock className="w-4 h-4 fill-current" />
-                <span>COMPRA ANTICIPADA - Envío Junio 2026</span>
+              {/* Pre-order Badge */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20"
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>📦 COMPRA ANTICIPADA</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium"
+                >
+                  <Gift className="w-4 h-4" />
+                  <span>Envío Junio 2026</span>
+                </motion.div>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -123,45 +151,89 @@ const Product8000Book = () => {
                 <span className="text-amber-600">Libro Físico Tapa Blanda</span>
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-lg text-muted-foreground mb-4">
                 El mismo método completo para aprender inglés sin estrés, ahora en formato libro físico premium. 
                 Perfecto para estudiar sin pantallas.
               </p>
 
-
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$32.99</span>
-                <span className="px-3 py-1 rounded-full bg-amber-500 text-white text-sm font-bold">
-                  PRECIO ANTICIPADO
-                </span>
+              {/* Reviews - More Prominent */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+                </div>
+                <span className="font-bold text-foreground">4.9/5</span>
+                <span className="text-muted-foreground">(800+ Reseñas de la versión digital)</span>
               </div>
 
-              {/* Delivery Info */}
-              <div className="flex flex-wrap gap-4 mb-8 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-amber-600" />
-                  <span>Libro físico tapa blanda</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-amber-600" />
-                  <span>Envío a domicilio</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-amber-600" />
-                  <span>Bonus digital incluido</span>
-                </div>
+              {/* Purchase Counter - Social Proof */}
+              <div className="mb-4">
+                <PurchaseCounter baseCount={245} lang="es" />
               </div>
 
-              {/* CTA */}
-              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 bg-amber-500/50 cursor-not-allowed" disabled>
-                PRÓXIMAMENTE
-                <Clock className="w-5 h-5" />
+              {/* Live Viewers */}
+              <div className="mb-4">
+                <LiveViewers minViewers={5} maxViewers={15} />
+              </div>
+
+              {/* Price Section */}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-amber-600" />
+                  <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Compra Anticipada</span>
+                </div>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$32.99</span>
+                  <motion.span 
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-lg"
+                  >
+                    PRECIO ANTICIPADO
+                  </motion.span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  📦 Libro físico + PDF digital incluido • Envío a domicilio
+                </p>
+              </motion.div>
+
+              {/* CTA Button - Disabled */}
+              <Button 
+                variant="hero" 
+                size="xl" 
+                className="w-full mb-4 text-lg py-6 bg-amber-500/50 cursor-not-allowed"
+                disabled
+              >
+                <Clock className="w-6 h-6 mr-2" />
+                PRÓXIMAMENTE - JUNIO 2026
               </Button>
 
-              <p className="text-sm text-muted-foreground">
-                🔒 Pago 100% seguro • Envío Junio 2026 • Incluye versión PDF
+              <p className="text-center text-sm text-muted-foreground mb-6">
+                📧 Regístrate para recibir notificación cuando esté disponible
               </p>
+
+              {/* Trust Badges */}
+              <TrustBadges lang="es" variant="grid" />
+
+              {/* Pre-order Info */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-amber-500/5 to-orange-500/5 border-2 border-amber-500/30 mt-6"
+              >
+                <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Package className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-amber-700">📖 Libro Físico Premium</p>
+                  <p className="text-sm text-amber-600">Tapa blanda de alta calidad, 300-350 páginas. Incluye versión PDF digital.</p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -346,6 +418,18 @@ const Product8000Book = () => {
         productName="Libro Físico 8,000 Palabras" 
         productLabel="Libro Físico" 
       /> */}
+
+      {/* Video Testimonial */}
+      <VideoTestimonial 
+        videoUrl="https://youtu.be/bG35t0x3GkU"
+        customerName="Cliente Verificado"
+        customerLocation="Latinoamérica"
+        testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
+        lang="es"
+      />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop showAfter={500} />
     </main>
   );
 };

@@ -318,55 +318,72 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
               {currentReviews.map((review) => (
                 <div
                   key={review.id}
-                  className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-300"
+                  className="group bg-card rounded-2xl border border-border shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
                 >
-                  {/* Quote Icon */}
-                  <Quote className="w-8 h-8 text-primary/30 mb-4" />
-                  
-                  {/* Review Text */}
-                  <p className="text-foreground/90 text-sm md:text-base leading-relaxed mb-6 line-clamp-4">
-                    "{review.review}"
-                  </p>
-                  
-                  {/* Rating */}
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-accent text-accent" />
-                    ))}
-                  </div>
-                  
-                  {/* Author */}
-                  <div className="flex items-center gap-3">
-                    {review.img ? (
+                  {/* Customer Image - Large Card Style */}
+                  {review.img ? (
+                    <div className="relative h-48 md:h-56 overflow-hidden">
                       <img
                         src={review.img}
                         alt={review.nickname}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-bold text-lg">
-                          {review.nickname.charAt(0)}
-                        </span>
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      
+                      {/* Rating on Image */}
+                      <div className="absolute bottom-3 left-3 flex gap-0.5">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-accent text-accent drop-shadow-lg" />
+                        ))}
                       </div>
-                    )}
-                    <div className="flex-1">
-                      <p className="font-semibold text-foreground">{review.nickname}</p>
-                      <div className="flex items-center gap-2">
-                        {review.verified && (
-                          <span className="inline-flex items-center gap-1 text-xs text-green-600">
-                            <CheckCircle className="w-3 h-3" />
-                            {productType === "spanish" ? "Verified Purchase" : "Compra verificada"}
-                          </span>
-                        )}
+                      
+                      {/* Verified Badge on Image */}
+                      {review.verified && (
+                        <div className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/90 text-white text-xs font-medium backdrop-blur-sm">
+                          <CheckCircle className="w-3 h-3" />
+                          {productType === "spanish" ? "Verified" : "Verificado"}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="relative h-48 md:h-56 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                      <span className="text-6xl font-bold text-primary/40">
+                        {review.nickname.charAt(0)}
+                      </span>
+                      {/* Rating */}
+                      <div className="absolute bottom-3 left-3 flex gap-0.5">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                        ))}
                       </div>
+                      {review.verified && (
+                        <div className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/90 text-white text-xs font-medium">
+                          <CheckCircle className="w-3 h-3" />
+                          {productType === "spanish" ? "Verified" : "Verificado"}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Content */}
+                  <div className="p-5">
+                    {/* Quote Icon */}
+                    <Quote className="w-6 h-6 text-primary/40 mb-2" />
+                    
+                    {/* Review Text */}
+                    <p className="text-foreground/90 text-sm leading-relaxed mb-4 line-clamp-3">
+                      "{review.review}"
+                    </p>
+                    
+                    {/* Author & Date */}
+                    <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                      <p className="font-semibold text-foreground text-sm">{review.nickname}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDate(review.date)}
+                      </p>
                     </div>
                   </div>
-                  
-                  {/* Date */}
-                  <p className="text-xs text-muted-foreground mt-3">
-                    {formatDate(review.date)}
-                  </p>
                 </div>
               ))}
             </motion.div>

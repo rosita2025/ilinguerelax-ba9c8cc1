@@ -82,6 +82,17 @@ const ProductSpanish5000 = () => {
   useSpanishRelaxPixel(pixelParams);
 
   const handleBuyNow = () => {
+    // Track AddToCart event with Meta Pixel (with eventID for deduplication)
+    trackSpanishRelaxEvent("AddToCart", {
+      content_name: "Spanish Relax - 5,000 Words",
+      content_category: "Digital Book",
+      content_ids: ["product-spanish-5000"],
+      content_type: "product",
+      value: 17,
+      currency: "USD",
+      num_items: 1,
+    });
+    
     // Track InitiateCheckout event with Meta Pixel (with eventID for deduplication)
     trackSpanishRelaxEvent("InitiateCheckout", {
       content_name: "Spanish Relax - 5,000 Words",

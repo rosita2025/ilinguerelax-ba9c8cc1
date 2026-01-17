@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,16 +8,15 @@ import { motion } from "framer-motion";
 import { trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
 import {
   CheckCircle,
+  Download,
+  MessageCircle,
   Mail,
-  Package,
-  ArrowRight,
   PartyPopper,
   Heart,
-  BookOpen,
+  ArrowRight,
 } from "lucide-react";
 
 const PaymentSuccess = () => {
-  const [searchParams] = useSearchParams();
   const [confetti, setConfetti] = useState(true);
 
   useEffect(() => {
@@ -37,11 +36,23 @@ const PaymentSuccess = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleDownload = () => {
+    window.open("https://drive.google.com/file/d/1KA1IQ-WEB7a_dw3BKVWaU0pImfGsdV3i/view?usp=sharing", "_blank");
+  };
+
+  const handleWhatsApp = () => {
+    window.open("https://wa.me/15752160934?text=Hello!%20I%20just%20purchased%20Spanish%20Relax%205,000%20Words", "_blank");
+  };
+
+  const handleEmail = () => {
+    window.location.href = "mailto:hola@ilinguerelax.com?subject=Spanish%20Relax%20Purchase%20Support";
+  };
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Payment Successful - Thank You!"
-        description="Your order has been confirmed. Thank you for your purchase!"
+        title="Thank You For Your Purchase! - Spanish Relax"
+        description="Your order has been confirmed. Download your Spanish Relax 5,000 Words eBook now!"
       />
       <Navbar />
 
@@ -110,7 +121,7 @@ const PaymentSuccess = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              Payment Successful!
+              Thank You For Your Purchase!
             </motion.h1>
 
             <motion.p
@@ -119,62 +130,62 @@ const PaymentSuccess = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Thank you for your purchase! Your order has been confirmed.
+              Your Spanish Relax - 5,000 Words eBook is ready for download!
             </motion.p>
 
-            {/* Order Info Card */}
+            {/* Download Card */}
             <motion.div
-              className="bg-card rounded-3xl border border-border shadow-card p-8 mb-8"
+              className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-3xl border-2 border-green-500/30 shadow-xl p-8 mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                📚 Download Your eBook
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Click the button below to access your Spanish Relax - 5,000 Words PDF
+              </p>
+              <Button 
+                onClick={handleDownload}
+                size="lg" 
+                className="bg-green-500 hover:bg-green-600 text-white font-bold text-lg px-8 py-6 h-auto"
+              >
+                <Download className="w-6 h-6 mr-2" />
+                Download Now
+              </Button>
+            </motion.div>
+
+            {/* Contact Info Card */}
+            <motion.div
+              className="bg-card rounded-3xl border border-border shadow-card p-8 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
               <h2 className="text-xl font-semibold text-foreground mb-6">
-                What happens next?
+                Need Help? Contact Us
               </h2>
 
-              <div className="space-y-6">
-                <div className="flex items-start gap-4 text-left">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-purple-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-foreground mb-1">
-                      Check Your Email
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      You'll receive a confirmation email with your order details and receipt.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 text-left">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-foreground mb-1">
-                      Instant Digital Access
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Your digital PDF will be sent to your email immediately so you can start learning right away!
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 text-left">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                    <Package className="w-5 h-5 text-amber-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-foreground mb-1">
-                      Physical Book Shipping
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Your physical book will be shipped to your address. You'll receive tracking information once it's on its way.
-                    </p>
-                  </div>
-                </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={handleWhatsApp}
+                  variant="outline" 
+                  size="lg"
+                  className="bg-green-500/10 border-green-500/30 hover:bg-green-500/20 text-green-600"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  WhatsApp: +1 575 216 0934
+                </Button>
+                <Button 
+                  onClick={handleEmail}
+                  variant="outline" 
+                  size="lg"
+                  className="bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-600"
+                >
+                  <Mail className="w-5 h-5 mr-2" />
+                  hola@ilinguerelax.com
+                </Button>
               </div>
             </motion.div>
 

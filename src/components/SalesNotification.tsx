@@ -69,10 +69,10 @@ const SalesNotification = ({
   }, []);
 
   useEffect(() => {
-    // Random interval between 50-70 minutes (3000000-4200000 ms)
+    // Random interval between 7-10 seconds
     const getRandomInterval = () => {
-      const minInterval = 50 * 60 * 1000; // 50 minutes
-      const maxInterval = 70 * 60 * 1000; // 70 minutes
+      const minInterval = 7 * 1000; // 7 seconds
+      const maxInterval = 10 * 1000; // 10 seconds
       return Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
     };
 

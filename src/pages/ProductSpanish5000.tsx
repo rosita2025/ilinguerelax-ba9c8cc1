@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useSpanishRelaxPixel, trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -11,8 +11,6 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import {
   Check,
   BookOpen,
@@ -24,7 +22,6 @@ import {
   GraduationCap,
   Lightbulb,
   CreditCard,
-  Loader2,
   Globe,
   Download,
   Zap,
@@ -72,7 +69,6 @@ const benefits = [
 ];
 
 const ProductSpanish5000 = () => {
-  const [isLoading, setIsLoading] = useState(false);
 
   // Meta Pixel ViewContent event
   const pixelParams = useMemo(() => ({
@@ -80,43 +76,25 @@ const ProductSpanish5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 10,
+    value: 17,
     currency: "USD",
   }), []);
   useSpanishRelaxPixel(pixelParams);
 
-  const handleBuyNow = async () => {
-    setIsLoading(true);
-    
+  const handleBuyNow = () => {
     // Track InitiateCheckout event with Meta Pixel (with eventID for deduplication)
     trackSpanishRelaxEvent("InitiateCheckout", {
       content_name: "Spanish Relax - 5,000 Words",
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000"],
       content_type: "product",
-      value: 10,
+      value: 17,
       currency: "USD",
       num_items: 1,
     });
     
-    try {
-      const { data, error } = await supabase.functions.invoke("create-spanish-payment");
-      
-      if (error) {
-        console.error("Payment error:", error);
-        toast.error("Error creating payment session. Please try again.");
-        return;
-      }
-
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    // Open Stripe checkout in new tab
+    window.open("https://buy.stripe.com/cNi00iexqdlz2mA1XL8IU07", "_blank");
   };
 
   return (
@@ -127,7 +105,7 @@ const ProductSpanish5000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"
         image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
-        price="10"
+        price="17"
         originalPrice="54"
         rating="4.8"
         reviewCount="500"
@@ -177,10 +155,10 @@ const ProductSpanish5000 = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$10</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
                 <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="px-3 py-1 rounded-full bg-purple-500 text-white text-sm font-bold">
-                  SAVE 81%
+                  SAVE 69%
                 </span>
               </div>
 
@@ -206,19 +184,9 @@ const ProductSpanish5000 = () => {
                 size="xl" 
                 className="w-full md:w-auto mb-4"
                 onClick={handleBuyNow}
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    BUY NOW
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
+                BUY NOW
+                <ArrowRight className="w-5 h-5" />
               </Button>
 
               <p className="text-sm text-muted-foreground">
@@ -232,7 +200,7 @@ const ProductSpanish5000 = () => {
       {/* Countdown Timer */}
       <CountdownTimer 
         hoursFromNow={48} 
-        currentPrice="$10 USD"
+        currentPrice="$17 USD"
         originalPrice="$54 USD"
         storageKey="countdown_spanish_book"
         lang="en"
@@ -316,7 +284,7 @@ const ProductSpanish5000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$10</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
                 <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="text-purple-600 font-bold">USD</span>
               </div>
@@ -328,19 +296,9 @@ const ProductSpanish5000 = () => {
                 size="xl" 
                 className="w-full"
                 onClick={handleBuyNow}
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    BUY NOW
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
+                BUY NOW
+                <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
 
@@ -398,7 +356,7 @@ const ProductSpanish5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$10"
+        price="$17"
         originalPrice="$54"
         productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)"
         onBuyClick={handleBuyNow}
@@ -407,7 +365,6 @@ const ProductSpanish5000 = () => {
         showReviews={true}
         rating={4.8}
         reviewCount={30}
-        isLoading={isLoading}
         lang="en"
       />
 

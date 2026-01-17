@@ -99,19 +99,20 @@ export const StickyBuyBar = ({
           <Button
             variant="hero"
             size="default"
-            className={`w-full shadow-lg text-sm py-2.5 h-auto ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
+            className={`w-full shadow-xl text-base py-3 h-auto font-bold relative overflow-hidden group ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : 'animate-pulse'}`}
             onClick={handleBuy}
             disabled={disabled || isLoading}
           >
+            <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                <Loader2 className="w-5 h-5 ml-2 animate-spin" />
                 Processing...
               </>
             ) : (
               <>
-                {ctaText}
-                {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+                🛒 {ctaText}
+                {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
               </>
             )}
           </Button>
@@ -173,19 +174,20 @@ export const StickyBuyBar = ({
             <Button
               variant="hero"
               size="default"
-              className={`whitespace-nowrap shadow-lg text-sm px-4 py-2 h-auto ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
+              className={`whitespace-nowrap shadow-xl text-base px-6 py-3 h-auto font-bold relative overflow-hidden group ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
               onClick={handleBuy}
               disabled={disabled || isLoading}
             >
+              <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                  <Loader2 className="w-5 h-5 ml-2 animate-spin" />
                   Processing...
                 </>
               ) : (
                 <>
-                  {ctaText}
-                  {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+                  🛒 {ctaText}
+                  {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
                 </>
               )}
             </Button>

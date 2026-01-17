@@ -7,44 +7,40 @@ interface Sale {
   timeAgo: string;
 }
 
-// Sales for Spanish speakers learning English (Latin America)
+// Sales for Spanish speakers learning English (Latin America) - more realistic time ranges
 const latinSalesPeople: Sale[] = [
-  { name: "María García", country: "México", timeAgo: "hace 2 min" },
-  { name: "Carlos López", country: "España", timeAgo: "hace 5 min" },
-  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 8 min" },
-  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 12 min" },
-  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 15 min" },
-  { name: "José Hernández", country: "Perú", timeAgo: "hace 18 min" },
-  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 22 min" },
-  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 25 min" },
-  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 28 min" },
-  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 32 min" },
-  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 35 min" },
-  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 38 min" },
+  { name: "María García", country: "México", timeAgo: "hace 1 hora" },
+  { name: "Carlos López", country: "España", timeAgo: "hace 3 horas" },
+  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 5 horas" },
+  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 8 horas" },
+  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 1 día" },
+  { name: "José Hernández", country: "Perú", timeAgo: "hace 1 día" },
+  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 2 días" },
+  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 2 días" },
+  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 3 días" },
+  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 3 días" },
+  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 4 días" },
+  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 5 días" },
 ];
 
-// Sales for English speakers learning Spanish (Europe, USA, Canada, Asia)
+// Sales for English speakers learning Spanish (Europe, USA, Canada, Asia) - more realistic time ranges
 const internationalSalesPeople: Sale[] = [
-  { name: "Sarah Johnson", country: "United States", timeAgo: "2 min ago" },
-  { name: "James Smith", country: "United Kingdom", timeAgo: "5 min ago" },
-  { name: "Emily Brown", country: "Canada", timeAgo: "8 min ago" },
-  { name: "Michael Davis", country: "Australia", timeAgo: "12 min ago" },
-  { name: "Sophie Martin", country: "France", timeAgo: "15 min ago" },
-  { name: "Thomas Mueller", country: "Germany", timeAgo: "18 min ago" },
-  { name: "Emma Wilson", country: "Ireland", timeAgo: "22 min ago" },
-  { name: "David Anderson", country: "Scotland", timeAgo: "25 min ago" },
-  { name: "Olivia Taylor", country: "New Zealand", timeAgo: "28 min ago" },
-  { name: "William Thompson", country: "Netherlands", timeAgo: "32 min ago" },
-  { name: "Charlotte White", country: "Sweden", timeAgo: "35 min ago" },
-  { name: "Daniel Lee", country: "Singapore", timeAgo: "38 min ago" },
-  { name: "Mia Jackson", country: "South Africa", timeAgo: "42 min ago" },
-  { name: "Alexander Harris", country: "Norway", timeAgo: "45 min ago" },
-  { name: "Yuki Tanaka", country: "Japan", timeAgo: "48 min ago" },
-  { name: "Benjamin Clark", country: "Belgium", timeAgo: "52 min ago" },
-  { name: "Grace Robinson", country: "Denmark", timeAgo: "55 min ago" },
-  { name: "Ethan Lewis", country: "Switzerland", timeAgo: "58 min ago" },
-  { name: "Chloe Walker", country: "Austria", timeAgo: "1 hour ago" },
-  { name: "Ryan Kim", country: "South Korea", timeAgo: "1 hour ago" },
+  { name: "Sarah Johnson", country: "United States", timeAgo: "1 hour ago" },
+  { name: "James Smith", country: "United Kingdom", timeAgo: "3 hours ago" },
+  { name: "Emily Brown", country: "Canada", timeAgo: "5 hours ago" },
+  { name: "Michael Davis", country: "Australia", timeAgo: "8 hours ago" },
+  { name: "Sophie Martin", country: "France", timeAgo: "1 day ago" },
+  { name: "Thomas Mueller", country: "Germany", timeAgo: "1 day ago" },
+  { name: "Emma Wilson", country: "Ireland", timeAgo: "2 days ago" },
+  { name: "David Anderson", country: "Scotland", timeAgo: "2 days ago" },
+  { name: "Olivia Taylor", country: "New Zealand", timeAgo: "3 days ago" },
+  { name: "William Thompson", country: "Netherlands", timeAgo: "3 days ago" },
+  { name: "Charlotte White", country: "Sweden", timeAgo: "4 days ago" },
+  { name: "Daniel Lee", country: "Singapore", timeAgo: "4 days ago" },
+  { name: "Mia Jackson", country: "South Africa", timeAgo: "5 days ago" },
+  { name: "Alexander Harris", country: "Norway", timeAgo: "5 days ago" },
+  { name: "Yuki Tanaka", country: "Japan", timeAgo: "6 days ago" },
+  { name: "Benjamin Clark", country: "Belgium", timeAgo: "1 week ago" },
 ];
 
 interface SalesNotificationProps {
@@ -64,38 +60,59 @@ const SalesNotification = ({
   const [saleIndex, setSaleIndex] = useState(0);
 
   useEffect(() => {
-    // Show first notification after 2 seconds
+    // Show first notification after 5 seconds (more natural delay)
     const initialTimeout = setTimeout(() => {
       setIsVisible(true);
-    }, 2000);
+    }, 5000);
 
     return () => clearTimeout(initialTimeout);
   }, []);
 
   useEffect(() => {
-    // Cycle through notifications
-    const interval = setInterval(() => {
-      // Hide current notification
-      setIsVisible(false);
-      
-      // After 500ms (fade out), show next notification
-      setTimeout(() => {
-        setSaleIndex(prev => {
-          const nextIndex = (prev + 1) % salesPeople.length;
-          setCurrentSale(salesPeople[nextIndex]);
-          return nextIndex;
-        });
-        setIsVisible(true);
-      }, 500);
-    }, 8000); // Show each notification for 8 seconds
+    // Random interval between 50-70 minutes (3000000-4200000 ms)
+    const getRandomInterval = () => {
+      const minInterval = 50 * 60 * 1000; // 50 minutes
+      const maxInterval = 70 * 60 * 1000; // 70 minutes
+      return Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
+    };
 
-    return () => clearInterval(interval);
+    let intervalId: NodeJS.Timeout;
+
+    const scheduleNext = () => {
+      const nextInterval = getRandomInterval();
+      intervalId = setTimeout(() => {
+        // Hide current notification
+        setIsVisible(false);
+        
+        // After 500ms (fade out), show next notification
+        setTimeout(() => {
+          setSaleIndex(prev => {
+            const nextIndex = (prev + 1) % salesPeople.length;
+            setCurrentSale(salesPeople[nextIndex]);
+            return nextIndex;
+          });
+          setIsVisible(true);
+        }, 500);
+
+        // Schedule the next notification
+        scheduleNext();
+      }, nextInterval);
+    };
+
+    // Start the cycle after initial display (show first one for 15 seconds)
+    const firstTimeout = setTimeout(() => {
+      scheduleNext();
+    }, 15000);
+
+    return () => {
+      clearTimeout(firstTimeout);
+      clearTimeout(intervalId);
+    };
   }, [salesPeople]);
 
   const handleClose = () => {
     setIsVisible(false);
-    // Resume after 5 seconds
-    setTimeout(() => setIsVisible(true), 5000);
+    // Don't auto-resume - user dismissed it, wait for next cycle
   };
 
   return (

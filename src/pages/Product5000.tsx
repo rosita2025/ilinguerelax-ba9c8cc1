@@ -36,6 +36,8 @@ import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
+import { VideoTestimonial } from "@/components/VideoTestimonial";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const partnerLogos = [{
   src: logoAmazon,
@@ -482,6 +484,15 @@ const Product5000 = () => {
         </div>
       </section>
 
+      {/* Video Testimonial */}
+      <VideoTestimonial 
+        videoUrl="https://youtu.be/bG35t0x3GkU"
+        customerName="Cliente Verificado"
+        customerLocation="Latinoamérica"
+        testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
+        lang="es"
+      />
+
       {/* Comparison Table */}
       <ComparisonTable />
 
@@ -538,6 +549,9 @@ const Product5000 = () => {
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop showAfter={500} />
     </main>;
 };
 export default Product5000;

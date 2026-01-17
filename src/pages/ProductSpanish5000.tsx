@@ -11,6 +11,7 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
   Check,
   BookOpen,
@@ -25,10 +26,20 @@ import {
   Globe,
   Download,
   Zap,
+  Shield,
+  ShoppingCart,
+  Star,
 } from "lucide-react";
 
 // Product image
 import productSpanish5000Image from "@/assets/product-spanish-5000.png";
+
+// Conversion components
+import { PurchaseCounter } from "@/components/PurchaseCounter";
+import { StockCounter } from "@/components/StockCounter";
+import { TrustBadges } from "@/components/TrustBadges";
+import { VideoTestimonial } from "@/components/VideoTestimonial";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const features = [
   "5,000+ essential Spanish words",
@@ -143,14 +154,26 @@ const ProductSpanish5000 = () => {
 
             {/* Product Info */}
             <div>
-              {/* Live Viewers */}
-              <div className="mb-4">
-                <LiveViewers minViewers={8} maxViewers={22} lang="en" />
-              </div>
-
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium mb-4">
-                <Globe className="w-4 h-4" />
-                <span>LEARN SPANISH - For English Speakers</span>
+              {/* Trending & Bonus Badge */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-bold border border-purple-500/20"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>🆕 NEW RELEASE</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>For English Speakers</span>
+                </motion.div>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -159,50 +182,101 @@ const ProductSpanish5000 = () => {
                 <span className="text-purple-600">With English Pronunciation</span>
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-lg text-muted-foreground mb-4">
                 The complete stress-free method to learn Spanish. Digital PDF format - 
                 download instantly and start learning today!
               </p>
 
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$17</span>
-                <span className="text-2xl text-muted-foreground line-through">$54</span>
-                <span className="px-3 py-1 rounded-full bg-purple-500 text-white text-sm font-bold">
-                  SAVE 69%
-                </span>
+              {/* Reviews - More Prominent */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+                </div>
+                <span className="font-bold text-foreground">4.8/5</span>
+                <span className="text-muted-foreground">(500+ Verified Reviews)</span>
               </div>
 
-              {/* Delivery Info */}
-              <div className="flex flex-wrap gap-4 mb-8 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Download className="w-4 h-4 text-purple-600" />
-                  <span>Instant PDF download</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-purple-600" />
-                  <span>Start learning today</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-purple-600" />
-                  <span>Works on any device</span>
-                </div>
+              {/* Purchase Counter - Social Proof */}
+              <div className="mb-4">
+                <PurchaseCounter baseCount={500} lang="en" />
               </div>
 
-              {/* CTA */}
-              <Button 
-                variant="hero" 
-                size="xl" 
-                className="w-full md:w-auto mb-4"
-                onClick={handleBuyNow}
+              {/* Live Viewers */}
+              <div className="mb-4">
+                <LiveViewers minViewers={8} maxViewers={22} lang="en" />
+              </div>
+
+              {/* Price Section - More Impactful */}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-6 border border-purple-500/20 mb-6"
               >
-                BUY NOW
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  <span className="text-purple-600 font-semibold text-sm uppercase">Special Launch Price</span>
+                </div>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$17</span>
+                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                  <motion.span 
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-bold shadow-lg"
+                  >
+                    SAVE 69%
+                  </motion.span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  💳 One-time payment • No subscriptions • Lifetime access
+                </p>
+              </motion.div>
 
-              <p className="text-sm text-muted-foreground">
-                🔒 100% secure payment • Instant download after purchase
+              {/* Stock Counter - Scarcity */}
+              <div className="mb-6">
+                <StockCounter totalStock={50} remainingStock={15} lang="en" />
+              </div>
+
+              {/* CTA Button - More Impactful */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="w-full mb-4 text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700"
+                  onClick={handleBuyNow}
+                >
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                  BUY NOW!
+                  <ArrowRight className="w-6 h-6 ml-2" />
+                </Button>
+              </motion.div>
+
+              <p className="text-center text-sm text-muted-foreground mb-6">
+                👆 Click to secure your copy at the discount price
               </p>
+
+              {/* Trust Badges */}
+              <TrustBadges lang="en" variant="grid" />
+
+              {/* Money Back Guarantee - Enhanced */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
+              >
+                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-green-700">🛡️ 100% Money-Back Guarantee - 7 Days</p>
+                  <p className="text-sm text-green-600">If you're not satisfied, we'll refund ALL your money. No questions asked.</p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -396,6 +470,9 @@ const ProductSpanish5000 = () => {
         lang="en"
         storageKey="exit_intent_spanish"
       />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop showAfter={500} />
     </main>
   );
 };

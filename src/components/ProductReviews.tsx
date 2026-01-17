@@ -1,6 +1,11 @@
-import { useState, useEffect } from "react";
-import { Star, ChevronLeft, ChevronRight, Quote, CheckCircle } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { Star, CheckCircle, Quote } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 import reviewEnglishFrases from "@/assets/review-english-frases.jpg";
 import reviewEnglishIpad from "@/assets/review-english-ipad.png";
 import reviewSpanishVocab from "@/assets/review-spanish-vocab.jpg";
@@ -268,54 +273,18 @@ interface ProductReviewsProps {
 
 export const ProductReviews = ({ productType = "english" }: ProductReviewsProps) => {
   const baseReviews = productType === "english" ? englishReviews : spanishReviews;
+  const swiperRef = useRef<any>(null);
   
   // Generate dynamic dates for reviews (1-15 days ago)
   const reviews = baseReviews.map((review, index) => {
     if (review.date === "dynamic") {
-      const daysAgo = (index % 14) + 1; // 1-14 days ago
+      const daysAgo = (index % 14) + 1;
       const date = new Date();
       date.setDate(date.getDate() - daysAgo);
       return { ...review, date: date.toISOString().split('T')[0] };
     }
     return review;
   });
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  
-  // Reviews to show based on screen size
-  const reviewsPerPage = 3;
-  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
-
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % totalPages);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, totalPages]);
-
-  const goToPrev = () => {
-    setIsAutoPlaying(false);
-    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
-  };
-
-  const goToNext = () => {
-    setIsAutoPlaying(false);
-    setCurrentIndex((prev) => (prev + 1) % totalPages);
-  };
-
-  const goToPage = (index: number) => {
-    setIsAutoPlaying(false);
-    setCurrentIndex(index);
-  };
-
-  const currentReviews = reviews.slice(
-    currentIndex * reviewsPerPage,
-    currentIndex * reviewsPerPage + reviewsPerPage
-  );
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -335,7 +304,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
   };
 
   return (
-    <section className="py-16 md:py-20 bg-gradient-to-b from-secondary/30 to-background">
+    <section className="py-16 md:py-20 bg-gradient-to-b from-secondary/30 to-background overflow-hidden">
       <div className="container px-4 md:px-6">
         {/* Header */}
         <div className="text-center mb-12">
@@ -357,47 +326,55 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
           </div>
         </div>
 
-        {/* Reviews Carousel */}
-        <div className="relative max-w-6xl mx-auto">
-          {/* Navigation Arrows */}
-          <button
-            onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 z-10 p-3 rounded-full bg-card border border-border shadow-lg hover:bg-secondary transition-colors"
-            aria-label="Anterior"
+        {/* Swiper Carousel */}
+        <div className="relative max-w-7xl mx-auto px-2 md:px-8">
+          <Swiper
+            ref={swiperRef}
+            modules={[Autoplay, Navigation, Pagination]}
+            spaceBetween={24}
+            slidesPerView={1}
+            centeredSlides={false}
+            loop={true}
+            autoplay={{
+              delay: 5000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
+            navigation={{
+              nextEl: ".swiper-button-next-custom",
+              prevEl: ".swiper-button-prev-custom",
+            }}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            breakpoints={{
+              640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 24,
+              },
+              1280: {
+                slidesPerView: 4,
+                spaceBetween: 24,
+              },
+            }}
+            className="reviews-swiper !pb-14"
           >
-            <ChevronLeft className="w-6 h-6 text-foreground" />
-          </button>
-          
-          <button
-            onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 z-10 p-3 rounded-full bg-card border border-border shadow-lg hover:bg-secondary transition-colors"
-            aria-label="Siguiente"
-          >
-            <ChevronRight className="w-6 h-6 text-foreground" />
-          </button>
-
-          {/* Reviews Grid */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
-              {currentReviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="group bg-card rounded-2xl border border-border shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
-                >
+            {reviews.map((review) => (
+              <SwiperSlide key={review.id} className="h-auto">
+                <div className="group bg-card rounded-2xl border border-border shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full flex flex-col">
                   {/* Customer Image - Large Card Style */}
                   {review.img ? (
-                    <div className="relative h-48 md:h-56 overflow-hidden">
+                    <div className="relative h-48 md:h-56 overflow-hidden flex-shrink-0">
                       <img
                         src={review.img}
                         alt={review.nickname}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                       />
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -418,11 +395,10 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                       )}
                     </div>
                   ) : (
-                    <div className="relative h-48 md:h-56 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                    <div className="relative h-48 md:h-56 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-6xl font-bold text-primary/40">
                         {review.nickname.charAt(0)}
                       </span>
-                      {/* Rating */}
                       <div className="absolute bottom-3 left-3 flex gap-0.5">
                         {[...Array(review.rating)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 fill-accent text-accent" />
@@ -438,17 +414,17 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                   )}
                   
                   {/* Content */}
-                  <div className="p-5">
+                  <div className="p-5 flex flex-col flex-grow">
                     {/* Quote Icon */}
-                    <Quote className="w-6 h-6 text-primary/40 mb-2" />
+                    <Quote className="w-6 h-6 text-primary/40 mb-2 flex-shrink-0" />
                     
                     {/* Review Text */}
-                    <p className="text-foreground/90 text-sm leading-relaxed mb-4 line-clamp-3">
+                    <p className="text-foreground/90 text-sm leading-relaxed mb-4 line-clamp-3 flex-grow">
                       "{review.review}"
                     </p>
                     
                     {/* Author & Date */}
-                    <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                    <div className="flex items-center justify-between pt-3 border-t border-border/50 mt-auto">
                       <p className="font-semibold text-foreground text-sm">{review.nickname}</p>
                       <p className="text-xs text-muted-foreground">
                         {formatDate(review.date)}
@@ -456,37 +432,67 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                     </div>
                   </div>
                 </div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Pagination Dots */}
-          <div className="flex items-center justify-center gap-2 mt-8">
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToPage(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? "bg-primary w-8"
-                    : "bg-primary/30 hover:bg-primary/50"
-                }`}
-                aria-label={`Ir a página ${index + 1}`}
-              />
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
+
+          {/* Custom Navigation Buttons */}
+          <button 
+            className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-card border border-border shadow-lg hover:bg-secondary transition-all duration-300 flex items-center justify-center -translate-x-1 md:-translate-x-4 hover:scale-110"
+            aria-label="Anterior"
+          >
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <button 
+            className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-card border border-border shadow-lg hover:bg-secondary transition-all duration-300 flex items-center justify-center translate-x-1 md:translate-x-4 hover:scale-110"
+            aria-label="Siguiente"
+          >
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
-        {/* Trust Badge */}
+        {/* Trust Footer */}
         <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-green-500/10 border border-green-500/20">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium text-green-700">
-              {productType === "spanish" ? "All reviews are from real verified customers" : "Todas las reseñas son de clientes reales verificados"}
-            </span>
+          <div className="inline-flex items-center gap-6 flex-wrap justify-center">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              <span className="text-sm">{productType === "spanish" ? "All verified purchases" : "Todas compras verificadas"}</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Star className="w-5 h-5 fill-accent text-accent" />
+              <span className="text-sm">{productType === "spanish" ? "5-star average rating" : "Calificación promedio 5 estrellas"}</span>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Custom Swiper Styles */}
+      <style>{`
+        .reviews-swiper .swiper-pagination {
+          bottom: 0 !important;
+        }
+        .reviews-swiper .swiper-pagination-bullet {
+          width: 10px;
+          height: 10px;
+          background: hsl(var(--muted-foreground));
+          opacity: 0.4;
+          transition: all 0.3s ease;
+        }
+        .reviews-swiper .swiper-pagination-bullet-active {
+          opacity: 1;
+          background: hsl(var(--primary));
+          width: 24px;
+          border-radius: 5px;
+        }
+        .reviews-swiper .swiper-slide {
+          height: auto;
+        }
+      `}</style>
     </section>
   );
 };

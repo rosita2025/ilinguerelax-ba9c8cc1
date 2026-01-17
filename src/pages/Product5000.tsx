@@ -30,6 +30,9 @@ import bonusDiccionario from "@/assets/bonus-diccionario.png";
 import bonusArticulos from "@/assets/bonus-articulos.png";
 import bonusPreview from "@/assets/bonus-preview.jpg";
 
+// About section image
+import aboutIlingueRelax from "@/assets/about-ilingue-relax.png";
+
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
@@ -634,126 +637,30 @@ const Product5000 = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(139,69,180,0.3)_0%,_transparent_70%)]" />
         
         <div className="container px-4 md:px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-            {/* Left - Books Display */}
-            <div className="relative flex justify-center lg:justify-end">
-              <div className="relative">
-                {/* Background glow */}
-                <div className="absolute -inset-8 bg-purple-500/20 blur-3xl rounded-full" />
-                
-                {/* Books Stack */}
-                <div className="relative flex items-end gap-[-20px]">
-                  {/* Spanish Book (back) */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6 }}
-                    viewport={{ once: true }}
-                    className="relative z-10 transform -rotate-6"
-                  >
-                    <img 
-                      src={product5000Image} 
-                      alt="Inglés Relax - 5000 Palabras"
-                      className="w-40 md:w-52 h-auto drop-shadow-2xl"
-                    />
-                  </motion.div>
-                  
-                  {/* English Book (front) */}
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    viewport={{ once: true }}
-                    className="relative z-20 -ml-12 transform rotate-3"
-                  >
-                    <img 
-                      src={product5000Image} 
-                      alt="Spanish Relax - 5000 Words"
-                      className="w-44 md:w-56 h-auto drop-shadow-2xl"
-                    />
-                  </motion.div>
-                </div>
-              </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="max-w-6xl mx-auto"
+          >
+            {/* Full Width Image */}
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <img 
+                src={aboutIlingueRelax} 
+                alt="Acerca del ILINGUE RELAX - Autora Crady by iLingue Relax"
+                className="w-full h-auto"
+              />
             </div>
-
-            {/* Right - Content */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center lg:text-left"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Acerca del
-              </h2>
-              <div className="flex items-center gap-3 justify-center lg:justify-start mb-6">
-                <span className="text-3xl md:text-4xl font-bold text-white">ILINGUE RELAX</span>
-                <span className="text-2xl md:text-3xl font-script text-pink-400 italic">Lady</span>
-              </div>
-              
-              <div className="space-y-4 text-white/90 text-base md:text-lg leading-relaxed">
-                <p>
-                  Soy la Autora Youtumundial en <span className="font-semibold text-white">ILINGUE RELAX</span> by. 
-                  Inglés Relax, Spanish Relax, Portugues Relax, y mas. 
-                  Es un método creado para personas que desean aprender idiomas de forma simple, visual y relajada, 
-                  sin clases presenciales ni estrés.
-                </p>
-                <p>
-                  Está basado en la repetición auditiva, memoria visual y pronunciación guiada, 
-                  lo que facilita el aprendizaje natural, incluso si partes desde cero.
-                </p>
-              </div>
-
-              {/* CTA Button */}
-              <motion.div 
-                className="mt-8"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  onClick={handleBuy}
-                  size="lg"
-                  className="w-full md:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 hover:from-pink-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold text-lg md:text-xl px-8 py-6 rounded-xl shadow-[0_0_30px_rgba(168,85,247,0.5)] hover:shadow-[0_0_40px_rgba(168,85,247,0.7)] transition-all duration-300"
-                >
-                  ¡SÍ, LO QUIERO AHORA!
-                </Button>
-              </motion.div>
-
-              {/* Trust Badges */}
-              <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-6">
-                <div className="flex items-center gap-2 text-white/80">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/30 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-purple-300" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-semibold text-white">GARANTÍA</p>
-                    <p className="text-[10px] text-white/60">7 días de devolución</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2 text-white/80">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/30 flex items-center justify-center">
-                    <Download className="w-5 h-5 text-purple-300" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-semibold text-white">ACCESO INMEDIATO</p>
-                    <p className="text-[10px] text-white/60">Recibe tu producto ahora</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2 text-white/80">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/30 flex items-center justify-center">
-                    <CreditCard className="w-5 h-5 text-purple-300" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-semibold text-white">PAGO SEGURO</p>
-                    <p className="text-[10px] text-white/60">100% protegido</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+            
+            {/* Additional Content Below */}
+            <div className="mt-8 text-center">
+              <p className="text-white/80 text-lg md:text-xl max-w-3xl mx-auto">
+                <span className="font-semibold text-white">Autora Crady by iLingue Relax</span> - 
+                Creadora del método ILINGUE RELAX para aprender idiomas de forma simple, visual y relajada.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 

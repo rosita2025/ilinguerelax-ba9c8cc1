@@ -109,6 +109,8 @@ const chapters = ["Casa y Hogar", "Comidas y Bebidas", "Transportes", "Profesion
 const Product5000 = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
+  const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
 
   // Meta Pixel ViewContent event
   const pixelParams = useMemo(() => ({
@@ -129,6 +131,16 @@ const Product5000 = () => {
   };
   const prevImage = () => {
     setCurrentImageIndex(prev => (prev - 1 + previewImages.length) % previewImages.length);
+  };
+  const openBonusLightbox = (index: number) => {
+    setCurrentBonusIndex(index);
+    setBonusLightboxOpen(true);
+  };
+  const nextBonusImage = () => {
+    setCurrentBonusIndex(prev => (prev + 1) % bonuses.length);
+  };
+  const prevBonusImage = () => {
+    setCurrentBonusIndex(prev => (prev - 1 + bonuses.length) % bonuses.length);
   };
   const handleBuy = () => {
     window.open("https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true", "_blank");
@@ -170,6 +182,54 @@ const Product5000 = () => {
 
             {/* Next button */}
             <button onClick={nextImage} className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+              <ChevronRight className="w-8 h-8 text-white" />
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bonus Lightbox Dialog */}
+      <Dialog open={bonusLightboxOpen} onOpenChange={setBonusLightboxOpen}>
+        <DialogContent className="max-w-4xl w-full p-0 bg-black/95 border-none">
+          <DialogTitle className="sr-only">
+            {bonuses[currentBonusIndex]?.title}
+          </DialogTitle>
+          <div className="relative flex items-center justify-center min-h-[80vh]">
+            {/* Close button */}
+            <button onClick={() => setBonusLightboxOpen(false)} className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Previous button */}
+            <button onClick={prevBonusImage} className="absolute left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+              <ChevronLeft className="w-8 h-8 text-white" />
+            </button>
+
+            {/* Image */}
+            <div className="flex flex-col items-center px-16">
+              <img 
+                src={bonuses[currentBonusIndex]?.image} 
+                alt={bonuses[currentBonusIndex]?.title} 
+                className="max-h-[70vh] w-auto object-contain rounded-lg" 
+              />
+              <div className="mt-4 text-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold mb-2">
+                  GRATIS
+                </div>
+                <h3 className="text-xl font-bold text-white">
+                  {bonuses[currentBonusIndex]?.title}
+                </h3>
+                <p className="text-white/70 mt-1 max-w-md">
+                  {bonuses[currentBonusIndex]?.description}
+                </p>
+                <p className="text-white/50 text-sm mt-2">
+                  {currentBonusIndex + 1} / {bonuses.length}
+                </p>
+              </div>
+            </div>
+
+            {/* Next button */}
+            <button onClick={nextBonusImage} className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
               <ChevronRight className="w-8 h-8 text-white" />
             </button>
           </div>
@@ -476,7 +536,11 @@ const Product5000 = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {bonuses.map((bonus, index) => (
-              <div key={bonus.title} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group">
+              <div 
+                key={bonus.title} 
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group cursor-pointer"
+                onClick={() => openBonusLightbox(index)}
+              >
                 {/* Bonus Image */}
                 {bonus.image && (
                   <div className="relative h-48 md:h-56 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
@@ -487,6 +551,10 @@ const Product5000 = () => {
                     />
                     <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
                       GRATIS
+                    </div>
+                    {/* Zoom indicator */}
+                    <div className="absolute bottom-3 right-3 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <ZoomIn className="w-4 h-4" />
                     </div>
                   </div>
                 )}

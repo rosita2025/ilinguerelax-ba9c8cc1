@@ -6,6 +6,9 @@ import reviewEnglishIpad from "@/assets/review-english-ipad.png";
 import reviewSpanishVocab from "@/assets/review-spanish-vocab.jpg";
 import reviewSpanishLove from "@/assets/review-spanish-love.jpg";
 import reviewSpanishHealth from "@/assets/review-spanish-health.jpg";
+import reviewSymptoms from "@/assets/review-symptoms.jpg";
+import reviewBookCover from "@/assets/review-book-cover.jpg";
+import reviewPersonHolding from "@/assets/review-person-holding.jpg";
 
 interface Review {
   id: string;
@@ -125,6 +128,51 @@ const englishReviews: Review[] = [
     rating: 5,
     img: reviewEnglishIpad,
     date: "2025-01-08",
+    verified: true,
+  },
+  {
+    id: "13",
+    nickname: "Patricia López",
+    review: "La sección de síntomas y emergencias es súper útil. Ahora puedo comunicarme si tengo algún problema de salud en inglés. Muy práctico!",
+    rating: 5,
+    img: reviewSymptoms,
+    date: "2025-01-05",
+    verified: true,
+  },
+  {
+    id: "14",
+    nickname: "Miguel Ángel R.",
+    review: "El libro tiene todo organizado por temas. Me encanta poder estudiar vocabulario específico según lo que necesito. La calidad es excelente.",
+    rating: 5,
+    img: reviewBookCover,
+    date: "2025-01-03",
+    verified: true,
+  },
+  {
+    id: "15",
+    nickname: "Laura Fernández",
+    review: "Muy contenta con mi compra! El libro es exactamente como se ve en las fotos. La pronunciación escrita me ayuda muchísimo a practicar sola.",
+    rating: 5,
+    img: reviewPersonHolding,
+    date: "2024-12-28",
+    verified: true,
+  },
+  {
+    id: "16",
+    nickname: "Andrea Martínez",
+    review: "Súper recomendado para principiantes. Las categorías están muy bien pensadas y la fonética es clara. Lo uso todos los días!",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",
+    date: "2024-12-20",
+    verified: true,
+  },
+  {
+    id: "17",
+    nickname: "Jorge Sánchez",
+    review: "Perfecto para hispanohablantes que quieren aprender inglés de manera sencilla. La pronunciación en español es genial!",
+    rating: 5,
+    img: "https://images.loox.io/uploads/2025/11/23/IiDiyw9-U.jpg",
+    date: "2024-12-15",
     verified: true,
   },
 ];

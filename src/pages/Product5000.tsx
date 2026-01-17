@@ -24,6 +24,12 @@ import previewFrases from "@/assets/preview-frases.jpg";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
 import product5000Image from "@/assets/product-5000.png";
 
+// Bonus images
+import bonusEstructura from "@/assets/bonus-estructura.png";
+import bonusDiccionario from "@/assets/bonus-diccionario.png";
+import bonusArticulos from "@/assets/bonus-articulos.png";
+import bonusPreview from "@/assets/bonus-preview.jpg";
+
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
@@ -81,19 +87,23 @@ const features = ["5,000+ palabras más utilizadas en inglés", "Pronunciación 
 const bonuses = [{
   icon: BookOpen,
   title: "Bonus 1: Estructura de Frases",
-  description: "Aprende la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Incluye ejemplos y pronunciación."
+  description: "Aprende la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Incluye ejemplos y pronunciación.",
+  image: bonusEstructura
 }, {
   icon: Globe,
   title: "Bonus 2: Diccionario Alfabético",
-  description: "5,000 palabras organizadas alfabéticamente con pronunciación adaptada. Ideal para consultas rápidas."
+  description: "5,000 palabras organizadas alfabéticamente con pronunciación adaptada. Ideal para consultas rápidas.",
+  image: bonusDiccionario
 }, {
   icon: BookOpen,
   title: "Bonus 3: Verbo To Be y Más",
-  description: "Tablas prácticas del verbo To Be, artículos (a/an/the) y preposiciones (in/on/at) con ejemplos."
+  description: "Tablas prácticas del verbo To Be, artículos (a/an/the) y preposiciones (in/on/at) con ejemplos.",
+  image: bonusArticulos
 }, {
   icon: RefreshCw,
-  title: "Bonus 4: Actualizaciones Gratis",
-  description: "Acceso de por vida al contenido con todas las actualizaciones futuras y nuevas versiones sin costo adicional."
+  title: "Bonus 4: Vista Previa del Libro",
+  description: "Acceso de por vida al contenido con todas las actualizaciones futuras y nuevas versiones sin costo adicional.",
+  image: bonusPreview
 }];
 const chapters = ["Casa y Hogar", "Comidas y Bebidas", "Transportes", "Profesiones", "Lugares", "Países y Ciudades", "Ambiente y Naturaleza", "Tecnología", "Universidad", "Vida Cotidiana", "Trabajo", "Viajes", "Emociones", "Deportes", "Expresiones Comunes", "Y mucho más..."];
 const Product5000 = () => {
@@ -465,21 +475,39 @@ const Product5000 = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {bonuses.map((bonus, index) => <div key={bonus.title} className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
-                    <bonus.icon className="w-6 h-6 text-primary-foreground" />
+            {bonuses.map((bonus, index) => (
+              <div key={bonus.title} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group">
+                {/* Bonus Image */}
+                {bonus.image && (
+                  <div className="relative h-48 md:h-56 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
+                    <img
+                      src={bonus.image}
+                      alt={bonus.title}
+                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
+                      GRATIS
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      {bonus.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {bonus.description}
-                    </p>
+                )}
+                {/* Content */}
+                <div className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
+                      <bonus.icon className="w-6 h-6 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {bonus.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {bonus.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
       </section>

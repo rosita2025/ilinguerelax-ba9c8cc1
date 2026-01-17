@@ -86,10 +86,11 @@ export const CountdownTimer = ({
 
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
-      <div className="bg-[#1a2332] text-white font-bold text-3xl md:text-5xl rounded-xl w-20 md:w-28 h-20 md:h-28 flex items-center justify-center shadow-2xl">
-        {value.toString().padStart(2, "0")}
+      <div className="bg-[#1a2332] text-white font-black text-4xl md:text-6xl rounded-2xl w-20 md:w-32 h-20 md:h-32 flex items-center justify-center shadow-2xl border-2 border-white/10 relative overflow-hidden">
+        <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
+        <span className="relative">{value.toString().padStart(2, "0")}</span>
       </div>
-      <span className="text-xs md:text-sm text-white/80 mt-3 font-medium uppercase tracking-widest">{label}</span>
+      <span className="text-xs md:text-sm text-white/90 mt-3 font-semibold uppercase tracking-widest">{label}</span>
     </div>
   );
 

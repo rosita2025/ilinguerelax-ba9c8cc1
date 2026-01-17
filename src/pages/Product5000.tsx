@@ -14,7 +14,8 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Star, Check, BookOpen, Globe, ArrowRight, ShoppingCart, Clock, Gift, Download, RefreshCw, Eye, ZoomIn, ChevronLeft, ChevronRight, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, X } from "lucide-react";
+import { Star, Check, BookOpen, Globe, ArrowRight, ShoppingCart, Clock, Gift, Download, RefreshCw, Eye, ZoomIn, ChevronLeft, ChevronRight, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, X, Zap, Sparkles, Shield } from "lucide-react";
+import { motion } from "framer-motion";
 
 // Preview images
 import previewIndice from "@/assets/preview-indice.png";
@@ -32,6 +33,10 @@ import logoKindle from "@/assets/logo-kindle.png";
 
 // Components
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
+import { PurchaseCounter } from "@/components/PurchaseCounter";
+import { StockCounter } from "@/components/StockCounter";
+import { TrustBadges } from "@/components/TrustBadges";
+
 const partnerLogos = [{
   src: logoAmazon,
   alt: "Amazon",
@@ -180,9 +185,26 @@ const Product5000 = () => {
 
             {/* Product Info */}
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
-                <Gift className="w-4 h-4" />
-                <span>Incluye 4 Bonus</span>
+              {/* Trending & Bonus Badge */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>🔥 MÁS VENDIDO</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
+                >
+                  <Gift className="w-4 h-4" />
+                  <span>4 Bonus Gratis</span>
+                </motion.div>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -190,93 +212,98 @@ const Product5000 = () => {
                 Fonética UK/USA
               </h1>
 
-              <div className="flex items-center gap-3 mb-6">
+              {/* Reviews - More Prominent */}
+              <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-accent text-accent" />)}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
                 </div>
-                <span className="text-muted-foreground">(800 Reseñas)</span>
+                <span className="font-bold text-foreground">4.8/5</span>
+                <span className="text-muted-foreground">(800+ Reseñas Verificadas)</span>
+              </div>
+
+              {/* Purchase Counter - Social Proof */}
+              <div className="mb-4">
+                <PurchaseCounter baseCount={1247} lang="es" />
               </div>
 
               {/* Live Viewers */}
               <div className="mb-4">
-                <LiveViewers minViewers={15} maxViewers={32} />
+                <LiveViewers minViewers={18} maxViewers={42} />
               </div>
 
-              {/* Urgency Banner */}
-              <div className="flex items-center gap-2 mb-4 px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20">
-                <Clock className="w-4 h-4 text-red-500 animate-pulse" />
-                <span className="text-sm font-medium text-red-600">
-                  🔥 ¡Oferta por tiempo limitado! Quedan pocas unidades
-                </span>
+              {/* Price Section - More Impactful */}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-green-600" />
+                  <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
+                </div>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                  <motion.span 
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
+                  >
+                    AHORRA 81%
+                  </motion.span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  💳 Pago único • Sin suscripciones • Acceso de por vida
+                </p>
+              </motion.div>
+
+              {/* Stock Counter - Scarcity */}
+              <div className="mb-6">
+                <StockCounter totalStock={50} remainingStock={12} lang="es" />
               </div>
 
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-foreground">$10</span>
-                <span className="text-2xl text-muted-foreground line-through">
-                  $54
-                </span>
-                <span className="px-3 py-1 rounded-full gradient-accent text-accent-foreground text-sm font-bold">
-                  AHORRA 81%
-                </span>
-              </div>
+              {/* CTA Button - More Impactful */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
+                  onClick={handleBuy}
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                  ¡QUIERO COMPRAR AHORA!
+                  <ArrowRight className="w-6 h-6 ml-2" />
+                </Button>
+              </motion.div>
+
+              {/* Secondary CTA */}
+              <p className="text-center text-sm text-muted-foreground mb-6">
+                👆 Haz clic para asegurar tu copia al precio de oferta
+              </p>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <Check className="w-4 h-4 text-green-600" />
-                  <span className="text-xs font-medium text-green-700">Pago Seguro</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                  <Download className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-medium text-blue-700">Descarga Inmediata</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                  <RefreshCw className="w-4 h-4 text-purple-600" />
-                  <span className="text-xs font-medium text-purple-700">Garantía 7 días</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <Star className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-medium text-amber-700">+800 Reseñas</span>
-                </div>
-              </div>
+              <TrustBadges lang="es" variant="grid" />
 
-              {/* Delivery Info */}
-              <div className="flex flex-wrap gap-4 mb-8 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart className="w-4 h-4 text-primary" />
-                  <span>Agregar al carrito</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" />
-                  <span>Compra inmediata</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Download className="w-4 h-4 text-primary" />
-                  <span>Entrega digital</span>
-                </div>
-              </div>
-
-              {/* CTA */}
-              <Button variant="hero" size="xl" className="w-full md:w-auto mb-4 animate-pulse" onClick={handleBuy}>
-                QUIERO COMPRAR AHORA
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-
-              {/* Money Back Guarantee */}
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-green-500/5 border border-green-500/20 mb-4">
-                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <RefreshCw className="w-5 h-5 text-green-600" />
+              {/* Money Back Guarantee - Enhanced */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
+              >
+                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Shield className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-green-700">Garantía de Devolución 7 Días</p>
-                  <p className="text-xs text-green-600">Si no estás satisfecho, te devolvemos el 100% de tu dinero</p>
+                  <p className="text-base font-bold text-green-700">🛡️ Garantía de Devolución 100% - 7 Días</p>
+                  <p className="text-sm text-green-600">Si no estás satisfecho, te devolvemos TODO tu dinero. Sin preguntas.</p>
                 </div>
-              </div>
-
-              <p className="text-sm text-muted-foreground">
-                🔒 Pago 100% seguro • Entrega inmediata • Garantía de satisfacción
-              </p>
+              </motion.div>
             </div>
           </div>
         </div>

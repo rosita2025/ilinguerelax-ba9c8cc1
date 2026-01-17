@@ -3,6 +3,9 @@ import { Star, ChevronLeft, ChevronRight, Quote, CheckCircle } from "lucide-reac
 import { motion, AnimatePresence } from "framer-motion";
 import reviewEnglishFrases from "@/assets/review-english-frases.jpg";
 import reviewEnglishIpad from "@/assets/review-english-ipad.png";
+import reviewSpanishVocab from "@/assets/review-spanish-vocab.jpg";
+import reviewSpanishLove from "@/assets/review-spanish-love.jpg";
+import reviewSpanishHealth from "@/assets/review-spanish-health.jpg";
 
 interface Review {
   id: string;
@@ -131,27 +134,27 @@ const spanishReviews: Review[] = [
   {
     id: "s1",
     nickname: "Sarah M.",
-    review: "This book is amazing! The English pronunciation guide makes learning Spanish so much easier. I've tried many methods but this stress-free approach really works!",
+    review: "This book is amazing! The vocabulary section with vegetables, legumes, meats and dairy is so well organized. The pronunciation guide makes learning Spanish so much easier!",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishVocab,
     date: "dynamic",
     verified: true,
   },
   {
     id: "s2",
     nickname: "Michael T.",
-    review: "Perfect for beginners like me. No complicated grammar rules, just practical words I can use right away. The PDF arrived instantly!",
+    review: "Love the romance chapter! Learning words of affection and love relationships in Spanish is so fun. The pronunciation guide is perfect for English speakers.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishLove,
     date: "dynamic",
     verified: true,
   },
   {
     id: "s3",
     nickname: "Jennifer L.",
-    review: "I love that I don't need a dictionary. Everything is explained in a way English speakers can understand. Already learning 15 words a day!",
+    review: "The health and emergencies section is incredibly useful. Now I can communicate symptoms and ask for help in Spanish. Very practical vocabulary!",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishHealth,
     date: "dynamic",
     verified: true,
   },
@@ -160,7 +163,7 @@ const spanishReviews: Review[] = [
     nickname: "David R.",
     review: "The step-by-step method is brilliant. I was always stressed about learning Spanish but this book changed my perspective completely.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishVocab,
     date: "dynamic",
     verified: true,
   },
@@ -169,7 +172,7 @@ const spanishReviews: Review[] = [
     nickname: "Emily K.",
     review: "Bought this for my trip to Spain next year. The pronunciation guide with UK and US phonetics is exactly what I needed!",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishLove,
     date: "dynamic",
     verified: true,
   },
@@ -178,7 +181,7 @@ const spanishReviews: Review[] = [
     nickname: "Robert H.",
     review: "Great value for money. 5,000 words with pronunciation included. The digital PDF is a nice bonus while waiting for the physical book.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishHealth,
     date: "dynamic",
     verified: true,
   },
@@ -187,7 +190,7 @@ const spanishReviews: Review[] = [
     nickname: "Amanda P.",
     review: "Finally a Spanish learning book designed for English speakers! No more guessing pronunciation. Highly recommend!",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishVocab,
     date: "dynamic",
     verified: true,
   },
@@ -196,7 +199,7 @@ const spanishReviews: Review[] = [
     nickname: "Chris B.",
     review: "The stress-free method really works. I study 20 minutes a day and I'm already seeing progress. Can't wait for the physical book!",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishLove,
     date: "dynamic",
     verified: true,
   },
@@ -205,7 +208,7 @@ const spanishReviews: Review[] = [
     nickname: "Lisa W.",
     review: "I ordered for my whole family. We're all learning Spanish together now. The book is well organized and easy to follow.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face",
+    img: reviewSpanishHealth,
     date: "dynamic",
     verified: true,
   },

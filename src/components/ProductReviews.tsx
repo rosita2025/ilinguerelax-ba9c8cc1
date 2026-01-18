@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Star } from "lucide-react";
+import { Star, Quote } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -27,6 +27,33 @@ const spanishTestimonials = [
   "https://images.loox.io/uploads/2025/11/23/BWXo4KTI7Q.jpg",
 ];
 
+// Text-only reviews
+const textReviewsEnglish = [
+  "¡Excelente libro! La pronunciación está muy bien explicada y fácil de entender.",
+  "Me encantó, muy completo y organizado. Lo recomiendo 100%.",
+  "Perfecto para aprender inglés desde cero. Las fonéticas ayudan mucho.",
+  "El mejor libro que he comprado para aprender vocabulario en inglés.",
+  "Muy práctico y útil. Lo uso todos los días para estudiar.",
+  "La calidad del contenido es increíble. Vale cada peso invertido.",
+  "Súper recomendado. Aprendí más en una semana que en meses de clases.",
+  "Excelente material de estudio. La organización por temas es genial.",
+  "Me ayudó muchísimo con mi pronunciación. ¡Gracias iLingue Relax!",
+  "El formato es muy fácil de seguir. Perfecto para autodidactas.",
+];
+
+const textReviewsSpanish = [
+  "Amazing book! The pronunciation guide is so helpful for English speakers.",
+  "I love how organized it is. Makes learning Spanish so much easier!",
+  "Best Spanish vocabulary book I've ever purchased. Highly recommend!",
+  "The phonetics really help with pronunciation. Great resource!",
+  "Perfect for self-study. I use it every day.",
+  "Worth every penny! The content quality is incredible.",
+  "Learned more in a week than months of classes. Thank you!",
+  "The topic organization is brilliant. Easy to find what you need.",
+  "Helped me so much with my Spanish. Highly recommended!",
+  "Great format, easy to follow. Perfect for beginners.",
+];
+
 interface ProductReviewsProps {
   productType?: "english" | "spanish";
 }
@@ -34,6 +61,7 @@ interface ProductReviewsProps {
 export const ProductReviews = ({ productType = "english" }: ProductReviewsProps) => {
   const swiperRef = useRef<any>(null);
   const testimonials = productType === "english" ? englishTestimonials : spanishTestimonials;
+  const textReviews = productType === "english" ? textReviewsEnglish : textReviewsSpanish;
 
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-secondary/30 to-background overflow-hidden">
@@ -111,6 +139,32 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
             </SwiperSlide>
           ))}
         </Swiper>
+      </div>
+
+      {/* Text-only Reviews Section */}
+      <div className="container px-4 md:px-6 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {textReviews.map((review, index) => (
+            <div 
+              key={index} 
+              className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
+              <div className="flex items-start gap-3">
+                <Quote className="w-6 h-6 text-accent/60 flex-shrink-0 mt-1" />
+                <div>
+                  <div className="flex gap-0.5 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-foreground text-sm leading-relaxed italic">
+                    "{review}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Trust Footer */}

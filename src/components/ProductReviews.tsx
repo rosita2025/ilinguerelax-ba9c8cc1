@@ -29,29 +29,29 @@ const spanishTestimonials = [
 
 // Real verified reviews - iLingue Relax
 const textReviewsEnglish = [
-  { text: "Compré el libro y me llegó al instante. La pronunciación está super clara y me ayudó mucho con mi trabajo.", verified: true, date: "2025-01-10" },
-  { text: "Llevo 2 semanas estudiando y ya noto la diferencia. El método es muy relajado como dice el nombre.", verified: true, date: "2025-01-08" },
-  { text: "Lo mejor es que tiene la fonética UK y USA. Muy completo para el precio que tiene.", verified: true, date: "2025-01-05" },
-  { text: "Mi hijo de 15 años lo está usando y le encanta. Fácil de entender para cualquier edad.", verified: true, date: "2025-01-03" },
-  { text: "Excelente inversión. Los 52 capítulos están muy bien organizados por temas.", verified: true, date: "2024-12-28" },
-  { text: "La descarga fue inmediata y el PDF se ve perfecto en mi tablet. Muy recomendado.", verified: true, date: "2024-12-25" },
-  { text: "Después de probar varios métodos, este es el que mejor me funcionó. Gracias iLingue Relax.", verified: true, date: "2024-12-20" },
-  { text: "Los bonus que incluye valen oro. El diccionario alfabético es genial para consultas rápidas.", verified: true, date: "2024-12-18" },
-  { text: "Soy maestra y lo recomiendo a mis alumnos. El contenido es de calidad profesional.", verified: true, date: "2024-12-15" },
-  { text: "Nunca pensé que aprender vocabulario fuera tan fácil. Las 5,000 palabras están muy bien seleccionadas.", verified: true, date: "2024-12-10" },
+  { text: "Compré el libro y me llegó al instante. La pronunciación está super clara y me ayudó mucho con mi trabajo.", verified: true, date: "2026-01-15" },
+  { text: "Llevo 2 semanas estudiando y ya noto la diferencia. El método es muy relajado como dice el nombre.", verified: true, date: "2026-01-10" },
+  { text: "Lo mejor es que tiene la fonética UK y USA. Muy completo para el precio que tiene.", verified: true, date: "2026-01-05" },
+  { text: "Mi hijo de 15 años lo está usando y le encanta. Fácil de entender para cualquier edad.", verified: true, date: "2025-12-28" },
+  { text: "Excelente inversión. Los 52 capítulos están muy bien organizados por temas.", verified: true, date: "2025-11-20" },
+  { text: "La descarga fue inmediata y el PDF se ve perfecto en mi tablet. Muy recomendado.", verified: true, date: "2025-10-15" },
+  { text: "Después de probar varios métodos, este es el que mejor me funcionó. Gracias iLingue Relax.", verified: true, date: "2025-09-18" },
+  { text: "Los bonus que incluye valen oro. El diccionario alfabético es genial para consultas rápidas.", verified: true, date: "2025-08-22" },
+  { text: "Soy maestra y lo recomiendo a mis alumnos. El contenido es de calidad profesional.", verified: true, date: "2025-08-05" },
+  { text: "Nunca pensé que aprender vocabulario fuera tan fácil. Las 5,000 palabras están muy bien seleccionadas.", verified: true, date: "2025-07-12" },
 ];
 
 const textReviewsSpanish = [
-  { text: "Bought it instantly and the pronunciation guide is crystal clear. Helped me so much!", verified: true, date: "2025-01-10" },
-  { text: "Been studying for 2 weeks and I can already see the difference. Love the relaxed method!", verified: true, date: "2025-01-08" },
-  { text: "The UK and USA phonetics are the best part. Very complete for the price.", verified: true, date: "2025-01-05" },
-  { text: "My teenager is using it and loves it. Easy to understand for any age.", verified: true, date: "2025-01-03" },
-  { text: "Great investment! The chapters are well organized by topics.", verified: true, date: "2024-12-28" },
-  { text: "Instant download and the PDF looks perfect on my tablet. Highly recommended!", verified: true, date: "2024-12-25" },
-  { text: "After trying many methods, this one works best for me. Thank you iLingue Relax!", verified: true, date: "2024-12-20" },
-  { text: "The included bonuses are worth gold. The alphabetical dictionary is great for quick lookups.", verified: true, date: "2024-12-18" },
-  { text: "I'm a teacher and recommend it to my students. Professional quality content.", verified: true, date: "2024-12-15" },
-  { text: "Never thought learning vocabulary could be this easy. The 5,000 words are well selected.", verified: true, date: "2024-12-10" },
+  { text: "Bought it instantly and the pronunciation guide is crystal clear. Helped me so much!", verified: true, date: "2026-01-15" },
+  { text: "Been studying for 2 weeks and I can already see the difference. Love the relaxed method!", verified: true, date: "2026-01-10" },
+  { text: "The UK and USA phonetics are the best part. Very complete for the price.", verified: true, date: "2026-01-05" },
+  { text: "My teenager is using it and loves it. Easy to understand for any age.", verified: true, date: "2025-12-28" },
+  { text: "Great investment! The chapters are well organized by topics.", verified: true, date: "2025-11-20" },
+  { text: "Instant download and the PDF looks perfect on my tablet. Highly recommended!", verified: true, date: "2025-10-15" },
+  { text: "After trying many methods, this one works best for me. Thank you iLingue Relax!", verified: true, date: "2025-09-18" },
+  { text: "The included bonuses are worth gold. The alphabetical dictionary is great for quick lookups.", verified: true, date: "2025-08-22" },
+  { text: "I'm a teacher and recommend it to my students. Professional quality content.", verified: true, date: "2025-08-05" },
+  { text: "Never thought learning vocabulary could be this easy. The 5,000 words are well selected.", verified: true, date: "2025-07-12" },
 ];
 
 interface ProductReviewsProps {

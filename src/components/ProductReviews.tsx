@@ -1,11 +1,10 @@
 import { useRef } from "react";
 import { Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/navigation";
 
-// Testimonial screenshot images - just image cards like the reference
+// Testimonial screenshot images
 const englishTestimonials = [
   "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",
   "https://images.loox.io/uploads/2025/11/23/IiDiyw9-U.jpg",
@@ -58,80 +57,43 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
             <span className="text-muted-foreground">({testimonials.length}+ {productType === "spanish" ? "reviews" : "reseñas"})</span>
           </div>
         </div>
+      </div>
 
-        {/* Simple Image Carousel - like reference site */}
-        <div className="relative max-w-6xl mx-auto">
-          <Swiper
-            ref={swiperRef}
-            modules={[Autoplay, Navigation]}
-            spaceBetween={22}
-            slidesPerView={1.5}
-            centeredSlides={false}
-            loop={true}
-            autoplay={{
-              delay: 3500,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-            }}
-            navigation={{
-              nextEl: ".review-swiper-next",
-              prevEl: ".review-swiper-prev",
-            }}
-            breakpoints={{
-              480: {
-                slidesPerView: 2,
-                spaceBetween: 16,
-              },
-              640: {
-                slidesPerView: 3,
-                spaceBetween: 18,
-              },
-              768: {
-                slidesPerView: 4,
-                spaceBetween: 20,
-              },
-              1024: {
-                slidesPerView: 5,
-                spaceBetween: 22,
-              },
-            }}
-            className="!pb-4"
-          >
-            {testimonials.map((img, index) => (
-              <SwiperSlide key={index}>
-                <div className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                  <img
-                    src={img}
-                    alt={`Testimonio ${index + 1}`}
-                    className="w-full h-auto object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+      {/* Full-width Auto-scrolling Carousel - like stickers */}
+      <div className="w-full">
+        <Swiper
+          ref={swiperRef}
+          modules={[Autoplay]}
+          spaceBetween={20}
+          slidesPerView="auto"
+          centeredSlides={false}
+          loop={true}
+          speed={7500}
+          autoplay={{
+            delay: 0,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
+          allowTouchMove={true}
+          className="!overflow-visible"
+        >
+          {[...testimonials, ...testimonials].map((img, index) => (
+            <SwiperSlide key={index} className="!w-[200px] md:!w-[220px]">
+              <div className="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                <img
+                  src={img}
+                  alt={`Testimonio ${(index % testimonials.length) + 1}`}
+                  className="w-full h-[280px] md:h-[320px] object-cover"
+                  loading="lazy"
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
-          {/* Navigation Buttons */}
-          <button 
-            className="review-swiper-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 border border-border shadow-lg hover:bg-secondary transition-all duration-300 flex items-center justify-center -translate-x-2 hover:scale-110 backdrop-blur-sm"
-            aria-label="Anterior"
-          >
-            <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          
-          <button 
-            className="review-swiper-next absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 border border-border shadow-lg hover:bg-secondary transition-all duration-300 flex items-center justify-center translate-x-2 hover:scale-110 backdrop-blur-sm"
-            aria-label="Siguiente"
-          >
-            <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Trust Footer */}
+      {/* Trust Footer */}
+      <div className="container px-4 md:px-6">
         <div className="text-center mt-8">
           <p className="text-muted-foreground text-sm">
             {productType === "spanish" 

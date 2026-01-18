@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Star, Check, BookOpen, Globe, ArrowRight, ShoppingCart, Clock, Gift, Download, RefreshCw, Eye, ZoomIn, ChevronLeft, ChevronRight, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, X, Zap, Sparkles, Shield } from "lucide-react";
 import { motion } from "framer-motion";
-import { WatermarkedImage } from "@/components/WatermarkedImage";
+
 
 // Preview images
 import previewIndice from "@/assets/preview-indice.png";
@@ -255,12 +255,7 @@ const Product5000 = () => {
                   <Eye className="w-4 h-4" />
                   VISTA PREVIA O DEMO
                 </div>
-                <WatermarkedImage 
-                  src={product5000Image} 
-                  alt="Inglés Relax - 5,000 Palabras" 
-                  className="w-full h-auto rounded-2xl shadow-hero" 
-                  watermarkOpacity="high"
-                />
+                <img src={product5000Image} alt="Inglés Relax - 5,000 Palabras" className="w-full h-auto rounded-2xl shadow-hero" />
               </div>
             </div>
 

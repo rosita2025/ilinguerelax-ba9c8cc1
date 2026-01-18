@@ -29,7 +29,7 @@ import {
   Shield,
   ShoppingCart,
 } from "lucide-react";
-import { WatermarkedImage } from "@/components/WatermarkedImage";
+
 
 // Product image
 import product8000Image from "@/assets/product-8000.png";
@@ -132,11 +132,10 @@ const Product8000 = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
-                <WatermarkedImage
+                <img
                   src={product8000Image}
                   alt="Inglés Relax - 8,000 Palabras"
                   className="w-full h-auto rounded-2xl shadow-hero"
-                  watermarkOpacity="high"
                 />
               </div>
             </div>

@@ -28,7 +28,7 @@ import {
   Shield,
   ShoppingCart,
 } from "lucide-react";
-import { WatermarkedImage } from "@/components/WatermarkedImage";
+
 
 // Product image
 import product8000BookImage from "@/assets/product-8000-book.png";
@@ -114,11 +114,10 @@ const Product8000Book = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
-                <WatermarkedImage
+                <img
                   src={product8000BookImage}
                   alt="Inglés Relax - 8,000 Palabras Libro Físico"
                   className="w-full h-auto rounded-2xl shadow-hero"
-                  watermarkOpacity="high"
                 />
               </div>
             </div>

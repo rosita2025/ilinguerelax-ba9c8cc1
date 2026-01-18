@@ -79,13 +79,34 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
         >
           {[...testimonials, ...testimonials].map((img, index) => (
             <SwiperSlide key={index} className="!w-[200px] md:!w-[220px]">
-              <div className="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+              <div className="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 relative">
                 <img
                   src={img}
                   alt={`Testimonio ${(index % testimonials.length) + 1}`}
                   className="w-full h-[280px] md:h-[320px] object-cover"
                   loading="lazy"
                 />
+                {/* Watermark overlay - more visible to protect content */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                  <span 
+                    className="text-white font-bold text-lg md:text-xl opacity-70 rotate-[-25deg] select-none"
+                    style={{
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5)',
+                      letterSpacing: '0.05em'
+                    }}
+                  >
+                    iLingue Relax
+                  </span>
+                </div>
+                {/* Bottom watermark */}
+                <div className="absolute bottom-2 left-2 right-2 flex justify-center pointer-events-none">
+                  <span 
+                    className="text-white text-xs font-semibold opacity-80 bg-black/40 px-2 py-1 rounded select-none"
+                  >
+                    © iLingue Relax
+                  </span>
+                </div>
               </div>
             </SwiperSlide>
           ))}

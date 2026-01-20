@@ -1,9 +1,13 @@
 # Robots.txt for iLingue Relax
 # https://ilinguerelax.com
 
+# Allow all search engines
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
+
+User-agent: Googlebot-Image
+Allow: /
 
 User-agent: Bingbot
 Allow: /
@@ -21,6 +25,15 @@ Allow: /
 User-agent: Pinterest
 Allow: /
 
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
 User-agent: *
 Allow: /
 Crawl-delay: 2
@@ -33,3 +46,15 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
 Disallow: /private/
+Disallow: /*.json$
+
+# Allow important resources
+Allow: /og-image.png
+Allow: /product-5000.png
+Allow: /product-8000.png
+Allow: /product-8000-book.png
+Allow: /product-spanish-5000.png
+Allow: /favicon.ico
+
+# Host
+Host: https://ilinguerelax.com

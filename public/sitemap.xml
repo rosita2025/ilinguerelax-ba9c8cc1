@@ -1,53 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <!-- Homepage -->
   <url>
     <loc>https://ilinguerelax.com/</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/og-image.png</image:loc>
+      <image:title>iLingue Relax - Aprende Inglés con Pronunciación</image:title>
+      <image:caption>Plataforma de aprendizaje de inglés para hispanohablantes</image:caption>
+    </image:image>
   </url>
   
   <!-- Products Page -->
   <url>
     <loc>https://ilinguerelax.com/productos</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
-  <!-- Product: 5,000 Words -->
+  <!-- Product: 5,000 Words (Spanish) - Main product -->
   <url>
     <loc>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://ilinguerelax.com/product-5000.png</image:loc>
-      <image:title>Inglés Relax - 5,000 Palabras con Pronunciación</image:title>
-      <image:caption>Libro digital de vocabulario inglés con pronunciación para hispanohablantes</image:caption>
+      <image:title>Inglés Relax - 5,000 Palabras con Pronunciación para Hispanohablantes</image:title>
+      <image:caption>Libro digital de vocabulario inglés con pronunciación adaptada, fonética UK y USA, 52 capítulos temáticos</image:caption>
     </image:image>
   </url>
   
-  <!-- Product: 8,000 Words -->
+  <!-- Product: 8,000 Words (Spanish) - Premium -->
   <url>
     <loc>https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
       <image:loc>https://ilinguerelax.com/product-8000.png</image:loc>
-      <image:title>Inglés Relax - 8,000 Palabras Premium</image:title>
-      <image:caption>Libro digital completo de vocabulario inglés con gramática</image:caption>
+      <image:title>Inglés Relax Premium - 8,000 Palabras con Pronunciación</image:title>
+      <image:caption>Libro digital completo de vocabulario inglés con gramática y pronunciación para hispanohablantes</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 8,000 Words Physical Book -->
+  <url>
+    <loc>https://ilinguerelax.com/products/8-000-palabras-libro-fisico</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-8000-book.png</image:loc>
+      <image:title>Inglés Relax - Libro Físico 8,000 Palabras</image:title>
+      <image:caption>Libro físico tapa blanda de vocabulario inglés con pronunciación para hispanohablantes</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: Spanish for English Speakers -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"/>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-spanish-5000.png</image:loc>
+      <image:title>Spanish Relax - 5,000 Spanish Words with English Pronunciation</image:title>
+      <image:caption>Digital eBook to learn Spanish vocabulary with pronunciation for English speakers</image:caption>
     </image:image>
   </url>
   
   <!-- About Page -->
   <url>
     <loc>https://ilinguerelax.com/sobre-nosotros</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -55,7 +89,7 @@
   <!-- Contact Page -->
   <url>
     <loc>https://ilinguerelax.com/contacto</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -63,9 +97,9 @@
   <!-- FAQ Page -->
   <url>
     <loc>https://ilinguerelax.com/faq</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
 
 </urlset>

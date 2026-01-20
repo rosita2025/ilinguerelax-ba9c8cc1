@@ -93,6 +93,9 @@ const ProductSpanish5000 = () => {
   }), []);
   useSpanishRelaxPixel(pixelParams);
 
+  // Shopify product URL for Spanish 5000
+  const shopifyUrl = "https://ilinguerelax.com/products/5-000-palabras-en-espanol-con-pronunciacion-ingles";
+  
   const handleBuyNow = () => {
     // Track AddToCart event with Meta Pixel (with eventID for deduplication)
     trackSpanishRelaxEvent("AddToCart", {
@@ -116,8 +119,8 @@ const ProductSpanish5000 = () => {
       num_items: 1,
     });
     
-    // Open Stripe checkout in new tab
-    window.open("https://buy.stripe.com/cNi00iexqdlz2mA1XL8IU07", "_blank");
+    // Open Shopify store in new tab
+    window.open(shopifyUrl, "_blank");
   };
 
   return (

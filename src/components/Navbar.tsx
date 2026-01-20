@@ -61,6 +61,12 @@ export const Navbar = () => {
             >
               FAQ
             </Link>
+            <Link
+              to="/blog"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              Blog
+            </Link>
           </div>
 
           {/* Desktop CTA */}
@@ -120,6 +126,13 @@ export const Navbar = () => {
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
                 FAQ
+              </Link>
+              <Link
+                to="/blog"
+                onClick={handleLinkClick}
+                className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              >
+                Blog
               </Link>
               <div className="pt-2 border-t border-border mt-2">
                 <Link to="/products" onClick={handleLinkClick}>

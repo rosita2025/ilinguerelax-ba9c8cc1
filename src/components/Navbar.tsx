@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { CartDrawer } from "@/components/CartDrawer";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -71,6 +72,7 @@ export const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
+            <CartDrawer />
             <Link to="/products">
               <Button variant="hero" size="default" className="text-sm xl:text-base px-4 xl:px-6">
                 Comenzar Ahora
@@ -78,14 +80,17 @@ export const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile Hamburger Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Cart and Hamburger */}
+          <div className="lg:hidden flex items-center gap-2">
+            <CartDrawer />
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </nav>
 
         {/* Mobile Menu */}

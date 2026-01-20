@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSpanishRelaxPixel, trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -12,6 +12,9 @@ import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useCartStore } from "@/stores/cartStore";
+import { fetchShopifyProducts, ShopifyProduct } from "@/lib/shopify";
 import {
   Check,
   BookOpen,
@@ -29,6 +32,7 @@ import {
   Shield,
   ShoppingCart,
   Star,
+  Loader2,
 } from "lucide-react";
 
 
@@ -81,6 +85,30 @@ const benefits = [
 ];
 
 const ProductSpanish5000 = () => {
+  const [shopifyProduct, setShopifyProduct] = useState<ShopifyProduct | null>(null);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+  const { addItem, isLoading: isCartLoading, getCheckoutUrl } = useCartStore();
+
+  // Fetch the Spanish 5000 product from Shopify
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const products = await fetchShopifyProducts(10, 'title:Spanish');
+        const spanishProduct = products.find(p => 
+          p.node.title.toLowerCase().includes('spanish') && 
+          p.node.title.toLowerCase().includes('5,000')
+        );
+        if (spanishProduct) {
+          setShopifyProduct(spanishProduct);
+        }
+      } catch (error) {
+        console.error('Failed to load Shopify product:', error);
+      } finally {
+        setIsLoadingProduct(false);
+      }
+    };
+    loadProduct();
+  }, []);
 
   // Meta Pixel ViewContent event
   const pixelParams = useMemo(() => ({
@@ -93,11 +121,60 @@ const ProductSpanish5000 = () => {
   }), []);
   useSpanishRelaxPixel(pixelParams);
 
-  // Shopify product URL for Spanish 5000
-  const shopifyUrl = "https://ilinguerelax.com/products/5-000-palabras-en-espanol-con-pronunciacion-ingles";
-  
-  const handleBuyNow = () => {
-    // Track AddToCart event with Meta Pixel (with eventID for deduplication)
+  const handleAddToCart = async () => {
+    if (!shopifyProduct) {
+      toast.error("Product not available", { description: "Please try again later." });
+      return;
+    }
+
+    const variant = shopifyProduct.node.variants.edges[0]?.node;
+    if (!variant) {
+      toast.error("No variant available");
+      return;
+    }
+
+    // Track AddToCart event with Meta Pixel
+    trackSpanishRelaxEvent("AddToCart", {
+      content_name: "Spanish Relax - 5,000 Words",
+      content_category: "Digital Book",
+      content_ids: ["product-spanish-5000"],
+      content_type: "product",
+      value: 17,
+      currency: "USD",
+      num_items: 1,
+    });
+
+    await addItem({
+      product: shopifyProduct,
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: 1,
+      selectedOptions: variant.selectedOptions || [],
+    });
+
+    toast.success("Added to cart!", {
+      description: "Spanish Relax - 5,000 Words",
+      action: {
+        label: "View Cart",
+        onClick: () => {},
+      },
+    });
+  };
+
+  const handleBuyNow = async () => {
+    if (!shopifyProduct) {
+      toast.error("Product not available", { description: "Please try again later." });
+      return;
+    }
+
+    const variant = shopifyProduct.node.variants.edges[0]?.node;
+    if (!variant) {
+      toast.error("No variant available");
+      return;
+    }
+
+    // Track events with Meta Pixel
     trackSpanishRelaxEvent("AddToCart", {
       content_name: "Spanish Relax - 5,000 Words",
       content_category: "Digital Book",
@@ -108,7 +185,6 @@ const ProductSpanish5000 = () => {
       num_items: 1,
     });
     
-    // Track InitiateCheckout event with Meta Pixel (with eventID for deduplication)
     trackSpanishRelaxEvent("InitiateCheckout", {
       content_name: "Spanish Relax - 5,000 Words",
       content_category: "Digital Book",
@@ -118,9 +194,23 @@ const ProductSpanish5000 = () => {
       currency: "USD",
       num_items: 1,
     });
-    
-    // Open Shopify store in new tab
-    window.open(shopifyUrl, "_blank");
+
+    await addItem({
+      product: shopifyProduct,
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: 1,
+      selectedOptions: variant.selectedOptions || [],
+    });
+
+    // Wait a bit for cart to be created, then redirect to checkout
+    setTimeout(() => {
+      const checkoutUrl = getCheckoutUrl();
+      if (checkoutUrl) {
+        window.open(checkoutUrl, '_blank');
+      }
+    }, 500);
   };
 
   return (
@@ -242,22 +332,47 @@ const ProductSpanish5000 = () => {
                 <StockCounter totalStock={50} remainingStock={15} lang="en" />
               </div>
 
-              {/* CTA Button - More Impactful */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button 
-                  variant="hero" 
-                  size="xl" 
-                  className="w-full mb-4 text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700"
-                  onClick={handleBuyNow}
+              {/* CTA Buttons */}
+              <div className="space-y-3 mb-6">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  BUY NOW!
-                  <ArrowRight className="w-6 h-6 ml-2" />
+                  <Button 
+                    variant="hero" 
+                    size="xl" 
+                    className="w-full text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700"
+                    onClick={handleBuyNow}
+                    disabled={isCartLoading || isLoadingProduct}
+                  >
+                    {isCartLoading ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-6 h-6 mr-2" />
+                        BUY NOW!
+                        <ArrowRight className="w-6 h-6 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleAddToCart}
+                  disabled={isCartLoading || isLoadingProduct}
+                >
+                  {isCartLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Add to Cart
+                    </>
+                  )}
                 </Button>
-              </motion.div>
+              </div>
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👆 Click to secure your copy at the discount price
@@ -385,9 +500,16 @@ const ProductSpanish5000 = () => {
                 size="xl" 
                 className="w-full"
                 onClick={handleBuyNow}
+                disabled={isCartLoading || isLoadingProduct}
               >
-                BUY NOW
-                <ArrowRight className="w-5 h-5" />
+                {isCartLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    BUY NOW
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
               </Button>
             </div>
 
@@ -450,7 +572,7 @@ const ProductSpanish5000 = () => {
         productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)"
         onBuyClick={handleBuyNow}
         ctaText="BUY NOW"
-        disabled={false}
+        disabled={isCartLoading || isLoadingProduct}
         showReviews={true}
         rating={4.8}
         reviewCount={30}

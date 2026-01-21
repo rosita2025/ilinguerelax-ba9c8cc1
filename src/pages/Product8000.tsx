@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
+import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -96,7 +96,7 @@ const benefits = [
 ];
 
 const Product8000 = () => {
-  // Meta Pixel ViewContent event
+  // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 8,000 Palabras Digital",
     content_category: "Digital Book",
@@ -105,7 +105,21 @@ const Product8000 = () => {
     value: 24,
     currency: "USD",
   }), []);
-  useMetaPixelViewContent(pixelParams);
+  useHotmartPixel(pixelParams);
+
+  // Handle Buy Now with Hotmart pixel tracking
+  const handleBuyNow = () => {
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Inglés Relax - 8,000 Palabras Digital",
+      content_category: "Digital Book",
+      content_ids: ["product-8000"],
+      content_type: "product",
+      value: 24,
+      currency: "USD",
+      num_items: 1,
+    });
+    window.open("https://pay.hotmart.com/O100578526P?checkoutMode=10", "_blank");
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -234,7 +248,7 @@ const Product8000 = () => {
                   variant="hero" 
                   size="xl" 
                   className="w-full mb-4 text-lg py-6 shadow-2xl"
-                  onClick={() => window.open("https://pay.hotmart.com/O100578526P?checkoutMode=10", "_blank")}
+                  onClick={handleBuyNow}
                 >
                   <ShoppingCart className="w-6 h-6 mr-2" />
                   ¡OBTENER ACCESO AHORA!
@@ -380,7 +394,7 @@ const Product8000 = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Sin suscripciones • Acceso de por vida
               </p>
-              <Button variant="hero" size="xl" className="w-full">
+              <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
                 OBTENER ACCESO AHORA
                 <ArrowRight className="w-5 h-5" />
               </Button>

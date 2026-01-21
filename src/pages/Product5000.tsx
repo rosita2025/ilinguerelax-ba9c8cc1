@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
+import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -116,7 +116,7 @@ const Product5000 = () => {
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
 
-  // Meta Pixel ViewContent event
+  // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 5,000 Palabras",
     content_category: "Digital Book",
@@ -125,7 +125,8 @@ const Product5000 = () => {
     value: 10,
     currency: "USD"
   }), []);
-  useMetaPixelViewContent(pixelParams);
+  useHotmartPixel(pixelParams);
+
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
     setLightboxOpen(true);
@@ -147,6 +148,16 @@ const Product5000 = () => {
     setCurrentBonusIndex(prev => (prev - 1 + bonuses.length) % bonuses.length);
   };
   const handleBuy = () => {
+    // Track InitiateCheckout with Hotmart pixel
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Inglés Relax - 5,000 Palabras",
+      content_category: "Digital Book",
+      content_ids: ["product-5000"],
+      content_type: "product",
+      value: 10,
+      currency: "USD",
+      num_items: 1,
+    });
     window.open("https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true", "_blank");
   };
   return <main className="min-h-screen bg-background">

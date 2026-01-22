@@ -604,9 +604,6 @@ const Product5000 = () => {
         lang="es"
       />
 
-      {/* Comparison Table */}
-      <ComparisonTable />
-
       {/* Product Reviews Carousel */}
       <ProductReviews productType="english" />
 
@@ -641,6 +638,9 @@ const Product5000 = () => {
       answer: "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
       icon: CreditCard
     }]} title="Preguntas Frecuentes" subtitle="Resolvemos tus dudas sobre INGLÉS RELAX" />
+
+      {/* Comparison Table */}
+      <ComparisonTable />
 
       {/* About Me / Sobre Mí Section */}
       <section className="py-16 md:py-20 relative overflow-hidden">

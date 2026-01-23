@@ -3,9 +3,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { CartDrawer } from "@/components/CartDrawer";
+import { LanguageCurrencySelector } from "@/components/LanguageCurrencySelector";
+import { useI18n } from "@/i18n/I18nContext";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useI18n();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -36,46 +39,47 @@ export const Navbar = () => {
               to="/"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Home
+              {t.nav.home}
             </Link>
             <Link
               to="/products"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Productos
+              {t.nav.products}
             </Link>
             <Link
               to="/sobre-nosotros"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Sobre Nosotros
+              {t.nav.about}
             </Link>
             <Link
               to="/contacto"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Contacto
+              {t.nav.contact}
             </Link>
             <Link
               to="/faq"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              FAQ
+              {t.nav.faq}
             </Link>
             <Link
               to="/blog"
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Blog
+              {t.nav.blog}
             </Link>
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-2">
+            <LanguageCurrencySelector />
             <CartDrawer />
             <Link to="/products">
               <Button variant="hero" size="default" className="text-sm xl:text-base px-4 xl:px-6">
-                Comenzar Ahora
+                {t.hero.cta}
               </Button>
             </Link>
           </div>
@@ -97,52 +101,56 @@ export const Navbar = () => {
         {isMenuOpen && (
           <div className="lg:hidden mt-2 bg-card/95 backdrop-blur-lg rounded-2xl border border-border shadow-card p-4 animate-in slide-in-from-top-2 duration-200">
             <div className="flex flex-col gap-2">
+              {/* Language/Currency Selector in Mobile */}
+              <div className="px-4 py-2 border-b border-border mb-2">
+                <LanguageCurrencySelector />
+              </div>
               <Link
                 to="/"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                Home
+                {t.nav.home}
               </Link>
               <Link
                 to="/products"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                Productos
+                {t.nav.products}
               </Link>
               <Link
                 to="/sobre-nosotros"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                Sobre Nosotros
+                {t.nav.about}
               </Link>
               <Link
                 to="/contacto"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                Contacto
+                {t.nav.contact}
               </Link>
               <Link
                 to="/faq"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                FAQ
+                {t.nav.faq}
               </Link>
               <Link
                 to="/blog"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
-                Blog
+                {t.nav.blog}
               </Link>
               <div className="pt-2 border-t border-border mt-2">
                 <Link to="/products" onClick={handleLinkClick}>
                   <Button variant="hero" size="default" className="w-full">
-                    Comenzar Ahora
+                    {t.hero.cta}
                   </Button>
                 </Link>
               </div>

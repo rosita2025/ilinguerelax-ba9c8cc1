@@ -1,8 +1,78 @@
 import { ArrowRight, Play, Smile, Brain, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
 import heroBg from "@/assets/hero-bg.jpg";
 
 export const Hero = () => {
+  const { t, language } = useI18n();
+
+  // Language-specific content
+  const heroContent = {
+    es: {
+      title1: "Estudia Idiomas",
+      title2: "Sin Estrés",
+      subtitle: "Aprende de forma <strong class='font-semibold'>relajada, práctica y accesible</strong>.",
+      subtitle2: "Sin métodos complicados. A tu propio ritmo.",
+      pill1: "Aprendizaje relajado",
+      pill2: "Método claro y amigable",
+      pill3: "Sin presiones",
+      cta1: "Comenzar Ahora",
+      cta2: "Ver Demo",
+      trust: "Confiado por estudiantes en todo el mundo",
+      rating: "valoración",
+      students: "estudiantes",
+      guarantee: "Garantía 7 días",
+    },
+    en: {
+      title1: "Learn Languages",
+      title2: "Stress-Free",
+      subtitle: "Learn in a <strong class='font-semibold'>relaxed, practical and accessible</strong> way.",
+      subtitle2: "No complicated methods. At your own pace.",
+      pill1: "Relaxed learning",
+      pill2: "Clear & friendly method",
+      pill3: "No pressure",
+      cta1: "Start Now",
+      cta2: "Watch Demo",
+      trust: "Trusted by students worldwide",
+      rating: "rating",
+      students: "students",
+      guarantee: "7-day guarantee",
+    },
+    fr: {
+      title1: "Apprenez les Langues",
+      title2: "Sans Stress",
+      subtitle: "Apprenez de manière <strong class='font-semibold'>détendue, pratique et accessible</strong>.",
+      subtitle2: "Sans méthodes compliquées. À votre rythme.",
+      pill1: "Apprentissage détendu",
+      pill2: "Méthode claire et amicale",
+      pill3: "Sans pression",
+      cta1: "Commencer",
+      cta2: "Voir la Démo",
+      trust: "Approuvé par des étudiants du monde entier",
+      rating: "évaluation",
+      students: "étudiants",
+      guarantee: "Garantie 7 jours",
+    },
+    pt: {
+      title1: "Aprenda Idiomas",
+      title2: "Sem Estresse",
+      subtitle: "Aprenda de forma <strong class='font-semibold'>relaxada, prática e acessível</strong>.",
+      subtitle2: "Sem métodos complicados. No seu próprio ritmo.",
+      pill1: "Aprendizado relaxado",
+      pill2: "Método claro e amigável",
+      pill3: "Sem pressão",
+      cta1: "Começar Agora",
+      cta2: "Ver Demo",
+      trust: "Confiado por estudantes em todo o mundo",
+      rating: "avaliação",
+      students: "estudantes",
+      guarantee: "Garantia 7 dias",
+    },
+  };
+
+  const content = heroContent[language];
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background Image */}
@@ -29,10 +99,10 @@ export const Hero = () => {
 
           {/* Main Heading */}
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
-            Estudia Idiomas
+            {content.title1}
             <br />
             <span className="relative inline-block">
-              <span className="text-accent">Sin Estrés</span>
+              <span className="text-accent">{content.title2}</span>
               <svg
                 className="absolute -bottom-2 left-0 w-full"
                 viewBox="0 0 300 12"
@@ -51,54 +121,56 @@ export const Hero = () => {
 
           {/* Subheading */}
           <p className="text-lg md:text-2xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto font-light animate-fade-in" style={{ animationDelay: "200ms" }}>
-            Aprende de forma <strong className="font-semibold">relajada, práctica y accesible</strong>.
+            <span dangerouslySetInnerHTML={{ __html: content.subtitle }} />
             <br className="hidden md:block" />
-            Sin métodos complicados. A tu propio ritmo.
+            {content.subtitle2}
           </p>
 
           {/* Feature Pills */}
           <div className="flex flex-wrap justify-center gap-3 mb-10 animate-fade-in" style={{ animationDelay: "250ms" }}>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
               <Smile className="w-4 h-4 text-accent" />
-              <span>Aprendizaje relajado</span>
+              <span>{content.pill1}</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
               <Brain className="w-4 h-4 text-accent" />
-              <span>Método claro y amigable</span>
+              <span>{content.pill2}</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
               <Clock className="w-4 h-4 text-accent" />
-              <span>Sin presiones</span>
+              <span>{content.pill3}</span>
             </div>
           </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "300ms" }}>
-            <Button variant="hero" size="xl" className="shadow-xl hover:shadow-2xl transition-shadow">
-              Comenzar Ahora
-              <ArrowRight className="w-5 h-5" />
-            </Button>
+            <Link to="/products">
+              <Button variant="hero" size="xl" className="shadow-xl hover:shadow-2xl transition-shadow">
+                {content.cta1}
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
             <Button variant="heroOutline" size="xl">
               <Play className="w-5 h-5" />
-              Ver Demo
+              {content.cta2}
             </Button>
           </div>
 
           {/* Trust Indicators */}
           <div className="mt-14 pt-8 border-t border-primary-foreground/20 animate-fade-in" style={{ animationDelay: "400ms" }}>
-            <p className="text-primary-foreground/60 text-sm mb-4">Confiado por estudiantes en todo el mundo</p>
+            <p className="text-primary-foreground/60 text-sm mb-4">{content.trust}</p>
             <div className="flex flex-wrap justify-center gap-8 text-primary-foreground/80 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">⭐</span>
-                <span>4.9/5 valoración</span>
+                <span>4.9/5 {content.rating}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🎯</span>
-                <span>+10,000 estudiantes</span>
+                <span>+10,000 {content.students}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🔒</span>
-                <span>Garantía 7 días</span>
+                <span>{content.guarantee}</span>
               </div>
             </div>
           </div>

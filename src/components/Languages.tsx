@@ -2,8 +2,11 @@ import { Clock, Star, Sparkles, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { products, comingSoonLanguages, getProductLink } from "@/data/products";
+import { useI18n } from "@/i18n/I18nContext";
 
 export const Languages = () => {
+  const { t, language, formatPrice } = useI18n();
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -19,18 +22,60 @@ export const Languages = () => {
     ));
   };
 
+  // Language-specific content
+  const content = {
+    es: {
+      badge: "Nuestros Productos",
+      title: "Elige tu libro digital de",
+      titleHighlight: "Idioma",
+      subtitle: "Libros digitales diseñados con el método iLingue Relax para aprender sin estrés",
+      reviews: "reseñas",
+      buy: "Comprar",
+      comingSoon: "Próximamente más idiomas",
+    },
+    en: {
+      badge: "Our Products",
+      title: "Choose your digital book for",
+      titleHighlight: "Language",
+      subtitle: "Digital books designed with the iLingue Relax method to learn stress-free",
+      reviews: "reviews",
+      buy: "Buy",
+      comingSoon: "More languages coming soon",
+    },
+    fr: {
+      badge: "Nos Produits",
+      title: "Choisissez votre livre numérique de",
+      titleHighlight: "Langue",
+      subtitle: "Livres numériques conçus avec la méthode iLingue Relax pour apprendre sans stress",
+      reviews: "avis",
+      buy: "Acheter",
+      comingSoon: "Plus de langues bientôt",
+    },
+    pt: {
+      badge: "Nossos Produtos",
+      title: "Escolha seu livro digital de",
+      titleHighlight: "Idioma",
+      subtitle: "Livros digitais projetados com o método iLingue Relax para aprender sem estresse",
+      reviews: "avaliações",
+      buy: "Comprar",
+      comingSoon: "Mais idiomas em breve",
+    },
+  };
+
+  const c = content[language];
+
   return (
     <section className="py-16 md:py-24 bg-secondary/30">
       <div className="container px-4 md:px-6">
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            Nuestros Productos
+            {c.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Elige tu libro digital de <span className="text-gradient">Idioma</span>
+            {c.title} <span className="text-gradient">{c.titleHighlight}</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Libros digitales diseñados con el método iLingue Relax para aprender sin estrés
+            {c.subtitle}
           </p>
         </div>
 
@@ -91,24 +136,24 @@ export const Languages = () => {
                   <div className="flex items-center gap-0.5">{renderStars(product.rating)}</div>
                   <span className="text-sm font-medium text-foreground">{product.rating}</span>
                   <span className="text-sm text-muted-foreground">
-                    ({product.reviews.toLocaleString()} reseñas)
+                    ({product.reviews.toLocaleString()} {c.reviews})
                   </span>
                 </div>
 
                 {/* Pricing & Buy Button */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-primary">${product.price}</span>
+                    <span className="text-2xl font-bold text-primary">{formatPrice(product.price)}</span>
                     {product.originalPrice && (
                       <span className="text-sm text-muted-foreground line-through">
-                        ${product.originalPrice}
+                        {formatPrice(product.originalPrice)}
                       </span>
                     )}
                   </div>
                   <Button size="sm" className="gap-2" asChild>
                     <Link to={getProductLink(product)}>
                       <ShoppingCart className="w-4 h-4" />
-                      Comprar
+                      {c.buy}
                     </Link>
                   </Button>
                 </div>
@@ -121,7 +166,7 @@ export const Languages = () => {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-6">
             <Clock className="w-4 h-4" />
-            <span>Próximamente más idiomas</span>
+            <span>{c.comingSoon}</span>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
             {comingSoonLanguages.map((lang) => (

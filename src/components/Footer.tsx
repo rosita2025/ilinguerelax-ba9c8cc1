@@ -1,7 +1,39 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook } from "lucide-react";
+import { useI18n } from "@/i18n/I18nContext";
 
 export const Footer = () => {
+  const { t, language } = useI18n();
+
+  const content = {
+    es: {
+      products: "Productos",
+      about: "Sobre Nosotros",
+      contact: "Contacto",
+      rights: "Todos los derechos reservados",
+    },
+    en: {
+      products: "Products",
+      about: "About Us",
+      contact: "Contact",
+      rights: "All rights reserved",
+    },
+    fr: {
+      products: "Produits",
+      about: "À Propos",
+      contact: "Contact",
+      rights: "Tous droits réservés",
+    },
+    pt: {
+      products: "Produtos",
+      about: "Sobre Nós",
+      contact: "Contato",
+      rights: "Todos os direitos reservados",
+    },
+  };
+
+  const c = content[language];
+
   return (
     <footer className="py-12 bg-foreground">
       <div className="container px-4 md:px-6">
@@ -14,13 +46,13 @@ export const Footer = () => {
 
           <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/70">
             <Link to="/products" className="hover:text-primary-foreground transition-colors">
-              Productos
+              {c.products}
             </Link>
             <Link to="/sobre-nosotros" className="hover:text-primary-foreground transition-colors">
-              Sobre Nosotros
+              {c.about}
             </Link>
             <Link to="/contacto" className="hover:text-primary-foreground transition-colors">
-              Contacto
+              {c.contact}
             </Link>
             <Link to="/faq" className="hover:text-primary-foreground transition-colors">
               FAQ
@@ -51,7 +83,7 @@ export const Footer = () => {
 
         <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-center">
           <p className="text-sm text-primary-foreground/50">
-            © 2026 iLingue Relax. Todos los derechos reservados.
+            © 2026 iLingue Relax. {c.rights}.
           </p>
         </div>
       </div>

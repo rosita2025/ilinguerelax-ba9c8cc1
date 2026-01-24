@@ -134,7 +134,7 @@ const HotmartSuccess = () => {
               Tu libro Inglés Relax - 5,000 Palabras está listo. ¡Revisa tu email!
             </motion.p>
 
-            {/* Download Card */}
+            {/* Access Info Card */}
             <motion.div
               className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-3xl border-2 border-green-500/30 shadow-xl p-8 mb-8"
               initial={{ opacity: 0, y: 20 }}
@@ -142,19 +142,18 @@ const HotmartSuccess = () => {
               transition={{ delay: 0.5 }}
             >
               <h2 className="text-2xl font-bold text-foreground mb-4">
-                📚 Accede a Tu Libro
+                📧 Revisa Tu Correo Electrónico
               </h2>
-              <p className="text-muted-foreground mb-6">
-                Hotmart te enviará un email con el acceso a tu libro. También puedes acceder desde tu cuenta de Hotmart.
+              <p className="text-muted-foreground mb-4">
+                <strong>Te enviaremos el acceso a tu libro directamente al correo que registraste en Hotmart.</strong>
               </p>
-              <Button 
-                onClick={handleDownload}
-                size="lg" 
-                className="bg-green-500 hover:bg-green-600 text-white font-bold text-lg px-8 py-6 h-auto"
-              >
-                <Download className="w-6 h-6 mr-2" />
-                Ir a Mis Compras
-              </Button>
+              <p className="text-muted-foreground mb-4">
+                Por favor revisa tu bandeja de entrada (y la carpeta de spam) en los próximos minutos.
+              </p>
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-amber-700 dark:text-amber-400 text-sm">
+                <strong>⚠️ ¿No recibiste el correo?</strong><br />
+                Contáctanos por WhatsApp o email y te daremos acceso manualmente.
+              </div>
             </motion.div>
 
             {/* Contact Info Card */}

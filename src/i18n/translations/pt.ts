@@ -36,11 +36,11 @@ export const pt = {
       },
       {
         title: "Sem Estresse",
-        description: "Nosso método é projetado para que você aprenda no seu ritmo, sem pressão ou provas.",
+        description: "Nosso método é projetado para que você aprenda no seu ritmo, sem pressão nem exames.",
       },
       {
         title: "Acesso Imediato",
-        description: "Baixe seu livro digital instantaneamente e comece a aprender hoje.",
+        description: "Baixe seu livro digital instantaneamente e comece a aprender hoje mesmo.",
       },
     ],
   },
@@ -57,49 +57,160 @@ export const pt = {
   // How it works
   howItWorks: {
     title: "Como Funciona?",
-    subtitle: "Três passos simples para dominar o inglês",
+    subtitle: "Três passos simples para dominar o idioma",
     steps: [
       {
-        title: "1. Escolha Seu Nível",
-        description: "Selecione entre nossos livros de 5.000 ou 8.000 palavras de acordo com seu nível.",
+        number: "01",
+        title: "Ouça",
+        description: "Ouça a pronúncia correta de cada palavra com nosso áudio nativo",
       },
       {
-        title: "2. Download Instantâneo",
-        description: "Receba seu livro digital imediatamente após a compra.",
+        number: "02",
+        title: "Repita",
+        description: "Pratique a pronúncia no seu próprio ritmo, sem pressão nem estresse",
       },
       {
-        title: "3. Aprenda no Seu Ritmo",
-        description: "Estude quando quiser, onde quiser. Sem horários fixos.",
+        number: "03",
+        title: "Domine",
+        description: "Integre as palavras ao seu vocabulário diário de forma natural",
       },
     ],
   },
 
   // Pricing
   pricing: {
-    title: "Escolha Seu Plano",
-    subtitle: "Investimento único, acesso vitalício",
+    title: "Planos e Preços",
+    subtitle: "Escolha o plano que melhor se adapta às suas necessidades",
     popular: "Mais Popular",
-    features: "Recursos:",
+    features: "Características:",
     buyNow: "Comprar Agora",
     guarantee: "Garantia de 7 dias",
+    viewStore: "Ver na loja",
+    viewProducts: "Ver Produtos",
+    words: "Palavras",
+    priceFeatures: [
+      "8.000 palavras essenciais do inglês",
+      "Pronúncia em espanhol incluída",
+      "Projetado para hispanofalantes",
+      "Sem necessidade de dicionários",
+      "Metodologia passo a passo",
+      "Acesso vitalício",
+      "Atualizações gratuitas",
+      "Suporte personalizado",
+    ],
   },
 
   // About
   about: {
-    title: "Sobre Mim",
-    subtitle: "Conheça a pessoa por trás do iLingue Relax",
+    title: "Sobre Nós",
+    pageTitle: "Sobre Nós",
+    pageSubtitle: "Conheça a história por trás da iLingue Relax",
+    ourStory: "Nossa História",
+    aboutBrand: "Sobre",
+    brandDescription: "iLingue Relax é uma marca educacional focada no aprendizado de idiomas sem estresse, pensada para pessoas que desejam aprender de forma simples, clara e no seu próprio ritmo. Acreditamos que aprender um idioma não deve ser difícil nem frustrante. Por isso, a iLingue Relax oferece materiais práticos, organizados e acessíveis, projetados especialmente para autodidatas e iniciantes.",
+    mission: "Nossa Missão",
+    missionText: "Ajudar as pessoas a aprender idiomas de forma relaxada, prática e acessível, sem métodos complicados nem estresse desnecessário. Queremos que cada estudante aproveite o processo de aprendizado.",
+    vision: "Nossa Visão",
+    visionText: "Tornar a iLingue Relax uma marca educacional reconhecida mundialmente por ensinar idiomas sem estresse, de maneira clara e amigável para hispanofalantes.",
+    values: "Nossos Valores",
+    empathy: "Empatia",
+    empathyText: "Entendemos as dificuldades de aprender um novo idioma",
+    quality: "Qualidade",
+    qualityText: "Conteúdo cuidadosamente projetado e verificado",
+    accessibility: "Acessibilidade",
+    accessibilityText: "Materiais acessíveis para todos os orçamentos",
+    achievements: "Nossas Conquistas",
+    students: "Estudantes",
+    words: "Palavras",
+    rating: "Avaliação",
+    guarantee: "Garantia",
+    countries: "Países",
   },
 
   // Contact
   contact: {
     title: "Contato",
+    pageTitle: "Entre em Contato",
+    pageSubtitle: "Estamos aqui para ajudar com qualquer dúvida",
     subtitle: "Tem alguma dúvida? Estamos aqui para ajudar.",
+    sendMessage: "Envie-nos uma mensagem",
+    howCanWeHelp: "Como podemos ajudá-lo?",
     name: "Nome",
-    email: "E-mail",
+    namePlaceholder: "Seu nome",
+    email: "Email",
+    emailPlaceholder: "voce@email.com",
+    subject: "Assunto",
+    subjectPlaceholder: "Sobre o que se trata?",
     message: "Mensagem",
+    messagePlaceholder: "Escreva sua mensagem aqui...",
     send: "Enviar Mensagem",
-    success: "Mensagem enviada com sucesso!",
-    error: "Erro ao enviar mensagem. Por favor, tente novamente.",
+    sending: "Enviando...",
+    success: "Mensagem enviada! Responderemos em breve.",
+    error: "Erro ao enviar a mensagem. Por favor, tente novamente.",
+    fillRequired: "Por favor, preencha todos os campos obrigatórios",
+    invalidEmail: "Por favor, insira um email válido",
+    charLimit: "Um ou mais campos excedem o limite de caracteres",
+    responseTime: "Respondemos em 24-48 horas",
+    businessHours: "Horário de Atendimento",
+    weekdays: "Segunda a Sexta",
+    schedule: "9:00 - 18:00 (GMT-5)",
+    followUs: "Siga-nos",
+    faqTitle: "Perguntas Frequentes?",
+    faqText: "Consulte nosso FAQ para respostas imediatas sobre nossos produtos.",
+    viewFaq: "Ver FAQ",
+    weAreHere: "Estamos aqui para ajudar",
+    questionsAboutProducts: "Tem perguntas sobre nossos produtos? Escreva-nos e responderemos o mais rápido possível.",
+    quickHelp: "Precisa de ajuda rápida?",
+    immediateAnswers: "Consulte nosso FAQ para respostas imediatas.",
+  },
+
+  // FAQ
+  faq: {
+    title: "Perguntas Frequentes",
+    subtitle: "Tudo o que você precisa saber sobre a iLingue Relax",
+    badge: "FAQ",
+    items: [
+      {
+        question: "O que é iLingue Relax?",
+        answer: "iLingue Relax é uma marca educacional focada no aprendizado de idiomas sem estresse, projetada para pessoas que querem aprender de forma clara, prática e no seu próprio ritmo.",
+      },
+      {
+        question: "Que tipo de idiomas a iLingue Relax oferece?",
+        answer: "iLingue Relax oferece e desenvolverá materiais para diferentes idiomas, começando pelo inglês, sempre sob a filosofia de aprender sem pressão.",
+      },
+      {
+        question: "Preciso de experiência prévia para usar os materiais?",
+        answer: "Não. Nossos produtos são pensados para iniciantes e autodidatas, sem necessidade de conhecimentos prévios.",
+      },
+      {
+        question: "Os materiais são físicos ou digitais?",
+        answer: "Atualmente, a iLingue Relax oferece produtos digitais de download imediato. No futuro, alguns produtos poderão estar disponíveis em formato físico.",
+      },
+      {
+        question: "Posso estudar sozinho(a) com iLingue Relax?",
+        answer: "Sim. Todos os nossos materiais são projetados para autoestudo, para que você aprenda no seu ritmo e sem estresse.",
+      },
+      {
+        question: "Incluem pronúncia?",
+        answer: "Sim. Nossos conteúdos incluem pronúncia clara e fácil de entender, adaptada para hispanofalantes.",
+      },
+      {
+        question: "A partir de qual nível posso começar?",
+        answer: "Você pode começar do nível iniciante e progredir progressivamente conforme o material.",
+      },
+      {
+        question: "Como faço o pagamento?",
+        answer: "Aceitamos pagamentos seguros através de: Cartão de crédito ou débito internacional (Stripe) e Hotmart, com múltiplos métodos de pagamento conforme seu país.",
+      },
+      {
+        question: "Posso acessar o conteúdo de qualquer país?",
+        answer: "Sim. Os produtos digitais da iLingue Relax estão disponíveis para usuários de qualquer país.",
+      },
+      {
+        question: "A iLingue Relax oferece suporte ou ajuda?",
+        answer: "Sim. Se você tiver alguma dúvida, pode nos contatar através de nossos canais oficiais: 📧 Email: hola@ilinguerelax.com | 📱 WhatsApp: +1 575 216 0934 (EUA)",
+      },
+    ],
   },
 
   // Footer
@@ -108,6 +219,10 @@ export const pt = {
     privacy: "Política de Privacidade",
     terms: "Termos e Condições",
     cookies: "Política de Cookies",
+    description: "Aprenda idiomas de forma relaxada, prática e acessível. Sem estresse, sem pressão.",
+    quickLinks: "Links Rápidos",
+    support: "Suporte",
+    legal: "Legal",
   },
 
   // Product page
@@ -117,12 +232,43 @@ export const pt = {
     instantDownload: "Download Instantâneo",
     lifetimeAccess: "Acesso Vitalício",
     guarantee: "Garantia de 7 Dias",
-    whatsIncluded: "O Que Está Incluído?",
-    reviews: "Avaliações",
+    whatsIncluded: "O que está incluído?",
+    reviews: "avaliações",
     writeReview: "Escrever Avaliação",
     originalPrice: "Preço original",
     discount: "Desconto",
     off: "de desconto",
+    viewDetails: "Ver Detalhes",
+  },
+
+  // Products page
+  products: {
+    title: "Nossos Produtos",
+    subtitle: "Escolha o livro digital perfeito para seu nível e comece a aprender idiomas sem estresse",
+  },
+
+  // Blog
+  blog: {
+    title: "Blog Educativo",
+    pageTitle: "Aprenda Inglês com Nossos",
+    pageTitleHighlight: "Artigos",
+    subtitle: "Guias, dicas e estratégias para dominar o inglês de forma eficaz. Descubra os melhores métodos de aprendizagem.",
+    all: "Todos",
+    featured: "Destaque",
+    readArticle: "Ler artigo",
+    moreArticles: "Mais Artigos",
+    readTime: "de leitura",
+    readyToLearn: "Pronto para Começar a Aprender?",
+    ctaText: "Descubra nossos dicionários com pronúncia em espanhol e fonética UK/USA. A ferramenta perfeita para dominar o inglês.",
+    view5000: "Ver 5.000 Palavras",
+    view8000: "Ver 8.000 Palavras",
+  },
+
+  // CTA
+  cta: {
+    title: "Pronto para dominar o inglês sem estresse?",
+    subtitle: "Junte-se a mais de 10.000 estudantes que já estão aprendendo com iLingue Relax",
+    button: "VER PRODUTOS",
   },
 
   // Common
@@ -138,6 +284,7 @@ export const pt = {
     noResults: "Sem resultados",
     viewAll: "Ver Tudo",
     learnMore: "Saiba Mais",
+    required: "*",
   },
 
   // Trust badges
@@ -161,10 +308,24 @@ export const pt = {
   // Exit intent
   exitIntent: {
     wait: "Espere!",
-    dontLeave: "Não vá embora sem seu desconto",
+    dontLeave: "Não saia sem seu desconto",
     discount: "de desconto",
     useCode: "Use o código",
     getCoupon: "Obter Cupom",
     noThanks: "Não, obrigado",
+  },
+
+  // Success pages
+  success: {
+    title: "Obrigado Pela Sua Compra!",
+    checkEmail: "Verifique Seu Email",
+    emailSent: "Enviaremos o acesso ao seu livro diretamente para o email que você registrou no Hotmart.",
+    checkInbox: "Por favor, verifique sua caixa de entrada (e a pasta de spam) nos próximos minutos.",
+    noEmail: "Não recebeu o email?",
+    contactSupport: "Entre em contato conosco via WhatsApp ou email e daremos acesso manualmente.",
+    needHelp: "Precisa de Ajuda? Entre em Contato",
+    thankYou: "Obrigado por escolher Inglés Relax!",
+    backHome: "Voltar ao Início",
+    exploreProducts: "Explorar Mais Produtos",
   },
 };

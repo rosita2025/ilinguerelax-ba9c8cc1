@@ -1,25 +1,19 @@
-const steps = [{
-  number: "01",
-  title: "Escucha",
-  description: "Escucha la pronunciación correcta de cada palabra con nuestro audio nativo"
-}, {
-  number: "02",
-  title: "Repite",
-  description: "Practica la pronunciación a tu propio ritmo, sin presión ni estrés"
-}, {
-  number: "03",
-  title: "Domina",
-  description: "Integra las palabras en tu vocabulario diario de forma natural"
-}];
-export const HowItWorks = () => {
-  return <section className="py-20 md:py-28 bg-secondary/30">
-      <div className="container px-4 md:px-6">
-        
+import { useI18n } from "@/i18n/I18nContext";
 
+export const HowItWorks = () => {
+  const { t } = useI18n();
+  const steps = t.howItWorks.steps;
+
+  return (
+    <section className="py-20 md:py-28 bg-secondary/30">
+      <div className="container px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {steps.map((step, index) => <div key={step.number} className="relative group">
+          {steps.map((step, index) => (
+            <div key={step.number} className="relative group">
               {/* Connector Line */}
-              {index < steps.length - 1 && <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-border" />}
+              {index < steps.length - 1 && (
+                <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-border" />
+              )}
 
               <div className="relative bg-card rounded-2xl p-8 text-center border border-border shadow-card hover:shadow-hero transition-all duration-500">
                 {/* Step Number */}
@@ -34,8 +28,10 @@ export const HowItWorks = () => {
                   {step.description}
                 </p>
               </div>
-            </div>)}
+            </div>
+          ))}
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };

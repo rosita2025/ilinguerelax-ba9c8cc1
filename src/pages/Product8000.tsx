@@ -48,6 +48,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const partnerLogos = [
   { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
@@ -481,6 +482,9 @@ const Product8000 = () => {
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
+
+      {/* WhatsApp Support Button */}
+      <WhatsAppButton />
     </main>
   );
 };

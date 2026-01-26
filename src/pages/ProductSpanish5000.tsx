@@ -45,6 +45,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const features = [
   "5,000+ essential Spanish words",
@@ -599,6 +600,9 @@ const ProductSpanish5000 = () => {
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
+
+      {/* WhatsApp Support Button */}
+      <WhatsAppButton />
     </main>
   );
 };

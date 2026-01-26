@@ -39,6 +39,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const features = [
   "8,000 palabras esenciales del inglés",
@@ -431,6 +432,9 @@ const Product8000Book = () => {
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
+
+      {/* WhatsApp Support Button */}
+      <WhatsAppButton />
     </main>
   );
 };

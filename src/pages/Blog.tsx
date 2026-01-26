@@ -7,6 +7,7 @@ import { blogPosts, getAllCategories } from "@/data/blogPosts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const Blog = () => {
   const categories = getAllCategories();
@@ -215,6 +216,7 @@ const Blog = () => {
         </section>
       </main>
 
+      <WhatsAppButton />
       <Footer />
     </>
   );

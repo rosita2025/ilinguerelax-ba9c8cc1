@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { BookOpen, Heart, Target, Users, Award, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -210,6 +211,7 @@ const AboutPage = () => {
       </section>
 
       <Footer />
+      <WhatsAppButton />
       <ExitIntentPopup 
         discount="10%"
         couponCode="NEW10"

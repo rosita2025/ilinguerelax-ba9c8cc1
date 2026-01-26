@@ -16,6 +16,7 @@ import {
   HeadphonesIcon,
 } from "lucide-react";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const faqItems = [
   {
@@ -102,6 +103,7 @@ const FAQPage = () => {
         />
       </motion.main>
       <Footer />
+      <WhatsAppButton />
       <ExitIntentPopup 
         discount="10%"
         couponCode="NEW10"

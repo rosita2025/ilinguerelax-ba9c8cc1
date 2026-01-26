@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Star } from "lucide-react";
 import { products, getProductLink } from "@/data/products";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const Products = () => {
   return (
@@ -138,6 +139,7 @@ const Products = () => {
       </section>
 
       <Footer />
+      <WhatsAppButton />
       <ExitIntentPopup 
         discount="10%"
         couponCode="NEW10"

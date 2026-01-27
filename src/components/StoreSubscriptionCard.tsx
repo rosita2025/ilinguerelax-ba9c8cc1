@@ -10,6 +10,7 @@ interface StoreSubscriptionCardProps {
   storeName: string;
   type: "coming-soon" | "available";
   buyLink?: string;
+  productType?: "spanish" | "english";
 }
 
 export const StoreSubscriptionCard = ({
@@ -17,6 +18,7 @@ export const StoreSubscriptionCard = ({
   storeName,
   type,
   buyLink,
+  productType = "english",
 }: StoreSubscriptionCardProps) => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +44,7 @@ export const StoreSubscriptionCard = ({
         body: {
           email,
           storeName,
+          productType,
         },
       });
 
@@ -76,10 +79,13 @@ export const StoreSubscriptionCard = ({
           href={buyLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors mb-3"
         >
           Comprar Ahora <ArrowRight className="w-4 h-4" />
         </a>
+        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+          <Mail className="w-3 h-3" /> hola@ilinguerelax.com
+        </p>
       </div>
     );
   }
@@ -123,6 +129,9 @@ export const StoreSubscriptionCard = ({
           </div>
         </form>
       )}
+      <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-3">
+        <Mail className="w-3 h-3" /> hola@ilinguerelax.com
+      </p>
     </div>
   );
 };

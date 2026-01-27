@@ -328,4 +328,20 @@ export const en = {
     backHome: "Back to Home",
     exploreProducts: "Explore More Products",
   },
+
+  // Store Subscription Cards
+  storeCards: {
+    earlyPurchase: "🛒 Early Purchase",
+    availableNow: "Available now!",
+    buyNow: "Buy Now",
+    comingSoon: "📦 Coming Soon",
+    subscribed: "Subscribed!",
+    subscribeNotify: "Subscribe to be notified",
+    emailPlaceholder: "your@email.com",
+    contactEmail: "hola@ilinguerelax.com",
+    invalidEmail: "Please enter a valid email",
+    errorSubscribing: "Could not subscribe. Try again.",
+    successTitle: "Subscribed!",
+    successMessage: "We'll notify you when available on",
+  },
 };

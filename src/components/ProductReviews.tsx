@@ -4,7 +4,13 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 
-// Testimonial screenshot images
+// Import Spanish testimonial images
+import reviewSpanish1 from "@/assets/review-spanish-1.png";
+import reviewSpanish2 from "@/assets/review-spanish-2.jpg";
+import reviewSpanish3 from "@/assets/review-spanish-3.jpg";
+import reviewSpanish4 from "@/assets/review-spanish-4.jpg";
+
+// Testimonial screenshot images - English product
 const englishTestimonials = [
   "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",
   "https://images.loox.io/uploads/2025/11/23/IiDiyw9-U.jpg",
@@ -18,13 +24,12 @@ const englishTestimonials = [
   "https://images.loox.io/uploads/2025/11/23/smyzA3a5t.jpg",
 ];
 
+// Testimonial images - Spanish product (book photos)
 const spanishTestimonials = [
-  "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",
-  "https://images.loox.io/uploads/2025/11/23/IiDiyw9-U.jpg",
-  "https://images.loox.io/uploads/2025/11/23/GcNv27Ltw.jpg",
-  "https://images.loox.io/uploads/2025/11/23/6IAXeCS3b.jpg",
-  "https://images.loox.io/uploads/2025/11/23/mJSaAZynx.jpg",
-  "https://images.loox.io/uploads/2025/11/23/BWXo4KTI7Q.jpg",
+  reviewSpanish1,
+  reviewSpanish2,
+  reviewSpanish3,
+  reviewSpanish4,
 ];
 
 // Real verified reviews - iLingue Relax
@@ -48,7 +53,7 @@ const textReviewsSpanish = [
   { text: "My teenager is using it and loves it. Easy to understand for any age.", verified: true, date: "2025-12-28" },
   { text: "Great investment! The chapters are well organized by topics.", verified: true, date: "2025-11-20" },
   { text: "Instant download and the PDF looks perfect on my tablet. Highly recommended!", verified: true, date: "2025-10-15" },
-  { text: "After trying many methods, this one works best for me. Thank you Spanish Relax!", verified: true, date: "2025-09-18" },
+  { text: "After trying many methods, this one works best for me. Thank you iLingue Relax!", verified: true, date: "2025-09-18" },
   { text: "The included bonuses are worth gold. The alphabetical dictionary is great for quick lookups.", verified: true, date: "2025-08-22" },
   { text: "I'm a teacher and recommend it to my students. Professional quality content.", verified: true, date: "2025-08-05" },
   { text: "Never thought learning vocabulary could be this easy. The 5,000 words are well selected.", verified: true, date: "2025-07-12" },
@@ -130,7 +135,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
           </div>
           <p className="text-sm text-muted-foreground">
             {productType === "spanish" 
-              ? "Powered by Spanish Relax" 
+              ? "Powered by iLingue Relax" 
               : "Reseñas verificadas por iLingue Relax"
             }
           </p>
@@ -174,7 +179,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                       letterSpacing: '0.05em'
                     }}
                   >
-                    {productType === "spanish" ? "Spanish Relax" : "iLingue Relax"}
+                    iLingue Relax
                   </span>
                 </div>
                 {/* Bottom watermark */}
@@ -182,7 +187,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                   <span 
                     className="text-white text-xs font-semibold opacity-80 bg-black/40 px-2 py-1 rounded select-none"
                   >
-                    © {productType === "spanish" ? "Spanish Relax" : "iLingue Relax"}
+                    © iLingue Relax
                   </span>
                 </div>
               </div>
@@ -197,7 +202,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
           <span className="text-sm font-medium text-muted-foreground">
             {productType === "spanish" ? "Reviews from" : "Reseñas de"}
           </span>
-          <span className="text-sm font-bold text-primary">{productType === "spanish" ? "Spanish Relax" : "iLingue Relax"}</span>
+          <span className="text-sm font-bold text-primary">iLingue Relax</span>
           <CheckCircle className="w-4 h-4 text-green-500" />
         </div>
         
@@ -228,7 +233,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                 </p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>
-                    {productType === "spanish" ? "Customer via Spanish Relax" : "Cliente de iLingue Relax"}
+                    {productType === "spanish" ? "Customer via iLingue Relax" : "Cliente de iLingue Relax"}
                   </span>
                   <span>{new Date(review.date).toLocaleDateString(productType === "spanish" ? "en-US" : "es-ES", { month: "short", year: "numeric" })}</span>
                 </div>
@@ -243,12 +248,12 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
         <div className="text-center mt-8 space-y-2">
           <p className="text-muted-foreground text-sm">
             {productType === "spanish" 
-              ? "✓ All reviews are from verified customers of Spanish Relax"
+              ? "✓ All reviews are from verified customers of iLingue Relax"
               : "✓ Todas las reseñas son de clientes verificados de iLingue Relax"
             }
           </p>
           <p className="text-xs text-muted-foreground/70">
-            © {new Date().getFullYear()} {productType === "spanish" ? "Spanish Relax" : "iLingue Relax"} - {productType === "spanish" ? "All rights reserved" : "Todos los derechos reservados"}
+            © {new Date().getFullYear()} iLingue Relax - {productType === "spanish" ? "All rights reserved" : "Todos los derechos reservados"}
           </p>
         </div>
       </div>

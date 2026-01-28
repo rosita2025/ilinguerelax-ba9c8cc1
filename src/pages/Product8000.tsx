@@ -103,7 +103,7 @@ const Product8000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-8000"],
     content_type: "product",
-    value: 24,
+    value: 17,
     currency: "USD",
   }), []);
   useHotmartPixel(pixelParams);
@@ -115,7 +115,7 @@ const Product8000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 24,
+      value: 17,
       currency: "USD",
       num_items: 1,
     });
@@ -130,8 +130,8 @@ const Product8000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/product-8000.png"
         type="product"
-        price="24"
-        originalPrice="76"
+        price="17"
+        originalPrice="54"
         rating="4.9"
         reviewCount="892"
         sku="ILINGUE-8000"
@@ -220,14 +220,14 @@ const Product8000 = () => {
                   <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$24</span>
-                  <span className="text-2xl text-muted-foreground line-through">$76</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$17</span>
+                  <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span 
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
                   >
-                    AHORRA 68%
+                    AHORRA 69%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -386,9 +386,9 @@ const Product8000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$24</span>
+                <span className="text-5xl font-bold text-foreground">$17</span>
                 <span className="text-2xl text-muted-foreground line-through">
-                  $76
+                  $54
                 </span>
                 <span className="text-accent font-bold">USD</span>
               </div>
@@ -455,8 +455,8 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$24"
-        originalPrice="$76"
+        price="$17"
+        originalPrice="$54"
         rating={4.9}
         reviewCount={10000}
         buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"

@@ -48,7 +48,7 @@ const textReviewsSpanish = [
   { text: "My teenager is using it and loves it. Easy to understand for any age.", verified: true, date: "2025-12-28" },
   { text: "Great investment! The chapters are well organized by topics.", verified: true, date: "2025-11-20" },
   { text: "Instant download and the PDF looks perfect on my tablet. Highly recommended!", verified: true, date: "2025-10-15" },
-  { text: "After trying many methods, this one works best for me. Thank you iLingue Relax!", verified: true, date: "2025-09-18" },
+  { text: "After trying many methods, this one works best for me. Thank you Spanish Relax!", verified: true, date: "2025-09-18" },
   { text: "The included bonuses are worth gold. The alphabetical dictionary is great for quick lookups.", verified: true, date: "2025-08-22" },
   { text: "I'm a teacher and recommend it to my students. Professional quality content.", verified: true, date: "2025-08-05" },
   { text: "Never thought learning vocabulary could be this easy. The 5,000 words are well selected.", verified: true, date: "2025-07-12" },
@@ -130,7 +130,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
           </div>
           <p className="text-sm text-muted-foreground">
             {productType === "spanish" 
-              ? "Powered by iLingue Relax" 
+              ? "Powered by Spanish Relax" 
               : "Reseñas verificadas por iLingue Relax"
             }
           </p>
@@ -174,7 +174,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                       letterSpacing: '0.05em'
                     }}
                   >
-                    iLingue Relax
+                    {productType === "spanish" ? "Spanish Relax" : "iLingue Relax"}
                   </span>
                 </div>
                 {/* Bottom watermark */}
@@ -182,7 +182,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                   <span 
                     className="text-white text-xs font-semibold opacity-80 bg-black/40 px-2 py-1 rounded select-none"
                   >
-                    © iLingue Relax
+                    © {productType === "spanish" ? "Spanish Relax" : "iLingue Relax"}
                   </span>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
           <span className="text-sm font-medium text-muted-foreground">
             {productType === "spanish" ? "Reviews from" : "Reseñas de"}
           </span>
-          <span className="text-sm font-bold text-primary">iLingue Relax</span>
+          <span className="text-sm font-bold text-primary">{productType === "spanish" ? "Spanish Relax" : "iLingue Relax"}</span>
           <CheckCircle className="w-4 h-4 text-green-500" />
         </div>
         
@@ -228,7 +228,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                 </p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>
-                    {productType === "spanish" ? "Customer via" : "Cliente de"} iLingue Relax
+                    {productType === "spanish" ? "Customer via Spanish Relax" : "Cliente de iLingue Relax"}
                   </span>
                   <span>{new Date(review.date).toLocaleDateString(productType === "spanish" ? "en-US" : "es-ES", { month: "short", year: "numeric" })}</span>
                 </div>
@@ -243,12 +243,12 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
         <div className="text-center mt-8 space-y-2">
           <p className="text-muted-foreground text-sm">
             {productType === "spanish" 
-              ? "✓ All reviews are from verified customers of iLingue Relax"
+              ? "✓ All reviews are from verified customers of Spanish Relax"
               : "✓ Todas las reseñas son de clientes verificados de iLingue Relax"
             }
           </p>
           <p className="text-xs text-muted-foreground/70">
-            © {new Date().getFullYear()} iLingue Relax - {productType === "spanish" ? "All rights reserved" : "Todos los derechos reservados"}
+            © {new Date().getFullYear()} {productType === "spanish" ? "Spanish Relax" : "iLingue Relax"} - {productType === "spanish" ? "All rights reserved" : "Todos los derechos reservados"}
           </p>
         </div>
       </div>

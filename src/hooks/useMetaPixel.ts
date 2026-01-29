@@ -16,12 +16,8 @@ interface ViewContentParams {
 }
 
 // ============================================
-// PIXEL IDs - SEPARADOS POR PRODUCTO
+// PIXEL ID - ÚNICO PIXEL PARA TODOS LOS PRODUCTOS
 // ============================================
-// Spanish Relax 5,000 palabras (Shopify)
-const SPANISH_RELAX_PIXEL_ID = "1844523252813381";
-
-// Hotmart 8,000 palabras (Hotmart)
 const HOTMART_PIXEL_ID = "24959578143733255";
 
 // ============================================
@@ -71,72 +67,7 @@ const initPixel = (pixelId: string) => {
 };
 
 // ============================================
-// SPANISH RELAX PIXEL (5,000 palabras - Shopify)
-// ============================================
-
-// Hook for ViewContent event
-export const useSpanishRelaxPixel = (params: ViewContentParams) => {
-  useEffect(() => {
-    initPixel(SPANISH_RELAX_PIXEL_ID);
-    
-    if (typeof window !== "undefined" && window.fbq) {
-      const eventId = generateEventId();
-      window.fbq("track", "ViewContent", {
-        ...params,
-        eventID: eventId,
-      });
-    }
-  }, [params.content_name]);
-};
-
-// Hook for PageView only (Home page)
-export const useSpanishRelaxPixelPageView = () => {
-  useEffect(() => {
-    initPixel(SPANISH_RELAX_PIXEL_ID);
-    
-    if (typeof window !== "undefined" && window.fbq) {
-      const eventId = generateEventId();
-      window.fbq("track", "PageView", {
-        eventID: eventId,
-      });
-    }
-  }, []);
-};
-
-// Hook for Contact page
-export const useSpanishRelaxPixelContact = () => {
-  useEffect(() => {
-    initPixel(SPANISH_RELAX_PIXEL_ID);
-    
-    if (typeof window !== "undefined" && window.fbq) {
-      const eventId = generateEventId();
-      window.fbq("track", "ViewContent", {
-        content_name: "Contact Page",
-        content_category: "Page",
-        eventID: eventId,
-      });
-    }
-  }, []);
-};
-
-// Track any event for Spanish Relax pixel
-export const trackSpanishRelaxEvent = (
-  eventName: string,
-  params: Record<string, unknown> = {}
-) => {
-  initPixel(SPANISH_RELAX_PIXEL_ID);
-  
-  if (typeof window !== "undefined" && window.fbq) {
-    const eventId = generateEventId();
-    window.fbq("track", eventName, {
-      ...params,
-      eventID: eventId,
-    });
-  }
-};
-
-// ============================================
-// HOTMART PIXEL (8,000 palabras - Hotmart)
+// HOTMART PIXEL (Único pixel para todos los productos)
 // ============================================
 
 // Hook for ViewContent event
@@ -170,13 +101,42 @@ export const trackHotmartEvent = (
   }
 };
 
+// Hook for PageView only (Home page)
+export const useHotmartPixelPageView = () => {
+  useEffect(() => {
+    initPixel(HOTMART_PIXEL_ID);
+    
+    if (typeof window !== "undefined" && window.fbq) {
+      const eventId = generateEventId();
+      window.fbq("track", "PageView", {
+        eventID: eventId,
+      });
+    }
+  }, []);
+};
+
+// Hook for Contact page
+export const useHotmartPixelContact = () => {
+  useEffect(() => {
+    initPixel(HOTMART_PIXEL_ID);
+    
+    if (typeof window !== "undefined" && window.fbq) {
+      const eventId = generateEventId();
+      window.fbq("track", "ViewContent", {
+        content_name: "Contact Page",
+        content_category: "Page",
+        eventID: eventId,
+      });
+    }
+  }, []);
+};
+
 // ============================================
 // LEGACY EXPORTS (for backwards compatibility)
 // ============================================
-export const useMetaPixelViewContent = (params: ViewContentParams, pixelId?: string) => {
+export const useMetaPixelViewContent = (params: ViewContentParams, _pixelId?: string) => {
   useEffect(() => {
-    const targetPixelId = pixelId || SPANISH_RELAX_PIXEL_ID;
-    initPixel(targetPixelId);
+    initPixel(HOTMART_PIXEL_ID);
     
     if (typeof window !== "undefined" && window.fbq) {
       const eventId = generateEventId();
@@ -185,5 +145,11 @@ export const useMetaPixelViewContent = (params: ViewContentParams, pixelId?: str
         eventID: eventId,
       });
     }
-  }, [params.content_name, pixelId]);
+  }, [params.content_name]);
 };
+
+// Legacy aliases that now use the single Hotmart pixel
+export const useSpanishRelaxPixel = useHotmartPixel;
+export const trackSpanishRelaxEvent = trackHotmartEvent;
+export const useSpanishRelaxPixelPageView = useHotmartPixelPageView;
+export const useSpanishRelaxPixelContact = useHotmartPixelContact;

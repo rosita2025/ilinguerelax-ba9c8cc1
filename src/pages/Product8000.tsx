@@ -119,7 +119,7 @@ const Product8000 = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open("https://pay.hotmart.com/O100578526P?checkoutMode=10", "_blank");
+    window.open("https://pay.hotmart.com/U103990323W?checkoutMode=10", "_blank");
   };
 
   return (
@@ -459,7 +459,7 @@ const Product8000 = () => {
         originalPrice="$54"
         rating={4.9}
         reviewCount={10000}
-        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10"
       />
 
       {/* Spacer for sticky bar */}

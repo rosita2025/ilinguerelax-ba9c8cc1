@@ -85,9 +85,10 @@ const FAQPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Preguntas Frecuentes - Todo lo que Necesitas Saber"
-        description="Resuelve tus dudas sobre iLingue Relax. Información sobre productos, métodos de pago, pronunciación, garantía y soporte."
+        title="Preguntas Frecuentes - FAQ"
+        description="Resuelve dudas sobre iLingue Relax: productos, pagos, pronunciación, garantía de 7 días y soporte. Todo sobre libros de inglés para hispanohablantes."
         canonicalUrl="https://ilinguerelax.com/faq"
+        keywords="preguntas frecuentes iLingue Relax, FAQ libros inglés, dudas pronunciación inglés, garantía devolución, métodos pago"
       />
       <Navbar />
       <motion.main

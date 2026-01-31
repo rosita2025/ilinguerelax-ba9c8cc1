@@ -24,9 +24,10 @@ const AboutPage = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Sobre Nosotros - Nuestra Historia y Misión"
-        description="Conoce iLingue Relax, marca educativa enfocada en el aprendizaje de idiomas sin estrés. Nuestra misión es ayudar a hispanohablantes a aprender inglés de forma relajada."
+        title="Sobre Nosotros - Aprender Idiomas Sin Estrés"
+        description="iLingue Relax: marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes. +10,000 estudiantes en 20+ países."
         canonicalUrl="https://ilinguerelax.com/sobre-nosotros"
+        keywords="iLingue Relax, aprender inglés sin estrés, educación idiomas hispanohablantes, libros digitales inglés, pronunciación inglés español"
       />
       <Navbar />
 

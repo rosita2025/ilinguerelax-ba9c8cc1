@@ -12,10 +12,10 @@ const Products = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Libros Digitales para Aprender Inglés con Pronunciación"
-        description="Colección de libros digitales para aprender inglés con pronunciación adaptada para hispanohablantes. 5,000 y 8,000 palabras con fonética UK/USA. Descarga inmediata."
-        canonicalUrl="https://ilinguerelax.com/productos"
-        keywords="libros digitales inglés, aprender inglés pronunciación, vocabulario inglés hispanohablantes, libro inglés digital, fonética inglés UK USA, curso inglés online, aprender inglés fácil"
+        title="Libros Digitales de Inglés con Pronunciación - Catálogo"
+        description="Libros digitales para aprender inglés: 5,000 y 8,000 palabras con pronunciación adaptada para hispanohablantes. Fonética UK/USA. Descarga inmediata desde $10."
+        canonicalUrl="https://ilinguerelax.com/products"
+        keywords="comprar libros inglés digital, vocabulario inglés 5000 8000 palabras, libros pronunciación inglés español, diccionario inglés fonética UK USA, aprender inglés hispanohablantes"
         productList={products.map((product) => ({
           name: product.title,
           description: product.description,

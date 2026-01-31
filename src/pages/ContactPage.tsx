@@ -89,9 +89,10 @@ const ContactPage = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Contacto - Estamos Aquí para Ayudarte"
-        description="¿Tienes preguntas sobre nuestros libros de inglés? Contáctanos por email o redes sociales. Respondemos en 24-48 horas."
+        title="Contacto - Soporte y Ayuda"
+        description="¿Dudas sobre nuestros libros de inglés con pronunciación? Escríbenos a hola@ilinguerelax.com. Respuesta en 24-48 horas. Atención en español."
         canonicalUrl="https://ilinguerelax.com/contacto"
+        keywords="contacto iLingue Relax, soporte libros inglés, ayuda pronunciación inglés, atención cliente iLingue"
       />
       <Navbar />
 

@@ -19,13 +19,13 @@ const Blog = () => {
     "@type": "Blog",
     "name": "Blog iLingue Relax - Aprende Inglés",
     "description": "Artículos, guías y consejos para aprender inglés de forma efectiva con pronunciación y fonética.",
-    "url": "https://ilinguerelax.lovable.app/blog",
+    "url": "https://ilinguerelax.com/blog",
     "publisher": {
       "@type": "Organization",
       "name": "iLingue Relax",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://ilinguerelax.lovable.app/og-image.png"
+        "url": "https://ilinguerelax.com/og-image.png"
       }
     },
     "blogPost": blogPosts.map(post => ({
@@ -38,17 +38,17 @@ const Blog = () => {
         "@type": "Organization",
         "name": post.author
       },
-      "url": `https://ilinguerelax.lovable.app/blog/${post.slug}`
+      "url": `https://ilinguerelax.com/blog/${post.slug}`
     }))
   };
 
   return (
     <>
       <SEO 
-        title="Blog - Aprende Inglés con Consejos y Guías | iLingue Relax"
-        description="Descubre artículos, guías y consejos para aprender inglés de forma efectiva. Pronunciación, vocabulario, gramática y más."
-        canonicalUrl="https://ilinguerelax.lovable.app/blog"
-        keywords="blog inglés, aprender inglés, consejos inglés, guías inglés, vocabulario inglés, pronunciación inglés"
+        title="Blog - Aprende Inglés con Consejos y Guías Prácticas"
+        description="Artículos y guías para aprender inglés con pronunciación. Vocabulario, gramática, fonética UK/USA y estrategias para hispanohablantes. ¡Mejora tu inglés hoy!"
+        canonicalUrl="https://ilinguerelax.com/blog"
+        keywords="blog aprender inglés, consejos inglés hispanohablantes, guías vocabulario inglés, pronunciación inglés español, fonética inglés UK USA, errores comunes inglés"
       />
       <Navbar />
       

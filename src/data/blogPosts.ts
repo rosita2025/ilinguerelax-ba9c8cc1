@@ -532,6 +532,667 @@ Conocer estos errores te pone un paso adelante. Con los recursos correctos y pr�
     tags: ["errores comunes", "consejos", "hispanohablantes", "mejora"],
     relatedProducts: ["5000", "8000"],
   },
+  {
+    id: "6",
+    slug: "como-pronunciar-th-en-ingles",
+    title: "Cómo Pronunciar TH en Inglés: Guía Definitiva con Ejemplos",
+    excerpt: "Aprende a pronunciar correctamente el sonido TH en inglés. Técnicas paso a paso, ejercicios prácticos y palabras comunes para dominar este sonido.",
+    content: `
+# Cómo Pronunciar TH en Inglés: Guía Definitiva
+
+El sonido TH es uno de los más difíciles para hispanohablantes porque **no existe en español**. En esta guía te enseñaremos exactamente cómo pronunciarlo correctamente.
+
+## Los Dos Tipos de TH
+
+Existen dos variantes del sonido TH en inglés:
+
+### 1. TH Sonoro (Voiced TH)
+Se pronuncia con vibración de las cuerdas vocales:
+- **The** /ðə/ - el, la
+- **This** /ðɪs/ - esto
+- **That** /ðæt/ - eso
+- **They** /ðeɪ/ - ellos
+- **There** /ðeə/ - allí
+
+### 2. TH Sordo (Unvoiced TH)
+Se pronuncia sin vibración:
+- **Think** /θɪŋk/ - pensar
+- **Thank** /θæŋk/ - agradecer
+- **Three** /θriː/ - tres
+- **Through** /θruː/ - a través
+- **Thought** /θɔːt/ - pensamiento
+
+## Técnica Paso a Paso
+
+### Paso 1: Posición de la Lengua
+1. Coloca la punta de la lengua **entre los dientes**
+2. La lengua debe tocar ligeramente los dientes superiores
+3. No aprietes los dientes, déjalos ligeramente abiertos
+
+### Paso 2: Flujo de Aire
+1. Sopla aire suavemente entre la lengua y los dientes
+2. Para TH sonoro: añade vibración desde la garganta
+3. Para TH sordo: solo aire, sin vibración
+
+### Paso 3: Práctica con Espejo
+Usa un espejo para verificar que tu lengua sea visible entre los dientes.
+
+## Errores Comunes a Evitar
+
+### ❌ Pronunciar como "D" o "T"
+- "The" NO es "de"
+- "Think" NO es "tink"
+
+### ❌ Pronunciar como "S" o "Z"
+- "Think" NO es "sink"
+- "This" NO es "zis"
+
+### ❌ Pronunciar como "F"
+- "Three" NO es "free"
+- "Through" NO es "fru"
+
+## Ejercicios de Práctica
+
+### Trabalenguas con TH
+1. "The thirty-three thieves thought that they thrilled the throne throughout Thursday"
+2. "I thought a thought, but the thought I thought wasn't the thought I thought I thought"
+
+### Pares Mínimos
+Practica la diferencia entre sonidos similares:
+| TH | Sonido Similar |
+|-----|----------------|
+| Think | Sink |
+| Three | Free |
+| Thick | Sick |
+| Theme | Seem |
+
+## Palabras Más Comunes con TH
+
+### Las 20 Palabras TH Más Usadas
+1. The - el/la
+2. That - eso
+3. This - esto
+4. They - ellos
+5. There - allí
+6. Their - su (de ellos)
+7. Then - entonces
+8. Think - pensar
+9. Thing - cosa
+10. Through - a través
+
+## Conclusión
+
+Dominar el sonido TH requiere práctica consciente. Con un diccionario que incluya **fonética y pronunciación en español**, puedes aprender exactamente cómo suenan estas palabras y practicar correctamente desde el inicio.
+    `,
+    image: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&auto=format&fit=crop",
+    author: "iLingue Relax",
+    date: "2025-01-20",
+    readTime: "7 min",
+    category: "Pronunciación",
+    tags: ["pronunciación", "TH", "sonidos difíciles", "fonética", "ejercicios"],
+    relatedProducts: ["5000", "8000"],
+  },
+  {
+    id: "7",
+    slug: "phrasal-verbs-mas-usados-ingles",
+    title: "50 Phrasal Verbs Más Usados en Inglés con Ejemplos y Significado",
+    excerpt: "Domina los phrasal verbs más importantes del inglés. Lista completa con significados, ejemplos y trucos para memorizarlos fácilmente.",
+    content: `
+# 50 Phrasal Verbs Más Usados en Inglés
+
+Los phrasal verbs son **combinaciones de verbo + partícula** que tienen un significado diferente al verbo original. Son esenciales para sonar natural en inglés.
+
+## ¿Por Qué Son Importantes?
+
+Los nativos usan phrasal verbs constantemente:
+- En conversaciones diarias
+- En películas y series
+- En el trabajo
+- En redes sociales
+
+Sin conocerlos, entenderás solo el 60% de las conversaciones reales.
+
+## Los 50 Phrasal Verbs Esenciales
+
+### Movimiento y Dirección
+
+| Phrasal Verb | Significado | Ejemplo |
+|--------------|-------------|---------|
+| Get up | Levantarse | I get up at 7 AM |
+| Wake up | Despertar | Wake up! It's late |
+| Go out | Salir | Let's go out tonight |
+| Come back | Regresar | When will you come back? |
+| Get in | Entrar (vehículo) | Get in the car |
+| Get out | Salir (vehículo) | Get out of here! |
+| Go away | Irse | Please go away |
+| Come in | Entrar | Come in, the door is open |
+| Turn around | Dar la vuelta | Turn around and look |
+| Move on | Seguir adelante | It's time to move on |
+
+### Comunicación
+
+| Phrasal Verb | Significado | Ejemplo |
+|--------------|-------------|---------|
+| Call back | Devolver llamada | I'll call you back later |
+| Hang up | Colgar teléfono | Don't hang up on me |
+| Speak up | Hablar más fuerte | Can you speak up? |
+| Shut up | Callarse | Shut up and listen |
+| Bring up | Mencionar tema | Don't bring up politics |
+
+### Trabajo y Tareas
+
+| Phrasal Verb | Significado | Ejemplo |
+|--------------|-------------|---------|
+| Work out | Hacer ejercicio / Resolver | I work out every day |
+| Figure out | Descifrar | I can't figure it out |
+| Find out | Descubrir | I found out the truth |
+| Give up | Rendirse | Never give up! |
+| Keep on | Continuar | Keep on trying |
+| Put off | Posponer | Don't put it off |
+| Set up | Configurar/Organizar | Set up a meeting |
+| Turn on | Encender | Turn on the lights |
+| Turn off | Apagar | Turn off your phone |
+| Look for | Buscar | I'm looking for my keys |
+
+### Relaciones
+
+| Phrasal Verb | Significado | Ejemplo |
+|--------------|-------------|---------|
+| Break up | Terminar relación | They broke up last month |
+| Make up | Reconciliarse | They made up after the fight |
+| Get along | Llevarse bien | We get along great |
+| Look after | Cuidar | Look after your sister |
+| Grow up | Crecer/Madurar | Grow up! |
+| Look up to | Admirar | I look up to my father |
+
+### Vida Diaria
+
+| Phrasal Verb | Significado | Ejemplo |
+|--------------|-------------|---------|
+| Pick up | Recoger | Pick up your clothes |
+| Put on | Ponerse (ropa) | Put on your jacket |
+| Take off | Quitarse (ropa) | Take off your shoes |
+| Throw away | Tirar (basura) | Throw away the trash |
+| Run out of | Quedarse sin | We ran out of milk |
+| Look forward to | Esperar con ilusión | I look forward to seeing you |
+
+## Cómo Memorizar Phrasal Verbs
+
+### 1. Aprende en Contexto
+No memorices listas. Aprende phrasal verbs en oraciones completas.
+
+### 2. Agrupa por Verbo Base
+- GET: get up, get out, get along, get over...
+- TAKE: take off, take on, take over...
+- PUT: put on, put off, put up with...
+
+### 3. Practica con Situaciones Reales
+Usa los phrasal verbs en tu vida diaria, aunque sea mentalmente.
+
+## Conclusión
+
+Los phrasal verbs son esenciales para la fluidez. Un buen diccionario de **5,000-8,000 palabras** incluye los phrasal verbs más importantes con su pronunciación correcta.
+    `,
+    image: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=800&auto=format&fit=crop",
+    author: "iLingue Relax",
+    date: "2025-01-18",
+    readTime: "12 min",
+    category: "Vocabulario",
+    tags: ["phrasal verbs", "verbos", "vocabulario avanzado", "expresiones"],
+    relatedProducts: ["5000", "8000"],
+  },
+  {
+    id: "8",
+    slug: "como-mejorar-listening-ingles",
+    title: "Cómo Mejorar el Listening en Inglés: 10 Técnicas Efectivas",
+    excerpt: "Mejora tu comprensión auditiva en inglés con estas técnicas probadas. Aprende a entender películas, música y conversaciones reales.",
+    content: `
+# Cómo Mejorar el Listening en Inglés
+
+¿Te cuesta entender cuando los nativos hablan rápido? El listening es una de las habilidades más difíciles, pero con las técnicas correctas, puedes mejorar significativamente.
+
+## Por Qué el Listening es Difícil
+
+### Problemas Comunes
+1. **Los nativos hablan muy rápido**
+2. **Conectan palabras** (wanna, gonna, shoulda)
+3. **Usan expresiones coloquiales**
+4. **Diferentes acentos** (UK, USA, Australia)
+5. **Vocabulario desconocido**
+
+## Las 10 Técnicas Más Efectivas
+
+### 1. Escucha Activa vs Pasiva
+
+**Escucha Pasiva**: Tener inglés de fondo mientras haces otras cosas.
+- Útil para acostumbrar el oído
+- No mejora comprensión profunda
+
+**Escucha Activa**: Concentrarte 100% en entender.
+- Es más efectiva pero cansadora
+- Hazla por períodos cortos (15-20 min)
+
+### 2. El Método de los Subtítulos
+
+**Nivel 1**: Audio en inglés + subtítulos en español
+**Nivel 2**: Audio en inglés + subtítulos en inglés
+**Nivel 3**: Audio en inglés sin subtítulos
+
+Progresa gradualmente. No saltes niveles.
+
+### 3. Transcripción Manual
+
+1. Escucha un audio corto (30 segundos)
+2. Escríbelo palabra por palabra
+3. Compara con la transcripción real
+4. Identifica qué palabras perdiste
+
+### 4. Shadowing (Sombreado)
+
+1. Escucha una frase
+2. Repítela inmediatamente, imitando el tono y ritmo
+3. Grábate y compara
+
+Esta técnica mejora listening Y speaking simultáneamente.
+
+### 5. Enfócate en Palabras de Contenido
+
+Los nativos enfatizan:
+- **Sustantivos**: car, house, money
+- **Verbos principales**: go, want, need
+- **Adjetivos**: big, important, new
+
+Las palabras funcionales (the, a, is, are) se "tragan" o reducen.
+
+### 6. Aprende las Reducciones Comunes
+
+| Forma Completa | Reducción | Suena Como |
+|----------------|-----------|------------|
+| Want to | Wanna | "wána" |
+| Going to | Gonna | "góna" |
+| Have to | Hafta | "jáfta" |
+| Should have | Shoulda | "shúda" |
+| Would have | Woulda | "wúda" |
+| Could have | Coulda | "cúda" |
+| Let me | Lemme | "lémi" |
+| Give me | Gimme | "guími" |
+
+### 7. Varía los Acentos
+
+No te limites a un solo acento:
+- **Americano**: Netflix, YouTube USA
+- **Británico**: BBC, películas UK
+- **Australiano**: Podcasts australianos
+- **Internacional**: TED Talks
+
+### 8. Escucha el Mismo Contenido Varias Veces
+
+La repetición es clave:
+- Primera vez: Captar idea general
+- Segunda vez: Detalles específicos
+- Tercera vez: Expresiones y vocabulario
+
+### 9. Usa Contenido de Tu Nivel +1
+
+El contenido ideal es:
+- **70-80% comprensible**
+- **20-30% desafiante**
+
+Si entiendes menos del 50%, baja el nivel.
+
+### 10. Conecta Listening con Vocabulario
+
+El mayor obstáculo para el listening es **no conocer las palabras**.
+Si no conoces una palabra escrita, no la reconocerás hablada.
+
+## Recursos Gratuitos Recomendados
+
+### Para Principiantes
+- **BBC Learning English**: Lento y claro
+- **VOA Learning English**: Noticias simplificadas
+
+### Para Intermedios
+- **TED Talks**: Subtítulos disponibles
+- **Podcasts**: "6 Minute English" de BBC
+
+### Para Avanzados
+- **Películas sin subtítulos**
+- **Podcasts de nativos**
+- **YouTube vlogs**
+
+## La Conexión entre Vocabulario y Listening
+
+Este es el secreto: **Si conoces una palabra y su pronunciación correcta, la entenderás cuando la escuches**.
+
+Por eso es fundamental aprender vocabulario con:
+- Pronunciación en español
+- Fonética UK y USA
+- Audio de nativos
+
+Un diccionario completo de **5,000-8,000 palabras** con pronunciación es tu mejor herramienta para mejorar el listening.
+
+## Conclusión
+
+Mejorar el listening requiere práctica constante y las técnicas correctas. Combina escucha activa con estudio de vocabulario y verás resultados en semanas, no meses.
+    `,
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&auto=format&fit=crop",
+    author: "iLingue Relax",
+    date: "2025-01-22",
+    readTime: "10 min",
+    category: "Habilidades",
+    tags: ["listening", "comprensión auditiva", "películas", "podcasts", "técnicas"],
+    relatedProducts: ["5000", "8000"],
+  },
+  {
+    id: "9",
+    slug: "vocabulario-ingles-para-viajes",
+    title: "Vocabulario de Inglés para Viajes: 200+ Palabras y Frases Esenciales",
+    excerpt: "Prepárate para tu próximo viaje con este vocabulario esencial. Aeropuerto, hotel, restaurante, emergencias y más.",
+    content: `
+# Vocabulario de Inglés para Viajes
+
+¿Planeas viajar a un país de habla inglesa? Este vocabulario te ayudará a comunicarte en las situaciones más comunes.
+
+## En el Aeropuerto
+
+### Check-in y Documentos
+| Inglés | Español | Pronunciación |
+|--------|---------|---------------|
+| Passport | Pasaporte | pás-port |
+| Boarding pass | Tarjeta de embarque | bórding pas |
+| Gate | Puerta de embarque | guéit |
+| Flight | Vuelo | fláit |
+| Departure | Salida | dipár-chur |
+| Arrival | Llegada | arái-val |
+| Luggage/Baggage | Equipaje | lá-guich / bá-guich |
+| Carry-on | Equipaje de mano | cári-on |
+
+### Frases Útiles en el Aeropuerto
+- "Where is gate number 5?" - ¿Dónde está la puerta 5?
+- "Is this flight delayed?" - ¿Está retrasado este vuelo?
+- "I lost my luggage" - Perdí mi equipaje
+- "Where is baggage claim?" - ¿Dónde está la recogida de equipaje?
+
+## En el Hotel
+
+### Vocabulario de Alojamiento
+| Inglés | Español |
+|--------|---------|
+| Single room | Habitación individual |
+| Double room | Habitación doble |
+| Check-in | Registro de entrada |
+| Check-out | Registro de salida |
+| Key card | Tarjeta llave |
+| Reservation | Reservación |
+| Front desk | Recepción |
+| Room service | Servicio a la habitación |
+
+### Frases en el Hotel
+- "I have a reservation under [name]" - Tengo una reserva a nombre de...
+- "What time is check-out?" - ¿A qué hora es el check-out?
+- "Is breakfast included?" - ¿El desayuno está incluido?
+- "Can I have a wake-up call at 7 AM?" - ¿Pueden despertarme a las 7?
+- "The air conditioning doesn't work" - El aire acondicionado no funciona
+
+## En el Restaurante
+
+### Vocabulario de Comida
+| Inglés | Español |
+|--------|---------|
+| Menu | Menú |
+| Appetizer | Entrada |
+| Main course | Plato principal |
+| Dessert | Postre |
+| Bill/Check | La cuenta |
+| Tip | Propina |
+| Waiter/Waitress | Mesero/Mesera |
+| Reservation | Reservación |
+
+### Frases en Restaurantes
+- "A table for two, please" - Una mesa para dos, por favor
+- "Can I see the menu?" - ¿Puedo ver el menú?
+- "I'm allergic to..." - Soy alérgico a...
+- "Can I have the bill, please?" - ¿Me trae la cuenta?
+- "Is the tip included?" - ¿Está incluida la propina?
+
+## Transporte
+
+### Vocabulario de Transporte
+| Inglés | Español |
+|--------|---------|
+| Taxi | Taxi |
+| Bus stop | Parada de autobús |
+| Subway/Metro | Metro |
+| Train station | Estación de tren |
+| Ticket | Boleto |
+| One-way | Solo ida |
+| Round trip | Ida y vuelta |
+| Platform | Andén |
+
+### Frases de Transporte
+- "How much is a ticket to...?" - ¿Cuánto cuesta un boleto a...?
+- "Which platform for the train to...?" - ¿Qué andén para el tren a...?
+- "Does this bus go to...?" - ¿Este autobús va a...?
+- "Can you take me to this address?" - ¿Puede llevarme a esta dirección?
+
+## Emergencias
+
+### Vocabulario de Emergencia
+| Inglés | Español |
+|--------|---------|
+| Help! | ¡Ayuda! |
+| Emergency | Emergencia |
+| Police | Policía |
+| Ambulance | Ambulancia |
+| Hospital | Hospital |
+| Pharmacy | Farmacia |
+| Doctor | Doctor |
+| Accident | Accidente |
+
+### Frases de Emergencia
+- "I need help!" - ¡Necesito ayuda!
+- "Call an ambulance!" - ¡Llamen una ambulancia!
+- "Where is the nearest hospital?" - ¿Dónde está el hospital más cercano?
+- "I lost my passport" - Perdí mi pasaporte
+- "I've been robbed" - Me han robado
+
+## Direcciones y Orientación
+
+### Vocabulario de Direcciones
+| Inglés | Español |
+|--------|---------|
+| Left | Izquierda |
+| Right | Derecha |
+| Straight ahead | Todo recto |
+| Corner | Esquina |
+| Block | Cuadra |
+| Across from | Enfrente de |
+| Next to | Al lado de |
+| Behind | Detrás |
+
+### Frases para Pedir Direcciones
+- "Excuse me, where is...?" - Disculpe, ¿dónde está...?
+- "How do I get to...?" - ¿Cómo llego a...?
+- "Is it far from here?" - ¿Está lejos de aquí?
+- "Can you show me on the map?" - ¿Puede mostrarme en el mapa?
+
+## Conclusión
+
+Con este vocabulario básico, podrás manejar las situaciones más comunes durante tu viaje. Para una preparación completa, un diccionario con **5,000-8,000 palabras** y pronunciación te dará la confianza que necesitas.
+    `,
+    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop",
+    author: "iLingue Relax",
+    date: "2025-01-25",
+    readTime: "11 min",
+    category: "Vocabulario",
+    tags: ["viajes", "turismo", "vocabulario práctico", "frases útiles", "aeropuerto", "hotel"],
+    relatedProducts: ["5000", "8000"],
+  },
+  {
+    id: "10",
+    slug: "diferencia-make-do-ingles",
+    title: "Diferencia entre Make y Do en Inglés: Guía Completa con Ejemplos",
+    excerpt: "Aprende cuándo usar MAKE y cuándo usar DO en inglés. Reglas claras, excepciones y listas de expresiones comunes.",
+    content: `
+# Diferencia entre Make y Do en Inglés
+
+MAKE y DO son dos de los verbos más confusos para hispanohablantes porque ambos pueden traducirse como "hacer". En esta guía aprenderás exactamente cuándo usar cada uno.
+
+## La Regla General
+
+### DO = Acciones y Tareas
+Usamos DO para:
+- Trabajos y tareas
+- Actividades generales
+- Acciones sin resultado físico
+
+### MAKE = Crear y Producir
+Usamos MAKE para:
+- Crear algo nuevo
+- Producir un resultado
+- Causar una reacción
+
+## Expresiones con DO
+
+### Tareas Domésticas
+| Inglés | Español |
+|--------|---------|
+| Do the dishes | Lavar los platos |
+| Do the laundry | Hacer la colada |
+| Do the cleaning | Hacer la limpieza |
+| Do the ironing | Planchar |
+| Do the shopping | Hacer las compras |
+| Do the housework | Hacer las tareas del hogar |
+
+### Trabajo y Estudio
+| Inglés | Español |
+|--------|---------|
+| Do homework | Hacer tarea |
+| Do a job | Hacer un trabajo |
+| Do business | Hacer negocios |
+| Do research | Investigar |
+| Do an exercise | Hacer un ejercicio |
+| Do a course | Hacer un curso |
+
+### Cuidado Personal
+| Inglés | Español |
+|--------|---------|
+| Do your hair | Arreglarse el pelo |
+| Do your nails | Hacerse las uñas |
+| Do your makeup | Maquillarse |
+
+### Expresiones Generales
+| Inglés | Español |
+|--------|---------|
+| Do your best | Hacer lo mejor posible |
+| Do a favor | Hacer un favor |
+| Do well | Hacerlo bien |
+| Do badly | Hacerlo mal |
+| Do nothing | No hacer nada |
+| Do something | Hacer algo |
+
+## Expresiones con MAKE
+
+### Comida y Bebidas
+| Inglés | Español |
+|--------|---------|
+| Make breakfast | Hacer el desayuno |
+| Make lunch | Hacer el almuerzo |
+| Make dinner | Hacer la cena |
+| Make coffee | Hacer café |
+| Make a cake | Hacer un pastel |
+
+### Comunicación
+| Inglés | Español |
+|--------|---------|
+| Make a phone call | Hacer una llamada |
+| Make a comment | Hacer un comentario |
+| Make a suggestion | Hacer una sugerencia |
+| Make a complaint | Hacer una queja |
+| Make a promise | Hacer una promesa |
+| Make an announcement | Hacer un anuncio |
+
+### Dinero y Planes
+| Inglés | Español |
+|--------|---------|
+| Make money | Ganar dinero |
+| Make a decision | Tomar una decisión |
+| Make a plan | Hacer un plan |
+| Make a choice | Hacer una elección |
+| Make an appointment | Hacer una cita |
+| Make a reservation | Hacer una reservación |
+
+### Reacciones y Emociones
+| Inglés | Español |
+|--------|---------|
+| Make someone happy | Hacer feliz a alguien |
+| Make someone angry | Enojar a alguien |
+| Make someone laugh | Hacer reír a alguien |
+| Make someone cry | Hacer llorar a alguien |
+| Make a difference | Hacer una diferencia |
+
+### Errores y Progresos
+| Inglés | Español |
+|--------|---------|
+| Make a mistake | Cometer un error |
+| Make progress | Progresar |
+| Make an effort | Hacer un esfuerzo |
+| Make an exception | Hacer una excepción |
+
+## Excepciones Importantes
+
+### "Make the bed" vs "Do the bed"
+- ✅ **Make the bed** = Tender la cama
+- ❌ "Do the bed" NO existe
+
+### "Do exercise" vs "Make exercise"
+- ✅ **Do exercise** = Hacer ejercicio
+- ❌ "Make exercise" NO existe
+
+### "Make friends" vs "Do friends"
+- ✅ **Make friends** = Hacer amigos
+- ❌ "Do friends" NO existe
+
+## Trucos para Recordar
+
+### Truco 1: ¿Creas algo físico?
+Si el resultado es algo que puedes tocar o ver, probablemente es MAKE:
+- Make a cake ✅ (puedes ver el pastel)
+- Make a dress ✅ (puedes tocar el vestido)
+
+### Truco 2: ¿Es una tarea rutinaria?
+Si es algo que haces regularmente como obligación, probablemente es DO:
+- Do homework ✅
+- Do the dishes ✅
+
+### Truco 3: Memoriza las Excepciones
+Algunas expresiones simplemente hay que memorizarlas:
+- Make the bed (no "do the bed")
+- Do your best (no "make your best")
+
+## Ejercicios Prácticos
+
+Completa con MAKE o DO:
+
+1. I need to ___ the laundry. (DO)
+2. Can you ___ me a favor? (DO)
+3. She wants to ___ a cake. (MAKE)
+4. We should ___ a decision. (MAKE)
+5. He always ___ his best. (DOES)
+6. Don't ___ that mistake again. (MAKE)
+
+## Conclusión
+
+La diferencia entre MAKE y DO se aprende mejor con práctica y exposición. Un diccionario completo con **5,000-8,000 palabras** incluye estas expresiones con ejemplos que te ayudarán a usarlas correctamente.
+    `,
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop",
+    author: "iLingue Relax",
+    date: "2025-01-28",
+    readTime: "9 min",
+    category: "Gramática",
+    tags: ["make vs do", "gramática", "verbos", "errores comunes", "expresiones"],
+    relatedProducts: ["5000", "8000"],
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) => blogPosts.find(p => p.slug === slug);

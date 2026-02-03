@@ -15,7 +15,7 @@ export const translations = {
 
 export type Translations = typeof es;
 
-// Language detection from browser
+// Language detection from browser (fallback)
 export const detectLanguage = (): Language => {
   if (typeof navigator === "undefined") return "es";
   
@@ -26,6 +26,78 @@ export const detectLanguage = (): Language => {
   if (browserLang === "pt") return "pt";
   
   return "es"; // Default to Spanish
+};
+
+// Country to language mapping based on geographic location
+const countryToLanguage: Record<string, Language> = {
+  // Spanish-speaking countries (Latin America + Spain)
+  ES: "es", // Spain
+  MX: "es", // Mexico
+  AR: "es", // Argentina
+  CO: "es", // Colombia
+  PE: "es", // Peru
+  VE: "es", // Venezuela
+  CL: "es", // Chile
+  EC: "es", // Ecuador
+  GT: "es", // Guatemala
+  CU: "es", // Cuba
+  BO: "es", // Bolivia
+  DO: "es", // Dominican Republic
+  HN: "es", // Honduras
+  PY: "es", // Paraguay
+  SV: "es", // El Salvador
+  NI: "es", // Nicaragua
+  CR: "es", // Costa Rica
+  PA: "es", // Panama
+  UY: "es", // Uruguay
+  PR: "es", // Puerto Rico
+  
+  // English-speaking countries
+  US: "en", // United States
+  GB: "en", // United Kingdom
+  UK: "en", // United Kingdom (alt)
+  AU: "en", // Australia
+  CA: "en", // Canada
+  NZ: "en", // New Zealand
+  IE: "en", // Ireland
+  ZA: "en", // South Africa
+  
+  // French-speaking countries
+  FR: "fr", // France
+  BE: "fr", // Belgium (French)
+  CH: "fr", // Switzerland (could be French)
+  LU: "fr", // Luxembourg
+  MC: "fr", // Monaco
+  
+  // Portuguese-speaking countries
+  BR: "pt", // Brazil
+  PT: "pt", // Portugal
+  AO: "pt", // Angola
+  MZ: "pt", // Mozambique
+  
+  // European countries - default to English
+  DE: "en", // Germany
+  IT: "en", // Italy
+  NL: "en", // Netherlands
+  AT: "en", // Austria
+  PL: "en", // Poland
+  SE: "en", // Sweden
+  NO: "en", // Norway
+  DK: "en", // Denmark
+  FI: "en", // Finland
+  GR: "en", // Greece
+  CZ: "en", // Czech Republic
+  RO: "en", // Romania
+  HU: "en", // Hungary
+  SK: "en", // Slovakia
+  BG: "en", // Bulgaria
+  HR: "en", // Croatia
+};
+
+// Detect language from country code
+export const detectLanguageFromCountry = (countryCode: string): Language => {
+  const upperCountry = countryCode.toUpperCase();
+  return countryToLanguage[upperCountry] || "en"; // Default to English for unknown countries
 };
 
 // Country to currency mapping

@@ -35,6 +35,12 @@ import {
 // Product image
 import productSpanish5000Image from "@/assets/product-spanish-5000.png";
 
+// Preview images
+import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
+import previewSpanishPhrases from "@/assets/preview-spanish-phrases.png";
+import previewSpanishIndex from "@/assets/preview-spanish-index.png";
+import previewSpanishUpdates from "@/assets/preview-spanish-updates.jpg";
+
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
@@ -332,11 +338,134 @@ const ProductSpanish5000 = () => {
       {/* What's Included */}
       <section className="py-20 md:py-28">
         <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
               Everything Included
             </h2>
+            <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
+              A complete system to learn Spanish vocabulary with pronunciation adapted for English speakers
+            </p>
 
+            {/* Preview Badge */}
+            <div className="flex justify-center mb-8">
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 text-purple-600 text-sm font-bold border border-purple-500/20"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>📖 PREVIEW OR DEMO</span>
+              </motion.div>
+            </div>
+
+            {/* Preview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              {/* Card 1: Complete Index */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  <img 
+                    src={previewSpanishIndex} 
+                    alt="Complete Index - Chapters 1 to 50"
+                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-purple-500" />
+                    Complete Index
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    50 chapters organized from beginner to advanced level. Includes Home, Shopping, Food, Transportation, and more.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Card 2: Grammar Structure */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  <img 
+                    src={previewSpanishPhrases} 
+                    alt="Grammar Structure with Phrases"
+                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-purple-500" />
+                    Grammar Structure
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Practical phrases with Spanish-English translation and phonetic pronunciation for English speakers.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Card 3: Vocabulary Tables */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  <img 
+                    src={previewSpanishVocab} 
+                    alt="Vocabulary Tables with Pronunciation"
+                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-purple-500" />
+                    Vocabulary Tables
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Complete vocabulary organized by categories with English pronunciation. Common phrases and expressions included.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Card 4: Free Updates */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center">
+                  <img 
+                    src={previewSpanishUpdates} 
+                    alt="Free Lifetime Updates"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-500" />
+                    Free Lifetime Updates
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get all future updates and new versions completely free. Your eBook is always up to date!
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Features List */}
             <div className="bg-card rounded-3xl border border-border shadow-card p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (

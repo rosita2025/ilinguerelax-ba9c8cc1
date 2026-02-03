@@ -5,6 +5,7 @@ import {
   Translations,
   translations,
   detectLanguage,
+  detectLanguageFromCountry,
   detectCurrency,
   formatPrice,
   languageNames,
@@ -45,16 +46,13 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       const savedLang = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
       const savedCurrency = localStorage.getItem(CURRENCY_STORAGE_KEY) as Currency | null;
       
+      // If user has manually saved both preferences, use them
       if (savedLang && savedCurrency) {
         setLanguageState(savedLang);
         setCurrencyState(savedCurrency);
         setIsInitialized(true);
         return;
       }
-
-      // Detect language from browser
-      const detectedLang = detectLanguage();
-      setLanguageState(savedLang || detectedLang);
 
       // Try to detect country from IP using a free geolocation API
       try {
@@ -66,19 +64,39 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
           const country = data.country_code || "US";
           setCountryCode(country);
           
+          // Detect language based on country (not browser)
+          if (!savedLang) {
+            const detectedLang = detectLanguageFromCountry(country);
+            setLanguageState(detectedLang);
+            console.log(`Country detected: ${country} → Language: ${detectedLang}`);
+          } else {
+            setLanguageState(savedLang);
+          }
+          
+          // Detect currency based on country
           if (!savedCurrency) {
             const detectedCurrency = detectCurrency(country);
             setCurrencyState(detectedCurrency);
+          } else {
+            setCurrencyState(savedCurrency);
           }
+        } else {
+          // Fallback to browser language if IP detection fails
+          const detectedLang = savedLang || detectLanguage();
+          setLanguageState(detectedLang);
         }
       } catch (error) {
-        console.log("Could not detect country, using defaults");
-        // Try timezone-based detection as fallback
+        console.log("Could not detect country, using browser language as fallback");
+        // Fallback to browser language detection
+        const detectedLang = savedLang || detectLanguage();
+        setLanguageState(detectedLang);
+        
+        // Try timezone-based detection for currency
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (timezone.startsWith("Europe/")) {
-          setCurrencyState("EUR");
+          setCurrencyState(savedCurrency || "EUR");
         } else if (timezone.startsWith("America/Sao_Paulo") || timezone.includes("Brazil")) {
-          setCurrencyState("BRL");
+          setCurrencyState(savedCurrency || "BRL");
         }
       }
 

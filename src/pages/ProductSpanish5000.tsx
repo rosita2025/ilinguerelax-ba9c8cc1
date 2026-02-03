@@ -336,18 +336,18 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* What's Included */}
-      <section className="py-20 md:py-28">
+      <section className="py-12 md:py-16">
         <div className="container px-4 md:px-6">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
               Everything Included
             </h2>
-            <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-center text-muted-foreground mb-5 max-w-2xl mx-auto text-sm">
               A complete system to learn Spanish vocabulary with pronunciation adapted for English speakers
             </p>
 
             {/* Preview Badge */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-5">
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -360,106 +360,106 @@ const ProductSpanish5000 = () => {
             </div>
 
             {/* Preview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
               {/* Card 1: Complete Index */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+                className="bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-all duration-300"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                <div className="aspect-[3/4] overflow-hidden bg-muted">
                   <img 
                     src={previewSpanishIndex} 
                     alt="Complete Index - Chapters 1 to 50"
                     className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-purple-500" />
+                <div className="p-3">
+                  <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-purple-500" />
                     Complete Index
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    50 chapters organized from beginner to advanced level. Includes Home, Shopping, Food, Transportation, and more.
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    50 chapters from beginner to advanced
                   </p>
                 </div>
               </motion.div>
 
               {/* Card 2: Grammar Structure */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+                transition={{ delay: 0.05 }}
+                className="bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-all duration-300"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                <div className="aspect-[3/4] overflow-hidden bg-muted">
                   <img 
                     src={previewSpanishPhrases} 
                     alt="Grammar Structure with Phrases"
                     className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-purple-500" />
+                <div className="p-3">
+                  <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-1.5">
+                    <GraduationCap className="w-4 h-4 text-purple-500" />
                     Grammar Structure
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Practical phrases with Spanish-English translation and phonetic pronunciation for English speakers.
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    Phrases with phonetic pronunciation
                   </p>
                 </div>
               </motion.div>
 
               {/* Card 3: Vocabulary Tables */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+                transition={{ delay: 0.1 }}
+                className="bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-all duration-300"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                <div className="aspect-[3/4] overflow-hidden bg-muted">
                   <img 
                     src={previewSpanishVocab} 
                     alt="Vocabulary Tables with Pronunciation"
                     className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-purple-500" />
+                <div className="p-3">
+                  <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-1.5">
+                    <Brain className="w-4 h-4 text-purple-500" />
                     Vocabulary Tables
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Complete vocabulary organized by categories with English pronunciation. Common phrases and expressions included.
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    Complete vocabulary by categories
                   </p>
                 </div>
               </motion.div>
 
               {/* Card 4: Free Updates */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
+                transition={{ delay: 0.15 }}
+                className="bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-all duration-300"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center">
+                <div className="aspect-[3/4] overflow-hidden bg-muted flex items-center justify-center">
                   <img 
                     src={previewSpanishUpdates} 
                     alt="Free Lifetime Updates"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-500" />
-                    Free Lifetime Updates
+                <div className="p-3">
+                  <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-purple-500" />
+                    Free Updates
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Get all future updates and new versions completely free. Your eBook is always up to date!
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    Lifetime updates included free
                   </p>
                 </div>
               </motion.div>

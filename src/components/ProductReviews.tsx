@@ -1,14 +1,22 @@
-import { useRef } from "react";
-import { Star, Quote, CheckCircle } from "lucide-react";
+import { useRef, useState } from "react";
+import { Star, Quote, CheckCircle, Eye } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
+import { Button } from "@/components/ui/button";
 
 // Import Spanish testimonial images
 import reviewSpanish1 from "@/assets/review-spanish-1.png";
 import reviewSpanish2 from "@/assets/review-spanish-2.jpg";
 import reviewSpanish3 from "@/assets/review-spanish-3.jpg";
 import reviewSpanish4 from "@/assets/review-spanish-4.jpg";
+
+// Import English 8000 testimonial images
+import reviewEnglishIpad from "@/assets/review-english-ipad.png";
+import reviewEnglishFrases from "@/assets/review-english-frases.jpg";
+import reviewBookCover from "@/assets/review-book-cover.jpg";
+import reviewPersonHolding from "@/assets/review-person-holding.jpg";
+import reviewSymptoms from "@/assets/review-symptoms.jpg";
 
 // Testimonial screenshot images - English product
 const englishTestimonials = [
@@ -22,6 +30,15 @@ const englishTestimonials = [
   "https://images.loox.io/uploads/2025/11/23/-dLV0FCgkX.jpg",
   "https://images.loox.io/uploads/2025/11/23/O3AgBj_If.jpg",
   "https://images.loox.io/uploads/2025/11/23/smyzA3a5t.jpg",
+];
+
+// Testimonial images - English 8000 product (for Spanish speakers)
+const english8000Testimonials = [
+  reviewEnglishIpad,
+  reviewEnglishFrases,
+  reviewBookCover,
+  reviewPersonHolding,
+  reviewSymptoms,
 ];
 
 // Testimonial images - Spanish product (book photos)
@@ -59,20 +76,59 @@ const textReviewsSpanish = [
   { text: "Never thought learning vocabulary could be this easy. The 5,000 words are well selected.", verified: true, date: "2025-07-12" },
 ];
 
+// Text reviews for English 8000 product
+const textReviewsEnglish8000 = [
+  { text: "El libro de 8,000 palabras es increíble. La pronunciación en español me ayudó muchísimo.", verified: true, date: "2026-01-20" },
+  { text: "Más completo que el de 5,000. Perfecto para nivel intermedio-avanzado.", verified: true, date: "2026-01-12" },
+  { text: "La calidad del contenido es excelente. Vale cada peso invertido.", verified: true, date: "2025-12-30" },
+  { text: "Lo uso todos los días en mi trabajo. Las frases de negocios son muy útiles.", verified: true, date: "2025-12-15" },
+  { text: "Me encanta que incluye vocabulario técnico y profesional.", verified: true, date: "2025-11-28" },
+  { text: "Descarga instantánea y PDF de alta calidad. Muy satisfecho.", verified: true, date: "2025-10-20" },
+];
+
 interface ProductReviewsProps {
-  productType?: "english" | "spanish";
+  productType?: "english" | "spanish" | "english8000";
+  showProductSelector?: boolean;
 }
 
-export const ProductReviews = ({ productType = "english" }: ProductReviewsProps) => {
+export const ProductReviews = ({ productType = "english", showProductSelector = false }: ProductReviewsProps) => {
   const swiperRef = useRef<any>(null);
-  const testimonials = productType === "english" ? englishTestimonials : spanishTestimonials;
-  const textReviews = productType === "english" ? textReviewsEnglish : textReviewsSpanish;
+  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000">(productType);
+  
+  const getTestimonials = () => {
+    switch (activeProduct) {
+      case "english8000":
+        return english8000Testimonials;
+      case "spanish":
+        return spanishTestimonials;
+      default:
+        return englishTestimonials;
+    }
+  };
+  
+  const getTextReviews = () => {
+    switch (activeProduct) {
+      case "english8000":
+        return textReviewsEnglish8000;
+      case "spanish":
+        return textReviewsSpanish;
+      default:
+        return textReviewsEnglish;
+    }
+  };
+  
+  const testimonials = getTestimonials();
+  const textReviews = getTextReviews();
 
   // Schema.org structured data for reviews
   const reviewSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": productType === "english" ? "Inglés Relax - 5,000 Palabras" : "Spanish Relax - 5,000 Words",
+    "name": activeProduct === "english8000" 
+      ? "Inglés Relax - 8,000 Palabras" 
+      : activeProduct === "english" 
+        ? "Inglés Relax - 5,000 Palabras" 
+        : "Spanish Relax - 5,000 Words",
     "brand": {
       "@type": "Brand",
       "name": "iLingue Relax"
@@ -120,8 +176,33 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
             {productType === "spanish" ? "VERIFIED REVIEWS" : "RESEÑAS VERIFICADAS"}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {productType === "spanish" ? "What Our Customers Say" : "Lo que dicen nuestros clientes"}
+            {activeProduct === "spanish" ? "What Our Customers Say" : "Lo que dicen nuestros clientes"}
           </h2>
+          
+          {/* Product Selector Buttons */}
+          {showProductSelector && (
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-6 mb-4">
+              <Button
+                variant={activeProduct === "english" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveProduct("english")}
+                className="text-xs"
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                5,000 Palabras
+              </Button>
+              <Button
+                variant={activeProduct === "english8000" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveProduct("english8000")}
+                className="text-xs"
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                8,000 Palabras
+              </Button>
+            </div>
+          )}
+          
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
@@ -130,11 +211,11 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
             </div>
             <span className="text-lg font-semibold text-foreground">4.9</span>
             <span className="text-muted-foreground">
-              ({testimonials.length + textReviews.length}+ {productType === "spanish" ? "reviews" : "reseñas"})
+              ({testimonials.length + textReviews.length}+ {activeProduct === "spanish" ? "reviews" : "reseñas"})
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            {productType === "spanish" 
+            {activeProduct === "spanish" 
               ? "Powered by iLingue Relax" 
               : "Reseñas verificadas por iLingue Relax"
             }
@@ -143,7 +224,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
       </div>
 
       {/* Full-width Auto-scrolling Carousel - like stickers */}
-      <div className="w-full">
+      <div className="w-full" key={activeProduct}>
         <Swiper
           ref={swiperRef}
           modules={[Autoplay]}
@@ -200,7 +281,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
       <div className="container px-4 md:px-6 mt-12">
         <div className="flex items-center justify-center gap-2 mb-6">
           <span className="text-sm font-medium text-muted-foreground">
-            {productType === "spanish" ? "Reviews from" : "Reseñas de"}
+            {activeProduct === "spanish" ? "Reviews from" : "Reseñas de"}
           </span>
           <span className="text-sm font-bold text-primary">iLingue Relax</span>
           <CheckCircle className="w-4 h-4 text-green-500" />
@@ -223,7 +304,7 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                     <div className="flex items-center gap-1 text-green-600">
                       <CheckCircle className="w-3.5 h-3.5" />
                       <span className="text-xs font-medium">
-                        {productType === "spanish" ? "Verified" : "Verificado"}
+                        {activeProduct === "spanish" ? "Verified" : "Verificado"}
                       </span>
                     </div>
                   )}
@@ -233,9 +314,9 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
                 </p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>
-                    {productType === "spanish" ? "Customer via iLingue Relax" : "Cliente de iLingue Relax"}
+                    {activeProduct === "spanish" ? "Customer via iLingue Relax" : "Cliente de iLingue Relax"}
                   </span>
-                  <span>{new Date(review.date).toLocaleDateString(productType === "spanish" ? "en-US" : "es-ES", { month: "short", year: "numeric" })}</span>
+                  <span>{new Date(review.date).toLocaleDateString(activeProduct === "spanish" ? "en-US" : "es-ES", { month: "short", year: "numeric" })}</span>
                 </div>
               </div>
             </div>
@@ -247,13 +328,13 @@ export const ProductReviews = ({ productType = "english" }: ProductReviewsProps)
       <div className="container px-4 md:px-6">
         <div className="text-center mt-8 space-y-2">
           <p className="text-muted-foreground text-sm">
-            {productType === "spanish" 
+            {activeProduct === "spanish" 
               ? "✓ All reviews are from verified customers of iLingue Relax"
               : "✓ Todas las reseñas son de clientes verificados de iLingue Relax"
             }
           </p>
           <p className="text-xs text-muted-foreground/70">
-            © {new Date().getFullYear()} iLingue Relax - {productType === "spanish" ? "All rights reserved" : "Todos los derechos reservados"}
+            © {new Date().getFullYear()} iLingue Relax - {activeProduct === "spanish" ? "All rights reserved" : "Todos los derechos reservados"}
           </p>
         </div>
       </div>

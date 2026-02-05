@@ -249,7 +249,7 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* What's Included */}
-      <section className="py-20 md:py-28">
+      <section className="pt-6 pb-12 md:pt-8 md:pb-16">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">

@@ -216,7 +216,7 @@ const ProductSpanish5000 = () => {
       <CountdownTimer hoursFromNow={48} currentPrice="$17 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
 
       {/* Benefits */}
-      <section className="py-20 md:py-28 bg-secondary/30">
+      <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">

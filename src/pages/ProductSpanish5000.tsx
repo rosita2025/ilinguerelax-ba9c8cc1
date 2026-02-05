@@ -12,25 +12,7 @@ import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import {
-  Check,
-  BookOpen,
-  Sparkles,
-  ArrowRight,
-  Brain,
-  User,
-  FileText,
-  GraduationCap,
-  Lightbulb,
-  CreditCard,
-  Globe,
-  Download,
-  Zap,
-  Shield,
-  ShoppingCart,
-  Star,
-} from "lucide-react";
-
+import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star } from "lucide-react";
 
 // Product image
 import productSpanish5000Image from "@/assets/product-spanish-5000.png";
@@ -56,45 +38,24 @@ import logoShopify from "@/assets/logo-shopify.png";
 
 // Stripe checkout URL
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/cNi00iexqdlz2mA1XL8IU07";
-
-const features = [
-  "5,000+ essential Spanish words",
-  "English pronunciation included",
-  "Designed for English speakers",
-  "No dictionary needed",
-  "Stress-free step-by-step method",
-  "UK & USA phonetics included",
-  "Instant PDF download",
-  "Study on any device",
-];
-
-const benefits = [
-  {
-    icon: Download,
-    title: "Instant Download",
-    description:
-      "Get immediate access to your PDF right after purchase. Start learning Spanish in minutes!",
-  },
-  {
-    icon: Zap,
-    title: "Learn Anywhere",
-    description:
-      "Study on your phone, tablet, or computer. Your Spanish vocabulary is always with you.",
-  },
-  {
-    icon: Sparkles,
-    title: "Stress-Free Method",
-    description:
-      "Learn at your own pace with our relaxed methodology that respects your learning process.",
-  },
-  {
-    icon: Brain,
-    title: "No Dictionaries Needed",
-    description:
-      "Everything you need is included. Meanings, pronunciation, and examples all in one place.",
-  },
-];
-
+const features = ["5,000+ essential Spanish words", "English pronunciation included", "Designed for English speakers", "No dictionary needed", "Stress-free step-by-step method", "UK & USA phonetics included", "Instant PDF download", "Study on any device"];
+const benefits = [{
+  icon: Download,
+  title: "Instant Download",
+  description: "Get immediate access to your PDF right after purchase. Start learning Spanish in minutes!"
+}, {
+  icon: Zap,
+  title: "Learn Anywhere",
+  description: "Study on your phone, tablet, or computer. Your Spanish vocabulary is always with you."
+}, {
+  icon: Sparkles,
+  title: "Stress-Free Method",
+  description: "Learn at your own pace with our relaxed methodology that respects your learning process."
+}, {
+  icon: Brain,
+  title: "No Dictionaries Needed",
+  description: "Everything you need is included. Meanings, pronunciation, and examples all in one place."
+}];
 const ProductSpanish5000 = () => {
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -103,10 +64,9 @@ const ProductSpanish5000 = () => {
     content_ids: ["product-spanish-5000"],
     content_type: "product",
     value: 17,
-    currency: "USD",
+    currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
-
   const handleBuyNow = () => {
     // Track InitiateCheckout event with Hotmart Pixel
     trackHotmartEvent("InitiateCheckout", {
@@ -116,28 +76,14 @@ const ProductSpanish5000 = () => {
       content_type: "product",
       value: 17,
       currency: "USD",
-      num_items: 1,
+      num_items: 1
     });
 
     // Redirect to Stripe checkout
     window.open(STRIPE_CHECKOUT_URL, '_blank');
   };
-
-  return (
-    <main className="min-h-screen bg-background">
-      <SEO
-        title="Digital eBook: 5,000 Spanish Words with English Pronunciation"
-        description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price."
-        canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"
-        image="https://ilinguerelax.com/product-spanish-5000.png"
-        type="product"
-        price="17"
-        originalPrice="54"
-        rating="4.8"
-        reviewCount="500"
-        sku="SPANISH-5000"
-        keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book"
-      />
+  return <main className="min-h-screen bg-background">
+      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="17" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
       <Navbar />
 
       {/* Hero Section */}
@@ -148,37 +94,14 @@ const ProductSpanish5000 = () => {
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-60 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img
-                  src={productSpanish5000Image}
-                  alt="Spanish Relax - 5,000 Words Digital eBook"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                />
+                <img src={productSpanish5000Image} alt="Spanish Relax - 5,000 Words Digital eBook" className="w-full h-auto rounded-2xl shadow-hero" />
               </div>
             </div>
 
             {/* Product Info */}
             <div>
               {/* Trending & Bonus Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-bold border border-purple-500/20"
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>🆕 NEW RELEASE</span>
-                </motion.div>
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span>For English Speakers</span>
-                </motion.div>
-              </div>
+              
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Spanish Relax - 5,000 Words
@@ -211,12 +134,15 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* Price Section - More Impactful */}
-              <motion.div 
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-6 border border-purple-500/20 mb-6"
-              >
+              <motion.div initial={{
+              y: 20,
+              opacity: 0
+            }} animate={{
+              y: 0,
+              opacity: 1
+            }} transition={{
+              delay: 0.4
+            }} className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-6 border border-purple-500/20 mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-purple-600" />
                   <span className="text-purple-600 font-semibold text-sm uppercase">Special Launch Price</span>
@@ -224,11 +150,12 @@ const ProductSpanish5000 = () => {
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$17</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <motion.span 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-bold shadow-lg"
-                  >
+                  <motion.span animate={{
+                  scale: [1, 1.05, 1]
+                }} transition={{
+                  repeat: Infinity,
+                  duration: 2
+                }} className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-bold shadow-lg">
                     SAVE 69%
                   </motion.span>
                 </div>
@@ -244,16 +171,12 @@ const ProductSpanish5000 = () => {
 
               {/* CTA Button - Single Buy Now */}
               <div className="space-y-3 mb-6">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button 
-                    variant="hero" 
-                    size="xl" 
-                    className="w-full text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700"
-                    onClick={handleBuyNow}
-                  >
+                <motion.div whileHover={{
+                scale: 1.02
+              }} whileTap={{
+                scale: 0.98
+              }}>
+                  <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700" onClick={handleBuyNow}>
                     <ShoppingCart className="w-6 h-6 mr-2" />
                     BUY NOW!
                     <ArrowRight className="w-6 h-6 ml-2" />
@@ -269,12 +192,13 @@ const ProductSpanish5000 = () => {
               <TrustBadges lang="en" variant="grid" />
 
               {/* Money Back Guarantee - Enhanced */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
-              >
+              <motion.div initial={{
+              opacity: 0
+            }} animate={{
+              opacity: 1
+            }} transition={{
+              delay: 0.6
+            }} className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
                 <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                   <Shield className="w-7 h-7 text-white" />
                 </div>
@@ -289,16 +213,10 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Countdown Timer */}
-      <CountdownTimer 
-        hoursFromNow={48} 
-        currentPrice="$17 USD"
-        originalPrice="$54 USD"
-        storageKey="countdown_spanish_book"
-        lang="en"
-      />
+      <CountdownTimer hoursFromNow={48} currentPrice="$17 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
 
       {/* Benefits */}
-      <section className="py-12 md:py-16 bg-secondary/30">
+      <section className="py-20 md:py-28 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -311,11 +229,7 @@ const ProductSpanish5000 = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit.title}
-                className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500"
-              >
+            {benefits.map(benefit => <div key={benefit.title} className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center flex-shrink-0">
                     <benefit.icon className="w-6 h-6 text-white" />
@@ -329,8 +243,7 @@ const ProductSpanish5000 = () => {
                     </p>
                   </div>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -348,12 +261,15 @@ const ProductSpanish5000 = () => {
 
             {/* Preview Badge */}
             <div className="flex justify-center mb-8">
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 text-purple-600 text-sm font-bold border border-purple-500/20"
-              >
+              <motion.div initial={{
+              scale: 0.9,
+              opacity: 0
+            }} animate={{
+              scale: 1,
+              opacity: 1
+            }} transition={{
+              delay: 0.2
+            }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 text-purple-600 text-sm font-bold border border-purple-500/20">
                 <BookOpen className="w-4 h-4" />
                 <span>📖 PREVIEW OR DEMO</span>
               </motion.div>
@@ -362,18 +278,17 @@ const ProductSpanish5000 = () => {
             {/* Preview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
               {/* Card 1: Complete Index */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} whileInView={{
+              opacity: 1,
+              y: 0
+            }} viewport={{
+              once: true
+            }} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300">
                 <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  <img 
-                    src={previewSpanishIndex} 
-                    alt="Complete Index - Chapters 1 to 50"
-                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
-                  />
+                  <img src={previewSpanishIndex} alt="Complete Index - Chapters 1 to 50" className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
@@ -387,19 +302,19 @@ const ProductSpanish5000 = () => {
               </motion.div>
 
               {/* Card 2: Grammar Structure */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} whileInView={{
+              opacity: 1,
+              y: 0
+            }} viewport={{
+              once: true
+            }} transition={{
+              delay: 0.1
+            }} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300">
                 <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  <img 
-                    src={previewSpanishPhrases} 
-                    alt="Grammar Structure with Phrases"
-                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
-                  />
+                  <img src={previewSpanishPhrases} alt="Grammar Structure with Phrases" className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
@@ -413,19 +328,19 @@ const ProductSpanish5000 = () => {
               </motion.div>
 
               {/* Card 3: Vocabulary Tables */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} whileInView={{
+              opacity: 1,
+              y: 0
+            }} viewport={{
+              once: true
+            }} transition={{
+              delay: 0.2
+            }} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300">
                 <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  <img 
-                    src={previewSpanishVocab} 
-                    alt="Vocabulary Tables with Pronunciation"
-                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
-                  />
+                  <img src={previewSpanishVocab} alt="Vocabulary Tables with Pronunciation" className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
@@ -439,19 +354,19 @@ const ProductSpanish5000 = () => {
               </motion.div>
 
               {/* Card 4: Free Updates */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300"
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} whileInView={{
+              opacity: 1,
+              y: 0
+            }} viewport={{
+              once: true
+            }} transition={{
+              delay: 0.3
+            }} className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-300">
                 <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center">
-                  <img 
-                    src={previewSpanishUpdates} 
-                    alt="Free Lifetime Updates"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
+                  <img src={previewSpanishUpdates} alt="Free Lifetime Updates" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
@@ -468,14 +383,12 @@ const ProductSpanish5000 = () => {
             {/* Features List */}
             <div className="bg-card rounded-3xl border border-border shadow-card p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
+                {features.map(feature => <div key={feature} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
           </div>
@@ -505,12 +418,7 @@ const ProductSpanish5000 = () => {
               <p className="text-muted-foreground mb-6">
                 One-time payment • Instant PDF download • Lifetime access
               </p>
-              <Button 
-                variant="hero" 
-                size="xl" 
-                className="w-full"
-                onClick={handleBuyNow}
-              >
+              <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
                 BUY NOW
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -545,88 +453,55 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* FAQ Section */}
-      <FAQ
-        items={[
-          {
-            question: "Who is the author of this eBook?",
-            answer: "SPANISH RELAX is a work by iLingue Relax, an educational brand focused on learning Spanish in a simple, practical, and stress-free way.",
-            icon: User,
-          },
-          {
-            question: "How do I receive the eBook?",
-            answer: "Immediately after your purchase, you'll receive an email with a download link to your PDF. You can start studying right away!",
-            icon: Download,
-          },
-          {
-            question: "What format is the eBook?",
-            answer: "The eBook is in PDF format, which works on any device - phone, tablet, computer, or e-reader.",
-            icon: FileText,
-          },
-          {
-            question: "Is it suitable for self-study?",
-            answer: "Yes. SPANISH RELAX is designed for self-study, to learn at your own pace without pressure.",
-            icon: GraduationCap,
-          },
-          {
-            question: "Do I need to know Spanish before using this?",
-            answer: "No. You can start from scratch, with no prior knowledge of Spanish.",
-            icon: Lightbulb,
-          },
-          {
-            question: "Does the eBook include pronunciation?",
-            answer: "Yes. All 5,000 words include pronunciation adapted for English speakers with UK and USA phonetics.",
-            icon: BookOpen,
-          },
-          {
-            question: "How do I make the payment?",
-            answer: "You can pay securely using an international credit or debit card. We accept Visa, Mastercard, American Express, and more.",
-            icon: CreditCard,
-          },
-        ]}
-        title="Frequently Asked Questions"
-        subtitle="We answer your questions about the digital eBook"
-      />
+      <FAQ items={[{
+      question: "Who is the author of this eBook?",
+      answer: "SPANISH RELAX is a work by iLingue Relax, an educational brand focused on learning Spanish in a simple, practical, and stress-free way.",
+      icon: User
+    }, {
+      question: "How do I receive the eBook?",
+      answer: "Immediately after your purchase, you'll receive an email with a download link to your PDF. You can start studying right away!",
+      icon: Download
+    }, {
+      question: "What format is the eBook?",
+      answer: "The eBook is in PDF format, which works on any device - phone, tablet, computer, or e-reader.",
+      icon: FileText
+    }, {
+      question: "Is it suitable for self-study?",
+      answer: "Yes. SPANISH RELAX is designed for self-study, to learn at your own pace without pressure.",
+      icon: GraduationCap
+    }, {
+      question: "Do I need to know Spanish before using this?",
+      answer: "No. You can start from scratch, with no prior knowledge of Spanish.",
+      icon: Lightbulb
+    }, {
+      question: "Does the eBook include pronunciation?",
+      answer: "Yes. All 5,000 words include pronunciation adapted for English speakers with UK and USA phonetics.",
+      icon: BookOpen
+    }, {
+      question: "How do I make the payment?",
+      answer: "You can pay securely using an international credit or debit card. We accept Visa, Mastercard, American Express, and more.",
+      icon: CreditCard
+    }]} title="Frequently Asked Questions" subtitle="We answer your questions about the digital eBook" />
 
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar
-        price="$17"
-        originalPrice="$54"
-        productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)"
-        onBuyClick={handleBuyNow}
-        ctaText="BUY NOW"
-        showReviews={true}
-        rating={4.8}
-        reviewCount={30}
-        lang="en"
-      />
+      <StickyBuyBar price="$17" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="BUY NOW" showReviews={true} rating={4.8} reviewCount={30} lang="en" />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification 
-        productName="Spanish 5,000 Words" 
-        productLabel="5,000" 
-        variant="international"
-      />
+      <SalesNotification productName="Spanish 5,000 Words" productLabel="5,000" variant="international" />
 
       {/* Exit Intent Popup */}
-      <ExitIntentPopup 
-        onBuyClick={handleBuyNow}
-        discount="15%"
-        lang="en"
-        storageKey="exit_intent_spanish"
-      />
+      <ExitIntentPopup onBuyClick={handleBuyNow} discount="15%" lang="en" storageKey="exit_intent_spanish" />
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton />
-    </main>
-  );
+    </main>;
 };
-
 export default ProductSpanish5000;

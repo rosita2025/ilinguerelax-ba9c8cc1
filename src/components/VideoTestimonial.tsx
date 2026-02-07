@@ -1,6 +1,20 @@
-import { Play, Star, Quote } from "lucide-react";
+import { Play, Star, Quote, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+
+// Product images
+import product8000Image from "@/assets/product-8000.png";
+import product5000Image from "@/assets/product-5000.png";
+
+interface ProductTestimonial {
+  videoUrl: string;
+  customerName: string;
+  customerLocation: string;
+  testimonialQuote: string;
+  productName: string;
+  productImage: string;
+}
 
 interface VideoTestimonialProps {
   videoUrl: string;
@@ -8,16 +22,43 @@ interface VideoTestimonialProps {
   customerLocation?: string;
   testimonialQuote?: string;
   lang?: "es" | "en";
+  showProductSelector?: boolean;
 }
+
+const productTestimonials: Record<string, ProductTestimonial> = {
+  "5000": {
+    videoUrl: "https://youtu.be/bG35t0x3GkU",
+    customerName: "Cliente Verificado",
+    customerLocation: "Latinoamérica",
+    testimonialQuote: "Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!",
+    productName: "5,000 Palabras",
+    productImage: product5000Image,
+  },
+  "8000": {
+    videoUrl: "https://youtu.be/bG35t0x3GkU",
+    customerName: "María González",
+    customerLocation: "México",
+    testimonialQuote: "El libro de 8,000 palabras es increíble. Tiene todo el vocabulario que necesito para comunicarme con fluidez. La pronunciación en español me ayudó muchísimo.",
+    productName: "8,000 Palabras",
+    productImage: product8000Image,
+  },
+};
 
 export const VideoTestimonial = ({
   videoUrl,
   customerName = "Cliente Satisfecho",
   customerLocation = "España",
   testimonialQuote = "Este libro cambió mi forma de aprender inglés. ¡Totalmente recomendado!",
-  lang = "es"
+  lang = "es",
+  showProductSelector = false
 }: VideoTestimonialProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeProduct, setActiveProduct] = useState<"5000" | "8000">("5000");
+
+  // Get current testimonial data
+  const currentTestimonial = showProductSelector 
+    ? productTestimonials[activeProduct] 
+    : { videoUrl, customerName, customerLocation, testimonialQuote, productName: "", productImage: "" };
 
   // Extract YouTube video ID from various URL formats
   const getYouTubeId = (url: string) => {
@@ -26,7 +67,7 @@ export const VideoTestimonial = ({
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const videoId = getYouTubeId(videoUrl);
+  const videoId = getYouTubeId(currentTestimonial.videoUrl);
   const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0` : "";
   const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : "";
 
@@ -34,12 +75,19 @@ export const VideoTestimonial = ({
     title: "What Our Customers Say",
     subtitle: "Real testimonials from satisfied students",
     watch: "Watch Testimonial",
-    verified: "Verified Purchase"
+    verified: "Verified Purchase",
+    selectProduct: "Select Product"
   } : {
     title: "Lo Que Dicen Nuestros Clientes",
     subtitle: "Testimonios reales de estudiantes satisfechos",
     watch: "Ver Testimonio",
-    verified: "Compra Verificada"
+    verified: "Compra Verificada",
+    selectProduct: "Selecciona un Producto"
+  };
+
+  const handleProductChange = (product: "5000" | "8000") => {
+    setActiveProduct(product);
+    setIsPlaying(false);
   };
 
   return (
@@ -74,6 +122,56 @@ export const VideoTestimonial = ({
             {text.subtitle}
           </motion.p>
         </div>
+
+        {/* Product Selector Cards */}
+        {showProductSelector && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.25 }}
+            className="flex flex-wrap justify-center gap-4 mb-8"
+          >
+            {(["5000", "8000"] as const).map((product) => (
+              <Card
+                key={product}
+                onClick={() => handleProductChange(product)}
+                className={`cursor-pointer transition-all duration-300 hover:shadow-lg w-[160px] md:w-[200px] ${
+                  activeProduct === product
+                    ? "ring-2 ring-primary border-primary shadow-lg scale-105"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
+                <CardContent className="p-3 md:p-4 text-center">
+                  <img
+                    src={productTestimonials[product].productImage}
+                    alt={productTestimonials[product].productName}
+                    className="w-20 h-20 md:w-24 md:h-24 object-contain mx-auto mb-2"
+                  />
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <BookOpen className="w-3 h-3 text-primary" />
+                    <span className="text-xs font-semibold text-primary">
+                      {lang === "en" ? "English" : "Inglés"}
+                    </span>
+                  </div>
+                  <p className="text-sm md:text-base font-bold text-foreground">
+                    {productTestimonials[product].productName}
+                  </p>
+                  {activeProduct === product && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
+                    >
+                      <Star className="w-3 h-3 fill-primary" />
+                      {lang === "en" ? "Selected" : "Seleccionado"}
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        )}
 
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -142,7 +240,7 @@ export const VideoTestimonial = ({
             <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
             <div className="text-center">
               <p className="text-lg md:text-xl text-foreground italic mb-4 relative z-10">
-                "{testimonialQuote}"
+                "{currentTestimonial.testimonialQuote}"
               </p>
               <div className="flex items-center justify-center gap-2">
                 <div className="flex items-center gap-1">
@@ -151,8 +249,8 @@ export const VideoTestimonial = ({
                   ))}
                 </div>
               </div>
-              <p className="mt-3 font-semibold text-foreground">{customerName}</p>
-              <p className="text-sm text-muted-foreground">{customerLocation}</p>
+              <p className="mt-3 font-semibold text-foreground">{currentTestimonial.customerName}</p>
+              <p className="text-sm text-muted-foreground">{currentTestimonial.customerLocation}</p>
             </div>
           </motion.div>
         </div>

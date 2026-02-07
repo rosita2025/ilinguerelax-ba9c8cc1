@@ -554,23 +554,18 @@ const Product5000 = () => {
             {bonuses.map((bonus, index) => (
               <div 
                 key={bonus.title} 
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group cursor-pointer"
-                onClick={() => openBonusLightbox(index)}
+                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group"
               >
                 {/* Bonus Image */}
                 {bonus.image && (
-                  <div className="relative h-48 md:h-56 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
+                  <div className="relative h-64 md:h-80 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
                     <img
                       src={bonus.image}
                       alt={bonus.title}
-                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain p-6"
                     />
                     <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
                       GRATIS
-                    </div>
-                    {/* Zoom indicator */}
-                    <div className="absolute bottom-3 right-3 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <ZoomIn className="w-4 h-4" />
                     </div>
                   </div>
                 )}

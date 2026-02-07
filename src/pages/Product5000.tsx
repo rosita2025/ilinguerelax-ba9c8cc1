@@ -48,6 +48,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ProductCrossSell } from "@/components/ProductCrossSell";
 
 const partnerLogos = [{
   src: logoAmazon,
@@ -603,6 +604,9 @@ const Product5000 = () => {
         testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
         lang="es"
       />
+
+      {/* Cross-sell: Other Product Option */}
+      <ProductCrossSell currentProduct="5000" lang="es" />
 
       {/* Product Reviews Carousel */}
       <ProductReviews productType="english" />

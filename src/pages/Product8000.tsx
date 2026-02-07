@@ -478,6 +478,7 @@ const Product8000 = () => {
         customerLocation="Latinoamérica"
         testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
         lang="es"
+        showProductSelector={true}
       />
 
       {/* Scroll to Top Button */}

@@ -37,7 +37,7 @@ import logoEbay from "@/assets/logo-ebay.png";
 import logoShopify from "@/assets/logo-shopify.png";
 
 // Stripe checkout URL
-const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/cNi00iexqdlz2mA1XL8IU07";
+const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/28EbJ03SMbdr3qE8m98IU08";
 const features = ["5,000+ essential Spanish words", "English pronunciation included", "Designed for English speakers", "No dictionary needed", "Stress-free step-by-step method", "UK & USA phonetics included", "Instant PDF download", "Study on any device"];
 const benefits = [{
   icon: Download,
@@ -63,7 +63,7 @@ const ProductSpanish5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 17,
+    value: 22,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -74,7 +74,7 @@ const ProductSpanish5000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000"],
       content_type: "product",
-      value: 17,
+      value: 22,
       currency: "USD",
       num_items: 1
     });
@@ -83,7 +83,7 @@ const ProductSpanish5000 = () => {
     window.open(STRIPE_CHECKOUT_URL, '_blank');
   };
   return <main className="min-h-screen bg-background">
-      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="17" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
+      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="22" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
       <Navbar />
 
       {/* Hero Section */}
@@ -148,7 +148,7 @@ const ProductSpanish5000 = () => {
                   <span className="text-purple-600 font-semibold text-sm uppercase">Special Launch Price</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$17</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$22</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{
                   scale: [1, 1.05, 1]
@@ -156,7 +156,7 @@ const ProductSpanish5000 = () => {
                   repeat: Infinity,
                   duration: 2
                 }} className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-bold shadow-lg">
-                    SAVE 69%
+                    SAVE 59%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -213,7 +213,7 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Countdown Timer */}
-      <CountdownTimer hoursFromNow={48} currentPrice="$17 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
+      <CountdownTimer hoursFromNow={48} currentPrice="$22 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">
@@ -486,7 +486,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price="$17" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="BUY NOW" showReviews={true} rating={4.8} reviewCount={30} lang="en" />
+      <StickyBuyBar price="$22" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="BUY NOW" showReviews={true} rating={4.8} reviewCount={30} lang="en" />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

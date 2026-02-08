@@ -558,11 +558,11 @@ const Product5000 = () => {
               >
                 {/* Bonus Image */}
                 {bonus.image && (
-                  <div className="relative h-64 md:h-80 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
+                  <div className="relative h-80 md:h-96 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
                     <img
                       src={bonus.image}
                       alt={bonus.title}
-                      className="w-full h-full object-contain p-6"
+                      className="w-full h-full object-contain p-4"
                     />
                     <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
                       GRATIS

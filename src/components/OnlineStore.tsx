@@ -34,15 +34,6 @@ const storeLinks = [
     priceNote: "",
     type: "📖 Libro Digital",
   },
-  {
-    name: "Shopify",
-    logo: logoShopify,
-    url: "https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
-    available: true,
-    price: "$17",
-    priceNote: "+ impuestos",
-    type: "📖 Libro Digital",
-  },
   // Libro físico próximamente
   {
     name: "Amazon",

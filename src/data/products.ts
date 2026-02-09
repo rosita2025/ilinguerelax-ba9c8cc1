@@ -2,6 +2,8 @@ import product5000 from "@/assets/product-5000.png";
 import product8000 from "@/assets/product-8000.png";
 import productSpanish5000 from "@/assets/product-spanish-5000.png";
 import product8000Book from "@/assets/product-8000-book.png";
+import product1000Verbos from "@/assets/product-1000-verbos.png";
+import product500Preguntas from "@/assets/product-500-preguntas.png";
 
 export interface Product {
   id: string;
@@ -98,6 +100,44 @@ export const products: Product[] = [
     discount: 59,
     badge: "🆕 New",
     features: ["5,000 words", "English pronunciation", "For English speakers"],
+    isPhysical: false,
+  },
+  {
+    id: "1000-verbos",
+    slug: "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+    name: "1,000 Verbos",
+    flag: "🇬🇧",
+    country: "Inglés para Hispanohablantes",
+    image: product1000Verbos,
+    title: "Inglés Relax - 1,000 Verbos Esenciales",
+    subtitle: "Presente, Pasado y Futuro con Pronunciación",
+    description: "Verbos esenciales con pronunciación para hispanohablantes",
+    rating: 4.8,
+    reviews: 350,
+    price: 10.00,
+    originalPrice: 54.00,
+    discount: 81,
+    badge: "🆕 Nuevo",
+    features: ["1,000 verbos esenciales", "Presente, pasado y futuro", "Pronunciación hispanohablante"],
+    isPhysical: false,
+  },
+  {
+    id: "500-preguntas",
+    slug: "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
+    name: "500 Preguntas",
+    flag: "🇬🇧",
+    country: "Inglés para Hispanohablantes",
+    image: product500Preguntas,
+    title: "Inglés Relax - 500 Preguntas en Inglés",
+    subtitle: "Con Pronunciación para Hispanohablantes",
+    description: "Habla sin miedo en situaciones reales",
+    rating: 4.7,
+    reviews: 280,
+    price: 10.00,
+    originalPrice: 54.00,
+    discount: 81,
+    badge: "🆕 Nuevo",
+    features: ["500 preguntas prácticas", "Pronunciación adaptada", "Situaciones reales"],
     isPhysical: false,
   },
 ];

@@ -562,7 +562,7 @@ const Product5000 = () => {
                     <img
                       src={bonus.image}
                       alt={bonus.title}
-                      className="w-full h-full object-contain p-4"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
                       GRATIS

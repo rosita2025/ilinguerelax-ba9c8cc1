@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, Shield, Star, ArrowRight, Clock, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;
@@ -14,6 +16,9 @@ interface StickyBuyBarProps {
   showReviews?: boolean;
   isLoading?: boolean;
   lang?: "es" | "en";
+  showEmailSubscription?: boolean;
+  onSubscribe?: (email: string) => Promise<void>;
+  isSubscribed?: boolean;
 }
 
 export const StickyBuyBar = ({
@@ -29,7 +34,12 @@ export const StickyBuyBar = ({
   showReviews = true,
   isLoading = false,
   lang = "es",
+  showEmailSubscription = false,
+  onSubscribe,
+  isSubscribed = false,
 }: StickyBuyBarProps) => {
+  const [stickyEmail, setStickyEmail] = useState("");
+  const [stickySubmitting, setStickySubmitting] = useState(false);
   const handleBuy = () => {
     if (!disabled && !isLoading) {
       if (onBuyClick) {
@@ -95,26 +105,46 @@ export const StickyBuyBar = ({
             <span className="text-sm text-muted-foreground">USD</span>
           </div>
           
-          {/* Row 3: Button */}
-          <Button
-            variant="hero"
-            size="default"
-            className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
-            onClick={handleBuy}
-            disabled={disabled || isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                🛒 {ctaText}
-                {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
-              </>
-            )}
-          </Button>
+          {/* Row: Email or Button */}
+          {showEmailSubscription && !isSubscribed ? (
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (onSubscribe && stickyEmail) {
+                setStickySubmitting(true);
+                await onSubscribe(stickyEmail);
+                setStickySubmitting(false);
+              }
+            }} className="flex gap-2 w-full">
+              <Input type="email" placeholder="tu@correo.com" value={stickyEmail} onChange={(e) => setStickyEmail(e.target.value)} className="flex-1 h-12" required />
+              <Button type="submit" variant="hero" className="h-12 whitespace-nowrap" disabled={stickySubmitting}>
+                {stickySubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
+              </Button>
+            </form>
+          ) : isSubscribed ? (
+            <div className="flex items-center justify-center gap-2 py-2 text-green-600 font-semibold">
+              <Check className="w-5 h-5" /> ¡Suscrito! Te avisaremos.
+            </div>
+          ) : (
+            <Button
+              variant="hero"
+              size="default"
+              className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
+              onClick={handleBuy}
+              disabled={disabled || isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  🛒 {ctaText}
+                  {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Desktop: Horizontal Layout */}

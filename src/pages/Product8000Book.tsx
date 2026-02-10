@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -8,6 +8,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -27,8 +28,11 @@ import {
   Star,
   Shield,
   ShoppingCart,
+  Mail,
+  Loader2,
 } from "lucide-react";
-
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 // Product image
 import product8000BookImage from "@/assets/product-8000-book.png";
@@ -40,7 +44,6 @@ import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-
 const features = [
   "8,000 palabras esenciales del inglés",
   "Pronunciación en español incluida",
@@ -80,6 +83,31 @@ const benefits = [
 ];
 
 const Product8000Book = () => {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!email || !email.includes("@")) {
+      toast.error("Por favor ingresa un correo válido");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-store-notification", {
+        body: { email, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
+      });
+      if (error) throw error;
+      toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
+      setSubscribed(true);
+    } catch {
+      toast.error("Error al suscribirse. Intenta de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Meta Pixel ViewContent event
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 8,000 Palabras Libro Físico",
@@ -203,7 +231,34 @@ const Product8000Book = () => {
                 </p>
               </motion.div>
 
-              {/* CTA Button - Disabled */}
+              {/* Email Subscription Form */}
+              {subscribed ? (
+                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center mb-4">
+                  <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-green-700 font-semibold">¡Gracias por suscribirte!</p>
+                  <p className="text-sm text-muted-foreground">Te avisaremos cuando esté disponible.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="mb-4">
+                  <p className="text-center text-sm text-muted-foreground mb-3">
+                    📧 Déjanos tu correo y te avisamos cuando esté disponible
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      placeholder="tu@correo.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1"
+                      required
+                    />
+                    <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
+                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
+                    </Button>
+                  </div>
+                </form>
+              )}
+
               <Button 
                 variant="hero" 
                 size="xl" 
@@ -213,10 +268,6 @@ const Product8000Book = () => {
                 <Clock className="w-6 h-6 mr-2" />
                 PRÓXIMAMENTE - JUNIO 2026
               </Button>
-
-              <p className="text-center text-sm text-muted-foreground mb-6">
-                📧 Regístrate para recibir notificación cuando esté disponible
-              </p>
 
               {/* Trust Badges */}
               <TrustBadges lang="es" variant="grid" />
@@ -330,6 +381,26 @@ const Product8000Book = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Envío incluido* • Incluye PDF digital
               </p>
+              {subscribed ? (
+                <div className="text-center">
+                  <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-green-700 font-semibold">¡Ya estás suscrito!</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex gap-2 mb-4">
+                  <Input
+                    type="email"
+                    placeholder="tu@correo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1"
+                    required
+                  />
+                  <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
+                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
+                  </Button>
+                </form>
+              )}
               <Button variant="hero" size="xl" className="w-full bg-amber-500/50 cursor-not-allowed" disabled>
                 PRÓXIMAMENTE
                 <Clock className="w-5 h-5" />
@@ -405,11 +476,24 @@ const Product8000Book = () => {
       <StickyBuyBar
         price="$32.99"
         originalPrice="$45"
-        productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés con pronunciación en español y fonética USA/UK - Libro físico"
-        buyUrl="#"
+        productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
         ctaText="PRÓXIMAMENTE"
         disabled={true}
         showReviews={false}
+        showEmailSubscription={true}
+        isSubscribed={subscribed}
+        onSubscribe={async (subscriberEmail) => {
+          try {
+            const { error } = await supabase.functions.invoke("send-store-notification", {
+              body: { email: subscriberEmail, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
+            });
+            if (error) throw error;
+            toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
+            setSubscribed(true);
+          } catch {
+            toast.error("Error al suscribirse. Intenta de nuevo.");
+          }
+        }}
       />
 
       {/* Spacer for sticky bar */}

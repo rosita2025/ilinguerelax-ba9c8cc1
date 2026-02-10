@@ -5,6 +5,7 @@ import product8000Book from "@/assets/product-8000-book.png";
 import product1000Verbos from "@/assets/product-1000-verbos.png";
 import product500Preguntas from "@/assets/product-500-preguntas.png";
 import productGerman5000 from "@/assets/product-german-5000.png";
+import productPortuguese5000 from "@/assets/product-portuguese-5000.png";
 
 export interface Product {
   id: string;
@@ -159,6 +160,26 @@ export const products: Product[] = [
     discount: 78,
     badge: "🆕 Muy Pronto",
     features: ["5,000 palabras en alemán", "Pronunciación para hispanohablantes", "Fonética alemana (IPA)"],
+    isPhysical: false,
+    comingSoon: true,
+  },
+  {
+    id: "portuguese-5000",
+    slug: "5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes",
+    name: "5,000 Palabras Portugués",
+    flag: "🇧🇷",
+    country: "Portugués para Hispanohablantes",
+    image: productPortuguese5000,
+    title: "Portugués Relax - 5,000 Palabras",
+    subtitle: "Con Pronunciación Adaptada para Hispanohablantes y Fonética en Portugués Real",
+    description: "Aprende portugués con pronunciación adaptada para hispanohablantes",
+    rating: 4.8,
+    reviews: 0,
+    price: 12.00,
+    originalPrice: 54.00,
+    discount: 78,
+    badge: "🆕 Muy Pronto",
+    features: ["5,000 palabras en portugués", "Pronunciación para hispanohablantes", "Fonética en portugués real"],
     isPhysical: false,
     comingSoon: true,
   },

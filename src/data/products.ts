@@ -4,6 +4,7 @@ import productSpanish5000 from "@/assets/product-spanish-5000.png";
 import product8000Book from "@/assets/product-8000-book.png";
 import product1000Verbos from "@/assets/product-1000-verbos.png";
 import product500Preguntas from "@/assets/product-500-preguntas.png";
+import productGerman5000 from "@/assets/product-german-5000.png";
 
 export interface Product {
   id: string;
@@ -23,6 +24,7 @@ export interface Product {
   badge: string;
   features: string[];
   isPhysical: boolean;
+  comingSoon?: boolean;
 }
 
 export const products: Product[] = [
@@ -139,6 +141,26 @@ export const products: Product[] = [
     badge: "🆕 Nuevo",
     features: ["500 preguntas prácticas", "Pronunciación adaptada", "Situaciones reales"],
     isPhysical: false,
+  },
+  {
+    id: "german-5000",
+    slug: "5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes",
+    name: "5,000 Palabras Alemán",
+    flag: "🇩🇪",
+    country: "Alemán para Hispanohablantes",
+    image: productGerman5000,
+    title: "Alemán Relax - 5,000 Palabras",
+    subtitle: "Con Pronunciación para Hispanohablantes y Fonética Alemana",
+    description: "Aprende alemán con pronunciación adaptada para hispanohablantes",
+    rating: 4.8,
+    reviews: 0,
+    price: 12.00,
+    originalPrice: 54.00,
+    discount: 78,
+    badge: "🆕 Muy Pronto",
+    features: ["5,000 palabras en alemán", "Pronunciación para hispanohablantes", "Fonética alemana (IPA)"],
+    isPhysical: false,
+    comingSoon: true,
   },
 ];
 

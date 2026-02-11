@@ -30,7 +30,6 @@ import {
   ShoppingCart,
 } from "lucide-react";
 
-
 // Product image
 import product8000Image from "@/assets/product-8000.png";
 
@@ -85,27 +84,28 @@ const benefits = [
   {
     icon: Sparkles,
     title: "Método Sin Estrés",
-    description:
-      "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
+    description: "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
   },
   {
     icon: Brain,
     title: "Sin Diccionarios",
-    description:
-      "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
+    description: "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
   },
 ];
 
 const Product8000 = () => {
   // Meta Pixel ViewContent event - HOTMART PIXEL
-  const pixelParams = useMemo(() => ({
-    content_name: "Inglés Relax - 8,000 Palabras Digital",
-    content_category: "Digital Book",
-    content_ids: ["product-8000"],
-    content_type: "product",
-    value: 17,
-    currency: "USD",
-  }), []);
+  const pixelParams = useMemo(
+    () => ({
+      content_name: "Inglés Relax - 8,000 Palabras Digital",
+      content_category: "Digital Book",
+      content_ids: ["product-8000"],
+      content_type: "product",
+      value: 17,
+      currency: "USD",
+    }),
+    [],
+  );
   useHotmartPixel(pixelParams);
 
   // Handle Buy Now with Hotmart pixel tracking
@@ -159,7 +159,7 @@ const Product8000 = () => {
             <div>
               {/* Trending & Bonus Badge */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2 }}
@@ -168,7 +168,7 @@ const Product8000 = () => {
                   <Zap className="w-4 h-4" />
                   <span>🔥 PREMIUM</span>
                 </motion.div>
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -184,15 +184,16 @@ const Product8000 = () => {
               </h1>
 
               <p className="text-lg text-muted-foreground mb-4">
-                El método completo para aprender inglés sin estrés, sin
-                diccionarios, paso a paso. Diseñado exclusivamente para
-                hispanohablantes.
+                El método completo para aprender inglés sin estrés, sin diccionarios, paso a paso. Diseñado
+                exclusivamente para hispanohablantes.
               </p>
 
               {/* Reviews - More Prominent */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  ))}
                 </div>
                 <span className="font-bold text-foreground">4.9/5</span>
                 <span className="text-muted-foreground">(10,000+ Estudiantes Satisfechos)</span>
@@ -209,7 +210,7 @@ const Product8000 = () => {
               </div>
 
               {/* Price Section - More Impactful */}
-              <motion.div 
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -217,12 +218,14 @@ const Product8000 = () => {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-green-600" />
-                  <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
+                  <span className="text-green-600 font-semibold text-sm uppercase">
+                    Precio Especial Por Tiempo Limitado
+                  </span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$17</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <motion.span 
+                  <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
@@ -230,9 +233,7 @@ const Product8000 = () => {
                     AHORRA 69%
                   </motion.span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  💳 Pago único • Sin suscripciones • Acceso de por vida
-                </p>
+                <p className="text-sm text-muted-foreground">💳 Pago único • Sin suscripciones • Acceso de por vida</p>
               </motion.div>
 
               {/* Stock Counter - Scarcity */}
@@ -241,16 +242,8 @@ const Product8000 = () => {
               </div>
 
               {/* CTA Button - More Impactful */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button 
-                  variant="hero" 
-                  size="xl" 
-                  className="w-full mb-4 text-lg py-6 shadow-2xl"
-                  onClick={handleBuyNow}
-                >
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button variant="hero" size="xl" className="w-full mb-4 text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
                   <ShoppingCart className="w-6 h-6 mr-2" />
                   ¡OBTENER ACCESO AHORA!
                   <ArrowRight className="w-6 h-6 ml-2" />
@@ -265,7 +258,7 @@ const Product8000 = () => {
               <TrustBadges lang="es" variant="grid" />
 
               {/* Money Back Guarantee - Enhanced */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
@@ -276,7 +269,9 @@ const Product8000 = () => {
                 </div>
                 <div>
                   <p className="text-base font-bold text-green-700">🛡️ Garantía de Devolución 100% - 7 Días</p>
-                  <p className="text-sm text-green-600">Si no estás satisfecho, te devolvemos TODO tu dinero. Sin preguntas.</p>
+                  <p className="text-sm text-green-600">
+                    Si no estás satisfecho, te devolvemos TODO tu dinero. Sin preguntas.
+                  </p>
                 </div>
               </motion.div>
             </div>
@@ -291,7 +286,7 @@ const Product8000 = () => {
       <section className="py-6">
         <div className="container px-4 md:px-6">
           <div className="overflow-hidden bg-gray-900 py-8 md:py-10 rounded-2xl">
-            <div className="flex animate-ticker" style={{ width: 'max-content' }}>
+            <div className="flex animate-ticker" style={{ width: "max-content" }}>
               {[...Array(4)].map((_, setIndex) => (
                 <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
                   {partnerLogos.map((logo, index) => (
@@ -314,8 +309,7 @@ const Product8000 = () => {
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              ¿Por qué elegir el{" "}
-              <span className="text-gradient">Libro Digital Completo</span>?
+              ¿Por qué elegir el <span className="text-gradient">Libro Digital Completo</span>?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Todo lo que necesitas para dominar el inglés en un solo paquete
@@ -333,12 +327,8 @@ const Product8000 = () => {
                     <benefit.icon className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      {benefit.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {benefit.description}
-                    </p>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{benefit.description}</p>
                   </div>
                 </div>
               </div>
@@ -351,9 +341,7 @@ const Product8000 = () => {
       <section className="py-20 md:py-28">
         <div className="container px-4 md:px-6">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-              Todo lo que incluye
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">Todo lo que incluye</h2>
 
             <div className="bg-card rounded-3xl border border-border shadow-card p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -371,7 +359,6 @@ const Product8000 = () => {
         </div>
       </section>
 
-
       {/* Final CTA */}
       <section className="py-20 md:py-28 gradient-hero">
         <div className="container px-4 md:px-6">
@@ -380,21 +367,16 @@ const Product8000 = () => {
               ¿Listo para dominar el inglés sin estrés?
             </h2>
             <p className="text-lg text-primary-foreground/90 mb-8">
-              Únete a más de 10,000 estudiantes que ya están aprendiendo con
-              iLingue Relax
+              Únete a más de 10,000 estudiantes que ya están aprendiendo con iLingue Relax
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
                 <span className="text-5xl font-bold text-foreground">$17</span>
-                <span className="text-2xl text-muted-foreground line-through">
-                  $54
-                </span>
+                <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="text-accent font-bold">USD</span>
               </div>
-              <p className="text-muted-foreground mb-6">
-                Pago único • Sin suscripciones • Acceso de por vida
-              </p>
+              <p className="text-muted-foreground mb-6">Pago único • Sin suscripciones • Acceso de por vida</p>
               <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
                 OBTENER ACCESO AHORA
                 <ArrowRight className="w-5 h-5" />
@@ -413,17 +395,20 @@ const Product8000 = () => {
         items={[
           {
             question: "¿Quién es el autor del libro?",
-            answer: "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
+            answer:
+              "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
             icon: User,
           },
           {
             question: "¿INGLÉS RELAX es un libro físico o digital?",
-            answer: "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico (tapa blanda pegada) está previsto para junio de 2026. En algunas promociones futuras, el libro físico podrá incluir la versión digital (PDF) como bono.",
+            answer:
+              "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico (tapa blanda pegada) está previsto para junio de 2026. En algunas promociones futuras, el libro físico podrá incluir la versión digital (PDF) como bono.",
             icon: Smartphone,
           },
           {
             question: "¿Cuántas páginas tiene INGLÉS RELAX?",
-            answer: "El libro digital tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
+            answer:
+              "El libro digital tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
             icon: FileText,
           },
           {
@@ -443,7 +428,8 @@ const Product8000 = () => {
           },
           {
             question: "¿Cómo realizo el pago?",
-            answer: "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
+            answer:
+              "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
             icon: CreditCard,
           },
         ]}
@@ -466,13 +452,10 @@ const Product8000 = () => {
       <div className="h-20 md:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification 
-        productName="8,000 Palabras en Inglés" 
-        productLabel="8,000" 
-      />
+      <SalesNotification productName="8,000 Palabras en Inglés" productLabel="8,000" />
 
       {/* Video Testimonial */}
-      <VideoTestimonial 
+      <VideoTestimonial
         videoUrl="https://youtu.be/bG35t0x3GkU"
         customerName="Cliente Verificado"
         customerLocation="Latinoamérica"

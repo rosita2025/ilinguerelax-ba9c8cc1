@@ -196,7 +196,7 @@ const Product8000 = () => {
                   ))}
                 </div>
                 <span className="font-bold text-foreground">4.9/5</span>
-                <span className="text-muted-foreground">(10,000+ Estudiantes Satisfechos)</span>
+                <span className="text-muted-foreground">(20+ Estudiantes Satisfechos)</span>
               </div>
 
               {/* Purchase Counter - Social Proof */}
@@ -445,7 +445,7 @@ const Product8000 = () => {
         originalPrice="$54"
         rating={4.9}
         reviewCount={10000}
-        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10&bid=1770838124816"
+        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10"
       />
 
       {/* Spacer for sticky bar */}

@@ -89,9 +89,10 @@ const textReviewsEnglish8000 = [
 interface ProductReviewsProps {
   productType?: "english" | "spanish" | "english8000";
   showProductSelector?: boolean;
+  reviews?: Array<{ text: string; verified: boolean; date: string }>;
 }
 
-export const ProductReviews = ({ productType = "english", showProductSelector = false }: ProductReviewsProps) => {
+export const ProductReviews = ({ productType = "english", showProductSelector = false, reviews }: ProductReviewsProps) => {
   const swiperRef = useRef<any>(null);
   const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000">(productType);
   
@@ -107,15 +108,18 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
   };
   
   const getTextReviews = () => {
-    switch (activeProduct) {
-      case "english8000":
-        return textReviewsEnglish8000;
-      case "spanish":
-        return textReviewsSpanish;
-      default:
-        return textReviewsEnglish;
-    }
-  };
+     if (reviews !== undefined && reviews.length === 0) {
+       return [];
+     }
+     switch (activeProduct) {
+       case "english8000":
+         return textReviewsEnglish8000;
+       case "spanish":
+         return textReviewsSpanish;
+       default:
+         return textReviewsEnglish;
+     }
+   };
   
   const testimonials = getTestimonials();
   const textReviews = getTextReviews();
@@ -203,17 +207,21 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
             </div>
           )}
           
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-6 h-6 fill-accent text-accent" />
-              ))}
-            </div>
-            <span className="text-lg font-semibold text-foreground">4.9</span>
-            <span className="text-muted-foreground">
-              ({testimonials.length + textReviews.length}+ {activeProduct === "spanish" ? "reviews" : "reseñas"})
-            </span>
-          </div>
+           <div className="flex items-center justify-center gap-2 mb-2">
+             {textReviews.length > 0 && (
+               <>
+                 <div className="flex">
+                   {[...Array(5)].map((_, i) => (
+                     <Star key={i} className="w-6 h-6 fill-accent text-accent" />
+                   ))}
+                 </div>
+                 <span className="text-lg font-semibold text-foreground">4.9</span>
+               </>
+             )}
+             <span className={textReviews.length === 0 ? "text-lg font-semibold text-foreground" : "text-muted-foreground"}>
+               {textReviews.length === 0 ? "0" : `(${testimonials.length + textReviews.length}+`} {activeProduct === "spanish" ? "reviews" : "reseñas"}{textReviews.length > 0 ? ")" : ""}
+             </span>
+           </div>
           <p className="text-sm text-muted-foreground">
             {activeProduct === "spanish" 
               ? "Powered by iLingue Relax" 
@@ -277,18 +285,19 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
         </Swiper>
       </div>
 
-      {/* Text-only Reviews Section */}
-      <div className="container px-4 md:px-6 mt-12">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="text-sm font-medium text-muted-foreground">
-            {activeProduct === "spanish" ? "Reviews from" : "Reseñas de"}
-          </span>
-          <span className="text-sm font-bold text-primary">iLingue Relax</span>
-          <CheckCircle className="w-4 h-4 text-green-500" />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {textReviews.map((review, index) => (
+       {/* Text-only Reviews Section */}
+       {textReviews.length > 0 && (
+       <div className="container px-4 md:px-6 mt-12">
+         <div className="flex items-center justify-center gap-2 mb-6">
+           <span className="text-sm font-medium text-muted-foreground">
+             {activeProduct === "spanish" ? "Reviews from" : "Reseñas de"}
+           </span>
+           <span className="text-sm font-bold text-primary">iLingue Relax</span>
+           <CheckCircle className="w-4 h-4 text-green-500" />
+         </div>
+         
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+           {textReviews.map((review, index) => (
             <div 
               key={index} 
               className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -320,9 +329,10 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+           ))}
+         </div>
+       </div>
+       )}
 
       {/* Trust Footer */}
       <div className="container px-4 md:px-6">

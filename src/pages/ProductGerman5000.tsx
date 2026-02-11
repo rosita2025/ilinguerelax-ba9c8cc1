@@ -250,7 +250,6 @@ const ProductGerman5000 = () => {
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre 5,000 Palabras en Alemán"
-        reviews={[]}
       />
 
       <Footer />

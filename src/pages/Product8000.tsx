@@ -445,7 +445,7 @@ const Product8000 = () => {
         originalPrice="$54"
         rating={4.9}
         reviewCount={10000}
-        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10"
+        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10&bid=1770838124816"
       />
 
       {/* Spacer for sticky bar */}

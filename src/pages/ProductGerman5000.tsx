@@ -3,6 +3,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
+import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Button } from "@/components/ui/button";
@@ -240,6 +241,8 @@ const ProductGerman5000 = () => {
           </div>
         </div>
       </section>
+
+      <ProductReviews productType="english" reviews={[]} />
 
       <FAQ
         items={[

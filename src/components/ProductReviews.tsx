@@ -4,6 +4,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { Button } from "@/components/ui/button";
+import { ReviewForm } from "@/components/ReviewForm";
+import { useReviews } from "@/hooks/useReviews";
 
 // Import Spanish testimonial images
 import reviewSpanish1 from "@/assets/review-spanish-1.png";
@@ -87,14 +89,16 @@ const textReviewsEnglish8000 = [
 ];
 
 interface ProductReviewsProps {
-  productType?: "english" | "spanish" | "english8000";
+  productType?: "english" | "spanish" | "english8000" | "german" | "portuguese";
   showProductSelector?: boolean;
   reviews?: Array<{ text: string; verified: boolean; date: string }>;
+  showReviewForm?: boolean;
 }
 
-export const ProductReviews = ({ productType = "english", showProductSelector = false, reviews }: ProductReviewsProps) => {
+export const ProductReviews = ({ productType = "english", showProductSelector = false, reviews, showReviewForm = false }: ProductReviewsProps) => {
   const swiperRef = useRef<any>(null);
-  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000">(productType);
+  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000" | "german" | "portuguese">(productType as any);
+  const { data: dbReviews = [], refetch: refetchReviews } = useReviews(activeProduct);
   
   const getTestimonials = () => {
     switch (activeProduct) {
@@ -334,6 +338,53 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
        </div>
        )}
 
+      {/* Customer Reviews from Database */}
+      {dbReviews.length > 0 && (
+        <div className="container px-4 md:px-6 mt-12">
+          <h3 className="text-xl font-bold text-foreground text-center mb-6">
+            💬 {activeProduct === "spanish" ? "Customer Reviews" : "Reseñas de clientes"}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dbReviews.map((review) => (
+              <div key={review.id} className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-4 h-4 ${i < review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} />
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span className="text-xs font-medium">Verificado</span>
+                    </div>
+                  </div>
+                  <p className="text-foreground text-sm leading-relaxed">"{review.review_text}"</p>
+                  {review.photo_urls?.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {review.photo_urls.map((url, i) => (
+                        <img key={i} src={url} alt="Foto de reseña" className="w-16 h-16 rounded-lg object-cover border border-border" loading="lazy" />
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="font-medium">{review.customer_name}</span>
+                    <span>{new Date(review.created_at).toLocaleDateString("es-ES", { month: "short", year: "numeric" })}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Review Form */}
+      {showReviewForm && (
+        <div className="container px-4 md:px-6 mt-12 max-w-lg mx-auto">
+          <ReviewForm productType={activeProduct} onSubmitted={() => refetchReviews()} />
+        </div>
+      )}
+
       {/* Trust Footer */}
       <div className="container px-4 md:px-6">
         <div className="text-center mt-8 space-y-2">
@@ -348,6 +399,34 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
           </p>
         </div>
       </div>
+
+      {/* SEO: JSON-LD for DB reviews */}
+      {dbReviews.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": reviewSchema.name,
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": (dbReviews.reduce((sum, r) => sum + r.rating, 0) / dbReviews.length).toFixed(1),
+                "reviewCount": dbReviews.length + testimonials.length + textReviews.length,
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "review": dbReviews.map(r => ({
+                "@type": "Review",
+                "reviewRating": { "@type": "Rating", "ratingValue": String(r.rating), "bestRating": "5" },
+                "author": { "@type": "Person", "name": r.customer_name },
+                "datePublished": r.created_at.split("T")[0],
+                "reviewBody": r.review_text,
+              }))
+            })
+          }}
+        />
+      )}
     </section>
   );
 };

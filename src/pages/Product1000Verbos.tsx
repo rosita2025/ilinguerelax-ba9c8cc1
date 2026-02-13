@@ -231,7 +231,7 @@ const Product1000Verbos = () => {
         </div>
       </section>
 
-      <ProductReviews productType="english" />
+      <ProductReviews productType="english" showReviewForm />
 
       <FAQ
         items={[

@@ -604,7 +604,7 @@ const Product5000 = () => {
       <ProductCrossSell currentProduct="5000" lang="es" />
 
       {/* Product Reviews Carousel */}
-      <ProductReviews productType="english" />
+      <ProductReviews productType="english" showReviewForm />
 
 
       {/* FAQ Section */}

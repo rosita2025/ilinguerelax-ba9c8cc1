@@ -240,7 +240,7 @@ const Product500Preguntas = () => {
         </div>
       </section>
 
-      <ProductReviews productType="english" />
+      <ProductReviews productType="english" showReviewForm />
 
       <FAQ
         items={[

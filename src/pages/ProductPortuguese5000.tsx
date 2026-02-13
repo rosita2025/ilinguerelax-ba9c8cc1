@@ -242,7 +242,7 @@ const ProductPortuguese5000 = () => {
         </div>
       </section>
 
-      <ProductReviews productType="english" reviews={[]} />
+      <ProductReviews productType="portuguese" reviews={[]} showReviewForm />
 
       <FAQ
         items={[

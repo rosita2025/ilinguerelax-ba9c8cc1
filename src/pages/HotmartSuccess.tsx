@@ -14,6 +14,7 @@ import {
   PartyPopper,
   Heart,
   ArrowRight,
+  Star,
 } from "lucide-react";
 
 const HotmartSuccess = () => {
@@ -200,12 +201,38 @@ const HotmartSuccess = () => {
               <span>¡Gracias por elegir Inglés Relax!</span>
             </motion.div>
 
+            {/* Review CTA */}
+            <motion.div
+              className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-3xl border-2 border-amber-500/30 shadow-xl p-8 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <div className="flex items-center justify-center gap-1 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-6 h-6 text-amber-400 fill-amber-400" />
+                ))}
+              </div>
+              <h2 className="text-xl font-bold text-foreground mb-2">
+                ⭐ ¿Te gustó tu libro?
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Tu opinión ayuda a otros estudiantes. ¡Déjanos una reseña!
+              </p>
+              <Link to="/dejar-resena?product=english">
+                <Button variant="hero" size="lg" className="shadow-xl">
+                  <Star className="w-5 h-5 mr-2" />
+                  Dejar Mi Reseña
+                </Button>
+              </Link>
+            </motion.div>
+
             {/* CTA Buttons */}
             <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
+              transition={{ delay: 0.9 }}
             >
               <Link to="/">
                 <Button variant="outline" size="lg">

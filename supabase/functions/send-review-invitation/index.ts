@@ -9,11 +9,39 @@ const corsHeaders = {
 };
 
 interface ReviewInvitationRequest {
-  customerEmail: string;
+  customerEmail?: string;
   customerName?: string;
   productType?: string;
   productName?: string;
+  // Hotmart webhook format
+  buyer?: {
+    email: string;
+    name: string;
+  };
+  product?: {
+    name: string;
+  };
 }
+
+interface HotmartWebhook {
+  buyer: {
+    email: string;
+    name: string;
+  };
+  product: {
+    name: string;
+  };
+}
+
+const mapProductType = (productName: string): string => {
+  const name = productName.toLowerCase();
+  if (name.includes("5,000 palabras") || name.includes("5000 palabras")) return "english";
+  if (name.includes("8,000") || name.includes("8000")) return "english-8000";
+  if (name.includes("verbos")) return "1000-verbos";
+  if (name.includes("500 preguntas") || name.includes("500preguntas")) return "500-preguntas";
+  if (name.includes("spanish")) return "spanish";
+  return "english";
+};
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -21,24 +49,41 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { customerEmail, customerName, productType, productName }: ReviewInvitationRequest = await req.json();
+    const body = await req.json();
+    
+    // Handle both direct API calls and Hotmart webhook format
+    let customerEmail: string;
+    let customerName: string;
+    let productType: string;
+    let displayName: string;
+
+    // Check if it's a Hotmart webhook (has buyer and product properties)
+    if (body.buyer && body.product) {
+      customerEmail = body.buyer.email;
+      customerName = body.buyer.name || "Estudiante";
+      displayName = body.product.name || "Inglés Relax";
+      productType = mapProductType(displayName);
+    } else {
+      // Direct API call format
+      customerEmail = body.customerEmail;
+      customerName = body.customerName || "Estudiante";
+      displayName = body.productName || "Inglés Relax";
+      productType = body.productType || "english";
+    }
 
     if (!customerEmail) {
-      return new Response(JSON.stringify({ error: "customerEmail is required" }), {
+      return new Response(JSON.stringify({ error: "customerEmail or buyer.email is required" }), {
         status: 400,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    const name = customerName || "Estudiante";
-    const product = productType || "english";
-    const displayName = productName || "Inglés Relax";
-    const reviewUrl = `https://ilinguerelax.com/dejar-resena?product=${encodeURIComponent(product)}`;
+    const reviewUrl = `https://ilinguerelax.com/dejar-resena?product=${encodeURIComponent(productType)}`;
 
     const emailResponse = await resend.emails.send({
       from: "iLingue Relax <hola@ilinguerelax.com>",
       to: [customerEmail],
-      subject: `⭐ ${name}, ¿qué te pareció ${displayName}?`,
+      subject: `⭐ ${customerName}, ¿qué te pareció ${displayName}?`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -51,9 +96,9 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div style="background: white; padding: 40px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-              <p style="font-size: 18px; color: #1f2937; margin-bottom: 24px;">
-                ¡Hola ${name}! 👋
-              </p>
+               <p style="font-size: 18px; color: #1f2937; margin-bottom: 24px;">
+                 ¡Hola ${customerName}! 👋
+               </p>
               
               <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin-bottom: 24px;">
                 Esperamos que estés disfrutando <strong>${displayName}</strong>. Tu opinión es muy importante para nosotros y ayuda a otros estudiantes a decidirse.

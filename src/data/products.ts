@@ -43,7 +43,7 @@ export const products: Product[] = [
     reviews: 1247,
     price: 12.00,
     originalPrice: 54.00,
-    discount: 81,
+    discount: 78,
     badge: "Más Vendido",
     features: ["5,000 palabras", "4 Bonus gratis", "Acceso de por vida"],
     isPhysical: false,

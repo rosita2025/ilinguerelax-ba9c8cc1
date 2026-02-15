@@ -123,7 +123,7 @@ const Product5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-5000"],
     content_type: "product",
-    value: 10,
+    value: 12,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -155,14 +155,14 @@ const Product5000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-5000"],
       content_type: "product",
-      value: 10,
+      value: 12,
       currency: "USD",
       num_items: 1,
     });
     window.open("https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true", "_blank");
   };
   return <main className="min-h-screen bg-background">
-      <SEO title="5,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA" description="Aprende 5,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Incluye fonética UK/USA, 52 capítulos temáticos y 4 bonus gratis. Descarga inmediata." canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" image="https://ilinguerelax.com/product-5000.png" type="product" price="10" originalPrice="54" rating="4.8" reviewCount="800" sku="ILINGUE-5000" keywords="aprender inglés, vocabulario inglés 5000 palabras, pronunciación inglés hispanohablantes, libro digital inglés" />
+      <SEO title="5,000 Palabras en Inglés con Pronunciación Español y Fonética UK/USA" description="Aprende 5,000 palabras en inglés con pronunciación adaptada para hispanohablantes. Incluye fonética UK/USA, 52 capítulos temáticos y 4 bonus gratis. Descarga inmediata." canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" image="https://ilinguerelax.com/product-5000.png" type="product" price="12" originalPrice="54" rating="4.8" reviewCount="800" sku="ILINGUE-5000" keywords="aprender inglés, vocabulario inglés 5000 palabras, pronunciación inglés hispanohablantes, libro digital inglés" />
       {/* Lightbox Dialog */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="max-w-4xl w-full p-0 bg-black/95 border-none">
@@ -331,14 +331,14 @@ const Product5000 = () => {
                   <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span 
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
                   >
-                    AHORRA 81%
+                    AHORRA 78%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -678,7 +678,7 @@ const Product5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price="$10" originalPrice="$54" productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)" rating={4.8} reviewCount={800} showReviews={true} buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true" />
+      <StickyBuyBar price="$12" originalPrice="$54" productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)" rating={4.8} reviewCount={800} showReviews={true} buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true" />
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />

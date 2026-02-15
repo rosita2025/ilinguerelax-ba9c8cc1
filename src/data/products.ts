@@ -41,7 +41,7 @@ export const products: Product[] = [
     description: "Vocabulario esencial con pronunciación",
     rating: 4.8,
     reviews: 1247,
-    price: 10.00,
+    price: 12.00,
     originalPrice: 54.00,
     discount: 81,
     badge: "Más Vendido",

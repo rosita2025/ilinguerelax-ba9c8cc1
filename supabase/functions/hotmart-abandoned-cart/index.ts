@@ -1,0 +1,98 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json();
+    console.log("Hotmart abandoned cart webhook received:", JSON.stringify(body));
+
+    // Hotmart sends buyer info in different formats depending on webhook version
+    const buyerName = body.data?.buyer?.name || body.buyer?.name || body.name || "Cliente";
+    const buyerEmail = body.data?.buyer?.email || body.buyer?.email || body.email;
+
+    if (!buyerEmail) {
+      console.error("No email found in webhook payload");
+      return new Response(JSON.stringify({ error: "No email provided" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Detect language from email or name patterns
+    const language = detectLanguage(buyerEmail, buyerName);
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // Check if this email already has an active abandoned cart sequence
+    const { data: existing } = await supabase
+      .from("abandoned_carts")
+      .select("id, is_completed, converted")
+      .eq("customer_email", buyerEmail.toLowerCase())
+      .eq("is_completed", false)
+      .single();
+
+    if (existing) {
+      // Reset the existing sequence
+      await supabase
+        .from("abandoned_carts")
+        .update({
+          emails_sent: 0,
+          next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour
+          last_email_sent_at: null,
+          customer_name: buyerName,
+        })
+        .eq("id", existing.id);
+
+      console.log("Reset existing abandoned cart sequence for:", buyerEmail);
+    } else {
+      // Create new abandoned cart entry
+      const { error } = await supabase.from("abandoned_carts").insert({
+        customer_name: buyerName,
+        customer_email: buyerEmail.toLowerCase(),
+        product_type: "english",
+        language,
+        next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
+      });
+
+      if (error) {
+        console.error("Error inserting abandoned cart:", error);
+        throw error;
+      }
+
+      console.log("Created abandoned cart entry for:", buyerEmail);
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Webhook error:", msg);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
+
+function detectLanguage(email: string, name: string): string {
+  // Simple heuristic: Spanish-speaking domains or names
+  const spanishDomains = [".es", ".mx", ".ar", ".co", ".cl", ".pe", ".ve"];
+  const isSpanishDomain = spanishDomains.some(d => email.endsWith(d));
+  if (isSpanishDomain) return "es";
+
+  // Default to Spanish since the product targets Spanish speakers
+  return "es";
+}

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_carts: {
+        Row: {
+          converted: boolean
+          created_at: string
+          customer_email: string
+          customer_name: string
+          emails_sent: number
+          id: string
+          is_completed: boolean
+          language: string
+          last_email_sent_at: string | null
+          next_email_at: string
+          product_type: string
+          updated_at: string
+        }
+        Insert: {
+          converted?: boolean
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          emails_sent?: number
+          id?: string
+          is_completed?: boolean
+          language?: string
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          product_type?: string
+          updated_at?: string
+        }
+        Update: {
+          converted?: boolean
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          emails_sent?: number
+          id?: string
+          is_completed?: boolean
+          language?: string
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          product_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           created_at: string

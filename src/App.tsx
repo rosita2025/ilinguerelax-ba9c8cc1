@@ -16,6 +16,7 @@ import Product1000Verbos from "./pages/Product1000Verbos";
 import Product500Preguntas from "./pages/Product500Preguntas";
 import ProductGerman5000 from "./pages/ProductGerman5000";
 import ProductPortuguese5000 from "./pages/ProductPortuguese5000";
+import Product1000Free from "./pages/Product1000Free";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import HotmartSuccess from "./pages/HotmartSuccess";
 import HotmartPending from "./pages/HotmartPending";
@@ -57,6 +58,7 @@ const App = () => (
                 <Route path="/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes" element={<Product500Preguntas />} />
                 <Route path="/products/5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes" element={<ProductGerman5000 />} />
                 <Route path="/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes" element={<ProductPortuguese5000 />} />
+                <Route path="/products/1-000-palabras-en-ingles-con-pronunciacion-gratis" element={<Product1000Free />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/hotmart-success" element={<HotmartSuccess />} />
                 <Route path="/hotmart-pending" element={<HotmartPending />} />

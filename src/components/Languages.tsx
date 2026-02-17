@@ -143,7 +143,9 @@ export const Languages = () => {
                 {/* Pricing & Buy Button */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-primary">{formatPrice(product.price)}</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {product.price === 0 ? "GRATIS" : formatPrice(product.price)}
+                    </span>
                     {product.originalPrice && (
                       <span className="text-sm text-muted-foreground line-through">
                         {formatPrice(product.originalPrice)}
@@ -153,7 +155,7 @@ export const Languages = () => {
                   <Button size="sm" className="gap-2" asChild>
                     <Link to={getProductLink(product)}>
                       <ShoppingCart className="w-4 h-4" />
-                      {c.buy}
+                      {product.price === 0 ? (language === 'en' ? 'Free' : 'Gratis') : c.buy}
                     </Link>
                   </Button>
                 </div>

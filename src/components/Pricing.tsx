@@ -26,7 +26,7 @@ export const Pricing = () => {
                 {t.pricing.features}
               </h3>
               <div className="flex items-baseline justify-center gap-2">
-                <span className="text-4xl font-bold text-foreground">$17</span>
+                <span className="text-4xl font-bold text-foreground">$20</span>
                 <span className="text-muted-foreground line-through">$54</span>
               </div>
             </div>

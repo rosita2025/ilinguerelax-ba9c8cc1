@@ -4,6 +4,7 @@ import productSpanish5000 from "@/assets/product-spanish-5000.png";
 import product8000Book from "@/assets/product-8000-book.png";
 import product1000Verbos from "@/assets/product-1000-verbos.png";
 import product500Preguntas from "@/assets/product-500-preguntas.png";
+import product1000Free from "@/assets/product-1000-free.png";
 import productGerman5000 from "@/assets/product-german-5000.png";
 import productPortuguese5000 from "@/assets/product-portuguese-5000.png";
 
@@ -26,6 +27,7 @@ export interface Product {
   features: string[];
   isPhysical: boolean;
   comingSoon?: boolean;
+  externalUrl?: string;
 }
 
 export const products: Product[] = [
@@ -142,6 +144,26 @@ export const products: Product[] = [
     badge: "🆕 Nuevo",
     features: ["500 preguntas prácticas", "Pronunciación adaptada", "Situaciones reales"],
     isPhysical: false,
+  },
+  {
+    id: "1000-free",
+    slug: "1-000-palabras-en-ingles-con-pronunciacion-gratis",
+    name: "1,000 Palabras (Gratis)",
+    flag: "🇬🇧",
+    country: "Inglés para Hispanohablantes",
+    image: product1000Free,
+    title: "Inglés Relax - 1,000 Palabras",
+    subtitle: "Con Pronunciación en Español y Fonética UK/US",
+    description: "Libro digital gratuito con 1,000 palabras esenciales",
+    rating: 4.8,
+    reviews: 520,
+    price: 0,
+    originalPrice: 12.00,
+    discount: 100,
+    badge: "🎁 GRATIS",
+    features: ["1,000 palabras esenciales", "Pronunciación hispanohablante", "Fonética UK/US"],
+    isPhysical: false,
+    externalUrl: "https://ilinguerelax.gumroad.com/l/ingles-relax-1000-palabras",
   },
   {
     id: "german-5000",

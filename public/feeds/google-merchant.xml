@@ -77,5 +77,21 @@
       <g:product_type>Digital Books > Languages > Spanish</g:product_type>
     </item>
     
+    <item>
+      <g:id>1000-free</g:id>
+      <g:title>Inglés Relax - 1,000 Palabras en Inglés con Pronunciación GRATIS</g:title>
+      <g:description>Libro digital gratuito con 1,000 palabras en inglés con pronunciación adaptada para hispanohablantes y fonética UK/US. Descarga inmediata.</g:description>
+      <g:link>https://ilinguerelax.com/products/1-000-palabras-en-ingles-con-pronunciacion-gratis</g:link>
+      <g:image_link>https://ilinguerelax.com/assets/product-1000-free.png</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>0.00 USD</g:price>
+      <g:brand>Inglés Relax</g:brand>
+      <g:gtin></g:gtin>
+      <g:mpn>IR-1000-FREE</g:mpn>
+      <g:google_product_category>Media > Books > E-books</g:google_product_category>
+      <g:product_type>Libros Digitales > Idiomas > Inglés</g:product_type>
+    </item>
+    
   </channel>
 </rss>

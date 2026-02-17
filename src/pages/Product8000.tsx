@@ -223,14 +223,14 @@ const Product8000 = () => {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$17</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$20</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
                   >
-                    AHORRA 69%
+                    AHORRA 63%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">💳 Pago único • Sin suscripciones • Acceso de por vida</p>
@@ -372,7 +372,7 @@ const Product8000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$17</span>
+                <span className="text-5xl font-bold text-foreground">$20</span>
                 <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="text-accent font-bold">USD</span>
               </div>
@@ -441,7 +441,7 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$17"
+        price="$20"
         originalPrice="$54"
         rating={4.9}
         reviewCount={10000}

@@ -19,16 +19,20 @@ const EMAIL_SCHEDULE = [
   { index: 5, delayMs: 15 * 24 * 60 * 60 * 1000 },   // Email 6: +15 days (30 days total)
 ];
 
-const CHECKOUT_URLS: Record<string, string> = {
-  english: "https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067", // English 5,000 Words
-  english_8000: "https://pay.hotmart.com/U103990323W", // English 8,000 Words
-  verbs: "https://pay.hotmart.com/T102978081M",         // 1,000 Verbos
-  questions: "https://pay.hotmart.com/M102992330L",     // 500 Preguntas
-  spanish: "https://buy.stripe.com/28EbJ03SMbdr3qE8m98IU08", // Spanish 5,000
+const SITE_URL = "https://ilinguerelax.com";
+const COUPON_CODE = "NEW10";
+
+// Product page URLs on the website (not direct Hotmart checkout)
+const PRODUCT_URLS: Record<string, string> = {
+  english:      `${SITE_URL}/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa`,
+  english_8000: `${SITE_URL}/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa`,
+  verbs:        `${SITE_URL}/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion`,
+  questions:    `${SITE_URL}/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes`,
+  spanish:      `${SITE_URL}/products/5-000-spanish-words-with-english-pronunciation`,
 };
 
-function getCheckoutUrl(productType: string): string {
-  return CHECKOUT_URLS[productType] ?? CHECKOUT_URLS["english"];
+function getProductUrl(productType: string): string {
+  return PRODUCT_URLS[productType] ?? PRODUCT_URLS["english"];
 }
 
 serve(async (req) => {
@@ -83,8 +87,8 @@ serve(async (req) => {
           continue;
         }
 
-        const checkoutUrl = getCheckoutUrl(cart.product_type);
-        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, checkoutUrl);
+        const productUrl = getProductUrl(cart.product_type);
+        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, productUrl);
         
         const emailResponse = await resend.emails.send({
           from: "iLingue Relax <hola@ilinguerelax.com>",
@@ -93,7 +97,7 @@ serve(async (req) => {
           html: emailContent.html,
         });
 
-        console.log(`Email ${emailIndex + 1}/6 sent to ${cart.customer_email}:`, emailResponse);
+        console.log(`Email ${emailIndex + 1}/6 sent to ${cart.customer_email} (product: ${cart.product_type}):`, emailResponse);
 
         // Calculate next email time
         const nextEmailIndex = emailIndex + 1;
@@ -138,15 +142,24 @@ serve(async (req) => {
   }
 });
 
-function getEmailContent(index: number, name: string, lang: string, checkoutUrl: string) {
+function getEmailContent(index: number, name: string, lang: string, productUrl: string) {
   const isSpanish = lang === "es";
   const firstName = name.split(" ")[0];
-
-  const templates = isSpanish ? getSpanishTemplates(firstName, checkoutUrl) : getEnglishTemplates(firstName, checkoutUrl);
+  const templates = isSpanish ? getSpanishTemplates(firstName, productUrl) : getEnglishTemplates(firstName, productUrl);
   return templates[index] || templates[0];
 }
 
-function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
+function couponBox(isSpanish: boolean) {
+  const label = isSpanish ? "Usa este cupón al pagar y obtén un 10% de descuento extra:" : "Use this coupon at checkout for an extra 10% off:";
+  return `
+    <div style="background: linear-gradient(135deg, #f3e8ff, #ede9fe); border: 2px dashed #8b5cf6; border-radius: 12px; padding: 16px 24px; margin: 24px 0; text-align: center;">
+      <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">${label}</p>
+      <p style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: 4px; color: #7c3aed;">${COUPON_CODE}</p>
+    </div>`;
+}
+
+function getSpanishTemplates(name: string, productUrl: string) {
+  const cupon = couponBox(true);
   return [
     // Email 1: 1 hora - Recordatorio suave
     {
@@ -156,9 +169,10 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
         headline: "¡Tu libro te está esperando!",
         body: `<p>Notamos que estabas a punto de conseguir <strong>"Inglés Relax - 5,000 Palabras"</strong> pero no completaste la compra.</p>
         <p>¡No te preocupes! Tu selección sigue disponible al <strong>precio especial de $12</strong> (antes $54).</p>
-        <p>Con este libro podrás aprender 5,000 palabras en inglés de forma relajada y sin estrés, con pronunciación adaptada para hispanohablantes.</p>`,
+        <p>Con este libro podrás aprender 5,000 palabras en inglés de forma relajada y sin estrés, con pronunciación adaptada para hispanohablantes.</p>
+        ${cupon}`,
         ctaText: "Completar mi compra →",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "Este precio especial podría no estar disponible por mucho tiempo.",
         color: "#8b5cf6",
       }),
@@ -177,9 +191,10 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
           <li>✅ <strong>4 Bonus GRATIS</strong> incluidos con tu compra</li>
           <li>✅ <strong>Descarga inmediata</strong> - empieza hoy mismo</li>
         </ul>
-        <p>Y todo esto por solo <strong>$12</strong> en lugar de $54. ¡Un 78% de descuento!</p>`,
+        <p>Y todo esto por solo <strong>$12</strong> en lugar de $54. ¡Un 78% de descuento!</p>
+        ${cupon}`,
         ctaText: "¡Quiero mi libro ahora! 📚",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "Más de 1,200 personas ya confían en el método Relax.",
         color: "#6366f1",
       }),
@@ -193,9 +208,10 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
         body: `<p>Han pasado unos días desde que visitaste <strong>"Inglés Relax - 5,000 Palabras"</strong>.</p>
         <p>Queremos recordarte que el precio especial de <strong>$12</strong> (un ahorro del 78%) es por tiempo limitado.</p>
         <p>Imagina poder dominar 5,000 palabras en inglés aprendiendo solo <strong>10-15 palabras al día</strong>, sin estrés y a tu propio ritmo.</p>
-        <p>No dejes pasar esta oportunidad. ¡Tu futuro bilingüe te espera!</p>`,
+        <p>No dejes pasar esta oportunidad. ¡Tu futuro bilingüe te espera!</p>
+        ${cupon}`,
         ctaText: "Aprovechar el descuento →",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "Recuerda: incluye 4 bonus gratis valorados en más de $40.",
         color: "#ec4899",
       }),
@@ -215,9 +231,10 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
           <p style="font-style: italic; color: #4b5563;">"Lo mejor es que puedo aprender a mi ritmo, sin presión. Ya llevo 500 palabras en 2 semanas."</p>
           <p style="color: #6b7280; font-size: 14px;">⭐⭐⭐⭐⭐ - Carlos R.</p>
         </div>
-        <p>Únete a más de <strong>1,200 estudiantes</strong> que ya están aprendiendo con el método Relax.</p>`,
+        <p>Únete a más de <strong>1,200 estudiantes</strong> que ya están aprendiendo con el método Relax.</p>
+        ${cupon}`,
         ctaText: "Unirme ahora por solo $12 →",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "Satisfacción garantizada con nuestro método.",
         color: "#8b5cf6",
       }),
@@ -237,9 +254,10 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
           <li>📱 Descarga inmediata en PDF</li>
           <li>🔄 Actualizaciones gratuitas de por vida</li>
         </ul>
-        <p>Todo por solo <strong>$12</strong> en vez de $54.</p>`,
+        <p>Todo por solo <strong>$12</strong> en vez de $54.</p>
+        ${cupon}`,
         ctaText: "¡SÍ, QUIERO MI LIBRO! 🎉",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "Esta podría ser tu última oportunidad a este precio.",
         color: "#ef4444",
       }),
@@ -252,10 +270,11 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
         headline: "Un último mensaje para ti",
         body: `<p>Ha pasado un mes desde que visitaste nuestra página y este será nuestro último correo sobre <strong>"Inglés Relax - 5,000 Palabras"</strong>.</p>
         <p>Entendemos que quizás no era el momento adecuado, y lo respetamos completamente.</p>
-        <p>Pero antes de despedirnos, queremos dejarte el enlace por si en algún momento decides dar el paso. El precio de <strong>$12</strong> seguirá disponible para ti:</p>
+        <p>Pero antes de despedirnos, te dejamos un cupón especial de 10% extra por si en algún momento decides dar el paso:</p>
+        ${cupon}
         <p>Aprender inglés no tiene que ser difícil ni estresante. Cuando estés listo, estaremos aquí para ayudarte. 💜</p>`,
         ctaText: "Guardar mi enlace de compra →",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "¡Te deseamos mucho éxito en tu aprendizaje! Este es nuestro último correo.",
         color: "#8b5cf6",
       }),
@@ -263,7 +282,8 @@ function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
   ];
 }
 
-function getEnglishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
+function getEnglishTemplates(name: string, productUrl: string) {
+  const cupon = couponBox(false);
   return [
     {
       subject: `${name}, your book is waiting for you! 📚`,
@@ -272,9 +292,10 @@ function getEnglishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
         headline: "Your book is waiting!",
         body: `<p>We noticed you were about to get <strong>"Inglés Relax - 5,000 Words"</strong> but didn't complete your purchase.</p>
         <p>No worries! Your selection is still available at the <strong>special price of $12</strong> (was $54).</p>
-        <p>Learn 5,000 English words in a relaxed, stress-free way with pronunciation adapted for Spanish speakers.</p>`,
+        <p>Learn 5,000 English words in a relaxed, stress-free way with pronunciation adapted for Spanish speakers.</p>
+        ${cupon}`,
         ctaText: "Complete my purchase →",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "This special price may not last much longer.",
         color: "#8b5cf6",
       }),
@@ -292,9 +313,10 @@ function getEnglishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
           <li>✅ <strong>4 FREE bonuses</strong> included</li>
           <li>✅ <strong>Instant download</strong></li>
         </ul>
-        <p>All for just <strong>$12</strong> instead of $54. That's 78% off!</p>`,
+        <p>All for just <strong>$12</strong> instead of $54. That's 78% off!</p>
+        ${cupon}`,
         ctaText: "Get my book now! 📚",
-        ctaUrl: HOTMART_CHECKOUT_URL,
+        ctaUrl: productUrl,
         footer: "Over 1,200 people trust the Relax method.",
         color: "#6366f1",
       }),
@@ -302,32 +324,41 @@ function getEnglishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
     {
       subject: `⏰ ${name}, the special price is ending soon`,
       html: buildEmail({
-        name, headline: "Time is running out...",
+        name,
+        headline: "Time is running out...",
         body: `<p>It's been a few days since you visited <strong>"Inglés Relax - 5,000 Words"</strong>.</p>
         <p>The special price of <strong>$12</strong> (78% savings) is limited time only.</p>
-        <p>Imagine mastering 5,000 English words by learning just <strong>10-15 words per day</strong>, stress-free and at your own pace.</p>`,
-        ctaText: "Claim my discount →", ctaUrl: HOTMART_CHECKOUT_URL,
-        footer: "Remember: includes 4 free bonuses worth over $40.", color: "#ec4899",
+        <p>Imagine mastering 5,000 English words by learning just <strong>10-15 words per day</strong>, stress-free and at your own pace.</p>
+        ${cupon}`,
+        ctaText: "Claim my discount →",
+        ctaUrl: productUrl,
+        footer: "Remember: includes 4 free bonuses worth over $40.",
+        color: "#ec4899",
       }),
     },
     {
       subject: `${name}, see what our students say 🌟`,
       html: buildEmail({
-        name, headline: "What our students say",
+        name,
+        headline: "What our students say",
         body: `<p>A week ago you showed interest in our book. Here's what others say:</p>
         <div style="background: #f3f4f6; border-left: 4px solid #8b5cf6; padding: 16px; border-radius: 8px; margin: 16px 0;">
           <p style="font-style: italic; color: #4b5563;">"I never thought learning English could be this easy. The Spanish pronunciation guide helped me so much."</p>
           <p style="color: #6b7280; font-size: 14px;">⭐⭐⭐⭐⭐ - María G.</p>
         </div>
-        <p>Join <strong>1,200+ students</strong> learning with the Relax method.</p>`,
-        ctaText: "Join now for only $12 →", ctaUrl: HOTMART_CHECKOUT_URL,
-        footer: "Satisfaction guaranteed.", color: "#8b5cf6",
+        <p>Join <strong>1,200+ students</strong> learning with the Relax method.</p>
+        ${cupon}`,
+        ctaText: "Join now for only $12 →",
+        ctaUrl: productUrl,
+        footer: "Satisfaction guaranteed.",
+        color: "#8b5cf6",
       }),
     },
     {
       subject: `🚨 ${name}, last chance: 78% off`,
       html: buildEmail({
-        name, headline: "Last chance!",
+        name,
+        headline: "Last chance!",
         body: `<p>15 days ago you showed interest in learning English with our Relax method.</p>
         <p>The <strong>78% discount</strong> is still active but not for much longer.</p>
         <p><strong>What you get:</strong></p>
@@ -337,21 +368,28 @@ function getEnglishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
           <li>📱 Instant PDF download</li>
           <li>🔄 Free lifetime updates</li>
         </ul>
-        <p>All for just <strong>$12</strong> instead of $54.</p>`,
-        ctaText: "YES, I WANT MY BOOK! 🎉", ctaUrl: HOTMART_CHECKOUT_URL,
-        footer: "This might be your last chance at this price.", color: "#ef4444",
+        <p>All for just <strong>$12</strong> instead of $54.</p>
+        ${cupon}`,
+        ctaText: "YES, I WANT MY BOOK! 🎉",
+        ctaUrl: productUrl,
+        footer: "This might be your last chance at this price.",
+        color: "#ef4444",
       }),
     },
     {
       subject: `${name}, we're saying goodbye (but with a gift) 🎁`,
       html: buildEmail({
-        name, headline: "One last message",
+        name,
+        headline: "One last message",
         body: `<p>It's been a month since you visited our page. This will be our last email about <strong>"Inglés Relax - 5,000 Words"</strong>.</p>
         <p>We understand it might not have been the right time, and we respect that.</p>
-        <p>But before we say goodbye, here's the link in case you ever decide to take the step. The price of <strong>$12</strong> will still be available for you:</p>
+        <p>But before we say goodbye, here's a special 10% coupon in case you ever decide to take the step:</p>
+        ${cupon}
         <p>Learning English doesn't have to be hard or stressful. When you're ready, we'll be here. 💜</p>`,
-        ctaText: "Save my purchase link →", ctaUrl: HOTMART_CHECKOUT_URL,
-        footer: "Wishing you the best! This is our final email.", color: "#8b5cf6",
+        ctaText: "Save my purchase link →",
+        ctaUrl: productUrl,
+        footer: "Wishing you the best! This is our final email.",
+        color: "#8b5cf6",
       }),
     },
   ];
@@ -385,7 +423,7 @@ function buildEmail(params: {
       <p style="font-size: 14px; color: #9ca3af; text-align: center; margin-top: 24px;">${params.footer}</p>
     </div>
     <div style="text-align: center; padding: 24px; color: #9ca3af; font-size: 12px;">
-      <p style="margin: 0;">© 2024 iLingue Relax. All rights reserved.</p>
+      <p style="margin: 0;">© 2025 iLingue Relax. All rights reserved.</p>
       <p style="margin: 8px 0 0 0;">Si no deseas recibir más correos, simplemente ignora este mensaje.</p>
     </div>
   </div>

@@ -19,7 +19,17 @@ const EMAIL_SCHEDULE = [
   { index: 5, delayMs: 15 * 24 * 60 * 60 * 1000 },   // Email 6: +15 days (30 days total)
 ];
 
-const HOTMART_CHECKOUT_URL = "https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067";
+const CHECKOUT_URLS: Record<string, string> = {
+  english: "https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067", // English 5,000 Words
+  english_8000: "https://pay.hotmart.com/U103990323W", // English 8,000 Words
+  verbs: "https://pay.hotmart.com/T102978081M",         // 1,000 Verbos
+  questions: "https://pay.hotmart.com/M102992330L",     // 500 Preguntas
+  spanish: "https://buy.stripe.com/28EbJ03SMbdr3qE8m98IU08", // Spanish 5,000
+};
+
+function getCheckoutUrl(productType: string): string {
+  return CHECKOUT_URLS[productType] ?? CHECKOUT_URLS["english"];
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -73,7 +83,8 @@ serve(async (req) => {
           continue;
         }
 
-        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language);
+        const checkoutUrl = getCheckoutUrl(cart.product_type);
+        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, checkoutUrl);
         
         const emailResponse = await resend.emails.send({
           from: "iLingue Relax <hola@ilinguerelax.com>",
@@ -127,15 +138,15 @@ serve(async (req) => {
   }
 });
 
-function getEmailContent(index: number, name: string, lang: string) {
+function getEmailContent(index: number, name: string, lang: string, checkoutUrl: string) {
   const isSpanish = lang === "es";
   const firstName = name.split(" ")[0];
 
-  const templates = isSpanish ? getSpanishTemplates(firstName) : getEnglishTemplates(firstName);
+  const templates = isSpanish ? getSpanishTemplates(firstName, checkoutUrl) : getEnglishTemplates(firstName, checkoutUrl);
   return templates[index] || templates[0];
 }
 
-function getSpanishTemplates(name: string) {
+function getSpanishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
   return [
     // Email 1: 1 hora - Recordatorio suave
     {
@@ -252,7 +263,7 @@ function getSpanishTemplates(name: string) {
   ];
 }
 
-function getEnglishTemplates(name: string) {
+function getEnglishTemplates(name: string, HOTMART_CHECKOUT_URL: string) {
   return [
     {
       subject: `${name}, your book is waiting for you! 📚`,

@@ -22,6 +22,20 @@ const EMAIL_SCHEDULE = [
 const SITE_URL = "https://ilinguerelax.com";
 const COUPON_CODE = "NEW10";
 
+// Product display names for email subjects
+const PRODUCT_NAMES: Record<string, { es: string; en: string }> = {
+  english:      { es: "5,000 Palabras en Inglés", en: "5,000 English Words" },
+  english_8000: { es: "8,000 Palabras en Inglés", en: "8,000 English Words" },
+  verbs:        { es: "1,000 Verbos en Inglés",   en: "1,000 English Verbs" },
+  questions:    { es: "500 Preguntas en Inglés",   en: "500 English Questions" },
+  spanish:      { es: "5,000 Palabras en Español", en: "5,000 Spanish Words" },
+};
+
+function getProductName(productType: string, lang: string): string {
+  const names = PRODUCT_NAMES[productType] ?? PRODUCT_NAMES["english"];
+  return lang === "es" ? names.es : names.en;
+}
+
 // Product page URLs on the website (not direct Hotmart checkout)
 const PRODUCT_URLS: Record<string, string> = {
   english:      `${SITE_URL}/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa`,
@@ -88,7 +102,7 @@ serve(async (req) => {
         }
 
         const productUrl = getProductUrl(cart.product_type);
-        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, productUrl);
+        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, productUrl, cart.product_type);
         
         const emailResponse = await resend.emails.send({
           from: "iLingue Relax <hola@ilinguerelax.com>",
@@ -142,10 +156,11 @@ serve(async (req) => {
   }
 });
 
-function getEmailContent(index: number, name: string, lang: string, productUrl: string) {
+function getEmailContent(index: number, name: string, lang: string, productUrl: string, productType: string) {
   const isSpanish = lang === "es";
   const firstName = name.split(" ")[0];
-  const templates = isSpanish ? getSpanishTemplates(firstName, productUrl) : getEnglishTemplates(firstName, productUrl);
+  const productName = getProductName(productType, lang);
+  const templates = isSpanish ? getSpanishTemplates(firstName, productUrl, productName) : getEnglishTemplates(firstName, productUrl, productName);
   return templates[index] || templates[0];
 }
 
@@ -158,12 +173,12 @@ function couponBox(isSpanish: boolean) {
     </div>`;
 }
 
-function getSpanishTemplates(name: string, productUrl: string) {
+function getSpanishTemplates(name: string, productUrl: string, productName: string) {
   const cupon = couponBox(true);
   return [
     // Email 1: 1 hora - Recordatorio suave
     {
-      subject: `${name}, ¡tu libro te está esperando! 📚`,
+      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🛒`,
       html: buildEmail({
         name,
         headline: "¡Tu libro te está esperando!",
@@ -179,7 +194,7 @@ function getSpanishTemplates(name: string, productUrl: string) {
     },
     // Email 2: 1 día - Beneficios
     {
-      subject: `${name}, ¿sabías que puedes aprender 5,000 palabras sin estrés? 🧠`,
+      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🧠`,
       html: buildEmail({
         name,
         headline: "¿Por qué miles ya aprenden con nosotros?",
@@ -201,7 +216,7 @@ function getSpanishTemplates(name: string, productUrl: string) {
     },
     // Email 3: 4 días - Urgencia
     {
-      subject: `⏰ ${name}, el precio especial está por terminar`,
+      subject: `⏰ Tu carrito está esperando - iLingue Relax ${productName}`,
       html: buildEmail({
         name,
         headline: "El tiempo corre...",
@@ -218,7 +233,7 @@ function getSpanishTemplates(name: string, productUrl: string) {
     },
     // Email 4: 1 semana - Testimonio social
     {
-      subject: `${name}, mira lo que dicen nuestros estudiantes 🌟`,
+      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🌟`,
       html: buildEmail({
         name,
         headline: "Lo que dicen nuestros estudiantes",
@@ -241,7 +256,7 @@ function getSpanishTemplates(name: string, productUrl: string) {
     },
     // Email 5: 15 días - Última oportunidad
     {
-      subject: `🚨 ${name}, última oportunidad: 78% de descuento`,
+      subject: `🚨 Tu carrito está esperando - iLingue Relax ${productName}`,
       html: buildEmail({
         name,
         headline: "¡Última oportunidad!",
@@ -264,7 +279,7 @@ function getSpanishTemplates(name: string, productUrl: string) {
     },
     // Email 6: 30 días - Despedida
     {
-      subject: `${name}, te decimos adiós (pero con un regalo) 🎁`,
+      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🎁`,
       html: buildEmail({
         name,
         headline: "Un último mensaje para ti",
@@ -282,11 +297,11 @@ function getSpanishTemplates(name: string, productUrl: string) {
   ];
 }
 
-function getEnglishTemplates(name: string, productUrl: string) {
+function getEnglishTemplates(name: string, productUrl: string, productName: string) {
   const cupon = couponBox(false);
   return [
     {
-      subject: `${name}, your book is waiting for you! 📚`,
+      subject: `Your cart is waiting - iLingue Relax ${productName} 🛒`,
       html: buildEmail({
         name,
         headline: "Your book is waiting!",
@@ -301,7 +316,7 @@ function getEnglishTemplates(name: string, productUrl: string) {
       }),
     },
     {
-      subject: `${name}, did you know you can learn 5,000 words stress-free? 🧠`,
+      subject: `Your cart is waiting - iLingue Relax ${productName} 🧠`,
       html: buildEmail({
         name,
         headline: "Why thousands already learn with us",
@@ -322,7 +337,7 @@ function getEnglishTemplates(name: string, productUrl: string) {
       }),
     },
     {
-      subject: `⏰ ${name}, the special price is ending soon`,
+      subject: `⏰ Your cart is waiting - iLingue Relax ${productName}`,
       html: buildEmail({
         name,
         headline: "Time is running out...",
@@ -337,7 +352,7 @@ function getEnglishTemplates(name: string, productUrl: string) {
       }),
     },
     {
-      subject: `${name}, see what our students say 🌟`,
+      subject: `Your cart is waiting - iLingue Relax ${productName} 🌟`,
       html: buildEmail({
         name,
         headline: "What our students say",
@@ -355,7 +370,7 @@ function getEnglishTemplates(name: string, productUrl: string) {
       }),
     },
     {
-      subject: `🚨 ${name}, last chance: 78% off`,
+      subject: `🚨 Your cart is waiting - iLingue Relax ${productName}`,
       html: buildEmail({
         name,
         headline: "Last chance!",
@@ -377,7 +392,7 @@ function getEnglishTemplates(name: string, productUrl: string) {
       }),
     },
     {
-      subject: `${name}, we're saying goodbye (but with a gift) 🎁`,
+      subject: `Your cart is waiting - iLingue Relax ${productName} 🎁`,
       html: buildEmail({
         name,
         headline: "One last message",

@@ -7,6 +7,8 @@ import product500Preguntas from "@/assets/product-500-preguntas.png";
 import product1000Free from "@/assets/product-1000-free.png";
 import productGerman5000 from "@/assets/product-german-5000.png";
 import productPortuguese5000 from "@/assets/product-portuguese-5000.png";
+import productItalian5000 from "@/assets/product-italian-5000.jpg";
+import productFrench5000 from "@/assets/product-french-5000.jpg";
 
 export interface Product {
   id: string;
@@ -205,13 +207,49 @@ export const products: Product[] = [
     isPhysical: false,
     comingSoon: true,
   },
+  {
+    id: "italian-5000",
+    slug: "5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes",
+    name: "5,000 Palabras Italiano",
+    flag: "🇮🇹",
+    country: "Italiano para Hispanohablantes",
+    image: productItalian5000,
+    title: "Italiano Relax - 5,000 Palabras",
+    subtitle: "Con Pronunciación para Hispanohablantes y Fonética Italiana",
+    description: "Aprende italiano con pronunciación adaptada para hispanohablantes",
+    rating: 4.8,
+    reviews: 0,
+    price: 12.00,
+    originalPrice: 54.00,
+    discount: 78,
+    badge: "🆕 Muy Pronto",
+    features: ["5,000 palabras en italiano", "Pronunciación para hispanohablantes", "Fonética italiana"],
+    isPhysical: false,
+    comingSoon: true,
+  },
+  {
+    id: "french-5000",
+    slug: "5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes",
+    name: "5,000 Palabras Francés",
+    flag: "🇫🇷",
+    country: "Francés para Hispanohablantes",
+    image: productFrench5000,
+    title: "Francés Relax - 5,000 Palabras",
+    subtitle: "Con Pronunciación para Hispanohablantes y Fonética Francesa",
+    description: "Aprende francés con pronunciación adaptada para hispanohablantes",
+    rating: 4.8,
+    reviews: 0,
+    price: 12.00,
+    originalPrice: 54.00,
+    discount: 78,
+    badge: "🆕 Muy Pronto",
+    features: ["5,000 palabras en francés", "Pronunciación para hispanohablantes", "Fonética francesa"],
+    isPhysical: false,
+    comingSoon: true,
+  },
 ];
 
 export const comingSoonLanguages = [
-  { name: "Italiano", flag: "🇮🇹" },
-  { name: "Portugués", flag: "🇧🇷" },
-  { name: "Francés", flag: "🇫🇷" },
-  { name: "Alemán", flag: "🇩🇪" },
   { name: "Japonés", flag: "🇯🇵" },
   { name: "Chino", flag: "🇨🇳" },
   { name: "Coreano", flag: "🇰🇷" },

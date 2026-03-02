@@ -6,29 +6,29 @@
   <!-- Homepage -->
   <url>
     <loc>https://ilinguerelax.com/</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://ilinguerelax.com/og-image.png</image:loc>
-      <image:title>iLingue Relax - Aprende Inglés con Pronunciación para Hispanohablantes</image:title>
-      <image:caption>Plataforma de aprendizaje de inglés sin estrés con pronunciación adaptada</image:caption>
+      <image:title>iLingue Relax - Aprende Idiomas con Pronunciación para Hispanohablantes</image:title>
+      <image:caption>Plataforma de aprendizaje de idiomas sin estrés con pronunciación adaptada</image:caption>
     </image:image>
   </url>
   
   <!-- Products Page -->
   <url>
     <loc>https://ilinguerelax.com/products</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
-  <!-- Product: 5,000 Words (Spanish) - Main product -->
+  <!-- Product: 5,000 Palabras en Inglés -->
   <url>
     <loc>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</loc>
     <xhtml:link rel="alternate" hreflang="es" href="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"/>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
     <image:image>
@@ -38,11 +38,11 @@
     </image:image>
   </url>
   
-  <!-- Product: 8,000 Words (Spanish) - Premium -->
+  <!-- Product: 8,000 Palabras en Inglés -->
   <url>
     <loc>https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</loc>
     <xhtml:link rel="alternate" hreflang="es" href="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"/>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -52,10 +52,10 @@
     </image:image>
   </url>
 
-  <!-- Product: 8,000 Words Physical Book -->
+  <!-- Product: 8,000 Palabras Libro Físico -->
   <url>
     <loc>https://ilinguerelax.com/products/8-000-palabras-libro-fisico</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <image:image>
@@ -71,7 +71,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"/>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -80,11 +80,102 @@
       <image:caption>Digital eBook to learn Spanish vocabulary with pronunciation for English speakers</image:caption>
     </image:image>
   </url>
-  
+
+  <!-- Product: 1,000 Verbos Esenciales en Inglés -->
+  <url>
+    <loc>https://ilinguerelax.com/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-1000-verbos.png</image:loc>
+      <image:title>Inglés Relax - 1,000 Verbos Esenciales con Pronunciación</image:title>
+      <image:caption>Libro digital con 1,000 verbos esenciales en inglés en presente, pasado y futuro con pronunciación para hispanohablantes</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 500 Preguntas en Inglés -->
+  <url>
+    <loc>https://ilinguerelax.com/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-500-preguntas.png</image:loc>
+      <image:title>Inglés Relax - 500 Preguntas en Inglés con Pronunciación</image:title>
+      <image:caption>Libro digital con 500 preguntas prácticas en inglés con pronunciación adaptada para hispanohablantes</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 1,000 Palabras Gratis -->
+  <url>
+    <loc>https://ilinguerelax.com/products/1-000-palabras-en-ingles-con-pronunciacion-gratis</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-1000-free.png</image:loc>
+      <image:title>Inglés Relax - 1,000 Palabras en Inglés GRATIS</image:title>
+      <image:caption>Libro digital gratuito con 1,000 palabras en inglés con pronunciación para hispanohablantes</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 5,000 Palabras en Alemán -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-german-5000.png</image:loc>
+      <image:title>Alemán Relax - 5,000 Palabras en Alemán con Pronunciación para Hispanohablantes</image:title>
+      <image:caption>Libro digital de vocabulario alemán con pronunciación adaptada y fonética alemana</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 5,000 Palabras en Portugués -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-portuguese-5000.png</image:loc>
+      <image:title>Portugués Relax - 5,000 Palabras en Portugués con Pronunciación para Hispanohablantes</image:title>
+      <image:caption>Libro digital de vocabulario portugués con pronunciación adaptada y fonética portuguesa</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 5,000 Palabras en Italiano -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-italian-5000.jpg</image:loc>
+      <image:title>Italiano Relax - 5,000 Palabras en Italiano con Pronunciación para Hispanohablantes</image:title>
+      <image:caption>Libro digital de vocabulario italiano con pronunciación adaptada y fonética italiana</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Product: 5,000 Palabras en Francés -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ilinguerelax.com/product-french-5000.jpg</image:loc>
+      <image:title>Francés Relax - 5,000 Palabras en Francés con Pronunciación para Hispanohablantes</image:title>
+      <image:caption>Libro digital de vocabulario francés con pronunciación adaptada y fonética francesa</image:caption>
+    </image:image>
+  </url>
+
   <!-- Blog Index -->
   <url>
     <loc>https://ilinguerelax.com/blog</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -95,60 +186,36 @@
     <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800</image:loc>
-      <image:title>Cómo Aprender Inglés Desde Cero: Guía Completa 2025</image:title>
-    </image:image>
   </url>
-
   <url>
     <loc>https://ilinguerelax.com/blog/importancia-pronunciacion-ingles</loc>
     <lastmod>2026-01-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800</image:loc>
-      <image:title>La Importancia de la Pronunciación en Inglés</image:title>
-    </image:image>
   </url>
-
   <url>
     <loc>https://ilinguerelax.com/blog/5000-palabras-mas-usadas-ingles</loc>
     <lastmod>2026-01-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800</image:loc>
-      <image:title>Las 5,000 Palabras Más Usadas en Inglés</image:title>
-    </image:image>
   </url>
-
   <url>
     <loc>https://ilinguerelax.com/blog/diferencias-ingles-britanico-americano</loc>
     <lastmod>2026-01-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://images.unsplash.com/photo-1526129318478-62ed807ebdf9?w=800</image:loc>
-      <image:title>Diferencias Entre Inglés Británico y Americano</image:title>
-    </image:image>
   </url>
-
   <url>
     <loc>https://ilinguerelax.com/blog/errores-comunes-aprender-ingles</loc>
     <lastmod>2026-01-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800</image:loc>
-      <image:title>10 Errores Comunes al Aprender Inglés</image:title>
-    </image:image>
   </url>
-  
+
   <!-- About Page -->
   <url>
     <loc>https://ilinguerelax.com/sobre-nosotros</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -156,7 +223,7 @@
   <!-- Contact Page -->
   <url>
     <loc>https://ilinguerelax.com/contacto</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -164,22 +231,17 @@
   <!-- FAQ Page -->
   <url>
     <loc>https://ilinguerelax.com/faq</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- 1,000 Palabras Gratis -->
+  <!-- Leave Review Page -->
   <url>
-    <loc>https://ilinguerelax.com/products/1-000-palabras-en-ingles-con-pronunciacion-gratis</loc>
-    <lastmod>2026-02-17</lastmod>
+    <loc>https://ilinguerelax.com/dejar-resena</loc>
+    <lastmod>2026-03-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://ilinguerelax.com/product-1000-free.png</image:loc>
-      <image:title>Inglés Relax - 1,000 Palabras en Inglés GRATIS</image:title>
-      <image:caption>Libro digital gratuito con 1,000 palabras en inglés con pronunciación para hispanohablantes</image:caption>
-    </image:image>
+    <priority>0.5</priority>
   </url>
 
 </urlset>

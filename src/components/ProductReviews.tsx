@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Star, Quote, CheckCircle, Eye } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
+// @ts-ignore
 import "swiper/css";
 import { Button } from "@/components/ui/button";
 import { ReviewForm } from "@/components/ReviewForm";

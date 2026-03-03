@@ -5,6 +5,7 @@ import product8000Book from "@/assets/product-8000-book.png";
 import product1000Verbos from "@/assets/product-1000-verbos.png";
 import product500Preguntas from "@/assets/product-500-preguntas.png";
 import product1000Free from "@/assets/product-1000-free.png";
+import product5000Book from "@/assets/product-5000-book.png";
 import productGerman5000 from "@/assets/product-german-5000.png";
 import productPortuguese5000 from "@/assets/product-portuguese-5000.png";
 import productItalian5000 from "@/assets/product-italian-5000.jpg";
@@ -70,6 +71,26 @@ export const products: Product[] = [
     badge: "Premium",
     features: ["8,000 palabras", "Pronunciación español", "Fonética UK/USA"],
     isPhysical: false,
+  },
+  {
+    id: "5000-book",
+    slug: "5-000-palabras-libro-fisico",
+    name: "5,000 Palabras Libro",
+    flag: "🇬🇧",
+    country: "Inglés UK / USA",
+    image: product5000Book,
+    title: "Inglés Relax - 5,000 Palabras",
+    subtitle: "Libro Físico Tapa Blanda",
+    description: "Libro físico tapa blanda premium",
+    rating: 4.8,
+    reviews: 1247,
+    price: 32.99,
+    originalPrice: null,
+    discount: null,
+    badge: "📖 Libro Físico",
+    features: ["Tapa blanda", "250-300 páginas", "Disponible en Amazon"],
+    isPhysical: true,
+    externalUrl: "https://www.amazon.com/dp/B0GDTV8GWR",
   },
   {
     id: "8000-book",

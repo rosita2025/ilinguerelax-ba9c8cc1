@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Products from "./pages/Products";
 import Product5000 from "./pages/Product5000";
 import Product8000 from "./pages/Product8000";
+import Product5000Book from "./pages/Product5000Book";
 import Product8000Book from "./pages/Product8000Book";
 import ProductSpanish5000 from "./pages/ProductSpanish5000";
 import Product1000Verbos from "./pages/Product1000Verbos";
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/products" element={<Products />} />
                 <Route path="/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product5000 />} />
                 <Route path="/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product8000 />} />
+                <Route path="/products/5-000-palabras-libro-fisico" element={<Product5000Book />} />
                 <Route path="/products/8-000-palabras-libro-fisico" element={<Product8000Book />} />
                 <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductSpanish5000 />} />
                 <Route path="/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion" element={<Product1000Verbos />} />

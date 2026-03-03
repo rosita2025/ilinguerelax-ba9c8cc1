@@ -102,6 +102,8 @@ const Product5000Book = () => {
         reviewCount="1247"
         sku="ILINGUE-5000-BOOK"
         keywords="libro físico inglés, 5000 palabras inglés, pronunciación inglés hispanohablantes, libro inglés impreso, Amazon"
+        availability="InStock"
+        isPhysical={true}
       />
       <Navbar />
 

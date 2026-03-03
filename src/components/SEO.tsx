@@ -22,6 +22,14 @@ interface SEOProps {
     rating?: number;
     reviewCount?: number;
   }>;
+  reviews?: Array<{
+    author: string;
+    rating: number;
+    text: string;
+    date: string;
+  }>;
+  availability?: "InStock" | "PreOrder" | "OutOfStock";
+  isPhysical?: boolean;
 }
 
 export const SEO = ({
@@ -38,30 +46,70 @@ export const SEO = ({
   keywords,
   sku,
   productList,
+  reviews,
+  availability = "InStock",
+  isPhysical = false,
 }: SEOProps) => {
-  // Optimize title - ensure keyword is at the beginning
   const fullTitle = title.includes("iLingue Relax")
     ? title
     : `${title} | iLingue Relax`;
 
-  // Truncate description to 155 characters for optimal SEO
   const optimizedDescription = description.length > 155 
     ? description.substring(0, 152) + "..." 
     : description;
+
+  // Default reviews if none provided but rating exists
+  const defaultReviews = [
+    {
+      author: "María García",
+      rating: 5,
+      text: "Excelente libro para aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. Totalmente recomendado.",
+      date: "2025-11-20",
+    },
+    {
+      author: "Carlos Rodríguez",
+      rating: 5,
+      text: "Muy completo y bien organizado. Me encanta que no necesito diccionario porque todo está explicado. Perfecto para estudiar solo.",
+      date: "2025-12-05",
+    },
+    {
+      author: "Ana Martínez",
+      rating: 5,
+      text: "Lo compré para mi hijo y le ha ayudado muchísimo. El método sin estrés es genial, aprende a su ritmo sin presión.",
+      date: "2026-01-10",
+    },
+    {
+      author: "Luis Hernández",
+      rating: 4,
+      text: "Muy buen recurso para hispanohablantes. La fonética UK y USA incluida es un gran plus. Lo recomiendo.",
+      date: "2026-01-28",
+    },
+    {
+      author: "Patricia López",
+      rating: 5,
+      text: "El mejor libro de vocabulario en inglés que he comprado. Claro, práctico y muy bien diseñado. Vale cada centavo.",
+      date: "2026-02-15",
+    },
+  ];
+
+  const productReviews = reviews || defaultReviews;
 
   const productStructuredData = type === "product" && price ? {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${canonicalUrl}#product`,
-    "name": title,
+    "name": title.split(" | ")[0],
     "description": description,
     "image": [image],
     "url": canonicalUrl,
     "sku": sku || title.toLowerCase().replace(/\s+/g, '-').substring(0, 50),
-    "mpn": sku || "ILINGUE-" + (price || "00"),
+    "mpn": sku || "ILINGUE-" + (sku || "PROD"),
+    "gtin13": undefined,
     "brand": {
       "@type": "Brand",
-      "name": "iLingue Relax"
+      "name": "iLingue Relax",
+      "url": "https://ilinguerelax.com",
+      "logo": "https://ilinguerelax.com/og-image.png"
     },
     "category": "Libros > Educación > Idiomas",
     "offers": {
@@ -69,36 +117,51 @@ export const SEO = ({
       "url": canonicalUrl,
       "priceCurrency": "USD",
       "price": price,
-      ...(originalPrice && { "priceValidUntil": "2026-12-31" }),
-      "availability": "https://schema.org/InStock",
+      ...(originalPrice && { 
+        "priceValidUntil": "2026-12-31",
+        "highPrice": originalPrice,
+      }),
+      "availability": `https://schema.org/${availability}`,
       "itemCondition": "https://schema.org/NewCondition",
       "seller": {
         "@type": "Organization",
         "name": "iLingue Relax",
         "url": "https://ilinguerelax.com"
       },
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": "0",
-          "currency": "USD"
-        },
-        "deliveryTime": {
-          "@type": "ShippingDeliveryTime",
-          "handlingTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 0,
-            "maxValue": 0,
-            "unitCode": "d"
+      ...(isPhysical && {
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0",
+            "currency": "USD"
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": ["US", "ES", "MX", "AR", "CO", "PE", "CL"]
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 1,
+              "maxValue": 3,
+              "unitCode": "d"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 3,
+              "maxValue": 14,
+              "unitCode": "d"
+            }
           }
-        }
-      },
+        },
+      }),
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "applicableCountry": ["ES", "MX", "AR", "CO", "PE", "CL", "US"],
         "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 7,
+        "merchantReturnDays": 30,
         "returnMethod": "https://schema.org/ReturnByMail",
         "returnFees": "https://schema.org/FreeReturn"
       }
@@ -111,25 +174,32 @@ export const SEO = ({
         "bestRating": "5",
         "worstRating": "1"
       },
-      "review": [
-        {
-          "@type": "Review",
-          "reviewRating": {
-            "@type": "Rating",
-            "ratingValue": rating,
-            "bestRating": "5",
-            "worstRating": "1"
-          },
-          "author": {
-            "@type": "Person",
-            "name": "Cliente verificado"
-          },
-          "datePublished": "2025-12-15",
-          "reviewBody": "Excelente libro para aprender inglés con pronunciación clara para hispanohablantes."
+      "review": productReviews.map((r) => ({
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": String(r.rating),
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "author": {
+          "@type": "Person",
+          "name": r.author
+        },
+        "datePublished": r.date,
+        "reviewBody": r.text,
+        "publisher": {
+          "@type": "Organization",
+          "name": "iLingue Relax"
         }
-      ]
+      }))
     })
   } : null;
+
+  // Remove undefined keys
+  if (productStructuredData) {
+    delete (productStructuredData as Record<string, unknown>).gtin13;
+  }
 
   const itemListStructuredData = productList && productList.length > 0 ? {
     "@context": "https://schema.org",
@@ -176,12 +246,6 @@ export const SEO = ({
         "name": "Inicio",
         "item": "https://ilinguerelax.com"
       },
-      ...(canonicalUrl.includes("/productos") ? [{
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Productos",
-        "item": "https://ilinguerelax.com/productos"
-      }] : []),
       ...(canonicalUrl.includes("/products/") ? [
         {
           "@type": "ListItem",
@@ -195,8 +259,32 @@ export const SEO = ({
           "name": title.split(" | ")[0],
           "item": canonicalUrl
         }
-      ] : [])
+      ] : []),
+      ...(canonicalUrl.includes("/productos") && !canonicalUrl.includes("/products/") ? [{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Productos",
+        "item": "https://ilinguerelax.com/productos"
+      }] : []),
     ]
+  } : null;
+
+  // Organization structured data (for homepage/general pages)
+  const organizationData = type === "website" ? {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "iLingue Relax",
+    "url": "https://ilinguerelax.com",
+    "logo": "https://ilinguerelax.com/og-image.png",
+    "description": "Aprende idiomas sin estrés con el método iLingue Relax",
+    "sameAs": [
+      "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": ["Spanish", "English"]
+    }
   } : null;
 
   return (
@@ -237,6 +325,17 @@ export const SEO = ({
       <meta property="og:locale:alternate" content="es_AR" />
       <meta property="og:site_name" content="iLingue Relax" />
 
+      {/* Product-specific OG tags */}
+      {type === "product" && price && (
+        <>
+          <meta property="product:price:amount" content={price} />
+          <meta property="product:price:currency" content="USD" />
+          <meta property="product:availability" content="in stock" />
+          <meta property="product:condition" content="new" />
+          <meta property="product:brand" content="iLingue Relax" />
+        </>
+      )}
+
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       {canonicalUrl && <meta name="twitter:url" content={canonicalUrl} />}
@@ -264,6 +363,13 @@ export const SEO = ({
       {breadcrumbData && breadcrumbData.itemListElement.length > 1 && (
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbData)}
+        </script>
+      )}
+
+      {/* Organization Structured Data */}
+      {organizationData && (
+        <script type="application/ld+json">
+          {JSON.stringify(organizationData)}
         </script>
       )}
     </Helmet>

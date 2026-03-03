@@ -132,6 +132,8 @@ const Product8000Book = () => {
         reviewCount="800"
         sku="ILINGUE-8000-BOOK"
         keywords="libro físico inglés, vocabulario inglés, pronunciación inglés hispanohablantes, libro inglés impreso"
+        availability="PreOrder"
+        isPhysical={true}
       />
       <Navbar />
 

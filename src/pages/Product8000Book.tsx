@@ -114,7 +114,7 @@ const Product8000Book = () => {
     content_category: "Physical Book",
     content_ids: ["product-8000-book"],
     content_type: "product",
-    value: 32.99,
+    value: 29.99,
     currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
@@ -127,7 +127,7 @@ const Product8000Book = () => {
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/product-8000-book.png"
         type="product"
-        price="32.99"
+        price="29.99"
         rating="4.9"
         reviewCount="800"
         sku="ILINGUE-8000-BOOK"
@@ -217,7 +217,7 @@ const Product8000Book = () => {
                   <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Compra Anticipada</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$32.99</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
                   <motion.span 
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
@@ -295,7 +295,7 @@ const Product8000Book = () => {
       {/* Countdown Timer */}
       <CountdownTimer 
         hoursFromNow={48} 
-        currentPrice="$32.99 USD"
+        currentPrice="$29.99 USD"
         originalPrice="$45 USD"
         storageKey="countdown_book_physical"
       />
@@ -375,7 +375,7 @@ const Product8000Book = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$32.99</span>
+                <span className="text-5xl font-bold text-foreground">$29.99</span>
                 <span className="text-amber-600 font-bold">USD</span>
               </div>
               <p className="text-muted-foreground mb-6">
@@ -474,7 +474,7 @@ const Product8000Book = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$32.99"
+        price="$29.99"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
         ctaText="PRÓXIMAMENTE"

@@ -84,7 +84,7 @@ const Product5000Book = () => {
     content_category: "Physical Book",
     content_ids: ["product-5000-book"],
     content_type: "product",
-    value: 32.99,
+    value: 19.99,
     currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
@@ -97,7 +97,7 @@ const Product5000Book = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/product-5000-book.png"
         type="product"
-        price="32.99"
+        price="19.99"
         rating="4.8"
         reviewCount="1247"
         sku="ILINGUE-5000-BOOK"
@@ -187,7 +187,7 @@ const Product5000Book = () => {
                   <span className="text-primary font-semibold text-sm uppercase">Disponible en Amazon</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$32.99</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$19.99</span>
                   <span className="text-primary font-bold">USD</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -310,7 +310,7 @@ const Product5000Book = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$32.99</span>
+                <span className="text-5xl font-bold text-foreground">$19.99</span>
                 <span className="text-primary font-bold">USD</span>
               </div>
               <p className="text-muted-foreground mb-6">
@@ -370,7 +370,7 @@ const Product5000Book = () => {
       <Footer />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
-        price="$32.99"
+        price="$19.99"
         ctaText="Comprar en Amazon"
         buyUrl={AMAZON_URL}
       />

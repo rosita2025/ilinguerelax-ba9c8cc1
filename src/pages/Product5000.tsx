@@ -133,20 +133,20 @@ const Product5000 = () => {
     setLightboxOpen(true);
   };
   const nextImage = () => {
-    setCurrentImageIndex(prev => (prev + 1) % previewImages.length);
+    setCurrentImageIndex((prev) => (prev + 1) % previewImages.length);
   };
   const prevImage = () => {
-    setCurrentImageIndex(prev => (prev - 1 + previewImages.length) % previewImages.length);
+    setCurrentImageIndex((prev) => (prev - 1 + previewImages.length) % previewImages.length);
   };
   const openBonusLightbox = (index: number) => {
     setCurrentBonusIndex(index);
     setBonusLightboxOpen(true);
   };
   const nextBonusImage = () => {
-    setCurrentBonusIndex(prev => (prev + 1) % bonuses.length);
+    setCurrentBonusIndex((prev) => (prev + 1) % bonuses.length);
   };
   const prevBonusImage = () => {
-    setCurrentBonusIndex(prev => (prev - 1 + bonuses.length) % bonuses.length);
+    setCurrentBonusIndex((prev) => (prev - 1 + bonuses.length) % bonuses.length);
   };
   const handleBuy = () => {
     // Track InitiateCheckout with Hotmart pixel
@@ -157,7 +157,7 @@ const Product5000 = () => {
       content_type: "product",
       value: 12,
       currency: "USD",
-      num_items: 1,
+      num_items: 1
     });
     window.open("https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true", "_blank");
   };
@@ -223,11 +223,11 @@ const Product5000 = () => {
 
             {/* Image */}
             <div className="flex flex-col items-center px-16">
-              <img 
-                src={bonuses[currentBonusIndex]?.image} 
-                alt={bonuses[currentBonusIndex]?.title} 
-                className="max-h-[70vh] w-auto object-contain rounded-lg" 
-              />
+              <img
+              src={bonuses[currentBonusIndex]?.image}
+              alt={bonuses[currentBonusIndex]?.title}
+              className="max-h-[70vh] w-auto object-contain rounded-lg" />
+            
               <div className="mt-4 text-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold mb-2">
                   GRATIS
@@ -275,21 +275,21 @@ const Product5000 = () => {
             <div>
               {/* Trending & Bonus Badge */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20"
-                >
+                <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20">
+                
                   <Zap className="w-4 h-4" />
                   <span>🔥 MÁS VENDIDO</span>
                 </motion.div>
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
-                >
+                <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium">
+                
                   <Gift className="w-4 h-4" />
                   <span>4 Bonus Gratis</span>
                 </motion.div>
@@ -320,12 +320,12 @@ const Product5000 = () => {
               </div>
 
               {/* Price Section - More Impactful */}
-              <motion.div 
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6"
-              >
+              <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6">
+              
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-green-600" />
                   <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
@@ -333,11 +333,11 @@ const Product5000 = () => {
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <motion.span 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
-                  >
+                  <motion.span
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
+                  
                     AHORRA 78%
                   </motion.span>
                 </div>
@@ -353,15 +353,15 @@ const Product5000 = () => {
 
               {/* CTA Button - More Impactful */}
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button 
-                  variant="hero" 
-                  size="xl" 
-                  className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
-                  onClick={handleBuy}
-                >
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}>
+              
+                <Button
+                variant="hero"
+                size="xl"
+                className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
+                onClick={handleBuy}>
+                
                   <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                   <ShoppingCart className="w-6 h-6 mr-2" />
                   ¡QUIERO COMPRAR AHORA!
@@ -378,12 +378,12 @@ const Product5000 = () => {
               <TrustBadges lang="es" variant="grid" />
 
               {/* Money Back Guarantee - Enhanced */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
-              >
+              <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
+              
                 <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                   <Shield className="w-7 h-7 text-white" />
                 </div>
@@ -401,38 +401,38 @@ const Product5000 = () => {
       <CountdownTimer hoursFromNow={24} />
 
       {/* Collaboration Section */}
-      <section className="py-10 md:py-14 bg-secondary/20 border-y border-border">
-        <div className="container px-4 md:px-6">
-          {/* Top - Static text */}
-          <div className="text-center mb-8">
-            <p className="text-primary font-semibold text-sm md:text-base uppercase tracking-wider mb-2">
-              En colaboración
-            </p>
-            <h2 className="md:text-5xl font-bold text-foreground text-xl">
-               ¡Libro Físico Muy Pronto!
-            </h2>
-            <p className="text-muted-foreground mt-2">Junio 2026</p>
-          </div>
+      
 
-          {/* Store Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-8">
-            <StoreSubscriptionCard logo={logoAmazon} storeName="Amazon" type="coming-soon" />
-            <StoreSubscriptionCard logo={logoEbay} storeName="eBay" type="coming-soon" />
-            <StoreSubscriptionCard logo={logoShopify} storeName="Shopify" type="available" buyLink="https://ilinguerelax.com/products/8-000-palabras-libro-fisico" />
-          </div>
-        </div>
 
-        {/* Bottom - Logo Ticker */}
-        <div className="overflow-hidden bg-gray-900 py-8 md:py-10 mt-6 rounded-2xl">
-          <div className="flex animate-ticker" style={{
-          width: 'max-content'
-        }}>
-            {[...Array(4)].map((_, setIndex) => <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
-                {partnerLogos.map((logo, index) => <img key={`${setIndex}-${index}`} src={logo.src} alt={logo.alt} className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-90`} />)}
-              </div>)}
-          </div>
-        </div>
-      </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
       {/* What's Included */}
       <section className="py-8 md:py-10">
@@ -449,7 +449,7 @@ const Product5000 = () => {
 
             <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map(feature => <div key={feature} className="flex items-start gap-3">
+                {features.map((feature) => <div key={feature} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="w-4 h-4 text-primary-foreground" />
                     </div>
@@ -462,11 +462,11 @@ const Product5000 = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
               <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={previewIndice} 
-                    alt="Índice Completo" 
-                    className="w-full h-full object-cover object-top"
-                  />
+                  <img
+                  src={previewIndice}
+                  alt="Índice Completo"
+                  className="w-full h-full object-cover object-top" />
+                
                 </div>
                 <div className="p-4 text-center">
                   <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
@@ -479,11 +479,11 @@ const Product5000 = () => {
               
               <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={previewGramatica} 
-                    alt="Estructura Gramatical" 
-                    className="w-full h-full object-cover object-top"
-                  />
+                  <img
+                  src={previewGramatica}
+                  alt="Estructura Gramatical"
+                  className="w-full h-full object-cover object-top" />
+                
                 </div>
                 <div className="p-4 text-center">
                   <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
@@ -496,11 +496,11 @@ const Product5000 = () => {
               
               <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={previewFrases} 
-                    alt="Frases con Ejemplos" 
-                    className="w-full h-full object-cover object-top"
-                  />
+                  <img
+                  src={previewFrases}
+                  alt="Frases con Ejemplos"
+                  className="w-full h-full object-cover object-top" />
+                
                 </div>
                 <div className="p-4 text-center">
                   <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
@@ -513,11 +513,11 @@ const Product5000 = () => {
               
               <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={previewVocabulario} 
-                    alt="Vocabulario 5,000 Palabras" 
-                    className="w-full h-full object-cover object-top"
-                  />
+                  <img
+                  src={previewVocabulario}
+                  alt="Vocabulario 5,000 Palabras"
+                  className="w-full h-full object-cover object-top" />
+                
                 </div>
                 <div className="p-4 text-center">
                   <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
@@ -551,24 +551,24 @@ const Product5000 = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {bonuses.map((bonus, index) => (
-              <div 
-                key={bonus.title} 
-                className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group"
-              >
+            {bonuses.map((bonus, index) =>
+          <div
+            key={bonus.title}
+            className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group">
+            
                 {/* Bonus Image */}
-                {bonus.image && (
-                  <div className="relative h-80 md:h-96 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
+                {bonus.image &&
+            <div className="relative h-80 md:h-96 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
                     <img
-                      src={bonus.image}
-                      alt={bonus.title}
-                      className="w-full h-full object-cover"
-                    />
+                src={bonus.image}
+                alt={bonus.title}
+                className="w-full h-full object-cover" />
+              
                     <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
                       GRATIS
                     </div>
                   </div>
-                )}
+            }
                 {/* Content */}
                 <div className="p-6">
                   <div className="flex items-start gap-4">
@@ -586,19 +586,19 @@ const Product5000 = () => {
                   </div>
                 </div>
               </div>
-            ))}
+          )}
           </div>
         </div>
       </section>
 
       {/* Video Testimonial */}
-      <VideoTestimonial 
-        videoUrl="https://youtu.be/bG35t0x3GkU"
-        customerName="Cliente Verificado"
-        customerLocation="Latinoamérica"
-        testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
-        lang="es"
-      />
+      <VideoTestimonial
+      videoUrl="https://youtu.be/bG35t0x3GkU"
+      customerName="Cliente Verificado"
+      customerLocation="Latinoamérica"
+      testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
+      lang="es" />
+    
 
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
@@ -648,20 +648,20 @@ const Product5000 = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(139,69,180,0.3)_0%,_transparent_70%)]" />
         
         <div className="container px-4 md:px-6 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="max-w-6xl mx-auto"
-          >
+          <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="max-w-6xl mx-auto">
+          
             {/* Full Width Image */}
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img 
-                src={aboutIlingueRelax} 
-                alt="Acerca del ILINGUE RELAX - Autora Crady by iLingue Relax"
-                className="w-full h-auto"
-              />
+              <img
+              src={aboutIlingueRelax}
+              alt="Acerca del ILINGUE RELAX - Autora Crady by iLingue Relax"
+              className="w-full h-auto" />
+            
             </div>
             
             {/* Additional Content Below */}

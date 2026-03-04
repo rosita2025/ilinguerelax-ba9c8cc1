@@ -4,7 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { CountdownTimer } from "@/components/CountdownTimer";
+
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import {
 
 // Product image
 import product8000Image from "@/assets/product-8000.png";
+import product8000BookImg from "@/assets/product-8000-book.png";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -279,8 +280,35 @@ const Product8000 = () => {
         </div>
       </section>
 
-      {/* Countdown Timer */}
-      <CountdownTimer hoursFromNow={24} />
+      {/* Physical Book Promo */}
+      <section className="bg-gray-950 py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
+            <div className="w-48 md:w-56 flex-shrink-0">
+              <img 
+                src={product8000BookImg} 
+                alt="Inglés Relax 8,000 Palabras - Libro Físico" 
+                className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
+              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Te gustaría un libro físico?</h3>
+              <p className="text-yellow-200 mb-1 text-lg">Inglés Relax - 8,000 Palabras</p>
+              <p className="text-yellow-300/70 mb-4">Tapa blanda · Disponible próximamente</p>
+              <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
+                <span className="text-3xl font-black text-yellow-400">$29.99 USD</span>
+              </div>
+              <a 
+                href="/products/8-000-palabras-libro-fisico" 
+                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                🛒 Comprar Ahora
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Partner Logos Ticker */}
       <section className="py-6">

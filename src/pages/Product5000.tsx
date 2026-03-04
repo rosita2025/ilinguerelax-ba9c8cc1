@@ -398,29 +398,29 @@ const Product5000 = () => {
       </section>
 
       {/* Physical Book Promo */}
-      <section className="bg-gradient-to-r from-amber-50 to-orange-50 py-10 md:py-14">
+      <section className="bg-gray-950 py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
             <div className="w-48 md:w-56 flex-shrink-0">
               <img 
                 src={product5000BookImg} 
                 alt="Inglés Relax 5,000 Palabras - Libro Físico" 
-                className="w-full rounded-xl shadow-xl hover:scale-105 transition-transform duration-300"
+                className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
               />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <span className="inline-block bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">¿Te gustaría un libro físico?</h3>
-              <p className="text-gray-600 mb-1 text-lg">Inglés Relax - 5,000 Palabras</p>
-              <p className="text-gray-500 mb-4">Tapa blanda · 250-300 páginas · Disponible en Amazon</p>
+              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
+              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Te gustaría un libro físico?</h3>
+              <p className="text-yellow-200 mb-1 text-lg">Inglés Relax - 5,000 Palabras</p>
+              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Disponible en Amazon</p>
               <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
-                <span className="text-3xl font-black text-green-600">$19.99 USD</span>
+                <span className="text-3xl font-black text-yellow-400">$19.99 USD</span>
               </div>
               <a 
                 href="https://www.amazon.com/dp/B0GDTV8GWR" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 🛒 Comprar en Amazon
               </a>

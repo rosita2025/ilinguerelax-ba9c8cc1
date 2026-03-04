@@ -42,6 +42,7 @@ import logoHotmart from "@/assets/logo-hotmart.svg";
 import logoKindle from "@/assets/logo-kindle.png";
 
 // Conversion components
+import { Product8000Preview } from "@/components/Product8000Preview";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -386,6 +387,9 @@ const Product8000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Preview & Bonus Sections */}
+      <Product8000Preview />
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 gradient-hero">

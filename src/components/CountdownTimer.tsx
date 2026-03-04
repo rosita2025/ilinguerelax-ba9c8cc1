@@ -78,10 +78,10 @@ export const CountdownTimer = ({
   const TimeBox = ({
     value,
     label
-  }: {
-    value: number;
-    label: string;
-  }) => <div className="flex flex-col items-center">
+
+
+
+  }: {value: number;label: string;}) => <div className="flex flex-col items-center">
       <div className="bg-[#1a2332] text-white font-black text-4xl md:text-6xl rounded-2xl w-20 md:w-32 h-20 md:h-32 flex items-center justify-center shadow-2xl border-2 border-white/10 relative overflow-hidden">
         <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
         <span className="relative">{value.toString().padStart(2, "0")}</span>
@@ -91,7 +91,7 @@ export const CountdownTimer = ({
   return (
     <section className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 py-6 md:py-8 relative overflow-hidden">
       {/* Animated Background Effects */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZoLTJ2LTRoMnY0em0tNiA2aC0ydi00aDJ2NHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20" />
+      
       
       <div className="container px-4 md:px-6 relative z-10">
         <div className="flex flex-col items-center text-center">
@@ -132,6 +132,6 @@ export const CountdownTimer = ({
           </p>
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 };

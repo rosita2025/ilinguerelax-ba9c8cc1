@@ -416,14 +416,22 @@ const Product5000 = () => {
               <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
                 <span className="text-3xl font-black text-yellow-400">$19.99 USD</span>
               </div>
-              <a 
-                href="https://www.amazon.com/dp/B0GDTV8GWR" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                🛒 Comprar en Amazon
-              </a>
+              <div className="flex flex-col sm:flex-row items-center gap-3 justify-center md:justify-start">
+                <a 
+                  href="https://www.amazon.com/dp/B0GDTV8GWR" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  🛒 Comprar en Amazon
+                </a>
+                <a 
+                  href="/products/5-000-palabras-libro-fisico"
+                  className="inline-flex items-center gap-2 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-950 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
+                >
+                  📖 Ver detalles
+                </a>
+              </div>
             </div>
           </div>
         </div>

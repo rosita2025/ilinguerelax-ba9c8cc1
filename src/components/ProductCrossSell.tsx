@@ -133,11 +133,7 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(product.rating)
-                            ? "fill-amber-400 text-amber-400"
-                            : "fill-muted text-muted"
-                        }`}
+                      className="w-4 h-4 fill-amber-400 text-amber-400"
                       />
                     ))}
                   </div>

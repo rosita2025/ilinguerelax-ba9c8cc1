@@ -334,7 +334,7 @@ const Product8000 = () => {
       </section>
 
       {/* Benefits */}
-      <section className="py-20 md:py-28 bg-secondary/30">
+      <section className="py-12 md:py-16 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">

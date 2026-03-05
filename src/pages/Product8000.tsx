@@ -27,8 +27,8 @@ import {
   CreditCard,
   Zap,
   Shield,
-  ShoppingCart,
-} from "lucide-react";
+  ShoppingCart } from
+"lucide-react";
 
 // Product image
 import product8000Image from "@/assets/product-8000.png";
@@ -52,48 +52,48 @@ import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const partnerLogos = [
-  { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
-  { src: logoEtsy, alt: "Etsy", height: "h-10 md:h-14" },
-  { src: logoShopify, alt: "Shopify", height: "h-10 md:h-14" },
-  { src: logoHotmart, alt: "Hotmart", height: "h-8 md:h-12" },
-  { src: logoKindle, alt: "Amazon Kindle", height: "h-8 md:h-12" },
-];
+{ src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
+{ src: logoEtsy, alt: "Etsy", height: "h-10 md:h-14" },
+{ src: logoShopify, alt: "Shopify", height: "h-10 md:h-14" },
+{ src: logoHotmart, alt: "Hotmart", height: "h-8 md:h-12" },
+{ src: logoKindle, alt: "Amazon Kindle", height: "h-8 md:h-12" }];
+
 
 const features = [
-  "8,000 palabras esenciales del inglés",
-  "Pronunciación en español incluida",
-  "Diseñado para hispanohablantes",
-  "Sin necesidad de diccionarios",
-  "Metodología paso a paso sin estrés",
-  "Fonética UK y USA incluida",
-  "Actualizaciones gratuitas de por vida",
-  "Soporte personalizado",
-];
+"8,000 palabras esenciales del inglés",
+"Pronunciación en español incluida",
+"Diseñado para hispanohablantes",
+"Sin necesidad de diccionarios",
+"Metodología paso a paso sin estrés",
+"Fonética UK y USA incluida",
+"Actualizaciones gratuitas de por vida",
+"Soporte personalizado"];
+
 
 const benefits = [
-  {
-    icon: BookOpen,
-    title: "Pronunciación en Español",
-    description:
-      "Cada palabra incluye su pronunciación adaptada al español para que aprendas correctamente desde el primer día.",
-  },
-  {
-    icon: BookOpen,
-    title: "8,000 Palabras Esenciales",
-    description:
-      "El vocabulario más importante organizado por frecuencia de uso para máximo impacto en tu aprendizaje.",
-  },
-  {
-    icon: Sparkles,
-    title: "Método Sin Estrés",
-    description: "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
-  },
-  {
-    icon: Brain,
-    title: "Sin Diccionarios",
-    description: "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
-  },
-];
+{
+  icon: BookOpen,
+  title: "Pronunciación en Español",
+  description:
+  "Cada palabra incluye su pronunciación adaptada al español para que aprendas correctamente desde el primer día."
+},
+{
+  icon: BookOpen,
+  title: "8,000 Palabras Esenciales",
+  description:
+  "El vocabulario más importante organizado por frecuencia de uso para máximo impacto en tu aprendizaje."
+},
+{
+  icon: Sparkles,
+  title: "Método Sin Estrés",
+  description: "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje."
+},
+{
+  icon: Brain,
+  title: "Sin Diccionarios",
+  description: "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar."
+}];
+
 
 const Product8000 = () => {
   // Meta Pixel ViewContent event - HOTMART PIXEL
@@ -104,9 +104,9 @@ const Product8000 = () => {
       content_ids: ["product-8000"],
       content_type: "product",
       value: 17,
-      currency: "USD",
+      currency: "USD"
     }),
-    [],
+    []
   );
   useHotmartPixel(pixelParams);
 
@@ -119,7 +119,7 @@ const Product8000 = () => {
       content_type: "product",
       value: 17,
       currency: "USD",
-      num_items: 1,
+      num_items: 1
     });
     window.open("https://pay.hotmart.com/U103990323W?checkoutMode=10", "_blank");
   };
@@ -137,8 +137,8 @@ const Product8000 = () => {
         rating="4.9"
         reviewCount="892"
         sku="ILINGUE-8000"
-        keywords="aprender inglés, vocabulario inglés 8000 palabras, pronunciación inglés hispanohablantes, libro digital inglés avanzado"
-      />
+        keywords="aprender inglés, vocabulario inglés 8000 palabras, pronunciación inglés hispanohablantes, libro digital inglés avanzado" />
+      
       <Navbar />
 
       {/* Hero Section */}
@@ -152,8 +152,8 @@ const Product8000 = () => {
                 <img
                   src={product8000Image}
                   alt="Inglés Relax - 8,000 Palabras"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                />
+                  className="w-full h-auto rounded-2xl shadow-hero" />
+                
               </div>
             </div>
 
@@ -165,8 +165,8 @@ const Product8000 = () => {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20"
-                >
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20">
+                  
                   <Zap className="w-4 h-4" />
                   <span>🔥 PREMIUM</span>
                 </motion.div>
@@ -174,8 +174,8 @@ const Product8000 = () => {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
-                >
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium">
+                  
                   <Gift className="w-4 h-4" />
                   <span>4 Bonus Gratis</span>
                 </motion.div>
@@ -193,9 +193,9 @@ const Product8000 = () => {
               {/* Reviews - More Prominent */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  ))}
+                  {[...Array(5)].map((_, i) =>
+                  <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  )}
                 </div>
                 <span className="font-bold text-foreground">4.9/5</span>
                 <span className="text-muted-foreground">(20+ Estudiantes Satisfechos)</span>
@@ -216,8 +216,8 @@ const Product8000 = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6"
-              >
+                className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6">
+                
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-green-600" />
                   <span className="text-green-600 font-semibold text-sm uppercase">
@@ -230,8 +230,8 @@ const Product8000 = () => {
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
-                  >
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
+                    
                     AHORRA 63%
                   </motion.span>
                 </div>
@@ -264,8 +264,8 @@ const Product8000 = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
-              >
+                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
+                
                 <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                   <Shield className="w-7 h-7 text-white" />
                 </div>
@@ -286,11 +286,11 @@ const Product8000 = () => {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
             <div className="w-48 md:w-56 flex-shrink-0">
-              <img 
-                src={product8000BookImg} 
-                alt="Inglés Relax 8,000 Palabras - Libro Físico" 
-                className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
-              />
+              <img
+                src={product8000BookImg}
+                alt="Inglés Relax 8,000 Palabras - Libro Físico"
+                className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300" />
+              
             </div>
             <div className="flex-1 text-center md:text-left">
               <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
@@ -300,10 +300,10 @@ const Product8000 = () => {
               <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
                 <span className="text-3xl font-black text-yellow-400">$29.99 USD</span>
               </div>
-              <a 
-                href="/products/8-000-palabras-libro-fisico" 
-                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-              >
+              <a
+                href="/products/8-000-palabras-libro-fisico"
+                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                
                 🛒 Comprar Ahora
               </a>
             </div>
@@ -316,18 +316,18 @@ const Product8000 = () => {
         <div className="container px-4 md:px-6">
           <div className="overflow-hidden bg-gray-900 py-8 md:py-10 rounded-2xl">
             <div className="flex animate-ticker" style={{ width: "max-content" }}>
-              {[...Array(4)].map((_, setIndex) => (
-                <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
-                  {partnerLogos.map((logo, index) => (
-                    <img
-                      key={`${setIndex}-${index}`}
-                      src={logo.src}
-                      alt={logo.alt}
-                      className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-90`}
-                    />
-                  ))}
+              {[...Array(4)].map((_, setIndex) =>
+              <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
+                  {partnerLogos.map((logo, index) =>
+                <img
+                  key={`${setIndex}-${index}`}
+                  src={logo.src}
+                  alt={logo.alt}
+                  className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-90`} />
+
+                )}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -346,11 +346,11 @@ const Product8000 = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit.title}
-                className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500"
-              >
+            {benefits.map((benefit) =>
+            <div
+              key={benefit.title}
+              className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500">
+              
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
                     <benefit.icon className="w-6 h-6 text-primary-foreground" />
@@ -361,32 +361,32 @@ const Product8000 = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
 
       {/* What's Included */}
-      <section className="py-20 md:py-28">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">Todo lo que incluye</h2>
+      
 
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
 
       {/* Preview & Bonus Sections */}
       <Product8000Preview />
@@ -425,49 +425,49 @@ const Product8000 = () => {
       {/* FAQ Section */}
       <FAQ
         items={[
-          {
-            question: "¿Quién es el autor del libro?",
-            answer:
-              "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
-            icon: User,
-          },
-          {
-            question: "¿INGLÉS RELAX es un libro físico o digital?",
-            answer:
-              "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico (tapa blanda pegada) está previsto para junio de 2026. En algunas promociones futuras, el libro físico podrá incluir la versión digital (PDF) como bono.",
-            icon: Smartphone,
-          },
-          {
-            question: "¿Cuántas páginas tiene INGLÉS RELAX?",
-            answer:
-              "El libro digital tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
-            icon: FileText,
-          },
-          {
-            question: "¿Es adecuado para estudiar solo/a?",
-            answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
-            icon: GraduationCap,
-          },
-          {
-            question: "¿Necesito saber inglés antes de usar el libro?",
-            answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
-            icon: Lightbulb,
-          },
-          {
-            question: "¿El libro incluye pronunciación?",
-            answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
-            icon: BookOpen,
-          },
-          {
-            question: "¿Cómo realizo el pago?",
-            answer:
-              "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
-            icon: CreditCard,
-          },
-        ]}
+        {
+          question: "¿Quién es el autor del libro?",
+          answer:
+          "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
+          icon: User
+        },
+        {
+          question: "¿INGLÉS RELAX es un libro físico o digital?",
+          answer:
+          "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico (tapa blanda pegada) está previsto para junio de 2026. En algunas promociones futuras, el libro físico podrá incluir la versión digital (PDF) como bono.",
+          icon: Smartphone
+        },
+        {
+          question: "¿Cuántas páginas tiene INGLÉS RELAX?",
+          answer:
+          "El libro digital tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
+          icon: FileText
+        },
+        {
+          question: "¿Es adecuado para estudiar solo/a?",
+          answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
+          icon: GraduationCap
+        },
+        {
+          question: "¿Necesito saber inglés antes de usar el libro?",
+          answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
+          icon: Lightbulb
+        },
+        {
+          question: "¿El libro incluye pronunciación?",
+          answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
+          icon: BookOpen
+        },
+        {
+          question: "¿Cómo realizo el pago?",
+          answer:
+          "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
+          icon: CreditCard
+        }]
+        }
         title="Preguntas Frecuentes"
-        subtitle="Resolvemos tus dudas sobre INGLÉS RELAX"
-      />
+        subtitle="Resolvemos tus dudas sobre INGLÉS RELAX" />
+      
 
       <Footer />
 
@@ -477,8 +477,8 @@ const Product8000 = () => {
         originalPrice="$54"
         rating={4.9}
         reviewCount={10000}
-        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10"
-      />
+        buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10" />
+      
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />
@@ -493,16 +493,16 @@ const Product8000 = () => {
         customerLocation="Latinoamérica"
         testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
         lang="es"
-        showProductSelector={true}
-      />
+        showProductSelector={true} />
+      
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton />
-    </main>
-  );
+    </main>);
+
 };
 
 export default Product8000;

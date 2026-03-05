@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 import product5000BookImage from "@/assets/product-5000-book.png";
+import product5000BookPerson from "@/assets/product-5000-book-person.jpg";
 
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -78,7 +79,16 @@ const benefits = [
 
 const AMAZON_URL = "https://www.amazon.com/dp/B0GDTV8GWR";
 
+const MEDIA_SLIDES = [
+  { type: "image" as const, src: product5000BookImage, alt: "Inglés Relax - 5,000 Palabras Libro Físico" },
+  { type: "video" as const, src: "/videos/product-5000-book.mp4", alt: "" },
+  { type: "image" as const, src: product5000BookPerson, alt: "Persona con libro Inglés Relax" },
+];
+
 const Product5000Book = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 5,000 Palabras Libro Físico",
     content_category: "Physical Book",
@@ -88,6 +98,22 @@ const Product5000Book = () => {
     currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
+
+  useEffect(() => {
+    const slide = MEDIA_SLIDES[currentSlide];
+    if (slide.type === "video") {
+      const vid = videoRef.current;
+      if (vid) {
+        vid.currentTime = 0;
+        vid.play();
+        const onEnded = () => setCurrentSlide((c) => (c + 1) % MEDIA_SLIDES.length);
+        vid.addEventListener("ended", onEnded);
+        return () => vid.removeEventListener("ended", onEnded);
+      }
+    }
+    const timer = setTimeout(() => setCurrentSlide((c) => (c + 1) % MEDIA_SLIDES.length), 3500);
+    return () => clearTimeout(timer);
+  }, [currentSlide]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -111,15 +137,38 @@ const Product5000Book = () => {
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Product Image */}
+            {/* Product Media Carousel */}
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
-              <div className="relative">
-                <img
-                  src={product5000BookImage}
-                  alt="Inglés Relax - 5,000 Palabras Libro Físico"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                />
+              <div className="relative overflow-hidden rounded-2xl shadow-hero">
+                {MEDIA_SLIDES.map((slide, i) => (
+                  <div
+                    key={i}
+                    className={`transition-opacity duration-700 ${i === currentSlide ? "opacity-100" : "opacity-0 absolute inset-0"}`}
+                  >
+                    {slide.type === "image" ? (
+                      <img src={slide.src} alt={slide.alt} className="w-full h-auto" />
+                    ) : (
+                      <video
+                        ref={videoRef}
+                        src={slide.src}
+                        muted
+                        playsInline
+                        className="w-full h-auto"
+                      />
+                    )}
+                  </div>
+                ))}
+                {/* Dots */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                  {MEDIA_SLIDES.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentSlide(i)}
+                      className={`w-2.5 h-2.5 rounded-full transition-all ${i === currentSlide ? "bg-primary scale-125" : "bg-foreground/30"}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 

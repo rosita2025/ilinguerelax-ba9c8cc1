@@ -46,7 +46,7 @@ const features = [
   "Metodología paso a paso sin estrés",
   "Fonética UK y USA incluida",
   "Libro físico tapa blanda de alta calidad",
-  "Entre 250-300 páginas",
+  "Entre 200 Paginas",
 ];
 
 const benefits = [

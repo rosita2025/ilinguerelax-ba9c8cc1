@@ -83,7 +83,6 @@ const MEDIA_SLIDES = [
   { type: "image" as const, src: product5000BookImage, alt: "Inglés Relax - 5,000 Palabras Libro Físico" },
   { type: "video" as const, src: "/videos/product-5000-book.mp4", alt: "" },
   { type: "image" as const, src: product5000BookPerson, alt: "Persona con libro Inglés Relax" },
-  { type: "video" as const, src: "/videos/product-5000-book-details.mp4", alt: "" },
 ];
 
 const Product5000Book = () => {
@@ -318,6 +317,20 @@ const Product5000Book = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Video de detalles */}
+      <section className="py-12 md:py-16">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <video
+              src="/videos/product-5000-book-details.mp4"
+              controls
+              playsInline
+              className="w-full h-auto rounded-2xl shadow-hero"
+            />
           </div>
         </div>
       </section>

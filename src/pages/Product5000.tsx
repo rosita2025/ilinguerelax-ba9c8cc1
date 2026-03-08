@@ -397,45 +397,6 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Physical Book Promo */}
-      <section className="bg-gray-950 py-10 md:py-14">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
-            <div className="w-48 md:w-56 flex-shrink-0">
-              <img 
-                src={product5000BookImg} 
-                alt="Inglés Relax 5,000 Palabras - Libro Físico" 
-                className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Te gustaría un libro físico?</h3>
-              <p className="text-yellow-200 mb-1 text-lg">Inglés Relax - 5,000 Palabras</p>
-              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Disponible en Amazon</p>
-              <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
-                <span className="text-3xl font-black text-yellow-400">$19.99 USD</span>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3 justify-center md:justify-start">
-                <a 
-                  href="https://www.amazon.com/dp/B0GDTV8GWR" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  🛒 Comprar en Amazon
-                </a>
-                <a 
-                  href="/products/5-000-palabras-libro-fisico"
-                  className="inline-flex items-center gap-2 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-950 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
-                >
-                  📖 Ver detalles
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Collaboration Section */}
       

@@ -50,6 +50,7 @@ import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { ProductReviews } from "@/components/ProductReviews";
 
 const partnerLogos = [
 { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },

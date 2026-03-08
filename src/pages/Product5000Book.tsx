@@ -83,6 +83,7 @@ const MEDIA_SLIDES = [
   { type: "image" as const, src: product5000BookImage, alt: "Inglés Relax - 5,000 Palabras Libro Físico" },
   { type: "video" as const, src: "/videos/product-5000-book.mp4", alt: "" },
   { type: "image" as const, src: product5000BookPerson, alt: "Persona con libro Inglés Relax" },
+  { type: "video" as const, src: "/videos/product-5000-book-details.mp4", alt: "" },
 ];
 
 const Product5000Book = () => {

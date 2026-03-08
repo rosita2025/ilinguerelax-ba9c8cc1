@@ -321,6 +321,20 @@ const Product5000Book = () => {
         </div>
       </section>
 
+      {/* Video de detalles */}
+      <section className="py-12 md:py-16">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <video
+              src="/videos/product-5000-book-details.mp4"
+              controls
+              playsInline
+              className="w-full h-auto rounded-2xl shadow-hero"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* What's Included */}
       <section className="py-20 md:py-28">
         <div className="container px-4 md:px-6">

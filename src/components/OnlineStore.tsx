@@ -38,9 +38,11 @@ const storeLinks = [
   {
     name: "Amazon",
     logo: logoAmazon,
-    url: "#",
-    available: false,
-    comingSoon: "📚 Libro Físico - Muy Pronto",
+    url: "https://www.amazon.com/Ingles-Relax-palabras-pronunciación-fonética/dp/B0GDTV8GWR?ref_=ast_author_dp",
+    available: true,
+    price: "$19.99",
+    priceNote: "",
+    type: "📚 Libro Físico",
   },
   {
     name: "Shopify",

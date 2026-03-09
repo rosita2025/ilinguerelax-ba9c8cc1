@@ -1,16 +1,3 @@
-import product5000 from "@/assets/product-5000.png";
-import product8000 from "@/assets/product-8000.png";
-import productSpanish5000 from "@/assets/product-spanish-5000.png";
-import product8000Book from "@/assets/product-8000-book.png";
-import product1000Verbos from "@/assets/product-1000-verbos.png";
-import product500Preguntas from "@/assets/product-500-preguntas.png";
-import product1000Free from "@/assets/product-1000-free.png";
-import product5000Book from "@/assets/product-5000-book.png";
-import productGerman5000 from "@/assets/product-german-5000.png";
-import productPortuguese5000 from "@/assets/product-portuguese-5000.png";
-import productItalian5000 from "@/assets/product-italian-5000.jpg";
-import productFrench5000 from "@/assets/product-french-5000.jpg";
-
 export interface Product {
   id: string;
   slug: string;

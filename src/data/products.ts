@@ -78,7 +78,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Libro",
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    image: product5000Book,
+    image: "/lovable-uploads/71addebe-d687-4b49-8424-4532243c34f4.jpg",
     title: "Inglés Relax - 5,000 Palabras",
     subtitle: "Libro Físico Tapa Blanda",
     description: "Libro físico tapa blanda premium",

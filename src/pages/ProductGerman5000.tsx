@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-import productGerman5000Image from "@/assets/product-german-5000.png";
+const productGerman5000Image = "/images/product-german-5000.png";
 
 const features = [
   "5,000 palabras esenciales en alemán",

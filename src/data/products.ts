@@ -85,7 +85,7 @@ export const products: Product[] = [
     name: "8,000 Palabras Libro",
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    image: product8000Book,
+    image: "/images/product-8000-book.png",
     title: "Inglés Relax - 8,000 Palabras",
     subtitle: "Libro Físico Tapa Blanda",
     description: "Libro físico tapa blanda premium",

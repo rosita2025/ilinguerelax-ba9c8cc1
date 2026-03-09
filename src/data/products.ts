@@ -181,7 +181,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Alemán",
     flag: "🇩🇪",
     country: "Alemán para Hispanohablantes",
-    image: productGerman5000,
+    image: "/images/product-german-5000.png",
     title: "Alemán Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación para Hispanohablantes y Fonética Alemana",
     description: "Aprende alemán con pronunciación adaptada para hispanohablantes",

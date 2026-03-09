@@ -104,7 +104,7 @@ export const products: Product[] = [
     name: "5,000 Words",
     flag: "🇪🇸",
     country: "Spanish for English Speakers",
-    image: productSpanish5000,
+    image: "/images/product-spanish-5000.png",
     title: "Spanish Relax - 5,000 Words",
     subtitle: "Spanish for English Speakers",
     description: "With English Pronunciation",

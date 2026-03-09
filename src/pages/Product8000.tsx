@@ -31,8 +31,8 @@ import {
 "lucide-react";
 
 // Product image
-import product8000Image from "@/assets/product-8000.png";
-import product8000BookImg from "@/assets/product-8000-book.png";
+const product8000Image = "/images/product-8000.png";
+const product8000BookImg = "/images/product-8000-book.png";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";

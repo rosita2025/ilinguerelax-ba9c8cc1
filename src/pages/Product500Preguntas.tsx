@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, MessageCircle, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, Zap, Sparkles, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
-import product500PreguntasImage from "@/assets/product-500-preguntas.png";
+const product500PreguntasImage = "/images/product-500-preguntas.png";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";

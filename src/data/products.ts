@@ -1,16 +1,3 @@
-import product5000 from "@/assets/product-5000.png";
-import product8000 from "@/assets/product-8000.png";
-import productSpanish5000 from "@/assets/product-spanish-5000.png";
-import product8000Book from "@/assets/product-8000-book.png";
-import product1000Verbos from "@/assets/product-1000-verbos.png";
-import product500Preguntas from "@/assets/product-500-preguntas.png";
-import product1000Free from "@/assets/product-1000-free.png";
-import product5000Book from "@/assets/product-5000-book.png";
-import productGerman5000 from "@/assets/product-german-5000.png";
-import productPortuguese5000 from "@/assets/product-portuguese-5000.png";
-import productItalian5000 from "@/assets/product-italian-5000.jpg";
-import productFrench5000 from "@/assets/product-french-5000.jpg";
-
 export interface Product {
   id: string;
   slug: string;
@@ -40,7 +27,7 @@ export const products: Product[] = [
     name: "5,000 Palabras",
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    image: product5000,
+    image: "/images/product-5000.png",
     title: "Inglés Relax - 5,000 Palabras",
     subtitle: "Nivel Básico a Intermedio",
     description: "Vocabulario esencial con pronunciación",
@@ -59,7 +46,7 @@ export const products: Product[] = [
     name: "8,000 Palabras",
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    image: product8000,
+    image: "/images/product-8000.png",
     title: "Inglés Relax - 8,000 Palabras",
     subtitle: "Libro Digital Completo",
     description: "Vocabulario completo + gramática",
@@ -98,7 +85,7 @@ export const products: Product[] = [
     name: "8,000 Palabras Libro",
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    image: product8000Book,
+    image: "/images/product-8000-book.png",
     title: "Inglés Relax - 8,000 Palabras",
     subtitle: "Libro Físico Tapa Blanda",
     description: "Libro físico tapa blanda premium",
@@ -117,7 +104,7 @@ export const products: Product[] = [
     name: "5,000 Words",
     flag: "🇪🇸",
     country: "Spanish for English Speakers",
-    image: productSpanish5000,
+    image: "/images/product-spanish-5000.png",
     title: "Spanish Relax - 5,000 Words",
     subtitle: "Spanish for English Speakers",
     description: "With English Pronunciation",
@@ -136,7 +123,7 @@ export const products: Product[] = [
     name: "1,000 Verbos",
     flag: "🇬🇧",
     country: "Inglés para Hispanohablantes",
-    image: product1000Verbos,
+    image: "/images/product-1000-verbos.png",
     title: "Inglés Relax - 1,000 Verbos Esenciales",
     subtitle: "Presente, Pasado y Futuro con Pronunciación",
     description: "Verbos esenciales con pronunciación para hispanohablantes",
@@ -155,7 +142,7 @@ export const products: Product[] = [
     name: "500 Preguntas",
     flag: "🇬🇧",
     country: "Inglés para Hispanohablantes",
-    image: product500Preguntas,
+    image: "/images/product-500-preguntas.png",
     title: "Inglés Relax - 500 Preguntas en Inglés",
     subtitle: "Con Pronunciación para Hispanohablantes",
     description: "Habla sin miedo en situaciones reales",
@@ -174,7 +161,7 @@ export const products: Product[] = [
     name: "1,000 Palabras (Gratis)",
     flag: "🇬🇧",
     country: "Inglés para Hispanohablantes",
-    image: product1000Free,
+    image: "/images/product-1000-free.png",
     title: "Inglés Relax - 1,000 Palabras",
     subtitle: "Con Pronunciación en Español y Fonética UK/US",
     description: "Libro digital gratuito con 1,000 palabras esenciales",
@@ -194,7 +181,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Alemán",
     flag: "🇩🇪",
     country: "Alemán para Hispanohablantes",
-    image: productGerman5000,
+    image: "/images/product-german-5000.png",
     title: "Alemán Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación para Hispanohablantes y Fonética Alemana",
     description: "Aprende alemán con pronunciación adaptada para hispanohablantes",
@@ -214,7 +201,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Portugués",
     flag: "🇧🇷",
     country: "Portugués para Hispanohablantes",
-    image: productPortuguese5000,
+    image: "/images/product-portuguese-5000.png",
     title: "Portugués Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación Adaptada para Hispanohablantes y Fonética en Portugués Real",
     description: "Aprende portugués con pronunciación adaptada para hispanohablantes",
@@ -234,7 +221,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Italiano",
     flag: "🇮🇹",
     country: "Italiano para Hispanohablantes",
-    image: productItalian5000,
+    image: "/images/product-italian-5000.jpg",
     title: "Italiano Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación para Hispanohablantes y Fonética Italiana",
     description: "Aprende italiano con pronunciación adaptada para hispanohablantes",
@@ -254,7 +241,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Francés",
     flag: "🇫🇷",
     country: "Francés para Hispanohablantes",
-    image: productFrench5000,
+    image: "/images/product-french-5000.jpg",
     title: "Francés Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación para Hispanohablantes y Fonética Francesa",
     description: "Aprende francés con pronunciación adaptada para hispanohablantes",

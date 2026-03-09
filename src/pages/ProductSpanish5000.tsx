@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star } from "lucide-react";
 
 // Product image
-import productSpanish5000Image from "@/assets/product-spanish-5000.png";
+const productSpanish5000Image = "/images/product-spanish-5000.png";
 
 // Preview images
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";

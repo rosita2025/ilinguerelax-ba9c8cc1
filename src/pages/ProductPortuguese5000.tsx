@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-import productPortuguese5000Image from "@/assets/product-portuguese-5000.png";
+const productPortuguese5000Image = "/images/product-portuguese-5000.png";
 
 const features = [
   "5,000 palabras esenciales en portugués",

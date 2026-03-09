@@ -110,6 +110,7 @@ export const Languages = () => {
                     src={product.image}
                     alt={product.title}
                     loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

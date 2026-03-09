@@ -45,9 +45,11 @@ const storeLinks = [
   {
     name: "Shopify",
     logo: logoShopify,
-    url: "#",
-    available: false,
-    comingSoon: "📚 Libro Físico - Muy Pronto",
+    url: "https://inglesrelax.shop/products/ingles-relax-5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-usa-copy",
+    available: true,
+    price: "$19.99",
+    priceNote: "",
+    type: "📚 Libro Físico",
   },
 ];
 

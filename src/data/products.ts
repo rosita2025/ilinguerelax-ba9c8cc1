@@ -241,7 +241,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Francés",
     flag: "🇫🇷",
     country: "Francés para Hispanohablantes",
-    image: productFrench5000,
+    image: "/images/product-french-5000.jpg",
     title: "Francés Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación para Hispanohablantes y Fonética Francesa",
     description: "Aprende francés con pronunciación adaptada para hispanohablantes",

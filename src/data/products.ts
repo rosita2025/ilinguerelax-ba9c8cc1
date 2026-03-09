@@ -123,7 +123,7 @@ export const products: Product[] = [
     name: "1,000 Verbos",
     flag: "🇬🇧",
     country: "Inglés para Hispanohablantes",
-    image: product1000Verbos,
+    image: "/images/product-1000-verbos.png",
     title: "Inglés Relax - 1,000 Verbos Esenciales",
     subtitle: "Presente, Pasado y Futuro con Pronunciación",
     description: "Verbos esenciales con pronunciación para hispanohablantes",

@@ -142,7 +142,7 @@ export const products: Product[] = [
     name: "500 Preguntas",
     flag: "🇬🇧",
     country: "Inglés para Hispanohablantes",
-    image: product500Preguntas,
+    image: "/images/product-500-preguntas.png",
     title: "Inglés Relax - 500 Preguntas en Inglés",
     subtitle: "Con Pronunciación para Hispanohablantes",
     description: "Habla sin miedo en situaciones reales",

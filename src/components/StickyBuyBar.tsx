@@ -168,7 +168,7 @@ export const StickyBuyBar = ({
                 </Button>
               )}
             </div>
-        </div>
+          )}
 
         {/* Desktop: Horizontal Layout */}
         <div className="hidden lg:flex items-center justify-between gap-3">

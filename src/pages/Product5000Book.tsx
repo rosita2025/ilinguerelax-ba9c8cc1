@@ -38,6 +38,9 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ProductReviews } from "@/components/ProductReviews";
+import { useCartStore } from "@/stores/cartStore";
+import { fetchShopifyProducts } from "@/lib/shopify";
+import { toast } from "sonner";
 
 const features = [
   "5,000 palabras esenciales del inglés",

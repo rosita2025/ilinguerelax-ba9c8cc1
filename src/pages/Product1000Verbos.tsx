@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Gift, User, Smartphone, FileText, GraduationCap, Lightbulb, CreditCard, Zap, Sparkles, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
-const product1000VerbosImage = "/images/product-1000-verbos.png";
+const product1000VerbosImage = "/images/product-1000-verbos.webp";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";

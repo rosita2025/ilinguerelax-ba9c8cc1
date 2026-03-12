@@ -23,7 +23,7 @@ import previewIndice from "@/assets/preview-indice.png";
 import previewGramatica from "@/assets/preview-gramatica.png";
 import previewFrases from "@/assets/preview-frases.jpg";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
-const product5000Image = "/images/product-5000.png";
+const product5000Image = "/images/product-5000.webp";
 
 // Bonus images
 import bonusEstructura from "@/assets/bonus-estructura.png";

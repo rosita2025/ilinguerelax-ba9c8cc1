@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 
 // Product images
-const product8000Image = "/images/product-8000.png";
-const product5000Image = "/images/product-5000.png";
+const product8000Image = "/images/product-8000.webp";
+const product5000Image = "/images/product-5000.webp";
 
 interface ProductTestimonial {
   videoUrl: string;

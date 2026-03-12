@@ -40,6 +40,9 @@ export const StickyBuyBar = ({
   showEmailSubscription = false,
   onSubscribe,
   isSubscribed = false,
+  secondaryCtaText,
+  onSecondaryClick,
+  isSecondaryLoading = false,
 }: StickyBuyBarProps) => {
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);

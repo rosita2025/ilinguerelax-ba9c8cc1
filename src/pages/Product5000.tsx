@@ -3,7 +3,7 @@ import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-const product5000BookImg = "/lovable-uploads/71addebe-d687-4b49-8424-4532243c34f4.jpg";
+const product5000BookImg = "/images/product-5000-book.webp";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";

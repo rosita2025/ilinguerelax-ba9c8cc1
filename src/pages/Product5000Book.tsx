@@ -481,6 +481,9 @@ const Product5000Book = () => {
         price="$19.99"
         ctaText="Comprar en Amazon"
         buyUrl={AMAZON_URL}
+        secondaryCtaText="Agregar al Carrito"
+        onSecondaryClick={handleAddToShopifyCart}
+        isSecondaryLoading={cartLoading}
       />
       <SalesNotification />
       <ScrollToTop />

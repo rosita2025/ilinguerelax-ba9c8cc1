@@ -242,6 +242,22 @@ export const StickyBuyBar = ({
                 </>
               )}
             </Button>
+            {secondaryCtaText && onSecondaryClick && (
+              <Button
+                variant="outline"
+                size="default"
+                className="whitespace-nowrap text-sm px-4 py-3 h-auto font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                onClick={onSecondaryClick}
+                disabled={isSecondaryLoading}
+              >
+                {isSecondaryLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                )}
+                {secondaryCtaText}
+              </Button>
+            )}
           </div>
         </div>
       </div>

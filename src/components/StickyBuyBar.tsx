@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail } from "lucide-react";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;

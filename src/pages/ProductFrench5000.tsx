@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const productFrench5000Image = "/images/product-french-5000.jpg";
+const productFrench5000Image = "/images/product-french-5000.webp";
 
 const features = [
   "5,000 palabras esenciales en francés",

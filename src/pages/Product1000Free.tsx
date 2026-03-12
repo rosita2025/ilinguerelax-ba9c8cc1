@@ -8,7 +8,7 @@ import { Star, Check, BookOpen, Globe, ArrowRight, Download, Gift, ExternalLink 
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
-const product1000Free = "/images/product-1000-free.png";
+const product1000Free = "/images/product-1000-free.webp";
 
 const features = [
   "1,000+ palabras más utilizadas en inglés",

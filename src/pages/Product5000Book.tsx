@@ -29,8 +29,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-const product5000BookImage = "/lovable-uploads/71addebe-d687-4b49-8424-4532243c34f4.jpg";
-const product5000BookPerson = "/lovable-uploads/71addebe-d687-4b49-8424-4532243c34f4.jpg";
+const product5000BookImage = "/images/product-5000-book.webp";
+const product5000BookPerson = "/images/product-5000-book.webp";
 
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { TrustBadges } from "@/components/TrustBadges";

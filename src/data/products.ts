@@ -201,7 +201,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Portugués",
     flag: "🇧🇷",
     country: "Portugués para Hispanohablantes",
-    image: "/images/product-portuguese-5000.png",
+    image: "/images/product-portuguese-5000.webp",
     title: "Portugués Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación Adaptada para Hispanohablantes y Fonética en Portugués Real",
     description: "Aprende portugués con pronunciación adaptada para hispanohablantes",

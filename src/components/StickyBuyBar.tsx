@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail } from "lucide-react";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;
@@ -19,6 +19,9 @@ interface StickyBuyBarProps {
   showEmailSubscription?: boolean;
   onSubscribe?: (email: string) => Promise<void>;
   isSubscribed?: boolean;
+  secondaryCtaText?: string;
+  onSecondaryClick?: () => void;
+  isSecondaryLoading?: boolean;
 }
 
 export const StickyBuyBar = ({
@@ -37,6 +40,9 @@ export const StickyBuyBar = ({
   showEmailSubscription = false,
   onSubscribe,
   isSubscribed = false,
+  secondaryCtaText,
+  onSecondaryClick,
+  isSecondaryLoading = false,
 }: StickyBuyBarProps) => {
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
@@ -125,25 +131,43 @@ export const StickyBuyBar = ({
               <Check className="w-5 h-5" /> ¡Suscrito! Te avisaremos.
             </div>
           ) : (
-            <Button
-              variant="hero"
-              size="default"
-              className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
-              onClick={handleBuy}
-              disabled={disabled || isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  🛒 {ctaText}
-                  {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
-                </>
+            <div className="flex flex-col gap-2 w-full">
+              <Button
+                variant="hero"
+                size="default"
+                className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
+                onClick={handleBuy}
+                disabled={disabled || isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    🛒 {ctaText}
+                    {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
+                  </>
+                )}
+              </Button>
+              {secondaryCtaText && onSecondaryClick && (
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="w-full text-sm py-2.5 h-auto font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={onSecondaryClick}
+                  disabled={isSecondaryLoading}
+                >
+                  {isSecondaryLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                  )}
+                  {secondaryCtaText}
+                </Button>
               )}
-            </Button>
+            </div>
           )}
         </div>
 
@@ -219,6 +243,22 @@ export const StickyBuyBar = ({
                 </>
               )}
             </Button>
+            {secondaryCtaText && onSecondaryClick && (
+              <Button
+                variant="outline"
+                size="default"
+                className="whitespace-nowrap text-sm px-4 py-3 h-auto font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                onClick={onSecondaryClick}
+                disabled={isSecondaryLoading}
+              >
+                {isSecondaryLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                )}
+                {secondaryCtaText}
+              </Button>
+            )}
           </div>
         </div>
       </div>

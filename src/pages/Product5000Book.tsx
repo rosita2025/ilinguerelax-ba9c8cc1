@@ -38,6 +38,9 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ProductReviews } from "@/components/ProductReviews";
+import { useCartStore } from "@/stores/cartStore";
+import { fetchShopifyProducts } from "@/lib/shopify";
+import { toast } from "sonner";
 
 const features = [
   "5,000 palabras esenciales del inglés",
@@ -87,6 +90,47 @@ const MEDIA_SLIDES = [
 const Product5000Book = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
+  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
+  const { addItem, isLoading: cartLoading } = useCartStore();
+
+  // Fetch Shopify product variant for the physical book
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const products = await fetchShopifyProducts(10, "5000");
+        const book = products.find(p => 
+          p.node.title.toLowerCase().includes("5000") || 
+          p.node.title.toLowerCase().includes("5,000")
+        );
+        if (book) {
+          setShopifyProduct(book);
+          const variant = book.node.variants.edges[0]?.node;
+          if (variant) setShopifyVariantId(variant.id);
+        }
+      } catch (err) {
+        console.error("Failed to load Shopify product:", err);
+      }
+    };
+    loadProduct();
+  }, []);
+
+  const handleAddToShopifyCart = async () => {
+    if (!shopifyVariantId || !shopifyProduct) {
+      toast.error("Producto no disponible en la tienda en línea");
+      return;
+    }
+    const variant = shopifyProduct.node.variants.edges[0]?.node;
+    await addItem({
+      product: shopifyProduct,
+      variantId: shopifyVariantId,
+      variantTitle: variant?.title || "Default",
+      price: variant?.price || { amount: "19.99", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: variant?.selectedOptions || [],
+    });
+    toast.success("¡Agregado al carrito!", { description: "Puedes ver tu carrito en el icono 🛒" });
+  };
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 5,000 Palabras Libro Físico",
@@ -437,6 +481,9 @@ const Product5000Book = () => {
         price="$19.99"
         ctaText="Comprar en Amazon"
         buyUrl={AMAZON_URL}
+        secondaryCtaText="Agregar al Carrito"
+        onSecondaryClick={handleAddToShopifyCart}
+        isSecondaryLoading={cartLoading}
       />
       <SalesNotification />
       <ScrollToTop />

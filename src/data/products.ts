@@ -161,7 +161,7 @@ export const products: Product[] = [
     name: "1,000 Palabras (Gratis)",
     flag: "🇬🇧",
     country: "Inglés para Hispanohablantes",
-    image: "/images/product-1000-free.png",
+    image: "/images/product-1000-free.webp",
     title: "Inglés Relax - 1,000 Palabras",
     subtitle: "Con Pronunciación en Español y Fonética UK/US",
     description: "Libro digital gratuito con 1,000 palabras esenciales",

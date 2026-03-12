@@ -221,7 +221,7 @@ export const products: Product[] = [
     name: "5,000 Palabras Italiano",
     flag: "🇮🇹",
     country: "Italiano para Hispanohablantes",
-    image: "/images/product-italian-5000.jpg",
+    image: "/images/product-italian-5000.webp",
     title: "Italiano Relax - 5,000 Palabras",
     subtitle: "Con Pronunciación para Hispanohablantes y Fonética Italiana",
     description: "Aprende italiano con pronunciación adaptada para hispanohablantes",

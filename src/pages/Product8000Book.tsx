@@ -35,7 +35,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Product image
-const product8000BookImage = "/images/product-8000-book.png";
+const product8000BookImage = "/images/product-8000-book.webp";
 
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";

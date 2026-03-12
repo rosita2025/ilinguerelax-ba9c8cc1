@@ -32,7 +32,7 @@ import {
 
 // Product image
 const product8000Image = "/images/product-8000.png";
-const product8000BookImg = "/images/product-8000-book.png";
+const product8000BookImg = "/images/product-8000-book.webp";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";

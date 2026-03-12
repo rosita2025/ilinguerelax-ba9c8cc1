@@ -77,7 +77,7 @@ const SalesNotification = ({
       return Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
     };
 
-    let intervalId: NodeJS.Timeout;
+    let intervalId: ReturnType<typeof setTimeout>;
 
     const scheduleNext = () => {
       const nextInterval = getRandomInterval();

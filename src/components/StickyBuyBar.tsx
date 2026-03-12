@@ -19,6 +19,9 @@ interface StickyBuyBarProps {
   showEmailSubscription?: boolean;
   onSubscribe?: (email: string) => Promise<void>;
   isSubscribed?: boolean;
+  secondaryCtaText?: string;
+  onSecondaryClick?: () => void;
+  isSecondaryLoading?: boolean;
 }
 
 export const StickyBuyBar = ({

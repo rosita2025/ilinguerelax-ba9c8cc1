@@ -29,8 +29,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-const product5000BookImage = "/lovable-uploads/71addebe-d687-4b49-8424-4532243c34f4.jpg";
-const product5000BookPerson = "/lovable-uploads/71addebe-d687-4b49-8424-4532243c34f4.jpg";
+const product5000BookImage = "/images/product-5000-book.webp";
+const product5000BookPerson = "/images/product-5000-book.webp";
 
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -120,7 +120,7 @@ const Product5000Book = () => {
         title="Libro Físico: 5,000 Palabras en Inglés con Pronunciación | Comprar en Amazon"
         description="Compra el libro físico de 5,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium disponible en Amazon. Método iLingue Relax."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-libro-fisico"
-        image="https://ilinguerelax.com/product-5000-book.png"
+        image="https://ilinguerelax.com/images/product-5000-book.webp"
         type="product"
         price="19.99"
         rating="4.8"

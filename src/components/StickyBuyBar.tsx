@@ -137,7 +137,7 @@ export const StickyBuyBar = ({
               <Button
                 variant="hero"
                 size="default"
-                className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''}`}
+                className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 disabled={disabled || isLoading}
               >

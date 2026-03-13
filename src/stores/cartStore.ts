@@ -76,7 +76,7 @@ export const useCartStore = create<CartStore>()(
         } catch (error) {
           console.error('Failed to add item:', error);
         } finally {
-          set({ isLoading: false });
+          set({ isLoading: false, isDrawerOpen: true });
         }
       },
 

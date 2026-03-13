@@ -224,7 +224,7 @@ const Product8000Book = () => {
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Inglés Relax - 8,000 Palabras
                 <br />
-                <span className="text-amber-600">Libro Físico Tapa Blanda</span>
+                <span className="text-amber-600">Libro Físico </span>
               </h1>
 
               <p className="text-lg text-muted-foreground mb-4">
@@ -556,9 +556,9 @@ const Product8000Book = () => {
 
       {/* Sales Notification Popup - Disabled until product is available */}
       {/* <SalesNotification 
-          productName="Libro Físico 8,000 Palabras" 
-          productLabel="Libro Físico" 
-         /> */}
+                    productName="Libro Físico 8,000 Palabras" 
+                    productLabel="Libro Físico" 
+                   /> */}
 
       {/* Video Testimonial */}
       <VideoTestimonial

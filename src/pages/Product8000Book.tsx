@@ -128,26 +128,6 @@ const Product8000Book = () => {
     toast.success("¡Producto agregado al carrito!");
   };
 
-  const handleSubscribe = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!email || !email.includes("@")) {
-      toast.error("Por favor ingresa un correo válido");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.functions.invoke("send-store-notification", {
-        body: { email, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
-      });
-      if (error) throw error;
-      toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
-      setSubscribed(true);
-    } catch {
-      toast.error("Error al suscribirse. Intenta de nuevo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // Meta Pixel ViewContent event
   const pixelParams = useMemo(() => ({

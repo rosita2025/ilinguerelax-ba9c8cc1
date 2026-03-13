@@ -441,12 +441,11 @@ const Product8000Book = () => {
         price="$29.99"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
-        ctaText="Comprar en Amazon"
-        buyUrl={AMAZON_URL}
-        secondaryCtaText="Agregar al Carrito"
-        onSecondaryClick={handleAddToShopifyCart}
-        isSecondaryLoading={cartLoading}
-        ctaClassName="bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500"
+        ctaText="Agregar al Carrito"
+        onBuyClick={handleAddToShopifyCart}
+        isLoading={cartLoading}
+        secondaryCtaText="Comprar en Amazon"
+        onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
       />
 
       {/* Spacer for sticky bar */}

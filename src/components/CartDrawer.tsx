@@ -141,7 +141,7 @@ export const CartDrawer = () => {
                 </Button>
                 <Button
                 variant="outline"
-                className="w-full font-semibold"
+                className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-semibold"
                 size="lg"
                 asChild>
                 

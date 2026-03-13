@@ -305,15 +305,34 @@ const Product8000Book = () => {
                 </form>
               )}
 
-              <Button 
-                variant="hero" 
-                size="xl" 
-                className="w-full mb-4 text-lg py-6 bg-amber-500/50 cursor-not-allowed"
-                disabled
-              >
-                <Clock className="w-6 h-6 mr-2" />
-                PRÓXIMAMENTE - JUNIO 2026
-              </Button>
+              <div className="flex flex-col gap-3 mb-4">
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="w-full text-lg py-6"
+                  asChild
+                >
+                  <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    COMPRAR EN AMAZON
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </a>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="xl" 
+                  className="w-full text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={handleAddToShopifyCart}
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                  )}
+                  Agregar al Carrito
+                </Button>
+              </div>
 
               {/* Trust Badges */}
               <TrustBadges lang="es" variant="grid" />

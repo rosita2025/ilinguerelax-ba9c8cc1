@@ -446,6 +446,7 @@ const Product8000Book = () => {
         secondaryCtaText="Agregar al Carrito"
         onSecondaryClick={handleAddToShopifyCart}
         isSecondaryLoading={cartLoading}
+        ctaClassName="bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500"
       />
 
       {/* Spacer for sticky bar */}

@@ -289,19 +289,19 @@ const Product8000Book = () => {
                   
 
                 
-                  <div className="flex gap-2">
-                    <Input
-                    type="email"
-                    placeholder="tu@correo.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1"
-                    required />
                   
-                    <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
-                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
-                    </Button>
-                  </div>
+
+
+
+
+
+
+
+
+
+
+
+                
                 </form>
               }
 
@@ -556,9 +556,9 @@ const Product8000Book = () => {
 
       {/* Sales Notification Popup - Disabled until product is available */}
       {/* <SalesNotification 
-         productName="Libro Físico 8,000 Palabras" 
-         productLabel="Libro Físico" 
-        /> */}
+          productName="Libro Físico 8,000 Palabras" 
+          productLabel="Libro Físico" 
+         /> */}
 
       {/* Video Testimonial */}
       <VideoTestimonial

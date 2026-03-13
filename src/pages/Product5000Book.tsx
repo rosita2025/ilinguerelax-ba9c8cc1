@@ -27,6 +27,7 @@ import {
   Shield,
   ShoppingCart,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 
 const product5000BookImage = "/images/product-5000-book.webp";

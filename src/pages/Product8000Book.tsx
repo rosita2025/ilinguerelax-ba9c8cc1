@@ -166,8 +166,8 @@ const Product8000Book = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Libro Físico: 8,000 Palabras en Inglés - Compra Anticipada"
-        description="Reserva el libro físico de 8,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium, envío a domicilio. Precio especial de compra anticipada."
+        title="Libro Físico: 8,000 Palabras en Inglés - Comprar Ahora"
+        description="Compra el libro físico de 8,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium, envío a domicilio."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/product-8000-book.png"
         type="product"
@@ -176,7 +176,7 @@ const Product8000Book = () => {
         reviewCount="800"
         sku="ILINGUE-8000-BOOK"
         keywords="libro físico inglés, vocabulario inglés, pronunciación inglés hispanohablantes, libro inglés impreso"
-        availability="PreOrder"
+        availability="InStock"
         isPhysical={true}
       />
       <Navbar />

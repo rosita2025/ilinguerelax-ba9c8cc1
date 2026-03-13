@@ -544,23 +544,11 @@ const Product8000Book = () => {
         price="$29.99"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
-        ctaText="PRÓXIMAMENTE"
-        disabled={true}
-        showReviews={false}
-        showEmailSubscription={true}
-        isSubscribed={subscribed}
-        onSubscribe={async (subscriberEmail) => {
-          try {
-            const { error } = await supabase.functions.invoke("send-store-notification", {
-              body: { email: subscriberEmail, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
-            });
-            if (error) throw error;
-            toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
-            setSubscribed(true);
-          } catch {
-            toast.error("Error al suscribirse. Intenta de nuevo.");
-          }
-        }}
+        ctaText="Comprar en Amazon"
+        buyUrl={AMAZON_URL}
+        secondaryCtaText="Agregar al Carrito"
+        onSecondaryClick={handleAddToShopifyCart}
+        isSecondaryLoading={cartLoading}
       />
 
       {/* Spacer for sticky bar */}

@@ -10,14 +10,12 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   Check,
   BookOpen,
   Sparkles,
   ArrowRight,
-  Gift,
   Truck,
   Brain,
   User,
@@ -26,14 +24,11 @@ import {
   Lightbulb,
   CreditCard,
   Package,
-  Clock,
   Star,
   Shield,
   ShoppingCart,
-  Mail,
   Loader2,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Product image
@@ -86,9 +81,6 @@ const benefits = [
 ];
 
 const Product8000Book = () => {
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();
@@ -131,26 +123,6 @@ const Product8000Book = () => {
     toast.success("¡Producto agregado al carrito!");
   };
 
-  const handleSubscribe = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!email || !email.includes("@")) {
-      toast.error("Por favor ingresa un correo válido");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.functions.invoke("send-store-notification", {
-        body: { email, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
-      });
-      if (error) throw error;
-      toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
-      setSubscribed(true);
-    } catch {
-      toast.error("Error al suscribirse. Intenta de nuevo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // Meta Pixel ViewContent event
   const pixelParams = useMemo(() => ({
@@ -166,8 +138,8 @@ const Product8000Book = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Libro Físico: 8,000 Palabras en Inglés - Compra Anticipada"
-        description="Reserva el libro físico de 8,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium, envío a domicilio. Precio especial de compra anticipada."
+        title="Libro Físico: 8,000 Palabras en Inglés - Comprar Ahora"
+        description="Compra el libro físico de 8,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium, envío a domicilio."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/product-8000-book.png"
         type="product"
@@ -176,7 +148,7 @@ const Product8000Book = () => {
         reviewCount="800"
         sku="ILINGUE-8000-BOOK"
         keywords="libro físico inglés, vocabulario inglés, pronunciación inglés hispanohablantes, libro inglés impreso"
-        availability="PreOrder"
+        availability="InStock"
         isPhysical={true}
       />
       <Navbar />
@@ -199,28 +171,6 @@ const Product8000Book = () => {
 
             {/* Product Info */}
             <div>
-              {/* Pre-order Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>📦 COMPRA ANTICIPADA</span>
-                </motion.div>
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium"
-                >
-                  <Gift className="w-4 h-4" />
-                  <span>Envío Junio 2026</span>
-                </motion.div>
-              </div>
-
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Inglés Relax - 8,000 Palabras
                 <br />
@@ -231,15 +181,6 @@ const Product8000Book = () => {
                 El mismo método completo para aprender inglés sin estrés, ahora en formato libro físico premium. 
                 Perfecto para estudiar sin pantallas.
               </p>
-
-              {/* Reviews - More Prominent */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
-                </div>
-                <span className="font-bold text-foreground">4.9/5</span>
-                <span className="text-muted-foreground">(800+ Reseñas de la versión digital)</span>
-              </div>
 
               {/* Purchase Counter - Social Proof */}
               <div className="mb-4">
@@ -258,52 +199,14 @@ const Product8000Book = () => {
                 transition={{ delay: 0.4 }}
                 className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-amber-600" />
-                  <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Compra Anticipada</span>
-                </div>
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
-                  <motion.span 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-lg"
-                  >
-                    PRECIO ANTICIPADO
-                  </motion.span>
+                  <span className="text-lg text-muted-foreground line-through">$45 USD</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   📦 Libro físico + PDF digital incluido • Envío a domicilio
                 </p>
               </motion.div>
-
-              {/* Email Subscription Form */}
-              {subscribed ? (
-                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center mb-4">
-                  <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-semibold">¡Gracias por suscribirte!</p>
-                  <p className="text-sm text-muted-foreground">Te avisaremos cuando esté disponible.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="mb-4">
-                  <p className="text-center text-sm text-muted-foreground mb-3">
-                    📧 Déjanos tu correo y te avisamos cuando esté disponible
-                  </p>
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      placeholder="tu@correo.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="flex-1"
-                      required
-                    />
-                    <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
-                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
-                    </Button>
-                  </div>
-                </form>
-              )}
 
               <div className="flex flex-col gap-3 mb-4">
                 <Button 
@@ -446,31 +349,26 @@ const Product8000Book = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Envío incluido* • Incluye PDF digital
               </p>
-              {subscribed ? (
-                <div className="text-center">
-                  <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-semibold">¡Ya estás suscrito!</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="flex gap-2 mb-4">
-                  <Input
-                    type="email"
-                    placeholder="tu@correo.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1"
-                    required
-                  />
-                  <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
-                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
-                  </Button>
-                </form>
-              )}
-              <Button variant="hero" size="xl" className="w-full" asChild>
+              <Button variant="hero" size="xl" className="w-full mb-3" asChild>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                  <ShoppingCart className="w-5 h-5 mr-2" />
                   COMPRAR EN AMAZON
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </a>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="xl" 
+                className="w-full font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                onClick={handleAddToShopifyCart}
+                disabled={cartLoading}
+              >
+                {cartLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                )}
+                Agregar al Carrito
               </Button>
               <p className="text-xs text-muted-foreground mt-4">
                 *Consulta costos de envío según tu ubicación
@@ -494,7 +392,7 @@ const Product8000Book = () => {
           },
           {
             question: "¿Cuándo recibiré mi libro físico?",
-            answer: "El libro físico está en compra anticipada. Los envíos están programados para comenzar en Junio de 2026. Recibirás actualizaciones por email sobre el estado de tu pedido.",
+            answer: "El libro físico está disponible para envío inmediato. Los tiempos de entrega dependen de tu ubicación. Recibirás actualizaciones por email sobre el estado de tu pedido.",
             icon: Truck,
           },
           {
@@ -504,8 +402,8 @@ const Product8000Book = () => {
           },
           {
             question: "¿Incluye la versión digital?",
-            answer: "Sí. Al comprar el libro físico en compra anticipada, recibirás inmediatamente acceso a la versión digital (PDF) para que puedas comenzar a estudiar mientras esperas tu libro.",
-            icon: Gift,
+            answer: "Sí. Al comprar el libro físico, recibirás también acceso a la versión digital (PDF) para que puedas estudiar desde cualquier dispositivo.",
+            icon: Package,
           },
           {
             question: "¿Hacen envíos internacionales?",

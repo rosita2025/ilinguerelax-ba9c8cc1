@@ -417,8 +417,7 @@ const Product5000Book = () => {
         </div>
       </section>
 
-      {/* Reviews */}
-      <ProductReviews productType="english" />
+      {/* Reviews - disabled until physical book has reviews */}
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 bg-primary">

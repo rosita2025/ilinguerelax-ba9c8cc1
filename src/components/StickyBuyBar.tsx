@@ -155,7 +155,7 @@ export const StickyBuyBar = ({
                 <Button
                   variant="outline"
                   size="default"
-                  className="w-full text-sm py-2.5 h-auto font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                  className="w-full text-sm py-2.5 h-auto font-semibold bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500"
                   onClick={onSecondaryClick}
                   disabled={isSecondaryLoading}
                 >

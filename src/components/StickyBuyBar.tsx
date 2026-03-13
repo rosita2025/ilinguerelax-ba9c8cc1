@@ -44,6 +44,7 @@ export const StickyBuyBar = ({
   secondaryCtaText,
   onSecondaryClick,
   isSecondaryLoading = false,
+  ctaClassName,
 }: StickyBuyBarProps) => {
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);

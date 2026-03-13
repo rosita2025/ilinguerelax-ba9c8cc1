@@ -31,8 +31,8 @@ import {
   Shield,
   ShoppingCart,
   Mail,
-  Loader2 } from
-"lucide-react";
+  Loader2,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -48,42 +48,42 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 const features = [
-"8,000 palabras esenciales del inglés",
-"Pronunciación en español incluida",
-"Diseñado para hispanohablantes",
-"Sin necesidad de diccionarios",
-"Metodología paso a paso sin estrés",
-"Fonética UK y USA incluida",
-"Libro físico tapa blanda de alta calidad",
-"Entre 300-350 páginas"];
-
+  "8,000 palabras esenciales del inglés",
+  "Pronunciación en español incluida",
+  "Diseñado para hispanohablantes",
+  "Sin necesidad de diccionarios",
+  "Metodología paso a paso sin estrés",
+  "Fonética UK y USA incluida",
+  "Libro físico tapa blanda de alta calidad",
+  "Entre 300-350 páginas",
+];
 
 const benefits = [
-{
-  icon: BookOpen,
-  title: "Libro Físico Premium",
-  description:
-  "Tapa blanda de alta calidad, impresión profesional. Perfecto para estudiar sin pantallas y tomar notas."
-},
-{
-  icon: Package,
-  title: "Envío a Tu Puerta",
-  description:
-  "Recibe tu libro físico directamente en casa. Envío disponible a múltiples países."
-},
-{
-  icon: Sparkles,
-  title: "Método Sin Estrés",
-  description:
-  "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje."
-},
-{
-  icon: Brain,
-  title: "Sin Diccionarios",
-  description:
-  "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar."
-}];
-
+  {
+    icon: BookOpen,
+    title: "Libro Físico Premium",
+    description:
+      "Tapa blanda de alta calidad, impresión profesional. Perfecto para estudiar sin pantallas y tomar notas.",
+  },
+  {
+    icon: Package,
+    title: "Envío a Tu Puerta",
+    description:
+      "Recibe tu libro físico directamente en casa. Envío disponible a múltiples países.",
+  },
+  {
+    icon: Sparkles,
+    title: "Método Sin Estrés",
+    description:
+      "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
+  },
+  {
+    icon: Brain,
+    title: "Sin Diccionarios",
+    description:
+      "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
+  },
+];
 
 const Product8000Book = () => {
   const [email, setEmail] = useState("");
@@ -98,9 +98,9 @@ const Product8000Book = () => {
     const loadProduct = async () => {
       try {
         const products = await fetchShopifyProducts(10, "8000");
-        const book = products.find((p) =>
-        p.node.title.toLowerCase().includes("8000") ||
-        p.node.title.toLowerCase().includes("8,000")
+        const book = products.find(p => 
+          p.node.title.toLowerCase().includes("8000") || 
+          p.node.title.toLowerCase().includes("8,000")
         );
         if (book) {
           setShopifyProduct(book);
@@ -126,7 +126,7 @@ const Product8000Book = () => {
       variantTitle: variant?.title || "Default",
       price: variant?.price || { amount: "29.99", currencyCode: "USD" },
       quantity: 1,
-      selectedOptions: variant?.selectedOptions || []
+      selectedOptions: variant?.selectedOptions || [],
     });
     toast.success("¡Producto agregado al carrito!");
   };
@@ -140,7 +140,7 @@ const Product8000Book = () => {
     setIsSubmitting(true);
     try {
       const { error } = await supabase.functions.invoke("send-store-notification", {
-        body: { email, storeName: "Libro Físico 8,000 Palabras", productType: "english" }
+        body: { email, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
       });
       if (error) throw error;
       toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
@@ -159,7 +159,7 @@ const Product8000Book = () => {
     content_ids: ["product-8000-book"],
     content_type: "product",
     value: 29.99,
-    currency: "USD"
+    currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
 
@@ -177,8 +177,8 @@ const Product8000Book = () => {
         sku="ILINGUE-8000-BOOK"
         keywords="libro físico inglés, vocabulario inglés, pronunciación inglés hispanohablantes, libro inglés impreso"
         availability="PreOrder"
-        isPhysical={true} />
-      
+        isPhysical={true}
+      />
       <Navbar />
 
       {/* Hero Section */}
@@ -192,8 +192,8 @@ const Product8000Book = () => {
                 <img
                   src={product8000BookImage}
                   alt="Inglés Relax - 8,000 Palabras Libro Físico"
-                  className="w-full h-auto rounded-2xl shadow-hero" />
-                
+                  className="w-full h-auto rounded-2xl shadow-hero"
+                />
               </div>
             </div>
 
@@ -201,21 +201,21 @@ const Product8000Book = () => {
             <div>
               {/* Pre-order Badge */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div
+                <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20">
-                  
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20"
+                >
                   <Clock className="w-4 h-4" />
                   <span>📦 COMPRA ANTICIPADA</span>
                 </motion.div>
-                <motion.div
+                <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium">
-                  
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium"
+                >
                   <Gift className="w-4 h-4" />
                   <span>Envío Junio 2026</span>
                 </motion.div>
@@ -224,7 +224,7 @@ const Product8000Book = () => {
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Inglés Relax - 8,000 Palabras
                 <br />
-                <span className="text-amber-600">Libro Físico </span>
+                <span className="text-amber-600">Libro Físico Tapa Blanda</span>
               </h1>
 
               <p className="text-lg text-muted-foreground mb-4">
@@ -238,7 +238,7 @@ const Product8000Book = () => {
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
                 </div>
                 <span className="font-bold text-foreground">4.9/5</span>
-                
+                <span className="text-muted-foreground">(800+ Reseñas de la versión digital)</span>
               </div>
 
               {/* Purchase Counter - Social Proof */}
@@ -252,23 +252,23 @@ const Product8000Book = () => {
               </div>
 
               {/* Price Section */}
-              <motion.div
+              <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6">
-                
+                className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6"
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-amber-600" />
                   <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Compra Anticipada</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
-                  <motion.span
+                  <motion.span 
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-lg">
-                    
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-lg"
+                  >
                     PRECIO ANTICIPADO
                   </motion.span>
                 </div>
@@ -278,58 +278,58 @@ const Product8000Book = () => {
               </motion.div>
 
               {/* Email Subscription Form */}
-              {subscribed ?
-              <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center mb-4">
+              {subscribed ? (
+                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center mb-4">
                   <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
                   <p className="text-green-700 font-semibold">¡Gracias por suscribirte!</p>
                   <p className="text-sm text-muted-foreground">Te avisaremos cuando esté disponible.</p>
-                </div> :
-
-              <form onSubmit={handleSubscribe} className="mb-4">
-                  
-
-                
-                  
-
-
-
-
-
-
-
-
-
-
-
-                
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="mb-4">
+                  <p className="text-center text-sm text-muted-foreground mb-3">
+                    📧 Déjanos tu correo y te avisamos cuando esté disponible
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      placeholder="tu@correo.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1"
+                      required
+                    />
+                    <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
+                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
+                    </Button>
+                  </div>
                 </form>
-              }
+              )}
 
               <div className="flex flex-col gap-3 mb-4">
-                <Button
-                  variant="hero"
-                  size="xl"
+                <Button 
+                  variant="hero" 
+                  size="xl" 
                   className="w-full text-lg py-6"
-                  asChild>
-                  
+                  asChild
+                >
                   <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
                     <ShoppingCart className="w-6 h-6 mr-2" />
                     COMPRAR EN AMAZON
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </a>
                 </Button>
-                <Button
-                  variant="outline"
-                  size="xl"
+                <Button 
+                  variant="outline" 
+                  size="xl" 
                   className="w-full text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
                   onClick={handleAddToShopifyCart}
-                  disabled={cartLoading}>
-                  
-                  {cartLoading ?
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" /> :
-
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  }
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                  )}
                   Agregar al Carrito
                 </Button>
               </div>
@@ -338,12 +338,12 @@ const Product8000Book = () => {
               <TrustBadges lang="es" variant="grid" />
 
               {/* Pre-order Info */}
-              <motion.div
+              <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-amber-500/5 to-orange-500/5 border-2 border-amber-500/30 mt-6">
-                
+                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-amber-500/5 to-orange-500/5 border-2 border-amber-500/30 mt-6"
+              >
                 <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                   <Package className="w-7 h-7 text-white" />
                 </div>
@@ -358,12 +358,12 @@ const Product8000Book = () => {
       </section>
 
       {/* Countdown Timer */}
-      <CountdownTimer
-        hoursFromNow={48}
+      <CountdownTimer 
+        hoursFromNow={48} 
         currentPrice="$29.99 USD"
         originalPrice="$45 USD"
-        storageKey="countdown_book_physical" />
-      
+        storageKey="countdown_book_physical"
+      />
 
       {/* Benefits */}
       <section className="py-20 md:py-28 bg-secondary/30">
@@ -379,11 +379,11 @@ const Product8000Book = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {benefits.map((benefit) =>
-            <div
-              key={benefit.title}
-              className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500">
-              
+            {benefits.map((benefit) => (
+              <div
+                key={benefit.title}
+                className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500"
+              >
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0">
                     <benefit.icon className="w-6 h-6 text-white" />
@@ -398,7 +398,7 @@ const Product8000Book = () => {
                   </div>
                 </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </section>
@@ -412,31 +412,15 @@ const Product8000Book = () => {
             </h2>
 
             <div className="bg-card rounded-3xl border border-border shadow-card p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {features.map((feature) =>
-                <div key={feature} className="flex items-start gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {features.map((feature) => (
+                  <div key={feature} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-foreground">{feature}</span>
                   </div>
-                )}
-              </div>
-
-              {/* Preview CTA */}
-              <div className="border-t border-border pt-6 text-center">
-                <p className="text-sm text-muted-foreground mb-3">
-                  ¿Quieres ver cómo es por dentro antes de comprar?
-                </p>
-                <a
-                  href="https://www.amazon.com/dp/B0GRR584ZY?asin=B0GRR584ZY&revisionId=&format=4&depth=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 hover:underline transition-colors"
-                >
-                  <BookOpen className="w-5 h-5" />
-                  Ver previsualización / Leer fragmento
-                </a>
+                ))}
               </div>
             </div>
           </div>
@@ -462,26 +446,26 @@ const Product8000Book = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Envío incluido* • Incluye PDF digital
               </p>
-              {subscribed ?
-              <div className="text-center">
+              {subscribed ? (
+                <div className="text-center">
                   <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
                   <p className="text-green-700 font-semibold">¡Ya estás suscrito!</p>
-                </div> :
-
-              <form onSubmit={handleSubscribe} className="flex gap-2 mb-4">
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex gap-2 mb-4">
                   <Input
-                  type="email"
-                  placeholder="tu@correo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1"
-                  required />
-                
+                    type="email"
+                    placeholder="tu@correo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1"
+                    required
+                  />
                   <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
                   </Button>
                 </form>
-              }
+              )}
               <Button variant="hero" size="xl" className="w-full" asChild>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
                   COMPRAR EN AMAZON
@@ -503,55 +487,55 @@ const Product8000Book = () => {
       {/* FAQ Section */}
       <FAQ
         items={[
-        {
-          question: "¿Quién es el autor del libro?",
-          answer: "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
-          icon: User
-        },
-        {
-          question: "¿Cuándo recibiré mi libro físico?",
-          answer: "El libro físico está en compra anticipada. Los envíos están programados para comenzar en Junio de 2026. Recibirás actualizaciones por email sobre el estado de tu pedido.",
-          icon: Truck
-        },
-        {
-          question: "¿Cuántas páginas tiene el libro?",
-          answer: "El libro tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
-          icon: FileText
-        },
-        {
-          question: "¿Incluye la versión digital?",
-          answer: "Sí. Al comprar el libro físico en compra anticipada, recibirás inmediatamente acceso a la versión digital (PDF) para que puedas comenzar a estudiar mientras esperas tu libro.",
-          icon: Gift
-        },
-        {
-          question: "¿Hacen envíos internacionales?",
-          answer: "Sí, realizamos envíos a múltiples países. Los costos de envío pueden variar según tu ubicación.",
-          icon: Package
-        },
-        {
-          question: "¿Es adecuado para estudiar solo/a?",
-          answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
-          icon: GraduationCap
-        },
-        {
-          question: "¿Necesito saber inglés antes de usar el libro?",
-          answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
-          icon: Lightbulb
-        },
-        {
-          question: "¿El libro incluye pronunciación?",
-          answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
-          icon: BookOpen
-        },
-        {
-          question: "¿Cómo realizo el pago?",
-          answer: "Puedes pagar de forma segura mediante tarjeta de crédito o débito internacional.",
-          icon: CreditCard
-        }]
-        }
+          {
+            question: "¿Quién es el autor del libro?",
+            answer: "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
+            icon: User,
+          },
+          {
+            question: "¿Cuándo recibiré mi libro físico?",
+            answer: "El libro físico está en compra anticipada. Los envíos están programados para comenzar en Junio de 2026. Recibirás actualizaciones por email sobre el estado de tu pedido.",
+            icon: Truck,
+          },
+          {
+            question: "¿Cuántas páginas tiene el libro?",
+            answer: "El libro tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
+            icon: FileText,
+          },
+          {
+            question: "¿Incluye la versión digital?",
+            answer: "Sí. Al comprar el libro físico en compra anticipada, recibirás inmediatamente acceso a la versión digital (PDF) para que puedas comenzar a estudiar mientras esperas tu libro.",
+            icon: Gift,
+          },
+          {
+            question: "¿Hacen envíos internacionales?",
+            answer: "Sí, realizamos envíos a múltiples países. Los costos de envío pueden variar según tu ubicación.",
+            icon: Package,
+          },
+          {
+            question: "¿Es adecuado para estudiar solo/a?",
+            answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
+            icon: GraduationCap,
+          },
+          {
+            question: "¿Necesito saber inglés antes de usar el libro?",
+            answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
+            icon: Lightbulb,
+          },
+          {
+            question: "¿El libro incluye pronunciación?",
+            answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
+            icon: BookOpen,
+          },
+          {
+            question: "¿Cómo realizo el pago?",
+            answer: "Puedes pagar de forma segura mediante tarjeta de crédito o débito internacional.",
+            icon: CreditCard,
+          },
+        ]}
         title="Preguntas Frecuentes"
-        subtitle="Resolvemos tus dudas sobre el libro físico" />
-      
+        subtitle="Resolvemos tus dudas sobre el libro físico"
+      />
 
       <Footer />
 
@@ -564,34 +548,34 @@ const Product8000Book = () => {
         buyUrl={AMAZON_URL}
         secondaryCtaText="Agregar al Carrito"
         onSecondaryClick={handleAddToShopifyCart}
-        isSecondaryLoading={cartLoading} />
-      
+        isSecondaryLoading={cartLoading}
+      />
 
       {/* Spacer for sticky bar */}
       <div className="h-20 md:h-16" />
 
       {/* Sales Notification Popup - Disabled until product is available */}
       {/* <SalesNotification 
-                     productName="Libro Físico 8,000 Palabras" 
-                     productLabel="Libro Físico" 
-                    /> */}
+        productName="Libro Físico 8,000 Palabras" 
+        productLabel="Libro Físico" 
+      /> */}
 
       {/* Video Testimonial */}
-      <VideoTestimonial
+      <VideoTestimonial 
         videoUrl="https://youtu.be/bG35t0x3GkU"
         customerName="Cliente Verificado"
         customerLocation="Latinoamérica"
         testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
-        lang="es" />
-      
+        lang="es"
+      />
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton />
-    </main>);
-
+    </main>
+  );
 };
 
 export default Product8000Book;

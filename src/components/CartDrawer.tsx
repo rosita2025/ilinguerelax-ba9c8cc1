@@ -46,10 +46,10 @@ export const CartDrawer = () => {
           <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Your cart is empty</p>
+                <p className="text-muted-foreground">​Tu carrito está vacío
+</p>
               </div>
             </div> :
-
           <>
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                 <div className="space-y-4">
@@ -110,19 +110,15 @@ export const CartDrawer = () => {
                 </div>
               </div>
               <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
-                <div className="space-y-1 text-xs text-muted-foreground">
-                  <p>📦 Envío internacional disponible</p>
-                  <p>⏱ Entrega estimada: 12–15 días</p>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Los impuestos y los gastos de envío se calculan al finalizar la compra.
-                </p>
-                <div className="flex justify-between items-center pt-2">
+                <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total</span>
                   <span className="text-xl font-bold">
                     ${totalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
                   </span>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  ​Envío internacional disponible – tiempo estimado 12–15 días
+                </p>
                 <Button
                 onClick={handleCheckout}
                 className="w-full"
@@ -134,7 +130,7 @@ export const CartDrawer = () => {
 
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Continuar al Pago
+                      Comprar Ahora
                     </>
                 }
                 </Button>

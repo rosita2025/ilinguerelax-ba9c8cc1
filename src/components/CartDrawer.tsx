@@ -141,11 +141,11 @@ export const CartDrawer = () => {
                 asChild>
                 
                   <a href="https://www.amazon.com/dp/B0GRR584ZY" target="_blank" rel="noopener noreferrer">
-                    Amazon
+                    Comprar en Amazon
                   </a>
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
-                  🚚 Amazon Prime: envío rápido y seguro
+                  Disponible con Amazon Prime.
                 </p>
               </div>
             </>

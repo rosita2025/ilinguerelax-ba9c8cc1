@@ -494,11 +494,11 @@ const Product5000Book = () => {
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"
-        ctaText="Comprar en Amazon"
-        buyUrl={AMAZON_URL}
-        secondaryCtaText="Agregar al Carrito"
-        onSecondaryClick={handleAddToShopifyCart}
-        isSecondaryLoading={cartLoading}
+        ctaText="Agregar al Carrito"
+        onCtaClick={handleAddToShopifyCart}
+        isCtaLoading={cartLoading}
+        secondaryCtaText="Comprar en Amazon"
+        secondaryBuyUrl={AMAZON_URL}
       />
       <SalesNotification />
       <ScrollToTop />

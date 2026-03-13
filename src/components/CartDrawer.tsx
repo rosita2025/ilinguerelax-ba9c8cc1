@@ -130,19 +130,18 @@ export const CartDrawer = () => {
                   ) : (
                     <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Pagar con Shopify
+                      Comprar Ahora
                     </>
                   )}
                 </Button>
                 <Button 
                   variant="outline"
-                  className="w-full border-primary/30 text-primary hover:bg-primary/10 font-semibold" 
+                  className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-semibold" 
                   size="lg"
                   asChild
                 >
                   <a href="https://www.amazon.com/dp/B0GRR584ZY" target="_blank" rel="noopener noreferrer">
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Comprar en Amazon
+                    Amazon
                   </a>
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">

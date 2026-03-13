@@ -15,6 +15,8 @@ interface CartStore {
   checkoutUrl: string | null;
   isLoading: boolean;
   isSyncing: boolean;
+  isDrawerOpen: boolean;
+  setDrawerOpen: (open: boolean) => void;
   addItem: (item: Omit<CartItem, 'lineId'>) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
@@ -31,6 +33,8 @@ export const useCartStore = create<CartStore>()(
       checkoutUrl: null,
       isLoading: false,
       isSyncing: false,
+      isDrawerOpen: false,
+      setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
@@ -72,7 +76,7 @@ export const useCartStore = create<CartStore>()(
         } catch (error) {
           console.error('Failed to add item:', error);
         } finally {
-          set({ isLoading: false });
+          set({ isLoading: false, isDrawerOpen: true });
         }
       },
 

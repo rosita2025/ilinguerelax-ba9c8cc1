@@ -27,6 +27,7 @@ import {
   Shield,
   ShoppingCart,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 
 const product5000BookImage = "/images/product-5000-book.webp";
@@ -289,17 +290,32 @@ const Product5000Book = () => {
                 </p>
               </motion.div>
 
-              {/* Buy Button */}
+              {/* Add to Cart Button - Primary */}
               <Button
                 variant="hero"
                 size="xl"
-                className="w-full mb-4 text-lg py-6"
+                className="w-full mb-3 text-lg py-6"
+                onClick={handleAddToShopifyCart}
+                disabled={cartLoading}
+              >
+                {cartLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                )}
+                AGREGAR AL CARRITO
+              </Button>
+
+              {/* Buy on Amazon - Secondary */}
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full mb-4 text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
                 asChild
               >
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  COMPRAR AHORA EN AMAZON
-                  <ExternalLink className="w-5 h-5 ml-2" />
+                  <ExternalLink className="w-5 h-5 mr-2" />
+                  COMPRAR EN AMAZON
                 </a>
               </Button>
 
@@ -479,11 +495,11 @@ const Product5000Book = () => {
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"
-        ctaText="Comprar en Amazon"
-        buyUrl={AMAZON_URL}
-        secondaryCtaText="Agregar al Carrito"
-        onSecondaryClick={handleAddToShopifyCart}
-        isSecondaryLoading={cartLoading}
+        ctaText="Agregar al Carrito"
+        onBuyClick={handleAddToShopifyCart}
+        isLoading={cartLoading}
+        secondaryCtaText="Comprar en Amazon"
+        onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
       />
       <SalesNotification />
       <ScrollToTop />

@@ -89,6 +89,47 @@ const Product8000Book = () => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
+  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
+  const { addItem, isLoading: cartLoading } = useCartStore();
+
+  // Fetch Shopify product variant for the physical book
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const products = await fetchShopifyProducts(10, "8000");
+        const book = products.find(p => 
+          p.node.title.toLowerCase().includes("8000") || 
+          p.node.title.toLowerCase().includes("8,000")
+        );
+        if (book) {
+          setShopifyProduct(book);
+          const variant = book.node.variants.edges[0]?.node;
+          if (variant) setShopifyVariantId(variant.id);
+        }
+      } catch (err) {
+        console.error("Failed to load Shopify product:", err);
+      }
+    };
+    loadProduct();
+  }, []);
+
+  const handleAddToShopifyCart = async () => {
+    if (!shopifyVariantId || !shopifyProduct) {
+      toast.error("Producto no disponible en la tienda en línea");
+      return;
+    }
+    const variant = shopifyProduct.node.variants.edges[0]?.node;
+    await addItem({
+      product: shopifyProduct,
+      variantId: shopifyVariantId,
+      variantTitle: variant?.title || "Default",
+      price: variant?.price || { amount: "29.99", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: variant?.selectedOptions || [],
+    });
+    toast.success("¡Producto agregado al carrito!");
+  };
 
   const handleSubscribe = async (e?: React.FormEvent) => {
     e?.preventDefault();

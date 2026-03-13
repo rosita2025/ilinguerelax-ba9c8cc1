@@ -375,11 +375,6 @@ const Product8000Book = () => {
                 )}
                 Agregar al Carrito
               </Button>
-                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                  COMPRAR EN AMAZON
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </a>
-              </Button>
               <p className="text-xs text-muted-foreground mt-4">
                 *Consulta costos de envío según tu ubicación
               </p>

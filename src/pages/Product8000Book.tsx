@@ -354,27 +354,27 @@ const Product8000Book = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Envío incluido* • Incluye PDF digital
               </p>
-              {subscribed ? (
-                <div className="text-center">
-                  <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-semibold">¡Ya estás suscrito!</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="flex gap-2 mb-4">
-                  <Input
-                    type="email"
-                    placeholder="tu@correo.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1"
-                    required
-                  />
-                  <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
-                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
-                  </Button>
-                </form>
-              )}
-              <Button variant="hero" size="xl" className="w-full" asChild>
+              <Button variant="hero" size="xl" className="w-full mb-3" asChild>
+                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  COMPRAR EN AMAZON
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </a>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="xl" 
+                className="w-full font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                onClick={handleAddToShopifyCart}
+                disabled={cartLoading}
+              >
+                {cartLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                )}
+                Agregar al Carrito
+              </Button>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
                   COMPRAR EN AMAZON
                   <ArrowRight className="w-5 h-5 ml-2" />

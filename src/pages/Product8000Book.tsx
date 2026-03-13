@@ -38,6 +38,7 @@ import { toast } from "sonner";
 
 // Product image
 const product8000BookImage = "/images/product-8000-book.webp";
+const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
 
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";

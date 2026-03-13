@@ -102,18 +102,8 @@ export const CartDrawer = () => {
                         disabled={isLoading}>
                         
                             <Plus className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full"
-                  size="sm"
-                  asChild
-                >
-                  <a href="/products">
-                    Continuar comprando
-                  </a>
-                </Button>
-              </div>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                 )}

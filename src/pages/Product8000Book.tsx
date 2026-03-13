@@ -466,9 +466,11 @@ const Product8000Book = () => {
                   </Button>
                 </form>
               )}
-              <Button variant="hero" size="xl" className="w-full bg-amber-500/50 cursor-not-allowed" disabled>
-                PRÓXIMAMENTE
-                <Clock className="w-5 h-5" />
+              <Button variant="hero" size="xl" className="w-full" asChild>
+                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                  COMPRAR EN AMAZON
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </a>
               </Button>
               <p className="text-xs text-muted-foreground mt-4">
                 *Consulta costos de envío según tu ubicación

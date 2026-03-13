@@ -59,6 +59,51 @@ export type Database = {
         }
         Relationships: []
       }
+      review_invitations: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          emails_sent: number
+          has_reviewed: boolean
+          id: string
+          is_completed: boolean
+          last_email_sent_at: string | null
+          next_email_at: string
+          product_name: string
+          product_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name?: string
+          emails_sent?: number
+          has_reviewed?: boolean
+          id?: string
+          is_completed?: boolean
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          product_name?: string
+          product_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          emails_sent?: number
+          has_reviewed?: boolean
+          id?: string
+          is_completed?: boolean
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          product_name?: string
+          product_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           created_at: string

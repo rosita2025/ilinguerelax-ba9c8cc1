@@ -144,8 +144,8 @@ const Product8000Book = () => {
         image="https://ilinguerelax.com/product-8000-book.png"
         type="product"
         price="29.99"
-        rating="4.9"
-        reviewCount="800"
+        rating=""
+        reviewCount=""
         sku="ILINGUE-8000-BOOK"
         keywords="libro físico inglés, vocabulario inglés, pronunciación inglés hispanohablantes, libro inglés impreso"
         availability="InStock"
@@ -446,6 +446,7 @@ const Product8000Book = () => {
         isLoading={cartLoading}
         secondaryCtaText="Comprar en Amazon"
         onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
+        showReviews={false}
       />
 
       {/* Spacer for sticky bar */}

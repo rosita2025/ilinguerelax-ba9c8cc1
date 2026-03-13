@@ -168,8 +168,8 @@ const Product5000Book = () => {
         image="https://ilinguerelax.com/images/product-5000-book.webp"
         type="product"
         price="19.99"
-        rating="4.8"
-        reviewCount="1247"
+        rating=""
+        reviewCount=""
         sku="ILINGUE-5000-BOOK"
         keywords="libro físico inglés, 5000 palabras inglés, pronunciación inglés hispanohablantes, libro inglés impreso, Amazon"
         availability="InStock"
@@ -254,10 +254,9 @@ const Product5000Book = () => {
               {/* Reviews */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-muted-foreground/30" />)}
                 </div>
-                <span className="font-bold text-foreground">4.8/5</span>
-                <span className="text-muted-foreground">(1,247+ Reseñas)</span>
+                <span className="text-muted-foreground">(0 Reseñas)</span>
               </div>
 
               {/* Purchase Counter */}
@@ -418,8 +417,7 @@ const Product5000Book = () => {
         </div>
       </section>
 
-      {/* Reviews */}
-      <ProductReviews productType="english" />
+      {/* Reviews - disabled until physical book has reviews */}
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 bg-primary">
@@ -500,6 +498,7 @@ const Product5000Book = () => {
         isLoading={cartLoading}
         secondaryCtaText="Comprar en Amazon"
         onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
+        showReviews={false}
       />
       <SalesNotification />
       <ScrollToTop />

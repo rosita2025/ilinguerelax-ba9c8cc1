@@ -47,7 +47,7 @@ export const products: Product[] = [
     flag: "🇬🇧",
     country: "Inglés UK / USA",
     image: "/images/product-8000.webp",
-    title: "Inglés Relax - 8,000 Palabras",
+    title: "Inglés Relax - 8,000 Palabras Digital",
     subtitle: "Libro Digital Completo",
     description: "Vocabulario completo + gramática",
     rating: 4.9,

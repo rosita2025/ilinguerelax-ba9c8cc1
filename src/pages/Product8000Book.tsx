@@ -199,28 +199,6 @@ const Product8000Book = () => {
 
             {/* Product Info */}
             <div>
-              {/* Pre-order Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>📦 COMPRA ANTICIPADA</span>
-                </motion.div>
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium"
-                >
-                  <Gift className="w-4 h-4" />
-                  <span>Envío Junio 2026</span>
-                </motion.div>
-              </div>
-
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Inglés Relax - 8,000 Palabras
                 <br />
@@ -231,15 +209,6 @@ const Product8000Book = () => {
                 El mismo método completo para aprender inglés sin estrés, ahora en formato libro físico premium. 
                 Perfecto para estudiar sin pantallas.
               </p>
-
-              {/* Reviews - More Prominent */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
-                </div>
-                <span className="font-bold text-foreground">4.9/5</span>
-                <span className="text-muted-foreground">(800+ Reseñas de la versión digital)</span>
-              </div>
 
               {/* Purchase Counter - Social Proof */}
               <div className="mb-4">

@@ -119,6 +119,9 @@ export const CartDrawer = () => {
                 <p className="text-xs text-muted-foreground">
                   ​Envío internacional disponible – tiempo estimado 12–15 días
                 </p>
+                <p className="text-xs text-muted-foreground">
+                  Los impuestos y los gastos de envío se calculan al finalizar la compra.
+                </p>
                 <Button
                 onClick={handleCheckout}
                 className="w-full"

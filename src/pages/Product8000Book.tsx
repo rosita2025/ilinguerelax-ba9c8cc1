@@ -86,9 +86,6 @@ const benefits = [
 ];
 
 const Product8000Book = () => {
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();

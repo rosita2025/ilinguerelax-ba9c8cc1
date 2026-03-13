@@ -98,10 +98,10 @@ const Product5000Book = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const products = await fetchShopifyProducts(10, "5000");
+        const products = await fetchShopifyProducts(10, "LIBRO FISICO 5,000");
         const book = products.find(p => 
-          p.node.title.toLowerCase().includes("5000") || 
-          p.node.title.toLowerCase().includes("5,000")
+          p.node.title.toLowerCase().includes("libro fisico") && 
+          (p.node.title.toLowerCase().includes("5000") || p.node.title.toLowerCase().includes("5,000"))
         );
         if (book) {
           setShopifyProduct(book);

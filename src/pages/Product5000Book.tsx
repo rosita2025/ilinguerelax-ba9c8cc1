@@ -496,10 +496,10 @@ const Product5000Book = () => {
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"
         ctaText="Agregar al Carrito"
-        onCtaClick={handleAddToShopifyCart}
-        isCtaLoading={cartLoading}
+        onBuyClick={handleAddToShopifyCart}
+        isLoading={cartLoading}
         secondaryCtaText="Comprar en Amazon"
-        secondaryBuyUrl={AMAZON_URL}
+        onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
       />
       <SalesNotification />
       <ScrollToTop />

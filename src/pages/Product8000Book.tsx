@@ -397,7 +397,7 @@ const Product8000Book = () => {
           },
           {
             question: "¿Cuándo recibiré mi libro físico?",
-            answer: "El libro físico está en compra anticipada. Los envíos están programados para comenzar en Junio de 2026. Recibirás actualizaciones por email sobre el estado de tu pedido.",
+            answer: "El libro físico está disponible para envío inmediato. Los tiempos de entrega dependen de tu ubicación. Recibirás actualizaciones por email sobre el estado de tu pedido.",
             icon: Truck,
           },
           {

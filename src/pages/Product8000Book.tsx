@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { useCartStore } from "@/stores/cartStore";
+import { fetchShopifyProducts } from "@/lib/shopify";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -36,6 +38,7 @@ import { toast } from "sonner";
 
 // Product image
 const product8000BookImage = "/images/product-8000-book.webp";
+const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
 
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";
@@ -86,6 +89,47 @@ const Product8000Book = () => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
+  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
+  const { addItem, isLoading: cartLoading } = useCartStore();
+
+  // Fetch Shopify product variant for the physical book
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const products = await fetchShopifyProducts(10, "8000");
+        const book = products.find(p => 
+          p.node.title.toLowerCase().includes("8000") || 
+          p.node.title.toLowerCase().includes("8,000")
+        );
+        if (book) {
+          setShopifyProduct(book);
+          const variant = book.node.variants.edges[0]?.node;
+          if (variant) setShopifyVariantId(variant.id);
+        }
+      } catch (err) {
+        console.error("Failed to load Shopify product:", err);
+      }
+    };
+    loadProduct();
+  }, []);
+
+  const handleAddToShopifyCart = async () => {
+    if (!shopifyVariantId || !shopifyProduct) {
+      toast.error("Producto no disponible en la tienda en línea");
+      return;
+    }
+    const variant = shopifyProduct.node.variants.edges[0]?.node;
+    await addItem({
+      product: shopifyProduct,
+      variantId: shopifyVariantId,
+      variantTitle: variant?.title || "Default",
+      price: variant?.price || { amount: "29.99", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: variant?.selectedOptions || [],
+    });
+    toast.success("¡Producto agregado al carrito!");
+  };
 
   const handleSubscribe = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -261,15 +305,34 @@ const Product8000Book = () => {
                 </form>
               )}
 
-              <Button 
-                variant="hero" 
-                size="xl" 
-                className="w-full mb-4 text-lg py-6 bg-amber-500/50 cursor-not-allowed"
-                disabled
-              >
-                <Clock className="w-6 h-6 mr-2" />
-                PRÓXIMAMENTE - JUNIO 2026
-              </Button>
+              <div className="flex flex-col gap-3 mb-4">
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="w-full text-lg py-6"
+                  asChild
+                >
+                  <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    COMPRAR EN AMAZON
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </a>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="xl" 
+                  className="w-full text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={handleAddToShopifyCart}
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                  )}
+                  Agregar al Carrito
+                </Button>
+              </div>
 
               {/* Trust Badges */}
               <TrustBadges lang="es" variant="grid" />
@@ -403,9 +466,11 @@ const Product8000Book = () => {
                   </Button>
                 </form>
               )}
-              <Button variant="hero" size="xl" className="w-full bg-amber-500/50 cursor-not-allowed" disabled>
-                PRÓXIMAMENTE
-                <Clock className="w-5 h-5" />
+              <Button variant="hero" size="xl" className="w-full" asChild>
+                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                  COMPRAR EN AMAZON
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </a>
               </Button>
               <p className="text-xs text-muted-foreground mt-4">
                 *Consulta costos de envío según tu ubicación
@@ -479,23 +544,11 @@ const Product8000Book = () => {
         price="$29.99"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
-        ctaText="PRÓXIMAMENTE"
-        disabled={true}
-        showReviews={false}
-        showEmailSubscription={true}
-        isSubscribed={subscribed}
-        onSubscribe={async (subscriberEmail) => {
-          try {
-            const { error } = await supabase.functions.invoke("send-store-notification", {
-              body: { email: subscriberEmail, storeName: "Libro Físico 8,000 Palabras", productType: "english" },
-            });
-            if (error) throw error;
-            toast.success("¡Gracias por suscribirte! Te avisaremos cuando esté disponible.");
-            setSubscribed(true);
-          } catch {
-            toast.error("Error al suscribirse. Intenta de nuevo.");
-          }
-        }}
+        ctaText="Comprar en Amazon"
+        buyUrl={AMAZON_URL}
+        secondaryCtaText="Agregar al Carrito"
+        onSecondaryClick={handleAddToShopifyCart}
+        isSecondaryLoading={cartLoading}
       />
 
       {/* Spacer for sticky bar */}

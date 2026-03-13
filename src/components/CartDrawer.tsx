@@ -121,7 +121,7 @@ export const CartDrawer = () => {
                 </p>
                 <Button 
                   onClick={handleCheckout} 
-                  className="w-full" 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white" 
                   size="lg" 
                   disabled={items.length === 0 || isLoading || isSyncing}
                 >
@@ -130,10 +130,13 @@ export const CartDrawer = () => {
                   ) : (
                     <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Comprar Ahora
+                      Continuar al Pago
                     </>
                   )}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Pago directo en nuestra tienda oficial
+                </p>
                 <Button 
                   variant="outline"
                   className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-semibold" 

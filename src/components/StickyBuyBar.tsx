@@ -22,6 +22,7 @@ interface StickyBuyBarProps {
   secondaryCtaText?: string;
   onSecondaryClick?: () => void;
   isSecondaryLoading?: boolean;
+  ctaClassName?: string;
 }
 
 export const StickyBuyBar = ({

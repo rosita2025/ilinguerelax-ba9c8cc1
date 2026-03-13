@@ -227,19 +227,9 @@ const Product8000Book = () => {
                 transition={{ delay: 0.4 }}
                 className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-amber-600" />
-                  <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Compra Anticipada</span>
-                </div>
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
-                  <motion.span 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-lg"
-                  >
-                    PRECIO ANTICIPADO
-                  </motion.span>
+                  <span className="text-lg text-muted-foreground line-through">$45 USD</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   📦 Libro físico + PDF digital incluido • Envío a domicilio

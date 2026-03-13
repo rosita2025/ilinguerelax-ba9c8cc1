@@ -110,15 +110,20 @@ export const CartDrawer = () => {
                 </div>
               </div>
               <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
+                <p className="text-xs text-muted-foreground">
+                  Los impuestos y los gastos de envío se calculan al finalizar la compra.
+                </p>
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <p>📦 Envío internacional disponible</p>
+                  <p>⏱ Entrega estimada: 12–15 días</p>
+                </div>
+                <div className="h-px bg-border" />
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total</span>
                   <span className="text-xl font-bold">
                     ${totalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  ​Envío internacional disponible – tiempo estimado 12–15 días
-                </p>
                 <Button
                 onClick={handleCheckout}
                 className="w-full"

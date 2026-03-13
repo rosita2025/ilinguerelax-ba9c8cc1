@@ -236,34 +236,6 @@ const Product8000Book = () => {
                 </p>
               </motion.div>
 
-              {/* Email Subscription Form */}
-              {subscribed ? (
-                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center mb-4">
-                  <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-semibold">¡Gracias por suscribirte!</p>
-                  <p className="text-sm text-muted-foreground">Te avisaremos cuando esté disponible.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="mb-4">
-                  <p className="text-center text-sm text-muted-foreground mb-3">
-                    📧 Déjanos tu correo y te avisamos cuando esté disponible
-                  </p>
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      placeholder="tu@correo.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="flex-1"
-                      required
-                    />
-                    <Button type="submit" variant="hero" disabled={isSubmitting} className="whitespace-nowrap">
-                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-1" /> Suscribirme</>}
-                    </Button>
-                  </div>
-                </form>
-              )}
-
               <div className="flex flex-col gap-3 mb-4">
                 <Button 
                   variant="hero" 

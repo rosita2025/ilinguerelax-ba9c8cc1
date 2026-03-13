@@ -412,7 +412,7 @@ const Product8000Book = () => {
             </h2>
 
             <div className="bg-card rounded-3xl border border-border shadow-card p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {features.map((feature) =>
                 <div key={feature} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -421,6 +421,22 @@ const Product8000Book = () => {
                     <span className="text-foreground">{feature}</span>
                   </div>
                 )}
+              </div>
+
+              {/* Preview CTA */}
+              <div className="border-t border-border pt-6 text-center">
+                <p className="text-sm text-muted-foreground mb-3">
+                  ¿Quieres ver cómo es por dentro antes de comprar?
+                </p>
+                <a
+                  href="https://www.amazon.com/dp/B0GRR584ZY?asin=B0GRR584ZY&revisionId=&format=4&depth=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 hover:underline transition-colors"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  Ver previsualización / Leer fragmento
+                </a>
               </div>
             </div>
           </div>

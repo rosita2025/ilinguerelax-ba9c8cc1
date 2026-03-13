@@ -402,8 +402,8 @@ const Product8000Book = () => {
           },
           {
             question: "¿Incluye la versión digital?",
-            answer: "Sí. Al comprar el libro físico en compra anticipada, recibirás inmediatamente acceso a la versión digital (PDF) para que puedas comenzar a estudiar mientras esperas tu libro.",
-            icon: Gift,
+            answer: "Sí. Al comprar el libro físico, recibirás también acceso a la versión digital (PDF) para que puedas estudiar desde cualquier dispositivo.",
+            icon: Package,
           },
           {
             question: "¿Hacen envíos internacionales?",

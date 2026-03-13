@@ -109,13 +109,16 @@ export const CartDrawer = () => {
                   ))}
                 </div>
               </div>
-              <div className="flex-shrink-0 space-y-4 pt-4 border-t bg-background">
+              <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total</span>
                   <span className="text-xl font-bold">
                     ${totalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
                   </span>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  * No incluye gastos de envío internacional. Sin impuestos adicionales.
+                </p>
                 <Button 
                   onClick={handleCheckout} 
                   className="w-full" 
@@ -127,10 +130,24 @@ export const CartDrawer = () => {
                   ) : (
                     <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Checkout with Shopify
+                      Pagar con Shopify
                     </>
                   )}
                 </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10 font-semibold" 
+                  size="lg"
+                  asChild
+                >
+                  <a href="https://www.amazon.com/dp/B0GRR584ZY" target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Comprar en Amazon
+                  </a>
+                </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  🚚 Amazon Prime: envío rápido y seguro
+                </p>
               </div>
             </>
           )}

@@ -10,14 +10,12 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   Check,
   BookOpen,
   Sparkles,
   ArrowRight,
-  Gift,
   Truck,
   Brain,
   User,
@@ -26,14 +24,11 @@ import {
   Lightbulb,
   CreditCard,
   Package,
-  Clock,
   Star,
   Shield,
   ShoppingCart,
-  Mail,
   Loader2,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Product image

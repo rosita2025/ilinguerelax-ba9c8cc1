@@ -238,7 +238,7 @@ const Product8000Book = () => {
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
                 </div>
                 <span className="font-bold text-foreground">4.9/5</span>
-                <span className="text-muted-foreground">(800+ Reseñas de la versión digital)</span>
+                
               </div>
 
               {/* Purchase Counter - Social Proof */}
@@ -556,9 +556,9 @@ const Product8000Book = () => {
 
       {/* Sales Notification Popup - Disabled until product is available */}
       {/* <SalesNotification 
-                    productName="Libro Físico 8,000 Palabras" 
-                    productLabel="Libro Físico" 
-                   /> */}
+                     productName="Libro Físico 8,000 Palabras" 
+                     productLabel="Libro Físico" 
+                    /> */}
 
       {/* Video Testimonial */}
       <VideoTestimonial

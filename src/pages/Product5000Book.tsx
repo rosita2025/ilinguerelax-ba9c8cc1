@@ -289,17 +289,32 @@ const Product5000Book = () => {
                 </p>
               </motion.div>
 
-              {/* Buy Button */}
+              {/* Add to Cart Button - Primary */}
               <Button
                 variant="hero"
                 size="xl"
-                className="w-full mb-4 text-lg py-6"
+                className="w-full mb-3 text-lg py-6"
+                onClick={handleAddToShopifyCart}
+                disabled={cartLoading}
+              >
+                {cartLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                )}
+                AGREGAR AL CARRITO
+              </Button>
+
+              {/* Buy on Amazon - Secondary */}
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full mb-4 text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
                 asChild
               >
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  COMPRAR AHORA EN AMAZON
-                  <ExternalLink className="w-5 h-5 ml-2" />
+                  <ExternalLink className="w-5 h-5 mr-2" />
+                  COMPRAR EN AMAZON
                 </a>
               </Button>
 

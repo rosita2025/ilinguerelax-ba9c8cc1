@@ -133,6 +133,7 @@ export const Languages = () => {
                 <p className="text-sm text-muted-foreground mb-3">{product.description}</p>
 
                 {/* Reviews */}
+                {product.rating > 0 && (
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center gap-0.5">{renderStars(product.rating)}</div>
                   <span className="text-sm font-medium text-foreground">{product.rating}</span>
@@ -140,6 +141,7 @@ export const Languages = () => {
                     ({product.reviews.toLocaleString()} {c.reviews})
                   </span>
                 </div>
+                )}
 
                 {/* Pricing & Buy Button */}
                 <div className="flex items-center justify-between gap-3">

@@ -130,7 +130,7 @@ const Product5000Book = () => {
       quantity: 1,
       selectedOptions: variant?.selectedOptions || [],
     });
-    toast.success("¡Agregado al carrito!", { description: "Puedes ver tu carrito en el icono 🛒" });
+    
   };
 
   const pixelParams = useMemo(() => ({

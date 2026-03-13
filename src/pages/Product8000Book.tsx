@@ -120,7 +120,7 @@ const Product8000Book = () => {
       quantity: 1,
       selectedOptions: variant?.selectedOptions || [],
     });
-    toast.success("¡Producto agregado al carrito!");
+    
   };
 
 

@@ -210,9 +210,8 @@ const Product8000Book = () => {
 
               <div className="flex flex-col gap-3 mb-4">
                 <Button 
-                  variant="hero" 
                   size="xl" 
-                  className="w-full text-lg py-6"
+                  className="w-full text-lg py-6 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold"
                   asChild
                 >
                   <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">

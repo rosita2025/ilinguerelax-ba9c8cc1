@@ -254,10 +254,9 @@ const Product5000Book = () => {
               {/* Reviews */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-muted-foreground/30" />)}
                 </div>
-                <span className="font-bold text-foreground">4.8/5</span>
-                <span className="text-muted-foreground">(1,247+ Reseñas)</span>
+                <span className="text-muted-foreground">(0 Reseñas)</span>
               </div>
 
               {/* Purchase Counter */}

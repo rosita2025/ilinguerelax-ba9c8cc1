@@ -210,9 +210,8 @@ const Product8000Book = () => {
 
               <div className="flex flex-col gap-3 mb-4">
                 <Button 
-                  variant="hero" 
                   size="xl" 
-                  className="w-full text-lg py-6"
+                  className="w-full text-lg py-6 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold"
                   asChild
                 >
                   <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
@@ -349,7 +348,7 @@ const Product8000Book = () => {
               <p className="text-muted-foreground mb-6">
                 Pago único • Envío incluido* • Incluye PDF digital
               </p>
-              <Button variant="hero" size="xl" className="w-full mb-3" asChild>
+              <Button size="xl" className="w-full mb-3 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold" asChild>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   COMPRAR EN AMAZON
@@ -447,6 +446,7 @@ const Product8000Book = () => {
         secondaryCtaText="Agregar al Carrito"
         onSecondaryClick={handleAddToShopifyCart}
         isSecondaryLoading={cartLoading}
+        ctaClassName="bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500"
       />
 
       {/* Spacer for sticky bar */}

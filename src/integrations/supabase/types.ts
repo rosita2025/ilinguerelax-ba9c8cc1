@@ -143,6 +143,36 @@ export type Database = {
         }
         Relationships: []
       }
+      store_subscribers: {
+        Row: {
+          announcement_sent: boolean
+          created_at: string
+          email: string
+          id: string
+          product_type: string
+          store_name: string
+          updated_at: string
+        }
+        Insert: {
+          announcement_sent?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          product_type?: string
+          store_name?: string
+          updated_at?: string
+        }
+        Update: {
+          announcement_sent?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          product_type?: string
+          store_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

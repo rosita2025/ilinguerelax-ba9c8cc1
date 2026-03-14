@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -168,6 +169,21 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, storeName, productType = "english" }: NotificationRequest = await req.json();
 
     console.log(`Subscribing ${email} for ${storeName} notifications (${productType})`);
+
+    // Save subscriber to database
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    await supabaseAdmin
+      .from("store_subscribers")
+      .upsert(
+        { email, product_type: productType, store_name: storeName, updated_at: new Date().toISOString() },
+        { onConflict: "email,product_type" }
+      );
+
+    console.log(`Subscriber ${email} saved to database`);
 
     const { subject, productName, html } = getEmailContent(productType, email, storeName);
 

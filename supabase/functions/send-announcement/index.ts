@@ -81,7 +81,32 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { productTypes, subject, productName, productUrl, imageUrl } = body;
+    const { productTypes, subject, productName, productUrl, imageUrl, action, email } = body;
+
+    // Handle marking a drip as converted (purchased)
+    if (action === "mark_converted") {
+      if (!email) {
+        return new Response(JSON.stringify({ error: "Email required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const { data, error } = await supabaseAdmin
+        .from("announcement_drips")
+        .update({ converted: true, is_completed: true, updated_at: new Date().toISOString() })
+        .eq("email", email)
+        .eq("converted", false);
+      
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ message: `Marked ${email} as converted`, data }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!productTypes || !subject || !productName || !productUrl) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {

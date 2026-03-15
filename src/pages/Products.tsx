@@ -3,7 +3,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Gift } from "lucide-react";
 import { products, getProductLink } from "@/data/products";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";

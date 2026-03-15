@@ -100,7 +100,7 @@ const Products = () => {
                   </p>
 
                   {/* Features */}
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {product.features.map((feature) => (
                       <span
                         key={feature}
@@ -111,12 +111,27 @@ const Products = () => {
                     ))}
                   </div>
 
+                  {/* Digital Free Badge for Physical Products */}
+                  {product.isPhysical && (
+                    <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 border border-amber-200 dark:border-amber-800">
+                      <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                        🎁 Incluye versión digital GRATIS
+                      </span>
+                    </div>
+                  )}
+
                   {/* Price */}
                   <div className="flex items-baseline gap-2 mb-6">
                     <span className="text-3xl font-bold text-foreground">
                       ${product.price}
                     </span>
-                    {product.originalPrice && (
+                    {product.isPhysical && (
+                      <span className="text-sm text-muted-foreground">
+                        (valor pack: ${product.id === "5000-book" ? "31.99" : "49.99"})
+                      </span>
+                    )}
+                    {product.originalPrice && !product.isPhysical && (
                       <span className="text-lg text-muted-foreground line-through">
                         ${product.originalPrice}
                       </span>

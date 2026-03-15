@@ -113,9 +113,9 @@ const Products = () => {
 
                   {/* Digital Free Badge for Physical Products */}
                   {product.isPhysical && (
-                    <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 border border-amber-200 dark:border-amber-800">
-                      <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+                      <Gift className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-foreground">
                         🎁 Incluye versión digital GRATIS
                       </span>
                     </div>

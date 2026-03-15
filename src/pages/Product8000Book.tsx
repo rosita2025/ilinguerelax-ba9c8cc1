@@ -429,7 +429,7 @@ const Product8000Book = () => {
           },
           {
             question: "¿Incluye la versión digital?",
-            answer: "Sí. Al comprar el libro físico, recibirás también acceso a la versión digital (PDF) para que puedas estudiar desde cualquier dispositivo.",
+            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $29.99 USD.",
             icon: Package,
           },
           {

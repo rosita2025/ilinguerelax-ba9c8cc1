@@ -452,13 +452,15 @@ const Product5000Book = () => {
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$19.99</span>
-                <span className="text-primary font-bold">USD</span>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                Pago único • Envío por Amazon • Libro físico tapa blanda
-              </p>
+                <div className="flex items-baseline justify-center gap-3 mb-2">
+                  <span className="text-5xl font-bold text-foreground">$19.99</span>
+                  <span className="text-lg text-muted-foreground line-through">$31.99</span>
+                  <span className="text-primary font-bold">USD</span>
+                </div>
+                <p className="text-accent font-bold text-sm mb-1">🎁 PACK: Libro Físico + Digital GRATIS</p>
+                <p className="text-muted-foreground mb-6">
+                  Pago único • Envío por Amazon • Incluye PDF digital
+                </p>
               <Button variant="hero" size="xl" className="w-full" asChild>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
                   COMPRAR AHORA EN AMAZON

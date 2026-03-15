@@ -59,6 +59,51 @@ export type Database = {
         }
         Relationships: []
       }
+      announcement_drips: {
+        Row: {
+          converted: boolean
+          created_at: string
+          email: string
+          emails_sent: number
+          id: string
+          image_url: string | null
+          is_completed: boolean
+          last_email_sent_at: string | null
+          next_email_at: string
+          product_name: string
+          product_url: string
+          updated_at: string
+        }
+        Insert: {
+          converted?: boolean
+          created_at?: string
+          email: string
+          emails_sent?: number
+          id?: string
+          image_url?: string | null
+          is_completed?: boolean
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          product_name?: string
+          product_url?: string
+          updated_at?: string
+        }
+        Update: {
+          converted?: boolean
+          created_at?: string
+          email?: string
+          emails_sent?: number
+          id?: string
+          image_url?: string | null
+          is_completed?: boolean
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          product_name?: string
+          product_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       review_invitations: {
         Row: {
           created_at: string

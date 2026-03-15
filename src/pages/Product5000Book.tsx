@@ -499,7 +499,7 @@ const Product5000Book = () => {
           },
           {
             question: "¿El libro viene con versión digital?",
-            answer: "El libro físico se vende por separado. También puedes adquirir la versión digital (PDF) en nuestra tienda online.",
+            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $19.99 USD.",
             icon: FileText,
           },
           {

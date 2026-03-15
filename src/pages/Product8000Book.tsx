@@ -360,10 +360,10 @@ const Product8000Book = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              ¡Reserva tu libro físico ahora!
+              ¡Consigue tu libro físico ahora!
             </h2>
             <p className="text-lg text-white/90 mb-8">
-              Precio especial de compra anticipada. Envío programado para Junio 2026.
+              Pack exclusivo: Libro Físico + Digital GRATIS por solo $29.99 USD.
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">

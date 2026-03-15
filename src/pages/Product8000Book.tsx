@@ -16,6 +16,7 @@ import {
   BookOpen,
   Sparkles,
   ArrowRight,
+  Gift,
   Truck,
   Brain,
   User,

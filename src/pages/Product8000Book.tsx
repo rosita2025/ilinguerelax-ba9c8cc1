@@ -16,6 +16,7 @@ import {
   BookOpen,
   Sparkles,
   ArrowRight,
+  Gift,
   Truck,
   Brain,
   User,
@@ -192,20 +193,45 @@ const Product8000Book = () => {
                 <LiveViewers minViewers={5} maxViewers={15} />
               </div>
 
-              {/* Price Section */}
+              {/* Bundle Price Section */}
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6"
+                className="relative overflow-hidden rounded-2xl p-6 border-2 border-accent mb-6"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.18))" }}
               >
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
-                  <span className="text-lg text-muted-foreground line-through">$45 USD</span>
+                {/* Bundle Badge */}
+                <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl bg-accent text-accent-foreground text-xs font-black uppercase tracking-wider">
+                  🎁 Pack Promoción
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  📦 Libro físico + PDF digital incluido • Envío a domicilio
+
+                <div className="flex items-center gap-2 mb-3">
+                  <Gift className="w-5 h-5 text-accent" />
+                  <span className="text-accent font-bold text-sm uppercase">Libro Físico + Digital Incluido</span>
+                </div>
+
+                <div className="flex items-baseline gap-3 mb-1">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
+                  <span className="text-lg text-muted-foreground line-through">$49.99</span>
+                  <span className="text-primary font-bold">USD</span>
+                </div>
+
+                <p className="text-sm text-muted-foreground mb-3">
+                  📖 Libro físico tapa blanda + 📱 Libro digital (PDF) gratis
                 </p>
+
+                {/* What's in the bundle */}
+                <div className="flex flex-col gap-2 mt-3 p-3 rounded-xl bg-background/60">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $29.99</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                    <span className="text-sm text-foreground font-medium">📱 Libro Digital (PDF) — <span className="line-through text-muted-foreground">$20.00</span> <span className="text-accent font-bold">GRATIS</span></span>
+                  </div>
+                </div>
               </motion.div>
 
               <div className="flex flex-col gap-3 mb-4">
@@ -334,19 +360,21 @@ const Product8000Book = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              ¡Reserva tu libro físico ahora!
+              ¡Consigue tu libro físico ahora!
             </h2>
             <p className="text-lg text-white/90 mb-8">
-              Precio especial de compra anticipada. Envío programado para Junio 2026.
+              Pack exclusivo: Libro Físico + Digital GRATIS por solo $29.99 USD.
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
+              <div className="flex items-baseline justify-center gap-3 mb-2">
                 <span className="text-5xl font-bold text-foreground">$29.99</span>
+                <span className="text-lg text-muted-foreground line-through">$49.99</span>
                 <span className="text-amber-600 font-bold">USD</span>
               </div>
+              <p className="text-accent font-bold text-sm mb-1">🎁 PACK: Libro Físico + Digital GRATIS</p>
               <p className="text-muted-foreground mb-6">
-                Pago único • Envío incluido* • Incluye PDF digital
+                Pago único • Envío a domicilio • Incluye PDF digital
               </p>
               <Button size="xl" className="w-full mb-3 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold" asChild>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
@@ -401,7 +429,7 @@ const Product8000Book = () => {
           },
           {
             question: "¿Incluye la versión digital?",
-            answer: "Sí. Al comprar el libro físico, recibirás también acceso a la versión digital (PDF) para que puedas estudiar desde cualquier dispositivo.",
+            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $29.99 USD.",
             icon: Package,
           },
           {

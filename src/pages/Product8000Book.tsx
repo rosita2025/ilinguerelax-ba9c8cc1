@@ -367,12 +367,14 @@ const Product8000Book = () => {
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
+              <div className="flex items-baseline justify-center gap-3 mb-2">
                 <span className="text-5xl font-bold text-foreground">$29.99</span>
+                <span className="text-lg text-muted-foreground line-through">$49.99</span>
                 <span className="text-amber-600 font-bold">USD</span>
               </div>
+              <p className="text-accent font-bold text-sm mb-1">🎁 PACK: Libro Físico + Digital GRATIS</p>
               <p className="text-muted-foreground mb-6">
-                Pago único • Envío incluido* • Incluye PDF digital
+                Pago único • Envío a domicilio • Incluye PDF digital
               </p>
               <Button size="xl" className="w-full mb-3 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold" asChild>
                 <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">

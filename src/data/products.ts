@@ -68,7 +68,7 @@ export const products: Product[] = [
     image: "/images/product-5000-book.webp",
     title: "Inglés Relax - 5,000 Palabras",
     subtitle: "Libro Físico Tapa Blanda",
-    description: "Libro físico tapa blanda premium",
+    description: "📖 Libro físico + 📱 Digital GRATIS",
     rating: 0,
     reviews: 0,
     price: 19.99,

@@ -22,9 +22,9 @@ function mapHotmartProduct(productName: string): {
   if (lower.includes("5,000") || lower.includes("5.000") || lower.includes("5000")) {
     if (lower.includes("adicional") || lower.includes("3,000") || lower.includes("3.000") || lower.includes("8,000") || lower.includes("8.000") || lower.includes("completa")) {
       return {
-        id: "product-3000-upsell",
-        name: "Inglés Relax - 3,000 Palabras Adicionales (Completa 8,000)",
-        category: "Digital Book Upsell",
+        id: "product-8000",
+        name: "Inglés Relax - 8,000 Palabras (Upsell 3,000 Adicionales)",
+        category: "Digital Book",
         value: 10,
       };
     }

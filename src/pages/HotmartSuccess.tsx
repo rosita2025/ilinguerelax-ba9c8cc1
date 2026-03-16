@@ -1,11 +1,10 @@
-import { useEffect, useState, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import {
   CheckCircle,
   MessageCircle,
@@ -16,89 +15,15 @@ import {
   Star,
 } from "lucide-react";
 
-// ============================================
-// PRODUCT CATALOG - prices & pixel data
-// ============================================
-const PRODUCT_MAP: Record<string, { name: string; value: number; id: string; category: string }> = {
-  "5000": {
-    name: "Inglés Relax - 5,000 Palabras",
-    value: 12,
-    id: "product-5000",
-    category: "Digital Book",
-  },
-  "8000": {
-    name: "Inglés Relax - 8,000 Palabras",
-    value: 22,
-    id: "product-8000",
-    category: "Digital Book",
-  },
-  "3000": {
-    name: "Inglés Relax - 3,000 Palabras Adicionales (Upsell)",
-    value: 10,
-    id: "product-3000-upsell",
-    category: "Digital Book Upsell",
-  },
-  "1000verbos": {
-    name: "Inglés Relax - 1,000 Verbos",
-    value: 12,
-    id: "product-1000-verbos",
-    category: "Digital Book",
-  },
-  "500preguntas": {
-    name: "Inglés Relax - 500 Preguntas",
-    value: 12,
-    id: "product-500-preguntas",
-    category: "Digital Book",
-  },
-};
-
-const DEFAULT_PRODUCT = "5000";
-
 const HotmartSuccess = () => {
   const [confetti, setConfetti] = useState(true);
-  const [searchParams] = useSearchParams();
-
-  // Parse purchased products from URL
-  // Usage: /hotmart-success?products=5000,3000,1000verbos
-  // Or single: /hotmart-success?products=5000
-  // Or legacy (no param): fires default product only
-  const purchasedProducts = useMemo(() => {
-    const raw = searchParams.get("products") || searchParams.get("p");
-    if (!raw) return [DEFAULT_PRODUCT];
-    return raw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-  }, [searchParams]);
 
   useEffect(() => {
-    // Fire one Purchase event per product for Facebook Pixel
-    purchasedProducts.forEach((key) => {
-      const product = PRODUCT_MAP[key];
-      if (!product) {
-        console.warn(`Unknown product key for pixel: ${key}`);
-        return;
-      }
-
-      trackHotmartEvent("Purchase", {
-        content_name: product.name,
-        content_category: product.category,
-        content_ids: [product.id],
-        content_type: "product",
-        value: product.value,
-        currency: "USD",
-        num_items: 1,
-      });
-
-      console.log(`✅ Pixel Purchase fired: ${product.name} ($${product.value})`);
-    });
-
+    // Purchase pixel events are now sent server-side via Facebook Conversions API
+    // triggered by Hotmart PURCHASE_APPROVED webhooks (hotmart-purchase-pixel edge function)
     const timer = setTimeout(() => setConfetti(false), 5000);
     return () => clearTimeout(timer);
-  }, [purchasedProducts]);
-
-  const totalValue = purchasedProducts.reduce((sum, key) => {
-    return sum + (PRODUCT_MAP[key]?.value || 0);
-  }, 0);
-
-  const productCount = purchasedProducts.length;
+  }, []);
 
   const handleWhatsApp = () => {
     window.open(
@@ -180,7 +105,6 @@ const HotmartSuccess = () => {
               </div>
             </motion.div>
 
-            {/* Title */}
             <motion.h1
               className="text-3xl md:text-5xl font-bold text-foreground mb-4"
               initial={{ opacity: 0, y: 20 }}
@@ -191,38 +115,13 @@ const HotmartSuccess = () => {
             </motion.h1>
 
             <motion.p
-              className="text-lg md:text-xl text-muted-foreground mb-2"
+              className="text-lg md:text-xl text-muted-foreground mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              {productCount > 1
-                ? `Has comprado ${productCount} productos. ¡Revisa tu email!`
-                : "Tu libro está listo. ¡Revisa tu email!"}
+              ¡Revisa tu email para acceder a tu libro!
             </motion.p>
-
-            {/* Products purchased summary */}
-            {productCount > 1 && (
-              <motion.div
-                className="flex flex-wrap gap-2 justify-center mb-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.45 }}
-              >
-                {purchasedProducts.map((key) => {
-                  const product = PRODUCT_MAP[key];
-                  if (!product) return null;
-                  return (
-                    <span
-                      key={key}
-                      className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1 text-sm font-medium"
-                    >
-                      ✅ {product.name.replace("Inglés Relax - ", "")}
-                    </span>
-                  );
-                })}
-              </motion.div>
-            )}
 
             {/* Access Info Card */}
             <motion.div
@@ -236,9 +135,8 @@ const HotmartSuccess = () => {
               </h2>
               <p className="text-muted-foreground mb-4">
                 <strong>
-                  Te enviaremos el acceso{" "}
-                  {productCount > 1 ? "a tus libros" : "a tu libro"} directamente al
-                  correo que registraste en Hotmart.
+                  Te enviaremos el acceso directamente al correo que registraste en
+                  Hotmart.
                 </strong>
               </p>
               <p className="text-muted-foreground mb-4">

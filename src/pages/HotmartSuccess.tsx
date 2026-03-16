@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import {
   CheckCircle,
-  Download,
   MessageCircle,
   Mail,
   PartyPopper,
@@ -17,48 +16,111 @@ import {
   Star,
 } from "lucide-react";
 
+// ============================================
+// PRODUCT CATALOG - prices & pixel data
+// ============================================
+const PRODUCT_MAP: Record<string, { name: string; value: number; id: string; category: string }> = {
+  "5000": {
+    name: "Inglés Relax - 5,000 Palabras",
+    value: 12,
+    id: "product-5000",
+    category: "Digital Book",
+  },
+  "8000": {
+    name: "Inglés Relax - 8,000 Palabras",
+    value: 22,
+    id: "product-8000",
+    category: "Digital Book",
+  },
+  "3000": {
+    name: "Inglés Relax - 3,000 Palabras Adicionales (Upsell)",
+    value: 10,
+    id: "product-3000-upsell",
+    category: "Digital Book Upsell",
+  },
+  "1000verbos": {
+    name: "Inglés Relax - 1,000 Verbos",
+    value: 12,
+    id: "product-1000-verbos",
+    category: "Digital Book",
+  },
+  "500preguntas": {
+    name: "Inglés Relax - 500 Preguntas",
+    value: 12,
+    id: "product-500-preguntas",
+    category: "Digital Book",
+  },
+};
+
+const DEFAULT_PRODUCT = "5000";
+
 const HotmartSuccess = () => {
   const [confetti, setConfetti] = useState(true);
+  const [searchParams] = useSearchParams();
+
+  // Parse purchased products from URL
+  // Usage: /hotmart-success?products=5000,3000,1000verbos
+  // Or single: /hotmart-success?products=5000
+  // Or legacy (no param): fires default product only
+  const purchasedProducts = useMemo(() => {
+    const raw = searchParams.get("products") || searchParams.get("p");
+    if (!raw) return [DEFAULT_PRODUCT];
+    return raw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+  }, [searchParams]);
 
   useEffect(() => {
-    // Fire Purchase event for Hotmart Pixel (24959578143733255)
-    trackHotmartEvent("Purchase", {
-      content_name: "Inglés Relax - 5,000 Palabras",
-      content_category: "Digital Book",
-      content_ids: ["product-5000"],
-      content_type: "product",
-      value: 10,
-      currency: "USD",
-      num_items: 1,
+    // Fire one Purchase event per product for Facebook Pixel
+    purchasedProducts.forEach((key) => {
+      const product = PRODUCT_MAP[key];
+      if (!product) {
+        console.warn(`Unknown product key for pixel: ${key}`);
+        return;
+      }
+
+      trackHotmartEvent("Purchase", {
+        content_name: product.name,
+        content_category: product.category,
+        content_ids: [product.id],
+        content_type: "product",
+        value: product.value,
+        currency: "USD",
+        num_items: 1,
+      });
+
+      console.log(`✅ Pixel Purchase fired: ${product.name} ($${product.value})`);
     });
 
-    // Hide confetti after animation
     const timer = setTimeout(() => setConfetti(false), 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [purchasedProducts]);
 
-  const handleDownload = () => {
-    // Hotmart delivers the product automatically, but we can add a backup link
-    window.open("https://www.hotmart.com/my-purchases", "_blank");
-  };
+  const totalValue = purchasedProducts.reduce((sum, key) => {
+    return sum + (PRODUCT_MAP[key]?.value || 0);
+  }, 0);
+
+  const productCount = purchasedProducts.length;
 
   const handleWhatsApp = () => {
-    window.open("https://wa.me/15752160934?text=¡Hola!%20Acabo%20de%20comprar%20Inglés%20Relax%205,000%20Palabras", "_blank");
+    window.open(
+      "https://wa.me/15752160934?text=¡Hola!%20Acabo%20de%20comprar%20Inglés%20Relax",
+      "_blank"
+    );
   };
 
   const handleEmail = () => {
-    window.location.href = "mailto:hola@ilinguerelax.com?subject=Soporte%20Compra%20Inglés%20Relax";
+    window.location.href =
+      "mailto:hola@ilinguerelax.com?subject=Soporte%20Compra%20Inglés%20Relax";
   };
 
   return (
     <main className="min-h-screen bg-background">
       <SEO
         title="¡Gracias Por Tu Compra! - Inglés Relax"
-        description="Tu pedido ha sido confirmado. ¡Revisa tu email para acceder a tu libro Inglés Relax 5,000 Palabras!"
+        description="Tu pedido ha sido confirmado. ¡Revisa tu email para acceder a tus libros Inglés Relax!"
       />
       <Navbar />
 
-      {/* Confetti Animation */}
+      {/* Confetti */}
       {confetti && (
         <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
           {[...Array(50)].map((_, i) => (
@@ -67,7 +129,9 @@ const HotmartSuccess = () => {
               className="absolute w-3 h-3 rounded-full"
               style={{
                 left: `${Math.random() * 100}%`,
-                backgroundColor: ['#22c55e', '#8b5cf6', '#f59e0b', '#ec4899', '#3b82f6'][Math.floor(Math.random() * 5)],
+                backgroundColor: ["#22c55e", "#8b5cf6", "#f59e0b", "#ec4899", "#3b82f6"][
+                  Math.floor(Math.random() * 5)
+                ],
               }}
               initial={{ y: -20, opacity: 1, rotate: 0 }}
               animate={{
@@ -127,13 +191,38 @@ const HotmartSuccess = () => {
             </motion.h1>
 
             <motion.p
-              className="text-lg md:text-xl text-muted-foreground mb-8"
+              className="text-lg md:text-xl text-muted-foreground mb-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Tu libro Inglés Relax - 5,000 Palabras está listo. ¡Revisa tu email!
+              {productCount > 1
+                ? `Has comprado ${productCount} productos. ¡Revisa tu email!`
+                : "Tu libro está listo. ¡Revisa tu email!"}
             </motion.p>
+
+            {/* Products purchased summary */}
+            {productCount > 1 && (
+              <motion.div
+                className="flex flex-wrap gap-2 justify-center mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.45 }}
+              >
+                {purchasedProducts.map((key) => {
+                  const product = PRODUCT_MAP[key];
+                  if (!product) return null;
+                  return (
+                    <span
+                      key={key}
+                      className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1 text-sm font-medium"
+                    >
+                      ✅ {product.name.replace("Inglés Relax - ", "")}
+                    </span>
+                  );
+                })}
+              </motion.div>
+            )}
 
             {/* Access Info Card */}
             <motion.div
@@ -146,18 +235,24 @@ const HotmartSuccess = () => {
                 📧 Revisa Tu Correo Electrónico
               </h2>
               <p className="text-muted-foreground mb-4">
-                <strong>Te enviaremos el acceso a tu libro directamente al correo que registraste en Hotmart.</strong>
+                <strong>
+                  Te enviaremos el acceso{" "}
+                  {productCount > 1 ? "a tus libros" : "a tu libro"} directamente al
+                  correo que registraste en Hotmart.
+                </strong>
               </p>
               <p className="text-muted-foreground mb-4">
-                Por favor revisa tu bandeja de entrada (y la carpeta de spam) en los próximos minutos.
+                Por favor revisa tu bandeja de entrada (y la carpeta de spam) en los
+                próximos minutos.
               </p>
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-amber-700 dark:text-amber-400 text-sm">
-                <strong>⚠️ ¿No recibiste el correo?</strong><br />
+                <strong>⚠️ ¿No recibiste el correo?</strong>
+                <br />
                 Contáctanos por WhatsApp o email y te daremos acceso manualmente.
               </div>
             </motion.div>
 
-            {/* Contact Info Card */}
+            {/* Contact Card */}
             <motion.div
               className="bg-card rounded-3xl border border-border shadow-card p-8 mb-8"
               initial={{ opacity: 0, y: 20 }}
@@ -167,20 +262,19 @@ const HotmartSuccess = () => {
               <h2 className="text-xl font-semibold text-foreground mb-6">
                 ¿Necesitas Ayuda? Contáctanos
               </h2>
-
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
+                <Button
                   onClick={handleWhatsApp}
-                  variant="outline" 
+                  variant="outline"
                   size="lg"
                   className="bg-green-500/10 border-green-500/30 hover:bg-green-500/20 text-green-600"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
                   WhatsApp: +1 575 216 0934
                 </Button>
-                <Button 
+                <Button
                   onClick={handleEmail}
-                  variant="outline" 
+                  variant="outline"
                   size="lg"
                   className="bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-600"
                 >
@@ -190,7 +284,7 @@ const HotmartSuccess = () => {
               </div>
             </motion.div>
 
-            {/* Thank You Message */}
+            {/* Thank You */}
             <motion.div
               className="flex items-center justify-center gap-2 text-muted-foreground mb-8"
               initial={{ opacity: 0 }}

@@ -492,7 +492,7 @@ const ProductSpanish5000 = () => {
       <div className="h-32 lg:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification productName="Spanish 5,000 Words" productLabel="5,000" variant="international" />
+      <SalesNotification />
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup onBuyClick={handleBuyNow} discount="15%" lang="en" storageKey="exit_intent_spanish" />

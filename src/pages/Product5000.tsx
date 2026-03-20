@@ -299,6 +299,9 @@ const Product5000 = () => {
                 Inglés Relax - 5,000 Palabras con Pronunciación Español y
                 Fonética UK/USA
               </h1>
+              <p className="text-base text-muted-foreground mb-4">
+                📚 Incluye estructura gramatical completa desde <span className="font-bold text-foreground">Nivel Cero hasta Intermedio B1</span>. Perfecto para principiantes.
+              </p>
 
               {/* Reviews - More Prominent */}
               <div className="flex items-center gap-3 mb-4">

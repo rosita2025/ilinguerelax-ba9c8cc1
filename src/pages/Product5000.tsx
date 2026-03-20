@@ -481,7 +481,7 @@ const Product5000 = () => {
                 </div>
                 <div className="p-3 text-center">
                   <h4 className="font-bold text-foreground text-sm">Estructura Gramatical</h4>
-                  <p className="text-xs text-muted-foreground">Oraciones negativas, preguntas y más</p>
+                  <p className="text-xs text-muted-foreground">Sujeto + Verbo TO BE + Sustantivos</p>
                 </div>
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">

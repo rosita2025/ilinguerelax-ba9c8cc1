@@ -636,8 +636,8 @@ const Product5000 = () => {
       icon: CreditCard
     }]} title="Preguntas Frecuentes" subtitle="Resolvemos tus dudas sobre INGLÉS RELAX" />
 
-      {/* Comparison Table */}
-      <ComparisonTable />
+
+
 
       {/* About Me / Sobre Mí Section */}
       <section className="py-16 md:py-20 relative overflow-hidden">

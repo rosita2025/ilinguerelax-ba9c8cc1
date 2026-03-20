@@ -104,7 +104,7 @@ const Product8000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 17,
+      value: 20,
       currency: "USD"
     }),
     []
@@ -118,7 +118,7 @@ const Product8000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 17,
+      value: 20,
       currency: "USD",
       num_items: 1
     });

@@ -113,6 +113,9 @@ export const Product8000Preview = () => {
             <p className="text-lg text-muted-foreground">
               Incluidos GRATIS con tu compra
             </p>
+            <p className="text-base font-semibold text-primary mt-2">
+              ✅ Tiene 35 Estructuras Gramaticales en nivel desde Cero hasta Avanzado
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">

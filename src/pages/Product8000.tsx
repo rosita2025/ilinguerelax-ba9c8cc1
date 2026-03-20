@@ -104,7 +104,7 @@ const Product8000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 17,
+      value: 20,
       currency: "USD"
     }),
     []
@@ -118,7 +118,7 @@ const Product8000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 17,
+      value: 20,
       currency: "USD",
       num_items: 1
     });
@@ -133,7 +133,7 @@ const Product8000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/product-8000.png"
         type="product"
-        price="17"
+        price="20"
         originalPrice="54"
         rating="4.9"
         reviewCount="892"
@@ -337,27 +337,63 @@ const Product8000 = () => {
         </div>
       </section>
 
-      {/* What's Included */}
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
+      {/* What You Get Today - Value Stack */}
+      <section className="py-12 md:py-16">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+                🎯 <span className="text-gradient">¿Qué recibes HOY por solo $20?</span>
+              </h2>
+              <p className="text-muted-foreground">Todo esto incluido en un solo pago</p>
+            </div>
+            
+            <div className="bg-card rounded-2xl border-2 border-primary/30 shadow-hero p-6 md:p-8 space-y-4">
+              {[
+                { label: "📘 8,000 Palabras organizadas por temas y niveles (A1 → C1)", value: "$30" },
+                { label: "🔊 Pronunciación adaptada al español para cada palabra", value: "$15" },
+                { label: "🇬🇧🇺🇸 Fonética UK + USA (dos acentos en una sola palabra)", value: "$10" },
+                { label: "📗 35 Estructuras Gramaticales (desde cero hasta avanzado)", value: "$20" },
+                { label: "📝 Formulario de Repaso Gramatical", value: "$8" },
+                { label: "💡 Ejemplos de Estructuras en Contexto", value: "$8" },
+                { label: "❌ Errores Comunes de Hispanohablantes", value: "$5" },
+                { label: "📒 Lista de Notas y Apuntes Personales", value: "$4" },
+                { label: "🔄 Actualizaciones gratuitas de por vida", value: "∞" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between gap-3 py-2 border-b border-border last:border-0">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-foreground text-sm md:text-base">{item.label}</span>
+                  </div>
+                  <span className="text-muted-foreground line-through text-sm flex-shrink-0">{item.value}</span>
+                </div>
+              ))}
+              
+              <div className="pt-4 border-t-2 border-primary/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-lg font-bold text-muted-foreground">Valor total:</span>
+                  <span className="text-xl font-bold text-muted-foreground line-through">$100+</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-black text-foreground">Hoy pagas solo:</span>
+                  <span className="text-3xl font-black text-primary">$20 USD</span>
+                </div>
+              </div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="pt-2">
+                <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                  ¡SÍ, QUIERO MI COPIA AHORA!
+                  <ArrowRight className="w-6 h-6 ml-2" />
+                </Button>
+              </motion.div>
+              <p className="text-center text-xs text-muted-foreground">
+                🔒 Pago seguro • Garantía 7 días • Acceso inmediato
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Preview & Bonus Sections */}
       <Product8000Preview />

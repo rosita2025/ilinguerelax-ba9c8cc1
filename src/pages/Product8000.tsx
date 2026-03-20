@@ -530,7 +530,7 @@ const Product8000 = () => {
       <div className="h-20 md:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification productName="8,000 Palabras en Inglés" productLabel="8,000" />
+      <SalesNotification />
 
 
 

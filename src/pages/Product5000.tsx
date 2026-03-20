@@ -322,30 +322,86 @@ const Product5000 = () => {
                 <LiveViewers minViewers={18} maxViewers={42} />
               </div>
 
-              {/* Price Section - More Impactful */}
+              {/* Price Section with Value Stack */}
               <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6">
+              className="relative overflow-hidden rounded-2xl p-6 border-2 border-accent mb-6"
+              style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.18))" }}>
               
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-green-600" />
-                  <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
+                {/* Badge */}
+                <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl bg-accent text-accent-foreground text-xs font-black uppercase tracking-wider">
+                  🎁 Todo Incluido
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
+
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-accent" />
+                  <span className="text-accent font-bold text-sm uppercase">Lo que recibes hoy</span>
+                </div>
+
+                {/* Value Stack */}
+                <div className="flex flex-col gap-2 p-3 rounded-xl bg-background/60 mb-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">📖 5,000 Palabras con Pronunciación</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">$30</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">📚 Gramática Nivel Cero → B1</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">$15</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 1: Estructura de Frases</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$12</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 2: Diccionario Alfabético</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$12</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 3: Verbo To Be y Artículos</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$10</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 4: Actualizaciones de por vida</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$10</span>
+                  </div>
+                  <div className="border-t border-border pt-2 mt-1 flex items-center justify-between">
+                    <span className="text-sm font-bold text-foreground">Valor total:</span>
+                    <span className="text-sm font-bold text-muted-foreground line-through">$89 USD</span>
+                  </div>
+                </div>
+
+                <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                  <span className="text-2xl text-muted-foreground line-through">$89</span>
                   <motion.span
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ repeat: Infinity, duration: 2 }}
                   className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
-                  
-                    AHORRA 78%
+                    AHORRA 86%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  💳 Pago único • Sin suscripciones • Acceso de por vida
+                  💳 Pago único • 4 Bonus GRATIS • Acceso de por vida
                 </p>
               </motion.div>
 

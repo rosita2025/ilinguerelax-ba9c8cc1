@@ -20,8 +20,8 @@ import { motion } from "framer-motion";
 
 // Preview images
 import previewIndice from "@/assets/preview-indice.png";
-import previewGramatica from "@/assets/preview-gramatica.png";
-import previewFrases from "@/assets/preview-frases.jpg";
+import previewGramatica from "@/assets/preview-gramatica-estructura.png";
+import previewFrases from "@/assets/preview-frases-verbos.png";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
 const product5000Image = "/images/product-5000.webp";
 
@@ -480,8 +480,8 @@ const Product5000 = () => {
                   <img src={previewGramatica} alt="Gramática" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
-                  <h4 className="font-bold text-foreground text-sm">Gramática A1→B1</h4>
-                  <p className="text-xs text-muted-foreground">Fórmulas prácticas</p>
+                  <h4 className="font-bold text-foreground text-sm">Estructura Gramatical</h4>
+                  <p className="text-xs text-muted-foreground">Oraciones negativas, preguntas y más</p>
                 </div>
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
@@ -489,8 +489,8 @@ const Product5000 = () => {
                   <img src={previewFrases} alt="Frases" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
-                  <h4 className="font-bold text-foreground text-sm">Frases y Verbos</h4>
-                  <p className="text-xs text-muted-foreground">Ejemplos reales</p>
+                  <h4 className="font-bold text-foreground text-sm">Verbos con Ejemplos</h4>
+                  <p className="text-xs text-muted-foreground">Verbos académicos y profesionales</p>
                 </div>
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">

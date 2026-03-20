@@ -33,7 +33,7 @@ import {
 import { toast } from "sonner";
 
 // Product image
-const product8000BookImage = "/images/product-8000-book.webp";
+const product8000BookImage = "/images/promo-8000-bundle.png";
 const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
 
 // Conversion components

@@ -70,8 +70,8 @@ export const Product8000Preview = () => {
         <div className="container px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              📚 <span className="text-gradient">ESTE LIBRO INCLUYE:</span>
-            </h2>
+               📚 <span className="text-gradient">VISTA PREVIA ANTES DE COMPRAR</span>
+             </h2>
           </div>
 
           {/* 2 Preview Images */}

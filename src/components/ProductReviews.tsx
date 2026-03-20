@@ -290,54 +290,8 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
         </Swiper>
       </div>
 
-       {/* Text-only Reviews Section */}
-       {textReviews.length > 0 && (
-       <div className="container px-4 md:px-6 mt-12">
-         <div className="flex items-center justify-center gap-2 mb-6">
-           <span className="text-sm font-medium text-muted-foreground">
-             {activeProduct === "spanish" ? "Reviews from" : "Reseñas de"}
-           </span>
-           <span className="text-sm font-bold text-primary">iLingue Relax</span>
-           <CheckCircle className="w-4 h-4 text-green-500" />
-         </div>
-         
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-           {textReviews.map((review, index) => (
-            <div 
-              key={index} 
-              className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300"
-            >
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  {review.verified && (
-                    <div className="flex items-center gap-1 text-green-600">
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      <span className="text-xs font-medium">
-                        {activeProduct === "spanish" ? "Verified" : "Verificado"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <p className="text-foreground text-sm leading-relaxed">
-                  "{review.text}"
-                </p>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>
-                    {activeProduct === "spanish" ? "Customer via iLingue Relax" : "Cliente de iLingue Relax"}
-                  </span>
-                  <span>{new Date(review.date).toLocaleDateString(activeProduct === "spanish" ? "en-US" : "es-ES", { month: "short", year: "numeric" })}</span>
-                </div>
-              </div>
-            </div>
-           ))}
-         </div>
-       </div>
-       )}
+
+
 
       {/* Customer Reviews from Database */}
       {dbReviews.length > 0 && (

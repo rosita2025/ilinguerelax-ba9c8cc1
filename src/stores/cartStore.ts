@@ -2,11 +2,13 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { 
   CartItem, 
+  DiscountCodeResult,
   createShopifyCart, 
   addLineToShopifyCart, 
   updateShopifyCartLine, 
   removeLineFromShopifyCart,
-  syncShopifyCart
+  syncShopifyCart,
+  applyDiscountToShopifyCart
 } from '@/lib/shopify';
 
 interface CartStore {

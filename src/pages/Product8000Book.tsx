@@ -33,7 +33,7 @@ import {
 import { toast } from "sonner";
 
 // Product image
-const product8000BookImage = "/images/product-8000-book.webp";
+const product8000BookImage = "/images/promo-8000-bundle.png";
 const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
 
 // Conversion components
@@ -461,6 +461,34 @@ const Product8000Book = () => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre el libro físico"
       />
+
+      {/* Digital Only Option */}
+      <section className="py-10 md:py-14 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+              💡 ¿Prefieres solo la versión digital?
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Más económico, acceso inmediato. Descárgalo al instante y empieza a estudiar hoy.
+            </p>
+            <div className="bg-card rounded-2xl border border-border shadow-card p-6 inline-block">
+              <div className="flex items-baseline gap-3 justify-center mb-3">
+                <span className="text-4xl font-black text-foreground">$20</span>
+                <span className="text-lg text-muted-foreground line-through">$54</span>
+                <span className="text-primary font-bold">USD</span>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">📱 Solo digital (PDF) · Acceso de por vida · Sin envío</p>
+              <a
+                href="/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-all duration-300"
+              >
+                📱 Ver Versión Digital — $20
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
 

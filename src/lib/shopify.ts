@@ -287,6 +287,41 @@ export async function updateShopifyCartLine(cartId: string, lineId: string, quan
   return { success: true };
 }
 
+export interface DiscountCodeResult {
+  code: string;
+  applicable: boolean;
+}
+
+export interface ApplyDiscountResult {
+  success: boolean;
+  discountCodes: DiscountCodeResult[];
+  totalAmount?: { amount: string; currencyCode: string };
+  subtotalAmount?: { amount: string; currencyCode: string };
+  cartNotFound?: boolean;
+}
+
+export async function applyDiscountToShopifyCart(cartId: string, discountCodes: string[]): Promise<ApplyDiscountResult> {
+  const data = await storefrontApiRequest(CART_DISCOUNT_CODES_UPDATE_MUTATION, {
+    cartId,
+    discountCodes,
+  });
+
+  const userErrors = data?.data?.cartDiscountCodesUpdate?.userErrors || [];
+  if (isCartNotFoundError(userErrors)) return { success: false, discountCodes: [], cartNotFound: true };
+  if (userErrors.length > 0) {
+    console.error('Apply discount failed:', userErrors);
+    return { success: false, discountCodes: [] };
+  }
+
+  const cart = data?.data?.cartDiscountCodesUpdate?.cart;
+  return {
+    success: true,
+    discountCodes: cart?.discountCodes || [],
+    totalAmount: cart?.cost?.totalAmount,
+    subtotalAmount: cart?.cost?.subtotalAmount,
+  };
+}
+
 export async function removeLineFromShopifyCart(cartId: string, lineId: string): Promise<{ success: boolean; cartNotFound?: boolean }> {
   const data = await storefrontApiRequest(CART_LINES_REMOVE_MUTATION, {
     cartId,

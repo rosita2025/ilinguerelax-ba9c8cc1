@@ -41,6 +41,9 @@ export const useCartStore = create<CartStore>()(
       isLoading: false,
       isSyncing: false,
       isDrawerOpen: false,
+      discountCodes: [],
+      discountTotal: null,
+      discountSubtotal: null,
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
       addItem: async (item) => {

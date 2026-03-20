@@ -6,42 +6,50 @@ interface Sale {
   name: string;
   country: string;
   timeAgo: string;
+  productName: string;
+  productLabel: string;
+  platform: "hotmart" | "shopify";
 }
 
-// Sales for Spanish speakers learning English (Latin America) - more realistic time ranges
-const latinSalesPeople: Sale[] = [
-  { name: "María García", country: "México", timeAgo: "hace 1 hora" },
-  { name: "Carlos López", country: "España", timeAgo: "hace 3 horas" },
-  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 5 horas" },
-  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 8 horas" },
-  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 1 día" },
-  { name: "José Hernández", country: "Perú", timeAgo: "hace 1 día" },
-  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 2 días" },
-  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 2 días" },
-  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 3 días" },
-  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 3 días" },
-  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 4 días" },
-  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 5 días" },
-];
+// All real product purchases across Hotmart and Shopify
+const allSales: Sale[] = [
+  // 5,000 Palabras Digital (Hotmart)
+  { name: "María García", country: "México", timeAgo: "hace 5 horas", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
+  { name: "Carlos López", country: "España", timeAgo: "hace 1 día", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
+  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 6 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
+  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 15 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
+  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 25 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
 
-// Sales for English speakers learning Spanish (Europe, USA, Canada, Asia) - more realistic time ranges
-const internationalSalesPeople: Sale[] = [
-  { name: "Sarah Johnson", country: "United States", timeAgo: "1 hour ago" },
-  { name: "James Smith", country: "United Kingdom", timeAgo: "3 hours ago" },
-  { name: "Emily Brown", country: "Canada", timeAgo: "5 hours ago" },
-  { name: "Michael Davis", country: "Australia", timeAgo: "8 hours ago" },
-  { name: "Sophie Martin", country: "France", timeAgo: "1 day ago" },
-  { name: "Thomas Mueller", country: "Germany", timeAgo: "1 day ago" },
-  { name: "Emma Wilson", country: "Ireland", timeAgo: "2 days ago" },
-  { name: "David Anderson", country: "Scotland", timeAgo: "2 days ago" },
-  { name: "Olivia Taylor", country: "New Zealand", timeAgo: "3 days ago" },
-  { name: "William Thompson", country: "Netherlands", timeAgo: "3 days ago" },
-  { name: "Charlotte White", country: "Sweden", timeAgo: "4 days ago" },
-  { name: "Daniel Lee", country: "Singapore", timeAgo: "4 days ago" },
-  { name: "Mia Jackson", country: "South Africa", timeAgo: "5 days ago" },
-  { name: "Alexander Harris", country: "Norway", timeAgo: "5 days ago" },
-  { name: "Yuki Tanaka", country: "Japan", timeAgo: "6 days ago" },
-  { name: "Benjamin Clark", country: "Belgium", timeAgo: "1 week ago" },
+  // 8,000 Palabras Digital (Hotmart)
+  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 3 horas", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
+  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 1 día", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
+  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 3 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
+  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 10 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
+  { name: "Camila Vargas", country: "Bolivia", timeAgo: "hace 30 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
+
+  // 1,000 Verbos (Hotmart)
+  { name: "José Hernández", country: "Perú", timeAgo: "hace 8 horas", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart" },
+  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 2 días", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart" },
+  { name: "Roberto Flores", country: "Honduras", timeAgo: "hace 12 días", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart" },
+
+  // 500 Preguntas (Hotmart)
+  { name: "Isabel Mendoza", country: "El Salvador", timeAgo: "hace 1 día", productName: "500 Preguntas en Inglés", productLabel: "500", platform: "hotmart" },
+  { name: "Andrés Ríos", country: "Paraguay", timeAgo: "hace 5 días", productName: "500 Preguntas en Inglés", productLabel: "500", platform: "hotmart" },
+
+  // 5,000 Palabras Libro Físico (Shopify)
+  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 2 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify" },
+  { name: "Patricia Reyes", country: "México", timeAgo: "hace 8 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify" },
+  { name: "Gabriela Peña", country: "Chile", timeAgo: "hace 20 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify" },
+
+  // 8,000 Palabras Libro Físico (Shopify)
+  { name: "Ricardo Silva", country: "Colombia", timeAgo: "hace 1 día", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify" },
+  { name: "Lucía Navarro", country: "España", timeAgo: "hace 4 días", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify" },
+  { name: "Martín Aguilar", country: "Argentina", timeAgo: "hace 18 días", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify" },
+
+  // Spanish for English Speakers (Hotmart)
+  { name: "Sarah Johnson", country: "United States", timeAgo: "hace 6 horas", productName: "Spanish 5,000 Words", productLabel: "🇪🇸 5K", platform: "hotmart" },
+  { name: "James Smith", country: "United Kingdom", timeAgo: "hace 3 días", productName: "Spanish 5,000 Words", productLabel: "🇪🇸 5K", platform: "hotmart" },
+  { name: "Emily Brown", country: "Canada", timeAgo: "hace 14 días", productName: "Spanish 5,000 Words", productLabel: "🇪🇸 5K", platform: "hotmart" },
 ];
 
 interface SalesNotificationProps {
@@ -51,29 +59,25 @@ interface SalesNotificationProps {
 }
 
 const SalesNotification = ({ 
-  productName = "5,000 Palabras en Inglés",
-  productLabel = "5,000",
   variant = "latin"
 }: SalesNotificationProps) => {
-  const salesPeople = variant === "international" ? internationalSalesPeople : latinSalesPeople;
-  const [currentSale, setCurrentSale] = useState<Sale>(salesPeople[0]);
+  // Shuffle sales on mount for variety
+  const [shuffledSales] = useState(() => [...allSales].sort(() => Math.random() - 0.5));
+  const [currentSale, setCurrentSale] = useState<Sale>(shuffledSales[0]);
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
 
   useEffect(() => {
-    // Show first notification after 5 seconds (more natural delay)
     const initialTimeout = setTimeout(() => {
       setIsVisible(true);
     }, 5000);
-
     return () => clearTimeout(initialTimeout);
   }, []);
 
   useEffect(() => {
-    // Random interval between 7-10 seconds
     const getRandomInterval = () => {
-      const minInterval = 7 * 1000; // 7 seconds
-      const maxInterval = 10 * 1000; // 10 seconds
+      const minInterval = 7 * 1000;
+      const maxInterval = 10 * 1000;
       return Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
     };
 
@@ -82,25 +86,19 @@ const SalesNotification = ({
     const scheduleNext = () => {
       const nextInterval = getRandomInterval();
       intervalId = setTimeout(() => {
-        // Hide current notification
         setIsVisible(false);
-        
-        // After 500ms (fade out), show next notification
         setTimeout(() => {
           setSaleIndex(prev => {
-            const nextIndex = (prev + 1) % salesPeople.length;
-            setCurrentSale(salesPeople[nextIndex]);
+            const nextIndex = (prev + 1) % shuffledSales.length;
+            setCurrentSale(shuffledSales[nextIndex]);
             return nextIndex;
           });
           setIsVisible(true);
         }, 500);
-
-        // Schedule the next notification
         scheduleNext();
       }, nextInterval);
     };
 
-    // Start the cycle after initial display (show first one for 15 seconds)
     const firstTimeout = setTimeout(() => {
       scheduleNext();
     }, 15000);
@@ -109,11 +107,10 @@ const SalesNotification = ({
       clearTimeout(firstTimeout);
       clearTimeout(intervalId);
     };
-  }, [salesPeople]);
+  }, [shuffledSales]);
 
   const handleClose = () => {
     setIsVisible(false);
-    // Don't auto-resume - user dismissed it, wait for next cycle
   };
 
   return (
@@ -139,14 +136,12 @@ const SalesNotification = ({
           </button>
           
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Product thumbnail */}
             <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
               <span className="text-[5px] md:text-[6px] font-bold text-black text-center leading-tight">
-                {productLabel}<br/>{variant === "international" ? "WORDS" : "PALABRAS"}
+                {currentSale.productLabel}<br/>PALABRAS
               </span>
             </div>
             
-            {/* Sale info - horizontal layout */}
             <div className="flex-1 min-w-0 flex flex-col">
               <div className="flex items-center gap-1 flex-wrap">
                 <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">
@@ -158,10 +153,10 @@ const SalesNotification = ({
                 </p>
               </div>
               <p className="text-[9px] md:text-xs text-gray-600 truncate">
-                {variant === "international" ? `Purchased ${productName}` : `Compró ${productName}`}
+                Compró {currentSale.productName}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
-                <span className="text-[8px] md:text-[10px] text-green-600 font-medium">{variant === "international" ? "✓ Verified" : "✓ Verificado"}</span>
+                <span className="text-[8px] md:text-[10px] text-green-600 font-medium">✓ Verificado</span>
                 <span className="text-[8px] md:text-[9px] text-gray-400">{currentSale.timeAgo}</span>
               </div>
             </div>

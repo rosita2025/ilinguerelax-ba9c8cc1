@@ -532,15 +532,8 @@ const Product8000 = () => {
       {/* Sales Notification Popup */}
       <SalesNotification productName="8,000 Palabras en Inglés" productLabel="8,000" />
 
-      {/* Video Testimonial */}
-      <VideoTestimonial
-        videoUrl="https://youtu.be/bG35t0x3GkU"
-        customerName="Cliente Verificado"
-        customerLocation="Latinoamérica"
-        testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
-        lang="es"
-        showProductSelector={true} />
-      
+
+
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />

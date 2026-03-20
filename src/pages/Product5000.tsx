@@ -660,34 +660,71 @@ const Product5000 = () => {
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
 
-      {/* Physical Book Promo */}
+      {/* Physical Book Promo - Pack Libro Físico + Digital GRATIS */}
       <section className="bg-gray-950 py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
             <div className="w-48 md:w-56 flex-shrink-0">
               <img 
                 src={product5000BookImg} 
-                alt="Inglés Relax 5,000 Palabras - Libro Físico" 
+                alt="Inglés Relax 5,000 Palabras - Libro Físico + Digital" 
                 className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
               />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Te gustaría un libro físico?</h3>
-              <p className="text-yellow-200 mb-1 text-lg">Inglés Relax - 5,000 Palabras</p>
-              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Disponible en Amazon</p>
+              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">🎁 Pack Promoción</span>
+              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Prefieres el libro físico?</h3>
+              <p className="text-yellow-200 mb-1 text-lg">Libro Físico + Digital <span className="text-green-400 font-bold">GRATIS</span></p>
+              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Envío por Amazon</p>
+              
+              {/* Bundle Value */}
+              <div className="bg-yellow-400/10 rounded-xl p-3 mb-4 border border-yellow-400/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Check className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm text-yellow-200">📖 Libro Físico Tapa Blanda — $19.99</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm text-yellow-200">📱 Libro Digital (PDF) — <span className="line-through text-yellow-300/50">$12</span> <span className="text-green-400 font-bold">GRATIS</span></span>
+                </div>
+              </div>
+
               <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
                 <span className="text-3xl font-black text-yellow-400">$19.99 USD</span>
+                <span className="text-lg text-yellow-300/50 line-through">$31.99</span>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3 justify-center md:justify-start">
                 <a 
                   href="/products/5-000-palabras-libro-fisico"
-                  className="inline-flex items-center gap-2 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-950 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
+                  className="inline-flex items-center gap-2 bg-yellow-400 text-gray-950 hover:bg-yellow-300 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
                 >
-                  📖 Ver detalles
+                  📖 Ver Pack Libro Físico + Digital
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Digital Only Option */}
+      <section className="py-10 md:py-14 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+              💡 ¿Solo quieres la versión digital?
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Ya la tienes en esta página por solo <span className="font-bold text-foreground">$12 USD</span> — sin envío, descarga inmediata.
+            </p>
+            <div className="flex items-baseline gap-3 justify-center mb-4">
+              <span className="text-4xl font-black text-foreground">$12</span>
+              <span className="text-lg text-muted-foreground line-through">$89</span>
+              <span className="text-primary font-bold">USD</span>
+            </div>
+            <Button variant="hero" size="xl" className="w-full max-w-md" onClick={handleBuy}>
+              <Download className="w-5 h-5 mr-2" />
+              📱 Comprar Digital — $12
+            </Button>
           </div>
         </div>
       </section>

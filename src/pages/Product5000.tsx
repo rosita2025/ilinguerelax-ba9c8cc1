@@ -20,8 +20,8 @@ import { motion } from "framer-motion";
 
 // Preview images
 import previewIndice from "@/assets/preview-indice.png";
-import previewGramatica from "@/assets/preview-gramatica.png";
-import previewFrases from "@/assets/preview-frases.jpg";
+import previewGramatica from "@/assets/preview-gramatica-estructura.png";
+import previewFrases from "@/assets/preview-frases-verbos.png";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
 const product5000Image = "/images/product-5000.webp";
 

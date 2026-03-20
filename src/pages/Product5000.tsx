@@ -457,193 +457,52 @@ const Product5000 = () => {
       </section>
 
 
-      {/* Collaboration Section */}
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-      {/* What's Included */}
+      {/* Preview Cards - Compact */}
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-              5,000+ Palabras con{" "}
-              <span className="text-gradient">Pronunciación Hispanohablante</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-8">
+              📖 Vista Previa del Contenido
             </h2>
-            <p className="text-lg text-muted-foreground text-center mb-12">
-              Cada palabra incluye significado, pronunciación y fonética
-              internacional
-            </p>
 
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>)}
-              </div>
-            </div>
-
-            {/* Benefits Grid with Preview Images */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                  src={previewIndice}
-                  alt="Índice Completo"
-                  className="w-full h-full object-cover object-top" />
-                
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewIndice} alt="Índice Completo" className="w-full h-full object-cover object-top" />
                 </div>
-                <div className="p-4 text-center">
-                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-1">Índice Completo</h4>
-                  <p className="text-sm text-muted-foreground">52 capítulos temáticos organizados</p>
+                <div className="p-3 text-center">
+                  <h4 className="font-bold text-foreground text-sm">Índice Completo</h4>
+                  <p className="text-xs text-muted-foreground">52 capítulos</p>
                 </div>
               </div>
-              
-              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                  src={previewGramatica}
-                  alt="Estructura Gramatical"
-                  className="w-full h-full object-cover object-top" />
-                
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewGramatica} alt="Gramática" className="w-full h-full object-cover object-top" />
                 </div>
-                <div className="p-4 text-center">
-                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-1">Estructura Gramatical</h4>
-                  <p className="text-sm text-muted-foreground">Fórmulas para construir frases A1-C1</p>
+                <div className="p-3 text-center">
+                  <h4 className="font-bold text-foreground text-sm">Gramática A1→B1</h4>
+                  <p className="text-xs text-muted-foreground">Fórmulas prácticas</p>
                 </div>
               </div>
-              
-              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                  src={previewFrases}
-                  alt="Frases con Ejemplos"
-                  className="w-full h-full object-cover object-top" />
-                
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewFrases} alt="Frases" className="w-full h-full object-cover object-top" />
                 </div>
-                <div className="p-4 text-center">
-                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-1">Frases con Ejemplos</h4>
-                  <p className="text-sm text-muted-foreground">Verbos profesionales y académicos</p>
+                <div className="p-3 text-center">
+                  <h4 className="font-bold text-foreground text-sm">Frases y Verbos</h4>
+                  <p className="text-xs text-muted-foreground">Ejemplos reales</p>
                 </div>
               </div>
-              
-              <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                  src={previewVocabulario}
-                  alt="Vocabulario 5,000 Palabras"
-                  className="w-full h-full object-cover object-top" />
-                
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewVocabulario} alt="Vocabulario" className="w-full h-full object-cover object-top" />
                 </div>
-                <div className="p-4 text-center">
-                  <div className="w-10 h-10 mx-auto mb-3 rounded-full gradient-hero flex items-center justify-center">
-                    <GraduationCap className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-1">Vocabulario 5,000 Palabras</h4>
-                  <p className="text-sm text-muted-foreground">Palabras con pronunciación y fonética</p>
+                <div className="p-3 text-center">
+                  <h4 className="font-bold text-foreground text-sm">5,000 Palabras</h4>
+                  <p className="text-xs text-muted-foreground">Con pronunciación</p>
                 </div>
               </div>
             </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Bonuses */}
-      <section className="py-12 md:py-16 bg-secondary/30">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full gradient-accent text-accent-foreground text-sm font-bold mb-4">
-              <Gift className="w-4 h-4" />
-              INCLUIDOS CON TU COMPRA
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              4 Bonus Gratuitas
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Recibe estos recursos adicionales valorados en $50 completamente
-              gratis con tu compra
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {bonuses.map((bonus, index) =>
-          <div
-            key={bonus.title}
-            className="bg-card rounded-2xl border border-border shadow-card overflow-hidden hover:shadow-hero transition-all duration-500 group">
-            
-                {/* Bonus Image */}
-                {bonus.image &&
-            <div className="relative h-80 md:h-96 overflow-hidden bg-gradient-to-br from-secondary/50 to-muted/30">
-                    <img
-                src={bonus.image}
-                alt={bonus.title}
-                className="w-full h-full object-cover" />
-              
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-bold">
-                      GRATIS
-                    </div>
-                  </div>
-            }
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
-                      <bonus.icon className="w-6 h-6 text-primary-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        {bonus.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        {bonus.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-          )}
           </div>
         </div>
       </section>

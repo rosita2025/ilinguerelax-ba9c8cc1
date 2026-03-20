@@ -88,7 +88,7 @@ const previewImages = [{
   title: "Vocabulario 5,000 Palabras",
   subtitle: "Palabras con pronunciación y fonética"
 }];
-const features = ["5,000+ palabras más utilizadas en inglés", "Pronunciación adaptada para hispanohablantes", "Fonética internacional UK/USA incluida", "Nivel básico a intermedio", "52 capítulos temáticos organizados", "Significado en español de cada palabra", "Entrega digital inmediata", "Acceso de por vida"];
+const features = ["5,000+ palabras más utilizadas en inglés", "Pronunciación adaptada para hispanohablantes", "Fonética internacional UK/USA incluida", "Estructura gramatical desde Nivel Cero hasta Intermedio B1", "52 capítulos temáticos organizados", "Significado en español de cada palabra", "Entrega digital inmediata", "Acceso de por vida"];
 const bonuses = [{
   icon: BookOpen,
   title: "Bonus 1: Estructura de Frases",

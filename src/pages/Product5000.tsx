@@ -588,8 +588,21 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Product Reviews Carousel */}
-      <ProductReviews productType="english" showReviewForm />
+      {/* Reviews - Simple CTA */}
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-1 mb-3">
+              {[...Array(5)].map((_, i) => <Star key={i} className="w-6 h-6 fill-amber-400 text-amber-400" />)}
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">4.8/5 — 800+ Reseñas Verificadas</h3>
+            <p className="text-muted-foreground mb-4">¿Ya compraste? ¡Cuéntanos tu experiencia!</p>
+            <Button variant="outline" size="lg" asChild>
+              <a href="/dejar-resena">⭐ Deja tu Reseña</a>
+            </Button>
+          </div>
+        </div>
+      </section>
 
 
       {/* FAQ Section */}

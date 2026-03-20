@@ -1,14 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X, Check } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { toast } from "sonner";
 
 export const CartDrawer = () => {
-  const { items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart, isDrawerOpen, setDrawerOpen } = useCartStore();
+  const { 
+    items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
+    syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
+    applyDiscount, removeDiscount
+  } = useCartStore();
+  
+  const [couponInput, setCouponInput] = useState("");
+  const [isApplying, setIsApplying] = useState(false);
+  
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
+  const subtotalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
+  
+  const appliedDiscount = discountCodes.find(dc => dc.applicable);
+  const finalTotal = discountTotal ? parseFloat(discountTotal) : subtotalPrice;
+  const savings = appliedDiscount ? subtotalPrice - finalTotal : 0;
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();
@@ -20,6 +34,24 @@ export const CartDrawer = () => {
       window.open(checkoutUrl, '_blank');
       setDrawerOpen(false);
     }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setIsApplying(true);
+    const success = await applyDiscount(couponInput.trim());
+    setIsApplying(false);
+    if (success) {
+      toast.success("¡Cupón aplicado!", { description: `Código "${couponInput.trim().toUpperCase()}" aplicado correctamente.` });
+      setCouponInput("");
+    } else {
+      toast.error("Cupón no válido", { description: "El código ingresado no es válido o no aplica a estos productos." });
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    await removeDiscount();
+    toast.info("Cupón eliminado");
   };
 
   return (
@@ -46,8 +78,7 @@ export const CartDrawer = () => {
           <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">​Tu carrito está vacío
-</p>
+                <p className="text-muted-foreground">Tu carrito está vacío</p>
               </div>
             </div> :
           <>
@@ -61,7 +92,6 @@ export const CartDrawer = () => {
                       src={item.product.node.images.edges[0].node.url}
                       alt={item.product.node.title}
                       className="w-full h-full object-cover" />
-
                     }
                       </div>
                       <div className="flex-1 min-w-0">
@@ -80,7 +110,6 @@ export const CartDrawer = () => {
                       className="h-6 w-6"
                       onClick={() => removeItem(item.variantId)}
                       disabled={isLoading}>
-                      
                           <Trash2 className="h-3 w-3" />
                         </Button>
                         <div className="flex items-center gap-1">
@@ -90,7 +119,6 @@ export const CartDrawer = () => {
                         className="h-6 w-6"
                         onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                         disabled={isLoading}>
-                        
                             <Minus className="h-3 w-3" />
                           </Button>
                           <span className="w-8 text-center text-sm">{item.quantity}</span>
@@ -100,7 +128,6 @@ export const CartDrawer = () => {
                         className="h-6 w-6"
                         onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                         disabled={isLoading}>
-                        
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
@@ -110,16 +137,73 @@ export const CartDrawer = () => {
                 </div>
               </div>
               <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
+                {/* Coupon section */}
+                {appliedDiscount ? (
+                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                        {appliedDiscount.code}
+                      </span>
+                      {savings > 0 && (
+                        <span className="text-xs text-green-600 dark:text-green-500">
+                          (-${savings.toFixed(2)})
+                        </span>
+                      )}
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRemoveCoupon} disabled={isLoading}>
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        placeholder="Código de cupón"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                        className="pl-8 h-9 text-sm uppercase"
+                        disabled={isLoading || isApplying}
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 px-4"
+                      onClick={handleApplyCoupon}
+                      disabled={!couponInput.trim() || isLoading || isApplying}
+                    >
+                      {isApplying ? <Loader2 className="h-3 w-3 animate-spin" /> : "Aplicar"}
+                    </Button>
+                  </div>
+                )}
+
                 <div className="space-y-1 text-xs text-muted-foreground">
                   <p>📦 Envío internacional disponible</p>
                   <p>⏱ Entrega estimada: 12–15 días</p>
                 </div>
                 <div className="h-px bg-border" />
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold">Total</span>
-                  <span className="text-xl font-bold">
-                    ${totalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
-                  </span>
+                <div className="space-y-1">
+                  {appliedDiscount && savings > 0 && (
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                      <span>Subtotal</span>
+                      <span>${subtotalPrice.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {appliedDiscount && savings > 0 && (
+                    <div className="flex justify-between items-center text-sm text-green-600">
+                      <span>Descuento</span>
+                      <span>-${savings.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold">Total</span>
+                    <span className="text-xl font-bold">
+                      ${finalTotal.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Los impuestos y los gastos de envío se calculan al finalizar la compra.
@@ -129,10 +213,8 @@ export const CartDrawer = () => {
                 className="w-full"
                 size="lg"
                 disabled={items.length === 0 || isLoading || isSyncing}>
-                
                   {isLoading || isSyncing ?
                 <Loader2 className="w-4 h-4 animate-spin" /> :
-
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Continuar al pago
@@ -144,7 +226,6 @@ export const CartDrawer = () => {
                 className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-semibold"
                 size="lg"
                 asChild>
-                
                   <a href="https://www.amazon.com/dp/B0GRR584ZY" target="_blank" rel="noopener noreferrer">
                     Comprar en Amazon
                   </a>
@@ -158,5 +239,4 @@ export const CartDrawer = () => {
         </div>
       </SheetContent>
     </Sheet>);
-
 };

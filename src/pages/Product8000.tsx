@@ -133,7 +133,7 @@ const Product8000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/product-8000.png"
         type="product"
-        price="17"
+        price="20"
         originalPrice="54"
         rating="4.9"
         reviewCount="892"

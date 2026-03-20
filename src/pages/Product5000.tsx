@@ -88,7 +88,7 @@ const previewImages = [{
   title: "Vocabulario 5,000 Palabras",
   subtitle: "Palabras con pronunciación y fonética"
 }];
-const features = ["5,000+ palabras más utilizadas en inglés", "Pronunciación adaptada para hispanohablantes", "Fonética internacional UK/USA incluida", "Nivel básico a intermedio", "52 capítulos temáticos organizados", "Significado en español de cada palabra", "Entrega digital inmediata", "Acceso de por vida"];
+const features = ["5,000+ palabras más utilizadas en inglés", "Pronunciación adaptada para hispanohablantes", "Fonética internacional UK/USA incluida", "Estructura gramatical desde Nivel Cero hasta Intermedio B1", "52 capítulos temáticos organizados", "Significado en español de cada palabra", "Entrega digital inmediata", "Acceso de por vida"];
 const bonuses = [{
   icon: BookOpen,
   title: "Bonus 1: Estructura de Frases",
@@ -299,6 +299,9 @@ const Product5000 = () => {
                 Inglés Relax - 5,000 Palabras con Pronunciación Español y
                 Fonética UK/USA
               </h1>
+              <p className="text-base text-muted-foreground mb-4">
+                📚 Incluye estructura gramatical completa desde <span className="font-bold text-foreground">Nivel Cero hasta Intermedio B1</span>. Perfecto para principiantes.
+              </p>
 
               {/* Reviews - More Prominent */}
               <div className="flex items-center gap-3 mb-4">
@@ -319,30 +322,86 @@ const Product5000 = () => {
                 <LiveViewers minViewers={18} maxViewers={42} />
               </div>
 
-              {/* Price Section - More Impactful */}
+              {/* Price Section with Value Stack */}
               <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6">
+              className="relative overflow-hidden rounded-2xl p-6 border-2 border-accent mb-6"
+              style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.18))" }}>
               
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-green-600" />
-                  <span className="text-green-600 font-semibold text-sm uppercase">Precio Especial Por Tiempo Limitado</span>
+                {/* Badge */}
+                <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl bg-accent text-accent-foreground text-xs font-black uppercase tracking-wider">
+                  🎁 Todo Incluido
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
+
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-accent" />
+                  <span className="text-accent font-bold text-sm uppercase">Lo que recibes hoy</span>
+                </div>
+
+                {/* Value Stack */}
+                <div className="flex flex-col gap-2 p-3 rounded-xl bg-background/60 mb-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">📖 5,000 Palabras con Pronunciación</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">$30</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">📚 Gramática Nivel Cero → B1</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">$15</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 1: Estructura de Frases</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$12</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 2: Diccionario Alfabético</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$12</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 3: Verbo To Be y Artículos</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$10</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Bonus 4: Actualizaciones de por vida</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$10</span>
+                  </div>
+                  <div className="border-t border-border pt-2 mt-1 flex items-center justify-between">
+                    <span className="text-sm font-bold text-foreground">Valor total:</span>
+                    <span className="text-sm font-bold text-muted-foreground line-through">$89 USD</span>
+                  </div>
+                </div>
+
+                <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                  <span className="text-2xl text-muted-foreground line-through">$89</span>
                   <motion.span
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ repeat: Infinity, duration: 2 }}
                   className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
-                  
-                    AHORRA 78%
+                    AHORRA 86%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  💳 Pago único • Sin suscripciones • Acceso de por vida
+                  💳 Pago único • 4 Bonus GRATIS • Acceso de por vida
                 </p>
               </motion.div>
 
@@ -601,34 +660,71 @@ const Product5000 = () => {
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
 
-      {/* Physical Book Promo */}
+      {/* Physical Book Promo - Pack Libro Físico + Digital GRATIS */}
       <section className="bg-gray-950 py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
             <div className="w-48 md:w-56 flex-shrink-0">
               <img 
                 src={product5000BookImg} 
-                alt="Inglés Relax 5,000 Palabras - Libro Físico" 
+                alt="Inglés Relax 5,000 Palabras - Libro Físico + Digital" 
                 className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
               />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">📖 Nuevo</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Te gustaría un libro físico?</h3>
-              <p className="text-yellow-200 mb-1 text-lg">Inglés Relax - 5,000 Palabras</p>
-              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Disponible en Amazon</p>
+              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">🎁 Pack Promoción</span>
+              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Prefieres el libro físico?</h3>
+              <p className="text-yellow-200 mb-1 text-lg">Libro Físico + Digital <span className="text-green-400 font-bold">GRATIS</span></p>
+              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Envío por Amazon</p>
+              
+              {/* Bundle Value */}
+              <div className="bg-yellow-400/10 rounded-xl p-3 mb-4 border border-yellow-400/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Check className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm text-yellow-200">📖 Libro Físico Tapa Blanda — $19.99</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm text-yellow-200">📱 Libro Digital (PDF) — <span className="line-through text-yellow-300/50">$12</span> <span className="text-green-400 font-bold">GRATIS</span></span>
+                </div>
+              </div>
+
               <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
                 <span className="text-3xl font-black text-yellow-400">$19.99 USD</span>
+                <span className="text-lg text-yellow-300/50 line-through">$31.99</span>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3 justify-center md:justify-start">
                 <a 
                   href="/products/5-000-palabras-libro-fisico"
-                  className="inline-flex items-center gap-2 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-950 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
+                  className="inline-flex items-center gap-2 bg-yellow-400 text-gray-950 hover:bg-yellow-300 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
                 >
-                  📖 Ver detalles
+                  📖 Ver Pack Libro Físico + Digital
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Digital Only Option */}
+      <section className="py-10 md:py-14 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+              💡 ¿Solo quieres la versión digital?
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Ya la tienes en esta página por solo <span className="font-bold text-foreground">$12 USD</span> — sin envío, descarga inmediata.
+            </p>
+            <div className="flex items-baseline gap-3 justify-center mb-4">
+              <span className="text-4xl font-black text-foreground">$12</span>
+              <span className="text-lg text-muted-foreground line-through">$89</span>
+              <span className="text-primary font-bold">USD</span>
+            </div>
+            <Button variant="hero" size="xl" className="w-full max-w-md" onClick={handleBuy}>
+              <Download className="w-5 h-5 mr-2" />
+              📱 Comprar Digital — $12
+            </Button>
           </div>
         </div>
       </section>

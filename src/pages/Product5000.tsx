@@ -510,52 +510,6 @@ const Product5000 = () => {
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
 
-      {/* Physical Book Promo - Pack Libro Físico + Digital GRATIS */}
-      <section className="bg-gray-950 py-10 md:py-14">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
-            <div className="w-48 md:w-56 flex-shrink-0">
-              <img 
-                src={product5000BookImg} 
-                alt="Inglés Relax 5,000 Palabras - Libro Físico + Digital" 
-                className="w-full rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">🎁 Pack Promoción</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">¿Prefieres el libro físico?</h3>
-              <p className="text-yellow-200 mb-1 text-lg">Libro Físico + Digital <span className="text-green-400 font-bold">GRATIS</span></p>
-              <p className="text-yellow-300/70 mb-4">Tapa blanda · 190 páginas · Envío por Amazon</p>
-              
-              {/* Bundle Value */}
-              <div className="bg-yellow-400/10 rounded-xl p-3 mb-4 border border-yellow-400/20">
-                <div className="flex items-center gap-2 mb-1">
-                  <Check className="w-4 h-4 text-yellow-400" />
-                  <span className="text-sm text-yellow-200">📖 Libro Físico Tapa Blanda — $19.99</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-yellow-400" />
-                  <span className="text-sm text-yellow-200">📱 Libro Digital (PDF) — <span className="line-through text-yellow-300/50">$12</span> <span className="text-green-400 font-bold">GRATIS</span></span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
-                <span className="text-3xl font-black text-yellow-400">$19.99 USD</span>
-                <span className="text-lg text-yellow-300/50 line-through">$31.99</span>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3 justify-center md:justify-start">
-                <a 
-                  href="/products/5-000-palabras-libro-fisico"
-                  className="inline-flex items-center gap-2 bg-yellow-400 text-gray-950 hover:bg-yellow-300 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
-                >
-                  📖 Ver Pack Libro Físico + Digital
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Digital Only Option */}
       <section className="py-10 md:py-14 bg-secondary/30">
         <div className="container px-4 md:px-6">

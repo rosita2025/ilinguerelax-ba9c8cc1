@@ -136,6 +136,8 @@ export const CartDrawer = () => {
                     </div>
                 )}
                 </div>
+                {/* Upsell for physical book buyers */}
+                <CartUpsell items={items} />
               </div>
               <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
                 {/* Coupon section */}

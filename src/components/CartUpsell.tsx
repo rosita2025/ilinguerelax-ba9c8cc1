@@ -8,7 +8,7 @@ const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
 
 const upsellProducts = [
   {
-    title: "1,000 Verbos Esenciales",
+    title: "1,000 Verbos Esenciales Digital",
     description: "Presente, Pasado y Futuro",
     price: "10.00",
     image: "/images/product-1000-verbos.webp",
@@ -17,7 +17,7 @@ const upsellProducts = [
     handle: "ingles-relax-1-000-verbos-esenciales-en-ingles-presente-pasado-y-futuro-con-pronunciacion",
   },
   {
-    title: "500 Preguntas en Inglés",
+    title: "500 Preguntas Frecuentes Digital",
     description: "Habla sin miedo",
     price: "10.00",
     image: "/images/product-500-preguntas.webp",

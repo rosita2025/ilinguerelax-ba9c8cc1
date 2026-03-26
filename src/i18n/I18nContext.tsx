@@ -34,27 +34,21 @@ interface I18nProviderProps {
 }
 
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>("es");
-  const [currency, setCurrencyState] = useState<Currency>("USD");
+  // IMPORTANT: Default to "es" (Spanish) always - this is our target market
+  // Google's crawler and most users should see Spanish first
+  const savedLang = typeof window !== "undefined" ? localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null : null;
+  const savedCurrency = typeof window !== "undefined" ? localStorage.getItem(CURRENCY_STORAGE_KEY) as Currency | null : null;
+  
+  const [language, setLanguageState] = useState<Language>(savedLang || "es");
+  const [currency, setCurrencyState] = useState<Currency>(savedCurrency || "USD");
   const [countryCode, setCountryCode] = useState<string>("US");
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Detect language and country on mount
+  // Detect country in background WITHOUT blocking render
   useEffect(() => {
-    const initializeI18n = async () => {
-      // Check for saved preferences
-      const savedLang = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
-      const savedCurrency = localStorage.getItem(CURRENCY_STORAGE_KEY) as Currency | null;
-      
-      // If user has manually saved both preferences, use them
-      if (savedLang && savedCurrency) {
-        setLanguageState(savedLang);
-        setCurrencyState(savedCurrency);
-        setIsInitialized(true);
-        return;
-      }
+    // If user already saved preferences, skip detection
+    if (savedLang && savedCurrency) return;
 
-      // Try to detect country from IP using a free geolocation API
+    const detectCountry = async () => {
       try {
         const response = await fetch("https://ipapi.co/json/", { 
           signal: AbortSignal.timeout(3000) 
@@ -64,46 +58,23 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
           const country = data.country_code || "US";
           setCountryCode(country);
           
-          // Detect language based on country (not browser)
           if (!savedLang) {
             const detectedLang = detectLanguageFromCountry(country);
             setLanguageState(detectedLang);
             console.log(`Country detected: ${country} → Language: ${detectedLang}`);
-          } else {
-            setLanguageState(savedLang);
           }
           
-          // Detect currency based on country
           if (!savedCurrency) {
             const detectedCurrency = detectCurrency(country);
             setCurrencyState(detectedCurrency);
-          } else {
-            setCurrencyState(savedCurrency);
           }
-        } else {
-          // Fallback to browser language if IP detection fails
-          const detectedLang = savedLang || detectLanguage();
-          setLanguageState(detectedLang);
         }
       } catch (error) {
-        console.log("Could not detect country, using browser language as fallback");
-        // Fallback to browser language detection
-        const detectedLang = savedLang || detectLanguage();
-        setLanguageState(detectedLang);
-        
-        // Try timezone-based detection for currency
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (timezone.startsWith("Europe/")) {
-          setCurrencyState(savedCurrency || "EUR");
-        } else if (timezone.startsWith("America/Sao_Paulo") || timezone.includes("Brazil")) {
-          setCurrencyState(savedCurrency || "BRL");
-        }
+        console.log("Could not detect country, keeping Spanish as default");
       }
-
-      setIsInitialized(true);
     };
 
-    initializeI18n();
+    detectCountry();
   }, []);
 
   // Save preferences when they change
@@ -134,11 +105,6 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     languageNames,
     languageFlags,
   };
-
-  // Don't render until initialized to prevent flash
-  if (!isInitialized) {
-    return null;
-  }
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };

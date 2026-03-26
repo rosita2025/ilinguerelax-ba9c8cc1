@@ -77,6 +77,35 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     detectCountry();
   }, []);
 
+  // Save preferences when they change
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+  };
+
+  const setCurrency = (curr: Currency) => {
+    setCurrencyState(curr);
+    localStorage.setItem(CURRENCY_STORAGE_KEY, curr);
+  };
+
+  const t = translations[language];
+
+  const formatPriceWithCurrency = (priceInUSD: number): string => {
+    return formatPrice(priceInUSD, currency);
+  };
+
+  const value: I18nContextType = {
+    language,
+    setLanguage,
+    currency,
+    setCurrency,
+    t,
+    formatPrice: formatPriceWithCurrency,
+    countryCode,
+    languageNames,
+    languageFlags,
+  };
+
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };
 

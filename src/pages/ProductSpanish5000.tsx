@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -36,8 +37,8 @@ import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
 import logoShopify from "@/assets/logo-shopify.png";
 
-// Stripe checkout URL
-const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/28EbJ03SMbdr3qE8m98IU08";
+// Shopify product info for cart
+const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/42931924795453";
 const features = ["5,000+ essential Spanish words", "English pronunciation included", "Designed for English speakers", "No dictionary needed", "Stress-free step-by-step method", "UK & USA phonetics included", "Instant PDF download", "Study on any device"];
 const benefits = [{
   icon: Download,
@@ -67,7 +68,10 @@ const ProductSpanish5000 = () => {
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
-  const handleBuyNow = () => {
+  const addItem = useCartStore(state => state.addItem);
+  const getCheckoutUrl = useCartStore(state => state.getCheckoutUrl);
+
+  const handleBuyNow = async () => {
     // Track InitiateCheckout event with Hotmart Pixel
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Spanish Relax - 5,000 Words",
@@ -79,8 +83,36 @@ const ProductSpanish5000 = () => {
       num_items: 1
     });
 
-    // Redirect to Stripe checkout
-    window.open(STRIPE_CHECKOUT_URL, '_blank');
+    // Add to Shopify cart and redirect to checkout
+    const shopifyProduct = {
+      node: {
+        id: "gid://shopify/Product/7788747784253",
+        title: "Spanish Relax - 5,000 Words with English Pronunciation",
+        description: "",
+        handle: "spanish-relax-5-000-words-with-english-pronunciation",
+        priceRange: { minVariantPrice: { amount: "22.00", currencyCode: "USD" } },
+        images: { edges: [] },
+        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "22.00", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
+        options: [{ name: "Title", values: ["Default Title"] }]
+      }
+    };
+
+    await addItem({
+      product: shopifyProduct,
+      variantId: SHOPIFY_VARIANT_ID,
+      variantTitle: "Default Title",
+      price: { amount: "22.00", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: [{ name: "Title", value: "Default Title" }]
+    });
+
+    // Wait a tick for state to update, then redirect
+    setTimeout(() => {
+      const checkoutUrl = useCartStore.getState().checkoutUrl;
+      if (checkoutUrl) {
+        window.open(checkoutUrl, '_blank');
+      }
+    }, 500);
   };
   return <main className="min-h-screen bg-background">
       <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="22" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />

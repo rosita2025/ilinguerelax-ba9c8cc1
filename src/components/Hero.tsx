@@ -80,7 +80,7 @@ export const Hero = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/75 to-primary/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/95" />
       </div>
 
       {/* Floating Elements */}

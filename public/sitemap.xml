@@ -252,4 +252,36 @@
     <priority>0.5</priority>
   </url>
 
+  <!-- English Blog Posts - Learn Spanish (USA/Canada SEO) -->
+  <url>
+    <loc>https://ilinguerelax.com/blog/how-to-learn-spanish-fast-beginners-guide</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ilinguerelax.com/blog/5000-most-common-spanish-words-you-need</loc>
+    <lastmod>2026-03-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ilinguerelax.com/blog/spanish-pronunciation-guide-english-speakers</loc>
+    <lastmod>2026-03-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ilinguerelax.com/blog/why-americans-should-learn-spanish-2026</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ilinguerelax.com/blog/spanish-vs-french-which-language-learn-first</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>

@@ -36,8 +36,8 @@ import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
 import logoShopify from "@/assets/logo-shopify.png";
 
-// Stripe checkout URL
-const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/28EbJ03SMbdr3qE8m98IU08";
+// Shopify product info for cart
+const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/42931924795453";
 const features = ["5,000+ essential Spanish words", "English pronunciation included", "Designed for English speakers", "No dictionary needed", "Stress-free step-by-step method", "UK & USA phonetics included", "Instant PDF download", "Study on any device"];
 const benefits = [{
   icon: Download,

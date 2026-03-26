@@ -221,18 +221,6 @@ export const CartDrawer = () => {
                     </>
                 }
                 </Button>
-                <Button
-                variant="outline"
-                className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-semibold"
-                size="lg"
-                asChild>
-                  <a href="https://www.amazon.com/dp/B0GRR584ZY" target="_blank" rel="noopener noreferrer">
-                    Comprar en Amazon
-                  </a>
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Disponible con Amazon Prime.
-                </p>
               </div>
             </>
           }

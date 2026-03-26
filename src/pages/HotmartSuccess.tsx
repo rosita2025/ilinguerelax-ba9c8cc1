@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import {
   CheckCircle,
   MessageCircle,
@@ -17,13 +18,58 @@ import {
 
 const HotmartSuccess = () => {
   const [confetti, setConfetti] = useState(true);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Purchase pixel events are now sent server-side via Facebook Conversions API
-    // triggered by Hotmart PURCHASE_APPROVED webhooks (hotmart-purchase-pixel edge function)
+    // Fire browser-side Purchase event for Meta Pixel attribution
+    // This complements the server-side CAPI event for better matching
+    const productParam = searchParams.get("product") || "";
+    const valueParam = searchParams.get("value");
+    
+    // Determine product info from URL params or defaults
+    let contentName = "Inglés Relax - Compra";
+    let contentId = "product-5000";
+    let value = 12;
+
+    if (productParam.includes("8000") || productParam.includes("8,000")) {
+      contentName = "Inglés Relax - 8,000 Palabras";
+      contentId = "product-8000";
+      value = 22;
+    } else if (productParam.includes("5000") || productParam.includes("5,000")) {
+      contentName = "Inglés Relax - 5,000 Palabras";
+      contentId = "product-5000";
+      value = 12;
+    } else if (productParam.includes("verbos") || productParam.includes("1000")) {
+      contentName = "Inglés Relax - 1,000 Verbos";
+      contentId = "product-1000-verbos";
+      value = 12;
+    } else if (productParam.includes("preguntas") || productParam.includes("500")) {
+      contentName = "Inglés Relax - 500 Preguntas";
+      contentId = "product-500-preguntas";
+      value = 7;
+    } else if (productParam.includes("spanish")) {
+      contentName = "Spanish Relax - 5,000 Words";
+      contentId = "product-spanish-5000";
+      value = 12;
+    }
+
+    if (valueParam) {
+      value = parseFloat(valueParam) || value;
+    }
+
+    trackHotmartEvent("Purchase", {
+      content_name: contentName,
+      content_category: "Digital Book",
+      content_ids: [contentId],
+      content_type: "product",
+      value: value,
+      currency: "USD",
+      num_items: 1,
+    });
+
     const timer = setTimeout(() => setConfetti(false), 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [searchParams]);
 
   const handleWhatsApp = () => {
     window.open(

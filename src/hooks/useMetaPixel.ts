@@ -15,111 +15,88 @@ interface ViewContentParams {
   currency?: string;
 }
 
-// ============================================
-// PIXEL ID - ÚNICO PIXEL PARA TODOS LOS PRODUCTOS
-// ============================================
 const HOTMART_PIXEL_ID = "24959578143733255";
-
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
 
 // Generate unique event ID for deduplication
 const generateEventId = (): string => {
   return `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 };
 
-// Track which pixels have been initialized
-const initializedPixels = new Set<string>();
+// Initialize pixel ONCE globally
+let pixelInitialized = false;
 
-// Initialize a specific pixel (without PageView to avoid duplication)
-const initPixel = (pixelId: string) => {
-  if (typeof window === "undefined" || !pixelId) return;
+const ensurePixelReady = () => {
+  if (typeof window === "undefined") return;
   
-  // Prevent double initialization
-  if (initializedPixels.has(pixelId)) return;
+  if (pixelInitialized) return;
   
-  // Check if pixel script already exists
-  if (!document.getElementById(`fb-pixel-${pixelId}`)) {
-    const script = document.createElement('script');
-    script.id = `fb-pixel-${pixelId}`;
-    script.innerHTML = `
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '${pixelId}');
-    `;
-    document.head.appendChild(script);
-    
-    // Add noscript fallback
-    const noscript = document.createElement('noscript');
-    noscript.id = `fb-pixel-noscript-${pixelId}`;
-    noscript.innerHTML = `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1"/>`;
-    document.body.appendChild(noscript);
-    
-    initializedPixels.add(pixelId);
+  // If fbq already exists (script loaded), just ensure our pixel is init'd
+  if (window.fbq) {
+    pixelInitialized = true;
+    return;
   }
+
+  // Load fbevents.js and init pixel
+  const script = document.createElement('script');
+  script.id = 'fb-pixel-script';
+  script.innerHTML = `
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '${HOTMART_PIXEL_ID}');
+  `;
+  document.head.appendChild(script);
+
+  const noscript = document.createElement('noscript');
+  noscript.innerHTML = `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${HOTMART_PIXEL_ID}&ev=PageView&noscript=1"/>`;
+  document.body.appendChild(noscript);
+
+  pixelInitialized = true;
 };
 
 // ============================================
-// HOTMART PIXEL (Único pixel para todos los productos)
+// HOTMART PIXEL
 // ============================================
 
-// Hook for ViewContent event
 export const useHotmartPixel = (params: ViewContentParams) => {
   useEffect(() => {
-    initPixel(HOTMART_PIXEL_ID);
-    
+    ensurePixelReady();
     if (typeof window !== "undefined" && window.fbq) {
       const eventId = generateEventId();
-      window.fbq("track", "ViewContent", {
-        ...params,
-        eventID: eventId,
-      });
+      window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
   }, [params.content_name]);
 };
 
-// Track any event for Hotmart pixel
 export const trackHotmartEvent = (
   eventName: string,
   params: Record<string, unknown> = {}
 ) => {
-  initPixel(HOTMART_PIXEL_ID);
-  
+  ensurePixelReady();
   if (typeof window !== "undefined" && window.fbq) {
     const eventId = generateEventId();
-    window.fbq("track", eventName, {
-      ...params,
-      eventID: eventId,
-    });
+    window.fbq("track", eventName, { ...params, eventID: eventId });
   }
 };
 
-// Hook for PageView only (Home page)
 export const useHotmartPixelPageView = () => {
   useEffect(() => {
-    initPixel(HOTMART_PIXEL_ID);
-    
+    ensurePixelReady();
     if (typeof window !== "undefined" && window.fbq) {
       const eventId = generateEventId();
-      window.fbq("track", "PageView", {
-        eventID: eventId,
-      });
+      window.fbq("track", "PageView", { eventID: eventId });
     }
   }, []);
 };
 
-// Hook for Contact page
 export const useHotmartPixelContact = () => {
   useEffect(() => {
-    initPixel(HOTMART_PIXEL_ID);
-    
+    ensurePixelReady();
     if (typeof window !== "undefined" && window.fbq) {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", {
@@ -132,23 +109,18 @@ export const useHotmartPixelContact = () => {
 };
 
 // ============================================
-// LEGACY EXPORTS (for backwards compatibility)
+// LEGACY EXPORTS
 // ============================================
 export const useMetaPixelViewContent = (params: ViewContentParams, _pixelId?: string) => {
   useEffect(() => {
-    initPixel(HOTMART_PIXEL_ID);
-    
+    ensurePixelReady();
     if (typeof window !== "undefined" && window.fbq) {
       const eventId = generateEventId();
-      window.fbq("track", "ViewContent", {
-        ...params,
-        eventID: eventId,
-      });
+      window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
   }, [params.content_name]);
 };
 
-// Legacy aliases that now use the single Hotmart pixel
 export const useSpanishRelaxPixel = useHotmartPixel;
 export const trackSpanishRelaxEvent = trackHotmartEvent;
 export const useSpanishRelaxPixelPageView = useHotmartPixelPageView;

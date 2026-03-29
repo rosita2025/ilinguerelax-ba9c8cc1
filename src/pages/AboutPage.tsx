@@ -1,10 +1,11 @@
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { BookOpen, Heart, Target, Users, Award, Globe } from "lucide-react";
+import { BookOpen, Heart, Target, Users, Award, Globe, Instagram, Facebook, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { Helmet } from "react-helmet-async";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -23,6 +24,48 @@ const staggerContainer = {
 const AboutPage = () => {
   return (
     <main className="min-h-screen bg-background">
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "iLingue Relax",
+          "url": "https://ilinguerelax.com",
+          "logo": "https://ilinguerelax.com/og-image.png",
+          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes.",
+          "foundingDate": "2025",
+          "sameAs": [
+            "https://www.instagram.com/ilinguerelax/",
+            "https://www.facebook.com/ilinguerelax"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "url": "https://ilinguerelax.com/contacto",
+            "availableLanguage": ["Spanish", "English"]
+          },
+          "areaServed": {
+            "@type": "GeoShape",
+            "name": "Americas"
+          },
+          "knowsAbout": ["English language learning", "Spanish to English", "Language education"],
+          "numberOfEmployees": { "@type": "QuantitativeValue", "value": "1-10" }
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Sobre Nosotros - iLingue Relax",
+          "description": "Conoce la historia de iLingue Relax, marca educativa para aprender inglés sin estrés.",
+          "url": "https://ilinguerelax.com/sobre-nosotros",
+          "isPartOf": { "@type": "WebSite", "name": "iLingue Relax", "url": "https://ilinguerelax.com" },
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://ilinguerelax.com" },
+              { "@type": "ListItem", "position": 2, "name": "Sobre Nosotros", "item": "https://ilinguerelax.com/sobre-nosotros" }
+            ]
+          }
+        })}</script>
+      </Helmet>
       <SEO
         title="Sobre Nosotros - Aprender Idiomas Sin Estrés"
         description="iLingue Relax: marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes. +10,000 estudiantes en 20+ países."
@@ -176,6 +219,50 @@ const AboutPage = () => {
                   </p>
                 </motion.div>
               </motion.div>
+            </motion.div>
+
+            {/* Redes Sociales */}
+            <motion.div
+              className="mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h3 className="text-2xl font-bold text-foreground text-center mb-8">Síguenos en Redes Sociales</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a
+                  href="https://www.instagram.com/ilinguerelax/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-card rounded-2xl border border-border shadow-card p-6 flex items-center gap-5 hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
+                    <Instagram className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">@ilinguerelax</h4>
+                    <p className="text-sm text-muted-foreground">Tips, vocabulario y contenido diario para aprender inglés</p>
+                  </div>
+                  <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </a>
+
+                <a
+                  href="https://www.facebook.com/ilinguerelax"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-card rounded-2xl border border-border shadow-card p-6 flex items-center gap-5 hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="w-14 h-14 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
+                    <Facebook className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">iLingue Relax</h4>
+                    <p className="text-sm text-muted-foreground">Comunidad, ofertas especiales y novedades</p>
+                  </div>
+                  <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </a>
+              </div>
             </motion.div>
 
             {/* Stats */}

@@ -164,7 +164,7 @@ const ProductDutch5000 = () => {
         </div>
       </section>
 
-      <ProductReviews productType="dutch" reviews={[]} showReviewForm />
+      <ProductReviews productType="german" reviews={[]} showReviewForm />
       <FAQ
         items={[
           { question: "¿Cuándo estará disponible?", answer: "Estamos trabajando en el libro y estará disponible muy pronto. Suscríbete para ser el primero en saberlo.", icon: Sparkles },

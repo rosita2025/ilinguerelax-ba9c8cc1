@@ -65,6 +65,7 @@ const App = () => (
                 <Route path="/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes" element={<ProductPortuguese5000 />} />
                 <Route path="/products/5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes" element={<ProductItalian5000 />} />
                 <Route path="/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes" element={<ProductFrench5000 />} />
+                <Route path="/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes" element={<ProductDutch5000 />} />
                 <Route path="/products/1-000-palabras-en-ingles-con-pronunciacion-gratis" element={<Product1000Free />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/hotmart-success" element={<HotmartSuccess />} />

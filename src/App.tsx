@@ -19,6 +19,7 @@ import ProductGerman5000 from "./pages/ProductGerman5000";
 import ProductPortuguese5000 from "./pages/ProductPortuguese5000";
 import ProductItalian5000 from "./pages/ProductItalian5000";
 import ProductFrench5000 from "./pages/ProductFrench5000";
+import ProductDutch5000 from "./pages/ProductDutch5000";
 import Product1000Free from "./pages/Product1000Free";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import HotmartSuccess from "./pages/HotmartSuccess";

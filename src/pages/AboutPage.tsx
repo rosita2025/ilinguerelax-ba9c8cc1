@@ -221,6 +221,50 @@ const AboutPage = () => {
               </motion.div>
             </motion.div>
 
+            {/* Redes Sociales */}
+            <motion.div
+              className="mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h3 className="text-2xl font-bold text-foreground text-center mb-8">Síguenos en Redes Sociales</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a
+                  href="https://www.instagram.com/ilinguerelax/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-card rounded-2xl border border-border shadow-card p-6 flex items-center gap-5 hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
+                    <Instagram className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">@ilinguerelax</h4>
+                    <p className="text-sm text-muted-foreground">Tips, vocabulario y contenido diario para aprender inglés</p>
+                  </div>
+                  <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </a>
+
+                <a
+                  href="https://www.facebook.com/ilinguerelax"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-card rounded-2xl border border-border shadow-card p-6 flex items-center gap-5 hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="w-14 h-14 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
+                    <Facebook className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">iLingue Relax</h4>
+                    <p className="text-sm text-muted-foreground">Comunidad, ofertas especiales y novedades</p>
+                  </div>
+                  <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </a>
+              </div>
+            </motion.div>
+
             {/* Stats */}
             <motion.div
               className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-8 md:p-12"

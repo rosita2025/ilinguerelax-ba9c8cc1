@@ -24,6 +24,48 @@ const staggerContainer = {
 const AboutPage = () => {
   return (
     <main className="min-h-screen bg-background">
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "iLingue Relax",
+          "url": "https://ilinguerelax.com",
+          "logo": "https://ilinguerelax.com/og-image.png",
+          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes.",
+          "foundingDate": "2025",
+          "sameAs": [
+            "https://www.instagram.com/ilinguerelax/",
+            "https://www.facebook.com/ilinguerelax"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "url": "https://ilinguerelax.com/contacto",
+            "availableLanguage": ["Spanish", "English"]
+          },
+          "areaServed": {
+            "@type": "GeoShape",
+            "name": "Americas"
+          },
+          "knowsAbout": ["English language learning", "Spanish to English", "Language education"],
+          "numberOfEmployees": { "@type": "QuantitativeValue", "value": "1-10" }
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Sobre Nosotros - iLingue Relax",
+          "description": "Conoce la historia de iLingue Relax, marca educativa para aprender inglés sin estrés.",
+          "url": "https://ilinguerelax.com/sobre-nosotros",
+          "isPartOf": { "@type": "WebSite", "name": "iLingue Relax", "url": "https://ilinguerelax.com" },
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://ilinguerelax.com" },
+              { "@type": "ListItem", "position": 2, "name": "Sobre Nosotros", "item": "https://ilinguerelax.com/sobre-nosotros" }
+            ]
+          }
+        })}</script>
+      </Helmet>
       <SEO
         title="Sobre Nosotros - Aprender Idiomas Sin Estrés"
         description="iLingue Relax: marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes. +10,000 estudiantes en 20+ países."

@@ -90,6 +90,7 @@ const benefits = [
 ];
 
 const Product8000Book = () => {
+  const [currentImage, setCurrentImage] = useState(0);
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();

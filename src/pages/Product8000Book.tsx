@@ -32,8 +32,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-// Product image
-const product8000BookImage = "/images/promo-8000-bundle.png";
+// Product images
+const bookImages = [
+  { src: "/images/promo-8000-bundle.png", alt: "Pack Promoción - Libro Físico + Digital" },
+  { src: "/images/8000-book-cover.jpg", alt: "Portada Inglés Relax 8,000 Palabras" },
+  { src: "/images/8000-book-index.jpg", alt: "Índice del libro - 89 capítulos organizados por nivel" },
+  { src: "/images/8000-book-content.jpg", alt: "Contenido interior - Vocabulario con pronunciación y fonética" },
+  { src: "/images/8000-book-grammar.jpg", alt: "Gramática explicada con fórmulas paso a paso" },
+];
 const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
 
 // Conversion components

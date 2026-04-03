@@ -91,7 +91,7 @@ export const products: Product[] = [
     description: "📖 Libro físico + 📱 Digital GRATIS",
     rating: 0,
     reviews: 0,
-    price: 29.99,
+    price: 25.00,
     originalPrice: null,
     discount: null,
     badge: "📖 Libro Físico",

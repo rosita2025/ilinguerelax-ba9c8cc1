@@ -32,8 +32,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-// Product image
-const product8000BookImage = "/images/promo-8000-bundle.png";
+// Product images
+const bookImages = [
+  { src: "/images/promo-8000-bundle.png", alt: "Pack Promoción - Libro Físico + Digital" },
+  { src: "/images/8000-book-cover.jpg", alt: "Portada Inglés Relax 8,000 Palabras" },
+  { src: "/images/8000-book-index.jpg", alt: "Índice del libro - 89 capítulos organizados por nivel" },
+  { src: "/images/8000-book-content.jpg", alt: "Contenido interior - Vocabulario con pronunciación y fonética" },
+  { src: "/images/8000-book-grammar.jpg", alt: "Gramática explicada con fórmulas paso a paso" },
+];
 const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
 
 // Conversion components
@@ -44,44 +50,47 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 const features = [
-  "8,000 palabras esenciales del inglés",
-  "Pronunciación en español incluida",
-  "Diseñado para hispanohablantes",
-  "Sin necesidad de diccionarios",
-  "Metodología paso a paso sin estrés",
+  "Más de 8,000 palabras y expresiones en inglés",
+  "Pronunciación adaptada para hispanohablantes",
+  "Estructuras gramaticales explicadas paso a paso",
+  "Método tipo 'fórmulas' para aprender más fácil",
+  "Contenido organizado por niveles A1 a C1",
   "Fonética UK y USA incluida",
   "Libro físico tapa blanda de alta calidad",
-  "Entre 300-350 páginas",
+  "Traducción español-inglés incluida",
+  "89 capítulos temáticos progresivos",
+  "🎁 Incluye libro digital (PDF) GRATIS",
 ];
 
 const benefits = [
   {
     icon: BookOpen,
-    title: "Libro Físico Premium",
+    title: "Desde Nivel Cero hasta Avanzado",
     description:
-      "Tapa blanda de alta calidad, impresión profesional. Perfecto para estudiar sin pantallas y tomar notas.",
-  },
-  {
-    icon: Package,
-    title: "Envío a Tu Puerta",
-    description:
-      "Recibe tu libro físico directamente en casa. Envío disponible a múltiples países.",
-  },
-  {
-    icon: Sparkles,
-    title: "Método Sin Estrés",
-    description:
-      "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
+      "Empieza desde cero (A1) y avanza hasta nivel avanzado (C1) en un solo libro. No necesitas conocimientos previos.",
   },
   {
     icon: Brain,
-    title: "Sin Diccionarios",
+    title: "Método Fórmulas — Fácil de Entender",
     description:
-      "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
+      "Estructuras gramaticales explicadas como fórmulas simples. Sin complicaciones, aprende paso a paso.",
+  },
+  {
+    icon: Sparkles,
+    title: "Pronunciación para Hispanohablantes",
+    description:
+      "Cada palabra incluye pronunciación adaptada al español + fonética UK/USA. Habla inglés con confianza desde el primer día.",
+  },
+  {
+    icon: Package,
+    title: "Libro Físico + Digital GRATIS",
+    description:
+      "Recibe el libro impreso en tu puerta + la versión PDF digital gratis para empezar de inmediato mientras llega tu libro.",
   },
 ];
 
 const Product8000Book = () => {
+  const [currentImage, setCurrentImage] = useState(0);
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();
@@ -163,10 +172,24 @@ const Product8000Book = () => {
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
                 <img
-                  src={product8000BookImage}
-                  alt="Inglés Relax - 8,000 Palabras Libro Físico"
-                  className="w-full h-auto rounded-2xl shadow-hero"
+                  src={bookImages[currentImage].src}
+                  alt={bookImages[currentImage].alt}
+                  className="w-full h-auto rounded-2xl shadow-hero aspect-square object-cover"
                 />
+                {/* Thumbnail strip */}
+                <div className="flex gap-2 mt-4 justify-center">
+                  {bookImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImage(i)}
+                      className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                        currentImage === i ? "border-amber-500 ring-2 ring-amber-500/30" : "border-border opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -179,8 +202,11 @@ const Product8000Book = () => {
               </h1>
 
               <p className="text-lg text-muted-foreground mb-4">
-                El mismo método completo para aprender inglés sin estrés, ahora en formato libro físico premium. 
-                Perfecto para estudiar sin pantallas.
+                El libro <strong>Inglés Relax – 8,000 Palabras</strong> está diseñado para ayudarte a aprender inglés 
+                desde nivel básico (A1) hasta avanzado (C1) de forma práctica y progresiva.
+              </p>
+              <p className="text-base text-muted-foreground mb-4">
+                📘 Versión 1.5 — 89 capítulos temáticos, gramática con fórmulas, y pronunciación adaptada al español.
               </p>
 
               {/* Purchase Counter - Social Proof */}
@@ -331,20 +357,92 @@ const Product8000Book = () => {
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-20 md:py-28">
+      {/* ¿Para quién es? */}
+      <section className="py-16 md:py-20">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+              🎯 ¿Para quién es este libro?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { icon: "👉", title: "Empezar desde cero", desc: "Personas que no saben nada de inglés y quieren una guía clara." },
+                { icon: "👉", title: "Avanzar rápido", desc: "Estudiantes que quieren pasar de básico a avanzado con un método organizado." },
+                { icon: "👉", title: "Mejorar fluidez", desc: "Personas que desean mejorar su vocabulario, pronunciación y comprensión." },
+              ].map((item) => (
+                <div key={item.title} className="bg-card rounded-2xl border border-border p-6 shadow-card">
+                  <span className="text-3xl mb-3 block">{item.icon}</span>
+                  <h3 className="font-bold text-foreground mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Beneficios reales */}
+      <section className="py-16 md:py-20 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-              Todo lo que incluye
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
+              🚀 Beneficios reales
             </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                "Aprendes a comunicarte en situaciones reales",
+                "Mejoras tu comprensión y vocabulario rápidamente",
+                "Avanzas desde básico (A1) hasta avanzado (C1) en un solo libro",
+                "Método fácil de entender — sin complicaciones",
+                "No necesitas diccionarios ni apps adicionales",
+                "Estudia sin pantallas, a tu propio ritmo",
+              ].map((b) => (
+                <div key={b} className="flex items-start gap-3 bg-card rounded-xl border border-border p-4">
+                  <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-accent-foreground" />
+                  </div>
+                  <span className="text-foreground text-sm">{b}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* Book Preview Gallery */}
+      <section className="py-16 md:py-20">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              📖 Mira el interior del libro
+            </h2>
+            <p className="text-muted-foreground mb-8">Contenido real del libro — vocabulario, gramática y pronunciación</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {bookImages.slice(1).map((img, i) => (
+                <div key={i} className="rounded-2xl overflow-hidden shadow-card border border-border">
+                  <img src={img.src} alt={img.alt} className="w-full h-auto" loading="lazy" />
+                  <p className="text-xs text-muted-foreground p-3 bg-card">{img.alt}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      {/* What's Included - Checklist */}
+      <section className="py-16 md:py-20 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
+              📚 ¿Qué incluye el libro?
+            </h2>
             <div className="bg-card rounded-3xl border border-border shadow-card p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (
                   <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-accent-foreground" />
                     </div>
                     <span className="text-foreground">{feature}</span>
                   </div>
@@ -355,7 +453,7 @@ const Product8000Book = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
+
       <section className="py-20 md:py-28 bg-amber-500">
         <div className="container px-4 md:px-6">
           <div className="max-w-2xl mx-auto text-center">

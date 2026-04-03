@@ -172,10 +172,24 @@ const Product8000Book = () => {
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
                 <img
-                  src={product8000BookImage}
-                  alt="Inglés Relax - 8,000 Palabras Libro Físico"
-                  className="w-full h-auto rounded-2xl shadow-hero"
+                  src={bookImages[currentImage].src}
+                  alt={bookImages[currentImage].alt}
+                  className="w-full h-auto rounded-2xl shadow-hero aspect-square object-cover"
                 />
+                {/* Thumbnail strip */}
+                <div className="flex gap-2 mt-4 justify-center">
+                  {bookImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImage(i)}
+                      className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                        currentImage === i ? "border-amber-500 ring-2 ring-amber-500/30" : "border-border opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 

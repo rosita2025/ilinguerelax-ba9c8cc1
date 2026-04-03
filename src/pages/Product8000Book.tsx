@@ -65,27 +65,27 @@ const features = [
 const benefits = [
   {
     icon: BookOpen,
-    title: "Libro Físico Premium",
+    title: "Desde Nivel Cero hasta Avanzado",
     description:
-      "Tapa blanda de alta calidad, impresión profesional. Perfecto para estudiar sin pantallas y tomar notas.",
-  },
-  {
-    icon: Package,
-    title: "Envío a Tu Puerta",
-    description:
-      "Recibe tu libro físico directamente en casa. Envío disponible a múltiples países.",
-  },
-  {
-    icon: Sparkles,
-    title: "Método Sin Estrés",
-    description:
-      "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje.",
+      "Empieza desde cero (A1) y avanza hasta nivel avanzado (C1) en un solo libro. No necesitas conocimientos previos.",
   },
   {
     icon: Brain,
-    title: "Sin Diccionarios",
+    title: "Método Fórmulas — Fácil de Entender",
     description:
-      "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar.",
+      "Estructuras gramaticales explicadas como fórmulas simples. Sin complicaciones, aprende paso a paso.",
+  },
+  {
+    icon: Sparkles,
+    title: "Pronunciación para Hispanohablantes",
+    description:
+      "Cada palabra incluye pronunciación adaptada al español + fonética UK/USA. Habla inglés con confianza desde el primer día.",
+  },
+  {
+    icon: Package,
+    title: "Libro Físico + Digital GRATIS",
+    description:
+      "Recibe el libro impreso en tu puerta + la versión PDF digital gratis para empezar de inmediato mientras llega tu libro.",
   },
 ];
 

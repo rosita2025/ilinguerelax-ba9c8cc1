@@ -50,14 +50,16 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 const features = [
-  "8,000 palabras esenciales del inglés",
-  "Pronunciación en español incluida",
-  "Diseñado para hispanohablantes",
-  "Sin necesidad de diccionarios",
-  "Metodología paso a paso sin estrés",
+  "Más de 8,000 palabras y expresiones en inglés",
+  "Pronunciación adaptada para hispanohablantes",
+  "Estructuras gramaticales explicadas paso a paso",
+  "Método tipo 'fórmulas' para aprender más fácil",
+  "Contenido organizado por niveles A1 a C1",
   "Fonética UK y USA incluida",
   "Libro físico tapa blanda de alta calidad",
-  "Entre 300-350 páginas",
+  "Traducción español-inglés incluida",
+  "89 capítulos temáticos progresivos",
+  "🎁 Incluye libro digital (PDF) GRATIS",
 ];
 
 const benefits = [

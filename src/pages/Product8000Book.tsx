@@ -357,29 +357,79 @@ const Product8000Book = () => {
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-20 md:py-28">
+      {/* ¿Para quién es? */}
+      <section className="py-16 md:py-20">
         <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-              Todo lo que incluye
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+              🎯 ¿Para quién es este libro?
             </h2>
-
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { icon: "👉", title: "Empezar desde cero", desc: "Personas que no saben nada de inglés y quieren una guía clara." },
+                { icon: "👉", title: "Avanzar rápido", desc: "Estudiantes que quieren pasar de básico a avanzado con un método organizado." },
+                { icon: "👉", title: "Mejorar fluidez", desc: "Personas que desean mejorar su vocabulario, pronunciación y comprensión." },
+              ].map((item) => (
+                <div key={item.title} className="bg-card rounded-2xl border border-border p-6 shadow-card">
+                  <span className="text-3xl mb-3 block">{item.icon}</span>
+                  <h3 className="font-bold text-foreground mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
+
+      {/* Beneficios reales */}
+      <section className="py-16 md:py-20 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
+              🚀 Beneficios reales
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                "Aprendes a comunicarte en situaciones reales",
+                "Mejoras tu comprensión y vocabulario rápidamente",
+                "Avanzas desde básico (A1) hasta avanzado (C1) en un solo libro",
+                "Método fácil de entender — sin complicaciones",
+                "No necesitas diccionarios ni apps adicionales",
+                "Estudia sin pantallas, a tu propio ritmo",
+              ].map((b) => (
+                <div key={b} className="flex items-start gap-3 bg-card rounded-xl border border-border p-4">
+                  <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-accent-foreground" />
+                  </div>
+                  <span className="text-foreground text-sm">{b}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Book Preview Gallery */}
+      <section className="py-16 md:py-20">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              📖 Mira el interior del libro
+            </h2>
+            <p className="text-muted-foreground mb-8">Contenido real del libro — vocabulario, gramática y pronunciación</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {bookImages.slice(1).map((img, i) => (
+                <div key={i} className="rounded-2xl overflow-hidden shadow-card border border-border">
+                  <img src={img.src} alt={img.alt} className="w-full h-auto" loading="lazy" />
+                  <p className="text-xs text-muted-foreground p-3 bg-card">{img.alt}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
 
       {/* Final CTA */}
       <section className="py-20 md:py-28 bg-amber-500">

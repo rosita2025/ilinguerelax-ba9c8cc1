@@ -202,8 +202,11 @@ const Product8000Book = () => {
               </h1>
 
               <p className="text-lg text-muted-foreground mb-4">
-                El mismo método completo para aprender inglés sin estrés, ahora en formato libro físico premium. 
-                Perfecto para estudiar sin pantallas.
+                El libro <strong>Inglés Relax – 8,000 Palabras</strong> está diseñado para ayudarte a aprender inglés 
+                desde nivel básico (A1) hasta avanzado (C1) de forma práctica y progresiva.
+              </p>
+              <p className="text-base text-muted-foreground mb-4">
+                📘 Versión 1.5 — 89 capítulos temáticos, gramática con fórmulas, y pronunciación adaptada al español.
               </p>
 
               {/* Purchase Counter - Social Proof */}

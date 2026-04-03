@@ -128,7 +128,7 @@ const Product8000Book = () => {
       product: shopifyProduct,
       variantId: shopifyVariantId,
       variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: "29.99", currencyCode: "USD" },
+      price: variant?.price || { amount: "25.00", currencyCode: "USD" },
       quantity: 1,
       selectedOptions: variant?.selectedOptions || [],
     });
@@ -142,7 +142,7 @@ const Product8000Book = () => {
     content_category: "Physical Book",
     content_ids: ["product-8000-book"],
     content_type: "product",
-    value: 29.99,
+    value: 25.00,
     currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
@@ -155,7 +155,7 @@ const Product8000Book = () => {
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/product-8000-book.png"
         type="product"
-        price="29.99"
+        price="25.00"
         rating=""
         reviewCount=""
         sku="ILINGUE-8000-BOOK"
@@ -240,7 +240,7 @@ const Product8000Book = () => {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$25.00</span>
                   <span className="text-lg text-muted-foreground line-through">$49.99</span>
                   <span className="text-primary font-bold">USD</span>
                 </div>
@@ -253,7 +253,7 @@ const Product8000Book = () => {
                 <div className="flex flex-col gap-2 mt-3 p-3 rounded-xl bg-background/60">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $29.99</span>
+                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $25.00</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0" />
@@ -316,7 +316,7 @@ const Product8000Book = () => {
       {/* Countdown Timer */}
       <CountdownTimer 
         hoursFromNow={48} 
-        currentPrice="$29.99 USD"
+        currentPrice="$25.00 USD"
         originalPrice="$45 USD"
         storageKey="countdown_book_physical"
       />
@@ -463,12 +463,12 @@ const Product8000Book = () => {
               ¡Consigue tu libro físico ahora!
             </h2>
             <p className="text-lg text-white/90 mb-8">
-              Pack exclusivo: Libro Físico + Digital GRATIS por solo $29.99 USD.
+              Pack exclusivo: Libro Físico + Digital GRATIS por solo $25.00 USD.
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-2">
-                <span className="text-5xl font-bold text-foreground">$29.99</span>
+                <span className="text-5xl font-bold text-foreground">$25.00</span>
                 <span className="text-lg text-muted-foreground line-through">$49.99</span>
                 <span className="text-amber-600 font-bold">USD</span>
               </div>
@@ -529,7 +529,7 @@ const Product8000Book = () => {
           },
           {
             question: "¿Incluye la versión digital?",
-            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $29.99 USD.",
+            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $25.00 USD.",
             icon: Package,
           },
           {
@@ -594,7 +594,7 @@ const Product8000Book = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$29.99"
+        price="$25.00"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
         ctaText="Agregar al Carrito"

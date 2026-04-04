@@ -600,8 +600,6 @@ const Product8000Book = () => {
         ctaText="Agregar al Carrito"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}
-        secondaryCtaText="Comprar en Amazon"
-        onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
         showReviews={false}
       />
 

@@ -23,7 +23,7 @@ const upsellProducts = [
     title: "500 Preguntas Frecuentes Digital",
     description: "Habla sin miedo",
     price: "10.00",
-    compareAtPrice: "25.00",
+    compareAtPrice: "14.29",
     image: "/images/product-500-preguntas.webp",
     variantId: "gid://shopify/ProductVariant/43062338224189",
     productId: "gid://shopify/Product/7829744877629",

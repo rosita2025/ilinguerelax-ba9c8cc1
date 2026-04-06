@@ -81,6 +81,34 @@ export const CartDrawer = () => {
               </div>
             </div> :
           <>
+              {/* Free shipping progress bar */}
+              {(() => {
+                const FREE_SHIPPING_MIN = 45;
+                const progress = Math.min((subtotalPrice / FREE_SHIPPING_MIN) * 100, 100);
+                const remaining = Math.max(FREE_SHIPPING_MIN - subtotalPrice, 0);
+                return (
+                  <div className="flex-shrink-0 mb-3">
+                    {remaining > 0 ? (
+                      <p className="text-xs text-muted-foreground mb-1.5">
+                        🚚 ¡Te faltan <span className="font-bold text-foreground">${remaining.toFixed(2)}</span> para envío GRATIS!
+                      </p>
+                    ) : (
+                      <p className="text-xs font-semibold text-green-600 mb-1.5">
+                        ✅ ¡Tienes envío GRATIS!
+                      </p>
+                    )}
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${progress}%`,
+                          backgroundColor: progress >= 100 ? '#16a34a' : 'hsl(var(--primary))',
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                 <div className="space-y-4">
                   {items.map((item) =>

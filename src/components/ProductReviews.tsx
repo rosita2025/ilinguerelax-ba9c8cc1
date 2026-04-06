@@ -90,7 +90,7 @@ const textReviewsEnglish8000 = [
 ];
 
 interface ProductReviewsProps {
-  productType?: "english" | "spanish" | "english8000" | "german" | "portuguese" | "italian" | "french";
+  productType?: "english" | "spanish" | "english8000" | "german" | "portuguese" | "italian" | "french" | "english-book";
   showProductSelector?: boolean;
   reviews?: Array<{ text: string; verified: boolean; date: string }>;
   showReviewForm?: boolean;

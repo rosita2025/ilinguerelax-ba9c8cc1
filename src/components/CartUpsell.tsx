@@ -102,8 +102,13 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
   return (
     <div className="space-y-2 py-3">
       <p className="text-xs font-semibold text-primary flex items-center gap-1">
-        <BookOpen className="w-3 h-3" /> Complementa tu compra
+        <BookOpen className="w-3 h-3" /> Compra 1 y llévate el 2do con 30% OFF
       </p>
+      {hasCouponApplied && (
+        <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
+          <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
+        </div>
+      )}
       <div className="space-y-2">
         {available.map((product) => {
           const isAdding = addingId === product.variantId;

@@ -110,7 +110,11 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate">{product.title}</p>
                 <p className="text-[10px] text-muted-foreground">{product.description}</p>
-                <p className="text-xs font-bold text-primary">${product.price}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] line-through text-red-500 font-medium">${product.compareAtPrice}</span>
+                  <span className="text-xs font-bold text-primary">${product.price}</span>
+                  <span className="text-[9px] bg-red-100 text-red-600 font-bold px-1 rounded">-60%</span>
+                </div>
               </div>
               <Button
                 variant="outline"

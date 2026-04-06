@@ -37,9 +37,15 @@ interface CartUpsellProps {
 
 export const CartUpsell = ({ items }: CartUpsellProps) => {
   const addItem = useCartStore((s) => s.addItem);
+  const applyDiscount = useCartStore((s) => s.applyDiscount);
+  const discountCodes = useCartStore((s) => s.discountCodes);
   const isLoading = useCartStore((s) => s.isLoading);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [addedIds, setAddedIds] = useState<string[]>([]);
+
+  const hasCouponApplied = discountCodes.some(
+    (dc) => dc.code.toLowerCase() === UPSELL_COUPON.toLowerCase() && dc.applicable
+  );
 
   const hasPhysicalBook = items.some((item) =>
     PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))

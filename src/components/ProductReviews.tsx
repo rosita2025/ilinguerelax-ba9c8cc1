@@ -135,8 +135,8 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
   const reviewSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": activeProduct === "english8000" 
-      ? "Inglés Relax - 8,000 Palabras" 
+    "name": activeProduct === "english8000" || activeProduct === "english-book"
+      ? "Inglés Relax - 8,000 Palabras"
       : activeProduct === "english" 
         ? "Inglés Relax - 5,000 Palabras" 
         : "Spanish Relax - 5,000 Words",

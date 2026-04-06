@@ -11,6 +11,7 @@ const upsellProducts = [
     title: "1,000 Verbos Esenciales Digital",
     description: "Presente, Pasado y Futuro",
     price: "10.00",
+    compareAtPrice: "25.00",
     image: "/images/product-1000-verbos.webp",
     variantId: "gid://shopify/ProductVariant/43062338191421",
     productId: "gid://shopify/Product/7829744844861",
@@ -20,6 +21,7 @@ const upsellProducts = [
     title: "500 Preguntas Frecuentes Digital",
     description: "Habla sin miedo",
     price: "10.00",
+    compareAtPrice: "25.00",
     image: "/images/product-500-preguntas.webp",
     variantId: "gid://shopify/ProductVariant/43062338224189",
     productId: "gid://shopify/Product/7829744877629",
@@ -108,7 +110,11 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate">{product.title}</p>
                 <p className="text-[10px] text-muted-foreground">{product.description}</p>
-                <p className="text-xs font-bold text-primary">${product.price}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] line-through text-red-500 font-medium">${product.compareAtPrice}</span>
+                  <span className="text-xs font-bold text-primary">${product.price}</span>
+                  <span className="text-[9px] bg-red-100 text-red-600 font-bold px-1 rounded">-60%</span>
+                </div>
               </div>
               <Button
                 variant="outline"

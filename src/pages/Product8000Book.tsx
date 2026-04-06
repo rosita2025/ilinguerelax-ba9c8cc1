@@ -613,6 +613,9 @@ const Product8000Book = () => {
         productLabel="Libro Físico" 
       /> */}
 
+      {/* Product Reviews */}
+      <ProductReviews productType="english-book" />
+
       {/* Video Testimonial */}
       <VideoTestimonial 
         videoUrl="https://youtu.be/bG35t0x3GkU"

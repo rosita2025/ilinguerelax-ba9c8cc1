@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { BookOpen, Plus, Loader2, Check } from "lucide-react";
+import { BookOpen, Plus, Loader2, Check, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
+
+const UPSELL_COUPON = "upselldescuentos";
 
 const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
 

@@ -98,7 +98,7 @@ interface ProductReviewsProps {
 
 export const ProductReviews = ({ productType = "english", showProductSelector = false, reviews, showReviewForm = false }: ProductReviewsProps) => {
   const swiperRef = useRef<any>(null);
-  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000" | "german" | "portuguese">(productType as any);
+  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000" | "german" | "portuguese" | "english-book">(productType as any);
   const { data: dbReviews = [], refetch: refetchReviews } = useReviews(activeProduct);
   
   const getTestimonials = () => {

@@ -13,7 +13,7 @@ const upsellProducts = [
     title: "1,000 Verbos Esenciales Digital",
     description: "Presente, Pasado y Futuro",
     price: "10.00",
-    compareAtPrice: "25.00",
+    compareAtPrice: "14.29",
     image: "/images/product-1000-verbos.webp",
     variantId: "gid://shopify/ProductVariant/43062338191421",
     productId: "gid://shopify/Product/7829744844861",

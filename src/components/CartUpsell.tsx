@@ -91,6 +91,10 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
       quantity: 1,
       selectedOptions: [{ name: "Title", value: "Default Title" }],
     });
+    // Auto-apply upsell coupon
+    if (!hasCouponApplied) {
+      await applyDiscount(UPSELL_COUPON);
+    }
     setAddedIds((prev) => [...prev, product.variantId]);
     setAddingId(null);
   };

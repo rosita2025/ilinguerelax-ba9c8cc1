@@ -37,11 +37,12 @@ interface CartUpsellProps {
 
 export const CartUpsell = ({ items }: CartUpsellProps) => {
   const addItem = useCartStore((s) => s.addItem);
+  const removeItem = useCartStore((s) => s.removeItem);
   const applyDiscount = useCartStore((s) => s.applyDiscount);
+  const removeDiscount = useCartStore((s) => s.removeDiscount);
   const discountCodes = useCartStore((s) => s.discountCodes);
   const isLoading = useCartStore((s) => s.isLoading);
-  const [addingId, setAddingId] = useState<string | null>(null);
-  const [addedIds, setAddedIds] = useState<string[]>([]);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   const hasCouponApplied = discountCodes.some(
     (dc) => dc.code.toLowerCase() === UPSELL_COUPON.toLowerCase() && dc.applicable
@@ -53,50 +54,58 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
 
   if (!hasPhysicalBook) return null;
 
-  // Filter out products already in cart
-  const available = upsellProducts.filter(
-    (up) => !items.some((item) => item.variantId === up.variantId)
-  );
+  const handleToggle = async (product: typeof upsellProducts[0]) => {
+    const isInCart = items.some((item) => item.variantId === product.variantId);
+    setProcessingId(product.variantId);
 
-  if (available.length === 0) return null;
-
-  const handleAdd = async (product: typeof upsellProducts[0]) => {
-    setAddingId(product.variantId);
-    await addItem({
-      product: {
-        node: {
-          id: product.productId,
-          title: product.title,
-          description: product.description,
-          handle: product.handle,
-          priceRange: { minVariantPrice: { amount: product.price, currencyCode: "USD" } },
-          images: { edges: [] },
-          variants: {
-            edges: [{
-              node: {
-                id: product.variantId,
-                title: "Default Title",
-                price: { amount: product.price, currencyCode: "USD" },
-                availableForSale: true,
-                selectedOptions: [{ name: "Title", value: "Default Title" }],
-              },
-            }],
+    if (isInCart) {
+      // Remove from cart
+      await removeItem(product.variantId);
+      // If no upsell products remain in cart, remove the coupon
+      const remainingUpsells = items.filter(
+        (item) => item.variantId !== product.variantId && 
+        upsellProducts.some((up) => up.variantId === item.variantId)
+      );
+      if (remainingUpsells.length === 0 && hasCouponApplied) {
+        await removeDiscount();
+      }
+    } else {
+      // Add to cart
+      await addItem({
+        product: {
+          node: {
+            id: product.productId,
+            title: product.title,
+            description: product.description,
+            handle: product.handle,
+            priceRange: { minVariantPrice: { amount: product.price, currencyCode: "USD" } },
+            images: { edges: [] },
+            variants: {
+              edges: [{
+                node: {
+                  id: product.variantId,
+                  title: "Default Title",
+                  price: { amount: product.price, currencyCode: "USD" },
+                  availableForSale: true,
+                  selectedOptions: [{ name: "Title", value: "Default Title" }],
+                },
+              }],
+            },
+            options: [{ name: "Title", values: ["Default Title"] }],
           },
-          options: [{ name: "Title", values: ["Default Title"] }],
         },
-      },
-      variantId: product.variantId,
-      variantTitle: "Default Title",
-      price: { amount: product.price, currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }],
-    });
-    // Auto-apply upsell coupon
-    if (!hasCouponApplied) {
-      await applyDiscount(UPSELL_COUPON);
+        variantId: product.variantId,
+        variantTitle: "Default Title",
+        price: { amount: product.price, currencyCode: "USD" },
+        quantity: 1,
+        selectedOptions: [{ name: "Title", value: "Default Title" }],
+      });
+      // Auto-apply upsell coupon
+      if (!hasCouponApplied) {
+        await applyDiscount(UPSELL_COUPON);
+      }
     }
-    setAddedIds((prev) => [...prev, product.variantId]);
-    setAddingId(null);
+    setProcessingId(null);
   };
 
   return (
@@ -110,14 +119,17 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         </div>
       )}
       <div className="space-y-2">
-        {available.map((product) => {
-          const isAdding = addingId === product.variantId;
-          const wasAdded = addedIds.includes(product.variantId);
+        {upsellProducts.map((product) => {
+          const isProcessing = processingId === product.variantId;
+          const isInCart = items.some((item) => item.variantId === product.variantId);
 
           return (
             <div
               key={product.variantId}
-              className="flex items-center gap-3 p-2 border border-border rounded-lg"
+              className={`flex items-center gap-3 p-2 border rounded-lg cursor-pointer transition-colors ${
+                isInCart ? "border-primary/50 bg-primary/5" : "border-border"
+              }`}
+              onClick={() => !isLoading && !isProcessing && handleToggle(product)}
             >
               <img
                 src={product.image}
@@ -133,21 +145,21 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                   <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">-30%</span>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-7 w-7 flex-shrink-0"
-                onClick={() => handleAdd(product)}
-                disabled={isLoading || isAdding || wasAdded}
+              <div
+                className={`h-7 w-7 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  isInCart
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-muted-foreground/30"
+                }`}
               >
-                {isAdding ? (
+                {isProcessing ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
-                ) : wasAdded ? (
-                  <Check className="h-3 w-3" />
+                ) : isInCart ? (
+                  <Check className="h-3.5 w-3.5" />
                 ) : (
-                  <Plus className="h-3 w-3" />
+                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
-              </Button>
+              </div>
             </div>
           );
         })}

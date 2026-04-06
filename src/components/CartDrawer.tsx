@@ -22,8 +22,6 @@ export const CartDrawer = () => {
   const subtotalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
   
   const appliedDiscount = discountCodes.find(dc => dc.applicable);
-  const finalTotal = discountTotal ? parseFloat(discountTotal) : subtotalPrice;
-  const savings = appliedDiscount ? subtotalPrice - finalTotal : 0;
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();
@@ -146,13 +144,8 @@ export const CartDrawer = () => {
                     <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
                       <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                        {appliedDiscount.code}
+                        {appliedDiscount.code} — se aplica al pagar
                       </span>
-                      {savings > 0 && (
-                        <span className="text-xs text-green-600 dark:text-green-500">
-                          (-${savings.toFixed(2)})
-                        </span>
-                      )}
                     </div>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRemoveCoupon} disabled={isLoading}>
                       <X className="h-3 w-3" />
@@ -189,22 +182,10 @@ export const CartDrawer = () => {
                 </div>
                 <div className="h-px bg-border" />
                 <div className="space-y-1">
-                  {appliedDiscount && savings > 0 && (
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                      <span>Subtotal</span>
-                      <span>${subtotalPrice.toFixed(2)}</span>
-                    </div>
-                  )}
-                  {appliedDiscount && savings > 0 && (
-                    <div className="flex justify-between items-center text-sm text-green-600">
-                      <span>Descuento</span>
-                      <span>-${savings.toFixed(2)}</span>
-                    </div>
-                  )}
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-xl font-bold">
-                      ${finalTotal.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
+                      ${subtotalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
                     </span>
                   </div>
                 </div>

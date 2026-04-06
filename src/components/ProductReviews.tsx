@@ -118,8 +118,9 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
        return [];
      }
      switch (activeProduct) {
-       case "english8000":
-         return textReviewsEnglish8000;
+      case "english8000":
+      case "english-book":
+        return textReviewsEnglish8000;
        case "spanish":
          return textReviewsSpanish;
        default:

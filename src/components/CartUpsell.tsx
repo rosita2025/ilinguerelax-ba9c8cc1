@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { BookOpen, Plus, Loader2, Check } from "lucide-react";
+import { BookOpen, Plus, Loader2, Check, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
+
+const UPSELL_COUPON = "upselldescuentos";
 
 const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
 
@@ -11,7 +13,7 @@ const upsellProducts = [
     title: "1,000 Verbos Esenciales Digital",
     description: "Presente, Pasado y Futuro",
     price: "10.00",
-    compareAtPrice: "25.00",
+    compareAtPrice: "14.29",
     image: "/images/product-1000-verbos.webp",
     variantId: "gid://shopify/ProductVariant/43062338191421",
     productId: "gid://shopify/Product/7829744844861",
@@ -21,7 +23,7 @@ const upsellProducts = [
     title: "500 Preguntas Frecuentes Digital",
     description: "Habla sin miedo",
     price: "10.00",
-    compareAtPrice: "25.00",
+    compareAtPrice: "14.29",
     image: "/images/product-500-preguntas.webp",
     variantId: "gid://shopify/ProductVariant/43062338224189",
     productId: "gid://shopify/Product/7829744877629",
@@ -35,9 +37,15 @@ interface CartUpsellProps {
 
 export const CartUpsell = ({ items }: CartUpsellProps) => {
   const addItem = useCartStore((s) => s.addItem);
+  const applyDiscount = useCartStore((s) => s.applyDiscount);
+  const discountCodes = useCartStore((s) => s.discountCodes);
   const isLoading = useCartStore((s) => s.isLoading);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [addedIds, setAddedIds] = useState<string[]>([]);
+
+  const hasCouponApplied = discountCodes.some(
+    (dc) => dc.code.toLowerCase() === UPSELL_COUPON.toLowerCase() && dc.applicable
+  );
 
   const hasPhysicalBook = items.some((item) =>
     PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
@@ -83,6 +91,10 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
       quantity: 1,
       selectedOptions: [{ name: "Title", value: "Default Title" }],
     });
+    // Auto-apply upsell coupon
+    if (!hasCouponApplied) {
+      await applyDiscount(UPSELL_COUPON);
+    }
     setAddedIds((prev) => [...prev, product.variantId]);
     setAddingId(null);
   };
@@ -90,8 +102,13 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
   return (
     <div className="space-y-2 py-3">
       <p className="text-xs font-semibold text-primary flex items-center gap-1">
-        <BookOpen className="w-3 h-3" /> Complementa tu compra
+        <BookOpen className="w-3 h-3" /> Compra 1 y llévate el 2do con 30% OFF
       </p>
+      {hasCouponApplied && (
+        <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
+          <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
+        </div>
+      )}
       <div className="space-y-2">
         {available.map((product) => {
           const isAdding = addingId === product.variantId;
@@ -111,9 +128,9 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 <p className="text-xs font-medium truncate">{product.title}</p>
                 <p className="text-[10px] text-muted-foreground">{product.description}</p>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] line-through text-red-500 font-medium">${product.compareAtPrice}</span>
+                  <span className="text-[10px] line-through text-destructive font-medium">${product.compareAtPrice}</span>
                   <span className="text-xs font-bold text-primary">${product.price}</span>
-                  <span className="text-[9px] bg-red-100 text-red-600 font-bold px-1 rounded">-60%</span>
+                  <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">-30%</span>
                 </div>
               </div>
               <Button

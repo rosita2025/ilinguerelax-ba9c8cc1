@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
+import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
@@ -611,6 +612,9 @@ const Product8000Book = () => {
         productName="Libro Físico 8,000 Palabras" 
         productLabel="Libro Físico" 
       /> */}
+
+      {/* Product Reviews */}
+      <ProductReviews productType="english-book" />
 
       {/* Video Testimonial */}
       <VideoTestimonial 

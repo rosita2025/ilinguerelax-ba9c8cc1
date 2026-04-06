@@ -90,7 +90,7 @@ const textReviewsEnglish8000 = [
 ];
 
 interface ProductReviewsProps {
-  productType?: "english" | "spanish" | "english8000" | "german" | "portuguese" | "italian" | "french";
+  productType?: "english" | "spanish" | "english8000" | "german" | "portuguese" | "italian" | "french" | "english-book";
   showProductSelector?: boolean;
   reviews?: Array<{ text: string; verified: boolean; date: string }>;
   showReviewForm?: boolean;
@@ -98,12 +98,13 @@ interface ProductReviewsProps {
 
 export const ProductReviews = ({ productType = "english", showProductSelector = false, reviews, showReviewForm = false }: ProductReviewsProps) => {
   const swiperRef = useRef<any>(null);
-  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000" | "german" | "portuguese">(productType as any);
+  const [activeProduct, setActiveProduct] = useState<"english" | "spanish" | "english8000" | "german" | "portuguese" | "english-book">(productType as any);
   const { data: dbReviews = [], refetch: refetchReviews } = useReviews(activeProduct);
   
   const getTestimonials = () => {
     switch (activeProduct) {
       case "english8000":
+      case "english-book":
         return english8000Testimonials;
       case "spanish":
         return spanishTestimonials;
@@ -117,8 +118,9 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
        return [];
      }
      switch (activeProduct) {
-       case "english8000":
-         return textReviewsEnglish8000;
+      case "english8000":
+      case "english-book":
+        return textReviewsEnglish8000;
        case "spanish":
          return textReviewsSpanish;
        default:
@@ -133,8 +135,8 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
   const reviewSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": activeProduct === "english8000" 
-      ? "Inglés Relax - 8,000 Palabras" 
+    "name": activeProduct === "english8000" || activeProduct === "english-book"
+      ? "Inglés Relax - 8,000 Palabras"
       : activeProduct === "english" 
         ? "Inglés Relax - 5,000 Palabras" 
         : "Spanish Relax - 5,000 Words",

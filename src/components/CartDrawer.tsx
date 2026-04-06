@@ -22,8 +22,6 @@ export const CartDrawer = () => {
   const subtotalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
   
   const appliedDiscount = discountCodes.find(dc => dc.applicable);
-  const finalTotal = discountTotal ? parseFloat(discountTotal) : subtotalPrice;
-  const savings = appliedDiscount ? subtotalPrice - finalTotal : 0;
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();

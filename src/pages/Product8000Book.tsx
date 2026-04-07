@@ -35,7 +35,7 @@ import { toast } from "sonner";
 
 // Product images
 const bookImages = [
-  { src: "/images/promo-8000-bundle.png", alt: "Pack Promoción - Libro Físico + Digital" },
+  { src: "/images/8000-book-fisico-digital.png", alt: "Libro Físico Inglés Relax + Digital Gratis" },
   { src: "/images/8000-book-cover.jpg", alt: "Portada Inglés Relax 8,000 Palabras - Versión 1.5" },
   { src: "/images/8000-book-index.jpg", alt: "Índice del libro - 89 capítulos organizados por nivel A1 a C1" },
   { src: "/images/8000-book-content.jpg", alt: "Vocabulario con pronunciación adaptada y fonética UK/USA" },

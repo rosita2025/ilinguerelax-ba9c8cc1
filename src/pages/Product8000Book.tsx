@@ -601,7 +601,9 @@ const Product8000Book = () => {
         ctaText="Agregar al Carrito"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}
-        showReviews={false}
+        showReviews={true}
+        rating={4.89}
+        reviewCount={246}
       />
 
       {/* Spacer for sticky bar */}

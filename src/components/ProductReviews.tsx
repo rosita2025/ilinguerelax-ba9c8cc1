@@ -21,6 +21,11 @@ import reviewBookCover from "@/assets/review-book-cover.jpg";
 import reviewPersonHolding from "@/assets/review-person-holding.jpg";
 import reviewSymptoms from "@/assets/review-symptoms.jpg";
 
+// Import real book review photos
+import reviewBookReal1 from "@/assets/review-book-real-1.jpg";
+import reviewBookReal2 from "@/assets/review-book-real-2.jpg";
+import reviewBookReal3 from "@/assets/review-book-real-3.jpg";
+
 // Testimonial screenshot images - English product
 const englishTestimonials = [
   "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",

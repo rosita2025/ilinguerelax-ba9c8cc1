@@ -47,6 +47,9 @@ const english8000Testimonials = [
   reviewBookCover,
   reviewPersonHolding,
   reviewSymptoms,
+  reviewBookReal1,
+  reviewBookReal2,
+  reviewBookReal3,
 ];
 
 // Testimonial images - Spanish product (book photos)

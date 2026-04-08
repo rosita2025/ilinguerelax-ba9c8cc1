@@ -8,6 +8,12 @@ import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 
+// Hotmart checkout URL mapping for digital products
+const HOTMART_CHECKOUT_MAP: Record<string, string> = {
+  "gid://shopify/ProductVariant/43094791454781": "https://pay.hotmart.com/U103990323W?checkoutMode=10&bid=1775682596079", // 8,000 Palabras Digital
+  "gid://shopify/ProductVariant/43062338191421": "https://pay.hotmart.com/T102978081M?bid=1775682831595", // 1,000 Verbos Digital
+};
+
 export const CartDrawer = () => {
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 

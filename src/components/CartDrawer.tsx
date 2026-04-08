@@ -34,6 +34,14 @@ export const CartDrawer = () => {
   }, [isDrawerOpen, syncCart]);
 
   const handleCheckout = () => {
+    // Check if any item has a Hotmart checkout URL
+    const hotmartItem = items.find(item => HOTMART_CHECKOUT_MAP[item.variantId]);
+    if (hotmartItem) {
+      window.open(HOTMART_CHECKOUT_MAP[hotmartItem.variantId], '_blank');
+      setDrawerOpen(false);
+      return;
+    }
+    // Fallback to Shopify checkout for physical products
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
       window.open(checkoutUrl, '_blank');

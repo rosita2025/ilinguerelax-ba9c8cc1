@@ -281,17 +281,35 @@ const Product8000 = () => {
                 <StockCounter totalStock={50} remainingStock={8} lang="es" />
               </div>
 
-              {/* CTA Button - More Impactful */}
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button variant="hero" size="xl" className="w-full mb-4 text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  ¡OBTENER ACCESO AHORA!
-                  <ArrowRight className="w-6 h-6 ml-2" />
-                </Button>
-              </motion.div>
+              {/* CTA Buttons */}
+              <div className="space-y-3">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
+                    <CreditCard className="w-6 h-6 mr-2" />
+                    ¡COMPRAR AHORA EN HOTMART!
+                    <ArrowRight className="w-6 h-6 ml-2" />
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button 
+                    variant="outline" 
+                    size="xl" 
+                    className="w-full text-lg py-6 border-2 border-primary/30 hover:bg-primary/5" 
+                    onClick={handleAddToCart}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                    ) : (
+                      <ShoppingCart className="w-6 h-6 mr-2" />
+                    )}
+                    Agregar al Carrito 🛒
+                  </Button>
+                </motion.div>
+              </div>
 
-              <p className="text-center text-sm text-muted-foreground mb-6">
-                👆 Haz clic para asegurar tu copia al precio de oferta
+              <p className="text-center text-sm text-muted-foreground mb-6 mt-4">
+                👆 Compra directo en Hotmart o agrega al carrito con otros productos
               </p>
 
               {/* Trust Badges */}

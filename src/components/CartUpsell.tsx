@@ -18,6 +18,7 @@ const upsellProducts = [
     variantId: "gid://shopify/ProductVariant/43062338191421",
     productId: "gid://shopify/Product/7829744844861",
     handle: "ingles-relax-1-000-verbos-esenciales-en-ingles-presente-pasado-y-futuro-con-pronunciacion",
+    hotmartUrl: "https://pay.hotmart.com/T102978081M?bid=1775682831595",
   },
   {
     title: "500 Preguntas Frecuentes Digital",
@@ -28,6 +29,7 @@ const upsellProducts = [
     variantId: "gid://shopify/ProductVariant/43062338224189",
     productId: "gid://shopify/Product/7829744877629",
     handle: "ingles-relax-500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
+    hotmartUrl: "",
   },
 ];
 

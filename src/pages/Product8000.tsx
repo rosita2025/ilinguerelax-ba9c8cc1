@@ -27,8 +27,10 @@ import {
   CreditCard,
   Zap,
   Shield,
-  ShoppingCart } from
-"lucide-react";
+  ShoppingCart,
+  Loader2
+} from "lucide-react";
+import { useCartStore } from "@/stores/cartStore";
 
 // Product image
 const product8000Image = "/images/product-8000.webp";

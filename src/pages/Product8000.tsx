@@ -99,6 +99,9 @@ const benefits = [
 
 
 const Product8000 = () => {
+  const addItem = useCartStore((s) => s.addItem);
+  const isLoading = useCartStore((s) => s.isLoading);
+
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
     () => ({
@@ -125,6 +128,38 @@ const Product8000 = () => {
       num_items: 1
     });
     window.open("https://pay.hotmart.com/U103990323W?checkoutMode=10", "_blank");
+  };
+
+  const handleAddToCart = async () => {
+    await addItem({
+      product: {
+        node: {
+          id: "gid://shopify/Product/7837769039933",
+          title: "Inglés Relax - 8,000 Palabras en Inglés Digital",
+          description: "8,000 palabras esenciales del inglés con pronunciación en español y fonética UK/USA.",
+          handle: "ingles-relax-8-000-palabras-en-ingles-digital",
+          priceRange: { minVariantPrice: { amount: "20.00", currencyCode: "USD" } },
+          images: { edges: [{ node: { url: "/images/product-8000.webp", altText: "8,000 Palabras Digital" } }] },
+          variants: {
+            edges: [{
+              node: {
+                id: "gid://shopify/ProductVariant/43094791454781",
+                title: "Default Title",
+                price: { amount: "20.00", currencyCode: "USD" },
+                availableForSale: true,
+                selectedOptions: [{ name: "Title", value: "Default Title" }],
+              },
+            }],
+          },
+          options: [{ name: "Title", values: ["Default Title"] }],
+        },
+      },
+      variantId: "gid://shopify/ProductVariant/43094791454781",
+      variantTitle: "Default Title",
+      price: { amount: "20.00", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: [{ name: "Title", value: "Default Title" }],
+    });
   };
 
   return (

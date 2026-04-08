@@ -27,8 +27,10 @@ import {
   CreditCard,
   Zap,
   Shield,
-  ShoppingCart } from
-"lucide-react";
+  ShoppingCart,
+  Loader2
+} from "lucide-react";
+import { useCartStore } from "@/stores/cartStore";
 
 // Product image
 const product8000Image = "/images/product-8000.webp";
@@ -97,6 +99,9 @@ const benefits = [
 
 
 const Product8000 = () => {
+  const addItem = useCartStore((s) => s.addItem);
+  const isLoading = useCartStore((s) => s.isLoading);
+
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
     () => ({
@@ -123,6 +128,38 @@ const Product8000 = () => {
       num_items: 1
     });
     window.open("https://pay.hotmart.com/U103990323W?checkoutMode=10", "_blank");
+  };
+
+  const handleAddToCart = async () => {
+    await addItem({
+      product: {
+        node: {
+          id: "gid://shopify/Product/7837769039933",
+          title: "Inglés Relax - 8,000 Palabras en Inglés Digital",
+          description: "8,000 palabras esenciales del inglés con pronunciación en español y fonética UK/USA.",
+          handle: "ingles-relax-8-000-palabras-en-ingles-digital",
+          priceRange: { minVariantPrice: { amount: "20.00", currencyCode: "USD" } },
+          images: { edges: [{ node: { url: "/images/product-8000.webp", altText: "8,000 Palabras Digital" } }] },
+          variants: {
+            edges: [{
+              node: {
+                id: "gid://shopify/ProductVariant/43094791454781",
+                title: "Default Title",
+                price: { amount: "20.00", currencyCode: "USD" },
+                availableForSale: true,
+                selectedOptions: [{ name: "Title", value: "Default Title" }],
+              },
+            }],
+          },
+          options: [{ name: "Title", values: ["Default Title"] }],
+        },
+      },
+      variantId: "gid://shopify/ProductVariant/43094791454781",
+      variantTitle: "Default Title",
+      price: { amount: "20.00", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: [{ name: "Title", value: "Default Title" }],
+    });
   };
 
   return (
@@ -244,17 +281,35 @@ const Product8000 = () => {
                 <StockCounter totalStock={50} remainingStock={8} lang="es" />
               </div>
 
-              {/* CTA Button - More Impactful */}
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button variant="hero" size="xl" className="w-full mb-4 text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  ¡OBTENER ACCESO AHORA!
-                  <ArrowRight className="w-6 h-6 ml-2" />
-                </Button>
-              </motion.div>
+              {/* CTA Buttons */}
+              <div className="space-y-3">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
+                    <CreditCard className="w-6 h-6 mr-2" />
+                    ¡COMPRAR AHORA EN HOTMART!
+                    <ArrowRight className="w-6 h-6 ml-2" />
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button 
+                    variant="outline" 
+                    size="xl" 
+                    className="w-full text-lg py-6 border-2 border-primary/30 hover:bg-primary/5" 
+                    onClick={handleAddToCart}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                    ) : (
+                      <ShoppingCart className="w-6 h-6 mr-2" />
+                    )}
+                    Agregar al Carrito 🛒
+                  </Button>
+                </motion.div>
+              </div>
 
-              <p className="text-center text-sm text-muted-foreground mb-6">
-                👆 Haz clic para asegurar tu copia al precio de oferta
+              <p className="text-center text-sm text-muted-foreground mb-6 mt-4">
+                👆 Compra directo en Hotmart o agrega al carrito con otros productos
               </p>
 
               {/* Trust Badges */}

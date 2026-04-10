@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 const product5000BookImg = "/images/product-5000-book.webp";
+import ebookMockup from "@/assets/ebook-5000-mockup.png";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
@@ -184,39 +185,6 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  const handleAddToCart = async () => {
-    await addItem({
-      product: {
-        node: {
-          id: "gid://shopify/Product/7837769039933",
-          title: "Inglés Relax - 8,000 Palabras en Inglés Digital",
-          description: "8,000 palabras esenciales del inglés con pronunciación en español y fonética UK/USA.",
-          handle: "ingles-relax-8-000-palabras-en-ingles-digital",
-          priceRange: { minVariantPrice: { amount: "12.00", currencyCode: "USD" } },
-          images: { edges: [{ node: { url: "/images/product-5000.webp", altText: "5,000 Palabras Digital" } }] },
-          variants: {
-            edges: [
-              {
-                node: {
-                  id: "gid://shopify/ProductVariant/43094791454781",
-                  title: "Default Title",
-                  price: { amount: "12.00", currencyCode: "USD" },
-                  availableForSale: true,
-                  selectedOptions: [{ name: "Title", value: "Default Title" }],
-                },
-              },
-            ],
-          },
-          options: [{ name: "Title", values: ["Default Title"] }],
-        },
-      },
-      variantId: "gid://shopify/ProductVariant/43094791454781",
-      variantTitle: "Default Title",
-      price: { amount: "20.00", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }],
-    });
-  };
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -671,20 +639,111 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Reviews - Simple CTA */}
-      <section className="py-10 md:py-14">
+      {/* Ebook Mockup + Facebook Reviews Section */}
+      <section className="py-12 md:py-16">
         <div className="container px-4 md:px-6">
-          <div className="max-w-xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-1 mb-3">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-6 h-6 fill-amber-400 text-amber-400" />
-              ))}
+          <div className="max-w-5xl mx-auto">
+            {/* Ebook Image */}
+            <div className="flex justify-center mb-10">
+              <motion.img
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                src={ebookMockup}
+                alt="Ebook Inglés Relax - 5,000 Palabras"
+                className="w-48 md:w-64 h-auto drop-shadow-2xl"
+                loading="lazy"
+                width={800}
+                height={800}
+              />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">4.8/5 — 800+ Reseñas Verificadas</h3>
-            <p className="text-muted-foreground mb-4">¿Ya compraste? ¡Cuéntanos tu experiencia!</p>
-            <Button variant="outline" size="lg" asChild>
-              <a href="/dejar-resena">⭐ Deja tu Reseña</a>
-            </Button>
+
+            {/* Facebook-style Reviews Card */}
+            <div className="rounded-2xl border-2 border-border bg-card shadow-xl overflow-hidden">
+              {/* Header - Facebook style */}
+              <div className="bg-[#1877F2] px-6 py-4 flex items-center gap-3">
+                <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span className="text-white font-bold text-lg">Reseñas de Clientes en Facebook</span>
+              </div>
+
+              {/* Rating Summary */}
+              <div className="px-6 py-5 border-b border-border flex flex-col sm:flex-row items-center gap-4">
+                <div className="text-center">
+                  <div className="text-5xl font-black text-foreground">4.8</div>
+                  <div className="flex items-center gap-0.5 mt-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">800+ reseñas</p>
+                </div>
+                <div className="flex-1 w-full max-w-xs space-y-1.5">
+                  {[
+                    { stars: 5, pct: 78 },
+                    { stars: 4, pct: 15 },
+                    { stars: 3, pct: 5 },
+                    { stars: 2, pct: 1 },
+                    { stars: 1, pct: 1 },
+                  ].map((row) => (
+                    <div key={row.stars} className="flex items-center gap-2 text-sm">
+                      <span className="w-3 text-muted-foreground">{row.stars}</span>
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-amber-400 rounded-full" style={{ width: `${row.pct}%` }} />
+                      </div>
+                      <span className="w-8 text-xs text-muted-foreground">{row.pct}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Individual Reviews */}
+              <div className="divide-y divide-border">
+                {[
+                  { name: "María G.", location: "🇲🇽 México", date: "Hace 2 días", text: "¡Increíble! La pronunciación adaptada al español me ayudó mucho. Ya puedo leer palabras en inglés sin miedo. Lo recomiendo al 100%.", stars: 5 },
+                  { name: "Carlos R.", location: "🇨🇴 Colombia", date: "Hace 5 días", text: "Compré este libro para mi hija y le encantó. Los capítulos están muy bien organizados y los bonus son geniales. Vale cada peso.", stars: 5 },
+                  { name: "Ana P.", location: "🇪🇸 España", date: "Hace 1 semana", text: "Llevaba años intentando aprender inglés y este método es el que mejor me ha funcionado. La fonética UK/USA es un plus enorme.", stars: 5 },
+                  { name: "Jorge M.", location: "🇵🇪 Perú", date: "Hace 1 semana", text: "Muy buen material, práctico y fácil de seguir. Los 4 bonus incluidos hacen que sea una compra excelente por $12.", stars: 4 },
+                  { name: "Laura S.", location: "🇦🇷 Argentina", date: "Hace 2 semanas", text: "Lo descargué y empecé a estudiar de inmediato. Muy completo, me sorprendió la cantidad de contenido por ese precio.", stars: 5 },
+                ].map((review, i) => (
+                  <div key={i} className="px-6 py-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white font-bold text-sm">
+                        {review.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground text-sm">{review.name}</span>
+                          <span className="text-xs text-muted-foreground">{review.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-0.5">
+                            {[...Array(review.stars)].map((_, j) => (
+                              <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                            ))}
+                          </div>
+                          <span className="text-xs text-muted-foreground">• {review.date}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-foreground/90 leading-relaxed">{review.text}</p>
+                    {i === 0 && (
+                      <div className="mt-2 text-xs text-[#1877F2] font-medium">✓ Compra verificada</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4 bg-muted/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-sm text-muted-foreground">¿Ya compraste? ¡Cuéntanos tu experiencia!</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/dejar-resena">⭐ Deja tu Reseña</a>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

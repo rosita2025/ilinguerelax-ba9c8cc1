@@ -658,7 +658,31 @@ const Product5000 = () => {
         </div>
       </section>
 
-      <VideoTestimonial
+      {/* Mid-page CTA after Bonuses */}
+      <section className="py-8 md:py-10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-lg mx-auto text-center">
+            <p className="text-muted-foreground text-sm mb-3">
+              📦 Todo esto por solo <span className="font-bold text-foreground">$12 USD</span> en vez de <span className="line-through">$89</span>
+            </p>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant="hero"
+                size="xl"
+                className="w-full text-lg py-6 shadow-2xl relative overflow-hidden group"
+                onClick={handleBuy}
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <ShoppingCart className="w-6 h-6 mr-2" />
+                ¡COMPRAR AHORA — $12 USD!
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+            </motion.div>
+            <p className="text-xs text-muted-foreground mt-2">🛡️ Garantía 7 días • Descarga inmediata • Pago seguro</p>
+          </div>
+        </div>
+      </section>
+
         videoUrl="https://youtu.be/bG35t0x3GkU"
         customerName="Cliente Verificado"
         customerLocation="Latinoamérica"

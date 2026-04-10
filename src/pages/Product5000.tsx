@@ -607,7 +607,57 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Video Testimonial */}
+      {/* 4 Bonus GRATIS Section */}
+      <section className="py-10 md:py-14 bg-gradient-to-b from-accent/5 to-background">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-bold mb-3">
+                <Gift className="w-4 h-4" />
+                INCLUIDOS GRATIS
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                🎁 4 Bonus que Recibes HOY
+              </h2>
+              <p className="text-muted-foreground mt-2">Valorados en $44 USD — GRATIS con tu compra</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {bonuses.map((bonus, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-card rounded-xl border border-border shadow-card overflow-hidden cursor-pointer group"
+                  onClick={() => openBonusLightbox(i)}
+                >
+                  <div className="aspect-[4/3] overflow-hidden relative">
+                    <img
+                      src={bonus.image}
+                      alt={bonus.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-accent text-accent-foreground text-xs font-black">
+                      GRATIS
+                    </div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                      <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h4 className="font-bold text-foreground text-sm">{bonus.title}</h4>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{bonus.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <VideoTestimonial
         videoUrl="https://youtu.be/bG35t0x3GkU"
         customerName="Cliente Verificado"

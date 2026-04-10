@@ -682,7 +682,7 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
-
+      <VideoTestimonial
         videoUrl="https://youtu.be/bG35t0x3GkU"
         customerName="Cliente Verificado"
         customerLocation="Latinoamérica"

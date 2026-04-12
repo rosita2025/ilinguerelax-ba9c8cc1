@@ -842,7 +842,7 @@ const Product5000 = () => {
                   { name: "Greg P.", location: "🇺🇸 USA", date: "2 months ago", text: "I own a restaurant in Arizona. Half my staff speaks Spanish. This book improved our kitchen communication 100%. Money well spent!", stars: 5, verified: true },
                 ];
 
-                const [showAllReviews, setShowAllReviews] = useState(false);
+
                 const visibleReviews = showAllReviews ? allReviews : allReviews.slice(0, 8);
 
                 return (

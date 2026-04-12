@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";

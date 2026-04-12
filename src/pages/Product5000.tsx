@@ -9,12 +9,6 @@ import reviewFb1 from "@/assets/review-fb-1.jpg";
 import reviewFb2 from "@/assets/review-fb-2.jpg";
 import reviewFb3 from "@/assets/review-fb-3.jpg";
 import reviewFb4 from "@/assets/review-fb-4.jpg";
-import reviewPhoto5 from "@/assets/review-photo-5.jpg";
-import reviewPhoto6 from "@/assets/review-photo-6.jpg";
-import reviewPhoto7 from "@/assets/review-photo-7.jpg";
-import reviewPhoto8 from "@/assets/review-photo-8.jpg";
-import reviewBookToc from "@/assets/review-book-toc.jpg";
-import reviewBookContent from "@/assets/review-book-content.jpg";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
@@ -195,7 +189,7 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  const [showAllReviews, setShowAllReviews] = useState(false);
+  
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -750,7 +744,7 @@ const Product5000 = () => {
                 <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span className="text-white font-bold text-lg">Customer Reviews on Facebook</span>
+                <span className="text-white font-bold text-lg">Reseñas de Clientes en Facebook</span>
               </div>
 
               {/* Rating Summary */}
@@ -762,7 +756,7 @@ const Product5000 = () => {
                       <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">850+ reviews</p>
+                  <p className="text-sm text-muted-foreground mt-1">800+ reseñas</p>
                 </div>
                 <div className="flex-1 w-full max-w-xs space-y-1.5">
                   {[
@@ -785,127 +779,52 @@ const Product5000 = () => {
               </div>
 
               {/* Individual Reviews */}
-              {(() => {
-                const allReviews = [
-                  { name: "Sarah M.", location: "🇺🇸 USA", date: "2 days ago", text: "Amazing book! The phonetic pronunciation guide made it so easy to learn Spanish words. I can now order food in Spanish on my trips to Mexico!", stars: 5, photo: reviewPhoto5, verified: true },
-                  { name: "James T.", location: "🇬🇧 UK", date: "3 days ago", text: "Bought this for my retirement trip to Spain. The chapters are well organized — from basics to advanced. The 4 free bonuses are incredible value for $12.", stars: 5, photo: reviewPhoto6, verified: true },
-                  { name: "Emily R.", location: "🇺🇸 USA", date: "4 days ago", text: "I've tried Duolingo, Babbel, and Rosetta Stone. This book is the only resource that helped me actually REMEMBER the words. The pronunciation adapted for English speakers is genius!", stars: 5, photo: reviewPhoto7, verified: true },
-                  { name: "Robert & Linda K.", location: "🇨🇦 Canada", date: "5 days ago", text: "We bought this together for our anniversary trip to Colombia. We've been studying every evening and it's become our favorite activity. Highly recommend for couples!", stars: 5, photo: reviewPhoto8, verified: true },
-                  { name: "Michael B.", location: "🇺🇸 USA", date: "1 week ago", text: "The table of contents alone shows how well-structured this is. 49 chapters covering everything from food to emergencies. Downloaded it instantly and started learning.", stars: 5, photoImg: reviewBookToc, verified: true },
-                  { name: "Jessica L.", location: "🇦🇺 Australia", date: "1 week ago", text: "Love the layout! English, Spanish, and pronunciation side by side in clean tables. The health & emergency chapter is super practical for travelers.", stars: 5, photoImg: reviewBookContent, verified: true },
-                  { name: "David W.", location: "🇺🇸 USA", date: "1 week ago", text: "Best $12 I've ever spent on language learning. 5,000 words organized by topic with pronunciation — this is exactly what I needed for my work in Texas.", stars: 5, verified: true },
-                  { name: "Amanda C.", location: "🇬🇧 UK", date: "1 week ago", text: "I teach ESL and bought this for my Spanish-speaking students' parents. They love it! The bilingual format works both ways.", stars: 5, verified: true },
-                  { name: "Chris P.", location: "🇺🇸 USA", date: "8 days ago", text: "Downloaded the PDF and printed it at home. Now I carry it everywhere. The clothing chapter helped me shop in Barcelona last month!", stars: 5, verified: true },
-                  { name: "Karen H.", location: "🇨🇦 Canada", date: "9 days ago", text: "My daughter is dating a Mexican guy and I wanted to learn some Spanish. This book made it fun and easy. His family was impressed!", stars: 5, verified: true },
-                  { name: "Daniel F.", location: "🇺🇸 USA", date: "10 days ago", text: "As a nurse in Miami, I needed to learn medical Spanish quickly. The health chapter with body parts and symptoms is a lifesaver — literally!", stars: 5, verified: true },
-                  { name: "Rachel S.", location: "🇬🇧 UK", date: "10 days ago", text: "The pronunciation guide is the best feature. I was always afraid of saying things wrong. Now I feel confident speaking basic Spanish.", stars: 5, verified: true },
-                  { name: "Mark J.", location: "🇺🇸 USA", date: "11 days ago", text: "I manage a construction crew with Spanish speakers. This book helped me communicate better. The transportation and tools chapters are gold!", stars: 4, verified: true },
-                  { name: "Lisa D.", location: "🇦🇺 Australia", date: "12 days ago", text: "Planning a 3-month trip to South America. This book is my travel bible now. The food, accommodation, and emergency chapters are essential.", stars: 5, verified: true },
-                  { name: "Tom N.", location: "🇺🇸 USA", date: "12 days ago", text: "I've been studying Spanish for 2 years with apps. This book filled ALL the vocabulary gaps. The topics are practical, not random like most apps.", stars: 5, verified: true },
-                  { name: "Sophie W.", location: "🇬🇧 UK", date: "13 days ago", text: "Bought it on impulse and don't regret it at all. The digital format is convenient and the content is incredibly thorough for the price.", stars: 5, verified: true },
-                  { name: "Brian M.", location: "🇨🇦 Canada", date: "2 weeks ago", text: "My wife is from Peru and her family doesn't speak English. This book is helping me connect with them. The family and relationships chapter is perfect!", stars: 5, verified: true },
-                  { name: "Jennifer A.", location: "🇺🇸 USA", date: "2 weeks ago", text: "I homeschool my kids and we use this as our Spanish curriculum. The visual organization makes it easy for children aged 10+ to follow along.", stars: 5, verified: true },
-                  { name: "Steve R.", location: "🇬🇧 UK", date: "2 weeks ago", text: "Retired and learning Spanish for fun. This book doesn't overwhelm you — it's relaxing to study, just like the name says!", stars: 5, verified: true },
-                  { name: "Megan T.", location: "🇺🇸 USA", date: "2 weeks ago", text: "The jewelry and accessories chapter is so unique. No other book covers these topics. Perfect for my fashion business dealing with Latin American vendors.", stars: 4, verified: true },
-                  { name: "Patrick O.", location: "🇮🇪 Ireland", date: "2 weeks ago", text: "Moving to Costa Rica next year. This book is my preparation companion. Practical, well-organized, and the bonuses are fantastic.", stars: 5, verified: true },
-                  { name: "Nancy B.", location: "🇺🇸 USA", date: "3 weeks ago", text: "I work in a hotel in Florida and needed basic Spanish. This book covers hospitality vocabulary perfectly. My tips have gone up!", stars: 5, verified: true },
-                  { name: "Andrew G.", location: "🇬🇧 UK", date: "3 weeks ago", text: "Third language book I've bought but the first one I've actually finished. The structure keeps you motivated. Brilliant work!", stars: 5, verified: true },
-                  { name: "Michelle K.", location: "🇺🇸 USA", date: "3 weeks ago", text: "The food and restaurant chapter alone is worth the $12. I can now read a menu and order in Spanish without Google Translate!", stars: 5, verified: true },
-                  { name: "Peter H.", location: "🇦🇺 Australia", date: "3 weeks ago", text: "Great for self-study. I do 30 minutes every morning before work. Already noticing improvement in my conversations with Spanish-speaking colleagues.", stars: 5, verified: true },
-                  { name: "Laura C.", location: "🇺🇸 USA", date: "3 weeks ago", text: "I'm a real estate agent in Texas. Knowing Spanish vocabulary for housing and accommodation has helped me close more deals!", stars: 5, verified: true },
-                  { name: "Kevin D.", location: "🇨🇦 Canada", date: "3 weeks ago", text: "Bought this before a cruise to the Caribbean. The basic phrases and pronunciation guide saved me so many times. Thank you!", stars: 5, verified: true },
-                  { name: "Maria T.", location: "🇺🇸 USA", date: "3 weeks ago", text: "As a heritage speaker who never learned to read in Spanish, this helped me formalize my vocabulary. Great for all levels!", stars: 4, verified: true },
-                  { name: "George L.", location: "🇬🇧 UK", date: "4 weeks ago", text: "The sportswear and clothing chapters are surprisingly detailed. Perfect for my job at an international sports brand.", stars: 5, verified: true },
-                  { name: "Sandra E.", location: "🇺🇸 USA", date: "4 weeks ago", text: "I volunteer at a community center with many Spanish speakers. This book helped me break the language barrier. People are so grateful!", stars: 5, verified: true },
-                  { name: "Ryan W.", location: "🇺🇸 USA", date: "4 weeks ago", text: "Simple, clean, effective. No fluff, no complicated grammar explanations. Just the words you need with how to say them. 10/10.", stars: 5, verified: true },
-                  { name: "Helen P.", location: "🇳🇿 New Zealand", date: "4 weeks ago", text: "Planning to teach English in Colombia. Learning Spanish vocabulary first with this book. The education chapter is very helpful!", stars: 5, verified: true },
-                  { name: "Jason F.", location: "🇺🇸 USA", date: "1 month ago", text: "I'm a firefighter and the emergencies chapter is exactly what I needed. Now I can communicate with Spanish-speaking residents during calls.", stars: 5, verified: true },
-                  { name: "Catherine S.", location: "🇬🇧 UK", date: "1 month ago", text: "Beautiful layout, easy to read. I keep it on my iPad and study during my commute. Already on chapter 20!", stars: 5, verified: true },
-                  { name: "Matt V.", location: "🇺🇸 USA", date: "1 month ago", text: "Downloaded for my trip to Mexico City. The food chapter helped me discover amazing street food I would've never tried without knowing the names!", stars: 5, verified: true },
-                  { name: "Diana R.", location: "🇨🇦 Canada", date: "1 month ago", text: "I'm a nurse practitioner in Toronto. Many patients speak Spanish. This book's health section is now my quick reference at work!", stars: 5, verified: true },
-                  { name: "Paul A.", location: "🇺🇸 USA", date: "1 month ago", text: "The winter accessories and fabrics chapters — who else covers that?! So thorough. This book thinks of everything.", stars: 4, verified: true },
-                  { name: "Angela M.", location: "🇬🇧 UK", date: "1 month ago", text: "Gifted this to my mum who's retiring to Spain. She calls me every day to tell me new words she learned. Best £10 gift ever!", stars: 5, verified: true },
-                  { name: "Tyler B.", location: "🇺🇸 USA", date: "1 month ago", text: "College student here. This book has more practical vocabulary than my $200 textbook. Using it alongside my Spanish 101 class.", stars: 5, verified: true },
-                  { name: "Christine L.", location: "🇦🇺 Australia", date: "1 month ago", text: "The bags and personal accessories chapter is unique. I work in fashion retail and it's helped me serve our Latin American customers better.", stars: 5, verified: true },
-                  { name: "Derek J.", location: "🇺🇸 USA", date: "5 weeks ago", text: "I coach a youth soccer team with many Latino kids. Learning their language through this book has made me a better coach and mentor.", stars: 5, verified: true },
-                  { name: "Samantha N.", location: "🇬🇧 UK", date: "5 weeks ago", text: "The destinations and tourism chapter is perfect for planning our family holiday to Tenerife. Kids are learning too!", stars: 5, verified: true },
-                  { name: "Frank O.", location: "🇺🇸 USA", date: "5 weeks ago", text: "I run a landscaping business in California. This book helped me communicate with my crew. Productivity is up and everyone's happier!", stars: 5, verified: true },
-                  { name: "Victoria H.", location: "🇨🇦 Canada", date: "5 weeks ago", text: "Third time buying — gave copies to my two best friends. We study together on Zoom every Sunday. It's become our fun tradition!", stars: 5, verified: true },
-                  { name: "Marcus T.", location: "🇺🇸 USA", date: "6 weeks ago", text: "The condiments and spices chapter is wild — I didn't even know half these words in English! Learning both languages at once haha.", stars: 4, verified: true },
-                  { name: "Olivia K.", location: "🇬🇧 UK", date: "6 weeks ago", text: "I'm a travel blogger and this has become my go-to resource for Spanish-speaking countries. The vocabulary covers EVERYTHING you need.", stars: 5, verified: true },
-                  { name: "Benjamin S.", location: "🇺🇸 USA", date: "6 weeks ago", text: "Excellent PDF quality. Clean fonts, well-spaced tables. Easy on the eyes even after studying for an hour. Great design!", stars: 5, verified: true },
-                  { name: "Hannah W.", location: "🇳🇿 New Zealand", date: "6 weeks ago", text: "My husband and I are learning together before our honeymoon in Argentina. This book makes it competitive and fun between us!", stars: 5, verified: true },
-                  { name: "Carlos G.", location: "🇺🇸 USA", date: "7 weeks ago", text: "Born in the US but my grandparents speak Spanish. This book helped me reconnect with my roots. The pronunciation section is spot-on.", stars: 5, verified: true },
-                  { name: "Emma D.", location: "🇬🇧 UK", date: "7 weeks ago", text: "I teach primary school and use some of these vocabulary lists in my lessons. The kids love learning Spanish words with the fun pronunciation guide!", stars: 5, verified: true },
-                  { name: "William R.", location: "🇺🇸 USA", date: "2 months ago", text: "Military stationed in Honduras. This book was a game-changer for daily life off base. Recommended it to my entire unit.", stars: 5, verified: true },
-                  { name: "Natalie F.", location: "🇨🇦 Canada", date: "2 months ago", text: "As a social worker in Vancouver, I serve many Spanish-speaking families. This book gave me the vocabulary I needed to build trust.", stars: 5, verified: true },
-                  { name: "Greg P.", location: "🇺🇸 USA", date: "2 months ago", text: "I own a restaurant in Arizona. Half my staff speaks Spanish. This book improved our kitchen communication 100%. Money well spent!", stars: 5, verified: true },
-                ];
-
-
-                const visibleReviews = showAllReviews ? allReviews : allReviews.slice(0, 8);
-
-                return (
-                  <>
-                    <div className="divide-y divide-border">
-                      {visibleReviews.map((review, i) => (
-                        <div key={i} className="px-6 py-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            {review.photo ? (
-                              <img src={review.photo} alt={review.name} className="w-10 h-10 rounded-full object-cover" loading="lazy" />
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white font-bold text-sm">
-                                {review.name.charAt(0)}
-                              </div>
-                            )}
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-foreground text-sm">{review.name}</span>
-                                <span className="text-xs text-muted-foreground">{review.location}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-0.5">
-                                  {[...Array(review.stars)].map((_, j) => (
-                                    <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                  ))}
-                                </div>
-                                <span className="text-xs text-muted-foreground">• {review.date}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <p className="text-sm text-foreground/90 leading-relaxed">{review.text}</p>
-                          {review.photoImg && (
-                            <img src={review.photoImg} alt="Review photo" className="mt-3 rounded-lg max-h-48 object-cover border border-border" loading="lazy" />
-                          )}
-                          {review.verified && (
-                            <div className="mt-2 text-xs text-[#1877F2] font-medium">✓ Verified Purchase</div>
-                          )}
+              <div className="divide-y divide-border">
+                {[
+                  { name: "María G.", location: "🇲🇽 México", date: "Hace 2 días", text: "¡Increíble! La pronunciación adaptada al español me ayudó mucho. Ya puedo leer palabras en inglés sin miedo. Lo recomiendo al 100%.", stars: 5 },
+                  { name: "Carlos R.", location: "🇨🇴 Colombia", date: "Hace 5 días", text: "Compré este libro para mi hija y le encantó. Los capítulos están muy bien organizados y los bonus son geniales. Vale cada peso.", stars: 5 },
+                  { name: "Ana P.", location: "🇪🇸 España", date: "Hace 1 semana", text: "Llevaba años intentando aprender inglés y este método es el que mejor me ha funcionado. La fonética UK/USA es un plus enorme.", stars: 5 },
+                  { name: "Jorge M.", location: "🇵🇪 Perú", date: "Hace 1 semana", text: "Muy buen material, práctico y fácil de seguir. Los 4 bonus incluidos hacen que sea una compra excelente por $12.", stars: 4 },
+                  { name: "Laura S.", location: "🇦🇷 Argentina", date: "Hace 2 semanas", text: "Lo descargué y empecé a estudiar de inmediato. Muy completo, me sorprendió la cantidad de contenido por ese precio.", stars: 5 },
+                  { name: "Roberto D.", location: "🇨🇱 Chile", date: "Hace 2 semanas", text: "Excelente para principiantes. Mi esposa y yo lo estudiamos juntos cada noche. La pronunciación es muy clara y fácil de seguir.", stars: 5 },
+                  { name: "Sofía V.", location: "🇪🇨 Ecuador", date: "Hace 3 semanas", text: "Lo mejor es que no necesitas diccionario. Todo viene explicado con la pronunciación adaptada. Mis hijos también lo usan.", stars: 5 },
+                  { name: "Fernando T.", location: "🇲🇽 México", date: "Hace 3 semanas", text: "Trabajo en turismo y necesitaba aprender inglés rápido. Este libro me dio el vocabulario que necesitaba. ¡Las propinas han subido!", stars: 5 },
+                  { name: "Patricia M.", location: "🇨🇴 Colombia", date: "Hace 1 mes", text: "Tercer libro de inglés que compro pero el primero que realmente uso. La organización por temas es perfecta.", stars: 5 },
+                  { name: "Diego L.", location: "🇪🇸 España", date: "Hace 1 mes", text: "Calidad-precio increíble. 5,000 palabras con pronunciación por $12. He pagado mucho más por mucho menos.", stars: 5 },
+                ].map((review, i) => (
+                  <div key={i} className="px-6 py-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white font-bold text-sm">
+                        {review.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground text-sm">{review.name}</span>
+                          <span className="text-xs text-muted-foreground">{review.location}</span>
                         </div>
-                      ))}
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-0.5">
+                            {[...Array(review.stars)].map((_, j) => (
+                              <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                            ))}
+                          </div>
+                          <span className="text-xs text-muted-foreground">• {review.date}</span>
+                        </div>
+                      </div>
                     </div>
-                    {!showAllReviews && (
-                      <div className="px-6 py-4 text-center border-t border-border">
-                        <Button variant="outline" size="sm" onClick={() => setShowAllReviews(true)}>
-                          Show all {allReviews.length} reviews ↓
-                        </Button>
-                      </div>
+                    <p className="text-sm text-foreground/90 leading-relaxed">{review.text}</p>
+                    {i < 3 && (
+                      <div className="mt-2 text-xs text-[#1877F2] font-medium">✓ Compra verificada</div>
                     )}
-                    {showAllReviews && (
-                      <div className="px-6 py-4 text-center border-t border-border">
-                        <Button variant="outline" size="sm" onClick={() => setShowAllReviews(false)}>
-                          Show less ↑
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
+                  </div>
+                ))}
+              </div>
 
               {/* Footer */}
               <div className="px-6 py-4 bg-muted/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-sm text-muted-foreground">Already purchased? Share your experience!</p>
+                <p className="text-sm text-muted-foreground">¿Ya compraste? ¡Cuéntanos tu experiencia!</p>
                 <Button variant="outline" size="sm" asChild>
-                  <a href="/dejar-resena">⭐ Leave a Review</a>
+                  <a href="/dejar-resena">⭐ Deja tu Reseña</a>
                 </Button>
               </div>
             </div>

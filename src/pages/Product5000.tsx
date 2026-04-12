@@ -195,6 +195,7 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(

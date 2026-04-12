@@ -762,7 +762,7 @@ const Product5000 = () => {
                       <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">800+ reseñas</p>
+                  <p className="text-sm text-muted-foreground mt-1">850+ reviews</p>
                 </div>
                 <div className="flex-1 w-full max-w-xs space-y-1.5">
                   {[

@@ -13,7 +13,15 @@ import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star } from "lucide-react";
+import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp } from "lucide-react";
+
+// Review images
+import reviewPhoto5 from "@/assets/review-photo-5.jpg";
+import reviewPhoto6 from "@/assets/review-photo-6.jpg";
+import reviewPhoto7 from "@/assets/review-photo-7.jpg";
+import reviewPhoto8 from "@/assets/review-photo-8.jpg";
+import reviewBookToc from "@/assets/review-book-toc.jpg";
+import reviewBookContent from "@/assets/review-book-content.jpg";
 
 // Product image
 const productSpanish5000Image = "/images/product-spanish-5000.webp";

@@ -76,6 +76,7 @@ const ProductSpanish5000 = () => {
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const getCheckoutUrl = useCartStore(state => state.getCheckoutUrl);
 

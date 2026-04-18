@@ -148,7 +148,7 @@ export const StickyBuyBar = ({
                   </>
                 ) : (
                   <>
-                    🛒 {ctaText}
+                    {ctaText}
                     {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
                   </>
                 )}
@@ -240,7 +240,7 @@ export const StickyBuyBar = ({
                 </>
               ) : (
                 <>
-                  🛒 {ctaText}
+                  {ctaText}
                   {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
                 </>
               )}

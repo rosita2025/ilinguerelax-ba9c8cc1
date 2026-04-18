@@ -915,25 +915,6 @@ const Product5000 = () => {
 
       <Footer />
 
-      {/* Trust strip above Sticky Buy Bar (LATAM reassurance) */}
-      <div className="fixed bottom-[88px] md:bottom-[76px] left-0 right-0 z-40 pointer-events-none">
-        <div className="container px-3 sm:px-4">
-          <div className="mx-auto max-w-3xl flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-full bg-card/95 backdrop-blur-md border border-border shadow-md px-3 py-1.5 text-[11px] sm:text-xs font-medium">
-            <span className="flex items-center gap-1 text-green-600">
-              🔒 Pago seguro Hotmart
-            </span>
-            <span className="text-muted-foreground hidden sm:inline">·</span>
-            <span className="text-muted-foreground">
-              💳 Tarjeta · PIX · OXXO · PSE
-            </span>
-            <span className="text-muted-foreground hidden sm:inline">·</span>
-            <span className="text-foreground font-semibold">
-              🌎 +800 latinos ya lo compraron
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Sticky Buy Bar */}
       <StickyBuyBar
         price="$12"

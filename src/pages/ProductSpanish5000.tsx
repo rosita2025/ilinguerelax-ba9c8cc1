@@ -150,9 +150,12 @@ const ProductSpanish5000 = () => {
                 <span className="text-purple-600">With English Pronunciation</span>
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-4">
+              <p className="text-lg text-muted-foreground mb-2">
                 The complete stress-free method to learn Spanish. Digital PDF format - 
                 download instantly and start learning today!
+              </p>
+              <p className="text-xl font-bold text-primary mb-4">
+                Learn to Speak Spanish in 7 Days
               </p>
 
               {/* Reviews - More Prominent */}

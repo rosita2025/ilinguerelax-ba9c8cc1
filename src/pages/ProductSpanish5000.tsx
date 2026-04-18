@@ -441,12 +441,10 @@ const ProductSpanish5000 = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="rounded-2xl border-2 border-border bg-card shadow-xl overflow-hidden">
-              {/* Header - Facebook style */}
-              <div className="bg-[#1877F2] px-6 py-4 flex items-center gap-3">
-                <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                <span className="text-white font-bold text-lg">Customer Reviews on Facebook</span>
+              {/* Header - Neutral style */}
+              <div className="bg-primary px-6 py-4 flex items-center gap-3">
+                <Star className="w-7 h-7 text-white fill-white" />
+                <span className="text-white font-bold text-lg">Customer Reviews</span>
               </div>
 
               {/* Rating Summary */}

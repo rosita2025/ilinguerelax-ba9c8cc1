@@ -99,9 +99,9 @@ const ProductSpanish5000 = () => {
         title: "Spanish Relax - 5,000 Words with English Pronunciation",
         description: "",
         handle: "spanish-relax-5-000-words-with-english-pronunciation",
-        priceRange: { minVariantPrice: { amount: "22.00", currencyCode: "USD" } },
+        priceRange: { minVariantPrice: { amount: "27.99", currencyCode: "USD" } },
         images: { edges: [] },
-        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "22.00", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
+        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "27.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
         options: [{ name: "Title", values: ["Default Title"] }]
       }
     };
@@ -110,7 +110,7 @@ const ProductSpanish5000 = () => {
       product: shopifyProduct,
       variantId: SHOPIFY_VARIANT_ID,
       variantTitle: "Default Title",
-      price: { amount: "22.00", currencyCode: "USD" },
+      price: { amount: "27.99", currencyCode: "USD" },
       quantity: 1,
       selectedOptions: [{ name: "Title", value: "Default Title" }]
     });
@@ -124,7 +124,7 @@ const ProductSpanish5000 = () => {
     }, 500);
   };
   return <main className="min-h-screen bg-background">
-      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="22" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
+      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="27.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
       <Navbar />
 
       {/* Hero Section */}
@@ -189,7 +189,7 @@ const ProductSpanish5000 = () => {
                   <span className="text-purple-600 font-semibold text-sm uppercase">Special Launch Price</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$22</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$27.99</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{
                   scale: [1, 1.05, 1]
@@ -197,7 +197,7 @@ const ProductSpanish5000 = () => {
                   repeat: Infinity,
                   duration: 2
                 }} className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-bold shadow-lg">
-                    SAVE 59%
+                    SAVE 48%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">

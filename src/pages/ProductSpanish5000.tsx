@@ -24,7 +24,7 @@ import reviewBookToc from "@/assets/review-book-toc.jpg";
 import reviewBookContent from "@/assets/review-book-content.jpg";
 
 // Product image
-const productSpanish5000Image = "/images/product-spanish-5000.webp";
+import productSpanish5000Image from "@/assets/product-spanish-5000-v2.png";
 
 // Preview images
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";

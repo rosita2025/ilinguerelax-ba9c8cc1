@@ -254,7 +254,7 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Countdown Timer */}
-      <CountdownTimer hoursFromNow={48} currentPrice="$22 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
+      <CountdownTimer hoursFromNow={48} currentPrice="$27.99 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">
@@ -484,12 +484,12 @@ const ProductSpanish5000 = () => {
               {(() => {
                 const allReviews: Array<{ name: string; location: string; date: string; text: string; stars: number; photo?: string; photoImg?: string; verified?: boolean }> = [
                   { name: "Sarah M.", location: "🇺🇸 USA", date: "2 days ago", text: "Amazing book! The phonetic pronunciation guide made it so easy to learn Spanish words. I can now order food in Spanish on my trips to Mexico!", stars: 5, photo: reviewPhoto5, verified: true },
-                  { name: "James T.", location: "🇬🇧 UK", date: "3 days ago", text: "Bought this for my retirement trip to Spain. The chapters are well organized — from basics to advanced. The bonuses are incredible value for $22.", stars: 5, photo: reviewPhoto6, verified: true },
+                  { name: "James T.", location: "🇬🇧 UK", date: "3 days ago", text: "Bought this for my retirement trip to Spain. The chapters are well organized — from basics to advanced. The bonuses are incredible value for $27.99.", stars: 5, photo: reviewPhoto6, verified: true },
                   { name: "Emily R.", location: "🇺🇸 USA", date: "4 days ago", text: "I've tried Duolingo, Babbel, and Rosetta Stone. This book is the only resource that helped me actually REMEMBER the words. The pronunciation adapted for English speakers is genius!", stars: 5, photo: reviewPhoto7, verified: true },
                   { name: "Robert & Linda K.", location: "🇨🇦 Canada", date: "5 days ago", text: "We bought this together for our anniversary trip to Colombia. We've been studying every evening and it's become our favorite activity. Highly recommend for couples!", stars: 5, photo: reviewPhoto8, verified: true },
                   { name: "Michael B.", location: "🇺🇸 USA", date: "1 week ago", text: "The table of contents alone shows how well-structured this is. 49 chapters covering everything from food to emergencies. Downloaded it instantly and started learning.", stars: 5, photoImg: reviewBookToc, verified: true },
                   { name: "Jessica L.", location: "🇦🇺 Australia", date: "1 week ago", text: "Love the layout! English, Spanish, and pronunciation side by side in clean tables. The health & emergency chapter is super practical for travelers.", stars: 5, photoImg: reviewBookContent, verified: true },
-                  { name: "David W.", location: "🇺🇸 USA", date: "1 week ago", text: "Best $22 I've ever spent on language learning. 5,000 words organized by topic with pronunciation — this is exactly what I needed for my work in Texas.", stars: 5, verified: true },
+                  { name: "David W.", location: "🇺🇸 USA", date: "1 week ago", text: "Best $27.99 I've ever spent on language learning. 5,000 words organized by topic with pronunciation — this is exactly what I needed for my work in Texas.", stars: 5, verified: true },
                   { name: "Amanda C.", location: "🇬🇧 UK", date: "1 week ago", text: "I teach ESL and bought this to help my students learn Spanish too. The bilingual format works both ways. Absolutely brilliant.", stars: 5, verified: true },
                   { name: "Chris P.", location: "🇺🇸 USA", date: "8 days ago", text: "Downloaded the PDF and printed it at home. Now I carry it everywhere. The clothing chapter helped me shop in Barcelona last month!", stars: 5, verified: true },
                   { name: "Karen H.", location: "🇨🇦 Canada", date: "9 days ago", text: "My daughter is dating a Mexican guy and I wanted to learn some Spanish. This book made it fun and easy. His family was impressed!", stars: 5, verified: true },
@@ -506,7 +506,7 @@ const ProductSpanish5000 = () => {
                   { name: "Patrick O.", location: "🇮🇪 Ireland", date: "2 weeks ago", text: "Moving to Costa Rica next year. This book is my preparation companion. Practical, well-organized, and the bonuses are fantastic.", stars: 5, verified: true },
                   { name: "Nancy B.", location: "🇺🇸 USA", date: "3 weeks ago", text: "I work in a hotel in Florida and needed basic Spanish. This book covers hospitality vocabulary perfectly. My tips have gone up!", stars: 5, verified: true },
                   { name: "Andrew G.", location: "🇬🇧 UK", date: "3 weeks ago", text: "Third language book I've bought but the first one I've actually finished. The structure keeps you motivated. Brilliant work!", stars: 5, verified: true },
-                  { name: "Michelle K.", location: "🇺🇸 USA", date: "3 weeks ago", text: "The food and restaurant chapter alone is worth the $22. I can now read a menu and order in Spanish without Google Translate!", stars: 5, verified: true },
+                  { name: "Michelle K.", location: "🇺🇸 USA", date: "3 weeks ago", text: "The food and restaurant chapter alone is worth the $27.99. I can now read a menu and order in Spanish without Google Translate!", stars: 5, verified: true },
                   { name: "Peter H.", location: "🇦🇺 Australia", date: "3 weeks ago", text: "Great for self-study. I do 30 minutes every morning before work. Already noticing improvement in my conversations with Spanish-speaking colleagues.", stars: 5, verified: true },
                   { name: "Laura C.", location: "🇺🇸 USA", date: "3 weeks ago", text: "I'm a real estate agent in Texas. Knowing Spanish vocabulary for housing and accommodation has helped me close more deals!", stars: 5, verified: true },
                   { name: "Kevin D.", location: "🇨🇦 Canada", date: "3 weeks ago", text: "Bought this before a cruise to the Caribbean. The basic phrases and pronunciation guide saved me so many times. Thank you!", stars: 5, verified: true },
@@ -623,10 +623,13 @@ const ProductSpanish5000 = () => {
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$17</span>
+              <div className="flex items-baseline justify-center gap-3 mb-2">
+                <span className="text-5xl font-bold text-foreground">$27.99</span>
                 <span className="text-2xl text-muted-foreground line-through">$54</span>
                 <span className="text-purple-600 font-bold">USD</span>
+              </div>
+              <div className="flex justify-center mb-4">
+                <span className="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">SAVE 48%</span>
               </div>
               <p className="text-muted-foreground mb-6">
                 One-time payment • Instant PDF download • Lifetime access

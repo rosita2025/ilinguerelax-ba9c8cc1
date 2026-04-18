@@ -72,7 +72,7 @@ const ProductSpanish5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 22,
+    value: 27.99,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -87,7 +87,7 @@ const ProductSpanish5000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000"],
       content_type: "product",
-      value: 22,
+      value: 27.99,
       currency: "USD",
       num_items: 1
     });
@@ -755,7 +755,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price="$22" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="BUY NOW" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
+      <StickyBuyBar price="$27.99" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="BUY NOW" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

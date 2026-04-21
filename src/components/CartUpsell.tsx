@@ -7,6 +7,7 @@ import { useCartStore } from "@/stores/cartStore";
 const UPSELL_COUPON = "upselldescuentos";
 
 const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+const SPANISH_5000_KEYWORDS = ["Spanish Relax - 5,000", "Spanish Relax - 5000", "5,000 Words with English"];
 
 const upsellProducts = [
   {
@@ -33,6 +34,31 @@ const upsellProducts = [
   },
 ];
 
+const spanishUpsellProducts = [
+  {
+    title: "1,000 Verbs in Spanish",
+    description: "Present, Past & Future with English Pronunciation",
+    price: "12.00",
+    compareAtPrice: "27.99",
+    image: "/images/product-1000-verbos.webp",
+    variantId: "gid://shopify/ProductVariant/43118883995709",
+    productId: "gid://shopify/Product/7842578759741",
+    handle: "spanish-relax-1-000-verbs-in-spanish-with-english-pronunciation",
+    hotmartUrl: "",
+  },
+  {
+    title: "500 Questions in Spanish",
+    description: "Speak with confidence — English Pronunciation",
+    price: "12.00",
+    compareAtPrice: "27.99",
+    image: "/images/product-500-preguntas.webp",
+    variantId: "gid://shopify/ProductVariant/43118884028477",
+    productId: "gid://shopify/Product/7842578792509",
+    handle: "spanish-relax-500-questions-in-spanish-with-english-pronunciation-1",
+    hotmartUrl: "",
+  },
+];
+
 interface CartUpsellProps {
   items: CartItem[];
 }
@@ -54,7 +80,15 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
     PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
   );
 
-  if (!hasPhysicalBook) return null;
+  const hasSpanish5000 = items.some((item) =>
+    SPANISH_5000_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+  );
+
+  // Spanish-language UI when Spanish 5000 is in cart
+  const isSpanishContext = hasSpanish5000 && !hasPhysicalBook;
+  const activeUpsells = isSpanishContext ? spanishUpsellProducts : upsellProducts;
+
+  if (!hasPhysicalBook && !hasSpanish5000) return null;
 
   const handleToggle = async (product: typeof upsellProducts[0]) => {
     const isInCart = items.some((item) => item.variantId === product.variantId);
@@ -66,9 +100,9 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
       // If no upsell products remain in cart, remove the coupon
       const remainingUpsells = items.filter(
         (item) => item.variantId !== product.variantId && 
-        upsellProducts.some((up) => up.variantId === item.variantId)
+        activeUpsells.some((up) => up.variantId === item.variantId)
       );
-      if (remainingUpsells.length === 0 && hasCouponApplied) {
+      if (remainingUpsells.length === 0 && hasCouponApplied && !isSpanishContext) {
         await removeDiscount();
       }
     } else {
@@ -102,8 +136,8 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         quantity: 1,
         selectedOptions: [{ name: "Title", value: "Default Title" }],
       });
-      // Auto-apply upsell coupon
-      if (!hasCouponApplied) {
+      // Auto-apply upsell coupon (only for physical book flow)
+      if (!hasCouponApplied && !isSpanishContext) {
         await applyDiscount(UPSELL_COUPON);
       }
     }
@@ -113,15 +147,18 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
   return (
     <div className="space-y-2 py-3">
       <p className="text-xs font-semibold text-primary flex items-center gap-1">
-        <BookOpen className="w-3 h-3" /> Compra 1 y llévate el 2do con 30% OFF
+        <BookOpen className="w-3 h-3" />
+        {isSpanishContext
+          ? "Complete your Spanish learning kit — Add & save"
+          : "Compra 1 y llévate el 2do con 30% OFF"}
       </p>
-      {hasCouponApplied && (
+      {hasCouponApplied && !isSpanishContext && (
         <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
           <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
         </div>
       )}
       <div className="space-y-2">
-        {upsellProducts.map((product) => {
+        {activeUpsells.map((product) => {
           const isProcessing = processingId === product.variantId;
           const isInCart = items.some((item) => item.variantId === product.variantId);
 
@@ -144,7 +181,9 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] line-through text-destructive font-medium">${product.compareAtPrice}</span>
                   <span className="text-xs font-bold text-primary">${product.price}</span>
-                  <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">-30%</span>
+                  <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">
+                    {isSpanishContext ? "-57%" : "-30%"}
+                  </span>
                 </div>
               </div>
               <div

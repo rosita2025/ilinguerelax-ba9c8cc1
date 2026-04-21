@@ -631,7 +631,7 @@ const ProductSpanish5000 = () => {
                 One-time payment • Instant PDF download • Lifetime access
               </p>
               <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
-                BUY NOW
+                ADD TO CART
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>

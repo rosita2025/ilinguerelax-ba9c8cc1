@@ -97,6 +97,12 @@ export const CartDrawer = () => {
           <>
               {/* Free shipping progress bar */}
               {(() => {
+                // Hide free shipping bar if cart only has digital products (no physical books)
+                const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+                const hasPhysical = items.some((item) =>
+                  PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                );
+                if (!hasPhysical) return null;
                 const FREE_SHIPPING_MIN = 45;
                 const progress = Math.min((subtotalPrice / FREE_SHIPPING_MIN) * 100, 100);
                 const remaining = Math.max(FREE_SHIPPING_MIN - subtotalPrice, 0);

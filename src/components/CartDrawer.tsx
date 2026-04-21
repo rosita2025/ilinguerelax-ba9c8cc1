@@ -246,9 +246,18 @@ export const CartDrawer = () => {
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Los impuestos y los gastos de envío se calculan al finalizar la compra.
-                </p>
+                {(() => {
+                  const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+                  const hasPhysical = items.some((item) =>
+                    PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                  );
+                  if (!hasPhysical) return null;
+                  return (
+                    <p className="text-xs text-muted-foreground">
+                      Los impuestos y los gastos de envío se calculan al finalizar la compra.
+                    </p>
+                  );
+                })()}
                 <Button
                 onClick={handleCheckout}
                 className="w-full"
@@ -258,7 +267,13 @@ export const CartDrawer = () => {
                 <Loader2 className="w-4 h-4 animate-spin" /> :
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Continuar al pago
+                      {(() => {
+                        const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+                        const hasPhysical = items.some((item) =>
+                          PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                        );
+                        return hasPhysical ? "Continuar al pago" : "Checkout securely";
+                      })()}
                     </>
                 }
                 </Button>

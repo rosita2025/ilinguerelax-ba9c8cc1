@@ -224,10 +224,19 @@ export const CartDrawer = () => {
                   </div>
                 )}
 
-                <div className="space-y-1 text-xs text-muted-foreground">
-                  <p>📦 Envío internacional disponible</p>
-                  <p>⏱ Entrega estimada: 12–15 días</p>
-                </div>
+                {(() => {
+                  const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+                  const hasPhysical = items.some((item) =>
+                    PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                  );
+                  if (!hasPhysical) return null;
+                  return (
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <p>📦 Envío internacional disponible</p>
+                      <p>⏱ Entrega estimada: 12–15 días</p>
+                    </div>
+                  );
+                })()}
                 <div className="h-px bg-border" />
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">

@@ -167,9 +167,11 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         </div>
       )}
       <div className="space-y-2">
-        {activeUpsells.map((product) => {
+        {activeUpsells
+          .filter((product) => !items.some((item) => item.variantId === product.variantId))
+          .map((product) => {
           const isProcessing = processingId === product.variantId;
-          const isInCart = items.some((item) => item.variantId === product.variantId);
+          const isInCart = false;
 
           return (
             <div

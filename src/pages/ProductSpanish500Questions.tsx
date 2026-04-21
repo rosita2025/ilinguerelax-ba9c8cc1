@@ -11,7 +11,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const productImage = "/images/product-spanish-500-questions.png";
 const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/43120267132989";
-const PRICE = "8.00";
+const PRICE = "12.00";
 
 const features = [
   "500 essential Spanish questions",
@@ -106,9 +106,9 @@ const ProductSpanish500Questions = () => {
                   <span className="text-blue-600 font-semibold text-sm uppercase">Special Launch Price</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$8</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
                   <span className="text-2xl text-muted-foreground line-through">$40</span>
-                  <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold shadow-lg">SAVE 80%</span>
+                  <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold shadow-lg">SAVE 70%</span>
                 </div>
                 <p className="text-sm text-muted-foreground">💳 One-time payment • No subscription • Lifetime access</p>
               </motion.div>

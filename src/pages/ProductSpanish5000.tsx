@@ -217,7 +217,7 @@ const ProductSpanish5000 = () => {
               }}>
                   <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700" onClick={handleBuyNow}>
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    BUY NOW!
+                    ADD TO CART
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>

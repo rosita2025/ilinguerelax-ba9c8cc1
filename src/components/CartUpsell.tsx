@@ -80,7 +80,15 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
     PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
   );
 
-  if (!hasPhysicalBook) return null;
+  const hasSpanish5000 = items.some((item) =>
+    SPANISH_5000_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+  );
+
+  // Spanish-language UI when Spanish 5000 is in cart
+  const isSpanishContext = hasSpanish5000 && !hasPhysicalBook;
+  const activeUpsells = isSpanishContext ? spanishUpsellProducts : upsellProducts;
+
+  if (!hasPhysicalBook && !hasSpanish5000) return null;
 
   const handleToggle = async (product: typeof upsellProducts[0]) => {
     const isInCart = items.some((item) => item.variantId === product.variantId);
@@ -92,9 +100,9 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
       // If no upsell products remain in cart, remove the coupon
       const remainingUpsells = items.filter(
         (item) => item.variantId !== product.variantId && 
-        upsellProducts.some((up) => up.variantId === item.variantId)
+        activeUpsells.some((up) => up.variantId === item.variantId)
       );
-      if (remainingUpsells.length === 0 && hasCouponApplied) {
+      if (remainingUpsells.length === 0 && hasCouponApplied && !isSpanishContext) {
         await removeDiscount();
       }
     } else {
@@ -128,8 +136,8 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         quantity: 1,
         selectedOptions: [{ name: "Title", value: "Default Title" }],
       });
-      // Auto-apply upsell coupon
-      if (!hasCouponApplied) {
+      // Auto-apply upsell coupon (only for physical book flow)
+      if (!hasCouponApplied && !isSpanishContext) {
         await applyDiscount(UPSELL_COUPON);
       }
     }

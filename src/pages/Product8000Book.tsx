@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
+import { useMetaPixelViewContent, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";
@@ -125,6 +125,15 @@ const Product8000Book = () => {
       return;
     }
     const variant = shopifyProduct.node.variants.edges[0]?.node;
+    // Meta Pixel AddToCart event
+    trackHotmartEvent("AddToCart", {
+      content_name: "Inglés Relax - 8,000 Palabras Libro Físico",
+      content_category: "Physical Book",
+      content_ids: ["product-8000-book"],
+      content_type: "product",
+      value: 25.00,
+      currency: "USD",
+    });
     await addItem({
       product: shopifyProduct,
       variantId: shopifyVariantId,
@@ -267,13 +276,16 @@ const Product8000Book = () => {
                 <Button 
                   size="xl" 
                   className="w-full text-lg py-6 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold"
-                  asChild
+                  onClick={handleAddToShopifyCart}
+                  disabled={cartLoading}
                 >
-                  <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                  {cartLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                  ) : (
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    COMPRAR EN AMAZON
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </a>
+                  )}
+                  AGREGAR AL CARRITO
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button 
                   variant="outline" 

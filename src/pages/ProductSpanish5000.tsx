@@ -217,7 +217,7 @@ const ProductSpanish5000 = () => {
               }}>
                   <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700" onClick={handleBuyNow}>
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    BUY NOW!
+                    ADD TO CART
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>
@@ -631,7 +631,7 @@ const ProductSpanish5000 = () => {
                 One-time payment • Instant PDF download • Lifetime access
               </p>
               <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
-                BUY NOW
+                ADD TO CART
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -751,7 +751,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price="$27.99" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="BUY NOW" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
+      <StickyBuyBar price="$27.99" originalPrice="$54" productName="SPANISH RELAX - 5,000 Spanish Words (Digital PDF)" onBuyClick={handleBuyNow} ctaText="ADD TO CART" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

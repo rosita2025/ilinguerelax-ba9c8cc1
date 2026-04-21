@@ -7,6 +7,7 @@ import { useCartStore } from "@/stores/cartStore";
 const UPSELL_COUPON = "upselldescuentos";
 
 const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+const SPANISH_5000_KEYWORDS = ["Spanish Relax - 5,000", "Spanish Relax - 5000", "5,000 Words with English"];
 
 const upsellProducts = [
   {
@@ -29,6 +30,31 @@ const upsellProducts = [
     variantId: "gid://shopify/ProductVariant/43062338224189",
     productId: "gid://shopify/Product/7829744877629",
     handle: "ingles-relax-500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
+    hotmartUrl: "",
+  },
+];
+
+const spanishUpsellProducts = [
+  {
+    title: "1,000 Verbs in Spanish",
+    description: "Present, Past & Future with English Pronunciation",
+    price: "12.00",
+    compareAtPrice: "27.99",
+    image: "/images/product-1000-verbos.webp",
+    variantId: "gid://shopify/ProductVariant/43118883995709",
+    productId: "gid://shopify/Product/7842578759741",
+    handle: "spanish-relax-1-000-verbs-in-spanish-with-english-pronunciation",
+    hotmartUrl: "",
+  },
+  {
+    title: "500 Questions in Spanish",
+    description: "Speak with confidence — English Pronunciation",
+    price: "12.00",
+    compareAtPrice: "27.99",
+    image: "/images/product-500-preguntas.webp",
+    variantId: "gid://shopify/ProductVariant/43118884028477",
+    productId: "gid://shopify/Product/7842578792509",
+    handle: "spanish-relax-500-questions-in-spanish-with-english-pronunciation-1",
     hotmartUrl: "",
   },
 ];

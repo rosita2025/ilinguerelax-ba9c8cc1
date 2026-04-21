@@ -11,7 +11,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const productImage = "/images/product-spanish-500-questions.png";
 const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/43120267132989";
-const PRICE = "8.00";
+const PRICE = "12.00";
 
 const features = [
   "500 essential Spanish questions",

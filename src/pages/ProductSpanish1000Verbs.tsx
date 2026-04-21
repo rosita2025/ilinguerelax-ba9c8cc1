@@ -11,7 +11,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const productImage = "/images/product-spanish-1000-verbs.png";
 const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/43120267100221";
-const PRICE = "10.00";
+const PRICE = "12.00";
 
 const features = [
   "1,000 essential Spanish verbs",

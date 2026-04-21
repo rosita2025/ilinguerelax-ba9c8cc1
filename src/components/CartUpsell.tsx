@@ -115,7 +115,16 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
             description: product.description,
             handle: product.handle,
             priceRange: { minVariantPrice: { amount: product.price, currencyCode: "USD" } },
-            images: { edges: [] },
+            images: {
+              edges: [
+                {
+                  node: {
+                    url: product.image,
+                    altText: product.title,
+                  },
+                },
+              ],
+            },
             variants: {
               edges: [{
                 node: {

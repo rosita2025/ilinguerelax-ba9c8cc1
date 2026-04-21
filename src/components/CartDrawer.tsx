@@ -7,6 +7,7 @@ import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X, Check
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 // Hotmart checkout URL mapping for digital products
 const HOTMART_CHECKOUT_MAP: Record<string, string> = {
@@ -34,6 +35,20 @@ export const CartDrawer = () => {
   }, [isDrawerOpen, syncCart]);
 
   const handleCheckout = () => {
+    // Meta Pixel: InitiateCheckout
+    try {
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: items.map((i) => i.product.node.title).join(", "),
+        content_ids: items.map((i) => i.variantId),
+        content_type: "product",
+        num_items: totalItems,
+        value: subtotalPrice,
+        currency: items[0]?.price.currencyCode || "USD",
+      });
+    } catch (e) {
+      console.error("Pixel InitiateCheckout error:", e);
+    }
+
     // Check if any item has a Hotmart checkout URL
     const hotmartItem = items.find(item => HOTMART_CHECKOUT_MAP[item.variantId]);
     if (hotmartItem) {

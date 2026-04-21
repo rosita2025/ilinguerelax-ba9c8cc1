@@ -147,15 +147,18 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
   return (
     <div className="space-y-2 py-3">
       <p className="text-xs font-semibold text-primary flex items-center gap-1">
-        <BookOpen className="w-3 h-3" /> Compra 1 y llévate el 2do con 30% OFF
+        <BookOpen className="w-3 h-3" />
+        {isSpanishContext
+          ? "Complete your Spanish learning kit — Add & save"
+          : "Compra 1 y llévate el 2do con 30% OFF"}
       </p>
-      {hasCouponApplied && (
+      {hasCouponApplied && !isSpanishContext && (
         <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
           <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
         </div>
       )}
       <div className="space-y-2">
-        {upsellProducts.map((product) => {
+        {activeUpsells.map((product) => {
           const isProcessing = processingId === product.variantId;
           const isInCart = items.some((item) => item.variantId === product.variantId);
 
@@ -178,7 +181,9 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] line-through text-destructive font-medium">${product.compareAtPrice}</span>
                   <span className="text-xs font-bold text-primary">${product.price}</span>
-                  <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">-30%</span>
+                  <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">
+                    {isSpanishContext ? "-57%" : "-30%"}
+                  </span>
                 </div>
               </div>
               <div

@@ -167,8 +167,11 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               key={product.variantId}
               className={`flex items-center gap-3 p-2 border rounded-lg cursor-pointer transition-colors ${
                 isInCart ? "border-primary/50 bg-primary/5" : "border-border"
-              }`}
-              onClick={() => !isLoading && !isProcessing && handleToggle(product)}
+              } ${isProcessing ? "opacity-60 pointer-events-none" : ""}`}
+              onClick={() => {
+                if (isProcessing) return;
+                handleToggle(product);
+              }}
             >
               <img
                 src={product.image}

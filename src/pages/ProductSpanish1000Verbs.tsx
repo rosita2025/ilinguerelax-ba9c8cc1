@@ -106,9 +106,9 @@ const ProductSpanish1000Verbs = () => {
                   <span className="text-blue-600 font-semibold text-sm uppercase">Special Launch Price</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 text-white text-sm font-bold shadow-lg">SAVE 81%</span>
+                  <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 text-white text-sm font-bold shadow-lg">SAVE 78%</span>
                 </div>
                 <p className="text-sm text-muted-foreground">💳 One-time payment • No subscription • Lifetime access</p>
               </motion.div>

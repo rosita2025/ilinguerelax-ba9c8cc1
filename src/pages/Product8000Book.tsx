@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
+import { useMetaPixelViewContent, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";

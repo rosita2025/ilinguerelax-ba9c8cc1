@@ -539,41 +539,79 @@ const Product8000Book = () => {
               Pack exclusivo: Libro Físico + Digital GRATIS por solo $25.00 USD.
             </p>
 
-            <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-2">
-                <span className="text-5xl font-bold text-foreground">$25.00</span>
-                <span className="text-lg text-muted-foreground line-through">$49.99</span>
-                <span className="text-amber-600 font-bold">USD</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-left">
+              {/* Tarjeta Shopify - Recomendado */}
+              <div className="relative bg-card border-2 border-emerald-500 rounded-2xl shadow-card p-6 flex flex-col">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  ⭐ MEJOR PRECIO + BONUS
+                </span>
+                <h3 className="text-lg font-bold text-emerald-700 dark:text-emerald-300 mt-2 mb-1">
+                  Agregar al carrito 🎁
+                </h3>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-bold text-foreground">$25.00</span>
+                  <span className="text-sm text-muted-foreground line-through">$49.99</span>
+                </div>
+                <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Libro físico</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Ebook digital GRATIS (24h)</li>
+                  <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Envío: 13–15 días</li>
+                </ul>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold mb-3">
+                  Ahorra dinero y recibe contenido extra
+                </p>
+                <Button
+                  size="lg"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+                  onClick={handleAddToShopifyCart}
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                  )}
+                  Agregar al carrito
+                </Button>
               </div>
-              <p className="text-accent font-bold text-sm mb-1">🎁 PACK: Libro Físico + Digital GRATIS</p>
-              <p className="text-muted-foreground mb-6">
-                Pago único • Envío a domicilio • Incluye PDF digital
-              </p>
-              <Button size="xl" className="w-full mb-3 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold" asChild>
-                <a href={AMAZON_URL} rel="noopener noreferrer">
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  COMPRAR EN AMAZON
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </a>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="xl" 
-                className="w-full font-semibold border-primary/30 text-primary hover:bg-primary/10"
-                onClick={handleAddToShopifyCart}
-                disabled={cartLoading}
-              >
-                {cartLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                ) : (
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                )}
-                Agregar al Carrito
-              </Button>
-              <p className="text-xs text-muted-foreground mt-4">
-                *Consulta costos de envío según tu ubicación
-              </p>
+
+              {/* Tarjeta Amazon - Envío rápido */}
+              <div className="relative bg-card border-2 border-amber-400 rounded-2xl shadow-card p-6 flex flex-col">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-950 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  🚚 ENVÍO RÁPIDO
+                </span>
+                <h3 className="text-lg font-bold text-amber-700 dark:text-amber-300 mt-2 mb-1">
+                  Comprar en Amazon
+                </h3>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-bold text-foreground">$25.00</span>
+                  <span className="text-sm text-muted-foreground">USD</span>
+                </div>
+                <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Libro físico</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Pago seguro</li>
+                  <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Entrega más rápida</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Ebook GRATIS (enviar comprobante)</li>
+                </ul>
+                <p className="text-xs text-amber-700 dark:text-amber-300 font-semibold mb-3">
+                  Ideal si quieres recibirlo más rápido
+                </p>
+                <Button
+                  size="lg"
+                  className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold"
+                  asChild
+                >
+                  <a href="/amazon">
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Comprar en Amazon
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </a>
+                </Button>
+              </div>
             </div>
+            <p className="text-xs text-white/80 mb-2">
+              *Consulta costos de envío según tu ubicación
+            </p>
 
             <p className="text-sm text-white/70">
               🔒 Pago 100% seguro • Garantía de satisfacción

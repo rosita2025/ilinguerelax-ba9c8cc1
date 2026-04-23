@@ -35,6 +35,7 @@ import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import AdminReviews from "./pages/AdminReviews";
 import DejarResena from "./pages/DejarResena";
+import AmazonRedirect from "./pages/AmazonRedirect";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/dejar-resena" element={<DejarResena />} />
                 <Route path="/admin/reviews" element={<AdminReviews />} />
+                <Route path="/amazon" element={<AmazonRedirect />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

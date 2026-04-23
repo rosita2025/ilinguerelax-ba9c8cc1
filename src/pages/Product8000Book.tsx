@@ -43,7 +43,8 @@ const bookImages = [
   { src: "/images/8000-book-questions.jpg", alt: "Preguntas en inglés con estructura TO BE - Nivel A1" },
   { src: "/images/8000-book-structures.jpg", alt: "Estructuras gramaticales con ejemplos - Hábitos y negativas" },
 ];
-const AMAZON_URL = "https://www.amazon.com/dp/B0GRR584ZY";
+// URL intermedia para tracking de clics en Google Analytics (redirige a Amazon)
+const AMAZON_URL = "https://ilinguerelax.com/amazon";
 
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";

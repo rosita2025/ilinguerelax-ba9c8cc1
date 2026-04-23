@@ -387,7 +387,7 @@ Conocer las diferencias entre inglés británico y americano te hace un hablante
     readTime: "10 min",
     category: "Cultura",
     tags: ["UK vs USA", "británico", "americano", "diferencias"],
-    relatedProducts: ["5000", "8000"],
+    relatedProducts: ["5000", "8000", "8000-book"],
   },
   {
     id: "5",

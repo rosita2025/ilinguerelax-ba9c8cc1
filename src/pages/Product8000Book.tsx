@@ -491,7 +491,7 @@ const Product8000Book = () => {
                 Pago único • Envío a domicilio • Incluye PDF digital
               </p>
               <Button size="xl" className="w-full mb-3 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold" asChild>
-                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
+                <a href={AMAZON_URL} rel="noopener noreferrer">
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   COMPRAR EN AMAZON
                   <ArrowRight className="w-5 h-5 ml-2" />

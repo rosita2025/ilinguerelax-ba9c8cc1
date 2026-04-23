@@ -273,32 +273,94 @@ const Product8000Book = () => {
                 </div>
               </motion.div>
 
-              <div className="flex flex-col gap-3 mb-4">
-                <Button
-                  size="xl"
-                  className="w-full text-lg py-6 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold"
-                  asChild
-                >
-                  <a href="/amazon">
-                    <ShoppingCart className="w-6 h-6 mr-2" />
-                    COMPRAR EN AMAZON
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </a>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="xl" 
-                  className="w-full text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
-                  onClick={handleAddToShopifyCart}
-                  disabled={cartLoading}
-                >
-                  {cartLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  ) : (
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                  )}
-                  Agregar al Carrito
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {/* Tarjeta 1 - Shopify (destacada) */}
+                <div className="relative rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-5 shadow-lg flex flex-col">
+                  <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider">
+                    ⭐ Recomendado
+                  </div>
+                  <h3 className="text-base md:text-lg font-bold text-emerald-900 dark:text-emerald-100 mb-1 mt-1">
+                    Agregar al carrito
+                  </h3>
+                  <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-3">
+                    MEJOR PRECIO + BONUS 🎁
+                  </p>
+                  <ul className="space-y-2 mb-4 flex-1">
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <BookOpen className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span>Libro físico</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <Gift className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span><strong>Ebook digital GRATIS</strong> (enviado en 24h)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <Truck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span>Envío: 13–15 días</span>
+                    </li>
+                  </ul>
+                  <p className="text-xs italic text-emerald-700 dark:text-emerald-300 mb-3">
+                    Ahorra dinero y recibe contenido extra
+                  </p>
+                  <Button
+                    size="lg"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                    onClick={handleAddToShopifyCart}
+                    disabled={cartLoading}
+                  >
+                    {cartLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    ) : (
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                    )}
+                    Agregar al carrito
+                  </Button>
+                </div>
+
+                {/* Tarjeta 2 - Amazon */}
+                <div className="relative rounded-2xl border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30 p-5 shadow-md flex flex-col">
+                  <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-amber-500 text-amber-950 text-[10px] font-black uppercase tracking-wider">
+                    🚚 Envío rápido
+                  </div>
+                  <h3 className="text-base md:text-lg font-bold text-amber-900 dark:text-amber-100 mb-1 mt-1">
+                    Comprar en Amazon
+                  </h3>
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-3">
+                    ENVÍO RÁPIDO 🚚
+                  </p>
+                  <ul className="space-y-2 mb-4 flex-1">
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <BookOpen className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Libro físico</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Pago seguro</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <Truck className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Entrega más rápida</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <Gift className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Ebook digital GRATIS (enviar comprobante por correo)</span>
+                    </li>
+                  </ul>
+                  <p className="text-xs italic text-amber-700 dark:text-amber-300 mb-3">
+                    Ideal si quieres recibirlo más rápido
+                  </p>
+                  <Button
+                    size="lg"
+                    className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold"
+                    asChild
+                  >
+                    <a href="/amazon">
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Comprar en Amazon
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </a>
+                  </Button>
+                </div>
               </div>
 
               {/* Trust Badges */}

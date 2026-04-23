@@ -274,19 +274,16 @@ const Product8000Book = () => {
               </motion.div>
 
               <div className="flex flex-col gap-3 mb-4">
-                <Button 
-                  size="xl" 
+                <Button
+                  size="xl"
                   className="w-full text-lg py-6 bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500 font-bold"
-                  onClick={handleAddToShopifyCart}
-                  disabled={cartLoading}
+                  asChild
                 >
-                  {cartLoading ? (
-                    <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                  ) : (
+                  <a href="/amazon">
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                  )}
-                  AGREGAR AL CARRITO
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                    COMPRAR EN AMAZON
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </a>
                 </Button>
                 <Button 
                   variant="outline" 

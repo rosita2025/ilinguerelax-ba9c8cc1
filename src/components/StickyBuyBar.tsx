@@ -83,34 +83,25 @@ export const StickyBuyBar = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
-      <div className="container px-3 sm:px-4 py-2 lg:py-3">
+      <div className="container px-3 sm:px-4 py-1.5 lg:py-3">
         {/* Mobile & Tablet: Vertical Stack Layout */}
-        <div className="flex lg:hidden flex-col gap-2">
-          {/* Row 1: Product Name */}
-          {productName && (
-            <div className="text-center">
-              <span className="text-xs sm:text-sm font-semibold text-foreground line-clamp-2">
-                {productName}
-              </span>
+        <div className="flex lg:hidden flex-col gap-1.5">
+          {/* Row 1: Price + Reviews compacto en una línea */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-foreground">{price}</span>
+              {originalPrice && (
+                <span className="text-xs text-muted-foreground line-through">{originalPrice}</span>
+              )}
+              <span className="text-[10px] text-muted-foreground">USD</span>
             </div>
-          )}
-          
-          {/* Row 2: Reviews */}
-          {showReviews && (
-            <div className="flex items-center justify-center gap-1.5 text-sm">
-              {renderStars()}
-              <span className="text-foreground font-medium">{rating}</span>
-              <span className="text-muted-foreground">({reviewCount} {lang === "en" ? "reviews" : "reseñas"})</span>
-            </div>
-          )}
-          
-          {/* Row 3: Price */}
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-xl font-bold text-foreground">{price}</span>
-            {originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">{originalPrice}</span>
+            {showReviews && (
+              <div className="flex items-center gap-1 text-xs">
+                {renderStars()}
+                <span className="text-foreground font-medium">{rating}</span>
+                <span className="text-muted-foreground">({reviewCount})</span>
+              </div>
             )}
-            <span className="text-sm text-muted-foreground">USD</span>
           </div>
           
           {/* Row: Email or Button */}
@@ -133,40 +124,40 @@ export const StickyBuyBar = ({
               <Check className="w-5 h-5" /> ¡Suscrito! Te avisaremos.
             </div>
           ) : (
-            <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-1.5 w-full">
               <Button
                 size="default"
-                className={`w-full h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl text-base font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                className={`w-full h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg text-sm font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 disabled={disabled || isLoading}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    <ShoppingCart className="w-4 h-4 mr-1.5" />
                     {ctaText}
-                    {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
+                    {disabled ? <Clock className="w-4 h-4 ml-1.5" /> : <ArrowRight className="w-4 h-4 ml-1.5" />}
                   </>
                 )}
               </Button>
               {secondaryCtaText && onSecondaryClick && (
                 <Button
                   size="default"
-                  className="w-full h-12 rounded-full text-base font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 shadow-xl"
+                  className="w-full h-10 rounded-full text-sm font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 shadow-lg"
                   onClick={onSecondaryClick}
                   disabled={isSecondaryLoading}
                 >
                   {isSecondaryLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   ) : (
-                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    <ShoppingCart className="w-4 h-4 mr-1.5" />
                   )}
                   {secondaryCtaText}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               )}
             </div>

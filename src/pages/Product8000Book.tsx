@@ -399,9 +399,9 @@ const Product8000Book = () => {
       />
 
       {/* Benefits */}
-      <section className="py-20 md:py-28 bg-secondary/30">
+      <section className="py-10 md:py-14 bg-secondary/30">
         <div className="container px-4 md:px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               ¿Por qué elegir el{" "}
               <span className="text-amber-600">Libro Físico</span>?
@@ -437,10 +437,10 @@ const Product8000Book = () => {
       </section>
 
       {/* ¿Para quién es? */}
-      <section className="py-16 md:py-20">
+      <section className="py-8 md:py-12">
         <div className="container px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
               🎯 ¿Para quién es este libro?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -461,10 +461,10 @@ const Product8000Book = () => {
       </section>
 
       {/* Beneficios reales */}
-      <section className="py-16 md:py-20 bg-secondary/30">
+      <section className="py-8 md:py-12 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-6">
               🚀 Beneficios reales
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -489,13 +489,13 @@ const Product8000Book = () => {
       </section>
 
       {/* Book Preview Gallery */}
-      <section className="py-16 md:py-20">
+      <section className="py-8 md:py-12">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
               📖 Mira el interior del libro
             </h2>
-            <p className="text-muted-foreground mb-8">Contenido real del libro — vocabulario, gramática y pronunciación</p>
+            <p className="text-muted-foreground mb-6">Contenido real del libro — vocabulario, gramática y pronunciación</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {bookImages.slice(1).map((img, i) => (
                 <div key={i} className="rounded-2xl overflow-hidden shadow-card border border-border">
@@ -510,13 +510,13 @@ const Product8000Book = () => {
 
       {/* Final CTA */}
       {/* What's Included - Checklist */}
-      <section className="py-16 md:py-20 bg-secondary/30">
+      <section className="py-8 md:py-12 bg-secondary/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-6">
               📚 ¿Qué incluye el libro?
             </h2>
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8">
+            <div className="bg-card rounded-3xl border border-border shadow-card p-6 md:p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (
                   <div key={feature} className="flex items-start gap-3">
@@ -533,17 +533,17 @@ const Product8000Book = () => {
       </section>
 
 
-      <section className="py-20 md:py-28 bg-amber-500">
+      <section className="py-10 md:py-14 bg-amber-500">
         <div className="container px-4 md:px-6">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               ¡Consigue tu libro físico ahora!
             </h2>
-            <p className="text-lg text-white/90 mb-8">
+            <p className="text-lg text-white/90 mb-6">
               Pack exclusivo: Libro Físico + Digital GRATIS por solo $25.00 USD.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-left">
               {/* Tarjeta Shopify - Recomendado */}
               <div className="relative bg-card border-2 border-emerald-500 rounded-2xl shadow-card p-6 flex flex-col">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">

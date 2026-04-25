@@ -97,6 +97,7 @@ const Product8000Book = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
+  const [purchaseOption, setPurchaseOption] = useState<"shopify" | "amazon">("shopify");
   const { addItem, isLoading: cartLoading } = useCartStore();
 
   // Fetch Shopify product variant for the physical book
@@ -273,97 +274,133 @@ const Product8000Book = () => {
                 </div>
               </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {/* Tarjeta 1 - Shopify (destacada) */}
-                <div className="relative rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-5 shadow-lg flex flex-col">
-                  <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider">
-                    ⭐ Recomendado
-                  </div>
-                  <h3 className="text-base md:text-lg font-bold text-emerald-900 dark:text-emerald-100 mb-1 mt-1">
-                    Comprar aquí (Shopify)
-                  </h3>
-                  <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-3">
-                    MEJOR PRECIO + EBOOK GRATIS 🎁
-                  </p>
-                  <ul className="space-y-2 mb-4 flex-1">
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <BookOpen className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                      <span>Libro físico</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Gift className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                      <span><strong>Ebook PDF GRATIS</strong> (en 24h)</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Truck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                      <span>Envío: 13–15 días</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Shield className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                      <span>Pago seguro con tarjeta</span>
-                    </li>
-                  </ul>
-                  <p className="text-xs italic text-emerald-700 dark:text-emerald-300 mb-3">
-                    💚 Ahorra y recibe el ebook de regalo
-                  </p>
-                  <Button
-                    size="lg"
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                    onClick={handleAddToShopifyCart}
-                    disabled={cartLoading}
+              {/* Selector de opción de compra */}
+              <div className="mb-6">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                  1. Elige dónde comprar
+                </p>
+                <div role="radiogroup" aria-label="Opción de compra" className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
+                  {/* Opción Shopify */}
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={purchaseOption === "shopify"}
+                    onClick={() => setPurchaseOption("shopify")}
+                    className={`relative text-left rounded-2xl border-2 p-4 transition-all ${
+                      purchaseOption === "shopify"
+                        ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 shadow-lg"
+                        : "border-border bg-background hover:border-emerald-300"
+                    }`}
                   >
-                    {cartLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    ) : (
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                    )}
-                    Agregar al carrito
-                  </Button>
+                    <div className="absolute -top-3 left-4 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider">
+                      ⭐ Recomendado
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      <span className="font-bold text-foreground text-sm md:text-base">Shopify</span>
+                      <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        purchaseOption === "shopify" ? "border-emerald-600 bg-emerald-600" : "border-muted-foreground"
+                      }`}>
+                        {purchaseOption === "shopify" && <Check className="w-3 h-3 text-white" />}
+                      </span>
+                    </div>
+                    <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold mt-1">
+                      Mejor precio + Ebook GRATIS 🎁
+                    </p>
+                  </button>
+
+                  {/* Opción Amazon */}
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={purchaseOption === "amazon"}
+                    onClick={() => setPurchaseOption("amazon")}
+                    className={`relative text-left rounded-2xl border-2 p-4 transition-all ${
+                      purchaseOption === "amazon"
+                        ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30 shadow-lg"
+                        : "border-border bg-background hover:border-amber-300"
+                    }`}
+                  >
+                    <div className="absolute -top-3 left-4 px-2 py-0.5 rounded-full bg-amber-500 text-amber-950 text-[10px] font-black uppercase tracking-wider">
+                      🚚 Más rápido
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      <span className="font-bold text-foreground text-sm md:text-base">Amazon</span>
+                      <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        purchaseOption === "amazon" ? "border-amber-500 bg-amber-500" : "border-muted-foreground"
+                      }`}>
+                        {purchaseOption === "amazon" && <Check className="w-3 h-3 text-amber-950" />}
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 font-semibold mt-1">
+                      Entrega Prime + Ebook por recibo
+                    </p>
+                  </button>
                 </div>
 
-                {/* Tarjeta 2 - Amazon */}
-                <div className="relative rounded-2xl border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30 p-5 shadow-md flex flex-col">
-                  <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-amber-500 text-amber-950 text-[10px] font-black uppercase tracking-wider">
-                    🚚 Envío rápido
-                  </div>
-                  <h3 className="text-base md:text-lg font-bold text-amber-900 dark:text-amber-100 mb-1 mt-1">
-                    Comprar en Amazon
-                  </h3>
-                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-3">
-                    ENTREGA MÁS RÁPIDA 📦
+                {/* Resumen + Total */}
+                <div className={`rounded-2xl border-2 p-4 ${
+                  purchaseOption === "shopify"
+                    ? "border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/20"
+                    : "border-amber-500 bg-amber-50/60 dark:bg-amber-950/20"
+                }`}>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                    2. Tu pedido
                   </p>
-                  <ul className="space-y-2 mb-4 flex-1">
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <BookOpen className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Libro físico</span>
+                  <ul className="space-y-1.5 mb-3">
+                    <li className="flex items-center justify-between text-sm text-foreground">
+                      <span className="flex items-center gap-2"><BookOpen className="w-4 h-4" /> Libro físico</span>
+                      <span className="font-semibold">$25.00</span>
                     </li>
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Truck className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span><strong>Entrega Amazon Prime</strong></span>
+                    <li className="flex items-center justify-between text-sm text-foreground">
+                      <span className="flex items-center gap-2"><Gift className="w-4 h-4" /> Ebook PDF
+                        {purchaseOption === "amazon" && <span className="text-[10px] text-muted-foreground">(envía recibo)</span>}
+                      </span>
+                      <span className="font-bold text-emerald-600">GRATIS</span>
                     </li>
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Confianza Amazon</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Gift className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Ebook GRATIS enviando tu recibo a hola@ilinguerelax.com</span>
+                    <li className="flex items-center justify-between text-sm text-foreground">
+                      <span className="flex items-center gap-2"><Truck className="w-4 h-4" />
+                        {purchaseOption === "shopify" ? "Envío 13–15 días" : "Envío Amazon Prime"}
+                      </span>
+                      <span className="text-muted-foreground text-xs">según país</span>
                     </li>
                   </ul>
-                  <p className="text-xs italic text-amber-700 dark:text-amber-300 mb-3">
-                    ⚡ Ideal si lo quieres lo antes posible
+                  <div className="flex items-center justify-between border-t border-border pt-3 mb-4">
+                    <span className="text-base font-bold text-foreground">Total</span>
+                    <span className="text-2xl font-black text-foreground">$25.00 <span className="text-xs font-normal text-muted-foreground">USD</span></span>
+                  </div>
+
+                  {purchaseOption === "shopify" ? (
+                    <Button
+                      size="lg"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                      onClick={handleAddToShopifyCart}
+                      disabled={cartLoading}
+                    >
+                      {cartLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      ) : (
+                        <ShoppingCart className="w-5 h-5 mr-2" />
+                      )}
+                      Agregar al carrito
+                    </Button>
+                  ) : (
+                    <Button
+                      size="lg"
+                      className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold"
+                      asChild
+                    >
+                      <a href="/amazon">
+                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        Comprar en Amazon
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </a>
+                    </Button>
+                  )}
+                  <p className="text-[11px] text-center text-muted-foreground mt-2">
+                    {purchaseOption === "shopify"
+                      ? "💚 Pago seguro con tarjeta. Ebook enviado por email en 24h."
+                      : "⚡ Envía tu recibo a hola@ilinguerelax.com y recibe el ebook gratis."}
                   </p>
-                  <Button
-                    size="lg"
-                    className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold"
-                    asChild
-                  >
-                    <a href="/amazon">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Comprar en Amazon
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </a>
-                  </Button>
                 </div>
               </div>
 

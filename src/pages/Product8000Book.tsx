@@ -3,7 +3,6 @@ import { useMetaPixelViewContent, trackHotmartEvent } from "@/hooks/useMetaPixel
 import { SEO } from "@/components/SEO";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
@@ -679,8 +678,6 @@ const Product8000Book = () => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre el libro físico"
       />
-
-      <Footer />
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar

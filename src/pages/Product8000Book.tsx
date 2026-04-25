@@ -280,10 +280,10 @@ const Product8000Book = () => {
                     ⭐ Recomendado
                   </div>
                   <h3 className="text-base md:text-lg font-bold text-emerald-900 dark:text-emerald-100 mb-1 mt-1">
-                    Agregar al carrito
+                    Comprar aquí (Shopify)
                   </h3>
                   <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-3">
-                    MEJOR PRECIO + BONUS 🎁
+                    MEJOR PRECIO + EBOOK GRATIS 🎁
                   </p>
                   <ul className="space-y-2 mb-4 flex-1">
                     <li className="flex items-start gap-2 text-sm text-foreground">
@@ -292,15 +292,19 @@ const Product8000Book = () => {
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
                       <Gift className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                      <span><strong>Ebook digital GRATIS</strong> (enviado en 24h)</span>
+                      <span><strong>Ebook PDF GRATIS</strong> (en 24h)</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
                       <Truck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                       <span>Envío: 13–15 días</span>
                     </li>
+                    <li className="flex items-start gap-2 text-sm text-foreground">
+                      <Shield className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span>Pago seguro con tarjeta</span>
+                    </li>
                   </ul>
                   <p className="text-xs italic text-emerald-700 dark:text-emerald-300 mb-3">
-                    Ahorra dinero y recibe contenido extra
+                    💚 Ahorra y recibe el ebook de regalo
                   </p>
                   <Button
                     size="lg"
@@ -326,7 +330,7 @@ const Product8000Book = () => {
                     Comprar en Amazon
                   </h3>
                   <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-3">
-                    ENVÍO RÁPIDO 🚚
+                    ENTREGA MÁS RÁPIDA 📦
                   </p>
                   <ul className="space-y-2 mb-4 flex-1">
                     <li className="flex items-start gap-2 text-sm text-foreground">
@@ -334,20 +338,20 @@ const Product8000Book = () => {
                       <span>Libro físico</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Pago seguro</span>
+                      <Truck className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span><strong>Entrega Amazon Prime</strong></span>
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
-                      <Truck className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Entrega más rápida</span>
+                      <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Confianza Amazon</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
                       <Gift className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Ebook digital GRATIS (enviar comprobante por correo)</span>
+                      <span>Ebook GRATIS enviando tu recibo a hola@ilinguerelax.com</span>
                     </li>
                   </ul>
                   <p className="text-xs italic text-amber-700 dark:text-amber-300 mb-3">
-                    Ideal si quieres recibirlo más rápido
+                    ⚡ Ideal si lo quieres lo antes posible
                   </p>
                   <Button
                     size="lg"
@@ -546,7 +550,7 @@ const Product8000Book = () => {
                   ⭐ MEJOR PRECIO + BONUS
                 </span>
                 <h3 className="text-lg font-bold text-emerald-700 dark:text-emerald-300 mt-2 mb-1">
-                  Agregar al carrito 🎁
+                  Comprar aquí (Shopify) 🎁
                 </h3>
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-3xl font-bold text-foreground">$25.00</span>
@@ -554,11 +558,12 @@ const Product8000Book = () => {
                 </div>
                 <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Libro físico</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Ebook digital GRATIS (24h)</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> <strong>Ebook PDF GRATIS</strong> (en 24h)</li>
                   <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Envío: 13–15 días</li>
+                  <li className="flex items-start gap-2"><Shield className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" /> Pago seguro con tarjeta</li>
                 </ul>
                 <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold mb-3">
-                  Ahorra dinero y recibe contenido extra
+                  💚 Ahorra y recibe el ebook de regalo
                 </p>
                 <Button
                   size="lg"
@@ -589,12 +594,12 @@ const Product8000Book = () => {
                 </div>
                 <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Libro físico</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Pago seguro</li>
-                  <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Entrega más rápida</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Ebook GRATIS (enviar comprobante)</li>
+                  <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> <strong>Entrega Amazon Prime</strong></li>
+                  <li className="flex items-start gap-2"><Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Confianza Amazon</li>
+                  <li className="flex items-start gap-2"><Gift className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Ebook GRATIS enviando recibo a hola@ilinguerelax.com</li>
                 </ul>
                 <p className="text-xs text-amber-700 dark:text-amber-300 font-semibold mb-3">
-                  Ideal si quieres recibirlo más rápido
+                  ⚡ Ideal si lo quieres lo antes posible
                 </p>
                 <Button
                   size="lg"

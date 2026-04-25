@@ -679,8 +679,6 @@ const Product8000Book = () => {
         subtitle="Resolvemos tus dudas sobre el libro físico"
       />
 
-      <Footer />
-
       {/* Sticky Buy Bar */}
       <StickyBuyBar
         price="$25.00"

@@ -97,6 +97,7 @@ const Product8000Book = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
+  const [purchaseOption, setPurchaseOption] = useState<"shopify" | "amazon">("shopify");
   const { addItem, isLoading: cartLoading } = useCartStore();
 
   // Fetch Shopify product variant for the physical book

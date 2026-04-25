@@ -308,7 +308,7 @@ const Product8000Book = () => {
                   </p>
                   <Button
                     size="lg"
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                    className="w-full h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all"
                     onClick={handleAddToShopifyCart}
                     disabled={cartLoading}
                   >
@@ -318,6 +318,7 @@ const Product8000Book = () => {
                       <ShoppingCart className="w-5 h-5 mr-2" />
                     )}
                     Agregar al carrito
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
 
@@ -355,7 +356,7 @@ const Product8000Book = () => {
                   </p>
                   <Button
                     size="lg"
-                    className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold"
+                    className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
                     asChild
                   >
                     <a href="/amazon">
@@ -567,7 +568,7 @@ const Product8000Book = () => {
                 </p>
                 <Button
                   size="lg"
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+                  className="w-full h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all"
                   onClick={handleAddToShopifyCart}
                   disabled={cartLoading}
                 >
@@ -577,6 +578,7 @@ const Product8000Book = () => {
                     <ShoppingCart className="w-5 h-5 mr-2" />
                   )}
                   Agregar al carrito
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
 
@@ -603,7 +605,7 @@ const Product8000Book = () => {
                 </p>
                 <Button
                   size="lg"
-                  className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold"
+                  className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
                   asChild
                 >
                   <a href="/amazon">

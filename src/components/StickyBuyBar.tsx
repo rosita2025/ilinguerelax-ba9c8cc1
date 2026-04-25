@@ -135,9 +135,8 @@ export const StickyBuyBar = ({
           ) : (
             <div className="flex flex-col gap-2 w-full">
               <Button
-                variant="hero"
                 size="default"
-                className={`w-full shadow-xl text-base py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                className={`w-full h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl text-base font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 disabled={disabled || isLoading}
               >
@@ -148,6 +147,7 @@ export const StickyBuyBar = ({
                   </>
                 ) : (
                   <>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
                     {ctaText}
                     {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
                   </>
@@ -155,18 +155,18 @@ export const StickyBuyBar = ({
               </Button>
               {secondaryCtaText && onSecondaryClick && (
                 <Button
-                  variant="outline"
                   size="default"
-                  className="w-full text-sm py-2.5 h-auto font-semibold bg-amber-400 hover:bg-amber-500 text-amber-950 border-amber-500"
+                  className="w-full h-12 rounded-full text-base font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 shadow-xl"
                   onClick={onSecondaryClick}
                   disabled={isSecondaryLoading}
                 >
                   {isSecondaryLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   ) : (
-                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    <ShoppingCart className="w-5 h-5 mr-2" />
                   )}
                   {secondaryCtaText}
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               )}
             </div>
@@ -227,9 +227,8 @@ export const StickyBuyBar = ({
 
             {/* Buy Button */}
             <Button
-              variant="hero"
               size="default"
-              className={`whitespace-nowrap shadow-xl text-base px-6 py-3 h-auto font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+              className={`whitespace-nowrap h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl text-base px-6 font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
               onClick={handleBuy}
               disabled={disabled || isLoading}
             >
@@ -240,6 +239,7 @@ export const StickyBuyBar = ({
                 </>
               ) : (
                 <>
+                  <ShoppingCart className="w-5 h-5 mr-2" />
                   {ctaText}
                   {disabled ? <Clock className="w-5 h-5 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
                 </>
@@ -247,18 +247,18 @@ export const StickyBuyBar = ({
             </Button>
             {secondaryCtaText && onSecondaryClick && (
               <Button
-                variant="outline"
                 size="default"
-                className="whitespace-nowrap text-sm px-4 py-3 h-auto font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                className="whitespace-nowrap h-12 rounded-full text-base px-6 font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 shadow-xl"
                 onClick={onSecondaryClick}
                 disabled={isSecondaryLoading}
               >
                 {isSecondaryLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
                 ) : (
-                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  <ShoppingCart className="w-5 h-5 mr-2" />
                 )}
                 {secondaryCtaText}
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>

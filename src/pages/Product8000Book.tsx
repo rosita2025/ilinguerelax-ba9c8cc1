@@ -721,6 +721,8 @@ const Product8000Book = () => {
         showReviews={true}
         rating={4.89}
         reviewCount={246}
+        secondaryCtaText="Comprar en Amazon"
+        onSecondaryClick={() => window.open("/amazon", "_blank")}
       />
 
       {/* Spacer for sticky bar */}

@@ -79,6 +79,7 @@ const ProductSpanish5000 = () => {
   const [showAllReviews, setShowAllReviews] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
+  const getCheckoutUrl = useCartStore(state => state.getCheckoutUrl);
 
   const handleBuyNow = async () => {
     // Track InitiateCheckout event with Hotmart Pixel
@@ -115,8 +116,13 @@ const ProductSpanish5000 = () => {
       selectedOptions: [{ name: "Title", value: "Default Title" }]
     });
 
-    // Open cart drawer so the user can review upsells and press "Continuar al pago"
-    setDrawerOpen(true);
+    // Redirect directly to Shopify checkout (no drawer step)
+    const checkoutUrl = getCheckoutUrl();
+    if (checkoutUrl) {
+      window.open(checkoutUrl, "_blank");
+    } else {
+      setDrawerOpen(true);
+    }
   };
   return <main className="min-h-screen bg-background">
       <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="27.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />

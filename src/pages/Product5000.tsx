@@ -78,7 +78,7 @@ import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
-import { VideoTestimonial } from "@/components/VideoTestimonial";
+
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 
@@ -770,14 +770,6 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
-      <VideoTestimonial
-        videoUrl="https://youtu.be/bG35t0x3GkU"
-        customerName="Cliente Verificado"
-        customerLocation="Latinoamérica"
-        testimonialQuote="Este libro cambió completamente mi forma de aprender inglés. La pronunciación adaptada al español hace que sea muy fácil de entender. ¡100% recomendado!"
-        lang="es"
-      />
-
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
 

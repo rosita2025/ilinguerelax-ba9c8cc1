@@ -20,6 +20,7 @@ import { LiveViewers } from "@/components/LiveViewers";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { CompactBuyCard } from "@/components/CompactBuyCard";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -746,30 +747,25 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Mid-page CTA after Bonuses */}
-      <section className="py-8 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-lg mx-auto text-center">
-            <p className="text-muted-foreground text-sm mb-3">
-              🌎 Compra desde toda Latinoamérica en tu moneda local — solo <span className="font-bold text-foreground">$12 USD</span> en vez de <span className="line-through">$107</span>
-            </p>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                variant="hero"
-                size="xl"
-                className="w-full text-lg py-6 shadow-2xl relative overflow-hidden group"
-                onClick={handleBuy}
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <ShoppingCart className="w-6 h-6 mr-2" />
-                ¡COMPRAR AHORA — $12 USD!
-                <ArrowRight className="w-6 h-6 ml-2" />
-              </Button>
-            </motion.div>
-            <p className="text-xs text-muted-foreground mt-2">🛡️ Garantía 7 días • Descarga inmediata • Pago seguro</p>
-          </div>
-        </div>
-      </section>
+      <CompactBuyCard
+        title="Inglés Relax 5,000"
+        subtitle="Top-Rated Curso Digital con Pronunciación ES"
+        price="$12"
+        originalPrice="$107"
+        discountLabel="AHORRA 89%"
+        rating={4.8}
+        reviewsCount="800+"
+        badges={[
+          "Pronunciación ES",
+          "Fonética UK/USA",
+          "Descarga inmediata",
+          "4 Bonus GRATIS",
+        ]}
+        ctaText="COMPRAR AHORA | $12 USD"
+        onBuy={handleBuy}
+        socialProof="María y 12,000+ personas más ya lo compraron"
+        noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
+      />
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
 

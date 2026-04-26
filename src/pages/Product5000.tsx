@@ -45,6 +45,8 @@ import {
   Zap,
   Sparkles,
   Shield,
+  Pause,
+  Play,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -206,13 +208,15 @@ const Product5000 = () => {
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
 
   useEffect(() => {
+    if (!isAutoPlay) return;
     const id = setInterval(() => {
       setCurrentHeroImage((i) => (i + 1) % heroImages.length);
     }, 3000);
     return () => clearInterval(id);
-  }, []);
+  }, [isAutoPlay, heroImages.length]);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -405,7 +409,10 @@ const Product5000 = () => {
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setCurrentHeroImage(idx)}
+                      onClick={() => {
+                        setCurrentHeroImage(idx);
+                        setIsAutoPlay(false);
+                      }}
                       aria-label={`Ver imagen ${idx + 1}`}
                       className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
                         currentHeroImage === idx
@@ -420,6 +427,18 @@ const Product5000 = () => {
                       />
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setIsAutoPlay((p) => !p)}
+                    aria-label={isAutoPlay ? "Pausar slider" : "Reanudar slider"}
+                    className="ml-1 w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors"
+                  >
+                    {isAutoPlay ? (
+                      <Pause className="w-4 h-4" />
+                    ) : (
+                      <Play className="w-4 h-4 ml-0.5" />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>

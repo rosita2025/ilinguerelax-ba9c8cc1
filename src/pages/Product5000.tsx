@@ -281,6 +281,7 @@ const Product5000 = () => {
         rating="4.8"
         reviewCount="800"
         sku="ILINGUE-5000"
+        availability="InStock"
         keywords="aprender inglés, 5000 palabras inglés, vocabulario inglés con pronunciación, pronunciación inglés para hispanohablantes, fonética UK USA, inglés A1 B1, estructuras gramaticales inglés, libro digital inglés, PDF inglés descargable, inglés relax, aprender inglés en 6 meses, inglés Latinoamérica"
       />
       {/* Lightbox Dialog */}

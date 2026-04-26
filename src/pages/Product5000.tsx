@@ -400,23 +400,20 @@ const Product5000 = () => {
                   className="w-full h-auto rounded-2xl shadow-hero transition-opacity duration-500"
                 />
                 {/* Mini gallery thumbnails */}
-                <div className="flex items-center justify-center gap-3 mt-4">
+                <div className="flex items-center justify-center gap-2 mt-3">
                   {heroImages.map((img, idx) => (
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => {
-                        setCurrentHeroImage(idx);
-                        setIsAutoPlay(false);
-                      }}
+                      onClick={() => setCurrentHeroImage(idx)}
                       aria-label={
                         idx === 0
                           ? "Ver portada: 5,000 palabras inglés con pronunciación y fonética UK/USA"
                           : "Ver beneficios: aprende inglés en 6 meses con estructuras gramaticales"
                       }
-                      className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                      className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
                         currentHeroImage === idx
-                          ? "border-primary ring-2 ring-primary/30 scale-105"
+                          ? "border-primary ring-1 ring-primary/30"
                           : "border-border opacity-70 hover:opacity-100"
                       }`}
                     >
@@ -431,18 +428,6 @@ const Product5000 = () => {
                       />
                     </button>
                   ))}
-                  <button
-                    type="button"
-                    onClick={() => setIsAutoPlay((p) => !p)}
-                    aria-label={isAutoPlay ? "Pausar slider" : "Reanudar slider"}
-                    className="ml-1 w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors"
-                  >
-                    {isAutoPlay ? (
-                      <Pause className="w-4 h-4" />
-                    ) : (
-                      <Play className="w-4 h-4 ml-0.5" />
-                    )}
-                  </button>
                 </div>
               </div>
             </div>

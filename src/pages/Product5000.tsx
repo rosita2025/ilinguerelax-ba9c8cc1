@@ -59,11 +59,13 @@ import previewFrases from "@/assets/preview-frases-verbos.png";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
 const product5000Image = productoPrincipalInglesRelax;
 
-// Bonus images
-import bonusEstructura from "@/assets/bonus-estructura.png";
-import bonusDiccionario from "@/assets/bonus-diccionario.png";
-import bonusArticulos from "@/assets/bonus-articulos.png";
-import bonusPreview from "@/assets/bonus-preview.jpg";
+// Bonus images (6 regalos)
+import regalo1FormulaGramatica from "@/assets/regalo-1-formula-gramatica.webp";
+import regalo2EjemplosPreguntas from "@/assets/regalo-2-ejemplos-preguntas.webp";
+import regalo3TablaResumen from "@/assets/regalo-3-tabla-resumen-a1-b1.webp";
+import regalo4RecordatorioNiveles from "@/assets/regalo-4-recordatorio-niveles.webp";
+import regalo5MisNotas from "@/assets/regalo-5-mis-notas.webp";
+import regalo6AudioLibro from "@/assets/regalo-6-audio-libro.webp";
 
 // About section image
 import aboutIlingueRelax from "@/assets/about-ilingue-relax.png";
@@ -146,43 +148,45 @@ const features = [
 const bonuses = [
   {
     icon: BookOpen,
-    title: "Regalo 1: Estructuras Gramaticales",
+    title: "Regalo 1: La Fórmula de Gramática Para Ti",
     description:
-      "Domina la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Gramática paso a paso con ejemplos y pronunciación.",
-    image: bonusEstructura,
+      "Estructuras gramaticales B1 ordenadas para aprendizaje rápido. Presente continuo con fórmulas claras y ejemplos prácticos.",
+    image: regalo1FormulaGramatica,
   },
   {
     icon: Globe,
-    title: "Regalo 2: Diccionario Alfabético",
-    description: "5,000 palabras organizadas alfabéticamente con pronunciación adaptada. Ideal para consultas rápidas.",
-    image: bonusDiccionario,
+    title: "Regalo 2: Ejemplos de Estructuras para tu Uso Diario (Preguntas)",
+    description:
+      "Aprende a formular preguntas en inglés con estructuras claras: AM/IS/ARE + sujeto + verbo-ing + complemento. Incluye preguntas WH-.",
+    image: regalo2EjemplosPreguntas,
   },
   {
     icon: BookOpen,
-    title: "Regalo 3: Verbo To Be y Más",
-    description: "Tablas prácticas del verbo To Be, artículos (a/an/the) y preposiciones (in/on/at) con ejemplos.",
-    image: bonusArticulos,
+    title: "Regalo 3: Tabla Resumen desde Nivel A1 a B1",
+    description:
+      "Resumen visual de marcas, adjetivos, comparativos y preguntas comunes. Todo lo aprendido desde A1 hasta B1 en un solo lugar.",
+    image: regalo3TablaResumen,
   },
   {
     icon: RefreshCw,
-    title: "Regalo 4: Actualizaciones de por Vida",
+    title: "Regalo 4: Recordatorio de Niveles Anteriores (Conexión A1-A2)",
     description:
-      "Acceso de por vida al contenido con todas las actualizaciones futuras y nuevas versiones sin costo adicional.",
-    image: bonusPreview,
+      "Refuerza adjetivos posesivos, descriptivos y demostrativos (this/that/these/those) con la conexión perfecta entre A1 y A2.",
+    image: regalo4RecordatorioNiveles,
   },
   {
     icon: Globe,
-    title: "Regalo 5: Pago en Moneda Local 🌎",
+    title: "Regalo 5: Mis Notas (Consejos de Crack para ti)",
     description:
-      "Compra desde toda Latinoamérica en tu moneda local (MXN, COP, ARS, PEN, CLP, BOB, UYU y más) con métodos de pago locales.",
-    image: bonusEstructura,
+      "Tabla resumen de todos los condicionales (Zero, First, Second, Third y Mixed) con ejemplos prácticos y espacio para tus notas.",
+    image: regalo5MisNotas,
   },
   {
     icon: Sparkles,
-    title: "Regalo 6: Garantía 7 Días Sin Riesgo",
+    title: "Regalo 6: Audio Libro Próximamente GRATIS",
     description:
-      "Si no te encanta, te devolvemos el 100% de tu dinero. Sin preguntas. Compra con total tranquilidad.",
-    image: bonusPreview,
+      "Audio Libro próximamente como actualización gratuita, ideal para practicar la escucha de las 5,000 palabras de vocabulario.",
+    image: regalo6AudioLibro,
   },
 ];
 const chapters = [

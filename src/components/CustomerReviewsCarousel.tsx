@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import cliente1 from "@/assets/cliente-real-1.webp";
 import cliente2 from "@/assets/cliente-real-2.webp";
 import cliente3 from "@/assets/cliente-real-3.webp";
@@ -35,17 +35,48 @@ const images = [
 export const CustomerReviewsCarousel = () => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const [loaded, setLoaded] = useState<Set<number>>(new Set([0]));
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  // Lazy mount: only initialize carousel/auto-rotate after section enters viewport
+  useEffect(() => {
+    if (!sectionRef.current || visible) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [visible]);
 
   useEffect(() => {
-    if (!api) return;
-    setCurrent(api.selectedScrollSnap());
-    api.on("select", () => setCurrent(api.selectedScrollSnap()));
-    const interval = setInterval(() => api.scrollNext(), 3500);
+    if (!api || !visible) return;
+    const update = () => {
+      const idx = api.selectedScrollSnap();
+      setCurrent(idx);
+      // Preload current + neighbors
+      setLoaded((prev) => {
+        const next = new Set(prev);
+        next.add(idx);
+        next.add((idx + 1) % images.length);
+        next.add((idx - 1 + images.length) % images.length);
+        return next;
+      });
+    };
+    update();
+    api.on("select", update);
+    const interval = setInterval(() => api.scrollNext(), 4000);
     return () => clearInterval(interval);
-  }, [api]);
+  }, [api, visible]);
 
   return (
-    <section className="py-6 md:py-8">
+    <section ref={sectionRef} className="py-6 md:py-8">
       <div className="container px-4 md:px-6">
         <div className="max-w-2xl mx-auto text-center mb-4">
           <div className="inline-flex items-center gap-1.5 mb-2">
@@ -61,18 +92,24 @@ export const CustomerReviewsCarousel = () => {
           </p>
         </div>
 
-        <div className="max-w-md mx-auto">
+        <div className="max-w-xs sm:max-w-sm mx-auto">
           <Carousel setApi={setApi} opts={{ loop: true }} className="relative">
             <CarouselContent>
               {images.map((src, i) => (
                 <CarouselItem key={i}>
-                  <div className="rounded-2xl overflow-hidden border border-border shadow-lg bg-card">
-                    <img
-                      src={src}
-                      alt={`Reseña real de cliente ${i + 1}`}
-                      className="w-full h-auto object-contain"
-                      loading="lazy"
-                    />
+                  <div className="rounded-2xl overflow-hidden border border-border shadow-lg bg-muted aspect-[3/4]">
+                    {loaded.has(i) ? (
+                      <img
+                        src={src}
+                        alt={`Reseña real de cliente ${i + 1}`}
+                        className="w-full h-full object-contain"
+                        loading={i === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={i === 0 ? "high" : "low"}
+                      />
+                    ) : (
+                      <div className="w-full h-full animate-pulse bg-muted" />
+                    )}
                   </div>
                 </CarouselItem>
               ))}

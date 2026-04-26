@@ -268,7 +268,7 @@ export const StickyBuyBar = ({
             {/* Buy Button */}
             <Button
               size="default"
-              className={`whitespace-nowrap h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl text-base px-6 font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+              className={`whitespace-nowrap h-14 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_6px_24px_rgba(16,185,129,0.5)] text-base px-8 font-extrabold tracking-wide transition-all hover:scale-[1.03] active:scale-[0.98] ${pulse ? 'ring-4 ring-emerald-400/40 scale-[1.02]' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
               onClick={handleBuy}
               disabled={disabled || isLoading}
             >

@@ -643,15 +643,17 @@ const Product5000 = () => {
             <div className="text-center mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-bold mb-3">
                 <Gift className="w-4 h-4" />
-                INCLUIDOS GRATIS
+                INCLUIDOS GRATIS • LATINOAMÉRICA 🌎
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                🎁 4 Bonus que Recibes HOY
+                🎁 6 Regalos Para Ti
               </h2>
-              <p className="text-muted-foreground mt-2">Valorados en $44 USD — GRATIS con tu compra</p>
+              <p className="text-muted-foreground mt-2">
+                Incluye <span className="font-bold text-foreground">estructuras gramaticales</span> + pago en tu moneda local. Valorados en <span className="line-through">$62 USD</span> — <span className="font-bold text-accent">GRATIS</span> con tu compra hoy.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {bonuses.map((bonus, i) => (
                 <motion.div
                   key={i}

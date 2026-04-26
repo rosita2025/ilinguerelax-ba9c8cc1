@@ -400,7 +400,11 @@ const Product5000 = () => {
                 </div>
                 <img
                   src={heroImages[currentHeroImage]}
-                  alt="Inglés Relax - 5,000 Palabras"
+                  alt={
+                    currentHeroImage === 0
+                      ? "Inglés Relax 5,000 palabras - Libro digital con pronunciación para hispanohablantes y fonética UK/USA"
+                      : "Inglés Relax 5,000 palabras - Aprende inglés en 6 meses con estructuras gramaticales desde cero hasta intermedio"
+                  }
                   className="w-full h-auto rounded-2xl shadow-hero transition-opacity duration-500"
                 />
                 {/* Mini gallery thumbnails */}
@@ -413,7 +417,11 @@ const Product5000 = () => {
                         setCurrentHeroImage(idx);
                         setIsAutoPlay(false);
                       }}
-                      aria-label={`Ver imagen ${idx + 1}`}
+                      aria-label={
+                        idx === 0
+                          ? "Ver portada: 5,000 palabras inglés con pronunciación y fonética UK/USA"
+                          : "Ver beneficios: aprende inglés en 6 meses con estructuras gramaticales"
+                      }
                       className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
                         currentHeroImage === idx
                           ? "border-primary ring-2 ring-primary/30 scale-105"
@@ -422,7 +430,11 @@ const Product5000 = () => {
                     >
                       <img
                         src={img}
-                        alt={`Miniatura ${idx + 1}`}
+                        alt={
+                          idx === 0
+                            ? "Miniatura: Inglés Relax 5,000 palabras digital con fonética UK/USA"
+                            : "Miniatura: aprende inglés en 6 meses con estructuras gramaticales y pronunciación para hispanohablantes"
+                        }
                         className="w-full h-full object-cover"
                       />
                     </button>

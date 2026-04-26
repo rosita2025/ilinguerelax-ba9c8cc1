@@ -399,6 +399,28 @@ const Product5000 = () => {
                   alt="Inglés Relax - 5,000 Palabras"
                   className="w-full h-auto rounded-2xl shadow-hero transition-opacity duration-500"
                 />
+                {/* Mini gallery thumbnails */}
+                <div className="flex items-center justify-center gap-3 mt-4">
+                  {heroImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setCurrentHeroImage(idx)}
+                      aria-label={`Ver imagen ${idx + 1}`}
+                      className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                        currentHeroImage === idx
+                          ? "border-primary ring-2 ring-primary/30 scale-105"
+                          : "border-border opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Miniatura ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 

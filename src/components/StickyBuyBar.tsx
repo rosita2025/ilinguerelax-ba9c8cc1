@@ -189,7 +189,7 @@ export const StickyBuyBar = ({
                   </span>
                   <span className="flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-emerald-600" />
-                    {lang === "en" ? "30-day guarantee" : "Garantía 30 días"}
+                    {lang === "en" ? "6-day guarantee" : "Garantía 6 días"}
                   </span>
                 </div>
               )}

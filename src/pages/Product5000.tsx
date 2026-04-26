@@ -204,7 +204,15 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  
+  const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
+  const [currentHeroImage, setCurrentHeroImage] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentHeroImage((i) => (i + 1) % heroImages.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(

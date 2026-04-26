@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -45,8 +45,6 @@ import {
   Zap,
   Sparkles,
   Shield,
-  Pause,
-  Play,
 } from "lucide-react";
 import { motion } from "framer-motion";
 

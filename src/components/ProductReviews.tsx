@@ -26,18 +26,30 @@ import reviewBookReal1 from "@/assets/review-book-real-1.jpg";
 import reviewBookReal2 from "@/assets/review-book-real-2.jpg";
 import reviewBookReal3 from "@/assets/review-book-real-3.jpg";
 
-// Testimonial screenshot images - English product
+// Real customer testimonial photos (WhatsApp + Hotmart screenshots)
+import clienteReal1 from "@/assets/cliente-real-1.webp";
+import clienteReal2 from "@/assets/cliente-real-2.webp";
+import clienteReal3 from "@/assets/cliente-real-3.webp";
+import clienteReal4 from "@/assets/cliente-real-4.webp";
+import clienteReal5 from "@/assets/cliente-real-5.webp";
+import clienteReal6 from "@/assets/cliente-real-6.webp";
+import clienteReal7 from "@/assets/cliente-real-7.webp";
+import clienteReal8 from "@/assets/cliente-real-8.webp";
+import clienteReal9 from "@/assets/cliente-real-9.webp";
+import clienteReal10 from "@/assets/cliente-real-10.webp";
+
+// Testimonial screenshot images - English product (real verified customers)
 const englishTestimonials = [
-  "https://images.loox.io/uploads/2025/11/23/tQUUkUAf_.jpg",
-  "https://images.loox.io/uploads/2025/11/23/IiDiyw9-U.jpg",
-  "https://images.loox.io/uploads/2025/11/23/GcNv27Ltw.jpg",
-  "https://images.loox.io/uploads/2025/11/23/6IAXeCS3b.jpg",
-  "https://images.loox.io/uploads/2025/11/23/mJSaAZynx.jpg",
-  "https://images.loox.io/uploads/2025/11/23/BWXo4KTI7Q.jpg",
-  "https://images.loox.io/uploads/2025/11/23/r5UcoWJcpE.jpg",
-  "https://images.loox.io/uploads/2025/11/23/-dLV0FCgkX.jpg",
-  "https://images.loox.io/uploads/2025/11/23/O3AgBj_If.jpg",
-  "https://images.loox.io/uploads/2025/11/23/smyzA3a5t.jpg",
+  clienteReal1,
+  clienteReal2,
+  clienteReal3,
+  clienteReal4,
+  clienteReal5,
+  clienteReal6,
+  clienteReal7,
+  clienteReal8,
+  clienteReal9,
+  clienteReal10,
 ];
 
 // Testimonial images - English 8000 product (for Spanish speakers)

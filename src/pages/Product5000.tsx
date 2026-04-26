@@ -141,28 +141,42 @@ const features = [
 const bonuses = [
   {
     icon: BookOpen,
-    title: "Bonus 1: Estructura de Frases",
+    title: "Regalo 1: Estructuras Gramaticales",
     description:
-      "Aprende la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Incluye ejemplos y pronunciación.",
+      "Domina la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Gramática paso a paso con ejemplos y pronunciación.",
     image: bonusEstructura,
   },
   {
     icon: Globe,
-    title: "Bonus 2: Diccionario Alfabético",
+    title: "Regalo 2: Diccionario Alfabético",
     description: "5,000 palabras organizadas alfabéticamente con pronunciación adaptada. Ideal para consultas rápidas.",
     image: bonusDiccionario,
   },
   {
     icon: BookOpen,
-    title: "Bonus 3: Verbo To Be y Más",
+    title: "Regalo 3: Verbo To Be y Más",
     description: "Tablas prácticas del verbo To Be, artículos (a/an/the) y preposiciones (in/on/at) con ejemplos.",
     image: bonusArticulos,
   },
   {
     icon: RefreshCw,
-    title: "Bonus 4: Vista Previa del Libro",
+    title: "Regalo 4: Actualizaciones de por Vida",
     description:
       "Acceso de por vida al contenido con todas las actualizaciones futuras y nuevas versiones sin costo adicional.",
+    image: bonusPreview,
+  },
+  {
+    icon: Globe,
+    title: "Regalo 5: Pago en Moneda Local 🌎",
+    description:
+      "Compra desde toda Latinoamérica en tu moneda local (MXN, COP, ARS, PEN, CLP, BOB, UYU y más) con métodos de pago locales.",
+    image: bonusEstructura,
+  },
+  {
+    icon: Sparkles,
+    title: "Regalo 6: Garantía 7 Días Sin Riesgo",
+    description:
+      "Si no te encanta, te devolvemos el 100% de tu dinero. Sin preguntas. Compra con total tranquilidad.",
     image: bonusPreview,
   },
 ];
@@ -399,7 +413,7 @@ const Product5000 = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
                 >
                   <Gift className="w-4 h-4" />
-                  <span>4 Bonus Gratis</span>
+                  <span>6 Regalos Gratis</span>
                 </motion.div>
               </div>
 
@@ -470,21 +484,21 @@ const Product5000 = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground font-medium">🎁 Bonus 1: Estructura de Frases</span>
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 1: Estructuras Gramaticales</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$12</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground font-medium">🎁 Bonus 2: Diccionario Alfabético</span>
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 2: Diccionario Alfabético</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$12</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground font-medium">🎁 Bonus 3: Verbo To Be y Artículos</span>
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 3: Verbo To Be y Artículos</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$10</span>
                   </div>
@@ -492,29 +506,43 @@ const Product5000 = () => {
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
                       <span className="text-sm text-foreground font-medium">
-                        🎁 Bonus 4: Actualizaciones de por vida
+                        🎁 Regalo 4: Actualizaciones de por vida
                       </span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$10</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 5: Pago en Moneda Local 🌎</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$8</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 6: Garantía 7 Días Sin Riesgo</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$10</span>
                   </div>
                   <div className="border-t border-border pt-2 mt-1 flex items-center justify-between">
                     <span className="text-sm font-bold text-foreground">Valor total:</span>
-                    <span className="text-sm font-bold text-muted-foreground line-through">$89 USD</span>
+                    <span className="text-sm font-bold text-muted-foreground line-through">$107 USD</span>
                   </div>
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
-                  <span className="text-2xl text-muted-foreground line-through">$89</span>
+                  <span className="text-2xl text-muted-foreground line-through">$107</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
                   >
-                    AHORRA 86%
+                    AHORRA 89%
                   </motion.span>
                 </div>
-                <p className="text-sm text-muted-foreground">💳 Pago único • 4 Bonus GRATIS • Acceso de por vida</p>
+                <p className="text-sm text-muted-foreground">💳 Pago único • 6 Regalos GRATIS • Paga en tu moneda local 🌎</p>
               </motion.div>
 
               {/* Stock Counter - Scarcity */}
@@ -615,15 +643,17 @@ const Product5000 = () => {
             <div className="text-center mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-bold mb-3">
                 <Gift className="w-4 h-4" />
-                INCLUIDOS GRATIS
+                INCLUIDOS GRATIS • LATINOAMÉRICA 🌎
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                🎁 4 Bonus que Recibes HOY
+                🎁 6 Regalos Para Ti
               </h2>
-              <p className="text-muted-foreground mt-2">Valorados en $44 USD — GRATIS con tu compra</p>
+              <p className="text-muted-foreground mt-2">
+                Incluye <span className="font-bold text-foreground">estructuras gramaticales</span> + pago en tu moneda local. Valorados en <span className="line-through">$62 USD</span> — <span className="font-bold text-accent">GRATIS</span> con tu compra hoy.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {bonuses.map((bonus, i) => (
                 <motion.div
                   key={i}
@@ -664,7 +694,7 @@ const Product5000 = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-lg mx-auto text-center">
             <p className="text-muted-foreground text-sm mb-3">
-              📦 Todo esto por solo <span className="font-bold text-foreground">$12 USD</span> en vez de <span className="line-through">$89</span>
+              🌎 Compra desde toda Latinoamérica en tu moneda local — solo <span className="font-bold text-foreground">$12 USD</span> en vez de <span className="line-through">$107</span>
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button

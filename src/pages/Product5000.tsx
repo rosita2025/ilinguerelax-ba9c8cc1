@@ -21,6 +21,7 @@ import { ComparisonTable } from "@/components/ComparisonTable";
 import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
+import { CustomerReviewsCarousel } from "@/components/CustomerReviewsCarousel";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -746,6 +747,8 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
+
+      <CustomerReviewsCarousel />
 
       <CompactBuyCard
         title="Inglés Relax 5,000"

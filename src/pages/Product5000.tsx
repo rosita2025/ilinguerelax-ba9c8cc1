@@ -694,7 +694,7 @@ const Product5000 = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-lg mx-auto text-center">
             <p className="text-muted-foreground text-sm mb-3">
-              📦 Todo esto por solo <span className="font-bold text-foreground">$12 USD</span> en vez de <span className="line-through">$89</span>
+              🌎 Compra desde toda Latinoamérica en tu moneda local — solo <span className="font-bold text-foreground">$12 USD</span> en vez de <span className="line-through">$107</span>
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button

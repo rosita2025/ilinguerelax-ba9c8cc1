@@ -674,15 +674,6 @@ const Product5000 = () => {
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewGramatica} alt="Gramática" className="w-full h-full object-cover object-top" />
-                </div>
-                <div className="p-3 text-center">
-                  <h4 className="font-bold text-foreground text-sm">Estructura Gramatical</h4>
-                  <p className="text-xs text-muted-foreground">Sujeto + Verbo TO BE + Sustantivos</p>
-                </div>
-              </div>
-              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden">
                   <img src={previewVocabulario} alt="Vocabulario" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">

@@ -287,7 +287,7 @@ export const CartDrawer = () => {
                         const hasPhysical = items.some((item) =>
                           PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
                         );
-                        return "Continuar de Pago";
+                        return "Checkout securely";
                       })()}
                     </>
                 }

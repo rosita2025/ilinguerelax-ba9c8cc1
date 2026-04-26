@@ -118,7 +118,12 @@ export const StickyBuyBar = ({
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-bold text-foreground">{price}</span>
               {originalPrice && (
-                <span className="text-xs text-muted-foreground line-through">{originalPrice}</span>
+                <>
+                  <span className="text-xs text-muted-foreground line-through">{originalPrice}</span>
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full">
+                    -50%
+                  </span>
+                </>
               )}
               <span className="text-[10px] text-muted-foreground">USD</span>
             </div>
@@ -154,7 +159,7 @@ export const StickyBuyBar = ({
             <div className="flex flex-col gap-1.5 w-full">
               <Button
                 size="default"
-                className={`w-full h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg text-sm font-bold ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                className={`w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] text-base font-extrabold tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 disabled={disabled || isLoading}
               >
@@ -165,12 +170,29 @@ export const StickyBuyBar = ({
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="w-4 h-4 mr-1.5" />
+                    <ShoppingCart className="w-5 h-5 mr-2" />
                     {ctaText}
-                    {disabled ? <Clock className="w-4 h-4 ml-1.5" /> : <ArrowRight className="w-4 h-4 ml-1.5" />}
+                    {disabled ? <Clock className="w-4 h-4 ml-2" /> : <ArrowRight className="w-5 h-5 ml-2" />}
                   </>
                 )}
               </Button>
+              {/* Mobile trust microcopy */}
+              {!disabled && !secondaryCtaText && (
+                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Shield className="w-3 h-3 text-emerald-600" />
+                    {lang === "en" ? "Secure" : "Pago Seguro"}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    {lang === "en" ? "Instant access" : "Acceso inmediato"}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3 text-emerald-600" />
+                    {lang === "en" ? "30-day guarantee" : "Garantía 30 días"}
+                  </span>
+                </div>
+              )}
               {secondaryCtaText && onSecondaryClick && (
                 <Button
                   size="default"

@@ -86,6 +86,12 @@ export const StickyBuyBar = ({
       <div className="container px-3 sm:px-4 py-1.5 lg:py-3">
         {/* Mobile & Tablet: Vertical Stack Layout */}
         <div className="flex lg:hidden flex-col gap-1.5">
+          {/* Product name (mobile) */}
+          {productName && (
+            <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">
+              {productName}
+            </p>
+          )}
           {/* Row 1: Price + Reviews compacto en una línea */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1.5">

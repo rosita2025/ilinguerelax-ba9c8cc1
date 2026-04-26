@@ -894,6 +894,8 @@ const Product5000 = () => {
         </div>
       </section>
 
+      <ProductReviews productType="english" />
+
       {/* FAQ Section */}
       <FAQ
         items={[

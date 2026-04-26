@@ -6,6 +6,8 @@ import { Footer } from "@/components/Footer";
 const product5000BookImg = "/images/product-5000-book.webp";
 import productoPrincipalInglesRelax from "@/assets/producto-principal-ingles-relax.webp";
 import emocionaInglesRelax from "@/assets/emociona-ingles-relax.webp";
+import thumbProductoPrincipal from "@/assets/thumb-producto-principal.webp";
+import thumbEmociona from "@/assets/thumb-emociona.webp";
 import reviewFb1 from "@/assets/review-fb-1.jpg";
 import reviewFb2 from "@/assets/review-fb-2.jpg";
 import reviewFb3 from "@/assets/review-fb-3.jpg";
@@ -205,6 +207,7 @@ const Product5000 = () => {
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
+  const heroThumbs = [thumbProductoPrincipal, thumbEmociona];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
@@ -429,7 +432,11 @@ const Product5000 = () => {
                       }`}
                     >
                       <img
-                        src={img}
+                        src={heroThumbs[idx]}
+                        width={36}
+                        height={36}
+                        loading="lazy"
+                        decoding="async"
                         alt={
                           idx === 0
                             ? "Miniatura: Inglés Relax 5,000 palabras digital con fonética UK/USA"

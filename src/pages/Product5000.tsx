@@ -432,7 +432,11 @@ const Product5000 = () => {
                       }`}
                     >
                       <img
-                        src={img}
+                        src={heroThumbs[idx]}
+                        width={36}
+                        height={36}
+                        loading="lazy"
+                        decoding="async"
                         alt={
                           idx === 0
                             ? "Miniatura: Inglés Relax 5,000 palabras digital con fonética UK/USA"

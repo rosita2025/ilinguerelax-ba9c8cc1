@@ -141,28 +141,42 @@ const features = [
 const bonuses = [
   {
     icon: BookOpen,
-    title: "Bonus 1: Estructura de Frases",
+    title: "Regalo 1: Estructuras Gramaticales",
     description:
-      "Aprende la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Incluye ejemplos y pronunciación.",
+      "Domina la fórmula completa: Sujeto + Verbo + Artículo + Objeto + Preposición + Lugar. Gramática paso a paso con ejemplos y pronunciación.",
     image: bonusEstructura,
   },
   {
     icon: Globe,
-    title: "Bonus 2: Diccionario Alfabético",
+    title: "Regalo 2: Diccionario Alfabético",
     description: "5,000 palabras organizadas alfabéticamente con pronunciación adaptada. Ideal para consultas rápidas.",
     image: bonusDiccionario,
   },
   {
     icon: BookOpen,
-    title: "Bonus 3: Verbo To Be y Más",
+    title: "Regalo 3: Verbo To Be y Más",
     description: "Tablas prácticas del verbo To Be, artículos (a/an/the) y preposiciones (in/on/at) con ejemplos.",
     image: bonusArticulos,
   },
   {
     icon: RefreshCw,
-    title: "Bonus 4: Vista Previa del Libro",
+    title: "Regalo 4: Actualizaciones de por Vida",
     description:
       "Acceso de por vida al contenido con todas las actualizaciones futuras y nuevas versiones sin costo adicional.",
+    image: bonusPreview,
+  },
+  {
+    icon: Globe,
+    title: "Regalo 5: Pago en Moneda Local 🌎",
+    description:
+      "Compra desde toda Latinoamérica en tu moneda local (MXN, COP, ARS, PEN, CLP, BOB, UYU y más) con métodos de pago locales.",
+    image: bonusEstructura,
+  },
+  {
+    icon: Sparkles,
+    title: "Regalo 6: Garantía 7 Días Sin Riesgo",
+    description:
+      "Si no te encanta, te devolvemos el 100% de tu dinero. Sin preguntas. Compra con total tranquilidad.",
     image: bonusPreview,
   },
 ];

@@ -395,8 +395,21 @@ const Product5000 = () => {
                       ? "Inglés Relax 5,000 palabras - Libro digital con pronunciación para hispanohablantes y fonética UK/USA"
                       : "Inglés Relax 5,000 palabras - Aprende inglés en 6 meses con estructuras gramaticales desde cero hasta intermedio"
                   }
-                  className="w-full h-auto rounded-2xl shadow-hero transition-opacity duration-500"
+                  className="w-full h-auto rounded-2xl shadow-hero"
+                  loading="eager"
+                  decoding="async"
                 />
+                {/* Preload other hero images for instant switching */}
+                {heroImages.map((img, idx) =>
+                  idx === currentHeroImage ? null : (
+                    <link key={idx} rel="preload" as="image" href={img} />
+                  )
+                )}
+                <div className="hidden">
+                  {heroImages.map((img, idx) => (
+                    <img key={idx} src={img} alt="" aria-hidden="true" />
+                  ))}
+                </div>
                 {/* Mini gallery thumbnails */}
                 <div className="flex items-center justify-center gap-2 mt-3">
                   {heroImages.map((img, idx) => (
@@ -409,9 +422,9 @@ const Product5000 = () => {
                           ? "Ver portada: 5,000 palabras inglés con pronunciación y fonética UK/USA"
                           : "Ver beneficios: aprende inglés en 6 meses con estructuras gramaticales"
                       }
-                      className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                      className={`relative w-9 h-9 rounded-full overflow-hidden border-2 transition-all ${
                         currentHeroImage === idx
-                          ? "border-primary ring-1 ring-primary/30"
+                          ? "border-primary ring-1 ring-primary/40"
                           : "border-border opacity-70 hover:opacity-100"
                       }`}
                     >

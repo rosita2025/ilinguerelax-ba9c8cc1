@@ -45,6 +45,8 @@ import {
   Zap,
   Sparkles,
   Shield,
+  Pause,
+  Play,
 } from "lucide-react";
 import { motion } from "framer-motion";
 

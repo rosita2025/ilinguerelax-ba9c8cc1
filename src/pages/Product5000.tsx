@@ -769,8 +769,6 @@ const Product5000 = () => {
       {/* Cross-sell: Other Product Option */}
       <ProductCrossSell currentProduct="5000" lang="es" />
 
-      <ProductReviews productType="english" />
-
       {/* FAQ Section */}
       <FAQ
         items={[

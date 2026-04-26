@@ -413,7 +413,7 @@ const Product5000 = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
                 >
                   <Gift className="w-4 h-4" />
-                  <span>4 Bonus Gratis</span>
+                  <span>6 Regalos Gratis</span>
                 </motion.div>
               </div>
 
@@ -484,21 +484,21 @@ const Product5000 = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground font-medium">🎁 Bonus 1: Estructura de Frases</span>
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 1: Estructuras Gramaticales</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$12</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground font-medium">🎁 Bonus 2: Diccionario Alfabético</span>
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 2: Diccionario Alfabético</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$12</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground font-medium">🎁 Bonus 3: Verbo To Be y Artículos</span>
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 3: Verbo To Be y Artículos</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$10</span>
                   </div>
@@ -506,29 +506,43 @@ const Product5000 = () => {
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-accent flex-shrink-0" />
                       <span className="text-sm text-foreground font-medium">
-                        🎁 Bonus 4: Actualizaciones de por vida
+                        🎁 Regalo 4: Actualizaciones de por vida
                       </span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$10</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 5: Pago en Moneda Local 🌎</span>
+                    </div>
+                    <span className="text-sm line-through text-muted-foreground">$8</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-sm text-foreground font-medium">🎁 Regalo 6: Garantía 7 Días Sin Riesgo</span>
                     </div>
                     <span className="text-sm line-through text-muted-foreground">$10</span>
                   </div>
                   <div className="border-t border-border pt-2 mt-1 flex items-center justify-between">
                     <span className="text-sm font-bold text-foreground">Valor total:</span>
-                    <span className="text-sm font-bold text-muted-foreground line-through">$89 USD</span>
+                    <span className="text-sm font-bold text-muted-foreground line-through">$107 USD</span>
                   </div>
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
-                  <span className="text-2xl text-muted-foreground line-through">$89</span>
+                  <span className="text-2xl text-muted-foreground line-through">$107</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
                   >
-                    AHORRA 86%
+                    AHORRA 89%
                   </motion.span>
                 </div>
-                <p className="text-sm text-muted-foreground">💳 Pago único • 4 Bonus GRATIS • Acceso de por vida</p>
+                <p className="text-sm text-muted-foreground">💳 Pago único • 6 Regalos GRATIS • Paga en tu moneda local 🌎</p>
               </motion.div>
 
               {/* Stock Counter - Scarcity */}

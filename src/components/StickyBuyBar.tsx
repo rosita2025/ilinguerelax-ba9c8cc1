@@ -100,11 +100,11 @@ export const StickyBuyBar = ({
       {!disabled && !showEmailSubscription && (
         <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-3 text-center">
           <p className="text-[11px] lg:text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 animate-pulse">
-            <Zap className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-amber-300 text-amber-300" />
+            <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
             {isPhysical
               ? (lang === "en" ? "LIMITED OFFER • Fast Physical Shipping" : "OFERTA LIMITADA • Envío Físico Rápido")
               : (lang === "en" ? "LIMITED OFFER • Instant Digital Delivery" : "OFERTA LIMITADA • Entrega Digital Inmediata")}
-            <Zap className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-amber-300 text-amber-300" />
+            <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
           </p>
         </div>
       )}

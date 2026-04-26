@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -204,7 +204,15 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  
+  const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
+  const [currentHeroImage, setCurrentHeroImage] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentHeroImage((i) => (i + 1) % heroImages.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -387,9 +395,9 @@ const Product5000 = () => {
                   VISTA PREVIA O DEMO
                 </div>
                 <img
-                  src={product5000Image}
+                  src={heroImages[currentHeroImage]}
                   alt="Inglés Relax - 5,000 Palabras"
-                  className="w-full h-auto rounded-2xl shadow-hero"
+                  className="w-full h-auto rounded-2xl shadow-hero transition-opacity duration-500"
                 />
               </div>
             </div>

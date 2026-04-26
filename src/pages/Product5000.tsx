@@ -453,23 +453,23 @@ const Product5000 = () => {
             {/* Product Info */}
             <div>
               {/* Trending & Bonus Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
+              <div className="flex flex-nowrap items-center gap-2 mb-3 -mt-1">
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-bold border border-red-500/20"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 md:px-4 md:py-2 rounded-full bg-red-500/10 text-red-600 text-[11px] md:text-sm font-bold border border-red-500/20 whitespace-nowrap"
                 >
-                  <Zap className="w-4 h-4" />
+                  <Zap className="w-3 h-3 md:w-4 md:h-4" />
                   <span>🔥 MÁS VENDIDO</span>
                 </motion.div>
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 md:px-4 md:py-2 rounded-full bg-accent/10 text-accent text-[11px] md:text-sm font-medium whitespace-nowrap"
                 >
-                  <Gift className="w-4 h-4" />
+                  <Gift className="w-3 h-3 md:w-4 md:h-4" />
                   <span>6 Regalos Gratis</span>
                 </motion.div>
               </div>

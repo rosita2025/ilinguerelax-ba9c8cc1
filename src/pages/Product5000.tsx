@@ -4,7 +4,8 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 const product5000BookImg = "/images/product-5000-book.webp";
-import ebookMockup from "@/assets/ebook-5000-mockup.png";
+import productoPrincipalInglesRelax from "@/assets/producto-principal-ingles-relax.webp";
+import emocionaInglesRelax from "@/assets/emociona-ingles-relax.webp";
 import reviewFb1 from "@/assets/review-fb-1.jpg";
 import reviewFb2 from "@/assets/review-fb-2.jpg";
 import reviewFb3 from "@/assets/review-fb-3.jpg";
@@ -52,7 +53,7 @@ import previewIndice from "@/assets/preview-indice.png";
 import previewGramatica from "@/assets/preview-gramatica-estructura.png";
 import previewFrases from "@/assets/preview-frases-verbos.png";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
-const product5000Image = "/images/product-5000.webp";
+const product5000Image = productoPrincipalInglesRelax;
 
 // Bonus images
 import bonusEstructura from "@/assets/bonus-estructura.png";

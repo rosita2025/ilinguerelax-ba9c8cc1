@@ -407,7 +407,10 @@ const Product5000 = () => {
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setCurrentHeroImage(idx)}
+                      onClick={() => {
+                        setCurrentHeroImage(idx);
+                        setIsAutoPlay(false);
+                      }}
                       aria-label={`Ver imagen ${idx + 1}`}
                       className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
                         currentHeroImage === idx
@@ -422,6 +425,18 @@ const Product5000 = () => {
                       />
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setIsAutoPlay((p) => !p)}
+                    aria-label={isAutoPlay ? "Pausar slider" : "Reanudar slider"}
+                    className="ml-1 w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors"
+                  >
+                    {isAutoPlay ? (
+                      <Pause className="w-4 h-4" />
+                    ) : (
+                      <Play className="w-4 h-4 ml-0.5" />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>

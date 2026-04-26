@@ -523,6 +523,7 @@ const Product5000Book = () => {
         secondaryCtaText="Comprar en Amazon"
         onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
         showReviews={false}
+        isPhysical={true}
       />
       <SalesNotification />
       <ScrollToTop />

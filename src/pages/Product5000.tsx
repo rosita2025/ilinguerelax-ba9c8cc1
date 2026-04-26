@@ -387,9 +387,9 @@ const Product5000 = () => {
                   VISTA PREVIA O DEMO
                 </div>
                 <img
-                  src={product5000Image}
+                  src={heroImages[currentHeroImage]}
                   alt="Inglés Relax - 5,000 Palabras"
-                  className="w-full h-auto rounded-2xl shadow-hero"
+                  className="w-full h-auto rounded-2xl shadow-hero transition-opacity duration-500"
                 />
               </div>
             </div>

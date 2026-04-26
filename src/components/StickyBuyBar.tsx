@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart } from "lucide-react";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart, Zap, TrendingUp } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;
@@ -48,6 +48,17 @@ export const StickyBuyBar = ({
 }: StickyBuyBarProps) => {
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
+  const [pulse, setPulse] = useState(false);
+
+  // Subtle pulse every 6s to grab attention without being annoying
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPulse(true);
+      setTimeout(() => setPulse(false), 1200);
+    }, 6000);
+    return () => clearInterval(id);
+  }, []);
+
   const handleBuy = () => {
     if (!disabled && !isLoading) {
       if (onBuyClick) {

@@ -93,8 +93,18 @@ export const StickyBuyBar = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
-      <div className="container px-3 sm:px-4 py-1.5 lg:py-3">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+      {/* Top urgency strip - high visibility */}
+      {!disabled && !showEmailSubscription && (
+        <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-3 text-center">
+          <p className="text-[11px] lg:text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 animate-pulse">
+            <Zap className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-amber-300 text-amber-300" />
+            {lang === "en" ? "LIMITED OFFER • Instant Digital Delivery" : "OFERTA LIMITADA • Entrega Digital Inmediata"}
+            <Zap className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-amber-300 text-amber-300" />
+          </p>
+        </div>
+      )}
+      <div className="container px-3 sm:px-4 py-2 lg:py-3">
         {/* Mobile & Tablet: Vertical Stack Layout */}
         <div className="flex lg:hidden flex-col gap-1.5">
           {/* Product name (mobile) */}

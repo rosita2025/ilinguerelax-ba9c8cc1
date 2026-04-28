@@ -8,11 +8,19 @@ import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import productSpanish5000Image from "@/assets/product-spanish-5000-v2.png";
 
 // Hotmart checkout URL mapping for digital products
 const HOTMART_CHECKOUT_MAP: Record<string, string> = {
   "gid://shopify/ProductVariant/43094791454781": "https://pay.hotmart.com/U103990323W?checkoutMode=10&bid=1775682596079", // 8,000 Palabras Digital
   "gid://shopify/ProductVariant/43062338191421": "https://pay.hotmart.com/T102978081M?bid=1775682831595", // 1,000 Verbos Digital
+};
+
+const CART_IMAGE_FALLBACKS: Record<string, { url: string; alt: string }> = {
+  "gid://shopify/ProductVariant/42931924795453": {
+    url: productSpanish5000Image,
+    alt: "Spanish Relax - 5,000 Words",
+  },
 };
 
 export const CartDrawer = () => {
@@ -82,6 +90,21 @@ export const CartDrawer = () => {
     toast.info("Cupón eliminado");
   };
 
+  const getCartItemImage = (item: typeof items[number]) => {
+    const primaryImage = item.product.node.images?.edges?.[0]?.node;
+    if (primaryImage?.url) {
+      return {
+        url: primaryImage.url,
+        alt: primaryImage.altText || item.product.node.title,
+      };
+    }
+
+    const fallbackImage = CART_IMAGE_FALLBACKS[item.variantId];
+    if (fallbackImage) return fallbackImage;
+
+    return null;
+  };
+
   return (
     <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
       <SheetTrigger asChild>
@@ -149,13 +172,15 @@ export const CartDrawer = () => {
                   {items.map((item) =>
                 <div key={item.variantId} className="flex gap-4 p-2 border rounded-lg">
                       <div className="w-16 h-16 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center">
-                        {item.product.node.images?.edges?.[0]?.node ?
-                    <img
-                      src={item.product.node.images.edges[0].node.url}
-                      alt={item.product.node.title}
-                      className="w-full h-full object-cover" />
-                    : <ShoppingCart className="h-6 w-6 text-muted-foreground/50" />
-                    }
+                        {(() => {
+                          const image = getCartItemImage(item);
+                          return image ? (
+                            <img
+                              src={image.url}
+                              alt={image.alt}
+                              className="w-full h-full object-cover" />
+                          ) : null;
+                        })()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium truncate text-sm">{item.product.node.title}</h4>

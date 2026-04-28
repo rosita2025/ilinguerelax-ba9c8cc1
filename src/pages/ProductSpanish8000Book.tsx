@@ -444,7 +444,42 @@ const ProductSpanish8000Book = () => {
         </div>
       </section>
 
-      <FAQ />
+      <FAQ
+        title="Pre-Order FAQ"
+        subtitle="Everything you need to know before reserving your copy"
+        items={[
+          {
+            question: "When will the book ship?",
+            answer:
+              "Pre-orders open in June 2026 and books ship shortly after through Amazon's worldwide logistics network.",
+          },
+          {
+            question: "Do I pay now?",
+            answer:
+              "No. Reserving your spot is free. You'll get an email with the Amazon pre-order link when it goes live, at the locked-in $15 price.",
+          },
+          {
+            question: "What happens to the price after launch?",
+            answer:
+              "Once pre-orders close and the book launches publicly, the regular price goes up to $35 USD on Amazon.",
+          },
+          {
+            question: "How does free shipping work?",
+            answer:
+              "Amazon offers free international shipping on qualifying orders over $50 USD. You can add other items to reach the threshold.",
+          },
+          {
+            question: "Is this book for me?",
+            answer:
+              "Yes if you're an English speaker who wants to learn Spanish. Every word includes English pronunciation and English-Spanish translation.",
+          },
+          {
+            question: "What's inside?",
+            answer:
+              "8,000 Spanish words and expressions, English pronunciation, English-Spanish translations, and grammar formulas from beginner (A1) to advanced (C1).",
+          },
+        ]}
+      />
       <Footer />
       <ScrollToTop />
       <WhatsAppButton />

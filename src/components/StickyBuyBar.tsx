@@ -95,7 +95,7 @@ export const StickyBuyBar = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
       {/* Top urgency strip - high visibility */}
       {!disabled && !showEmailSubscription && (
         <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-3 text-center">

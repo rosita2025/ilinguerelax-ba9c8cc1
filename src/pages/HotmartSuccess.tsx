@@ -50,7 +50,7 @@ const HotmartSuccess = () => {
     } else if (productParam.includes("spanish")) {
       contentName = "Spanish Relax - 5,000 Words";
       contentId = "product-spanish-5000";
-      value = 27.99;
+      value = 29.99;
     }
 
     if (valueParam) {

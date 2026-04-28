@@ -100,7 +100,7 @@ const ProductSpanish5000 = () => {
         description: "",
         handle: "spanish-relax-5-000-words-with-english-pronunciation",
         priceRange: { minVariantPrice: { amount: "29.99", currencyCode: "USD" } },
-        images: { edges: [] },
+        images: { edges: [{ node: { url: productSpanish5000Image, altText: "Spanish Relax - 5,000 Words" } }] },
         variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "29.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
         options: [{ name: "Title", values: ["Default Title"] }]
       }

@@ -240,8 +240,8 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               <Truck className="w-3 h-3" />
               Add the physical book — Free shipping on orders over $50
             </p>
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              Pre-order now at the lowest price ever. Price goes up to $35 in June 2026.
+            <p className="text-[10px] text-muted-foreground leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+              Pre-order from <strong className="text-primary">$15</strong> · goes up to <strong>$35</strong> in June 2026
             </p>
             <div
               key={spanishPhysicalPreorderUpsell.variantId}

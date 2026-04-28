@@ -236,10 +236,25 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         <>
           <div className="border-t border-dashed border-border my-3" />
           <div className="space-y-1.5">
-            <p className="text-xs font-bold text-accent flex items-center gap-1">
-              <Truck className="w-3 h-3" />
-              Add the physical book — Free shipping on orders over $50
-            </p>
+            {(() => {
+              const subtotal = items.reduce(
+                (sum, item) => sum + parseFloat(item.price.amount) * item.quantity,
+                0
+              ) + parseFloat(spanishPhysicalPreorderUpsell.price);
+              const FREE_SHIP_THRESHOLD = 44;
+              const remaining = FREE_SHIP_THRESHOLD - subtotal;
+              return remaining <= 0 ? (
+                <p className="text-xs font-bold text-green-600 flex items-center gap-1">
+                  <Truck className="w-3 h-3" />
+                  ✓ You qualify for FREE shipping with the physical book!
+                </p>
+              ) : (
+                <p className="text-xs font-bold text-accent flex items-center gap-1">
+                  <Truck className="w-3 h-3" />
+                  Add ${remaining.toFixed(2)} more for FREE shipping (over $44)
+                </p>
+              );
+            })()}
             <p className="text-[10px] text-muted-foreground leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
               Pre-order from <strong className="text-primary">$15</strong> · goes up to <strong>$35</strong> in June 2026
             </p>

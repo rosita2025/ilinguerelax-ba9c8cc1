@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, Plus, Loader2, Check, Tag } from "lucide-react";
+import { BookOpen, Plus, Loader2, Check, Tag, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
@@ -58,6 +58,18 @@ const spanishUpsellProducts = [
     hotmartUrl: "",
   },
 ];
+
+const spanishPhysicalPreorderUpsell = {
+  title: "Spanish Relax 8,000 Words — Physical Book (PRE-ORDER)",
+  description: "Lock in the lowest price ever — ships June 2026",
+  price: "15.00",
+  compareAtPrice: "35.00",
+  image: "/images/product-spanish-8000-book.webp",
+  variantId: "gid://shopify/ProductVariant/43137345749053",
+  productId: "gid://shopify/Product/7849025568829",
+  handle: "spanish-relax-8-000-words-physical-book-pre-order",
+  hotmartUrl: "",
+};
 
 interface CartUpsellProps {
   items: CartItem[];
@@ -219,6 +231,53 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
           );
         })}
       </div>
+
+      {isSpanishContext && !items.some((item) => item.variantId === spanishPhysicalPreorderUpsell.variantId) && (
+        <>
+          <div className="border-t border-dashed border-border my-3" />
+          <div className="space-y-1.5">
+            <p className="text-xs font-bold text-accent flex items-center gap-1">
+              <Truck className="w-3 h-3" />
+              Add the physical book — Free shipping on orders over $50
+            </p>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              Pre-order now at the lowest price ever. Price goes up to $35 in June 2026.
+            </p>
+            <div
+              key={spanishPhysicalPreorderUpsell.variantId}
+              className={`flex items-center gap-3 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
+                processingId === spanishPhysicalPreorderUpsell.variantId ? "opacity-60 pointer-events-none" : ""
+              }`}
+              onClick={() => {
+                if (processingId === spanishPhysicalPreorderUpsell.variantId) return;
+                handleToggle(spanishPhysicalPreorderUpsell);
+              }}
+            >
+              <img
+                src={spanishPhysicalPreorderUpsell.image}
+                alt={spanishPhysicalPreorderUpsell.title}
+                className="w-10 h-10 rounded object-cover flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">{spanishPhysicalPreorderUpsell.title}</p>
+                <p className="text-[10px] text-muted-foreground">{spanishPhysicalPreorderUpsell.description}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] line-through text-destructive font-medium">${spanishPhysicalPreorderUpsell.compareAtPrice}</span>
+                  <span className="text-xs font-bold text-primary">${spanishPhysicalPreorderUpsell.price}</span>
+                  <span className="text-[9px] bg-accent/20 text-accent font-bold px-1 rounded">PRE-ORDER</span>
+                </div>
+              </div>
+              <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">
+                {processingId === spanishPhysicalPreorderUpsell.variantId ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Plus className="h-3.5 w-3.5 text-accent" />
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

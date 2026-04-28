@@ -515,27 +515,32 @@ const ProductSpanish8000Book = () => {
 
       <FAQ
         title="Pre-Order FAQ"
-        subtitle="Everything you need to know before reserving your copy"
+        subtitle="Everything you need to know about your pre-order"
         items={[
           {
-            question: "When will the book ship?",
+            question: "Can I pre-order now?",
             answer:
-              "Pre-orders open in June 2026 and books ship shortly after through Amazon's worldwide logistics network.",
+              "Yes! Pre-orders are open right now at the special price of $15 USD. Just click 'PRE-ORDER NOW' and complete your purchase securely through our checkout.",
+          },
+          {
+            question: "When will the physical book ship?",
+            answer:
+              "Physical books are scheduled to ship starting June 2026 through our worldwide logistics network. You'll receive tracking information by email as soon as your copy is dispatched.",
           },
           {
             question: "Do I pay now?",
             answer:
-              "No. Reserving your spot is free. You'll get an email with the Amazon pre-order link when it goes live, at the locked-in $15 price.",
+              "Yes. By pre-ordering today you lock in the $15 USD price and reserve your copy from the first print run. Your card is charged at checkout and the book is shipped to you in June 2026.",
           },
           {
             question: "What happens to the price after launch?",
             answer:
-              "Once pre-orders close and the book launches publicly, the regular price goes up to $35 USD on Amazon.",
+              "Once the pre-order window closes and the book launches publicly in June 2026, the regular price goes up to $35 USD. Pre-ordering now is the only way to get it for $15.",
           },
           {
             question: "How does free shipping work?",
             answer:
-              "Amazon offers free international shipping on qualifying orders over $50 USD. You can add other items to reach the threshold.",
+              "We offer free international shipping on orders over $50 USD. You can add other books or products to reach the threshold and ship everything together.",
           },
           {
             question: "Is this book for me?",

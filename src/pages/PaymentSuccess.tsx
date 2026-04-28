@@ -26,7 +26,7 @@ const PaymentSuccess = () => {
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000"],
       content_type: "product",
-      value: 27.99,
+      value: 29.99,
       currency: "USD",
       num_items: 1,
     });

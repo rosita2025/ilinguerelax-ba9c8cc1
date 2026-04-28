@@ -110,7 +110,7 @@ export const products: Product[] = [
     description: "With English Pronunciation",
     rating: 4.8,
     reviews: 500,
-    price: 27.99,
+    price: 29.99,
     originalPrice: 54.00,
     discount: 48,
     badge: "🆕 New",

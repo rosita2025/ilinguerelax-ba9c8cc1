@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -21,12 +21,15 @@ import {
   TrendingUp,
   Mail,
   Loader2,
+  ShoppingCart,
 } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { TrustBadges } from "@/components/TrustBadges";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCartStore } from "@/stores/cartStore";
+import { fetchShopifyProducts } from "@/lib/shopify";
 
 const COVER_IMAGE = "/images/product-spanish-8000-book.webp";
 const COVER_IMAGE_2 = "/images/product-spanish-8000-book-2.webp";
@@ -78,6 +81,46 @@ const ProductSpanish8000Book = () => {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
+  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
+  const { addItem, isLoading: cartLoading } = useCartStore();
+
+  // Fetch Shopify pre-order product
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const products = await fetchShopifyProducts(20, "Spanish Relax 8,000 Pre-Order");
+        const book = products.find((p: any) => {
+          const t = p.node.title.toLowerCase();
+          return t.includes("spanish") && t.includes("8,000") && t.includes("pre-order");
+        }) || products.find((p: any) => p.node.handle === "spanish-relax-8-000-words-physical-book-pre-order");
+        if (book) {
+          setShopifyProduct(book);
+          const variant = book.node.variants.edges[0]?.node;
+          if (variant) setShopifyVariantId(variant.id);
+        }
+      } catch (err) {
+        console.error("Failed to load Shopify pre-order product:", err);
+      }
+    };
+    loadProduct();
+  }, []);
+
+  const handleAddToCart = async () => {
+    if (!shopifyVariantId || !shopifyProduct) {
+      toast.error("Pre-order product is not available yet. Please try again in a moment.");
+      return;
+    }
+    const variant = shopifyProduct.node.variants.edges[0]?.node;
+    await addItem({
+      product: shopifyProduct,
+      variantId: shopifyVariantId,
+      variantTitle: variant?.title || "Default",
+      price: variant?.price || { amount: "15.00", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: variant?.selectedOptions || [],
+    });
+  };
 
   const pixelParams = useMemo(
     () => ({
@@ -274,11 +317,40 @@ const ProductSpanish8000Book = () => {
               </motion.div>
 
               {/* Pre-order email signup */}
+              {/* Primary Pre-Order CTA — adds to Shopify cart */}
+              <Button
+                variant="hero"
+                size="xl"
+                className="w-full mb-3 text-lg py-6"
+                onClick={handleAddToCart}
+                disabled={cartLoading || !shopifyVariantId}
+              >
+                {cartLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                ) : (
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                )}
+                {shopifyVariantId ? `PRE-ORDER NOW — $${PREORDER_PRICE}` : "Loading pre-order..."}
+              </Button>
+              <p className="text-xs text-center text-muted-foreground mb-5">
+                Secure checkout via Shopify • Charged today • Ships June 2026
+              </p>
+
+              {/* Optional email reservation (no payment) */}
+              <div className="relative mb-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-3 text-muted-foreground">Or reserve without paying</span>
+                </div>
+              </div>
+
               {!subscribed ? (
                 <form onSubmit={handlePreorder} className="space-y-3 mb-4">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Mail className="w-4 h-4 text-primary" />
-                    Reserve your pre-order spot — we'll email you in June
+                    Not ready to pay? Get the pre-order link by email
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
@@ -291,7 +363,7 @@ const ProductSpanish8000Book = () => {
                     />
                     <Button
                       type="submit"
-                      variant="hero"
+                      variant="outline"
                       size="xl"
                       className="text-base py-3"
                       disabled={submitting}
@@ -299,15 +371,11 @@ const ProductSpanish8000Book = () => {
                       {submitting ? (
                         <Loader2 className="w-5 h-5 animate-spin mr-2" />
                       ) : (
-                        <Clock className="w-5 h-5 mr-2" />
+                        <Mail className="w-5 h-5 mr-2" />
                       )}
-                      RESERVE PRE-ORDER
+                      NOTIFY ME
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    No payment now. We'll send you the Amazon pre-order link in June at the
-                    locked-in ${PREORDER_PRICE} price.
-                  </p>
                 </form>
               ) : (
                 <div className="mb-4 p-5 rounded-xl bg-green-500/10 border-2 border-green-500/30">
@@ -316,7 +384,7 @@ const ProductSpanish8000Book = () => {
                     <div>
                       <p className="font-bold text-foreground">You're on the list! 🎉</p>
                       <p className="text-sm text-muted-foreground">
-                        We'll email you the pre-order link in June at the ${PREORDER_PRICE} price.
+                        We'll email you when your pre-order ships in June.
                       </p>
                     </div>
                   </div>

@@ -3,6 +3,7 @@ import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -551,6 +552,19 @@ const ProductSpanish8000Book = () => {
       <Footer />
       <ScrollToTop />
       <WhatsAppButton />
+      <StickyBuyBar
+        lang="en"
+        productName="Spanish Relax 8,000 Words — Pre-Order"
+        price={`$${PREORDER_PRICE}`}
+        originalPrice={`$${RETAIL_PRICE}`}
+        rating={4.9}
+        reviewCount={1200}
+        ctaText={`PRE-ORDER NOW — $${PREORDER_PRICE}`}
+        onBuyClick={handleAddToCart}
+        isLoading={cartLoading}
+        disabled={!shopifyVariantId}
+        isPhysical={true}
+      />
     </main>
   );
 };

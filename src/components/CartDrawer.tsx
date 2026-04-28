@@ -148,12 +148,13 @@ export const CartDrawer = () => {
                 <div className="space-y-4">
                   {items.map((item) =>
                 <div key={item.variantId} className="flex gap-4 p-2 border rounded-lg">
-                      <div className="w-16 h-16 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                        {item.product.node.images?.edges?.[0]?.node &&
+                      <div className="w-16 h-16 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center">
+                        {item.product.node.images?.edges?.[0]?.node ?
                     <img
                       src={item.product.node.images.edges[0].node.url}
                       alt={item.product.node.title}
                       className="w-full h-full object-cover" />
+                    : <ShoppingCart className="h-6 w-6 text-muted-foreground/50" />
                     }
                       </div>
                       <div className="flex-1 min-w-0">

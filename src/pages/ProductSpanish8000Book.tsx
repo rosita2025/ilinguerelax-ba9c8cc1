@@ -552,6 +552,11 @@ const ProductSpanish8000Book = () => {
             answer:
               "8,000 Spanish words and expressions, English pronunciation, English-Spanish translations, and grammar formulas from beginner (A1) to advanced (C1).",
           },
+          {
+            question: "Need help with your pre-order or shipping tracking?",
+            answer:
+              "Our team is happy to help with any questions about your pre-order, payment, or shipping tracking. Email us at hola@ilinguerelax.com or message us on WhatsApp at +1 575 216 0934 — we usually reply within a few hours.",
+          },
         ]}
       />
       <Footer />

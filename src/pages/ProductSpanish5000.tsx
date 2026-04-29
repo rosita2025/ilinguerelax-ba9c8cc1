@@ -331,14 +331,14 @@ const ProductSpanish5000 = () => {
                   <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
                     <Sparkles className="w-3 h-3" /> Bonus #1
                   </div>
-                  <div className="mt-3 mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
-                    <FileText className="w-6 h-6" />
+                  <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
+                    <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
-                    The 100 Most Common Spanish Slang Words
+                    Complete Spanish Language Exam
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    PDF guide with the everyday slang real Spanish speakers use — sound natural from day one.
+                    A complete PDF exam to test your Spanish vocabulary, grammar, and comprehension — track your real progress.
                   </p>
                   <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
                     <Download className="w-3.5 h-3.5" /> Instant PDF
@@ -356,14 +356,14 @@ const ProductSpanish5000 = () => {
                   <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
                     <Sparkles className="w-3 h-3" /> Bonus #2
                   </div>
-                  <div className="mt-3 mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
-                    <Lightbulb className="w-6 h-6" />
+                  <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
+                    <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
-                    Spanish Pronunciation Cheat Sheet
+                    Daily Study Planner
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    A quick-reference sheet with phonetic rules so you can pronounce any Spanish word with confidence.
+                    A printable planner to organize your daily learning routine and stay consistent without stress.
                   </p>
                   <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
                     <Download className="w-3.5 h-3.5" /> Instant PDF
@@ -381,14 +381,14 @@ const ProductSpanish5000 = () => {
                   <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
                     <Sparkles className="w-3 h-3" /> Bonus #3
                   </div>
-                  <div className="mt-3 mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
-                    <GraduationCap className="w-6 h-6" />
+                  <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
+                    <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
-                    Daily Study Planner
+                    Spanish Pronunciation Cheat Sheet
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    A printable planner to organize your daily learning routine and stay consistent without stress.
+                    A quick-reference sheet with phonetic rules so you can pronounce any Spanish word with confidence.
                   </p>
                   <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
                     <Download className="w-3.5 h-3.5" /> Instant PDF

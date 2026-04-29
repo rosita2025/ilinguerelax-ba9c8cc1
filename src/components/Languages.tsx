@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Clock, Star, Sparkles, ShoppingCart } from "lucide-react";
+import { Clock, Star, Sparkles, ShoppingCart, Download, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { products, comingSoonLanguages, getProductLink, type Product } from "@/data/products";
@@ -7,6 +7,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
 type LangKey = "english" | "spanish" | "portuguese" | "soon";
+type FormatKey = "digital" | "physical";
 
 // Map each product to a language tab
 const getProductLangKey = (p: Product): LangKey => {
@@ -52,6 +53,7 @@ const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabA
 
 export const Languages = () => {
   const { language, formatPrice } = useI18n();
+  const [activeFormat, setActiveFormat] = useState<FormatKey>("digital");
   const [activeTab, setActiveTab] = useState<LangKey>("english");
 
   const renderStars = (rating: number) => {
@@ -81,6 +83,13 @@ export const Languages = () => {
       comingSoon: "Próximamente más idiomas",
       tabs: { english: "Inglés", spanish: "Español", portuguese: "Portugués", soon: "Pronto" },
       soonLabel: "Muy pronto",
+      step1: "1. Elige el formato",
+      step2: "2. Elige el idioma",
+      digital: "Digital",
+      physical: "Físico",
+      digitalDesc: "Descarga inmediata · PDF",
+      physicalDesc: "Libro impreso · Envío",
+      empty: "No hay productos disponibles en esta combinación.",
     },
     en: {
       badge: "Our Products",
@@ -92,6 +101,13 @@ export const Languages = () => {
       comingSoon: "More languages coming soon",
       tabs: { english: "English", spanish: "Spanish", portuguese: "Portuguese", soon: "Coming Soon" },
       soonLabel: "Coming soon",
+      step1: "1. Choose the format",
+      step2: "2. Choose the language",
+      digital: "Digital",
+      physical: "Physical",
+      digitalDesc: "Instant download · PDF",
+      physicalDesc: "Printed book · Shipping",
+      empty: "No products available for this combination.",
     },
     fr: {
       badge: "Nos Produits",
@@ -103,6 +119,13 @@ export const Languages = () => {
       comingSoon: "Plus de langues bientôt",
       tabs: { english: "Anglais", spanish: "Espagnol", portuguese: "Portugais", soon: "Bientôt" },
       soonLabel: "Bientôt disponible",
+      step1: "1. Choisissez le format",
+      step2: "2. Choisissez la langue",
+      digital: "Numérique",
+      physical: "Physique",
+      digitalDesc: "Téléchargement immédiat · PDF",
+      physicalDesc: "Livre imprimé · Livraison",
+      empty: "Aucun produit disponible pour cette combinaison.",
     },
     pt: {
       badge: "Nossos Produtos",
@@ -114,16 +137,26 @@ export const Languages = () => {
       comingSoon: "Mais idiomas em breve",
       tabs: { english: "Inglês", spanish: "Espanhol", portuguese: "Português", soon: "Em breve" },
       soonLabel: "Em breve",
+      step1: "1. Escolha o formato",
+      step2: "2. Escolha o idioma",
+      digital: "Digital",
+      physical: "Físico",
+      digitalDesc: "Download imediato · PDF",
+      physicalDesc: "Livro impresso · Envio",
+      empty: "Nenhum produto disponível nesta combinação.",
     },
   };
 
   const c = content[language];
 
+  // Filter by selected format first, then group by language
   const grouped = useMemo(() => {
     const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], soon: [] };
-    products.forEach((p) => g[getProductLangKey(p)].push(p));
+    products
+      .filter((p) => (activeFormat === "physical" ? p.isPhysical : !p.isPhysical))
+      .forEach((p) => g[getProductLangKey(p)].push(p));
     return g;
-  }, []);
+  }, [activeFormat]);
 
   const tabs: { key: LangKey; flag: string }[] = [
     { key: "english", flag: "🇬🇧" },
@@ -133,6 +166,11 @@ export const Languages = () => {
   ];
 
   const visibleProducts = grouped[activeTab];
+
+  const formats: { key: FormatKey; icon: typeof Download; label: string; desc: string }[] = [
+    { key: "digital", icon: Download, label: c.digital, desc: c.digitalDesc },
+    { key: "physical", icon: BookOpen, label: c.physical, desc: c.physicalDesc },
+  ];
 
   return (
     <section className="py-16 md:py-24 bg-secondary/30">
@@ -149,7 +187,42 @@ export const Languages = () => {
           </p>
         </div>
 
-        {/* Language Tabs */}
+        {/* Step 1: Format Toggle */}
+        <div className="max-w-2xl mx-auto mb-6">
+          <p className="text-center text-sm font-semibold text-muted-foreground mb-3">{c.step1}</p>
+          <div className="grid grid-cols-2 gap-3">
+            {formats.map((f) => {
+              const Icon = f.icon;
+              const isActive = activeFormat === f.key;
+              return (
+                <button
+                  key={f.key}
+                  onClick={() => setActiveFormat(f.key)}
+                  className={cn(
+                    "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left",
+                    isActive
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "border-border bg-card hover:border-primary/40"
+                  )}
+                >
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                    isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  )}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-foreground">{f.label}</div>
+                    <div className="text-xs text-muted-foreground truncate">{f.desc}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Step 2: Language Tabs */}
+        <p className="text-center text-sm font-semibold text-muted-foreground mb-3">{c.step2}</p>
         <div className="flex flex-wrap justify-center gap-2 mb-8">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -179,6 +252,11 @@ export const Languages = () => {
         </div>
 
         {/* Products */}
+        {visibleProducts.length === 0 ? (
+          <div className="max-w-2xl mx-auto mb-12 p-8 text-center rounded-2xl border border-dashed border-border bg-card/50">
+            <p className="text-muted-foreground">{c.empty}</p>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
           {visibleProducts.map((product) => {
             const styles = langStyles[getProductLangKey(product)];
@@ -271,6 +349,7 @@ export const Languages = () => {
             );
           })}
         </div>
+        )}
 
         {/* Coming Soon Languages */}
         <div className="text-center">

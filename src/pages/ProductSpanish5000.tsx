@@ -935,58 +935,6 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Upsell Section */}
-      <section className="py-12 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-2">📚 Complete Your Collection</h2>
-          <p className="text-center text-muted-foreground mb-8">More resources to accelerate your learning</p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* 8,000 Words Digital */}
-            <a href="/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" className="group bg-card border border-border rounded-xl p-4 text-center hover:border-primary/50 hover:shadow-lg transition-all">
-              <img src="/images/product-8000.webp" alt="8,000 Words" className="w-full aspect-[3/4] object-cover rounded-lg mb-3" />
-              <h3 className="font-semibold text-sm mb-1">8,000 Words Digital</h3>
-              <p className="text-xs text-muted-foreground mb-2">Complete vocabulary + grammar</p>
-              <div className="flex items-center justify-center gap-1">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-              </div>
-              <p className="font-bold text-primary mt-1">$20.00</p>
-            </a>
-
-            {/* 5,000 Words Physical Book */}
-            <a href="/products/5-000-palabras-libro-fisico" className="group bg-card border border-border rounded-xl p-4 text-center hover:border-primary/50 hover:shadow-lg transition-all">
-              <img src="/images/product-5000-book.webp" alt="5,000 Words Book" className="w-full aspect-[3/4] object-cover rounded-lg mb-3" />
-              <h3 className="font-semibold text-sm mb-1">5,000 Words Book</h3>
-              <p className="text-xs text-muted-foreground mb-2">📖 Physical + 📱 Digital FREE</p>
-              <div className="flex items-center justify-center gap-1">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-              </div>
-              <p className="font-bold text-primary mt-1">$19.99</p>
-            </a>
-
-            {/* 1,000 Verbos Digital */}
-            <a href="/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion" className="group bg-card border border-border rounded-xl p-4 text-center hover:border-primary/50 hover:shadow-lg transition-all">
-              <img src="/images/product-1000-verbos.webp" alt="1,000 Verbs" className="w-full aspect-[3/4] object-cover rounded-lg mb-3" />
-              <h3 className="font-semibold text-sm mb-1">1,000 Essential Verbs</h3>
-              <p className="text-xs text-muted-foreground mb-2">Present, Past & Future</p>
-              <div className="flex items-center justify-center gap-1">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-              </div>
-              <p className="font-bold text-primary mt-1">$10.00</p>
-            </a>
-
-            {/* 500 Preguntas Digital */}
-            <a href="/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes" className="group bg-card border border-border rounded-xl p-4 text-center hover:border-primary/50 hover:shadow-lg transition-all">
-              <img src="/images/product-500-preguntas.webp" alt="500 Questions" className="w-full aspect-[3/4] object-cover rounded-lg mb-3" />
-              <h3 className="font-semibold text-sm mb-1">500 Questions</h3>
-              <p className="text-xs text-muted-foreground mb-2">Speak without fear</p>
-              <div className="flex items-center justify-center gap-1">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-              </div>
-              <p className="font-bold text-primary mt-1">$10.00</p>
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <FAQ items={[{
       question: "What does \"SPANISH RELAX\" mean?",

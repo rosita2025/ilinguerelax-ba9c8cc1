@@ -178,4 +178,13 @@
   .animate-ticker:hover {
     animation-play-state: paused;
   }
+
+  /* Hide scrollbar (used for horizontally scrollable tab strips on mobile) */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

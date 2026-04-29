@@ -293,6 +293,117 @@ const ProductSpanish5000 = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
               Everything Included
             </h2>
+
+            {/* Bonuses Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-10 rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-6 md:p-10 shadow-card"
+            >
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider mb-4 border border-accent/20">
+                  <Sparkles className="w-4 h-4" />
+                  Limited Time Offer
+                </div>
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">
+                  Master the Spanish Language with{" "}
+                  <span className="text-primary">'Spanish Relax'</span>
+                </h3>
+                <p className="mt-3 text-lg md:text-xl font-semibold text-foreground">
+                  The Ultimate 5,000 Word System{" "}
+                  <span className="text-accent">+ 3 FREE Bonuses!</span>
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Bonus #1 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.05 }}
+                  className="relative bg-card rounded-2xl border border-border p-6 shadow-card hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
+                    <Sparkles className="w-3 h-3" /> Bonus #1
+                  </div>
+                  <div className="mt-3 mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-lg font-bold text-foreground mb-2">
+                    The 100 Most Common Spanish Slang Words
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    PDF guide with the everyday slang real Spanish speakers use — sound natural from day one.
+                  </p>
+                  <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                    <Download className="w-3.5 h-3.5" /> Instant PDF
+                  </div>
+                </motion.div>
+
+                {/* Bonus #2 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="relative bg-card rounded-2xl border border-border p-6 shadow-card hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
+                    <Sparkles className="w-3 h-3" /> Bonus #2
+                  </div>
+                  <div className="mt-3 mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
+                    <Lightbulb className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-lg font-bold text-foreground mb-2">
+                    Spanish Pronunciation Cheat Sheet
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    A quick-reference sheet with phonetic rules so you can pronounce any Spanish word with confidence.
+                  </p>
+                  <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                    <Download className="w-3.5 h-3.5" /> Instant PDF
+                  </div>
+                </motion.div>
+
+                {/* Bonus #3 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.15 }}
+                  className="relative bg-card rounded-2xl border border-border p-6 shadow-card hover:shadow-hero transition-all duration-300"
+                >
+                  <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
+                    <Sparkles className="w-3 h-3" /> Bonus #3
+                  </div>
+                  <div className="mt-3 mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
+                    <GraduationCap className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-lg font-bold text-foreground mb-2">
+                    Daily Study Planner
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    A printable planner to organize your daily learning routine and stay consistent without stress.
+                  </p>
+                  <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                    <Download className="w-3.5 h-3.5" /> Instant PDF
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground">
+                <div className="inline-flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-primary" /> All 3 bonuses included free
+                </div>
+                <span className="hidden md:inline">•</span>
+                <div className="inline-flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-primary" /> Delivered instantly with your purchase
+                </div>
+              </div>
+            </motion.div>
+
             <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
               A complete system to learn Spanish vocabulary with pronunciation adapted for English speakers
             </p>

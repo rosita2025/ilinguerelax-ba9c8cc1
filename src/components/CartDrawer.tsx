@@ -26,8 +26,8 @@ const CART_IMAGE_FALLBACKS: Record<string, { url: string; alt: string }> = {
 // Short display titles + subtitle + compareAt price for cart items
 const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compareAt?: string }> = {
   "gid://shopify/ProductVariant/42931924795453": {
-    title: "5,000 Spanish Words",
-    subtitle: "with English Pronunciation",
+    title: "5,000 Spanish",
+    subtitle: "w/ English pronunciation",
     compareAt: "69.99",
   },
 };
@@ -204,9 +204,9 @@ export const CartDrawer = () => {
                             : null;
                           return (
                             <>
-                              <h4 className="font-medium truncate text-sm">{title}</h4>
+                              <h4 className="font-semibold text-sm leading-tight truncate">{title}</h4>
                               {subtitle ? (
-                                <p className="text-[11px] text-muted-foreground truncate">{subtitle}</p>
+                                <p className="text-[10px] text-muted-foreground leading-tight truncate">{subtitle}</p>
                               ) : item.variantTitle !== "Default Title" ? (
                                 <p className="text-xs text-muted-foreground">{item.variantTitle}</p>
                               ) : null}

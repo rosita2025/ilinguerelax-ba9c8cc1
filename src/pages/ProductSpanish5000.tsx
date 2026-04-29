@@ -755,18 +755,18 @@ const ProductSpanish5000 = () => {
           <div className="text-center mb-10 max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-xs font-bold mb-4 uppercase tracking-wider">
               <Package className="w-4 h-4" />
-              Best Value · Save $13
+              Best Value · Save $18
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Complete the <span className="text-amber-400">Spanish Relax Collection</span>
             </h2>
             <p className="text-base md:text-lg text-slate-300">
-              Words alone aren't enough. Add <strong className="text-white">3,000 Verbs</strong> and <strong className="text-white">Grammar Patterns A1–C1</strong> to build perfect sentences from day one.
+              Build true fluency with all 4 books: <strong className="text-white">5,000 Words</strong>, <strong className="text-white">8,000 Words</strong>, <strong className="text-white">3,000 Verbs</strong> and <strong className="text-white">Grammar Patterns A1–C1</strong>.
             </p>
           </div>
 
           {/* Bundle items grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mb-8">
             {/* Item 1 — current product */}
             <div className="bg-slate-900/60 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-sm">
               <div className="aspect-square bg-gradient-to-br from-purple-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
@@ -781,7 +781,22 @@ const ProductSpanish5000 = () => {
               </div>
             </div>
 
-            {/* Item 2 — 3000 Verbs */}
+            {/* Item 2 — 8,000 Words Physical Book */}
+            <div className="bg-slate-900/60 border border-emerald-500/30 rounded-2xl p-5 backdrop-blur-sm relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black uppercase tracking-wider">+ Add</div>
+              <div className="aspect-square bg-gradient-to-br from-emerald-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
+                <img src="/images/product-spanish-8000-book.webp" alt="8,000 Spanish Words Physical Book" className="max-h-full object-contain" />
+              </div>
+              <div className="inline-block px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase mb-2">Pre-Order</div>
+              <h3 className="text-white font-bold text-sm mb-1">8,000 Words Book</h3>
+              <p className="text-slate-400 text-xs mb-2">Expanded vocabulary · Physical edition</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-white font-bold">$15</span>
+                <span className="text-slate-500 line-through text-xs">$35</span>
+              </div>
+            </div>
+
+            {/* Item 3 — 3000 Verbs */}
             <div className="bg-slate-900/60 border border-cyan-500/30 rounded-2xl p-5 backdrop-blur-sm relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">+ Add</div>
               <div className="aspect-square bg-gradient-to-br from-cyan-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
@@ -796,7 +811,7 @@ const ProductSpanish5000 = () => {
               </div>
             </div>
 
-            {/* Item 3 — Grammar Patterns */}
+            {/* Item 4 — Grammar Patterns */}
             <div className="bg-slate-900/60 border border-amber-500/30 rounded-2xl p-5 backdrop-blur-sm relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase tracking-wider">+ Add</div>
               <div className="aspect-square bg-gradient-to-br from-amber-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
@@ -820,11 +835,11 @@ const ProductSpanish5000 = () => {
                   <Tag className="w-5 h-5 text-amber-400" />
                   <span className="text-amber-300 font-bold text-sm uppercase tracking-wider">Bundle Discount</span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Get All 3 Together</h3>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Get All 4 Together</h3>
                 <div className="flex items-baseline gap-3 justify-center md:justify-start">
-                  <span className="text-4xl md:text-5xl font-black text-amber-400">$49</span>
-                  <span className="text-xl text-slate-400 line-through">$61.99</span>
-                  <span className="px-2 py-1 rounded-md bg-green-500/20 text-green-300 text-xs font-bold">SAVE 21%</span>
+                  <span className="text-4xl md:text-5xl font-black text-amber-400">$59</span>
+                  <span className="text-xl text-slate-400 line-through">$76.99</span>
+                  <span className="px-2 py-1 rounded-md bg-green-500/20 text-green-300 text-xs font-bold">SAVE 23%</span>
                 </div>
                 <p className="text-slate-400 text-xs mt-2">USD · Pre-orders ship June 2026</p>
               </div>

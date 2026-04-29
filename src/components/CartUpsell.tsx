@@ -310,7 +310,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                   />
                   <div className="flex-1 min-w-0">
                     <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
-                      <Package className="w-2.5 h-2.5" /> Físico · Pre-Order
+                      <Package className="w-2.5 h-2.5" /> Physical · Pre-Order
                     </span>
                     <p className="text-xs font-medium truncate">{preorder.title}</p>
                     <p className="text-[10px] text-muted-foreground">{preorder.description}</p>

@@ -34,7 +34,7 @@ import reviewBookToc from "@/assets/review-book-toc.jpg";
 import reviewBookContent from "@/assets/review-book-content.jpg";
 
 // Product image
-import productSpanish5000Image from "@/assets/product-spanish-5000-v2.png";
+import productSpanish5000Image from "@/assets/spanish-5000-cover.webp";
 import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.webp";
 import product3000VerbsImage from "@/assets/product-spanish-3000-verbs-book.webp";
 

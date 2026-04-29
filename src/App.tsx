@@ -15,6 +15,7 @@ import Product8000Book from "./pages/Product8000Book";
 import ProductSpanish5000 from "./pages/ProductSpanish5000";
 import ProductSpanish8000Book from "./pages/ProductSpanish8000Book";
 import ProductSpanish3000VerbsBook from "./pages/ProductSpanish3000VerbsBook";
+import ProductSpanishGrammarPatterns from "./pages/ProductSpanishGrammarPatterns";
 import ProductSpanish1000Verbs from "./pages/ProductSpanish1000Verbs";
 import ProductSpanish500Questions from "./pages/ProductSpanish500Questions";
 import Product1000Verbos from "./pages/Product1000Verbos";
@@ -66,6 +67,7 @@ const App = () => (
                 <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductSpanish5000 />} />
                 <Route path="/products/spanish-relax-8000-words-physical-book-preorder" element={<ProductSpanish8000Book />} />
                 <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
+                <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />
                 <Route path="/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation" element={<ProductSpanish1000Verbs />} />
                 <Route path="/products/500-questions-in-spanish-with-english-pronunciation" element={<ProductSpanish500Questions />} />
                 <Route path="/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion" element={<Product1000Verbos />} />

@@ -12,11 +12,18 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
-import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye } from "lucide-react";
 
 // Review images
 import reviewPhoto5 from "@/assets/review-photo-5.jpg";

@@ -177,10 +177,10 @@ export const CartDrawer = () => {
                 );
               })()}
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {items.map((item) =>
-                <div key={item.variantId} className="flex gap-4 p-2 border rounded-lg">
-                      <div className="w-16 h-16 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center">
+                <div key={item.variantId} className="flex gap-2.5 p-2 border rounded-lg">
+                      <div className="w-12 h-12 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center">
                         {(() => {
                           const image = getCartItemImage(item);
                           return image ? (
@@ -204,23 +204,23 @@ export const CartDrawer = () => {
                             : null;
                           return (
                             <>
-                              <h4 className="font-semibold text-sm leading-tight truncate">{title}</h4>
+                              <h4 className="font-semibold text-xs leading-tight truncate">{title}</h4>
                               {subtitle ? (
                                 <p className="text-[10px] text-muted-foreground leading-tight truncate">{subtitle}</p>
                               ) : item.variantTitle !== "Default Title" ? (
-                                <p className="text-xs text-muted-foreground">{item.variantTitle}</p>
+                                <p className="text-[10px] text-muted-foreground leading-tight">{item.variantTitle}</p>
                               ) : null}
-                              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {compareNum && (
-                                  <span className="text-xs line-through text-destructive font-medium">
+                                  <span className="text-[10px] line-through text-destructive font-medium">
                                     ${compareNum.toFixed(2)}
                                   </span>
                                 )}
-                                <span className="font-semibold text-sm text-primary">
-                                  ${price.toFixed(2)} {item.price.currencyCode}
+                                <span className="text-xs font-bold text-primary">
+                                  ${price.toFixed(2)}
                                 </span>
                                 {discountPct && (
-                                  <span className="text-[10px] bg-destructive/10 text-destructive font-bold px-1 rounded">
+                                  <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">
                                     -{discountPct}%
                                   </span>
                                 )}
@@ -229,11 +229,11 @@ export const CartDrawer = () => {
                           );
                         })()}
                       </div>
-                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
                         <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6"
+                      className="h-5 w-5"
                       onClick={() => removeItem(item.variantId)}
                       disabled={isLoading}>
                           <Trash2 className="h-3 w-3" />
@@ -242,16 +242,16 @@ export const CartDrawer = () => {
                           <Button
                         variant="outline"
                         size="icon"
-                        className="h-6 w-6"
+                        className="h-5 w-5"
                         onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                         disabled={isLoading}>
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-8 text-center text-sm">{item.quantity}</span>
+                          <span className="w-6 text-center text-xs">{item.quantity}</span>
                           <Button
                         variant="outline"
                         size="icon"
-                        className="h-6 w-6"
+                        className="h-5 w-5"
                         onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                         disabled={isLoading}>
                             <Plus className="h-3 w-3" />

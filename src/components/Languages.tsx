@@ -174,23 +174,23 @@ export const Languages = () => {
 
   return (
     <section className="py-16 md:py-24 bg-secondary/30">
-      <div className="container px-4 md:px-6">
-        <div className="text-center mb-12">
+      <div className="container px-3 md:px-6">
+        <div className="text-center mb-8 md:mb-12">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             {c.badge}
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 px-2">
             {c.title} <span className="text-gradient">{c.titleHighlight}</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
             {c.subtitle}
           </p>
         </div>
 
         {/* Step 1: Format Toggle */}
         <div className="max-w-2xl mx-auto mb-6">
-          <p className="text-center text-sm font-semibold text-muted-foreground mb-3">{c.step1}</p>
-          <div className="grid grid-cols-2 gap-3">
+          <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">{c.step1}</p>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {formats.map((f) => {
               const Icon = f.icon;
               const isActive = activeFormat === f.key;
@@ -198,22 +198,23 @@ export const Languages = () => {
                 <button
                   key={f.key}
                   onClick={() => setActiveFormat(f.key)}
+                  aria-pressed={isActive}
                   className={cn(
-                    "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left",
+                    "flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl border-2 transition-all text-left min-h-[64px] active:scale-[0.98]",
                     isActive
                       ? "border-primary bg-primary/5 shadow-md"
                       : "border-border bg-card hover:border-primary/40"
                   )}
                 >
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                    "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0",
                     isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}>
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-foreground">{f.label}</div>
-                    <div className="text-xs text-muted-foreground truncate">{f.desc}</div>
+                    <div className="font-bold text-foreground text-sm sm:text-base leading-tight">{f.label}</div>
+                    <div className="text-[11px] sm:text-xs text-muted-foreground leading-tight mt-0.5 line-clamp-2 sm:truncate">{f.desc}</div>
                   </div>
                 </button>
               );
@@ -222,8 +223,10 @@ export const Languages = () => {
         </div>
 
         {/* Step 2: Language Tabs */}
-        <p className="text-center text-sm font-semibold text-muted-foreground mb-3">{c.step2}</p>
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">{c.step2}</p>
+        {/* Mobile: horizontal scroll. Desktop: centered wrap */}
+        <div className="-mx-3 px-3 mb-8 md:mx-0 md:px-0">
+          <div className="flex md:flex-wrap md:justify-center gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
             const count = grouped[tab.key].length;
@@ -231,8 +234,9 @@ export const Languages = () => {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
+                aria-pressed={isActive}
                 className={cn(
-                  "inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold transition-all",
+                  "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
                   isActive
                     ? langStyles[tab.key].tabActive + " shadow-md scale-105"
                     : "bg-card text-foreground border-border hover:border-foreground/40"
@@ -249,6 +253,7 @@ export const Languages = () => {
               </button>
             );
           })}
+          </div>
         </div>
 
         {/* Products */}

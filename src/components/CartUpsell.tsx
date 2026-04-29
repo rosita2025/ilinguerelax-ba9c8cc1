@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, Plus, Loader2, Check, Tag, Truck } from "lucide-react";
+import { BookOpen, Plus, Loader2, Check, Tag, Truck, Download, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
@@ -228,14 +228,12 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 className="w-10 h-10 rounded object-cover flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">
-                  {product.title}
-                  {isSpanishContext && (
-                    <span className="ml-1 text-[9px] bg-primary/15 text-primary font-bold px-1 py-0.5 rounded uppercase">
-                      Digital PDF
-                    </span>
-                  )}
-                </p>
+                {isSpanishContext && (
+                  <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
+                    <Download className="w-2.5 h-2.5" /> Digital PDF · Instant
+                  </span>
+                )}
+                <p className="text-xs font-medium truncate">{product.title}</p>
                 <p className="text-[10px] text-muted-foreground">{product.description}</p>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] line-through text-destructive font-medium">${product.compareAtPrice}</span>
@@ -311,12 +309,14 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                     className="w-10 h-10 rounded object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
+                    <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
+                      <Package className="w-2.5 h-2.5" /> Físico · Pre-Order
+                    </span>
                     <p className="text-xs font-medium truncate">{preorder.title}</p>
                     <p className="text-[10px] text-muted-foreground">{preorder.description}</p>
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] line-through text-destructive font-medium">${preorder.compareAtPrice}</span>
                       <span className="text-xs font-bold text-primary">${preorder.price}</span>
-                      <span className="text-[9px] bg-accent/20 text-accent font-bold px-1 rounded">PRE-ORDER</span>
                     </div>
                   </div>
                   <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">

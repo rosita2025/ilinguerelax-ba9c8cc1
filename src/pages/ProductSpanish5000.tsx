@@ -748,6 +748,106 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
+      {/* Bundle Upsell Section: Spanish Relax Complete Collection */}
+      <section className="py-16 md:py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.15),_transparent_60%)]" />
+        <div className="container px-4 md:px-6 relative">
+          <div className="text-center mb-10 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-xs font-bold mb-4 uppercase tracking-wider">
+              <Package className="w-4 h-4" />
+              Best Value · Save $13
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Complete the <span className="text-amber-400">Spanish Relax Collection</span>
+            </h2>
+            <p className="text-base md:text-lg text-slate-300">
+              Words alone aren't enough. Add <strong className="text-white">3,000 Verbs</strong> and <strong className="text-white">Grammar Patterns A1–C1</strong> to build perfect sentences from day one.
+            </p>
+          </div>
+
+          {/* Bundle items grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
+            {/* Item 1 — current product */}
+            <div className="bg-slate-900/60 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-sm">
+              <div className="aspect-square bg-gradient-to-br from-purple-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
+                <img src={productSpanish5000Image} alt="5,000 Spanish Words" className="max-h-full object-contain" />
+              </div>
+              <div className="inline-block px-2 py-1 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase mb-2">Included</div>
+              <h3 className="text-white font-bold text-sm mb-1">5,000 Spanish Words</h3>
+              <p className="text-slate-400 text-xs mb-2">Vocabulary + English pronunciation</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-white font-bold">$29.99</span>
+                <span className="text-slate-500 line-through text-xs">$54</span>
+              </div>
+            </div>
+
+            {/* Item 2 — 3000 Verbs */}
+            <div className="bg-slate-900/60 border border-cyan-500/30 rounded-2xl p-5 backdrop-blur-sm relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">+ Add</div>
+              <div className="aspect-square bg-gradient-to-br from-cyan-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
+                <img src={product3000VerbsImage} alt="3,000 Spanish Verbs Mastery" className="max-h-full object-contain" />
+              </div>
+              <div className="inline-block px-2 py-1 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-bold uppercase mb-2">Pre-Order</div>
+              <h3 className="text-white font-bold text-sm mb-1">3,000 Spanish Verbs</h3>
+              <p className="text-slate-400 text-xs mb-2">Past, Present & Future tenses</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-white font-bold">$17</span>
+                <span className="text-slate-500 line-through text-xs">$29.99</span>
+              </div>
+            </div>
+
+            {/* Item 3 — Grammar Patterns */}
+            <div className="bg-slate-900/60 border border-amber-500/30 rounded-2xl p-5 backdrop-blur-sm relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase tracking-wider">+ Add</div>
+              <div className="aspect-square bg-gradient-to-br from-amber-500/10 to-transparent rounded-xl flex items-center justify-center mb-4 p-4">
+                <img src={productGrammarPatternsImage} alt="Spanish Grammar Patterns A1–C1" className="max-h-full object-contain" />
+              </div>
+              <div className="inline-block px-2 py-1 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase mb-2">Pre-Order</div>
+              <h3 className="text-white font-bold text-sm mb-1">Grammar Patterns A1–C1</h3>
+              <p className="text-slate-400 text-xs mb-2">The "Lego" sentence-building system</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-white font-bold">$15</span>
+                <span className="text-slate-500 line-through text-xs">$29.99</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bundle pricing card */}
+          <div className="max-w-3xl mx-auto bg-gradient-to-br from-amber-500/10 to-purple-500/10 border-2 border-amber-400/40 rounded-3xl p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                  <Tag className="w-5 h-5 text-amber-400" />
+                  <span className="text-amber-300 font-bold text-sm uppercase tracking-wider">Bundle Discount</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Get All 3 Together</h3>
+                <div className="flex items-baseline gap-3 justify-center md:justify-start">
+                  <span className="text-4xl md:text-5xl font-black text-amber-400">$49</span>
+                  <span className="text-xl text-slate-400 line-through">$61.99</span>
+                  <span className="px-2 py-1 rounded-md bg-green-500/20 text-green-300 text-xs font-bold">SAVE 21%</span>
+                </div>
+                <p className="text-slate-400 text-xs mt-2">USD · Pre-orders ship June 2026</p>
+              </div>
+              <Button
+                variant="hero"
+                size="xl"
+                className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950"
+                onClick={() => window.location.href = '/products/spanish-grammar-patterns-a1-c1-mastery-preorder'}
+              >
+                <Package className="w-5 h-5 mr-2" />
+                Get the Bundle
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </div>
+            <div className="mt-5 pt-5 border-t border-white/10 grid grid-cols-3 gap-3 text-center">
+              <div className="text-slate-300 text-xs"><Check className="w-4 h-4 inline text-green-400 mr-1" />Lifetime access</div>
+              <div className="text-slate-300 text-xs"><Check className="w-4 h-4 inline text-green-400 mr-1" />Free shipping</div>
+              <div className="text-slate-300 text-xs"><Check className="w-4 h-4 inline text-green-400 mr-1" />30-day guarantee</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Physical Book Coming Soon Section */}
       <section className="py-16 bg-gradient-to-b from-purple-50 to-background dark:from-purple-950/20">
         <div className="container px-4 md:px-6">

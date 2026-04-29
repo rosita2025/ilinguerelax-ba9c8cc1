@@ -196,7 +196,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
       <p className="text-xs font-semibold text-primary flex items-center gap-1">
         <BookOpen className="w-3 h-3" />
         {isSpanishContext
-          ? "Complete your Spanish learning kit — Add & save"
+          ? "Complete your Spanish learning kit — Digital PDF (instant download)"
           : "Compra 1 y llévate el 2do con 30% OFF"}
       </p>
       {hasCouponApplied && !isSpanishContext && (
@@ -228,7 +228,14 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 className="w-10 h-10 rounded object-cover flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">{product.title}</p>
+                <p className="text-xs font-medium truncate">
+                  {product.title}
+                  {isSpanishContext && (
+                    <span className="ml-1 text-[9px] bg-primary/15 text-primary font-bold px-1 py-0.5 rounded uppercase">
+                      Digital PDF
+                    </span>
+                  )}
+                </p>
                 <p className="text-[10px] text-muted-foreground">{product.description}</p>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] line-through text-destructive font-medium">${product.compareAtPrice}</span>

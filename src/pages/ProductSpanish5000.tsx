@@ -775,10 +775,19 @@ const ProductSpanish5000 = () => {
               <div className="inline-block px-2 py-1 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase mb-2">Included</div>
               <h3 className="text-white font-bold text-sm mb-1">5,000 Spanish Words</h3>
               <p className="text-slate-400 text-xs mb-2">Vocabulary + English pronunciation</p>
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-white font-bold">$29.99</span>
                 <span className="text-slate-500 line-through text-xs">$54</span>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full border-purple-400/40 text-purple-200 hover:bg-purple-500/10 hover:text-white text-xs"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+                Buy this only
+              </Button>
             </div>
 
             {/* Item 2 — 8,000 Words Physical Book */}
@@ -790,10 +799,18 @@ const ProductSpanish5000 = () => {
               <div className="inline-block px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase mb-2">Pre-Order</div>
               <h3 className="text-white font-bold text-sm mb-1">8,000 Words Book</h3>
               <p className="text-slate-400 text-xs mb-2">Expanded vocabulary · Physical edition</p>
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-white font-bold">$15</span>
                 <span className="text-slate-500 line-through text-xs">$35</span>
               </div>
+              <Button
+                size="sm"
+                className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs"
+                onClick={() => window.location.href = '/products/spanish-relax-8000-words-physical-book-preorder'}
+              >
+                <Package className="w-3.5 h-3.5 mr-1.5" />
+                Pre-Order $15
+              </Button>
             </div>
 
             {/* Item 3 — 3000 Verbs */}
@@ -805,10 +822,18 @@ const ProductSpanish5000 = () => {
               <div className="inline-block px-2 py-1 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-bold uppercase mb-2">Pre-Order</div>
               <h3 className="text-white font-bold text-sm mb-1">3,000 Spanish Verbs</h3>
               <p className="text-slate-400 text-xs mb-2">Past, Present & Future tenses</p>
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-white font-bold">$17</span>
                 <span className="text-slate-500 line-through text-xs">$29.99</span>
               </div>
+              <Button
+                size="sm"
+                className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs"
+                onClick={() => window.location.href = '/products/3-000-spanish-verbs-mastery-physical-book-preorder'}
+              >
+                <Package className="w-3.5 h-3.5 mr-1.5" />
+                Pre-Order $17
+              </Button>
             </div>
 
             {/* Item 4 — Grammar Patterns */}
@@ -820,10 +845,18 @@ const ProductSpanish5000 = () => {
               <div className="inline-block px-2 py-1 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase mb-2">Pre-Order</div>
               <h3 className="text-white font-bold text-sm mb-1">Grammar Patterns A1–C1</h3>
               <p className="text-slate-400 text-xs mb-2">The "Lego" sentence-building system</p>
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-white font-bold">$15</span>
                 <span className="text-slate-500 line-through text-xs">$29.99</span>
               </div>
+              <Button
+                size="sm"
+                className="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs"
+                onClick={() => window.location.href = '/products/spanish-grammar-patterns-a1-c1-mastery-preorder'}
+              >
+                <Package className="w-3.5 h-3.5 mr-1.5" />
+                Pre-Order $15
+              </Button>
             </div>
           </div>
 

@@ -189,18 +189,14 @@ const ProductSpanish5000 = () => {
               {/* Trending & Bonus Badge */}
               
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Spanish Relax - 5,000 Words
-                <br />
-                <span className="text-purple-600">With English Pronunciation</span>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
+                Speak Spanish in 7 Days —{" "}
+                <span className="text-purple-600">Without the Frustration</span> of Confusing Pronunciation
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-2">
-                The complete stress-free method to learn Spanish. Digital PDF format - 
-                download instantly and start learning today!
-              </p>
-              <p className="text-xl font-bold text-primary mb-4">
-                Learn to Speak Spanish in 7 Days
+              <p className="text-base md:text-lg text-muted-foreground mb-4">
+                <strong className="text-foreground">5,000 essential Spanish words</strong> written the way they{" "}
+                <em>actually sound</em> in English. No phonetic symbols. No guessing. Just open the PDF and start speaking today.
               </p>
 
               {/* Reviews - More Prominent */}
@@ -234,7 +230,7 @@ const ProductSpanish5000 = () => {
             }} className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-6 border border-purple-500/20 mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-purple-600" />
-                  <span className="text-purple-600 font-semibold text-sm uppercase">Special Launch Price</span>
+                  <span className="text-purple-600 font-semibold text-sm uppercase">Launch price ends Sunday</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
@@ -248,9 +244,30 @@ const ProductSpanish5000 = () => {
                     SAVE 48%
                   </motion.span>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mb-3">
                   💳 One-time payment • No subscriptions • Lifetime access
                 </p>
+
+                {/* Bonus stack preview — visible above CTA */}
+                <div className="bg-white/60 dark:bg-background/40 rounded-xl p-3 border border-purple-500/20">
+                  <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2 flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5" /> + 3 FREE Bonuses included today
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center text-center">
+                      <img src={bonus1Image} alt="Bonus 1" className="w-12 h-12 rounded-lg object-cover border border-border mb-1" />
+                      <span className="text-[10px] leading-tight text-muted-foreground">Spanish Exam</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center">
+                      <img src={bonus2Image} alt="Bonus 2" className="w-12 h-12 rounded-lg object-cover border border-border mb-1" />
+                      <span className="text-[10px] leading-tight text-muted-foreground">Daily Planner</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center">
+                      <img src={bonus3Image} alt="Bonus 3" className="w-12 h-12 rounded-lg object-cover border border-border mb-1" />
+                      <span className="text-[10px] leading-tight text-muted-foreground">Pronunciation</span>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
 
               {/* Stock Counter - Scarcity */}

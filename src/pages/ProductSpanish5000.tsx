@@ -75,6 +75,45 @@ const benefits = [{
   title: "No Dictionaries Needed",
   description: "Everything you need is included. Meanings, pronunciation, and examples all in one place."
 }];
+
+// ============= Bonus Preview Dialog =============
+type BonusPreviewProps = {
+  triggerLabel?: string;
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+};
+const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, children }: BonusPreviewProps) => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant="outline" size="sm" className="mt-3 w-full gap-1.5">
+        <Eye className="w-4 h-4" /> {triggerLabel}
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </DialogHeader>
+      {/* Simulated PDF page */}
+      <div className="relative mx-auto w-full bg-white text-slate-900 rounded-lg shadow-lg overflow-hidden border border-border">
+        {/* Diagonal watermark */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-10 select-none">
+          <span className="text-5xl md:text-6xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap">
+            PREVIEW · ilinguerelax.com
+          </span>
+        </div>
+        <div className="relative p-6 md:p-8">
+          {children}
+        </div>
+      </div>
+      <p className="text-xs text-center text-muted-foreground mt-2">
+        This is a 1-page sample. Full PDF delivered after purchase.
+      </p>
+    </DialogContent>
+  </Dialog>
+);
+
 const ProductSpanish5000 = () => {
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({

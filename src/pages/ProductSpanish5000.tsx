@@ -555,37 +555,6 @@ const ProductSpanish5000 = () => {
                 <span className="text-white font-bold text-lg">Customer Reviews</span>
               </div>
 
-              {/* Rating Summary */}
-              <div className="px-6 py-5 border-b border-border flex flex-col sm:flex-row items-center gap-4">
-                <div className="text-center">
-                  <div className="text-5xl font-black text-foreground">4.8</div>
-                  <div className="flex items-center gap-0.5 mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">500+ reviews</p>
-                </div>
-                <div className="flex-1 w-full max-w-xs space-y-1.5">
-                  {[
-                    { stars: 5, pct: 80 },
-                    { stars: 4, pct: 13 },
-                    { stars: 3, pct: 5 },
-                    { stars: 2, pct: 1 },
-                    { stars: 1, pct: 1 },
-                  ].map((row) => (
-                    <div key={row.stars} className="flex items-center gap-2 text-sm">
-                      <span className="w-3 text-muted-foreground">{row.stars}</span>
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-400 rounded-full" style={{ width: `${row.pct}%` }} />
-                      </div>
-                      <span className="w-8 text-xs text-muted-foreground">{row.pct}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* Individual Reviews */}
               {(() => {
                 const allReviews: Array<{ name: string; location: string; date: string; text: string; stars: number; photo?: string; photoImg?: string; verified?: boolean }> = [

@@ -389,6 +389,45 @@ const ProductSpanish5000 = () => {
                   <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
                     <Download className="w-3.5 h-3.5" /> Instant PDF
                   </div>
+                  <BonusPreviewDialog
+                    title="Complete Spanish Language Exam"
+                    subtitle="Sample page — 1 of 24"
+                  >
+                    <h3 className="text-xl font-bold mb-1 text-center">Complete Spanish Language Exam</h3>
+                    <p className="text-center text-sm text-slate-600 mb-6">Section 1 — Vocabulary &amp; Grammar</p>
+                    <ol className="space-y-4 text-sm">
+                      <li>
+                        <p className="font-semibold mb-1">1. What is the correct translation of "house"?</p>
+                        <ul className="ml-5 space-y-0.5 text-slate-700">
+                          <li>A) Coche</li><li>B) Casa</li><li>C) Perro</li><li>D) Libro</li>
+                        </ul>
+                      </li>
+                      <li>
+                        <p className="font-semibold mb-1">2. Choose the correct verb form: "Yo ___ español."</p>
+                        <ul className="ml-5 space-y-0.5 text-slate-700">
+                          <li>A) habla</li><li>B) hablo</li><li>C) hablas</li><li>D) hablan</li>
+                        </ul>
+                      </li>
+                      <li>
+                        <p className="font-semibold mb-1">3. Which word means "tomorrow"?</p>
+                        <ul className="ml-5 space-y-0.5 text-slate-700">
+                          <li>A) Ayer</li><li>B) Hoy</li><li>C) Mañana</li><li>D) Noche</li>
+                        </ul>
+                      </li>
+                      <li>
+                        <p className="font-semibold mb-1">4. Complete: "Ella ___ una manzana."</p>
+                        <ul className="ml-5 space-y-0.5 text-slate-700">
+                          <li>A) come</li><li>B) comes</li><li>C) comemos</li><li>D) comen</li>
+                        </ul>
+                      </li>
+                      <li>
+                        <p className="font-semibold mb-1">5. The opposite of "grande" is:</p>
+                        <ul className="ml-5 space-y-0.5 text-slate-700">
+                          <li>A) Alto</li><li>B) Pequeño</li><li>C) Bonito</li><li>D) Rápido</li>
+                        </ul>
+                      </li>
+                    </ol>
+                  </BonusPreviewDialog>
                 </motion.div>
 
                 {/* Bonus #2 */}
@@ -414,6 +453,43 @@ const ProductSpanish5000 = () => {
                   <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
                     <Download className="w-3.5 h-3.5" /> Instant PDF
                   </div>
+                  <BonusPreviewDialog
+                    title="Daily Study Planner"
+                    subtitle="Sample page — Weekly template"
+                  >
+                    <h3 className="text-xl font-bold mb-1 text-center">Daily Study Planner</h3>
+                    <p className="text-center text-sm text-slate-600 mb-6">Stay consistent — 15 minutes a day</p>
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100">
+                          <th className="border border-slate-300 p-2 text-left">Day</th>
+                          <th className="border border-slate-300 p-2 text-left">Vocabulary</th>
+                          <th className="border border-slate-300 p-2 text-left">Grammar</th>
+                          <th className="border border-slate-300 p-2 text-left">Practice</th>
+                          <th className="border border-slate-300 p-2 text-center">✓</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          ["Monday", "20 new words", "Present tense", "Listen to podcast"],
+                          ["Tuesday", "Review Mon.", "Articles", "Read short story"],
+                          ["Wednesday", "20 new words", "Adjectives", "Speaking 5 min"],
+                          ["Thursday", "Review Wed.", "Past tense", "Write a paragraph"],
+                          ["Friday", "20 new words", "Questions", "Watch a video"],
+                          ["Saturday", "Flashcards", "Review week", "Conversation"],
+                          ["Sunday", "Rest / Recap", "—", "Self-test"],
+                        ].map(([d, v, g, p]) => (
+                          <tr key={d}>
+                            <td className="border border-slate-300 p-2 font-semibold">{d}</td>
+                            <td className="border border-slate-300 p-2">{v}</td>
+                            <td className="border border-slate-300 p-2">{g}</td>
+                            <td className="border border-slate-300 p-2">{p}</td>
+                            <td className="border border-slate-300 p-2 text-center">☐</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </BonusPreviewDialog>
                 </motion.div>
 
                 {/* Bonus #3 */}
@@ -439,6 +515,43 @@ const ProductSpanish5000 = () => {
                   <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
                     <Download className="w-3.5 h-3.5" /> Instant PDF
                   </div>
+                  <BonusPreviewDialog
+                    title="Spanish Pronunciation Cheat Sheet"
+                    subtitle="Sample page — Vowels &amp; key consonants"
+                  >
+                    <h3 className="text-xl font-bold mb-1 text-center">Spanish Pronunciation Cheat Sheet</h3>
+                    <p className="text-center text-sm text-slate-600 mb-6">Pronounce any Spanish word with confidence</p>
+                    <table className="w-full text-sm border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100">
+                          <th className="border border-slate-300 p-2 text-left">Letter</th>
+                          <th className="border border-slate-300 p-2 text-left">Sound</th>
+                          <th className="border border-slate-300 p-2 text-left">English example</th>
+                          <th className="border border-slate-300 p-2 text-left">Spanish example</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          ["A", "ah", "father", "casa"],
+                          ["E", "eh", "bed", "mesa"],
+                          ["I", "ee", "see", "fino"],
+                          ["O", "oh", "more", "loco"],
+                          ["U", "oo", "food", "luna"],
+                          ["J", "h (strong)", "hot", "jamón"],
+                          ["LL", "y", "yes", "llave"],
+                          ["Ñ", "ny", "canyon", "niño"],
+                          ["RR", "rolled r", "—", "perro"],
+                        ].map(([l, s, e, sp]) => (
+                          <tr key={l}>
+                            <td className="border border-slate-300 p-2 font-bold">{l}</td>
+                            <td className="border border-slate-300 p-2">{s}</td>
+                            <td className="border border-slate-300 p-2 italic">{e}</td>
+                            <td className="border border-slate-300 p-2">{sp}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </BonusPreviewDialog>
                 </motion.div>
               </div>
 

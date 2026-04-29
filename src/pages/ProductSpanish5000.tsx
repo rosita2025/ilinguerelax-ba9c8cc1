@@ -914,26 +914,6 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Physical Book Coming Soon Section */}
-      <section className="py-16 bg-gradient-to-b from-purple-50 to-background dark:from-purple-950/20">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-              📚 Physical Book <span className="text-purple-600">Coming Soon!</span>
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              We'll soon have the physical version available on major marketplaces. Subscribe to be notified!
-            </p>
-          </div>
-
-          {/* Store Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-8">
-            <StoreSubscriptionCard logo={logoAmazon} storeName="Amazon" type="coming-soon" productType="spanish" />
-            <StoreSubscriptionCard logo={logoEbay} storeName="eBay" type="coming-soon" productType="spanish" />
-            <StoreSubscriptionCard logo={logoShopify} storeName="Shopify" type="available" buyLink="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" productType="spanish" />
-          </div>
-        </div>
-      </section>
-
       {/* Upsell Section */}
       {/* FAQ Section */}
       <FAQ items={[{

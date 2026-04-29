@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, Plus, Loader2, Check, Tag, Truck } from "lucide-react";
+import { BookOpen, Plus, Loader2, Check, Tag, Truck, Download, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";

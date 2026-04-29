@@ -73,8 +73,8 @@ export const Languages = () => {
   const content = {
     es: {
       badge: "Nuestros Productos",
-      title: "Elige tu libro digital de",
-      titleHighlight: "Idioma",
+      title: "Elige tu libro",
+      titleHighlight: "digital o físico",
       subtitle: "Libros digitales diseñados con el método iLingue Relax para aprender sin estrés",
       reviews: "reseñas",
       buy: "Comprar",
@@ -84,8 +84,8 @@ export const Languages = () => {
     },
     en: {
       badge: "Our Products",
-      title: "Choose your digital book for",
-      titleHighlight: "Language",
+      title: "Choose your",
+      titleHighlight: "digital or physical book",
       subtitle: "Digital books designed with the iLingue Relax method to learn stress-free",
       reviews: "reviews",
       buy: "Buy",
@@ -95,8 +95,8 @@ export const Languages = () => {
     },
     fr: {
       badge: "Nos Produits",
-      title: "Choisissez votre livre numérique de",
-      titleHighlight: "Langue",
+      title: "Choisissez votre livre",
+      titleHighlight: "numérique ou physique",
       subtitle: "Livres numériques conçus avec la méthode iLingue Relax pour apprendre sans stress",
       reviews: "avis",
       buy: "Acheter",
@@ -106,8 +106,8 @@ export const Languages = () => {
     },
     pt: {
       badge: "Nossos Produtos",
-      title: "Escolha seu livro digital de",
-      titleHighlight: "Idioma",
+      title: "Escolha seu livro",
+      titleHighlight: "digital ou físico",
       subtitle: "Livros digitais projetados com o método iLingue Relax para aprender sem estresse",
       reviews: "avaliações",
       buy: "Comprar",

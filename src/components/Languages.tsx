@@ -1,11 +1,58 @@
+import { useState, useMemo } from "react";
 import { Clock, Star, Sparkles, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { products, comingSoonLanguages, getProductLink } from "@/data/products";
+import { products, comingSoonLanguages, getProductLink, type Product } from "@/data/products";
 import { useI18n } from "@/i18n/I18nContext";
+import { cn } from "@/lib/utils";
+
+type LangKey = "english" | "spanish" | "portuguese" | "soon";
+
+// Map each product to a language tab
+const getProductLangKey = (p: Product): LangKey => {
+  if (p.id === "portuguese-5000") return "portuguese";
+  // Coming soon languages (other than portuguese) go to "soon"
+  if (p.comingSoon && ["german-5000", "italian-5000", "french-5000", "dutch-5000"].includes(p.id)) {
+    return "soon";
+  }
+  // English-target products (for Spanish speakers learning English)
+  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas", "1000-free"];
+  if (englishIds.includes(p.id)) return "english";
+  // Spanish-target products (for English speakers learning Spanish)
+  return "spanish";
+};
+
+// Tailwind color tokens per language tab
+const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabActive: string }> = {
+  english: {
+    ring: "hover:border-blue-500/60",
+    bg: "from-blue-500/5 to-blue-500/10",
+    chip: "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
+    tabActive: "bg-blue-500 text-white border-blue-500",
+  },
+  spanish: {
+    ring: "hover:border-amber-500/60",
+    bg: "from-amber-500/5 to-red-500/10",
+    chip: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30",
+    tabActive: "bg-amber-500 text-white border-amber-500",
+  },
+  portuguese: {
+    ring: "hover:border-green-500/60",
+    bg: "from-green-500/5 to-emerald-500/10",
+    chip: "bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/30",
+    tabActive: "bg-green-600 text-white border-green-600",
+  },
+  soon: {
+    ring: "hover:border-muted-foreground/40",
+    bg: "from-muted/30 to-muted/10",
+    chip: "bg-muted text-muted-foreground border-border",
+    tabActive: "bg-foreground text-background border-foreground",
+  },
+};
 
 export const Languages = () => {
-  const { t, language, formatPrice } = useI18n();
+  const { language, formatPrice } = useI18n();
+  const [activeTab, setActiveTab] = useState<LangKey>("english");
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -32,6 +79,8 @@ export const Languages = () => {
       reviews: "reseñas",
       buy: "Comprar",
       comingSoon: "Próximamente más idiomas",
+      tabs: { english: "Inglés", spanish: "Español", portuguese: "Portugués", soon: "Pronto" },
+      soonLabel: "Muy pronto",
     },
     en: {
       badge: "Our Products",
@@ -41,6 +90,8 @@ export const Languages = () => {
       reviews: "reviews",
       buy: "Buy",
       comingSoon: "More languages coming soon",
+      tabs: { english: "English", spanish: "Spanish", portuguese: "Portuguese", soon: "Coming Soon" },
+      soonLabel: "Coming soon",
     },
     fr: {
       badge: "Nos Produits",
@@ -50,6 +101,8 @@ export const Languages = () => {
       reviews: "avis",
       buy: "Acheter",
       comingSoon: "Plus de langues bientôt",
+      tabs: { english: "Anglais", spanish: "Espagnol", portuguese: "Portugais", soon: "Bientôt" },
+      soonLabel: "Bientôt disponible",
     },
     pt: {
       badge: "Nossos Produtos",
@@ -59,10 +112,27 @@ export const Languages = () => {
       reviews: "avaliações",
       buy: "Comprar",
       comingSoon: "Mais idiomas em breve",
+      tabs: { english: "Inglês", spanish: "Espanhol", portuguese: "Português", soon: "Em breve" },
+      soonLabel: "Em breve",
     },
   };
 
   const c = content[language];
+
+  const grouped = useMemo(() => {
+    const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], soon: [] };
+    products.forEach((p) => g[getProductLangKey(p)].push(p));
+    return g;
+  }, []);
+
+  const tabs: { key: LangKey; flag: string }[] = [
+    { key: "english", flag: "🇬🇧" },
+    { key: "spanish", flag: "🇪🇸" },
+    { key: "portuguese", flag: "🇧🇷" },
+    { key: "soon", flag: "✨" },
+  ];
+
+  const visibleProducts = grouped[activeTab];
 
   return (
     <section className="py-16 md:py-24 bg-secondary/30">
@@ -79,12 +149,46 @@ export const Languages = () => {
           </p>
         </div>
 
+        {/* Language Tabs */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            const count = grouped[tab.key].length;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold transition-all",
+                  isActive
+                    ? langStyles[tab.key].tabActive + " shadow-md scale-105"
+                    : "bg-card text-foreground border-border hover:border-foreground/40"
+                )}
+              >
+                <span className="text-base">{tab.flag}</span>
+                <span>{c.tabs[tab.key]}</span>
+                <span className={cn(
+                  "text-xs px-1.5 py-0.5 rounded-full",
+                  isActive ? "bg-white/25" : "bg-muted text-muted-foreground"
+                )}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Products */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
-          {products.map((product) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+          {visibleProducts.map((product) => {
+            const styles = langStyles[getProductLangKey(product)];
+            return (
             <div
               key={product.id}
-              className="group relative bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-2"
+              className={cn(
+                "group relative bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hero transition-all duration-300 hover:-translate-y-2",
+                styles.ring
+              )}
             >
               {/* Discount Badge */}
               {product.discount && (
@@ -98,14 +202,14 @@ export const Languages = () => {
 
               {/* Product Badge */}
               <div className="absolute top-3 right-3 z-10">
-                <div className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                  {product.badge}
+                <div className={cn("px-3 py-1 rounded-full text-xs font-semibold border", styles.chip)}>
+                  {product.comingSoon ? c.soonLabel : product.badge}
                 </div>
               </div>
 
               {/* Product Image - Clickable */}
               <Link to={getProductLink(product)}>
-                <div className="aspect-[4/3] bg-gradient-to-br from-primary/5 to-accent/5 p-6 flex items-center justify-center cursor-pointer">
+                <div className={cn("aspect-[4/3] bg-gradient-to-br p-6 flex items-center justify-center cursor-pointer", styles.bg)}>
                   <img
                     src={product.image}
                     alt={product.title}
@@ -164,7 +268,8 @@ export const Languages = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Coming Soon Languages */}

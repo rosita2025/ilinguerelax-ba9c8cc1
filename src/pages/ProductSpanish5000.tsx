@@ -989,6 +989,22 @@ const ProductSpanish5000 = () => {
 
       {/* FAQ Section */}
       <FAQ items={[{
+      question: "What does \"SPANISH RELAX\" mean?",
+      answer: "SPANISH RELAX is our stress-free method to learn Spanish without pressure, frustration, or confusing rules. \"Relax\" because you study at your own pace, with pronunciation already simplified, so your brain absorbs Spanish naturally — like a conversation, not a class.",
+      icon: Sparkles
+    }, {
+      question: "Is the pronunciation really stress-free? I've tried other apps and got lost.",
+      answer: "Yes. Every Spanish word is written the way it actually SOUNDS in English — no IPA symbols, no weird accent marks to memorize. If you can read English, you can pronounce Spanish from page 1. Example: \"Hola\" → OH-lah. That's it.",
+      icon: BookOpen
+    }, {
+      question: "Do I need a dictionary or other apps to use it?",
+      answer: "No. Everything is included in the PDF: the Spanish word, its English translation, and the pronunciation — all on the same line. No tabs to switch, no Google Translate, no extra purchases. Open the PDF and learn.",
+      icon: Brain
+    }, {
+      question: "What exactly is included in the PDF?",
+      answer: "5,000 essential Spanish words organized by topic (greetings, food, travel, work, family, emotions, etc.), each with English translation + simplified pronunciation. Plus 3 FREE bonuses: a Spanish placement exam, a daily study planner, and a pronunciation cheat-sheet. ~250 pages, instant download.",
+      icon: FileText
+    }, {
       question: "Who is the author of this eBook?",
       answer: "SPANISH RELAX is a work by iLingue Relax, an educational brand focused on learning Spanish in a simple, practical, and stress-free way.",
       icon: User

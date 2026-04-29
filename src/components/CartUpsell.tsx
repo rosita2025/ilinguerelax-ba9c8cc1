@@ -258,67 +258,73 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         })}
       </div>
 
-      {isSpanishContext && !items.some((item) => item.variantId === spanishPhysicalPreorderUpsell.variantId) && (
-        <>
-          <div className="border-t border-dashed border-border my-3" />
-          <div className="space-y-1.5">
-            {(() => {
-              const subtotal = items.reduce(
-                (sum, item) => sum + parseFloat(item.price.amount) * item.quantity,
-                0
-              ) + parseFloat(spanishPhysicalPreorderUpsell.price);
-              const FREE_SHIP_THRESHOLD = 44;
-              const remaining = FREE_SHIP_THRESHOLD - subtotal;
-              return remaining <= 0 ? (
+      {isSpanishContext && (() => {
+        const visiblePreorders = spanishPhysicalPreorderUpsells.filter(
+          (p) => !items.some((item) => item.variantId === p.variantId)
+        );
+        if (visiblePreorders.length === 0) return null;
+        const subtotal = items.reduce(
+          (sum, item) => sum + parseFloat(item.price.amount) * item.quantity,
+          0
+        ) + parseFloat(visiblePreorders[0].price);
+        const FREE_SHIP_THRESHOLD = 44;
+        const remaining = FREE_SHIP_THRESHOLD - subtotal;
+        return (
+          <>
+            <div className="border-t border-dashed border-border my-3" />
+            <div className="space-y-1.5">
+              {remaining <= 0 ? (
                 <p className="text-xs font-bold text-green-600 flex items-center gap-1">
                   <Truck className="w-3 h-3" />
-                  ✓ You qualify for FREE shipping with the physical book!
+                  ✓ You qualify for FREE shipping with any physical book!
                 </p>
               ) : (
                 <p className="text-xs font-bold text-accent flex items-center gap-1">
                   <Truck className="w-3 h-3" />
                   Add ${remaining.toFixed(2)} more for FREE shipping (over $44)
                 </p>
-              );
-            })()}
-            <p className="text-[10px] text-muted-foreground leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
-              Pre-order from <strong className="text-primary">$15</strong> · goes up to <strong>$35</strong> in June 2026
-            </p>
-            <div
-              key={spanishPhysicalPreorderUpsell.variantId}
-              className={`flex items-center gap-3 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
-                processingId === spanishPhysicalPreorderUpsell.variantId ? "opacity-60 pointer-events-none" : ""
-              }`}
-              onClick={() => {
-                if (processingId === spanishPhysicalPreorderUpsell.variantId) return;
-                handleToggle(spanishPhysicalPreorderUpsell);
-              }}
-            >
-              <img
-                src={spanishPhysicalPreorderUpsell.image}
-                alt={spanishPhysicalPreorderUpsell.title}
-                className="w-10 h-10 rounded object-cover flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">{spanishPhysicalPreorderUpsell.title}</p>
-                <p className="text-[10px] text-muted-foreground">{spanishPhysicalPreorderUpsell.description}</p>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] line-through text-destructive font-medium">${spanishPhysicalPreorderUpsell.compareAtPrice}</span>
-                  <span className="text-xs font-bold text-primary">${spanishPhysicalPreorderUpsell.price}</span>
-                  <span className="text-[9px] bg-accent/20 text-accent font-bold px-1 rounded">PRE-ORDER</span>
+              )}
+              <p className="text-[10px] text-muted-foreground leading-tight">
+                Pre-order physical books · prices go up in <strong>June 2026</strong>
+              </p>
+              {visiblePreorders.map((preorder) => (
+                <div
+                  key={preorder.variantId}
+                  className={`flex items-center gap-3 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
+                    processingId === preorder.variantId ? "opacity-60 pointer-events-none" : ""
+                  }`}
+                  onClick={() => {
+                    if (processingId === preorder.variantId) return;
+                    handleToggle(preorder);
+                  }}
+                >
+                  <img
+                    src={preorder.image}
+                    alt={preorder.title}
+                    className="w-10 h-10 rounded object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{preorder.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{preorder.description}</p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] line-through text-destructive font-medium">${preorder.compareAtPrice}</span>
+                      <span className="text-xs font-bold text-primary">${preorder.price}</span>
+                      <span className="text-[9px] bg-accent/20 text-accent font-bold px-1 rounded">PRE-ORDER</span>
+                    </div>
+                  </div>
+                  <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">
+                    {processingId === preorder.variantId ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Plus className="h-3.5 w-3.5 text-accent" />
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">
-                {processingId === spanishPhysicalPreorderUpsell.variantId ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Plus className="h-3.5 w-3.5 text-accent" />
-                )}
-              </div>
+              ))}
             </div>
-          </div>
-        </>
-      )}
+          </>
+        );
+      })()}
     </div>
   );
 };

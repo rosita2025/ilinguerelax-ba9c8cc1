@@ -23,6 +23,15 @@ const CART_IMAGE_FALLBACKS: Record<string, { url: string; alt: string }> = {
   },
 };
 
+// Short display titles + subtitle + compareAt price for cart items
+const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compareAt?: string }> = {
+  "gid://shopify/ProductVariant/42931924795453": {
+    title: "5,000 Spanish Words",
+    subtitle: "with English Pronunciation",
+    compareAt: "69.99",
+  },
+};
+
 export const CartDrawer = () => {
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
@@ -183,13 +192,42 @@ export const CartDrawer = () => {
                         })()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium truncate text-sm">{item.product.node.title}</h4>
-                        {item.variantTitle !== "Default Title" &&
-                    <p className="text-xs text-muted-foreground">{item.variantTitle}</p>
-                    }
-                        <p className="font-semibold text-sm mt-1">
-                          ${parseFloat(item.price.amount).toFixed(2)} {item.price.currencyCode}
-                        </p>
+                        {(() => {
+                          const display = CART_ITEM_DISPLAY[item.variantId];
+                          const title = display?.title ?? item.product.node.title;
+                          const subtitle = display?.subtitle;
+                          const compareAt = display?.compareAt;
+                          const price = parseFloat(item.price.amount);
+                          const compareNum = compareAt ? parseFloat(compareAt) : null;
+                          const discountPct = compareNum && compareNum > price
+                            ? Math.round(((compareNum - price) / compareNum) * 100)
+                            : null;
+                          return (
+                            <>
+                              <h4 className="font-medium truncate text-sm">{title}</h4>
+                              {subtitle ? (
+                                <p className="text-[11px] text-muted-foreground truncate">{subtitle}</p>
+                              ) : item.variantTitle !== "Default Title" ? (
+                                <p className="text-xs text-muted-foreground">{item.variantTitle}</p>
+                              ) : null}
+                              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                {compareNum && (
+                                  <span className="text-xs line-through text-destructive font-medium">
+                                    ${compareNum.toFixed(2)}
+                                  </span>
+                                )}
+                                <span className="font-semibold text-sm text-primary">
+                                  ${price.toFixed(2)} {item.price.currencyCode}
+                                </span>
+                                {discountPct && (
+                                  <span className="text-[10px] bg-destructive/10 text-destructive font-bold px-1 rounded">
+                                    -{discountPct}%
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         <Button

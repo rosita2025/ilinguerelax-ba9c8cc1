@@ -38,7 +38,7 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   AR: "ARS",
 };
 
-function build(currency: CampaignCurrency, countryCode: string): CampaignPrice {
+function build(currency: CampaignCurrency, countryCode: string): Omit<CampaignPrice, "setCurrency"> {
   const cfg = PRICING[currency];
   // COP/ARS use thousand separators and no decimals; USD/GBP/CAD keep 2 decimals.
   const noDecimals = currency === "COP" || currency === "ARS";

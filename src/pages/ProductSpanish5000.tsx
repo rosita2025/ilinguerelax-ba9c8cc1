@@ -191,18 +191,18 @@ const ProductSpanish5000 = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Product Image */}
             <div className="relative">
-              {/* Trustpilot-style badge — placed above product image, separated */}
+              {/* Trustpilot-style badge — placed above product image, responsive 320/375/480+ */}
               <div className="flex justify-center mb-3">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-emerald-200 shadow-sm">
+                <div className="inline-flex items-center gap-1 xs:gap-1.5 px-2 xs:px-2.5 py-1 rounded-md bg-white border border-emerald-200 shadow-sm whitespace-nowrap">
                   <div className="flex items-center gap-0.5 shrink-0">
                     {[...Array(5)].map((_, i) => (
-                      <span key={i} className="inline-flex items-center justify-center w-3.5 h-3.5 bg-emerald-500 rounded-[2px]">
-                        <Star className="w-2.5 h-2.5 fill-white text-white" strokeWidth={0} />
+                      <span key={i} className="inline-flex items-center justify-center w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 bg-emerald-500 rounded-[2px]">
+                        <Star className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 fill-white text-white" strokeWidth={0} />
                       </span>
                     ))}
                   </div>
-                  <span className="text-[11px] font-bold text-slate-800 shrink-0">Excellent</span>
-                  <span className="text-[11px] font-bold text-emerald-600 shrink-0">★ Trustpilot</span>
+                  <span className="text-[10px] xs:text-[11px] sm:text-xs font-bold text-slate-800 shrink-0">Excellent</span>
+                  <span className="text-[10px] xs:text-[11px] sm:text-xs font-bold text-emerald-600 shrink-0">★ Trustpilot</span>
                 </div>
               </div>
 
@@ -262,15 +262,15 @@ const ProductSpanish5000 = () => {
                 ))}
               </ul>
 
-              {/* Reviews — single clean row, fits 320px+: ★★★★★ 4.8 (500+) ✓Verified */}
-              <div className="flex items-center gap-1.5 mb-4 whitespace-nowrap">
+              {/* Reviews — responsive single row, no wrap on 320/375/480+ */}
+              <div className="flex items-center gap-1 xs:gap-1.5 mb-4 whitespace-nowrap">
                 <div className="flex items-center gap-0.5 shrink-0">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />)}
                 </div>
-                <span className="font-bold text-foreground text-sm shrink-0">4.8</span>
-                <span className="text-muted-foreground text-xs shrink-0">(500+)</span>
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-[10px] font-semibold shrink-0">
-                  <BadgeCheck className="w-3 h-3" />
+                <span className="font-bold text-foreground text-xs xs:text-sm shrink-0">4.8</span>
+                <span className="text-muted-foreground text-[10px] xs:text-xs shrink-0">(500+)</span>
+                <span className="inline-flex items-center gap-0.5 px-1 xs:px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-[9px] xs:text-[10px] sm:text-xs font-semibold shrink-0">
+                  <BadgeCheck className="w-2.5 h-2.5 xs:w-3 xs:h-3" />
                   Verified
                 </span>
               </div>

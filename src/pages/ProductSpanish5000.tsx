@@ -247,31 +247,30 @@ const ProductSpanish5000 = () => {
                 ))}
               </ul>
 
-              {/* Reviews — stars, rating, Verified + Trustpilot-style badge */}
-              <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-                <div className="flex items-center gap-0.5">
+              {/* Reviews — compact mobile-first: stars + rating + Verified in one row, Trustpilot badge below */}
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="flex items-center gap-0.5 shrink-0">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
                 </div>
-                <span className="font-bold text-foreground text-sm">4.8/5</span>
-                <span className="text-muted-foreground text-sm">(500+ Reviews)</span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-[11px] font-semibold">
-                  <BadgeCheck className="w-3.5 h-3.5" />
+                <span className="font-bold text-foreground text-sm shrink-0">4.8</span>
+                <span className="text-muted-foreground text-xs shrink-0">(500+)</span>
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-[10px] font-semibold shrink-0">
+                  <BadgeCheck className="w-3 h-3" />
                   Verified
                 </span>
               </div>
 
-              {/* Trustpilot-style badge */}
-              <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-md bg-white border border-emerald-200 shadow-sm">
-                <div className="flex items-center gap-0.5">
+              {/* Trustpilot-style badge — compact, fits 320px+ */}
+              <div className="inline-flex items-center gap-1.5 mb-4 px-2 py-1 rounded-md bg-white border border-emerald-200 shadow-sm max-w-full">
+                <div className="flex items-center gap-0.5 shrink-0">
                   {[...Array(5)].map((_, i) => (
-                    <span key={i} className="inline-flex items-center justify-center w-4 h-4 bg-emerald-500 rounded-sm">
-                      <Star className="w-3 h-3 fill-white text-white" strokeWidth={0} />
+                    <span key={i} className="inline-flex items-center justify-center w-3.5 h-3.5 bg-emerald-500 rounded-[2px]">
+                      <Star className="w-2.5 h-2.5 fill-white text-white" strokeWidth={0} />
                     </span>
                   ))}
                 </div>
-                <span className="text-xs font-bold text-slate-800">Excellent</span>
-                <span className="text-xs text-slate-600">4.8 · 500+ reviews on</span>
-                <span className="text-xs font-bold text-emerald-600">★ Trustpilot</span>
+                <span className="text-[11px] font-bold text-slate-800 shrink-0">Excellent</span>
+                <span className="text-[11px] font-bold text-emerald-600 shrink-0">★ Trustpilot</span>
               </div>
 
               {/* Purchase Counter - Social Proof */}

@@ -2,12 +2,25 @@ import { CAMPAIGN_CURRENCIES, CampaignCurrency, CampaignPrice } from "@/hooks/us
 
 const FLAGS: Record<CampaignCurrency, string> = {
   USD: "🇺🇸",
+  EUR: "🇪🇺",
   GBP: "🇬🇧",
   CAD: "🇨🇦",
+  AUD: "🇦🇺",
   COP: "🇨🇴",
   ARS: "🇦🇷",
   PEN: "🇵🇪",
   MXN: "🇲🇽",
+  CLP: "🇨🇱",
+  BRL: "🇧🇷",
+  UYU: "🇺🇾",
+  BOB: "🇧🇴",
+  PYG: "🇵🇾",
+  GTQ: "🇬🇹",
+  DOP: "🇩🇴",
+  CRC: "🇨🇷",
+  HNL: "🇭🇳",
+  NIO: "🇳🇮",
+  VES: "🇻🇪",
 };
 
 interface Props {

@@ -52,6 +52,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { CampaignCurrencySelector } from "@/components/CampaignCurrencySelector";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";

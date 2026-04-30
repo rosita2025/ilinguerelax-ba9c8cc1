@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -99,6 +100,7 @@ const benefits = [
 
 
 const Product8000 = () => {
+  const campaign = useCampaignPrice(20, 54);
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
 
@@ -574,8 +576,8 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$20"
-        originalPrice="$54"
+        price={campaign.price}
+        originalPrice={campaign.originalPrice}
         rating={4.9}
         reviewCount={10000}
         buyUrl="https://pay.hotmart.com/U103990323W?checkoutMode=10" />

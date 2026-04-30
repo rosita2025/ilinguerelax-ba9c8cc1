@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Dialog,
@@ -13,6 +13,12 @@ export interface FlipbookPage {
   src: string;
   alt: string;
   caption?: string;
+  /** Optional low-quality placeholder shown while the full image loads. */
+  placeholder?: string;
+  /** Optional intrinsic width (px) for the image — improves CLS/LCP. */
+  width?: number;
+  /** Optional intrinsic height (px) for the image — improves CLS/LCP. */
+  height?: number;
 }
 
 interface PdfFlipbookProps {
@@ -40,6 +46,7 @@ export const PdfFlipbook = ({
 }: PdfFlipbookProps) => {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState<Record<number, boolean>>({ 0: false });
 
   const total = pages.length;
   const page = pages[index];
@@ -48,6 +55,35 @@ export const PdfFlipbook = ({
   const prev = () => setIndex((i) => (i - 1 + total) % total);
 
   if (total === 0) return null;
+
+  // Selective preload: only the next page (idle), once the current one is loaded.
+  // This keeps initial payload tiny on mobile (better LCP) but flips feel instant.
+  useEffect(() => {
+    if (!loaded[index]) return;
+    const nextIdx = (index + 1) % total;
+    if (loaded[nextIdx]) return;
+    const nextSrc = pages[nextIdx]?.src;
+    if (!nextSrc) return;
+
+    const schedule =
+      (window as unknown as { requestIdleCallback?: (cb: () => void) => number })
+        .requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
+
+    const id = schedule(() => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = nextSrc;
+      img.onload = () => setLoaded((s) => ({ ...s, [nextIdx]: true }));
+    });
+    return () => {
+      const cancel =
+        (window as unknown as { cancelIdleCallback?: (id: number) => void })
+          .cancelIdleCallback ?? window.clearTimeout;
+      cancel(id as number);
+    };
+  }, [index, loaded, pages, total]);
+
+  const isCurrentLoaded = !!loaded[index];
 
   return (
     <div className="rounded-2xl border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-background to-blue-500/5 p-4 md:p-5 shadow-card">
@@ -81,11 +117,31 @@ export const PdfFlipbook = ({
               className="relative aspect-[4/3] md:aspect-[3/2] w-full"
               style={{ transformStyle: "preserve-3d", perspective: "1200px" }}
             >
+              {/* Skeleton fallback while the page image is loading */}
+              {!isCurrentLoaded && (
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 animate-pulse"
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                    <BookOpen className="w-8 h-8 opacity-60" />
+                    <span className="text-xs font-medium">Loading page…</span>
+                  </div>
+                </div>
+              )}
               <img
                 src={page.src}
                 alt={page.alt}
-                className="w-full h-full object-contain object-top bg-white select-none pointer-events-none"
-                loading="lazy"
+                width={page.width}
+                height={page.height}
+                /* First page eager (above-the-fold LCP); rest lazy. */
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "low"}
+                decoding="async"
+                onLoad={() => setLoaded((s) => ({ ...s, [index]: true }))}
+                className={`w-full h-full object-contain object-top bg-white select-none pointer-events-none transition-opacity duration-300 ${
+                  isCurrentLoaded ? "opacity-100" : "opacity-0"
+                }`}
                 draggable={false}
               />
               {/* Diagonal watermark — protects IP */}

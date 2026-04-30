@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type CampaignCurrency = "USD" | "GBP" | "CAD";
+export type CampaignCurrency = "USD" | "GBP" | "CAD" | "COP" | "ARS";
 
 export interface CampaignPrice {
   currency: CampaignCurrency;
@@ -13,7 +13,7 @@ export interface CampaignPrice {
   countryCode: string;
 }
 
-const STORAGE_KEY = "campaign_currency_us_uk_ca";
+const STORAGE_KEY = "campaign_currency_v2";
 
 // Fixed marketing prices per currency (NOT live conversion).
 // Charge always happens in USD via Hotmart/Shopify; this is display-only.
@@ -21,6 +21,11 @@ const PRICING: Record<CampaignCurrency, { symbol: string; price: number; origina
   USD: { symbol: "$",  price: 29.99, original: 54 },
   GBP: { symbol: "£",  price: 23.99, original: 43 },
   CAD: { symbol: "CA$", price: 39.99, original: 72 },
+  // Fixed marketing prices for LATAM campaigns. Charge still happens in USD.
+  // COP: ~29.99 USD ≈ 120,000 COP → promo psychological price
+  COP: { symbol: "COP$", price: 119900, original: 219000 },
+  // ARS: ~29.99 USD ≈ 30,000 ARS (ajustable)
+  ARS: { symbol: "AR$",  price: 29999, original: 54000 },
 };
 
 const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
@@ -28,12 +33,22 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   GB: "GBP",
   UK: "GBP",
   CA: "CAD",
+  CO: "COP",
+  AR: "ARS",
 };
 
 function build(currency: CampaignCurrency, countryCode: string): CampaignPrice {
   const cfg = PRICING[currency];
-  const priceStr = `${cfg.symbol}${cfg.price.toFixed(2)}`;
-  const originalStr = `${cfg.symbol}${cfg.original}`;
+  // COP/ARS use thousand separators and no decimals; USD/GBP/CAD keep 2 decimals.
+  const noDecimals = currency === "COP" || currency === "ARS";
+  const priceFmt = noDecimals
+    ? Math.round(cfg.price).toLocaleString("es-CO")
+    : cfg.price.toFixed(2);
+  const originalFmt = noDecimals
+    ? Math.round(cfg.original).toLocaleString("es-CO")
+    : String(cfg.original);
+  const priceStr = `${cfg.symbol}${priceFmt}`;
+  const originalStr = `${cfg.symbol}${originalFmt}`;
   return {
     currency,
     symbol: cfg.symbol,

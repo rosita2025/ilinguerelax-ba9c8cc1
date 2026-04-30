@@ -247,8 +247,8 @@ const ProductSpanish5000 = () => {
                 ))}
               </ul>
 
-              {/* Reviews — single line, stars + rating + count together */}
-              <div className="flex items-center gap-1.5 mb-4 whitespace-nowrap">
+              {/* Reviews — stars, rating, Verified + Trustpilot-style badge */}
+              <div className="flex items-center gap-1.5 mb-2 flex-wrap">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
                 </div>
@@ -258,6 +258,20 @@ const ProductSpanish5000 = () => {
                   <BadgeCheck className="w-3.5 h-3.5" />
                   Verified
                 </span>
+              </div>
+
+              {/* Trustpilot-style badge */}
+              <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-md bg-white border border-emerald-200 shadow-sm">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="inline-flex items-center justify-center w-4 h-4 bg-emerald-500 rounded-sm">
+                      <Star className="w-3 h-3 fill-white text-white" strokeWidth={0} />
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs font-bold text-slate-800">Excellent</span>
+                <span className="text-xs text-slate-600">4.8 · 500+ reviews on</span>
+                <span className="text-xs font-bold text-emerald-600">★ Trustpilot</span>
               </div>
 
               {/* Purchase Counter - Social Proof */}

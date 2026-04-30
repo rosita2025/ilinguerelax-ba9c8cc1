@@ -28,6 +28,7 @@ const features = [
 ];
 
 const ProductItalian5000 = () => {
+  const campaign = useCampaignPrice(12, 54);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);

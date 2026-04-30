@@ -5,17 +5,44 @@ export type CampaignCurrency = "USD" | "GBP" | "CAD" | "COP" | "ARS";
 export interface CampaignPrice {
   currency: CampaignCurrency;
   symbol: string;
-  price: string;        // e.g. "$29.99"
+  price: string;        // e.g. "$29.99" or "COP$119.900"
   originalPrice: string; // e.g. "$54"
-  priceWithCurrency: string; // e.g. "$29.99 USD"
-  originalWithCurrency: string; // e.g. "$54 USD"
-  numericPrice: number;
+  priceWithCurrency: string;
+  originalWithCurrency: string;
+  numericPrice: number;  // local currency value
+  numericPriceUSD: number; // original USD (for tracking/checkout)
   countryCode: string;
   setCurrency: (c: CampaignCurrency) => void;
 }
 
 const STORAGE_KEY = "campaign_currency_v3";
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+// Fixed marketing exchange rates (NOT live). Charge always happens in USD.
+const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: number; nice: (n: number) => number }> = {
+  USD: { symbol: "$",    rate: 1,    decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  GBP: { symbol: "£",    rate: 0.80, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  CAD: { symbol: "CA$",  rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  // COP: tasa oficial ~4.000, redondeo a múltiplos de 100 terminados en 900
+  COP: { symbol: "COP$", rate: 4000, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 1000) * 1000;
+    return Math.max(900, rounded - 100); // termina en .900
+  }},
+  // ARS: dólar blue ~1.200, redondeo a terminaciones .990
+  ARS: { symbol: "AR$",  rate: 1200, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 1000) * 1000;
+    return rounded - 10; // termina en .990
+  }},
+};
+
+const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
+  US: "USD",
+  GB: "GBP",
+  UK: "GBP",
+  CA: "CAD",
+  CO: "COP",
+  AR: "ARS",
+};
 
 interface CachedDetection {
   currency: CampaignCurrency;
@@ -29,7 +56,7 @@ function readCache(): CachedDetection | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CachedDetection;
-    if (!parsed?.currency || !PRICING[parsed.currency]) return null;
+    if (!parsed?.currency || !RATES[parsed.currency]) return null;
     if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
     return parsed;
   } catch {
@@ -37,117 +64,96 @@ function readCache(): CachedDetection | null {
   }
 }
 
-// Fixed marketing prices per currency (NOT live conversion).
-// Charge always happens in USD via Hotmart/Shopify; this is display-only.
-const PRICING: Record<CampaignCurrency, { symbol: string; price: number; original: number }> = {
-  USD: { symbol: "$",  price: 29.99, original: 54 },
-  GBP: { symbol: "£",  price: 23.99, original: 43 },
-  CAD: { symbol: "CA$", price: 39.99, original: 72 },
-  // Fixed marketing prices for LATAM campaigns. Charge still happens in USD.
-  // COP: tasa oficial ~4.000 COP/USD → 29.99 USD ≈ 119.900 COP, original 54 USD ≈ 215.900 COP
-  COP: { symbol: "COP$", price: 119900, original: 215900 },
-  // ARS: dólar blue ~1.200 ARS/USD → 29.99 USD ≈ 35.990 ARS, original 54 USD ≈ 64.900 ARS
-  ARS: { symbol: "AR$",  price: 35990, original: 64900 },
-};
+function format(currency: CampaignCurrency, usdAmount: number): { str: string; numeric: number } {
+  const cfg = RATES[currency];
+  const local = cfg.nice(usdAmount * cfg.rate);
+  const formatted = cfg.decimals > 0
+    ? local.toFixed(cfg.decimals)
+    : Math.round(local).toLocaleString("es-CO");
+  return { str: `${cfg.symbol}${formatted}`, numeric: local };
+}
 
-const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
-  US: "USD",
-  GB: "GBP",
-  UK: "GBP",
-  CA: "CAD",
-  CO: "COP",
-  AR: "ARS",
-};
-
-function build(currency: CampaignCurrency, countryCode: string): Omit<CampaignPrice, "setCurrency"> {
-  const cfg = PRICING[currency];
-  // COP/ARS use thousand separators and no decimals; USD/GBP/CAD keep 2 decimals.
-  const noDecimals = currency === "COP" || currency === "ARS";
-  const priceFmt = noDecimals
-    ? Math.round(cfg.price).toLocaleString("es-CO")
-    : cfg.price.toFixed(2);
-  const originalFmt = noDecimals
-    ? Math.round(cfg.original).toLocaleString("es-CO")
-    : String(cfg.original);
-  const priceStr = `${cfg.symbol}${priceFmt}`;
-  const originalStr = `${cfg.symbol}${originalFmt}`;
+function build(
+  currency: CampaignCurrency,
+  countryCode: string,
+  priceUSD: number,
+  originalUSD: number,
+): Omit<CampaignPrice, "setCurrency"> {
+  const p = format(currency, priceUSD);
+  const o = format(currency, originalUSD);
   return {
     currency,
-    symbol: cfg.symbol,
-    price: priceStr,
-    originalPrice: originalStr,
-    priceWithCurrency: `${priceStr} ${currency}`,
-    originalWithCurrency: `${originalStr} ${currency}`,
-    numericPrice: cfg.price,
+    symbol: RATES[currency].symbol,
+    price: p.str,
+    originalPrice: o.str,
+    priceWithCurrency: `${p.str} ${currency}`,
+    originalWithCurrency: `${o.str} ${currency}`,
+    numericPrice: p.numeric,
+    numericPriceUSD: priceUSD,
     countryCode,
   };
 }
 
-/**
- * Detects visitor country via IP and returns a fixed marketing price
- * in USD / GBP / CAD. Defaults to USD for everything else.
- * Display-only — actual checkout still charges in USD.
- */
 export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "COP", "ARS"];
 
-export function useCampaignPrice(): CampaignPrice {
+/**
+ * Auto-detects visitor country via IP and returns the product price in their local
+ * marketing currency. Charge still happens in USD via Hotmart/Shopify.
+ *
+ * @param priceUSD     The current/sale price in USD (e.g. 29.99)
+ * @param originalUSD  The original/strikethrough price in USD (e.g. 54)
+ *
+ * Backwards compatibility: called with no args defaults to (29.99, 54) — the
+ * Spanish 5000 product. Existing callers keep working.
+ */
+export function useCampaignPrice(priceUSD: number = 29.99, originalUSD: number = 54): CampaignPrice {
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
-    // URL override: ?currency=COP for QA/testing without VPN
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
-      if (forced && PRICING[forced]) return build(forced, "");
+      if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD);
     }
     const cached = readCache();
-    if (cached) return build(cached.currency, cached.countryCode);
-    return build("USD", "US");
+    if (cached) return build(cached.currency, cached.countryCode, priceUSD, originalUSD);
+    return build("USD", "US", priceUSD, originalUSD);
   });
 
   useEffect(() => {
-    // Skip IP detection if URL forces a currency
     const params = new URLSearchParams(window.location.search);
     const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
-    if (forced && PRICING[forced]) return;
+    if (forced && RATES[forced]) {
+      setState(build(forced, "", priceUSD, originalUSD));
+      return;
+    }
 
-    // Always revalidate IP on mount; cache only short-circuits initial render.
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("https://ipapi.co/json/", {
-          signal: AbortSignal.timeout(3000),
-        });
+        const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
         if (!res.ok) return;
         const data = await res.json();
         const country = (data.country_code || "US").toUpperCase();
         const currency = COUNTRY_TO_CURRENCY[country] || "USD";
         if (cancelled) return;
-        const payload: CachedDetection = {
-          currency,
-          countryCode: country,
-          timestamp: Date.now(),
-        };
+        const payload: CachedDetection = { currency, countryCode: country, timestamp: Date.now() };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-        setState(build(currency, country));
+        setState(build(currency, country, priceUSD, originalUSD));
       } catch {
-        /* keep default USD */
+        /* keep default */
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    return () => { cancelled = true; };
+    // Re-run when prices change (different products on same page navigation)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [priceUSD, originalUSD]);
 
   const setCurrency = (c: CampaignCurrency) => {
-    if (!PRICING[c]) return;
-    const payload: CachedDetection = {
-      currency: c,
-      countryCode: state.countryCode,
-      timestamp: Date.now(),
-    };
+    if (!RATES[c]) return;
+    const payload: CachedDetection = { currency: c, countryCode: state.countryCode, timestamp: Date.now() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    setState(build(c, state.countryCode));
+    setState(build(c, state.countryCode, priceUSD, originalUSD));
   };
 
   return { ...state, setCurrency };

@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
 import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ const features = [
 ];
 
 const ProductGerman5000 = () => {
+  const campaign = useCampaignPrice(12, 54);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -140,9 +142,10 @@ const ProductGerman5000 = () => {
                     Precio de Lanzamiento
                   </span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-2">
+                  <span className={`${campaign.price.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground`}>{campaign.price}</span>
+                  <span className={`${campaign.price.length > 7 ? 'text-base md:text-2xl' : 'text-2xl'} text-muted-foreground line-through`}>{campaign.originalPrice}</span>
+                  <span className="text-sm md:text-base text-muted-foreground font-semibold">{campaign.currency}</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}

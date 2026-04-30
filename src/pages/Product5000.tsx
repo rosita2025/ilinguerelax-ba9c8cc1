@@ -213,6 +213,8 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
+  const campaign = useCampaignPrice(12, 54);
+  const campaignFull = useCampaignPrice(12, 107);
   const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
   const heroThumbs = [thumbProductoPrincipal, thumbEmociona];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);

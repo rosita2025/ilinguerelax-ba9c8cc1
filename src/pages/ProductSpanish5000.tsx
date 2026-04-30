@@ -333,6 +333,39 @@ const ProductSpanish5000 = () => {
                   💳 One-time payment • No subscriptions • Lifetime access
                 </p>
 
+                {/* Value stack — anchors perceived value vs price */}
+                <div className="bg-white/60 dark:bg-background/40 rounded-xl p-3 border border-purple-500/20 mb-3">
+                  <p className="text-[11px] font-bold text-purple-700 uppercase tracking-wide mb-1.5">
+                    What you actually get today:
+                  </p>
+                  <ul className="space-y-1 text-xs text-foreground">
+                    <li className="flex items-center justify-between">
+                      <span>📘 5,000 Spanish Words PDF</span>
+                      <span className="text-muted-foreground line-through">$54</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span>🎁 Spanish Exam (Bonus)</span>
+                      <span className="text-muted-foreground line-through">$19</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span>🎁 Daily Planner (Bonus)</span>
+                      <span className="text-muted-foreground line-through">$14</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span>🎁 Pronunciation Guide (Bonus)</span>
+                      <span className="text-muted-foreground line-through">$19</span>
+                    </li>
+                    <li className="flex items-center justify-between pt-1.5 mt-1 border-t border-purple-500/20 font-bold">
+                      <span>Total value</span>
+                      <span className="text-muted-foreground line-through">$106</span>
+                    </li>
+                    <li className="flex items-center justify-between text-emerald-700 font-extrabold">
+                      <span>Today only</span>
+                      <span>{campaign.price}</span>
+                    </li>
+                  </ul>
+                </div>
+
                 {/* Bonus stack preview — visible above CTA */}
                 <div className="bg-white/60 dark:bg-background/40 rounded-xl p-3 border border-purple-500/20">
                   <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2 flex items-center gap-1">

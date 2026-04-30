@@ -22,10 +22,10 @@ const PRICING: Record<CampaignCurrency, { symbol: string; price: number; origina
   GBP: { symbol: "£",  price: 23.99, original: 43 },
   CAD: { symbol: "CA$", price: 39.99, original: 72 },
   // Fixed marketing prices for LATAM campaigns. Charge still happens in USD.
-  // COP: ~29.99 USD ≈ 120,000 COP → promo psychological price
-  COP: { symbol: "COP$", price: 119900, original: 219000 },
-  // ARS: ~29.99 USD ≈ 30,000 ARS (ajustable)
-  ARS: { symbol: "AR$",  price: 29999, original: 54000 },
+  // COP: tasa oficial ~4.000 COP/USD → 29.99 USD ≈ 119.900 COP, original 54 USD ≈ 215.900 COP
+  COP: { symbol: "COP$", price: 119900, original: 215900 },
+  // ARS: dólar blue ~1.200 ARS/USD → 29.99 USD ≈ 35.990 ARS, original 54 USD ≈ 64.900 ARS
+  ARS: { symbol: "AR$",  price: 35990, original: 64900 },
 };
 
 const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {

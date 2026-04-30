@@ -1143,7 +1143,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price={campaign.price} originalPrice={campaign.originalPrice} currencyCode={campaign.currency} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText="ADD TO CART" showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode />
+      <StickyBuyBar price={campaign.price} originalPrice={campaign.originalPrice} currencyCode={campaign.currency} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText={stickyCtaText} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

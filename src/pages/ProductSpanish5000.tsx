@@ -281,17 +281,11 @@ const ProductSpanish5000 = () => {
 
               {/* CTA Button - Single Buy Now */}
               <div className="space-y-3 mb-6">
-                <motion.div whileHover={{
-                scale: 1.02
-              }} whileTap={{
-                scale: 0.98
-              }}>
-                  <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl bg-purple-600 hover:bg-purple-700" onClick={handleBuyNow}>
-                    <ShoppingCart className="w-6 h-6 mr-2" />
-                    ADD TO CART
-                    <ArrowRight className="w-6 h-6 ml-2" />
-                  </Button>
-                </motion.div>
+                <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-lg bg-purple-600 hover:bg-purple-700" onClick={handleBuyNow}>
+                  <ShoppingCart className="w-6 h-6 mr-2" />
+                  ADD TO CART
+                  <ArrowRight className="w-6 h-6 ml-2" />
+                </Button>
               </div>
 
               <p className="text-center text-sm text-muted-foreground mb-6">
@@ -969,7 +963,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price={campaign.price} originalPrice={campaign.originalPrice} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText="ADD TO CART" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
+      <StickyBuyBar price={campaign.price} originalPrice={campaign.originalPrice} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText="ADD TO CART" showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

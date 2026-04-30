@@ -5,64 +5,90 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Sale {
   name: string;
   country: string;
+  /** Spanish time label */
   timeAgo: string;
+  /** English time label (used when lang="en") */
+  timeAgoEn?: string;
   productName: string;
+  /** Optional English product name override */
+  productNameEn?: string;
   productLabel: string;
   platform: "hotmart" | "shopify";
+  /** Used to filter sales per product page */
+  productKey?: "spanish5000" | "english5000" | "english8000" | "verbs1000" | "questions500" | "book5000" | "book8000";
+  /** When true, shows a pulsing "live" indicator instead of timeAgo */
+  live?: boolean;
 }
 
 // All real product purchases across Hotmart and Shopify
 const allSales: Sale[] = [
   // 5,000 Palabras Digital (Hotmart)
-  { name: "María García", country: "México", timeAgo: "hace 5 horas", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
-  { name: "Carlos López", country: "España", timeAgo: "hace 1 día", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
-  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 6 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
-  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 15 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
-  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 25 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart" },
+  { name: "María García", country: "México", timeAgo: "hace 5 horas", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart", productKey: "english5000" },
+  { name: "Carlos López", country: "España", timeAgo: "hace 1 día", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart", productKey: "english5000" },
+  { name: "Valentina Ruiz", country: "Uruguay", timeAgo: "hace 6 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart", productKey: "english5000" },
+  { name: "Sofía Ramírez", country: "Guatemala", timeAgo: "hace 15 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart", productKey: "english5000" },
+  { name: "Diego Morales", country: "Costa Rica", timeAgo: "hace 25 días", productName: "5,000 Palabras en Inglés", productLabel: "5,000", platform: "hotmart", productKey: "english5000" },
 
   // 8,000 Palabras Digital (Hotmart)
-  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 3 horas", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
-  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 1 día", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
-  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 3 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
-  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 10 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
-  { name: "Camila Vargas", country: "Bolivia", timeAgo: "hace 30 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart" },
+  { name: "Ana Martínez", country: "Argentina", timeAgo: "hace 3 horas", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart", productKey: "english8000" },
+  { name: "Pedro Sánchez", country: "Colombia", timeAgo: "hace 1 día", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart", productKey: "english8000" },
+  { name: "Laura Rodríguez", country: "Chile", timeAgo: "hace 3 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart", productKey: "english8000" },
+  { name: "Fernando Castro", country: "Panamá", timeAgo: "hace 10 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart", productKey: "english8000" },
+  { name: "Camila Vargas", country: "Bolivia", timeAgo: "hace 30 días", productName: "8,000 Palabras en Inglés", productLabel: "8,000", platform: "hotmart", productKey: "english8000" },
 
   // 1,000 Verbos (Hotmart)
-  { name: "José Hernández", country: "Perú", timeAgo: "hace 8 horas", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart" },
-  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 2 días", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart" },
-  { name: "Roberto Flores", country: "Honduras", timeAgo: "hace 12 días", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart" },
+  { name: "José Hernández", country: "Perú", timeAgo: "hace 8 horas", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart", productKey: "verbs1000" },
+  { name: "Carmen Díaz", country: "Ecuador", timeAgo: "hace 2 días", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart", productKey: "verbs1000" },
+  { name: "Roberto Flores", country: "Honduras", timeAgo: "hace 12 días", productName: "1,000 Verbos en Inglés", productLabel: "1,000", platform: "hotmart", productKey: "verbs1000" },
 
   // 500 Preguntas (Hotmart)
-  { name: "Isabel Mendoza", country: "El Salvador", timeAgo: "hace 1 día", productName: "500 Preguntas en Inglés", productLabel: "500", platform: "hotmart" },
-  { name: "Andrés Ríos", country: "Paraguay", timeAgo: "hace 5 días", productName: "500 Preguntas en Inglés", productLabel: "500", platform: "hotmart" },
+  { name: "Isabel Mendoza", country: "El Salvador", timeAgo: "hace 1 día", productName: "500 Preguntas en Inglés", productLabel: "500", platform: "hotmart", productKey: "questions500" },
+  { name: "Andrés Ríos", country: "Paraguay", timeAgo: "hace 5 días", productName: "500 Preguntas en Inglés", productLabel: "500", platform: "hotmart", productKey: "questions500" },
 
   // 5,000 Palabras Libro Físico (Shopify)
-  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 2 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify" },
-  { name: "Patricia Reyes", country: "México", timeAgo: "hace 8 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify" },
-  { name: "Gabriela Peña", country: "Chile", timeAgo: "hace 20 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify" },
+  { name: "Miguel Torres", country: "Venezuela", timeAgo: "hace 2 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify", productKey: "book5000" },
+  { name: "Patricia Reyes", country: "México", timeAgo: "hace 8 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify", productKey: "book5000" },
+  { name: "Gabriela Peña", country: "Chile", timeAgo: "hace 20 días", productName: "5,000 Palabras Libro Físico", productLabel: "📖 5K", platform: "shopify", productKey: "book5000" },
 
   // 8,000 Palabras Libro Físico (Shopify)
-  { name: "Ricardo Silva", country: "Colombia", timeAgo: "hace 1 día", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify" },
-  { name: "Lucía Navarro", country: "España", timeAgo: "hace 4 días", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify" },
-  { name: "Martín Aguilar", country: "Argentina", timeAgo: "hace 18 días", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify" },
+  { name: "Ricardo Silva", country: "Colombia", timeAgo: "hace 1 día", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify", productKey: "book8000" },
+  { name: "Lucía Navarro", country: "España", timeAgo: "hace 4 días", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify", productKey: "book8000" },
+  { name: "Martín Aguilar", country: "Argentina", timeAgo: "hace 18 días", productName: "8,000 Palabras Libro Físico", productLabel: "📖 8K", platform: "shopify", productKey: "book8000" },
 
-  // Spanish for English Speakers (Hotmart)
-  { name: "Sarah Johnson", country: "United States", timeAgo: "hace 6 horas", productName: "Spanish 5,000 Words", productLabel: "🇪🇸 5K", platform: "hotmart" },
-  { name: "James Smith", country: "United Kingdom", timeAgo: "hace 3 días", productName: "Spanish 5,000 Words", productLabel: "🇪🇸 5K", platform: "hotmart" },
-  { name: "Emily Brown", country: "Canada", timeAgo: "hace 14 días", productName: "Spanish 5,000 Words", productLabel: "🇪🇸 5K", platform: "hotmart" },
+  // Spanish for English Speakers (Hotmart) — English copy + short timestamps for trust
+  { name: "Sarah Johnson", country: "United States", timeAgo: "hace 1 hora", timeAgoEn: "1 hour ago", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000" },
+  { name: "Michael Davis", country: "United States", timeAgo: "hace 4 horas", timeAgoEn: "4 hours ago", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000" },
+  { name: "Jessica Wilson", country: "Canada", timeAgo: "ahora", timeAgoEn: "just now", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000", live: true },
+  { name: "James Smith", country: "United Kingdom", timeAgo: "hace 12 horas", timeAgoEn: "12 hours ago", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000" },
+  { name: "Emily Brown", country: "Canada", timeAgo: "hace 2 días", timeAgoEn: "2 days ago", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000" },
+  { name: "David Miller", country: "Australia", timeAgo: "hace 6 horas", timeAgoEn: "6 hours ago", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000" },
+  { name: "Olivia Taylor", country: "United States", timeAgo: "ahora", timeAgoEn: "live now", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000", live: true },
+  { name: "Daniel Anderson", country: "Ireland", timeAgo: "hace 3 días", timeAgoEn: "3 days ago", productName: "5,000 Spanish Words", productNameEn: "5,000 Spanish Words", productLabel: "🇪🇸 5K", platform: "hotmart", productKey: "spanish5000" },
 ];
 
 interface SalesNotificationProps {
   productName?: string;
   productLabel?: string;
   variant?: "latin" | "international";
+  /** UI language for the notification copy. Defaults to "es". */
+  lang?: "es" | "en";
+  /** When provided, filters notifications to only this product. */
+  productKey?: Sale["productKey"];
 }
 
 const SalesNotification = ({ 
-  variant = "latin"
+  variant = "latin",
+  lang = "es",
+  productKey,
 }: SalesNotificationProps) => {
-  // Shuffle sales on mount for variety
-  const [shuffledSales] = useState(() => [...allSales].sort(() => Math.random() - 0.5));
+  // Optionally filter by product, then shuffle for variety
+  const [shuffledSales] = useState(() => {
+    const pool = productKey
+      ? allSales.filter((s) => s.productKey === productKey)
+      : allSales;
+    const list = pool.length > 0 ? pool : allSales;
+    return [...list].sort(() => Math.random() - 0.5);
+  });
   const [currentSale, setCurrentSale] = useState<Sale>(shuffledSales[0]);
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
@@ -138,7 +164,7 @@ const SalesNotification = ({
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
               <span className="text-[5px] md:text-[6px] font-bold text-black text-center leading-tight">
-                {currentSale.productLabel}<br/>PALABRAS
+                {currentSale.productLabel}<br/>{lang === "en" ? "WORDS" : "PALABRAS"}
               </span>
             </div>
             
@@ -153,11 +179,22 @@ const SalesNotification = ({
                 </p>
               </div>
               <p className="text-[9px] md:text-xs text-gray-600 truncate">
-                Compró {currentSale.productName}
+                {lang === "en" ? "Purchased" : "Compró"} {lang === "en" ? (currentSale.productNameEn ?? currentSale.productName) : currentSale.productName}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
-                <span className="text-[8px] md:text-[10px] text-green-600 font-medium">✓ Verificado</span>
-                <span className="text-[8px] md:text-[9px] text-gray-400">{currentSale.timeAgo}</span>
+                <span className="text-[8px] md:text-[10px] text-green-600 font-medium">
+                  ✓ {lang === "en" ? "Verified Purchase" : "Compra Verificada"}
+                </span>
+                {currentSale.live ? (
+                  <span className="inline-flex items-center gap-1 text-[8px] md:text-[9px] text-red-600 font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    {lang === "en" ? "live now" : "en vivo"}
+                  </span>
+                ) : (
+                  <span className="text-[8px] md:text-[9px] text-gray-400">
+                    {lang === "en" ? (currentSale.timeAgoEn ?? currentSale.timeAgo) : currentSale.timeAgo}
+                  </span>
+                )}
               </div>
             </div>
           </div>

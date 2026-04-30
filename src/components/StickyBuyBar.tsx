@@ -24,6 +24,8 @@ interface StickyBuyBarProps {
   isSecondaryLoading?: boolean;
   ctaClassName?: string;
   isPhysical?: boolean;
+  /** Disables pulsing/scaling animations for accessibility (e.g. older audiences) */
+  calmMode?: boolean;
 }
 
 export const StickyBuyBar = ({
@@ -47,6 +49,7 @@ export const StickyBuyBar = ({
   isSecondaryLoading = false,
   ctaClassName,
   isPhysical = false,
+  calmMode = false,
 }: StickyBuyBarProps) => {
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
@@ -54,12 +57,13 @@ export const StickyBuyBar = ({
 
   // Subtle pulse every 6s to grab attention without being annoying
   useEffect(() => {
+    if (calmMode) return; // skip pulsing entirely in calm mode
     const id = setInterval(() => {
       setPulse(true);
       setTimeout(() => setPulse(false), 1200);
     }, 6000);
     return () => clearInterval(id);
-  }, []);
+  }, [calmMode]);
 
   const handleBuy = () => {
     if (!disabled && !isLoading) {
@@ -99,7 +103,7 @@ export const StickyBuyBar = ({
       {/* Top urgency strip - high visibility */}
       {!disabled && !showEmailSubscription && (
         <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-3 text-center">
-          <p className="text-[11px] lg:text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 animate-pulse">
+          <p className={`text-[11px] lg:text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 ${calmMode ? '' : 'animate-pulse'}`}>
             <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
             {isPhysical
               ? (lang === "en" ? "LIMITED OFFER • Fast Physical Shipping • 3 FREE BONUSES" : "OFERTA LIMITADA • Envío Físico Rápido • 3 BONUS GRATIS")

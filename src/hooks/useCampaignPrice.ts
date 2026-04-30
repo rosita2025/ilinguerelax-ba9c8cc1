@@ -93,12 +93,23 @@ export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "CO
 export function useCampaignPrice(): CampaignPrice {
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
+    // URL override: ?currency=COP for QA/testing without VPN
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+      if (forced && PRICING[forced]) return build(forced, "");
+    }
     const cached = readCache();
     if (cached) return build(cached.currency, cached.countryCode);
     return build("USD", "US");
   });
 
   useEffect(() => {
+    // Skip IP detection if URL forces a currency
+    const params = new URLSearchParams(window.location.search);
+    const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+    if (forced && PRICING[forced]) return;
+
     // Always revalidate IP on mount; cache only short-circuits initial render.
     let cancelled = false;
     (async () => {

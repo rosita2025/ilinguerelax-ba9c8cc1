@@ -54,6 +54,8 @@ export const StickyBuyBar = ({
   calmMode = false,
   currencyCode = "USD",
 }: StickyBuyBarProps) => {
+  // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
+  const isLongPrice = price.length > 7;
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);
@@ -126,17 +128,17 @@ export const StickyBuyBar = ({
           )}
           {/* Row 1: Price + Reviews compacto en una línea */}
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1.5 min-w-0 flex-shrink">
-              <span className="text-base sm:text-lg font-bold text-foreground whitespace-nowrap">{price}</span>
-              {originalPrice && (
+            <div className="flex items-baseline gap-1 min-w-0 flex-shrink">
+              <span className={`${isLongPrice ? 'text-sm' : 'text-base'} sm:text-lg font-bold text-foreground whitespace-nowrap`}>{price}</span>
+              {originalPrice && !isLongPrice && (
                 <span className="text-[11px] text-muted-foreground line-through whitespace-nowrap">{originalPrice}</span>
               )}
               <span className="text-[10px] text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {showReviews && (
-              <div className="flex items-center gap-1 text-xs">
-                {renderStars()}
-                <span className="text-foreground font-medium">{rating}</span>
+              <div className="flex items-center gap-1 text-xs flex-shrink-0">
+                {!isLongPrice && renderStars()}
+                <span className="text-foreground font-medium">★ {rating}</span>
                 <span className="text-muted-foreground">({reviewCount})</span>
               </div>
             )}

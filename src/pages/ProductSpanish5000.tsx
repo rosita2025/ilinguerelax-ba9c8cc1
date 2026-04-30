@@ -179,7 +179,24 @@ const ProductSpanish5000 = () => {
       selectedOptions: [{ name: "Title", value: "Default Title" }]
     });
 
-    setDrawerOpen(true);
+    // Express checkout: skip drawer and go straight to Shopify (lower friction → higher conversion)
+    const checkoutUrl = useCartStore.getState().checkoutUrl;
+    if (checkoutUrl) {
+      // Track InitiateCheckout for Meta Pixel attribution
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Spanish Relax - 5,000 Words",
+        content_ids: ["product-spanish-5000"],
+        value: 29.99,
+        currency: "USD",
+        num_items: 1,
+        ab_experiment: "spanish5000_headline_v1",
+        ab_variant: headlineVariant ?? "unassigned",
+      });
+      window.open(checkoutUrl, "_blank");
+    } else {
+      // Fallback: open the cart drawer if checkout URL is not yet available
+      setDrawerOpen(true);
+    }
   };
   return <main className="min-h-screen bg-background">
       <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="29.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />

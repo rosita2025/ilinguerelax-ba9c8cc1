@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -135,6 +136,12 @@ const ProductSpanish5000 = () => {
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
 
+  // A/B test: main headline (50/50 split, persisted per browser)
+  const headlineVariant = useAbTest(
+    "spanish5000_headline_v1",
+    ["A_speak7days", "B_5000words"] as const,
+  );
+
   const handleBuyNow = async () => {
     // Track AddToCart event with Meta Pixel
     trackHotmartEvent("AddToCart", {
@@ -144,7 +151,9 @@ const ProductSpanish5000 = () => {
       content_type: "product",
       value: 29.99,
       currency: "USD",
-      num_items: 1
+      num_items: 1,
+      ab_experiment: "spanish5000_headline_v1",
+      ab_variant: headlineVariant ?? "unassigned",
     });
 
     // Add to cart only; checkout continues from the cart drawer
@@ -201,9 +210,22 @@ const ProductSpanish5000 = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
-                Speak Spanish in 7 Days —{" "}
-                <span className="text-purple-600">Without the Frustration</span> of Confusing Pronunciation
+              <h1
+                className="text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight"
+                data-ab-experiment="spanish5000_headline_v1"
+                data-ab-variant={headlineVariant ?? "loading"}
+              >
+                {headlineVariant === "B_5000words" ? (
+                  <>
+                    5,000 Spanish Words{" "}
+                    <span className="text-purple-600">You Can Pronounce</span> Today
+                  </>
+                ) : (
+                  <>
+                    Speak Spanish in 7 Days —{" "}
+                    <span className="text-purple-600">Without the Frustration</span> of Confusing Pronunciation
+                  </>
+                )}
               </h1>
 
               <p className="text-base md:text-lg text-muted-foreground mb-4">

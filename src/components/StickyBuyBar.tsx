@@ -26,6 +26,8 @@ interface StickyBuyBarProps {
   isPhysical?: boolean;
   /** Disables pulsing/scaling animations for accessibility (e.g. older audiences) */
   calmMode?: boolean;
+  /** Currency code label shown next to price (e.g. "USD", "COP", "ARS"). Defaults to "USD". */
+  currencyCode?: string;
 }
 
 export const StickyBuyBar = ({
@@ -50,6 +52,7 @@ export const StickyBuyBar = ({
   ctaClassName,
   isPhysical = false,
   calmMode = false,
+  currencyCode = "USD",
 }: StickyBuyBarProps) => {
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
@@ -123,17 +126,12 @@ export const StickyBuyBar = ({
           )}
           {/* Row 1: Price + Reviews compacto en una línea */}
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-bold text-foreground">{price}</span>
+            <div className="flex items-baseline gap-1.5 min-w-0 flex-shrink">
+              <span className="text-base sm:text-lg font-bold text-foreground whitespace-nowrap">{price}</span>
               {originalPrice && (
-                <>
-                  <span className="text-xs text-muted-foreground line-through">{originalPrice}</span>
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full">
-                    -50%
-                  </span>
-                </>
+                <span className="text-[11px] text-muted-foreground line-through whitespace-nowrap">{originalPrice}</span>
               )}
-              <span className="text-[10px] text-muted-foreground">USD</span>
+              <span className="text-[10px] text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {showReviews && (
               <div className="flex items-center gap-1 text-xs">
@@ -258,12 +256,12 @@ export const StickyBuyBar = ({
           <div className="flex items-center gap-4">
             {/* Price */}
             <div className="text-right">
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 whitespace-nowrap">
                 <span className="text-2xl font-bold text-foreground">{price}</span>
                 {originalPrice && (
                   <span className="text-sm text-muted-foreground line-through">{originalPrice}</span>
                 )}
-                <span className="text-sm text-muted-foreground">USD</span>
+                <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>
               {!disabled && (
                 <p className="text-xs text-muted-foreground">

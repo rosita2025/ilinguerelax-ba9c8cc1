@@ -253,6 +253,9 @@ const ProductSpanish5000 = () => {
                   💳 One-time payment • No subscriptions • Lifetime access
                 </p>
 
+                {/* Manual currency switcher (also auto-detected by IP) */}
+                <CampaignCurrencySelector campaign={campaign} className="mb-3" />
+
                 {/* Bonus stack preview — visible above CTA */}
                 <div className="bg-white/60 dark:bg-background/40 rounded-xl p-3 border border-purple-500/20">
                   <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2 flex items-center gap-1">

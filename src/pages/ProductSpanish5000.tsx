@@ -52,6 +52,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { PdfFlipbook } from "@/components/PdfFlipbook";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -311,6 +312,37 @@ const ProductSpanish5000 = () => {
                   <p className="text-sm text-green-600">If you're not satisfied, we'll refund ALL your money. No questions asked.</p>
                 </div>
               </motion.div>
+
+              {/* PDF Flipbook — real preview to build trust before purchase */}
+              <div className="mt-6">
+                <PdfFlipbook
+                  title="Look inside the PDF"
+                  subtitle="Real interior pages — flip to see what you'll get"
+                  accentClass="text-purple-600"
+                  pages={[
+                    {
+                      src: previewSpanishIndex,
+                      alt: "Complete index — 50 chapters from beginner to advanced",
+                      caption: "📑 Complete index — 50 organized chapters",
+                    },
+                    {
+                      src: previewSpanishVocab,
+                      alt: "Vocabulary table with English pronunciation",
+                      caption: "🔤 5,000 words written the way they sound in English",
+                    },
+                    {
+                      src: previewSpanishPhrases,
+                      alt: "Practical phrases with grammar structure",
+                      caption: "💬 Real-life phrases with phonetic pronunciation",
+                    },
+                    {
+                      src: previewSpanishUpdates,
+                      alt: "Free lifetime updates included",
+                      caption: "🔄 Free lifetime updates included",
+                    },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </div>

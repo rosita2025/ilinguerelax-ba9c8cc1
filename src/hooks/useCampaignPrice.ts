@@ -14,7 +14,28 @@ export interface CampaignPrice {
   setCurrency: (c: CampaignCurrency) => void;
 }
 
-const STORAGE_KEY = "campaign_currency_v2";
+const STORAGE_KEY = "campaign_currency_v3";
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+interface CachedDetection {
+  currency: CampaignCurrency;
+  countryCode: string;
+  timestamp: number;
+}
+
+function readCache(): CachedDetection | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CachedDetection;
+    if (!parsed?.currency || !PRICING[parsed.currency]) return null;
+    if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
 
 // Fixed marketing prices per currency (NOT live conversion).
 // Charge always happens in USD via Hotmart/Shopify; this is display-only.
@@ -72,17 +93,13 @@ export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "CO
 export function useCampaignPrice(): CampaignPrice {
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
-    if (typeof window !== "undefined") {
-      const cached = localStorage.getItem(STORAGE_KEY) as CampaignCurrency | null;
-      if (cached && PRICING[cached]) return build(cached, "");
-    }
+    const cached = readCache();
+    if (cached) return build(cached.currency, cached.countryCode);
     return build("USD", "US");
   });
 
   useEffect(() => {
-    const cached = localStorage.getItem(STORAGE_KEY) as CampaignCurrency | null;
-    if (cached && PRICING[cached]) return;
-
+    // Always revalidate IP on mount; cache only short-circuits initial render.
     let cancelled = false;
     (async () => {
       try {
@@ -94,7 +111,12 @@ export function useCampaignPrice(): CampaignPrice {
         const country = (data.country_code || "US").toUpperCase();
         const currency = COUNTRY_TO_CURRENCY[country] || "USD";
         if (cancelled) return;
-        localStorage.setItem(STORAGE_KEY, currency);
+        const payload: CachedDetection = {
+          currency,
+          countryCode: country,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         setState(build(currency, country));
       } catch {
         /* keep default USD */
@@ -108,7 +130,12 @@ export function useCampaignPrice(): CampaignPrice {
 
   const setCurrency = (c: CampaignCurrency) => {
     if (!PRICING[c]) return;
-    localStorage.setItem(STORAGE_KEY, c);
+    const payload: CachedDetection = {
+      currency: c,
+      countryCode: state.countryCode,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     setState(build(c, state.countryCode));
   };
 

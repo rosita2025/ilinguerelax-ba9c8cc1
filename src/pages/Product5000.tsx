@@ -22,6 +22,7 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 import { CustomerReviewsCarousel } from "@/components/CustomerReviewsCarousel";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {

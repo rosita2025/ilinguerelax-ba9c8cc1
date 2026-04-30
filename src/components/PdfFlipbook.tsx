@@ -117,11 +117,31 @@ export const PdfFlipbook = ({
               className="relative aspect-[4/3] md:aspect-[3/2] w-full"
               style={{ transformStyle: "preserve-3d", perspective: "1200px" }}
             >
+              {/* Skeleton fallback while the page image is loading */}
+              {!isCurrentLoaded && (
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 animate-pulse"
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                    <BookOpen className="w-8 h-8 opacity-60" />
+                    <span className="text-xs font-medium">Loading page…</span>
+                  </div>
+                </div>
+              )}
               <img
                 src={page.src}
                 alt={page.alt}
-                className="w-full h-full object-contain object-top bg-white select-none pointer-events-none"
-                loading="lazy"
+                width={page.width}
+                height={page.height}
+                /* First page eager (above-the-fold LCP); rest lazy. */
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "low"}
+                decoding="async"
+                onLoad={() => setLoaded((s) => ({ ...s, [index]: true }))}
+                className={`w-full h-full object-contain object-top bg-white select-none pointer-events-none transition-opacity duration-300 ${
+                  isCurrentLoaded ? "opacity-100" : "opacity-0"
+                }`}
                 draggable={false}
               />
               {/* Diagonal watermark — protects IP */}

@@ -15,7 +15,7 @@ export interface CampaignPrice {
   setCurrency: (c: CampaignCurrency) => void;
 }
 
-const STORAGE_KEY = "campaign_currency_v3";
+const STORAGE_KEY = "campaign_currency_v4";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 // Fixed marketing exchange rates (NOT live). Charge always happens in USD.

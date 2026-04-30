@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
@@ -37,6 +38,7 @@ const features = [
 ];
 
 const Product500Preguntas = () => {
+  const campaign = useCampaignPrice(10, 54);
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 500 Preguntas en Inglés",
     content_category: "Digital Book",
@@ -258,8 +260,8 @@ const Product500Preguntas = () => {
       <Footer />
 
       <StickyBuyBar
-        price="$10"
-        originalPrice="$54"
+        price={campaign.price}
+        originalPrice={campaign.originalPrice}
         productName="INGLÉS RELAX - 500 Preguntas en Inglés (Digital PDF)"
         rating={4.7}
         reviewCount={280}

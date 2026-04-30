@@ -837,6 +837,9 @@ const ProductSpanish5000 = () => {
       </section>
 
 
+      {/* Review submission form — kept at the end */}
+      <ProductReviews productType="spanish" showReviewForm />
+
       {/* Final CTA */}
       <section className="py-20 md:py-28 bg-purple-500">
         <div className="container px-4 md:px-6">

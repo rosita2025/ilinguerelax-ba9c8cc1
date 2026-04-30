@@ -247,13 +247,13 @@ const ProductSpanish5000 = () => {
                 ))}
               </ul>
 
-              {/* Reviews - More Prominent */}
-              <div className="flex items-center gap-3 mb-4 flex-wrap">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+              {/* Reviews — single line, stars + rating + count together */}
+              <div className="flex items-center gap-1.5 mb-4 whitespace-nowrap">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
                 </div>
-                <span className="font-bold text-foreground">4.8/5</span>
-                <span className="text-muted-foreground">(500+ Verified Reviews)</span>
+                <span className="font-bold text-foreground text-sm">4.8/5</span>
+                <span className="text-muted-foreground text-sm">(500+ Verified Reviews)</span>
               </div>
 
               {/* Purchase Counter - Social Proof */}

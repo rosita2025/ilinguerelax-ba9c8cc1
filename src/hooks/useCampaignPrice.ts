@@ -11,6 +11,7 @@ export interface CampaignPrice {
   originalWithCurrency: string; // e.g. "$54 USD"
   numericPrice: number;
   countryCode: string;
+  setCurrency: (c: CampaignCurrency) => void;
 }
 
 const STORAGE_KEY = "campaign_currency_v2";
@@ -66,6 +67,8 @@ function build(currency: CampaignCurrency, countryCode: string): CampaignPrice {
  * in USD / GBP / CAD. Defaults to USD for everything else.
  * Display-only — actual checkout still charges in USD.
  */
+export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "COP", "ARS"];
+
 export function useCampaignPrice(): CampaignPrice {
   const [state, setState] = useState<CampaignPrice>(() => {
     if (typeof window !== "undefined") {
@@ -102,5 +105,11 @@ export function useCampaignPrice(): CampaignPrice {
     };
   }, []);
 
-  return state;
+  const setCurrency = (c: CampaignCurrency) => {
+    if (!PRICING[c]) return;
+    localStorage.setItem(STORAGE_KEY, c);
+    setState(build(c, state.countryCode));
+  };
+
+  return { ...state, setCurrency };
 }

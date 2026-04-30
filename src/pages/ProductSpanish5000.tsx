@@ -118,6 +118,8 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 );
 
 const ProductSpanish5000 = () => {
+  // Multi-currency display (USA / UK / Canada campaign). Display only.
+  const campaign = useCampaignPrice();
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words",
@@ -234,8 +236,9 @@ const ProductSpanish5000 = () => {
                   <span className="text-purple-600 font-semibold text-sm uppercase">Launch price ends Sunday</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$29.99</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">{campaign.price}</span>
+                  <span className="text-2xl text-muted-foreground line-through">{campaign.originalPrice}</span>
+                  <span className="text-base text-muted-foreground font-semibold">{campaign.currency}</span>
                   <motion.span animate={{
                   scale: [1, 1.05, 1]
                 }} transition={{
@@ -320,7 +323,7 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Countdown Timer */}
-      <CountdownTimer hoursFromNow={48} currentPrice="$29.99 USD" originalPrice="$54 USD" storageKey="countdown_spanish_book" lang="en" />
+      <CountdownTimer hoursFromNow={48} currentPrice={campaign.priceWithCurrency} originalPrice={campaign.originalWithCurrency} storageKey="countdown_spanish_book" lang="en" />
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">
@@ -743,9 +746,9 @@ const ProductSpanish5000 = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
               <div className="flex items-baseline justify-center gap-3 mb-2">
-                <span className="text-5xl font-bold text-foreground">$29.99</span>
-                <span className="text-2xl text-muted-foreground line-through">$54</span>
-                <span className="text-purple-600 font-bold">USD</span>
+                <span className="text-5xl font-bold text-foreground">{campaign.price}</span>
+                <span className="text-2xl text-muted-foreground line-through">{campaign.originalPrice}</span>
+                <span className="text-purple-600 font-bold">{campaign.currency}</span>
               </div>
               <div className="flex justify-center mb-4">
                 <span className="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">SAVE 48%</span>
@@ -966,7 +969,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price="$29.99" originalPrice="$54" productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText="ADD TO CART" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
+      <StickyBuyBar price={campaign.price} originalPrice={campaign.originalPrice} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText="ADD TO CART" showReviews={true} rating={4.8} reviewCount={500} lang="en" />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

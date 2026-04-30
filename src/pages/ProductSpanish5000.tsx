@@ -797,8 +797,8 @@ const ProductSpanish5000 = () => {
               <h3 className="text-white font-bold text-sm mb-1">5,000 Spanish Words</h3>
               <p className="text-slate-400 text-xs mb-2">Vocabulary + English pronunciation</p>
               <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-white font-bold">$29.99</span>
-                <span className="text-slate-500 line-through text-xs">$54</span>
+                <span className="text-white font-bold">{campaign.price}</span>
+                <span className="text-slate-500 line-through text-xs">{campaign.originalPrice}</span>
               </div>
               <Button
                 size="sm"

@@ -418,7 +418,7 @@ const ProductSpanish5000 = () => {
                   </span>
                   <span className="flex items-center gap-1">
                     <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    7-day refund
+                    30-day refund
                   </span>
                 </div>
               </div>
@@ -455,7 +455,7 @@ const ProductSpanish5000 = () => {
                   <Shield className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <p className="text-base font-bold text-green-700">🛡️ 100% Money-Back Guarantee - 7 Days</p>
+                  <p className="text-base font-bold text-green-700">🛡️ 100% Money-Back Guarantee — 30 Days</p>
                   <p className="text-sm text-green-600">If you're not satisfied, we'll refund ALL your money. No questions asked.</p>
                 </div>
               </motion.div>

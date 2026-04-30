@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type CampaignCurrency = "USD" | "GBP" | "CAD" | "COP" | "ARS";
+export type CampaignCurrency = "USD" | "GBP" | "CAD" | "COP" | "ARS" | "PEN" | "MXN";
 
 export interface CampaignPrice {
   currency: CampaignCurrency;
@@ -33,6 +33,16 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     const rounded = Math.round(n / 1000) * 1000;
     return rounded - 10; // termina en .990
   }},
+  // PEN (Sol peruano) ~3.75, redondeo a terminaciones .90
+  PEN: { symbol: "S/",   rate: 3.75, decimals: 2, nice: (n) => {
+    const rounded = Math.round(n);
+    return rounded - 0.10; // termina en .90
+  }},
+  // MXN (Peso mexicano) ~18, redondeo a terminaciones .00 menos 1 => .00 o .99
+  MXN: { symbol: "MX$",  rate: 18, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 10) * 10;
+    return Math.max(9, rounded - 1); // termina en 9 (psicológico)
+  }},
 };
 
 const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
@@ -42,6 +52,8 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   CA: "CAD",
   CO: "COP",
   AR: "ARS",
+  PE: "PEN",
+  MX: "MXN",
 };
 
 interface CachedDetection {
@@ -94,7 +106,7 @@ function build(
   };
 }
 
-export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "COP", "ARS"];
+export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "COP", "ARS", "PEN", "MXN"];
 
 /**
  * Auto-detects visitor country via IP and returns the product price in their local

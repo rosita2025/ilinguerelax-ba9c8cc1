@@ -6,6 +6,8 @@ const FLAGS: Record<CampaignCurrency, string> = {
   CAD: "🇨🇦",
   COP: "🇨🇴",
   ARS: "🇦🇷",
+  PEN: "🇵🇪",
+  MXN: "🇲🇽",
 };
 
 interface Props {

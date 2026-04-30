@@ -142,6 +142,18 @@ const ProductSpanish5000 = () => {
     ["A_speak7days", "B_5000words"] as const,
   );
 
+  // A/B test: sticky bar CTA copy (3-way split)
+  const ctaVariant = useAbTest(
+    "spanish5000_sticky_cta_v1",
+    ["A_add_to_cart", "B_i_want_to_buy", "C_download_now"] as const,
+  );
+  const ctaTextByVariant: Record<string, string> = {
+    A_add_to_cart: "ADD TO CART",
+    B_i_want_to_buy: "I WANT TO BUY",
+    C_download_now: "DOWNLOAD NOW",
+  };
+  const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "ADD TO CART";
+
   const handleBuyNow = async () => {
     // Track AddToCart event with Meta Pixel
     trackHotmartEvent("AddToCart", {
@@ -154,6 +166,8 @@ const ProductSpanish5000 = () => {
       num_items: 1,
       ab_experiment: "spanish5000_headline_v1",
       ab_variant: headlineVariant ?? "unassigned",
+      ab_cta_experiment: "spanish5000_sticky_cta_v1",
+      ab_cta_variant: ctaVariant ?? "unassigned",
     });
 
     // Add to cart only; checkout continues from the cart drawer

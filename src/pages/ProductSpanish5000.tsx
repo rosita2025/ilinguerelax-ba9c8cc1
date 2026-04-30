@@ -179,7 +179,24 @@ const ProductSpanish5000 = () => {
       selectedOptions: [{ name: "Title", value: "Default Title" }]
     });
 
-    setDrawerOpen(true);
+    // Express checkout: skip drawer and go straight to Shopify (lower friction → higher conversion)
+    const checkoutUrl = useCartStore.getState().checkoutUrl;
+    if (checkoutUrl) {
+      // Track InitiateCheckout for Meta Pixel attribution
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Spanish Relax - 5,000 Words",
+        content_ids: ["product-spanish-5000"],
+        value: 29.99,
+        currency: "USD",
+        num_items: 1,
+        ab_experiment: "spanish5000_headline_v1",
+        ab_variant: headlineVariant ?? "unassigned",
+      });
+      window.open(checkoutUrl, "_blank");
+    } else {
+      // Fallback: open the cart drawer if checkout URL is not yet available
+      setDrawerOpen(true);
+    }
   };
   return <main className="min-h-screen bg-background">
       <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="29.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
@@ -316,6 +333,39 @@ const ProductSpanish5000 = () => {
                   💳 One-time payment • No subscriptions • Lifetime access
                 </p>
 
+                {/* Value stack — anchors perceived value vs price */}
+                <div className="bg-white/60 dark:bg-background/40 rounded-xl p-3 border border-purple-500/20 mb-3">
+                  <p className="text-[11px] font-bold text-purple-700 uppercase tracking-wide mb-1.5">
+                    What you actually get today:
+                  </p>
+                  <ul className="space-y-1 text-xs text-foreground">
+                    <li className="flex items-center justify-between">
+                      <span>📘 5,000 Spanish Words PDF</span>
+                      <span className="text-muted-foreground line-through">$54</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span>🎁 Spanish Exam (Bonus)</span>
+                      <span className="text-muted-foreground line-through">$19</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span>🎁 Daily Planner (Bonus)</span>
+                      <span className="text-muted-foreground line-through">$14</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span>🎁 Pronunciation Guide (Bonus)</span>
+                      <span className="text-muted-foreground line-through">$19</span>
+                    </li>
+                    <li className="flex items-center justify-between pt-1.5 mt-1 border-t border-purple-500/20 font-bold">
+                      <span>Total value</span>
+                      <span className="text-muted-foreground line-through">$106</span>
+                    </li>
+                    <li className="flex items-center justify-between text-emerald-700 font-extrabold">
+                      <span>Today only</span>
+                      <span>{campaign.price}</span>
+                    </li>
+                  </ul>
+                </div>
+
                 {/* Bonus stack preview — visible above CTA */}
                 <div className="bg-white/60 dark:bg-background/40 rounded-xl p-3 border border-purple-500/20">
                   <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2 flex items-center gap-1">
@@ -368,7 +418,7 @@ const ProductSpanish5000 = () => {
                   </span>
                   <span className="flex items-center gap-1">
                     <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    7-day refund
+                    30-day refund
                   </span>
                 </div>
               </div>
@@ -405,7 +455,7 @@ const ProductSpanish5000 = () => {
                   <Shield className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <p className="text-base font-bold text-green-700">🛡️ 100% Money-Back Guarantee - 7 Days</p>
+                  <p className="text-base font-bold text-green-700">🛡️ 100% Money-Back Guarantee — 30 Days</p>
                   <p className="text-sm text-green-600">If you're not satisfied, we'll refund ALL your money. No questions asked.</p>
                 </div>
               </motion.div>

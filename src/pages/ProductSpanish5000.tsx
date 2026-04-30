@@ -51,6 +51,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";

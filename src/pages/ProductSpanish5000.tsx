@@ -210,9 +210,22 @@ const ProductSpanish5000 = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
-                Speak Spanish in 7 Days —{" "}
-                <span className="text-purple-600">Without the Frustration</span> of Confusing Pronunciation
+              <h1
+                className="text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight"
+                data-ab-experiment="spanish5000_headline_v1"
+                data-ab-variant={headlineVariant ?? "loading"}
+              >
+                {headlineVariant === "B_5000words" ? (
+                  <>
+                    5,000 Spanish Words{" "}
+                    <span className="text-purple-600">You Can Pronounce</span> Today
+                  </>
+                ) : (
+                  <>
+                    Speak Spanish in 7 Days —{" "}
+                    <span className="text-purple-600">Without the Frustration</span> of Confusing Pronunciation
+                  </>
+                )}
               </h1>
 
               <p className="text-base md:text-lg text-muted-foreground mb-4">

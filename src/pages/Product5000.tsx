@@ -598,8 +598,8 @@ const Product5000 = () => {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$12</span>
-                  <span className="text-2xl text-muted-foreground line-through">$107</span>
+                  <span className={`${campaignFull.price.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground`}>{campaignFull.price}</span>
+                  <span className="text-xl md:text-2xl text-muted-foreground line-through">{campaignFull.originalPrice}</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
@@ -751,8 +751,8 @@ const Product5000 = () => {
       <CompactBuyCard
         title="Inglés Relax 5,000"
         subtitle="Top-Rated Curso Digital con Pronunciación ES"
-        price="$12"
-        originalPrice="$107"
+        price={campaignFull.price}
+        originalPrice={campaignFull.originalPrice}
         discountLabel="AHORRA 89%"
         rating={4.8}
         reviewsCount="800+"
@@ -762,7 +762,7 @@ const Product5000 = () => {
           "Descarga inmediata",
           "4 Bonus GRATIS",
         ]}
-        ctaText="COMPRAR AHORA | $12 USD"
+        ctaText={`COMPRAR AHORA | ${campaignFull.price}`}
         onBuy={handleBuy}
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
@@ -855,8 +855,8 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price="$12"
-        originalPrice="$54"
+        price={campaign.price}
+        originalPrice={campaign.originalPrice}
         productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)"
         rating={4.8}
         reviewCount={800}

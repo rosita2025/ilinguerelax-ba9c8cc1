@@ -70,7 +70,8 @@ function build(currency: CampaignCurrency, countryCode: string): Omit<CampaignPr
 export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = ["USD", "GBP", "CAD", "COP", "ARS"];
 
 export function useCampaignPrice(): CampaignPrice {
-  const [state, setState] = useState<CampaignPrice>(() => {
+  type State = Omit<CampaignPrice, "setCurrency">;
+  const [state, setState] = useState<State>(() => {
     if (typeof window !== "undefined") {
       const cached = localStorage.getItem(STORAGE_KEY) as CampaignCurrency | null;
       if (cached && PRICING[cached]) return build(cached, "");

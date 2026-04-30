@@ -1099,7 +1099,7 @@ const ProductSpanish5000 = () => {
       <div className="h-32 lg:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification />
+      <SalesNotification lang="en" productKey="spanish5000" />
 
       {/* Exit Intent Popup */}
       {/* Exit-intent popup hidden in US/UK/CA — older audience converts worse with popups */}

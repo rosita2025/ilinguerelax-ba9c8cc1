@@ -24,7 +24,7 @@ import { motion } from "framer-motion";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
-import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag } from "lucide-react";
+import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck } from "lucide-react";
 
 // Review images
 import reviewPhoto5 from "@/assets/review-photo-5.jpg";
@@ -253,7 +253,11 @@ const ProductSpanish5000 = () => {
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
                 </div>
                 <span className="font-bold text-foreground text-sm">4.8/5</span>
-                <span className="text-muted-foreground text-sm">(500+ Verified Reviews)</span>
+                <span className="text-muted-foreground text-sm">(500+ Reviews)</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-[11px] font-semibold">
+                  <BadgeCheck className="w-3.5 h-3.5" />
+                  Verified
+                </span>
               </div>
 
               {/* Purchase Counter - Social Proof */}

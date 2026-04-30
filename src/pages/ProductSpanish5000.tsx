@@ -429,8 +429,8 @@ const ProductSpanish5000 = () => {
       {/* Countdown Timer */}
       <CountdownTimer hoursFromNow={48} currentPrice={campaign.priceWithCurrency} originalPrice={campaign.originalWithCurrency} storageKey="countdown_spanish_book" lang="en" />
 
-      {/* Customer Reviews — moved up to build trust early */}
-      <ProductReviews productType="spanish" showReviewForm />
+      {/* Reviews carousel — moved up to build trust early (no form) */}
+      <ProductReviews productType="spanish" />
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">

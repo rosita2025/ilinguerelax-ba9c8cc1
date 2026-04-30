@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -135,6 +136,12 @@ const ProductSpanish5000 = () => {
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
 
+  // A/B test: main headline (50/50 split, persisted per browser)
+  const headlineVariant = useAbTest(
+    "spanish5000_headline_v1",
+    ["A_speak7days", "B_5000words"] as const,
+  );
+
   const handleBuyNow = async () => {
     // Track AddToCart event with Meta Pixel
     trackHotmartEvent("AddToCart", {
@@ -144,7 +151,9 @@ const ProductSpanish5000 = () => {
       content_type: "product",
       value: 29.99,
       currency: "USD",
-      num_items: 1
+      num_items: 1,
+      ab_experiment: "spanish5000_headline_v1",
+      ab_variant: headlineVariant ?? "unassigned",
     });
 
     // Add to cart only; checkout continues from the cart drawer

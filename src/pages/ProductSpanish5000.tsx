@@ -54,6 +54,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
+import { BundleSelector } from "@/components/BundleSelector";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -391,34 +392,9 @@ const ProductSpanish5000 = () => {
                 <StockCounter totalStock={50} remainingStock={15} lang="en" />
               </div>
 
-              {/* CTA Button - Single Buy Now */}
-              <div className="space-y-2 mb-4">
-                <Button
-                  variant="hero"
-                  size="xl"
-                  className="w-full text-base md:text-lg py-6 shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99] animate-pulse"
-                  onClick={handleBuyNow}
-                  style={{ animationDuration: "3s" }}
-                >
-                  <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 mr-2" />
-                  GET INSTANT ACCESS — {campaign.price}
-                  <ArrowRight className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                </Button>
-                {/* Micro-trust row directly under CTA — biggest conversion lift */}
-                <div className="flex items-center justify-center gap-3 md:gap-4 text-[11px] md:text-xs text-muted-foreground flex-wrap">
-                  <span className="flex items-center gap-1">
-                    <Shield className="w-3.5 h-3.5 text-emerald-600" />
-                    Secure checkout
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Download className="w-3.5 h-3.5 text-emerald-600" />
-                    Instant download
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    30-day refund
-                  </span>
-                </div>
+              {/* Bundle selector - 3 options (Atlas-style upsell) */}
+              <div className="mb-4">
+                <BundleSelector defaultBundle="digital" />
               </div>
 
               {/* Recent buyer micro-testimonial — fights buyer hesitation */}

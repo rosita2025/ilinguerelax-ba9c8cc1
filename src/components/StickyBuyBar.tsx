@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart, Zap, TrendingUp } from "lucide-react";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart, Zap, TrendingUp, X } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;
@@ -28,6 +28,8 @@ interface StickyBuyBarProps {
   calmMode?: boolean;
   /** Currency code label shown next to price (e.g. "USD", "COP", "ARS"). Defaults to "USD". */
   currencyCode?: string;
+  /** Allow user to dismiss the sticky bar (shows an X button). */
+  dismissible?: boolean;
 }
 
 export const StickyBuyBar = ({
@@ -53,12 +55,14 @@ export const StickyBuyBar = ({
   isPhysical = false,
   calmMode = false,
   currencyCode = "USD",
+  dismissible = false,
 }: StickyBuyBarProps) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   // Subtle pulse every 6s to grab attention without being annoying
   useEffect(() => {
@@ -103,8 +107,32 @@ export const StickyBuyBar = ({
     );
   };
 
+  if (dismissed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setDismissed(false)}
+        className="fixed bottom-4 right-4 z-30 h-12 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_6px_20px_rgba(16,185,129,0.5)] flex items-center gap-2 text-sm font-bold"
+        aria-label={lang === "en" ? "Show buy bar" : "Mostrar barra de compra"}
+      >
+        <ShoppingCart className="w-4 h-4" />
+        {price}
+      </button>
+    );
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+      {dismissible && (
+        <button
+          type="button"
+          onClick={() => setDismissed(true)}
+          aria-label={lang === "en" ? "Hide buy bar" : "Ocultar barra"}
+          className="absolute top-1 right-1 z-40 w-7 h-7 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      )}
       {/* Top urgency strip - high visibility */}
       {!disabled && !showEmailSubscription && (
         <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-3 text-center">

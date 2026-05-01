@@ -38,7 +38,7 @@ export const ScrollToTop = ({ showAfter = 400 }: ScrollToTopProps) => {
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           onClick={scrollToTop}
-          className="fixed bottom-56 md:bottom-48 left-4 z-40 w-12 h-12 rounded-full bg-primary shadow-lg hover:bg-primary/90 transition-colors flex items-center justify-center group"
+          className="fixed bottom-36 md:bottom-48 left-4 z-20 w-12 h-12 rounded-full bg-primary shadow-lg hover:bg-primary/90 transition-colors flex items-center justify-center group"
           aria-label="Scroll to top"
         >
           <ArrowUp className="w-5 h-5 text-primary-foreground group-hover:animate-bounce" />

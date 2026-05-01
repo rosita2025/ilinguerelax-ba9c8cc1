@@ -104,7 +104,7 @@ export const StickyBuyBar = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+    <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
       {/* Top urgency strip - high visibility */}
       {!disabled && !showEmailSubscription && (
         <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-3 text-center">
@@ -166,8 +166,9 @@ export const StickyBuyBar = ({
           ) : (
             <div className="flex flex-col gap-1.5 w-full">
               <Button
+                type="button"
                 size="default"
-                className={`w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] text-base font-extrabold tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                className={`relative z-10 w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] text-base font-extrabold tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] touch-manipulation ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 disabled={disabled || isLoading}
               >
@@ -202,6 +203,7 @@ export const StickyBuyBar = ({
               )}
               {secondaryCtaText && onSecondaryClick && (
                 <Button
+                  type="button"
                   size="default"
                   className="w-full h-10 rounded-full text-sm font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 shadow-lg"
                   onClick={onSecondaryClick}

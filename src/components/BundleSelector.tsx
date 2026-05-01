@@ -3,6 +3,7 @@ import { Check, ShoppingCart, Truck, Package, Download, Loader2, Star } from "lu
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { toast } from "sonner";
 
 // Variant IDs (Shopify)
 const DIGITAL_5000_VARIANT = "gid://shopify/ProductVariant/42931924795453";
@@ -13,6 +14,15 @@ const BOOK_3000_VERBS_VARIANT = "gid://shopify/ProductVariant/43138982281277";
 const BOOK_3000_VERBS_PRODUCT = "gid://shopify/Product/7849457778749";
 const BOOK_GRAMMAR_VARIANT = "gid://shopify/ProductVariant/43138982314045";
 const BOOK_GRAMMAR_PRODUCT = "gid://shopify/Product/7849457811517";
+
+// Set of all variant IDs that belong to ANY bundle. Used to clean prior bundle items
+// from cart before re-adding the selected bundle, guaranteeing exact composition.
+const ALL_BUNDLE_VARIANT_IDS = new Set<string>([
+  DIGITAL_5000_VARIANT,
+  BOOK_8000_VARIANT,
+  BOOK_3000_VERBS_VARIANT,
+  BOOK_GRAMMAR_VARIANT,
+]);
 
 type BundleId = "digital" | "digital_plus_2" | "complete";
 
@@ -146,6 +156,8 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
   const [selected, setSelected] = useState<BundleId>(defaultBundle);
   const [loading, setLoading] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
   const current = bundles.find((b) => b.id === selected) ?? bundles[0];
@@ -164,8 +176,30 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
         bundle_id: current.id,
       });
 
-      // Add all items sequentially (cart store handles cart creation/lines)
+      // STEP 1: Remove any prior bundle items from cart so the bundle composition is exact.
+      const bundleVariantIds = new Set(current.items.map((i) => i.variantId));
+      const existingItems = useCartStore.getState().items;
+      for (const cartItem of existingItems) {
+        if (
+          ALL_BUNDLE_VARIANT_IDS.has(cartItem.variantId) &&
+          !bundleVariantIds.has(cartItem.variantId)
+        ) {
+          await removeItem(cartItem.variantId);
+        }
+      }
+
+      // STEP 2: For each item in the bundle, ensure quantity is exactly 1.
+      // If item already in cart, force qty=1; otherwise add it.
       for (const item of current.items) {
+        const existing = useCartStore
+          .getState()
+          .items.find((ci) => ci.variantId === item.variantId);
+        if (existing) {
+          if (existing.quantity !== 1) {
+            await updateQuantity(item.variantId, 1);
+          }
+          continue;
+        }
         await addItem({
           product: {
             node: {
@@ -198,6 +232,46 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
           selectedOptions: [{ name: "Title", value: "Default Title" }],
         });
       }
+
+      // STEP 3: Validate cart matches the selected bundle exactly.
+      const finalItems = useCartStore.getState().items;
+      const expectedIds = new Set(current.items.map((i) => i.variantId));
+      const finalBundleItems = finalItems.filter((i) => expectedIds.has(i.variantId));
+
+      const subtotal = finalBundleItems.reduce(
+        (sum, i) => sum + parseFloat(i.price.amount) * i.quantity,
+        0,
+      );
+      const expectedSubtotal = current.items.reduce(
+        (sum, i) => sum + parseFloat(i.price),
+        0,
+      );
+
+      const composedCorrectly =
+        finalBundleItems.length === current.items.length &&
+        current.items.every((ci) => {
+          const m = finalBundleItems.find((fi) => fi.variantId === ci.variantId);
+          return m && m.quantity === 1;
+        });
+      const totalsMatch = Math.abs(subtotal - expectedSubtotal) < 0.01 &&
+                          Math.abs(expectedSubtotal - current.total) < 0.01;
+
+      if (!composedCorrectly || !totalsMatch) {
+        console.error("[BundleSelector] Validation failed", {
+          bundle: current.id,
+          expected: { items: current.items.length, total: current.total, subtotal: expectedSubtotal },
+          actual: { items: finalBundleItems.length, subtotal },
+        });
+        toast.error("There was a problem composing your bundle. Please review your cart before checkout.");
+      } else {
+        console.info("[BundleSelector] Bundle validated", {
+          bundle: current.id,
+          items: finalBundleItems.length,
+          subtotal: subtotal.toFixed(2),
+          expected: current.total.toFixed(2),
+        });
+      }
+
       setDrawerOpen(true);
     } finally {
       setLoading(false);

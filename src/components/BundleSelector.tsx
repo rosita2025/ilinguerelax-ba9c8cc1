@@ -53,7 +53,7 @@ const COVER_8000 = "/images/product-spanish-8000-book.webp";
 const COVER_3000 = "/images/product-spanish-3000-verbs-book.webp";
 const COVER_GRAMMAR = "/images/product-grammar-patterns-a1c1.webp";
 
-const bundles: Bundle[] = [
+export const bundles: Bundle[] = [
   {
     id: "digital",
     label: "Digital eBook only",

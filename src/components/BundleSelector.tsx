@@ -1,0 +1,333 @@
+import { useState } from "react";
+import { Check, ShoppingCart, Truck, Package, Download, Loader2, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/stores/cartStore";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+
+// Variant IDs (Shopify)
+const DIGITAL_5000_VARIANT = "gid://shopify/ProductVariant/42931924795453";
+const DIGITAL_5000_PRODUCT = "gid://shopify/Product/7788747784253";
+const BOOK_8000_VARIANT = "gid://shopify/ProductVariant/43137345749053";
+const BOOK_8000_PRODUCT = "gid://shopify/Product/7849025568829";
+const BOOK_3000_VERBS_VARIANT = "gid://shopify/ProductVariant/43138982281277";
+const BOOK_3000_VERBS_PRODUCT = "gid://shopify/Product/7849457778749";
+const BOOK_GRAMMAR_VARIANT = "gid://shopify/ProductVariant/43138982314045";
+const BOOK_GRAMMAR_PRODUCT = "gid://shopify/Product/7849457811517";
+
+type BundleId = "digital" | "digital_plus_2" | "complete";
+
+interface BundleItem {
+  productId: string;
+  variantId: string;
+  title: string;
+  price: string;
+  image: string;
+}
+
+interface Bundle {
+  id: BundleId;
+  label: string;
+  badge?: string;
+  badgeColor?: string;
+  description: string;
+  total: number;
+  retail: number;
+  savePct: number;
+  freeShipping: boolean;
+  items: BundleItem[];
+}
+
+const COVER_5000 = "/images/spanish-5000-cover.webp";
+const COVER_8000 = "/images/product-spanish-8000-book.webp";
+const COVER_3000 = "/images/product-spanish-3000-verbs-book.webp";
+const COVER_GRAMMAR = "/images/product-grammar-patterns-a1c1.webp";
+
+const bundles: Bundle[] = [
+  {
+    id: "digital",
+    label: "Digital eBook only",
+    description: "Instant PDF download · Start in minutes",
+    total: 29.99,
+    retail: 54.0,
+    savePct: 44,
+    freeShipping: false,
+    items: [
+      {
+        productId: DIGITAL_5000_PRODUCT,
+        variantId: DIGITAL_5000_VARIANT,
+        title: "Spanish Relax - 5,000 Words (Digital PDF)",
+        price: "29.99",
+        image: COVER_5000,
+      },
+    ],
+  },
+  {
+    id: "digital_plus_2",
+    label: "Digital + 2 Physical Books",
+    badge: "RECOMMENDED",
+    badgeColor: "bg-amber-500 text-white",
+    description: "Digital PDF + 8,000 Words book + 3,000 Verbs book (pre-order, ships June 2026)",
+    total: 61.99,
+    retail: 94.98,
+    savePct: 35,
+    freeShipping: true,
+    items: [
+      {
+        productId: DIGITAL_5000_PRODUCT,
+        variantId: DIGITAL_5000_VARIANT,
+        title: "Spanish Relax - 5,000 Words (Digital PDF)",
+        price: "29.99",
+        image: COVER_5000,
+      },
+      {
+        productId: BOOK_8000_PRODUCT,
+        variantId: BOOK_8000_VARIANT,
+        title: "Spanish Relax 8,000 Words — Physical Book (PRE-ORDER)",
+        price: "15.00",
+        image: COVER_8000,
+      },
+      {
+        productId: BOOK_3000_VERBS_PRODUCT,
+        variantId: BOOK_3000_VERBS_VARIANT,
+        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER)",
+        price: "17.00",
+        image: COVER_3000,
+      },
+    ],
+  },
+  {
+    id: "complete",
+    label: "Complete Library — 3 Books + Digital",
+    badge: "BEST VALUE",
+    badgeColor: "bg-rose-600 text-white",
+    description: "Digital PDF + 8,000 Words + 3,000 Verbs + Grammar A1–C1 · Free shipping",
+    total: 76.99,
+    retail: 124.97,
+    savePct: 38,
+    freeShipping: true,
+    items: [
+      {
+        productId: DIGITAL_5000_PRODUCT,
+        variantId: DIGITAL_5000_VARIANT,
+        title: "Spanish Relax - 5,000 Words (Digital PDF)",
+        price: "29.99",
+        image: COVER_5000,
+      },
+      {
+        productId: BOOK_8000_PRODUCT,
+        variantId: BOOK_8000_VARIANT,
+        title: "Spanish Relax 8,000 Words — Physical Book (PRE-ORDER)",
+        price: "15.00",
+        image: COVER_8000,
+      },
+      {
+        productId: BOOK_3000_VERBS_PRODUCT,
+        variantId: BOOK_3000_VERBS_VARIANT,
+        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER)",
+        price: "17.00",
+        image: COVER_3000,
+      },
+      {
+        productId: BOOK_GRAMMAR_PRODUCT,
+        variantId: BOOK_GRAMMAR_VARIANT,
+        title: "Grammar Patterns A1–C1 — Physical Book (PRE-ORDER)",
+        price: "15.00",
+        image: COVER_GRAMMAR,
+      },
+    ],
+  },
+];
+
+interface BundleSelectorProps {
+  defaultBundle?: BundleId;
+}
+
+export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProps) => {
+  const [selected, setSelected] = useState<BundleId>(defaultBundle);
+  const [loading, setLoading] = useState(false);
+  const addItem = useCartStore((s) => s.addItem);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+
+  const current = bundles.find((b) => b.id === selected) ?? bundles[0];
+
+  const handleBuy = async () => {
+    setLoading(true);
+    try {
+      trackHotmartEvent("AddToCart", {
+        content_name: `Bundle: ${current.label}`,
+        content_category: "Bundle",
+        content_ids: [current.id],
+        content_type: "product_group",
+        value: current.total,
+        currency: "USD",
+        num_items: current.items.length,
+        bundle_id: current.id,
+      });
+
+      // Add all items sequentially (cart store handles cart creation/lines)
+      for (const item of current.items) {
+        await addItem({
+          product: {
+            node: {
+              id: item.productId,
+              title: item.title,
+              description: "",
+              handle: "",
+              priceRange: { minVariantPrice: { amount: item.price, currencyCode: "USD" } },
+              images: { edges: [{ node: { url: item.image, altText: item.title } }] },
+              variants: {
+                edges: [
+                  {
+                    node: {
+                      id: item.variantId,
+                      title: "Default Title",
+                      price: { amount: item.price, currencyCode: "USD" },
+                      availableForSale: true,
+                      selectedOptions: [{ name: "Title", value: "Default Title" }],
+                    },
+                  },
+                ],
+              },
+              options: [{ name: "Title", values: ["Default Title"] }],
+            },
+          },
+          variantId: item.variantId,
+          variantTitle: "Default Title",
+          price: { amount: item.price, currencyCode: "USD" },
+          quantity: 1,
+          selectedOptions: [{ name: "Title", value: "Default Title" }],
+        });
+      }
+      setDrawerOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+          <Package className="w-3.5 h-3.5" /> Buy more, save more
+        </p>
+        <span className="text-[10px] text-muted-foreground">Hannah & 12,000+ purchased</span>
+      </div>
+
+      {/* Bundle cards */}
+      <div className="space-y-2">
+        {bundles.map((b) => {
+          const isSelected = b.id === selected;
+          return (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => setSelected(b.id)}
+              className={`relative w-full text-left rounded-xl border-2 p-3 transition-all ${
+                isSelected
+                  ? "border-primary bg-primary/5 shadow-[0_4px_20px_rgba(20,184,166,0.15)]"
+                  : "border-border bg-card hover:border-primary/40"
+              }`}
+            >
+              {b.badge && (
+                <span
+                  className={`absolute -top-2 right-3 text-[9px] font-black px-2 py-0.5 rounded-full shadow ${b.badgeColor}`}
+                >
+                  {b.badge}
+                </span>
+              )}
+              <div className="flex items-start gap-3">
+                {/* Radio */}
+                <div
+                  className={`mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border-2 flex items-center justify-center ${
+                    isSelected
+                      ? "bg-primary border-primary"
+                      : "border-muted-foreground/40"
+                  }`}
+                >
+                  {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-0.5">
+                    <p className="text-sm font-bold leading-tight">{b.label}</p>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-base font-black text-primary leading-none">
+                        ${b.total.toFixed(2)}
+                      </p>
+                      <p className="text-[10px] line-through text-muted-foreground">
+                        ${b.retail.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-snug mb-1.5">
+                    {b.description}
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="inline-flex items-center gap-0.5 text-[9px] bg-rose-500/10 text-rose-600 font-bold px-1.5 py-0.5 rounded uppercase">
+                      Save {b.savePct}%
+                    </span>
+                    {b.freeShipping && (
+                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-emerald-500/10 text-emerald-700 font-bold px-1.5 py-0.5 rounded uppercase">
+                        <Truck className="w-2.5 h-2.5" /> Free shipping
+                      </span>
+                    )}
+                    {b.id === "digital" && (
+                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
+                        <Download className="w-2.5 h-2.5" /> Instant
+                      </span>
+                    )}
+                  </div>
+                  {/* Mini covers for bundles with books */}
+                  {b.items.length > 1 && (
+                    <div className="flex items-center gap-1 mt-2">
+                      {b.items.map((it) => (
+                        <img
+                          key={it.variantId}
+                          src={it.image}
+                          alt={it.title}
+                          className="w-7 h-9 object-cover rounded border border-border"
+                          loading="lazy"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* CTA */}
+      <Button
+        type="button"
+        onClick={handleBuy}
+        disabled={loading}
+        size="xl"
+        className="relative z-10 w-full mt-3 text-base md:text-lg py-6 touch-manipulation shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99]"
+      >
+        {loading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : (
+          <>
+            <ShoppingCart className="w-5 h-5 mr-2" />
+            TAKE THE OFFER · ${current.total.toFixed(2)}
+          </>
+        )}
+      </Button>
+
+      {/* Trust row */}
+      <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-muted-foreground flex-wrap">
+        <span className="flex items-center gap-0.5">
+          <Check className="w-3 h-3 text-emerald-600" /> Secure checkout
+        </span>
+        <span className="flex items-center gap-0.5">
+          <Star className="w-3 h-3 text-amber-500 fill-amber-500" /> 4.8/5 · 500+ reviews
+        </span>
+        <span className="flex items-center gap-0.5">
+          <Check className="w-3 h-3 text-emerald-600" /> 30-day refund
+        </span>
+      </div>
+    </div>
+  );
+};

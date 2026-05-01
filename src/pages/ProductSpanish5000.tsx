@@ -159,6 +159,8 @@ const ProductSpanish5000 = () => {
 
   // Live-mirror selected bundle into the StickyBuyBar (price updates automatically).
   const selectedBundle = useBundleStore((s) => s.selected);
+  const isPhysicalBundle = selectedBundle?.id === "digital_plus_2" || selectedBundle?.id === "complete";
+  const dynamicCtaText = isPhysicalBundle ? "RESERVE PRE-ORDER" : stickyCtaText;
   const stickyPriceLabel = selectedBundle
     ? `$${selectedBundle.total.toFixed(2)}`
     : campaign.price;

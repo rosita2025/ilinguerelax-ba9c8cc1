@@ -54,7 +54,8 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
-import { BundleSelector } from "@/components/BundleSelector";
+import { BundleSelector, addBundleToCart } from "@/components/BundleSelector";
+import { useBundleStore } from "@/stores/bundleStore";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -154,6 +155,22 @@ const ProductSpanish5000 = () => {
     C_download_now: "DOWNLOAD NOW",
   };
   const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "ADD TO CART";
+
+  // Live-mirror selected bundle into the StickyBuyBar (price updates automatically).
+  const selectedBundle = useBundleStore((s) => s.selected);
+  const stickyPriceLabel = selectedBundle
+    ? `$${selectedBundle.total.toFixed(2)}`
+    : campaign.price;
+  const stickyOriginalLabel = selectedBundle
+    ? `$${selectedBundle.retail.toFixed(2)}`
+    : campaign.originalPrice;
+  const stickyCurrency = selectedBundle ? "USD" : campaign.currency;
+
+  // When sticky bar CTA is clicked, dispatch the currently-selected bundle (or default).
+  const handleStickyBuy = async () => {
+    const targetId = (selectedBundle?.id as "digital" | "digital_plus_2" | "complete") ?? "digital";
+    await addBundleToCart(targetId);
+  };
 
   const handleBuyNow = async () => {
     // Track AddToCart event with Meta Pixel
@@ -1119,7 +1136,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price={campaign.price} originalPrice={campaign.originalPrice} currencyCode={campaign.currency} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleBuyNow} ctaText={stickyCtaText} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode />
+      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName={selectedBundle ? selectedBundle.label : "5,000 Words With English Pronunciation and includes grammatical structures"} onBuyClick={handleStickyBuy} ctaText={stickyCtaText} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

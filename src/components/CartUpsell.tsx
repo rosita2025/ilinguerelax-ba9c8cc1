@@ -287,7 +287,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         })}
       </div>
 
-      {isSpanishContext && (() => {
+      {(isSpanishContext || hasSpanishBundlePhysical) && (() => {
         const visiblePreorders = spanishPhysicalPreorderUpsells.filter(
           (p) => !items.some((item) => item.variantId === p.variantId)
         );

@@ -57,7 +57,7 @@ export const bundles: Bundle[] = [
   {
     id: "digital",
     label: "Digital eBook only",
-    description: "📥 Descarga al instante por email · Empieza en 2 minutos",
+    description: "📥 Instant email delivery · Start in 2 minutes",
     total: 29.99,
     retail: 54.0,
     savePct: 44,
@@ -77,7 +77,7 @@ export const bundles: Bundle[] = [
     label: "Digital + 2 Physical Books",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "📥 PDF al instante + 📦 2 libros físicos en pre-venta (envío Junio 2026)",
+    description: "📥 Instant PDF + 📦 2 physical books pre-order (ships June 2026)",
     total: 61.99,
     retail: 94.98,
     savePct: 35,
@@ -111,7 +111,7 @@ export const bundles: Bundle[] = [
     label: "Complete Library — 3 Books + Digital",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "📥 PDF al instante + 📦 3 libros físicos en pre-venta (envío Junio 2026)",
+    description: "📥 Instant PDF + 📦 3 physical books pre-order (ships June 2026)",
     total: 76.99,
     retail: 124.97,
     savePct: 38,
@@ -397,14 +397,14 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                     <div className="mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 space-y-1">
                       <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
                         <Zap className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>HOY:</strong> recibes el PDF digital al instante por email.</span>
+                        <span><strong>TODAY:</strong> get the digital PDF instantly by email.</span>
                       </div>
                       <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
                         <CalendarClock className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>JUNIO 2026:</strong> enviamos los libros físicos a tu casa (envío gratis).</span>
+                        <span><strong>JUNE 2026:</strong> we ship the physical books to your home (free shipping).</span>
                       </div>
                       <p className="text-[9px] text-amber-700 dark:text-amber-300 italic pl-4">
-                        Reservas hoy al precio más bajo · sube en junio.
+                        Lock in the lowest price today · price goes up in June.
                       </p>
                     </div>
                   )}
@@ -442,8 +442,8 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
               {current.id === "digital"
-                ? "PDF en tu email en 2 minutos"
-                : "PDF hoy + libros físicos en Junio 2026"}
+                ? "PDF in your email within 2 minutes"
+                : "PDF today + physical books in June 2026"}
             </span>
           </span>
         )}

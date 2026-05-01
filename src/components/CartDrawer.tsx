@@ -143,7 +143,7 @@ export const CartDrawer = () => {
           <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Tu carrito está vacío</p>
+                <p className="text-muted-foreground">Your cart is empty</p>
               </div>
             </div> :
           <>
@@ -161,11 +161,11 @@ export const CartDrawer = () => {
                   <div className="flex-shrink-0 mb-3">
                     {remaining > 0 ? (
                       <p className="text-xs text-muted-foreground mb-1.5">
-                        🚚 ¡Te faltan <span className="font-bold text-foreground">${remaining.toFixed(2)}</span> para envío GRATIS!
+                        🚚 You're <span className="font-bold text-foreground">${remaining.toFixed(2)}</span> away from FREE shipping!
                       </p>
                     ) : (
                       <p className="text-xs font-semibold text-green-600 mb-1.5">
-                        ✅ ¡Tienes envío GRATIS!
+                        ✅ You've unlocked FREE shipping!
                       </p>
                     )}
                     <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -189,10 +189,10 @@ export const CartDrawer = () => {
                 return (
                   <div className="flex-shrink-0 mb-3 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30">
                     <p className="text-xs font-bold text-amber-900 dark:text-amber-200 leading-tight">
-                      ⚠️ PRE-VENTA · Envío desde Junio 2026
+                      ⚠️ PRE-ORDER · Ships from June 2026
                     </p>
                     <p className="text-[10px] text-amber-800 dark:text-amber-300 mt-0.5 leading-tight">
-                      Los libros físicos son <strong>pre-order anticipado</strong>. Pagas hoy al precio bajo y los recibes a partir de junio 2026. Los productos digitales se entregan al instante por email.
+                      Physical books are <strong>advance pre-orders</strong>. Pay today at the lowest price and receive them starting June 2026. Digital products are delivered instantly by email.
                     </p>
                   </div>
                 );
@@ -234,7 +234,7 @@ export const CartDrawer = () => {
                               ) : null}
                               {isPreorder && (
                                 <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400 text-amber-950">
-                                  📦 PRE-ORDER · Envía Jun 2026
+                                  📦 PRE-ORDER · Ships Jun 2026
                                 </span>
                               )}
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -298,7 +298,7 @@ export const CartDrawer = () => {
                     <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
                       <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                        {appliedDiscount.code} — se aplica al pagar
+                        {appliedDiscount.code} — applied at checkout
                       </span>
                     </div>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRemoveCoupon} disabled={isLoading}>
@@ -310,7 +310,7 @@ export const CartDrawer = () => {
                     <div className="relative flex-1">
                       <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                       <Input
-                        placeholder="Código de cupón"
+                        placeholder="Coupon code"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                         onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
@@ -325,7 +325,7 @@ export const CartDrawer = () => {
                       onClick={handleApplyCoupon}
                       disabled={!couponInput.trim() || isLoading || isApplying}
                     >
-                      {isApplying ? <Loader2 className="h-3 w-3 animate-spin" /> : "Aplicar"}
+                      {isApplying ? <Loader2 className="h-3 w-3 animate-spin" /> : "Apply"}
                     </Button>
                   </div>
                 )}
@@ -337,8 +337,8 @@ export const CartDrawer = () => {
                   if (!hasPhysical) return null;
                   return (
                     <div className="space-y-1 text-xs text-muted-foreground">
-                      <p>📦 Envío internacional incluido (gratis +$45)</p>
-                      <p>⏱ Despacho a partir de <strong className="text-foreground">junio 2026</strong> · entrega 12–15 días después</p>
+                      <p>📦 International shipping included (free over $45)</p>
+                      <p>⏱ Ships starting <strong className="text-foreground">June 2026</strong> · delivery 12–15 days after</p>
                     </div>
                   );
                 })()}
@@ -358,7 +358,7 @@ export const CartDrawer = () => {
                   if (!hasPhysical) return null;
                   return (
                     <p className="text-xs text-muted-foreground">
-                      Los impuestos y los gastos de envío se calculan al finalizar la compra.
+                      Taxes and shipping calculated at checkout.
                     </p>
                   );
                 })()}
@@ -375,7 +375,7 @@ export const CartDrawer = () => {
                         const hasPhysical = items.some((item) =>
                           isPhysicalPreorderItem(item.product.node.title)
                         );
-                        return hasPhysical ? "Reservar pre-order ahora" : "Checkout securely";
+                        return hasPhysical ? "Reserve pre-order now" : "Checkout securely";
                       })()}
                     </>
                 }

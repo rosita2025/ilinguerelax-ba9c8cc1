@@ -1116,7 +1116,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName={selectedBundle ? selectedBundle.label : "5,000 Words With English Pronunciation and includes grammatical structures"} onBuyClick={handleStickyBuy} ctaText={stickyCtaText} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode />
+      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName={selectedBundle ? selectedBundle.label : "5,000 Words With English Pronunciation and includes grammatical structures"} onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

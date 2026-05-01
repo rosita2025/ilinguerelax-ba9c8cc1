@@ -275,10 +275,6 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
 export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProps) => {
   const [selected, setSelected] = useState<BundleId>(defaultBundle);
   const [loading, setLoading] = useState(false);
-  const addItem = useCartStore((s) => s.addItem);
-  const removeItem = useCartStore((s) => s.removeItem);
-  const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const setSelectedBundle = useBundleStore((s) => s.setSelected);
 
   const current = bundles.find((b) => b.id === selected) ?? bundles[0];

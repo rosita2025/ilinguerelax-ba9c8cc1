@@ -3,11 +3,19 @@ import { BookOpen, Plus, Loader2, Check, Tag, Truck, Download, Package } from "l
 import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
+import { useBundleStore } from "@/stores/bundleStore";
 
 const UPSELL_COUPON = "upselldescuentos";
 
 const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
 const SPANISH_5000_KEYWORDS = ["Spanish Relax - 5,000", "Spanish Relax - 5000", "5,000 Words with English"];
+
+// All Spanish bundle physical book variant IDs (used to detect "Spanish bundle" context).
+const SPANISH_BUNDLE_PHYSICAL_VARIANTS = new Set<string>([
+  "gid://shopify/ProductVariant/43137345749053", // 8000 Words book
+  "gid://shopify/ProductVariant/43138982281277", // 3000 Verbs book
+  "gid://shopify/ProductVariant/43138982314045", // Grammar A1-C1 book
+]);
 
 const upsellProducts = [
   {
@@ -109,6 +117,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
   const discountCodes = useCartStore((s) => s.discountCodes);
   const isLoading = useCartStore((s) => s.isLoading);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const selectedBundle = useBundleStore((s) => s.selected);
 
   const hasCouponApplied = discountCodes.some(
     (dc) => dc.code.toLowerCase() === UPSELL_COUPON.toLowerCase() && dc.applicable
@@ -122,11 +131,23 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
     SPANISH_5000_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
   );
 
-  // Spanish-language UI when Spanish 5000 is in cart
-  const isSpanishContext = hasSpanish5000 && !hasPhysicalBook;
+  // Detect Spanish bundle context: cart contains the digital 5000 (any of the 3 Spanish bundles).
+  // We treat ALL Spanish-bundle scenarios as "Spanish context" so the UI stays consistent
+  // even when the user picked Bundle 2 or 3 (which include physical pre-order books).
+  const hasSpanishBundlePhysical = items.some((item) =>
+    SPANISH_BUNDLE_PHYSICAL_VARIANTS.has(item.variantId)
+  );
+  const isSpanishContext = hasSpanish5000;
   const activeUpsells = isSpanishContext ? spanishUpsellProducts : upsellProducts;
 
-  if (!hasPhysicalBook && !hasSpanish5000) return null;
+  // Bundle 3 ("complete") = user already has digital + 3 physical books → no upsells at all.
+  const isCompleteBundle = selectedBundle?.id === "complete";
+
+  // Hide entire upsell block for non-Spanish flows that have no physical book either.
+  if (!hasPhysicalBook && !hasSpanish5000 && !hasSpanishBundlePhysical) return null;
+
+  // If user picked the "Complete Library" bundle, hide all upsells (they already have everything).
+  if (isCompleteBundle) return null;
 
   const handleToggle = async (product: typeof upsellProducts[0]) => {
     const isInCart = items.some((item) => item.variantId === product.variantId);
@@ -193,12 +214,15 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
 
   return (
     <div className="space-y-2 py-3">
-      <p className="text-xs font-semibold text-primary flex items-center gap-1">
-        <BookOpen className="w-3 h-3" />
-        {isSpanishContext
-          ? "Complete your Spanish learning kit — Digital PDF (instant download)"
-          : "Compra 1 y llévate el 2do con 30% OFF"}
-      </p>
+      {/* Only show digital upsell header if there is at least one digital upsell still available */}
+      {activeUpsells.some((p) => !items.some((i) => i.variantId === p.variantId)) && (
+        <p className="text-xs font-semibold text-primary flex items-center gap-1">
+          <BookOpen className="w-3 h-3" />
+          {isSpanishContext
+            ? "Complete your Spanish learning kit — Digital PDF (instant download)"
+            : "Compra 1 y llévate el 2do con 30% OFF"}
+        </p>
+      )}
       {hasCouponApplied && !isSpanishContext && (
         <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
           <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
@@ -263,7 +287,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         })}
       </div>
 
-      {isSpanishContext && (() => {
+      {(isSpanishContext || hasSpanishBundlePhysical) && (() => {
         const visiblePreorders = spanishPhysicalPreorderUpsells.filter(
           (p) => !items.some((item) => item.variantId === p.variantId)
         );

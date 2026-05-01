@@ -32,6 +32,11 @@ const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compa
   },
 };
 
+// Helper: detect physical pre-order items by product title keywords
+const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+const isPhysicalPreorderItem = (title: string) =>
+  PHYSICAL_KEYWORDS.some((kw) => title.includes(kw));
+
 export const CartDrawer = () => {
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 

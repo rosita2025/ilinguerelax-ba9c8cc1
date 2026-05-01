@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, ShoppingCart, Truck, Package, Download, Loader2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
+import { useBundleStore } from "@/stores/bundleStore";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { toast } from "sonner";
 
@@ -159,8 +160,20 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+  const setSelectedBundle = useBundleStore((s) => s.setSelected);
 
   const current = bundles.find((b) => b.id === selected) ?? bundles[0];
+
+  // Publish selection to the shared bundle store so other UI (StickyBuyBar) can react.
+  useEffect(() => {
+    setSelectedBundle({
+      id: current.id,
+      label: current.label,
+      total: current.total,
+      retail: current.retail,
+      itemCount: current.items.length,
+    });
+  }, [current, setSelectedBundle]);
 
   const handleBuy = async () => {
     setLoading(true);

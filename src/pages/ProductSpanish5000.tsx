@@ -24,6 +24,7 @@ import { motion } from "framer-motion";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
+import learnSpanish3BooksVideo from "@/assets/learn-spanish-3-physical-books-preorder.mp4";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck } from "lucide-react";
 
 // Review images
@@ -434,21 +435,28 @@ const ProductSpanish5000 = () => {
               {/* Trust Badges */}
               <TrustBadges lang="en" variant="grid" />
 
-              {/* Money Back Guarantee - Enhanced */}
-              <motion.div initial={{
-              opacity: 0
-            }} animate={{
-              opacity: 1
-            }} transition={{
-              delay: 0.6
-            }} className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
-                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Shield className="w-7 h-7 text-white" />
+              {/* Video — Learn Spanish with 3 Physical Books (Pre-order) */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mt-6 rounded-2xl overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg"
+              >
+                <div className="px-4 pt-4 pb-2">
+                  <p className="text-sm font-bold text-primary flex items-center gap-2">
+                    🎬 Learn Spanish — 3 Physical Books (Pre-order from June 2026)
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    8,000 Words + 3,000 Verbs + Grammar A1–C1 · Lock in the lowest price now
+                  </p>
                 </div>
-                <div>
-                  <p className="text-base font-bold text-green-700">🛡️ 100% Money-Back Guarantee — 30 Days</p>
-                  <p className="text-sm text-green-600">If you're not satisfied, we'll refund ALL your money. No questions asked.</p>
-                </div>
+                <video
+                  src={learnSpanish3BooksVideo}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full h-auto bg-black"
+                />
               </motion.div>
 
               {/* PDF Flipbook — real preview to build trust before purchase */}

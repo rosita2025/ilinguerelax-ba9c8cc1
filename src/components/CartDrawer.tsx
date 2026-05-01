@@ -32,6 +32,11 @@ const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compa
   },
 };
 
+// Helper: detect physical pre-order items by product title keywords
+const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
+const isPhysicalPreorderItem = (title: string) =>
+  PHYSICAL_KEYWORDS.some((kw) => title.includes(kw));
+
 export const CartDrawer = () => {
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
@@ -145,9 +150,8 @@ export const CartDrawer = () => {
               {/* Free shipping progress bar */}
               {(() => {
                 // Hide free shipping bar if cart only has digital products (no physical books)
-                const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
                 const hasPhysical = items.some((item) =>
-                  PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                  isPhysicalPreorderItem(item.product.node.title)
                 );
                 if (!hasPhysical) return null;
                 const FREE_SHIPPING_MIN = 45;
@@ -173,6 +177,23 @@ export const CartDrawer = () => {
                         }}
                       />
                     </div>
+                  </div>
+                );
+              })()}
+              {/* Pre-order warning banner — shown whenever a physical book is in cart */}
+              {(() => {
+                const hasPhysical = items.some((item) =>
+                  isPhysicalPreorderItem(item.product.node.title)
+                );
+                if (!hasPhysical) return null;
+                return (
+                  <div className="flex-shrink-0 mb-3 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30">
+                    <p className="text-xs font-bold text-amber-900 dark:text-amber-200 leading-tight">
+                      ⚠️ PRE-VENTA · Envío desde Junio 2026
+                    </p>
+                    <p className="text-[10px] text-amber-800 dark:text-amber-300 mt-0.5 leading-tight">
+                      Los libros físicos son <strong>pre-order anticipado</strong>. Pagas hoy al precio bajo y los recibes a partir de junio 2026. Los productos digitales se entregan al instante por email.
+                    </p>
                   </div>
                 );
               })()}
@@ -202,6 +223,7 @@ export const CartDrawer = () => {
                           const discountPct = compareNum && compareNum > price
                             ? Math.round(((compareNum - price) / compareNum) * 100)
                             : null;
+                          const isPreorder = isPhysicalPreorderItem(item.product.node.title);
                           return (
                             <>
                               <h4 className="font-semibold text-xs leading-tight truncate">{title}</h4>
@@ -210,6 +232,11 @@ export const CartDrawer = () => {
                               ) : item.variantTitle !== "Default Title" ? (
                                 <p className="text-[10px] text-muted-foreground leading-tight">{item.variantTitle}</p>
                               ) : null}
+                              {isPreorder && (
+                                <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400 text-amber-950">
+                                  📦 PRE-ORDER · Envía Jun 2026
+                                </span>
+                              )}
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {compareNum && (
                                   <span className="text-[10px] line-through text-destructive font-medium">
@@ -304,15 +331,14 @@ export const CartDrawer = () => {
                 )}
 
                 {(() => {
-                  const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
                   const hasPhysical = items.some((item) =>
-                    PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                    isPhysicalPreorderItem(item.product.node.title)
                   );
                   if (!hasPhysical) return null;
                   return (
                     <div className="space-y-1 text-xs text-muted-foreground">
-                      <p>📦 Envío internacional disponible</p>
-                      <p>⏱ Entrega estimada: 12–15 días</p>
+                      <p>📦 Envío internacional incluido (gratis +$45)</p>
+                      <p>⏱ Despacho a partir de <strong className="text-foreground">junio 2026</strong> · entrega 12–15 días después</p>
                     </div>
                   );
                 })()}
@@ -326,9 +352,8 @@ export const CartDrawer = () => {
                   </div>
                 </div>
                 {(() => {
-                  const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
                   const hasPhysical = items.some((item) =>
-                    PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                    isPhysicalPreorderItem(item.product.node.title)
                   );
                   if (!hasPhysical) return null;
                   return (
@@ -347,11 +372,10 @@ export const CartDrawer = () => {
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
                       {(() => {
-                        const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
                         const hasPhysical = items.some((item) =>
-                          PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
+                          isPhysicalPreorderItem(item.product.node.title)
                         );
-                        return "Checkout securely";
+                        return hasPhysical ? "Reservar pre-order ahora" : "Checkout securely";
                       })()}
                     </>
                 }

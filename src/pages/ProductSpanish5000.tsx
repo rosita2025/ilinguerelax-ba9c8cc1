@@ -462,44 +462,10 @@ const ProductSpanish5000 = () => {
                   className="w-full h-auto max-h-[70vh] sm:max-h-[60vh] object-contain bg-black"
                 />
               </motion.div>
-
-              {/* PDF Flipbook — real preview to build trust before purchase */}
-              <div className="mt-6">
-                <PdfFlipbook
-                  title="Look inside the PDF"
-                  subtitle="Real interior pages — flip to see what you'll get"
-                  accentClass="text-purple-600"
-                  pages={[
-                    {
-                      src: previewSpanishIndex,
-                      alt: "Complete index — 50 chapters from beginner to advanced",
-                      caption: "📑 Complete index — 50 organized chapters",
-                    },
-                    {
-                      src: previewSpanishVocab,
-                      alt: "Vocabulary table with English pronunciation",
-                      caption: "🔤 5,000 words written the way they sound in English",
-                    },
-                    {
-                      src: previewSpanishPhrases,
-                      alt: "Practical phrases with grammar structure",
-                      caption: "💬 Real-life phrases with phonetic pronunciation",
-                    },
-                    {
-                      src: previewSpanishUpdates,
-                      alt: "Free lifetime updates included",
-                      caption: "🔄 Free lifetime updates included",
-                    },
-                  ]}
-                />
-              </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Countdown Timer */}
-      <CountdownTimer hoursFromNow={48} currentPrice={campaign.priceWithCurrency} originalPrice={campaign.originalWithCurrency} storageKey="countdown_spanish_book" lang="en" />
 
       {/* Reviews carousel — moved up to build trust early (no form) */}
       <ProductReviews productType="spanish" />

@@ -153,6 +153,125 @@ interface BundleSelectorProps {
   defaultBundle?: BundleId;
 }
 
+/**
+ * Adds a bundle to the cart with exact composition guarantee:
+ * 1. Removes any items belonging to other bundles.
+ * 2. Sets each bundle item to qty=1 (adds if missing, updates if present).
+ * 3. Validates the resulting subtotal equals the bundle target.
+ * Safe to call from anywhere (e.g. StickyBuyBar) — uses cart store directly.
+ */
+export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
+  const bundle = bundles.find((b) => b.id === bundleId);
+  if (!bundle) return false;
+
+  const cartStore = useCartStore.getState();
+  const { addItem, removeItem, updateQuantity, setDrawerOpen } = cartStore;
+
+  trackHotmartEvent("AddToCart", {
+    content_name: `Bundle: ${bundle.label}`,
+    content_category: "Bundle",
+    content_ids: [bundle.id],
+    content_type: "product_group",
+    value: bundle.total,
+    currency: "USD",
+    num_items: bundle.items.length,
+    bundle_id: bundle.id,
+  });
+
+  // STEP 1: clean other bundle items.
+  const bundleVariantIds = new Set(bundle.items.map((i) => i.variantId));
+  const existingItems = useCartStore.getState().items;
+  for (const cartItem of existingItems) {
+    if (
+      ALL_BUNDLE_VARIANT_IDS.has(cartItem.variantId) &&
+      !bundleVariantIds.has(cartItem.variantId)
+    ) {
+      await removeItem(cartItem.variantId);
+    }
+  }
+
+  // STEP 2: ensure each bundle item is in cart with qty=1.
+  for (const item of bundle.items) {
+    const existing = useCartStore
+      .getState()
+      .items.find((ci) => ci.variantId === item.variantId);
+    if (existing) {
+      if (existing.quantity !== 1) await updateQuantity(item.variantId, 1);
+      continue;
+    }
+    await addItem({
+      product: {
+        node: {
+          id: item.productId,
+          title: item.title,
+          description: "",
+          handle: "",
+          priceRange: { minVariantPrice: { amount: item.price, currencyCode: "USD" } },
+          images: { edges: [{ node: { url: item.image, altText: item.title } }] },
+          variants: {
+            edges: [
+              {
+                node: {
+                  id: item.variantId,
+                  title: "Default Title",
+                  price: { amount: item.price, currencyCode: "USD" },
+                  availableForSale: true,
+                  selectedOptions: [{ name: "Title", value: "Default Title" }],
+                },
+              },
+            ],
+          },
+          options: [{ name: "Title", values: ["Default Title"] }],
+        },
+      },
+      variantId: item.variantId,
+      variantTitle: "Default Title",
+      price: { amount: item.price, currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: [{ name: "Title", value: "Default Title" }],
+    });
+  }
+
+  // STEP 3: validate.
+  const finalItems = useCartStore.getState().items;
+  const expectedIds = new Set(bundle.items.map((i) => i.variantId));
+  const finalBundleItems = finalItems.filter((i) => expectedIds.has(i.variantId));
+  const subtotal = finalBundleItems.reduce(
+    (sum, i) => sum + parseFloat(i.price.amount) * i.quantity,
+    0,
+  );
+  const expectedSubtotal = bundle.items.reduce((sum, i) => sum + parseFloat(i.price), 0);
+  const composedCorrectly =
+    finalBundleItems.length === bundle.items.length &&
+    bundle.items.every((ci) => {
+      const m = finalBundleItems.find((fi) => fi.variantId === ci.variantId);
+      return m && m.quantity === 1;
+    });
+  const totalsMatch =
+    Math.abs(subtotal - expectedSubtotal) < 0.01 &&
+    Math.abs(expectedSubtotal - bundle.total) < 0.01;
+
+  if (!composedCorrectly || !totalsMatch) {
+    console.error("[BundleSelector] Validation failed", {
+      bundle: bundle.id,
+      expected: { items: bundle.items.length, total: bundle.total, subtotal: expectedSubtotal },
+      actual: { items: finalBundleItems.length, subtotal },
+    });
+    toast.error("There was a problem composing your bundle. Please review your cart before checkout.");
+    setDrawerOpen(true);
+    return false;
+  }
+
+  console.info("[BundleSelector] Bundle validated", {
+    bundle: bundle.id,
+    items: finalBundleItems.length,
+    subtotal: subtotal.toFixed(2),
+    expected: bundle.total.toFixed(2),
+  });
+  setDrawerOpen(true);
+  return true;
+}
+
 export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProps) => {
   const [selected, setSelected] = useState<BundleId>(defaultBundle);
   const [loading, setLoading] = useState(false);

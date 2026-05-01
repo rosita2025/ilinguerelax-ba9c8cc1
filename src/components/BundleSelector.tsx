@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, ShoppingCart, Truck, Package, Download, Loader2, Star } from "lucide-react";
+import { Check, ShoppingCart, Truck, Package, Download, Loader2, Star, CalendarClock, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import { useBundleStore } from "@/stores/bundleStore";
@@ -57,7 +57,7 @@ export const bundles: Bundle[] = [
   {
     id: "digital",
     label: "Digital eBook only",
-    description: "Instant PDF download · Start in minutes",
+    description: "📥 Descarga al instante por email · Empieza en 2 minutos",
     total: 29.99,
     retail: 54.0,
     savePct: 44,
@@ -77,7 +77,7 @@ export const bundles: Bundle[] = [
     label: "Digital + 2 Physical Books",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "Digital PDF + 8,000 Words book + 3,000 Verbs book (pre-order, ships June 2026)",
+    description: "📥 PDF al instante + 📦 2 libros físicos en pre-venta (envío Junio 2026)",
     total: 61.99,
     retail: 94.98,
     savePct: 35,
@@ -111,7 +111,7 @@ export const bundles: Bundle[] = [
     label: "Complete Library — 3 Books + Digital",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "Digital PDF + 8,000 Words + 3,000 Verbs + Grammar A1–C1 · Free shipping",
+    description: "📥 PDF al instante + 📦 3 libros físicos en pre-venta (envío Junio 2026)",
     total: 76.99,
     retail: 124.97,
     savePct: 38,
@@ -313,6 +313,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
       <div className="space-y-2">
         {bundles.map((b) => {
           const isSelected = b.id === selected;
+          const isPreorderBundle = b.id !== "digital";
           return (
             <button
               key={b.id}
@@ -371,6 +372,11 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                         <Download className="w-2.5 h-2.5" /> Instant
                       </span>
                     )}
+                    {isPreorderBundle && (
+                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded uppercase">
+                        <CalendarClock className="w-2.5 h-2.5" /> Pre-order · Jun 2026
+                      </span>
+                    )}
                   </div>
                   {/* Mini covers for bundles with books */}
                   {b.items.length > 1 && (
@@ -386,6 +392,22 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                       ))}
                     </div>
                   )}
+                  {/* Inline timeline shown only on the SELECTED preorder bundle to crush confusion */}
+                  {isSelected && isPreorderBundle && (
+                    <div className="mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 space-y-1">
+                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
+                        <Zap className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                        <span><strong>HOY:</strong> recibes el PDF digital al instante por email.</span>
+                      </div>
+                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
+                        <CalendarClock className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                        <span><strong>JUNIO 2026:</strong> enviamos los libros físicos a tu casa (envío gratis).</span>
+                      </div>
+                      <p className="text-[9px] text-amber-700 dark:text-amber-300 italic pl-4">
+                        Reservas hoy al precio más bajo · sube en junio.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </button>
@@ -393,7 +415,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
         })}
       </div>
 
-      {/* CTA */}
+      {/* CTA — text adapts to bundle type so customers know exactly what happens next */}
       <Button
         type="button"
         onClick={handleBuy}
@@ -404,10 +426,26 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
         {loading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
-          <>
-            <ShoppingCart className="w-5 h-5 mr-2" />
-            TAKE THE OFFER · ${current.total.toFixed(2)}
-          </>
+          <span className="flex flex-col items-center leading-tight">
+            <span className="flex items-center gap-2 font-black">
+              {current.id === "digital" ? (
+                <>
+                  <Download className="w-5 h-5" />
+                  GET INSTANT ACCESS · ${current.total.toFixed(2)}
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="w-5 h-5" />
+                  RESERVE PRE-ORDER · ${current.total.toFixed(2)}
+                </>
+              )}
+            </span>
+            <span className="text-[10px] font-medium opacity-90 mt-0.5">
+              {current.id === "digital"
+                ? "PDF en tu email en 2 minutos"
+                : "PDF hoy + libros físicos en Junio 2026"}
+            </span>
+          </span>
         )}
       </Button>
 

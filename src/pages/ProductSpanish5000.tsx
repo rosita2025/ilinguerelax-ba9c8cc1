@@ -151,11 +151,11 @@ const ProductSpanish5000 = () => {
     ["A_add_to_cart", "B_i_want_to_buy", "C_download_now"] as const,
   );
   const ctaTextByVariant: Record<string, string> = {
-    A_add_to_cart: "ADD TO CART",
+    A_add_to_cart: "BUY NOW",
     B_i_want_to_buy: "I WANT TO BUY",
-    C_download_now: "DOWNLOAD NOW",
+    C_download_now: "GET INSTANT ACCESS",
   };
-  const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "ADD TO CART";
+  const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "BUY NOW";
 
   // Live-mirror selected bundle into the StickyBuyBar (price updates automatically).
   const selectedBundle = useBundleStore((s) => s.selected);
@@ -172,7 +172,49 @@ const ProductSpanish5000 = () => {
   // When sticky bar CTA is clicked, dispatch the currently-selected bundle (or default).
   const handleStickyBuy = async () => {
     const targetId = (selectedBundle?.id as "digital" | "digital_plus_2" | "complete") ?? "digital";
-    await addBundleToCart(targetId);
+
+    if (targetId !== "digital") {
+      await addBundleToCart(targetId);
+      return;
+    }
+
+    const shopifyProduct = {
+      node: {
+        id: "gid://shopify/Product/7788747784253",
+        title: "Spanish Relax - 5,000 Words with English Pronunciation",
+        description: "",
+        handle: "spanish-relax-5-000-words-with-english-pronunciation",
+        priceRange: { minVariantPrice: { amount: "29.99", currencyCode: "USD" } },
+        images: { edges: [{ node: { url: productSpanish5000Image, altText: "Spanish Relax - 5,000 Words" } }] },
+        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "29.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
+        options: [{ name: "Title", values: ["Default Title"] }]
+      }
+    };
+
+    await addItem({
+      product: shopifyProduct,
+      variantId: SHOPIFY_VARIANT_ID,
+      variantTitle: "Default Title",
+      price: { amount: "29.99", currencyCode: "USD" },
+      quantity: 1,
+      selectedOptions: [{ name: "Title", value: "Default Title" }]
+    });
+
+    const checkoutUrl = useCartStore.getState().getCheckoutUrl();
+    if (checkoutUrl) {
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Spanish Relax - 5,000 Words",
+        content_category: "Digital Book",
+        content_ids: ["product-spanish-5000"],
+        content_type: "product",
+        value: 29.99,
+        currency: "USD",
+        num_items: 1,
+        source: "sticky_buy_bar",
+      });
+      setDrawerOpen(false);
+      window.location.href = checkoutUrl;
+    }
   };
 
   const handleBuyNow = async () => {

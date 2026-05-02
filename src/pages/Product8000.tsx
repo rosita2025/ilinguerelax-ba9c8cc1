@@ -452,6 +452,9 @@ const Product8000 = () => {
         </div>
       </section>
 
+      {/* Reviews carousel (moved above preview) */}
+      <ProductReviews productType="english" />
+
       {/* Preview & Bonus Sections */}
       <Product8000Preview />
 
@@ -531,9 +534,6 @@ const Product8000 = () => {
         }
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX" />
-
-      {/* Reviews */}
-      <ProductReviews productType="english" />
 
       {/* Physical Book Promo */}
       <section className="bg-gray-950 py-10 md:py-14">

@@ -120,11 +120,11 @@ export const StickyBuyBar = ({
       <button
         type="button"
         onClick={() => setDismissed(false)}
-        className="fixed bottom-4 right-4 z-30 h-12 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_6px_20px_rgba(16,185,129,0.5)] flex items-center gap-2 text-sm font-bold"
         aria-label={lang === "en" ? "Show buy bar" : "Mostrar barra de compra"}
+        className={`fixed bottom-4 right-4 z-30 w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 ${calmMode ? '' : 'animate-pulse'}`}
       >
-        <ShoppingCart className="w-4 h-4" />
-        {price}
+        <ShoppingCart className="w-5 h-5" />
+        <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
       </button>
     );
   }

@@ -497,12 +497,15 @@ const ProductSpanish5000 = () => {
                 <video
                   src={learnSpanish3BooksVideo}
                   controls
+                  autoPlay
+                  muted
+                  loop
                   controlsList="nodownload noremoteplayback noplaybackrate"
                   disablePictureInPicture
                   disableRemotePlayback
                   onContextMenu={(e) => e.preventDefault()}
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   className="w-full h-auto max-h-[70vh] sm:max-h-[60vh] object-contain bg-black"
                 />
               </motion.div>

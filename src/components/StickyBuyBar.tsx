@@ -74,6 +74,14 @@ export const StickyBuyBar = ({
     return () => clearInterval(id);
   }, [calmMode]);
 
+  // Auto re-open the sticky bar 25s after the user dismisses it,
+  // so customers always come back to the price/CTA without losing the page.
+  useEffect(() => {
+    if (!dismissed) return;
+    const id = setTimeout(() => setDismissed(false), 25000);
+    return () => clearTimeout(id);
+  }, [dismissed]);
+
   const handleBuy = () => {
     if (!disabled && !isLoading) {
       if (onBuyClick) {

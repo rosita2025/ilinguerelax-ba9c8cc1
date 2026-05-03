@@ -25,7 +25,7 @@ import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import learnSpanish3BooksVideo from "@/assets/learn-spanish-3-physical-books-preorder.mp4";
-import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck } from "lucide-react";
+import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
 
 // Review images
 import reviewPhoto5 from "@/assets/review-photo-5.jpg";

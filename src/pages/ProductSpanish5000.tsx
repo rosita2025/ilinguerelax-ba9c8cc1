@@ -890,42 +890,6 @@ const ProductSpanish5000 = () => {
       {/* Review submission form — kept at the end */}
       <ProductReviews productType="spanish" showReviewForm />
 
-      {/* Final CTA */}
-      <section className="py-20 md:py-28 bg-purple-500">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Get Your Digital Copy Now!
-            </h2>
-            <p className="text-lg text-white/90 mb-8">
-              Instant download. Start learning Spanish today!
-            </p>
-
-            <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 mb-2">
-                <span className={`${campaign.price.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl'} font-bold text-foreground`}>{campaign.price}</span>
-                <span className={`${campaign.price.length > 7 ? 'text-base md:text-2xl' : 'text-2xl'} text-muted-foreground line-through`}>{campaign.originalPrice}</span>
-                <span className="text-purple-600 font-bold text-sm md:text-base">{campaign.currency}</span>
-              </div>
-              <div className="flex justify-center mb-4">
-                <span className="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">SAVE 48%</span>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                One-time payment • Instant PDF download • Lifetime access
-              </p>
-              <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
-                ADD TO CART
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </div>
-
-            <p className="text-sm text-white/70">
-              🔒 100% secure payment • Satisfaction guaranteed
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Bundle Upsell Section: Spanish Relax Complete Collection */}
       <section className="py-16 md:py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.15),_transparent_60%)]" />

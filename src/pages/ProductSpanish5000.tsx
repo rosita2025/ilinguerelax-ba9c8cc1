@@ -163,7 +163,9 @@ const ProductSpanish5000 = () => {
   // All bundles now include a physical book ("digital" bundle = 1 physical + digital free)
   const isPhysicalBundle = true;
   const isPreorderBundle = selectedBundle?.id === "digital_plus_2" || selectedBundle?.id === "complete";
-  const dynamicCtaText = isPreorderBundle ? "RESERVE PRE-ORDER" : "GET PHYSICAL BOOK";
+  const dynamicCtaText = isPreorderBundle
+    ? "RESERVE PHYSICAL + DIGITAL FREE"
+    : "BUY PHYSICAL BOOK + DIGITAL FREE";
   const stickyPriceLabel = selectedBundle
     ? `$${selectedBundle.total.toFixed(2)}`
     : campaign.price;

@@ -56,44 +56,37 @@ const COVER_GRAMMAR = "/images/product-grammar-patterns-a1c1.webp";
 export const bundles: Bundle[] = [
   {
     id: "digital",
-    label: "Digital eBook only",
-    description: "📥 Instant email delivery · Start in 2 minutes",
-    total: 29.99,
+    label: "Physical Book + Digital FREE",
+    description: "📦 Physical book (in stock, ships now) + 📥 Digital PDF FREE by email",
+    total: 15.0,
     retail: 54.0,
-    savePct: 44,
+    savePct: 72,
     freeShipping: false,
     items: [
       {
-        productId: DIGITAL_5000_PRODUCT,
-        variantId: DIGITAL_5000_VARIANT,
-        title: "Spanish Relax - 5,000 Words (Digital PDF)",
-        price: "29.99",
-        image: COVER_5000,
+        productId: BOOK_8000_PRODUCT,
+        variantId: BOOK_8000_VARIANT,
+        title: "Spanish Relax - Physical Book + Digital 5,000 FREE",
+        price: "15.00",
+        image: COVER_8000,
       },
     ],
   },
   {
     id: "digital_plus_2",
-    label: "Digital + 2 Physical Books",
+    label: "2 Physical Books + Digital FREE",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "📥 Instant PDF + 📦 2 physical books pre-order (ships June 2026)",
-    total: 61.99,
-    retail: 94.98,
-    savePct: 35,
+    description: "📦 Physical book (in stock) + 📦 3,000 Verbs (pre-order) + 📥 Digital PDF FREE",
+    total: 32.0,
+    retail: 84.0,
+    savePct: 62,
     freeShipping: true,
     items: [
       {
-        productId: DIGITAL_5000_PRODUCT,
-        variantId: DIGITAL_5000_VARIANT,
-        title: "Spanish Relax - 5,000 Words (Digital PDF)",
-        price: "29.99",
-        image: COVER_5000,
-      },
-      {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax 8,000 Words — Physical Book (PRE-ORDER)",
+        title: "Spanish Relax - Physical Book + Digital 5,000 FREE",
         price: "15.00",
         image: COVER_8000,
       },
@@ -108,26 +101,19 @@ export const bundles: Bundle[] = [
   },
   {
     id: "complete",
-    label: "Complete Library — 3 Books + Digital",
+    label: "Complete Library — 3 Physical Books + Digital FREE",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "📥 Instant PDF + 📦 3 physical books pre-order (ships June 2026)",
-    total: 76.99,
-    retail: 124.97,
-    savePct: 38,
+    description: "📦 3 physical books + 📥 Digital PDF FREE — full mastery library",
+    total: 47.0,
+    retail: 124.0,
+    savePct: 62,
     freeShipping: true,
     items: [
       {
-        productId: DIGITAL_5000_PRODUCT,
-        variantId: DIGITAL_5000_VARIANT,
-        title: "Spanish Relax - 5,000 Words (Digital PDF)",
-        price: "29.99",
-        image: COVER_5000,
-      },
-      {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax 8,000 Words — Physical Book (PRE-ORDER)",
+        title: "Spanish Relax - Physical Book + Digital 5,000 FREE",
         price: "15.00",
         image: COVER_8000,
       },
@@ -369,7 +355,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                     )}
                     {b.id === "digital" && (
                       <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
-                        <Download className="w-2.5 h-2.5" /> Instant
+                        <Package className="w-2.5 h-2.5" /> In stock
                       </span>
                     )}
                     {isPreorderBundle && (
@@ -430,8 +416,8 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
             <span className="flex items-center gap-2 font-black">
               {current.id === "digital" ? (
                 <>
-                  <Download className="w-5 h-5" />
-                  GET INSTANT ACCESS · ${current.total.toFixed(2)}
+                  <ShoppingCart className="w-5 h-5" />
+                  GET PHYSICAL BOOK · ${current.total.toFixed(2)}
                 </>
               ) : (
                 <>
@@ -442,7 +428,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
               {current.id === "digital"
-                ? "PDF in your email within 2 minutes"
+                ? "Physical book ships now + PDF FREE in your email"
                 : "PDF today + physical books in June 2026"}
             </span>
           </span>

@@ -25,7 +25,7 @@ import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import learnSpanish3BooksVideo from "@/assets/learn-spanish-3-physical-books-preorder.mp4";
-import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck } from "lucide-react";
+import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
 
 // Review images
 import reviewPhoto5 from "@/assets/review-photo-5.jpg";
@@ -893,8 +893,33 @@ const ProductSpanish5000 = () => {
       {/* Review submission form — kept at the end */}
       <ProductReviews productType="spanish" showReviewForm />
 
-      {/* Physical Book Coming Soon Section */}
-      {/* Upsell Section */}
+      {/* Bundle FAQ — Physical + Digital FREE */}
+      <FAQ items={[{
+        question: "How does the \"Physical Book + Digital FREE\" bundle work?",
+        answer: "When you order any physical book, you automatically get the 5,000 Words digital PDF for FREE. The digital download link is sent to your email instantly after checkout, so you can start studying right away while your physical book ships.",
+        icon: Package,
+      }, {
+        question: "How long does shipping take?",
+        answer: "Books in stock (Spanish Relax Physical Book) ship within 1–3 business days and arrive in approximately 15 days worldwide. Pre-order titles (3,000 Verbs and Grammar Patterns A1–C1) ship as soon as the print run is ready and are clearly marked as PRE-ORDER.",
+        icon: Truck,
+      }, {
+        question: "What does Bundle 1 include? (Physical Book + Digital FREE — $29.99)",
+        answer: "1 physical book (in stock, ships now) + the 5,000 Words digital PDF FREE by email + the 3 study bonuses (placement exam, daily planner, pronunciation cheat-sheet).",
+        icon: BookOpen,
+      }, {
+        question: "What does Bundle 2 include? (2 Physical Books + Digital FREE — $42.99)",
+        answer: "Everything in Bundle 1 + the 3,000 Spanish Verbs Mastery physical book at early-bird pre-order price ($13 instead of $17). Free worldwide shipping included.",
+        icon: BookOpen,
+      }, {
+        question: "What does Bundle 3 include? (Complete Library — $54.99)",
+        answer: "Everything in Bundle 2 + the Grammar Patterns A1–C1 physical book at early-bird pre-order price ($12 instead of $15). 3 physical books + the digital PDF + all bonuses + free worldwide shipping.",
+        icon: Package,
+      }, {
+        question: "Why are pre-order books cheaper?",
+        answer: "Pre-orders help us print the exact quantity needed. As a thank you, you lock in the early-bird price (3,000 Verbs at $13 and Grammar Patterns at $12) which goes up once the books are in stock.",
+        icon: CalendarClock,
+      }]} title="Bundle & Shipping FAQ" subtitle="Physical book + digital free, shipping times and what each option includes" />
+
       {/* FAQ Section */}
       <FAQ items={[{
       question: "What does \"SPANISH RELAX\" mean?",

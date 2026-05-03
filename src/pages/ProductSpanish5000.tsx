@@ -37,6 +37,7 @@ import reviewBookContent from "@/assets/review-book-content.jpg";
 
 // Product image
 import productSpanish5000Image from "@/assets/spanish-5000-cover.webp";
+import productSpanish5000BundleImage from "@/assets/spanish-relax-physical-digital-bundle.webp";
 import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.webp";
 import product3000VerbsImage from "@/assets/product-spanish-3000-verbs-book.webp";
 
@@ -286,7 +287,10 @@ const ProductSpanish5000 = () => {
 
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-60 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img src={productSpanish5000Image} alt="Spanish Relax - 5,000 Words Digital eBook" className="w-full h-auto rounded-2xl shadow-hero" />
+                <img src={productSpanish5000BundleImage} alt="Spanish Relax - Buy the physical book, get the digital version FREE" className="w-full h-auto rounded-2xl shadow-hero" />
+                <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg">
+                  <Package className="w-3.5 h-3.5" /> PHYSICAL + DIGITAL FREE
+                </div>
               </div>
             </div>
 
@@ -321,18 +325,17 @@ const ProductSpanish5000 = () => {
                 )}
               </h1>
 
-              <p className="text-base md:text-lg text-muted-foreground mb-4">
-                <strong className="text-foreground">5,000 essential Spanish words</strong> written the way they{" "}
-                <em>actually sound</em> in English. No phonetic symbols. No guessing. Just open the PDF and start speaking today.
-              </p>
+                <p className="text-base md:text-lg text-muted-foreground mb-4">
+                  <strong className="text-foreground">Buy the physical book and get the digital version FREE</strong> — plus <strong className="text-foreground">3 exclusive bonuses</strong> still available. 5,000 essential Spanish words written the way they <em>actually sound</em> in English.
+                </p>
 
               {/* Benefits bullets — scannable above the fold */}
-              <ul className="space-y-1.5 mb-4">
-                {[
-                  "Read Spanish like English — no IPA symbols",
-                  "Instant PDF · works on phone, tablet & PC",
-                  "Lifetime updates + 3 free bonuses included",
-                ].map((b) => (
+                <ul className="space-y-1.5 mb-4">
+                  {[
+                    "📦 Physical book shipped to your door (limited stock — no preorder)",
+                    "📱 Digital PDF version included FREE — instant access",
+                    "🎁 Only 3 bonuses left + lifetime updates",
+                  ].map((b) => (
                   <li key={b} className="flex items-start gap-2 text-sm md:text-base text-foreground">
                     <Check className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                     <span>{b}</span>

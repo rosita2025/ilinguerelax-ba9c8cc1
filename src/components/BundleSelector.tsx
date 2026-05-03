@@ -77,10 +77,10 @@ export const bundles: Bundle[] = [
     label: "2 Physical Books + Digital FREE",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "📦 Physical book (in stock) + 📦 3,000 Verbs (pre-order) + 📥 Digital PDF FREE",
-    total: 46.99,
+    description: "📦 Physical book (in stock) + 📦 3,000 Verbs (pre-order, early-bird price) + 📥 Digital PDF FREE",
+    total: 42.99,
     retail: 84.0,
-    savePct: 44,
+    savePct: 49,
     freeShipping: true,
     items: [
       {
@@ -93,8 +93,8 @@ export const bundles: Bundle[] = [
       {
         productId: BOOK_3000_VERBS_PRODUCT,
         variantId: BOOK_3000_VERBS_VARIANT,
-        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER)",
-        price: "17.00",
+        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER · Early-bird)",
+        price: "13.00",
         image: COVER_3000,
       },
     ],
@@ -104,10 +104,10 @@ export const bundles: Bundle[] = [
     label: "Complete Library — 3 Physical Books + Digital FREE",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "📦 3 physical books + 📥 Digital PDF FREE — full mastery library",
-    total: 61.98,
+    description: "📦 3 physical books (early-bird pre-order pricing) + 📥 Digital PDF FREE — full mastery library",
+    total: 54.99,
     retail: 124.0,
-    savePct: 50,
+    savePct: 56,
     freeShipping: true,
     items: [
       {
@@ -120,15 +120,15 @@ export const bundles: Bundle[] = [
       {
         productId: BOOK_3000_VERBS_PRODUCT,
         variantId: BOOK_3000_VERBS_VARIANT,
-        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER)",
-        price: "17.00",
+        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER · Early-bird)",
+        price: "13.00",
         image: COVER_3000,
       },
       {
         productId: BOOK_GRAMMAR_PRODUCT,
         variantId: BOOK_GRAMMAR_VARIANT,
-        title: "Grammar Patterns A1–C1 — Physical Book (PRE-ORDER)",
-        price: "15.00",
+        title: "Grammar Patterns A1–C1 — Physical Book (PRE-ORDER · Early-bird)",
+        price: "12.00",
         image: COVER_GRAMMAR,
       },
     ],

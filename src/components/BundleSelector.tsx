@@ -355,7 +355,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                     )}
                     {b.id === "digital" && (
                       <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
-                        <Download className="w-2.5 h-2.5" /> Instant
+                        <Package className="w-2.5 h-2.5" /> In stock
                       </span>
                     )}
                     {isPreorderBundle && (
@@ -416,8 +416,8 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
             <span className="flex items-center gap-2 font-black">
               {current.id === "digital" ? (
                 <>
-                  <Download className="w-5 h-5" />
-                  GET INSTANT ACCESS · ${current.total.toFixed(2)}
+                  <ShoppingCart className="w-5 h-5" />
+                  GET PHYSICAL BOOK · ${current.total.toFixed(2)}
                 </>
               ) : (
                 <>
@@ -428,7 +428,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
               {current.id === "digital"
-                ? "PDF in your email within 2 minutes"
+                ? "Physical book ships now + PDF FREE in your email"
                 : "PDF today + physical books in June 2026"}
             </span>
           </span>

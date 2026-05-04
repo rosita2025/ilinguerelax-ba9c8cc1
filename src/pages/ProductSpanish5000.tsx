@@ -924,53 +924,6 @@ const ProductSpanish5000 = () => {
         icon: CalendarClock,
       }]} title="Bundle & Shipping FAQ" subtitle="Spanish Relax physical book + digital FREE + 3 bonuses · Free shipping (24–72h dispatch, ~15 days delivery)" />
 
-      {/* FAQ Section */}
-      <FAQ items={[{
-      question: "What does \"SPANISH RELAX\" mean?",
-      answer: "SPANISH RELAX is our stress-free method to learn Spanish without pressure, frustration, or confusing rules. \"Relax\" because you study at your own pace, with pronunciation already simplified, so your brain absorbs Spanish naturally — like a conversation, not a class.",
-      icon: Sparkles
-    }, {
-      question: "Is the pronunciation really stress-free? I've tried other apps and got lost.",
-      answer: "Yes. Every Spanish word is written the way it actually SOUNDS in English — no IPA symbols, no weird accent marks to memorize. If you can read English, you can pronounce Spanish from page 1. Example: \"Hola\" → OH-lah. That's it.",
-      icon: BookOpen
-    }, {
-      question: "Do I need a dictionary or other apps to use it?",
-      answer: "No. Everything is included in the PDF: the Spanish word, its English translation, and the pronunciation — all on the same line. No tabs to switch, no Google Translate, no extra purchases. Open the PDF and learn.",
-      icon: Brain
-    }, {
-      question: "What exactly is included in the PDF?",
-      answer: "5,000 essential Spanish words organized by topic (greetings, food, travel, work, family, emotions, etc.), each with English translation + simplified pronunciation. Plus 3 FREE bonuses: a Spanish placement exam, a daily study planner, and a pronunciation cheat-sheet. ~250 pages, instant download.",
-      icon: FileText
-    }, {
-      question: "Who is the author of this eBook?",
-      answer: "SPANISH RELAX is a work by iLingue Relax, an educational brand focused on learning Spanish in a simple, practical, and stress-free way.",
-      icon: User
-    }, {
-      question: "How do I receive the eBook?",
-      answer: "Immediately after your purchase, you'll receive an email with a download link to your PDF. You can start studying right away!",
-      icon: Download
-    }, {
-      question: "What format is the eBook?",
-      answer: "The eBook is in PDF format, which works on any device - phone, tablet, computer, or e-reader.",
-      icon: FileText
-    }, {
-      question: "Is it suitable for self-study?",
-      answer: "Yes. SPANISH RELAX is designed for self-study, to learn at your own pace without pressure.",
-      icon: GraduationCap
-    }, {
-      question: "Do I need to know Spanish before using this?",
-      answer: "No. You can start from scratch, with no prior knowledge of Spanish.",
-      icon: Lightbulb
-    }, {
-      question: "Does the eBook include pronunciation?",
-      answer: "Yes. All 5,000 words include pronunciation adapted for English speakers with UK and USA phonetics.",
-      icon: BookOpen
-    }, {
-      question: "How do I make the payment?",
-      answer: "You can pay securely using an international credit or debit card. We accept Visa, Mastercard, American Express, and more.",
-      icon: CreditCard
-    }]} title="Frequently Asked Questions" subtitle="We answer your questions about the digital eBook" />
-
       <Footer />
 
       {/* Sticky Buy Bar */}

@@ -181,7 +181,8 @@ const ProductSpanish5000 = () => {
   // When sticky bar CTA is clicked, dispatch the currently-selected bundle (or default).
   const handleStickyBuy = async () => {
     const targetId = (selectedBundle?.id as "single" | "duo" | "trio") ?? "single";
-    await addBundleToCart(targetId);
+    // Sticky bar = direct redirect to Shopify checkout (no drawer in between).
+    await addBundleToCart(targetId, { redirectToCheckout: true });
   };
 
   const handleBuyNow = async () => {

@@ -115,8 +115,13 @@ interface BundleSelectorProps {
  * 2. Sets each bundle item to qty=1 (adds if missing, updates if present).
  * 3. Validates the resulting subtotal equals the bundle target.
  * Safe to call from anywhere (e.g. StickyBuyBar) — uses cart store directly.
+ * If `redirectToCheckout` is true, opens the Shopify checkout URL in a new tab
+ * instead of opening the cart drawer.
  */
-export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
+export async function addBundleToCart(
+  bundleId: BundleId,
+  options: { redirectToCheckout?: boolean } = {},
+): Promise<boolean> {
   const bundle = bundles.find((b) => b.id === bundleId);
   if (!bundle) return false;
 
@@ -238,6 +243,39 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
     subtotal: subtotal.toFixed(2),
     expected: bundle.total.toFixed(2),
   });
+
+  // Redirect directly to Shopify checkout (skips cart drawer) when requested.
+  if (options.redirectToCheckout) {
+    const checkoutUrl = useCartStore.getState().getCheckoutUrl();
+    if (checkoutUrl) {
+      // GA4: begin_checkout fired here too because the drawer is bypassed.
+      try {
+        trackGAEvent("begin_checkout", {
+          currency: "USD",
+          value: bundle.total,
+          checkout_type: "shopify",
+          source: "direct_redirect",
+          bundle_id: bundle.id,
+          num_items: bundle.items.reduce((s, i) => s + i.quantity, 0),
+          items: bundle.items.map((it) => ({
+            item_id: it.variantId,
+            item_name: it.title,
+            price: parseFloat(it.price),
+            quantity: it.quantity,
+          })),
+        });
+      } catch (e) {
+        console.warn("GA begin_checkout failed:", e);
+      }
+      window.open(checkoutUrl, "_blank");
+      return true;
+    }
+    // Fallback: if no checkout URL yet, open the drawer so user can continue.
+    console.warn("[BundleSelector] No checkout URL available, opening drawer instead");
+    setDrawerOpen(true);
+    return true;
+  }
+
   setDrawerOpen(true);
   return true;
 }
@@ -263,7 +301,8 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
   const handleBuy = async () => {
     setLoading(true);
     try {
-      await addBundleToCart(current.id);
+      // Bundle CTA = upsell 1/2/3 → redirect straight to Shopify checkout.
+      await addBundleToCart(current.id, { redirectToCheckout: true });
     } finally {
       setLoading(false);
     }

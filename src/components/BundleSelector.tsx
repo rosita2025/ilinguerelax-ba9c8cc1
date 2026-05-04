@@ -367,13 +367,13 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
         onClick={handleBuy}
         disabled={loading}
         size="xl"
-        className="relative z-10 w-full mt-3 text-base md:text-lg py-6 touch-manipulation shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99]"
+        className="relative z-10 w-full mt-3 text-base md:text-lg py-6 px-4 h-auto min-h-[64px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99]"
       >
         {loading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
-          <span className="flex flex-col items-center leading-tight">
-            <span className="flex items-center gap-2 font-black">
+          <span className="flex flex-col items-center leading-tight w-full">
+            <span className="flex items-center justify-center gap-2 font-black text-center flex-wrap">
               {current.id === "single" ? (
                 <>
                   <ShoppingCart className="w-5 h-5" />
@@ -386,7 +386,7 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
                 </>
               )}
             </span>
-            <span className="text-[10px] font-medium opacity-90 mt-0.5">
+            <span className="text-[10px] font-medium opacity-90 mt-1 text-center px-1 break-words leading-snug">
               {current.freeShipping
                 ? "Ships in 7–15 days · FREE shipping · PDF FREE in your email today"
                 : "Ships in 7–15 days · shipping calculated at checkout · PDF FREE in your email today"}

@@ -145,13 +145,13 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
     }
   }
 
-  // STEP 2: ensure each bundle item is in cart with qty=1.
+  // STEP 2: ensure each bundle item is in cart with the right quantity.
   for (const item of bundle.items) {
     const existing = useCartStore
       .getState()
       .items.find((ci) => ci.variantId === item.variantId);
     if (existing) {
-      if (existing.quantity !== 1) await updateQuantity(item.variantId, 1);
+      if (existing.quantity !== item.quantity) await updateQuantity(item.variantId, item.quantity);
       continue;
     }
     await addItem({
@@ -182,7 +182,7 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
       variantId: item.variantId,
       variantTitle: "Default Title",
       price: { amount: item.price, currencyCode: "USD" },
-      quantity: 1,
+      quantity: item.quantity,
       selectedOptions: [{ name: "Title", value: "Default Title" }],
     });
   }
@@ -195,12 +195,12 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
     (sum, i) => sum + parseFloat(i.price.amount) * i.quantity,
     0,
   );
-  const expectedSubtotal = bundle.items.reduce((sum, i) => sum + parseFloat(i.price), 0);
+  const expectedSubtotal = bundle.items.reduce((sum, i) => sum + parseFloat(i.price) * i.quantity, 0);
   const composedCorrectly =
     finalBundleItems.length === bundle.items.length &&
     bundle.items.every((ci) => {
       const m = finalBundleItems.find((fi) => fi.variantId === ci.variantId);
-      return m && m.quantity === 1;
+      return m && m.quantity === ci.quantity;
     });
   const totalsMatch =
     Math.abs(subtotal - expectedSubtotal) < 0.01 &&
@@ -227,7 +227,7 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
   return true;
 }
 
-export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProps) => {
+export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps) => {
   const [selected, setSelected] = useState<BundleId>(defaultBundle);
   const [loading, setLoading] = useState(false);
   const setSelectedBundle = useBundleStore((s) => s.setSelected);
@@ -324,14 +324,14 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                         <Truck className="w-2.5 h-2.5" /> Free shipping
                       </span>
                     )}
-                    {b.id === "digital" && (
+                    {b.id === "single" && (
                       <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
                         <Package className="w-2.5 h-2.5" /> In stock
                       </span>
                     )}
                     {isPreorderBundle && (
                       <span className="inline-flex items-center gap-0.5 text-[9px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded uppercase">
-                        <CalendarClock className="w-2.5 h-2.5" /> Pre-order · Jun 2026
+                        <Truck className="w-2.5 h-2.5" /> Ships in 48h
                       </span>
                     )}
                   </div>

@@ -48,7 +48,7 @@ export const bundles: Bundle[] = [
     total: 29.99,
     retail: 54.0,
     savePct: 44,
-    freeShipping: true,
+    freeShipping: false,
     items: [
       {
         productId: BOOK_8000_PRODUCT,

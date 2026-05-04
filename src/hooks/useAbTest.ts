@@ -35,22 +35,6 @@ export function useAbTest<T extends string>(
     }
 
     setVariant(assigned);
-
-    // Fire exposure event once per session per experiment
-    const sessionKey = `ab_exposed_${experimentId}_${assigned}`;
-    if (!window.sessionStorage.getItem(sessionKey)) {
-      window.sessionStorage.setItem(sessionKey, "1");
-      const payload = { experiment_id: experimentId, variant: assigned };
-      try {
-        // Meta Pixel
-        (window as any).fbq?.("trackCustom", "ABTestExposure", payload);
-        // GA4 / GTM
-        (window as any).gtag?.("event", "ab_test_exposure", payload);
-        (window as any).dataLayer?.push({ event: "ab_test_exposure", ...payload });
-      } catch {
-        /* no-op */
-      }
-    }
   }, [experimentId, variants, weights]);
 
   return variant;

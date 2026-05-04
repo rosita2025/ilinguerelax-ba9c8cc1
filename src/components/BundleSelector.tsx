@@ -6,32 +6,22 @@ import { useBundleStore } from "@/stores/bundleStore";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { toast } from "sonner";
 
-// Variant IDs (Shopify)
-const DIGITAL_5000_VARIANT = "gid://shopify/ProductVariant/42931924795453";
-const DIGITAL_5000_PRODUCT = "gid://shopify/Product/7788747784253";
+// Variant IDs (Shopify) — every bundle is the same 8,000-words physical book in different quantities.
 const BOOK_8000_VARIANT = "gid://shopify/ProductVariant/43137345749053";
 const BOOK_8000_PRODUCT = "gid://shopify/Product/7849025568829";
-const BOOK_3000_VERBS_VARIANT = "gid://shopify/ProductVariant/43138982281277";
-const BOOK_3000_VERBS_PRODUCT = "gid://shopify/Product/7849457778749";
-const BOOK_GRAMMAR_VARIANT = "gid://shopify/ProductVariant/43138982314045";
-const BOOK_GRAMMAR_PRODUCT = "gid://shopify/Product/7849457811517";
 
 // Set of all variant IDs that belong to ANY bundle. Used to clean prior bundle items
 // from cart before re-adding the selected bundle, guaranteeing exact composition.
-const ALL_BUNDLE_VARIANT_IDS = new Set<string>([
-  DIGITAL_5000_VARIANT,
-  BOOK_8000_VARIANT,
-  BOOK_3000_VERBS_VARIANT,
-  BOOK_GRAMMAR_VARIANT,
-]);
+const ALL_BUNDLE_VARIANT_IDS = new Set<string>([BOOK_8000_VARIANT]);
 
-type BundleId = "digital" | "digital_plus_2" | "complete";
+type BundleId = "single" | "duo" | "trio";
 
 interface BundleItem {
   productId: string;
   variantId: string;
   title: string;
-  price: string;
+  price: string; // per-unit price
+  quantity: number;
   image: string;
 }
 
@@ -48,15 +38,12 @@ interface Bundle {
   items: BundleItem[];
 }
 
-const COVER_5000 = "/images/product-spanish-5000.webp";
 const COVER_8000 = "/images/product-spanish-8000-book.webp";
-const COVER_3000 = "/images/product-spanish-3000-verbs-book.webp";
-const COVER_GRAMMAR = "/images/product-grammar-patterns-a1c1.webp";
 
 export const bundles: Bundle[] = [
   {
-    id: "digital",
-    label: "Spanish Relax Physical Book + Digital FREE + 3 Bonuses",
+    id: "single",
+    label: "1 × Spanish Relax 8,000 Words — Physical + Digital FREE",
     description: "",
     total: 29.99,
     retail: 54.0,
@@ -66,70 +53,52 @@ export const bundles: Bundle[] = [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
+        title: "Spanish Relax — 8,000 Words Physical Book + Digital FREE",
         price: "29.99",
+        quantity: 1,
         image: COVER_8000,
       },
     ],
   },
   {
-    id: "digital_plus_2",
-    label: "2 Physical Books + Digital FREE + 3 Bonuses",
+    id: "duo",
+    label: "2 × Spanish Relax 8,000 Words — Save 15%",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "",
-    total: 42.99,
-    retail: 84.0,
-    savePct: 49,
+    description: "Perfect to gift one — both include the digital PDF FREE.",
+    total: 50.98,
+    retail: 59.98,
+    savePct: 15,
     freeShipping: true,
     items: [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
-        price: "29.99",
+        title: "Spanish Relax — 8,000 Words Physical Book + Digital FREE",
+        price: "25.49",
+        quantity: 2,
         image: COVER_8000,
-      },
-      {
-        productId: BOOK_3000_VERBS_PRODUCT,
-        variantId: BOOK_3000_VERBS_VARIANT,
-        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER · Early-bird)",
-        price: "13.00",
-        image: COVER_3000,
       },
     ],
   },
   {
-    id: "complete",
-    label: "Complete Library — 3 Physical Books + Digital FREE + 3 Bonuses",
+    id: "trio",
+    label: "3 × Spanish Relax 8,000 Words — Save 25%",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "",
-    total: 54.99,
-    retail: 124.0,
-    savePct: 56,
+    description: "Best value — share with family or study buddies.",
+    total: 67.48,
+    retail: 89.97,
+    savePct: 25,
     freeShipping: true,
     items: [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
-        price: "29.99",
+        title: "Spanish Relax — 8,000 Words Physical Book + Digital FREE",
+        price: "22.49",
+        quantity: 3,
         image: COVER_8000,
-      },
-      {
-        productId: BOOK_3000_VERBS_PRODUCT,
-        variantId: BOOK_3000_VERBS_VARIANT,
-        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER · Early-bird)",
-        price: "13.00",
-        image: COVER_3000,
-      },
-      {
-        productId: BOOK_GRAMMAR_PRODUCT,
-        variantId: BOOK_GRAMMAR_VARIANT,
-        title: "Grammar Patterns A1–C1 — Physical Book (PRE-ORDER · Early-bird)",
-        price: "12.00",
-        image: COVER_GRAMMAR,
       },
     ],
   },

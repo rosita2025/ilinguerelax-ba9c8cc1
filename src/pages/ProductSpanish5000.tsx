@@ -49,6 +49,7 @@ import { PdfFlipbook } from "@/components/PdfFlipbook";
 import { BundleSelector, addBundleToCart } from "@/components/BundleSelector";
 import { useBundleStore } from "@/stores/bundleStore";
 import { InfluencerVideoCarousel } from "@/components/InfluencerVideoCarousel";
+import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";

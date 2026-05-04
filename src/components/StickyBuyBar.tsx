@@ -193,7 +193,7 @@ export const StickyBuyBar = ({
           <p className={`text-[11px] lg:text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 ${calmMode ? '' : 'animate-pulse'}`}>
             <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
             {isPhysical
-              ? (lang === "en" ? "FREE Shipping • Delivery 7–15 days • PDF FREE" : "Envío GRATIS • Entrega 7–15 días • PDF GRATIS")
+              ? (lang === "en" ? "Delivery 7–15 days • PDF FREE • Get 2+ books for FREE shipping" : "Entrega 7–15 días • PDF GRATIS • 2+ libros = envío GRATIS")
               : (lang === "en" ? "Instant Digital Delivery • 3 FREE BONUSES" : "Entrega Digital Inmediata • 3 BONUS GRATIS")}
             <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
           </p>

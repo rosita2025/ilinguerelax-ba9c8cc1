@@ -57,7 +57,7 @@ export const bundles: Bundle[] = [
   {
     id: "digital",
     label: "Spanish Relax Physical Book + Digital FREE + 3 Bonuses",
-    description: "📦 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in ~15 days) + 📥 Digital PDF FREE by email + 🎁 3 FREE bonuses",
+    description: "",
     total: 29.99,
     retail: 54.0,
     savePct: 44,
@@ -77,7 +77,7 @@ export const bundles: Bundle[] = [
     label: "2 Physical Books + Digital FREE + 3 Bonuses",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "📦 Spanish Relax physical book (ships 24–72h) + 📦 3,000 Verbs (pre-order, early-bird) + 📥 Digital PDF FREE + 🎁 3 FREE bonuses",
+    description: "",
     total: 42.99,
     retail: 84.0,
     savePct: 49,
@@ -104,7 +104,7 @@ export const bundles: Bundle[] = [
     label: "Complete Library — 3 Physical Books + Digital FREE + 3 Bonuses",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "📦 3 physical books (Spanish Relax ships 24–72h, others early-bird pre-order) + 📥 Digital PDF FREE + 🎁 3 FREE bonuses",
+    description: "",
     total: 54.99,
     retail: 124.0,
     savePct: 56,
@@ -341,9 +341,11 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                       </p>
                     </div>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug mb-1.5">
-                    {b.description}
-                  </p>
+                  {b.description && (
+                    <p className="text-[11px] text-muted-foreground leading-snug mb-1.5">
+                      {b.description}
+                    </p>
+                  )}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="inline-flex items-center gap-0.5 text-[9px] bg-rose-500/10 text-rose-600 font-bold px-1.5 py-0.5 rounded uppercase">
                       Save {b.savePct}%

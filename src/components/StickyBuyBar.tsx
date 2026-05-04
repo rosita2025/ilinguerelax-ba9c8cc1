@@ -63,6 +63,7 @@ export const StickyBuyBar = ({
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [priceFlash, setPriceFlash] = useState(false);
 
   // Subtle pulse every 6s to grab attention without being annoying
   useEffect(() => {
@@ -78,9 +79,36 @@ export const StickyBuyBar = ({
   // so customers always come back to the price/CTA without losing the page.
   useEffect(() => {
     if (!dismissed) return;
-    const id = setTimeout(() => setDismissed(false), 25000);
+    const id = setTimeout(() => setDismissed(false), 15000);
     return () => clearTimeout(id);
   }, [dismissed]);
+
+  // Auto-collapse to floating circle when user scrolls down (gives back page space),
+  // auto-expand again when user scrolls back up. Customer can also tap the circle.
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy = y - lastY;
+      if (dy > 8 && y > 400) {
+        setDismissed(true);
+      } else if (dy < -8) {
+        setDismissed(false);
+      }
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // When the price changes (e.g. user selects a different bundle), pop the bar
+  // open and flash it so they see the new total immediately.
+  useEffect(() => {
+    setDismissed(false);
+    setPriceFlash(true);
+    const id = setTimeout(() => setPriceFlash(false), 1400);
+    return () => clearTimeout(id);
+  }, [price]);
 
   const handleBuy = () => {
     if (!disabled && !isLoading) {
@@ -121,7 +149,7 @@ export const StickyBuyBar = ({
         type="button"
         onClick={() => setDismissed(false)}
         aria-label={lang === "en" ? "Show buy bar" : "Mostrar barra de compra"}
-        className={`fixed bottom-4 right-4 z-30 w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 ${calmMode ? '' : 'animate-pulse'}`}
+        className={`fixed bottom-4 right-4 z-30 w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 ${calmMode ? '' : 'animate-pulse'} ${priceFlash ? 'ring-4 ring-amber-300 scale-110' : ''}`}
       >
         <ShoppingCart className="w-5 h-5" />
         <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>

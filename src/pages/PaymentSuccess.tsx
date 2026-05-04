@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
+import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import {
   CheckCircle,
   Download,
@@ -29,6 +30,24 @@ const PaymentSuccess = () => {
       value: 29.99,
       currency: "USD",
       num_items: 1,
+    });
+
+    // Google Analytics 4: purchase (Shopify)
+    const urlParams = new URLSearchParams(window.location.search);
+    trackGAEvent("purchase", {
+      transaction_id: urlParams.get("order") || urlParams.get("transaction") || `shopify_${Date.now()}`,
+      currency: "USD",
+      value: 29.99,
+      payment_provider: "shopify",
+      items: [
+        {
+          item_id: "product-spanish-5000",
+          item_name: "Spanish Relax - 5,000 Words",
+          item_category: "Digital Book",
+          price: 29.99,
+          quantity: 1,
+        },
+      ],
     });
 
     // Hide confetti after animation

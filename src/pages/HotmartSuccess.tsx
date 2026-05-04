@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import {
   CheckCircle,
   MessageCircle,
@@ -65,6 +66,23 @@ const HotmartSuccess = () => {
       value: value,
       currency: "USD",
       num_items: 1,
+    });
+
+    // Google Analytics 4: purchase (Hotmart)
+    trackGAEvent("purchase", {
+      transaction_id: searchParams.get("transaction") || `hotmart_${Date.now()}`,
+      currency: "USD",
+      value: value,
+      payment_provider: "hotmart",
+      items: [
+        {
+          item_id: contentId,
+          item_name: contentName,
+          item_category: "Digital Book",
+          price: value,
+          quantity: 1,
+        },
+      ],
     });
 
     const timer = setTimeout(() => setConfetti(false), 5000);

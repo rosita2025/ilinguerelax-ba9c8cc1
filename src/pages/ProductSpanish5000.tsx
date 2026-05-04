@@ -883,8 +883,20 @@ const ProductSpanish5000 = () => {
         answer: "This is a PHYSICAL book purchase. When you buy the Spanish Relax physical book, you also receive the 5,000 Words digital PDF for FREE plus 3 FREE bonuses — all sent to your email instantly after checkout. There is no digital-only option: every order ships a real printed book.",
         icon: Package,
       }, {
-        question: "How long does shipping take?",
-        answer: "FREE worldwide shipping. Spanish Relax physical book ships from our warehouse within 24–72 hours and arrives in approximately 15 days worldwide. Pre-order titles (3,000 Verbs and Grammar Patterns A1–C1) ship as soon as the print run is ready and are clearly marked as PRE-ORDER.",
+        question: "Who is the author of Spanish Relax?",
+        answer: "Spanish Relax is created by Crady, founder of iLingue Relax — a language-learning brand specialized in calm, relaxed methods to learn Spanish, English, French and Portuguese. Every book and digital resource is designed and curated personally by Crady to guarantee a stress-free learning experience.",
+        icon: User,
+      }, {
+        question: "Is iLingue Relax a real brand?",
+        answer: "Yes. iLingue Relax is the official brand behind all our books, PDFs and audio courses (ilinguerelax.com). We ship physical books worldwide, deliver digital content by email, and offer dedicated WhatsApp support at +1 575 216 0934 and email at hola@ilinguerelax.com.",
+        icon: BadgeCheck,
+      }, {
+        question: "How long until I receive the DIGITAL PDF by email?",
+        answer: "The 5,000 Words digital PDF + the 3 FREE bonuses are sent automatically to your email within a few minutes after checkout. If you don't see it in your inbox, please check your spam/promotions folder or contact us at hola@ilinguerelax.com.",
+        icon: Download,
+      }, {
+        question: "How long until the PHYSICAL book arrives?",
+        answer: "Your Spanish Relax physical book is dispatched from our warehouse within 24–72 hours and is delivered worldwide in approximately 7–15 days depending on your country. You'll receive a tracking number by email as soon as it ships.",
         icon: Truck,
       }, {
         question: "What does Bundle 1 include? (Spanish Relax Physical Book + Digital FREE + 3 Bonuses — $29.99)",
@@ -902,10 +914,6 @@ const ProductSpanish5000 = () => {
         question: "Is there a digital-only option?",
         answer: "No. To protect our content and guarantee the best experience, we only sell the PHYSICAL Spanish Relax book — the digital PDF and 3 bonuses are included FREE with every physical order.",
         icon: BookOpen,
-      }, {
-        question: "Why are pre-order books cheaper?",
-        answer: "Pre-orders help us print the exact quantity needed. As a thank you, you lock in the early-bird price (3,000 Verbs at $13 and Grammar Patterns at $12) which goes up once the books are in stock.",
-        icon: CalendarClock,
       }]} title="Bundle & Shipping FAQ" subtitle="Spanish Relax physical book + digital FREE + 3 bonuses · Free shipping (24–72h dispatch, ~15 days delivery)" />
 
       <Footer />

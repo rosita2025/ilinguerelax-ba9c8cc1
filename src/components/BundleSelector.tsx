@@ -325,7 +325,7 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
                       </span>
                     )}
                     <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
-                      <Package className="w-2.5 h-2.5" /> In stock · ships 48h
+                      <Package className="w-2.5 h-2.5" /> In stock · ships in 7–15 days
                     </span>
                   </div>
                   {/* Mini covers for bundles with books */}
@@ -350,7 +350,7 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
                       </div>
                       <div className="flex items-start gap-1.5 text-[10px] leading-tight text-emerald-900 dark:text-emerald-200">
                         <Truck className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>SHIPPING:</strong> physical books ship within 48h · FREE worldwide.</span>
+                        <span><strong>SHIPPING:</strong> physical books delivered in 7–15 days · FREE worldwide.</span>
                       </div>
                     </div>
                   )}
@@ -387,7 +387,7 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
               )}
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
-              Ships in 48h · FREE shipping · PDF FREE in your email today
+              Ships in 7–15 days · FREE shipping · PDF FREE in your email today
             </span>
           </span>
         )}

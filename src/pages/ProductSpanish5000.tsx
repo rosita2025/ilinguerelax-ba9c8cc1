@@ -9,7 +9,6 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
@@ -949,12 +948,6 @@ const ProductSpanish5000 = () => {
 
       {/* Sales Notification Popup */}
       <SalesNotification lang="en" productKey="spanish5000" />
-
-      {/* Exit Intent Popup */}
-      {/* Exit-intent popup hidden in US/UK/CA — older audience converts worse with popups */}
-      {!["US", "GB", "UK", "CA"].includes(campaign.countryCode) && (
-        <ExitIntentPopup onBuyClick={handleBuyNow} discount="15%" lang="en" storageKey="exit_intent_spanish" />
-      )}
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />

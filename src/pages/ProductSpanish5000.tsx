@@ -448,6 +448,15 @@ const ProductSpanish5000 = () => {
               {/* Trust Badges */}
               <TrustBadges lang="en" variant="grid" />
 
+              {/* Influencer video carousel — social proof */}
+              <div className="mt-6 -mx-4 md:-mx-0">
+                <InfluencerVideoCarousel
+                  onCta={() => {
+                    document.querySelector('[data-bundle-selector]')?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }}
+                />
+              </div>
+
               {/* Video — Learn Spanish with 3 Physical Books (Pre-order) */}
               <motion.div
                 initial={{ opacity: 0 }}

@@ -187,31 +187,6 @@ export const StickyBuyBar = ({
           <X className="w-3.5 h-3.5" />
         </button>
       )}
-      {/* Top urgency strip - high visibility, never clipped (responsive copy) */}
-      {!disabled && !showEmailSubscription && (
-        <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-1 px-2 sm:px-3 text-center">
-          <p className={`text-[10px] sm:text-[11px] lg:text-xs font-bold tracking-tight sm:tracking-wide flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap leading-tight ${calmMode ? '' : 'animate-pulse'}`}>
-            <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white flex-shrink-0" />
-            {isPhysical ? (
-              <>
-                {/* Mobile: short copy */}
-                <span className="sm:hidden">
-                  {lang === "en" ? "PDF FREE • 2+ books = FREE shipping" : "PDF GRATIS • 2+ libros = envío GRATIS"}
-                </span>
-                {/* Desktop: full copy */}
-                <span className="hidden sm:inline">
-                  {lang === "en" ? "Delivery 7–15 days • PDF FREE • Get 2+ books for FREE shipping" : "Entrega 7–15 días • PDF GRATIS • 2+ libros = envío GRATIS"}
-                </span>
-              </>
-            ) : (
-              <span>
-                {lang === "en" ? "Instant Digital Delivery • 3 FREE BONUSES" : "Entrega Digital Inmediata • 3 BONUS GRATIS"}
-              </span>
-            )}
-            <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white flex-shrink-0" />
-          </p>
-        </div>
-      )}
       <div className="container px-3 sm:px-4 py-2 lg:py-3">
         {/* Mobile & Tablet: Vertical Stack Layout */}
         <div className="flex lg:hidden flex-col gap-1.5">

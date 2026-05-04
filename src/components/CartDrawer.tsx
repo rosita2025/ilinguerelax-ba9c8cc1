@@ -8,6 +8,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import productSpanish5000Image from "@/assets/product-spanish-5000-v2.png";
 
 // Hotmart checkout URL mapping for digital products
@@ -69,6 +70,28 @@ export const CartDrawer = () => {
       });
     } catch (e) {
       console.error("Pixel InitiateCheckout error:", e);
+    }
+
+    // Google Analytics 4: begin_checkout (Continue to Checkout button)
+    try {
+      const hasPhysical = items.some((i) => HOTMART_CHECKOUT_MAP[i.variantId] === undefined);
+      const checkoutType = items.some((i) => HOTMART_CHECKOUT_MAP[i.variantId])
+        ? "hotmart"
+        : "shopify";
+      trackGAEvent("begin_checkout", {
+        currency: items[0]?.price.currencyCode || "USD",
+        value: subtotalPrice,
+        checkout_type: checkoutType,
+        num_items: totalItems,
+        items: items.map((i) => ({
+          item_id: i.variantId,
+          item_name: i.product.node.title,
+          price: parseFloat(i.price.amount),
+          quantity: i.quantity,
+        })),
+      });
+    } catch (e) {
+      console.error("GA begin_checkout error:", e);
     }
 
     // Check if any item has a Hotmart checkout URL

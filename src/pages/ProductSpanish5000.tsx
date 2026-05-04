@@ -128,6 +128,15 @@ const ProductSpanish5000 = () => {
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
+  // Google Analytics 4: product_view + scroll/time tracking
+  useTrackProductView({
+    productId: "product-spanish-5000",
+    productName: "Spanish Relax - 5,000 Words",
+    price: 29.99,
+    currency: "USD",
+    category: "Digital Book",
+  });
+  useScrollTimeTracking("product_spanish_5000");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);

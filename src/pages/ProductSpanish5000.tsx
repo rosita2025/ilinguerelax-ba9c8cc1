@@ -9,7 +9,6 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";

@@ -424,7 +424,7 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* Bundle selector - 3 options (Atlas-style upsell) */}
-              <div className="mb-4">
+              <div className="mb-4" data-bundle-selector>
                 <BundleSelector defaultBundle="digital" />
               </div>
 
@@ -452,7 +452,12 @@ const ProductSpanish5000 = () => {
               <div className="mt-6 -mx-4 md:-mx-0">
                 <InfluencerVideoCarousel
                   onCta={() => {
-                    document.querySelector('[data-bundle-selector]')?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    const el = document.querySelector('[data-bundle-selector]') as HTMLElement | null;
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      el.classList.add("ring-4", "ring-primary", "rounded-2xl");
+                      setTimeout(() => el.classList.remove("ring-4", "ring-primary", "rounded-2xl"), 1800);
+                    }
                   }}
                 />
               </div>

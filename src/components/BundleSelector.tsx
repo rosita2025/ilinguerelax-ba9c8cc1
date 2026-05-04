@@ -407,6 +407,15 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
           <Check className="w-3 h-3 text-emerald-600" /> 30-day refund
         </span>
       </div>
+
+      {/* Accepted payment methods */}
+      <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">We accept</span>
+        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-white border border-border text-[9px] font-black text-[#1A1F71]">VISA</span>
+        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-white border border-border text-[9px] font-black text-[#EB001B]">Mastercard</span>
+        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-white border border-border text-[9px] font-black text-[#003087]">Pay<span className="text-[#009CDE]">Pal</span></span>
+        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-black text-white border border-border text-[9px] font-bold"> Pay</span>
+      </div>
     </div>
   );
 };

@@ -895,30 +895,34 @@ const ProductSpanish5000 = () => {
 
       {/* Bundle FAQ — Physical + Digital FREE */}
       <FAQ items={[{
-        question: "How does the \"Physical Book + Digital FREE\" bundle work?",
-        answer: "When you order any physical book, you automatically get the 5,000 Words digital PDF for FREE. The digital download link is sent to your email instantly after checkout, so you can start studying right away while your physical book ships.",
+        question: "How does the \"Spanish Relax Physical Book + Digital FREE\" offer work?",
+        answer: "This is a PHYSICAL book purchase. When you buy the Spanish Relax physical book, you also receive the 5,000 Words digital PDF for FREE plus 3 FREE bonuses — all sent to your email instantly after checkout. There is no digital-only option: every order ships a real printed book.",
         icon: Package,
       }, {
         question: "How long does shipping take?",
-        answer: "Books in stock (Spanish Relax Physical Book) ship within 1–3 business days and arrive in approximately 15 days worldwide. Pre-order titles (3,000 Verbs and Grammar Patterns A1–C1) ship as soon as the print run is ready and are clearly marked as PRE-ORDER.",
+        answer: "FREE worldwide shipping. Spanish Relax physical book ships from our warehouse within 24–72 hours and arrives in approximately 15 days worldwide. Pre-order titles (3,000 Verbs and Grammar Patterns A1–C1) ship as soon as the print run is ready and are clearly marked as PRE-ORDER.",
         icon: Truck,
       }, {
-        question: "What does Bundle 1 include? (Physical Book + Digital FREE — $29.99)",
-        answer: "1 physical book (in stock, ships now) + the 5,000 Words digital PDF FREE by email + the 3 study bonuses (placement exam, daily planner, pronunciation cheat-sheet).",
+        question: "What does Bundle 1 include? (Spanish Relax Physical Book + Digital FREE + 3 Bonuses — $29.99)",
+        answer: "1 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in ~15 days, FREE worldwide shipping) + the 5,000 Words digital PDF FREE by email + 3 FREE bonuses (placement exam, daily planner, pronunciation cheat-sheet).",
         icon: BookOpen,
       }, {
-        question: "What does Bundle 2 include? (2 Physical Books + Digital FREE — $42.99)",
-        answer: "Everything in Bundle 1 + the 3,000 Spanish Verbs Mastery physical book at early-bird pre-order price ($13 instead of $17). Free worldwide shipping included.",
+        question: "What does Bundle 2 include? (2 Physical Books + Digital FREE + 3 Bonuses — $42.99)",
+        answer: "Everything in Bundle 1 + the 3,000 Spanish Verbs Mastery physical book at early-bird pre-order price ($13 instead of $17). FREE worldwide shipping included.",
         icon: BookOpen,
       }, {
         question: "What does Bundle 3 include? (Complete Library — $54.99)",
-        answer: "Everything in Bundle 2 + the Grammar Patterns A1–C1 physical book at early-bird pre-order price ($12 instead of $15). 3 physical books + the digital PDF + all bonuses + free worldwide shipping.",
+        answer: "Everything in Bundle 2 + the Grammar Patterns A1–C1 physical book at early-bird pre-order price ($12 instead of $15). 3 physical books + the digital PDF + 3 FREE bonuses + FREE worldwide shipping.",
         icon: Package,
+      }, {
+        question: "Is there a digital-only option?",
+        answer: "No. To protect our content and guarantee the best experience, we only sell the PHYSICAL Spanish Relax book — the digital PDF and 3 bonuses are included FREE with every physical order.",
+        icon: BookOpen,
       }, {
         question: "Why are pre-order books cheaper?",
         answer: "Pre-orders help us print the exact quantity needed. As a thank you, you lock in the early-bird price (3,000 Verbs at $13 and Grammar Patterns at $12) which goes up once the books are in stock.",
         icon: CalendarClock,
-      }]} title="Bundle & Shipping FAQ" subtitle="Physical book + digital free, shipping times and what each option includes" />
+      }]} title="Bundle & Shipping FAQ" subtitle="Spanish Relax physical book + digital FREE + 3 bonuses · Free shipping (24–72h dispatch, ~15 days delivery)" />
 
       {/* FAQ Section */}
       <FAQ items={[{

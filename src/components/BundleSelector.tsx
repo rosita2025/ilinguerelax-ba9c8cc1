@@ -6,32 +6,22 @@ import { useBundleStore } from "@/stores/bundleStore";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { toast } from "sonner";
 
-// Variant IDs (Shopify)
-const DIGITAL_5000_VARIANT = "gid://shopify/ProductVariant/42931924795453";
-const DIGITAL_5000_PRODUCT = "gid://shopify/Product/7788747784253";
+// Variant IDs (Shopify) — every bundle is the same 8,000-words physical book in different quantities.
 const BOOK_8000_VARIANT = "gid://shopify/ProductVariant/43137345749053";
 const BOOK_8000_PRODUCT = "gid://shopify/Product/7849025568829";
-const BOOK_3000_VERBS_VARIANT = "gid://shopify/ProductVariant/43138982281277";
-const BOOK_3000_VERBS_PRODUCT = "gid://shopify/Product/7849457778749";
-const BOOK_GRAMMAR_VARIANT = "gid://shopify/ProductVariant/43138982314045";
-const BOOK_GRAMMAR_PRODUCT = "gid://shopify/Product/7849457811517";
 
 // Set of all variant IDs that belong to ANY bundle. Used to clean prior bundle items
 // from cart before re-adding the selected bundle, guaranteeing exact composition.
-const ALL_BUNDLE_VARIANT_IDS = new Set<string>([
-  DIGITAL_5000_VARIANT,
-  BOOK_8000_VARIANT,
-  BOOK_3000_VERBS_VARIANT,
-  BOOK_GRAMMAR_VARIANT,
-]);
+const ALL_BUNDLE_VARIANT_IDS = new Set<string>([BOOK_8000_VARIANT]);
 
-type BundleId = "digital" | "digital_plus_2" | "complete";
+type BundleId = "single" | "duo" | "trio";
 
 interface BundleItem {
   productId: string;
   variantId: string;
   title: string;
-  price: string;
+  price: string; // per-unit price
+  quantity: number;
   image: string;
 }
 
@@ -48,15 +38,12 @@ interface Bundle {
   items: BundleItem[];
 }
 
-const COVER_5000 = "/images/product-spanish-5000.webp";
 const COVER_8000 = "/images/product-spanish-8000-book.webp";
-const COVER_3000 = "/images/product-spanish-3000-verbs-book.webp";
-const COVER_GRAMMAR = "/images/product-grammar-patterns-a1c1.webp";
 
 export const bundles: Bundle[] = [
   {
-    id: "digital",
-    label: "Spanish Relax Physical Book + Digital FREE + 3 Bonuses",
+    id: "single",
+    label: "1 × Spanish Relax 8,000 Words — Physical + Digital FREE",
     description: "",
     total: 29.99,
     retail: 54.0,
@@ -66,70 +53,52 @@ export const bundles: Bundle[] = [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
+        title: "Spanish Relax — 8,000 Words Physical Book + Digital FREE",
         price: "29.99",
+        quantity: 1,
         image: COVER_8000,
       },
     ],
   },
   {
-    id: "digital_plus_2",
-    label: "2 Physical Books + Digital FREE + 3 Bonuses",
+    id: "duo",
+    label: "2 × Spanish Relax 8,000 Words — Save 15%",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "",
-    total: 42.99,
-    retail: 84.0,
-    savePct: 49,
+    description: "Perfect to gift one — both include the digital PDF FREE.",
+    total: 50.98,
+    retail: 59.98,
+    savePct: 15,
     freeShipping: true,
     items: [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
-        price: "29.99",
+        title: "Spanish Relax — 8,000 Words Physical Book + Digital FREE",
+        price: "25.49",
+        quantity: 2,
         image: COVER_8000,
-      },
-      {
-        productId: BOOK_3000_VERBS_PRODUCT,
-        variantId: BOOK_3000_VERBS_VARIANT,
-        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER · Early-bird)",
-        price: "13.00",
-        image: COVER_3000,
       },
     ],
   },
   {
-    id: "complete",
-    label: "Complete Library — 3 Physical Books + Digital FREE + 3 Bonuses",
+    id: "trio",
+    label: "3 × Spanish Relax 8,000 Words — Save 25%",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "",
-    total: 54.99,
-    retail: 124.0,
-    savePct: 56,
+    description: "Best value — share with family or study buddies.",
+    total: 67.48,
+    retail: 89.97,
+    savePct: 25,
     freeShipping: true,
     items: [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
-        price: "29.99",
+        title: "Spanish Relax — 8,000 Words Physical Book + Digital FREE",
+        price: "22.49",
+        quantity: 3,
         image: COVER_8000,
-      },
-      {
-        productId: BOOK_3000_VERBS_PRODUCT,
-        variantId: BOOK_3000_VERBS_VARIANT,
-        title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER · Early-bird)",
-        price: "13.00",
-        image: COVER_3000,
-      },
-      {
-        productId: BOOK_GRAMMAR_PRODUCT,
-        variantId: BOOK_GRAMMAR_VARIANT,
-        title: "Grammar Patterns A1–C1 — Physical Book (PRE-ORDER · Early-bird)",
-        price: "12.00",
-        image: COVER_GRAMMAR,
       },
     ],
   },
@@ -176,13 +145,13 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
     }
   }
 
-  // STEP 2: ensure each bundle item is in cart with qty=1.
+  // STEP 2: ensure each bundle item is in cart with the right quantity.
   for (const item of bundle.items) {
     const existing = useCartStore
       .getState()
       .items.find((ci) => ci.variantId === item.variantId);
     if (existing) {
-      if (existing.quantity !== 1) await updateQuantity(item.variantId, 1);
+      if (existing.quantity !== item.quantity) await updateQuantity(item.variantId, item.quantity);
       continue;
     }
     await addItem({
@@ -213,7 +182,7 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
       variantId: item.variantId,
       variantTitle: "Default Title",
       price: { amount: item.price, currencyCode: "USD" },
-      quantity: 1,
+      quantity: item.quantity,
       selectedOptions: [{ name: "Title", value: "Default Title" }],
     });
   }
@@ -226,12 +195,12 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
     (sum, i) => sum + parseFloat(i.price.amount) * i.quantity,
     0,
   );
-  const expectedSubtotal = bundle.items.reduce((sum, i) => sum + parseFloat(i.price), 0);
+  const expectedSubtotal = bundle.items.reduce((sum, i) => sum + parseFloat(i.price) * i.quantity, 0);
   const composedCorrectly =
     finalBundleItems.length === bundle.items.length &&
     bundle.items.every((ci) => {
       const m = finalBundleItems.find((fi) => fi.variantId === ci.variantId);
-      return m && m.quantity === 1;
+      return m && m.quantity === ci.quantity;
     });
   const totalsMatch =
     Math.abs(subtotal - expectedSubtotal) < 0.01 &&
@@ -258,7 +227,7 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
   return true;
 }
 
-export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProps) => {
+export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps) => {
   const [selected, setSelected] = useState<BundleId>(defaultBundle);
   const [loading, setLoading] = useState(false);
   const setSelectedBundle = useBundleStore((s) => s.setSelected);
@@ -299,7 +268,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
       <div className="space-y-2">
         {bundles.map((b) => {
           const isSelected = b.id === selected;
-          const isPreorderBundle = b.id !== "digital";
+          const isMultiPack = b.id !== "single";
           return (
             <button
               key={b.id}
@@ -355,16 +324,9 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                         <Truck className="w-2.5 h-2.5" /> Free shipping
                       </span>
                     )}
-                    {b.id === "digital" && (
-                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
-                        <Package className="w-2.5 h-2.5" /> In stock
-                      </span>
-                    )}
-                    {isPreorderBundle && (
-                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded uppercase">
-                        <CalendarClock className="w-2.5 h-2.5" /> Pre-order · Jun 2026
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
+                      <Package className="w-2.5 h-2.5" /> In stock · ships 48h
+                    </span>
                   </div>
                   {/* Mini covers for bundles with books */}
                   {b.items.length > 1 && (
@@ -380,20 +342,16 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                       ))}
                     </div>
                   )}
-                  {/* Inline timeline shown only on the SELECTED preorder bundle to crush confusion */}
-                  {isSelected && isPreorderBundle && (
-                    <div className="mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 space-y-1">
-                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
+                  {isSelected && isMultiPack && (
+                    <div className="mt-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-700 space-y-1">
+                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-emerald-900 dark:text-emerald-200">
                         <Zap className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>TODAY:</strong> get the digital PDF instantly by email.</span>
+                        <span><strong>INSTANT:</strong> digital PDF delivered to your email today.</span>
                       </div>
-                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
-                        <CalendarClock className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>JUNE 2026:</strong> we ship the physical books to your home (free shipping).</span>
+                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-emerald-900 dark:text-emerald-200">
+                        <Truck className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                        <span><strong>SHIPPING:</strong> physical books ship within 48h · FREE worldwide.</span>
                       </div>
-                      <p className="text-[9px] text-amber-700 dark:text-amber-300 italic pl-4">
-                        Lock in the lowest price today · price goes up in June.
-                      </p>
                     </div>
                   )}
                 </div>
@@ -416,7 +374,7 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
         ) : (
           <span className="flex flex-col items-center leading-tight">
             <span className="flex items-center gap-2 font-black">
-              {current.id === "digital" ? (
+              {current.id === "single" ? (
                 <>
                   <ShoppingCart className="w-5 h-5" />
                   GET PHYSICAL BOOK · ${current.total.toFixed(2)}
@@ -424,14 +382,12 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
               ) : (
                 <>
                   <ShoppingCart className="w-5 h-5" />
-                  RESERVE PRE-ORDER · ${current.total.toFixed(2)}
+                  GET {current.items[0].quantity} BOOKS · ${current.total.toFixed(2)}
                 </>
               )}
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
-              {current.id === "digital"
-                ? "Physical book ships now + PDF FREE in your email"
-                : "PDF today + physical books in June 2026"}
+              Ships in 48h · FREE shipping · PDF FREE in your email today
             </span>
           </span>
         )}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import { useBundleStore } from "@/stores/bundleStore";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { toast } from "sonner";
 
 // Variant IDs (Shopify) — every bundle is the same 8,000-words physical book in different quantities.
@@ -131,6 +132,20 @@ export async function addBundleToCart(bundleId: BundleId): Promise<boolean> {
     currency: "USD",
     num_items: bundle.items.length,
     bundle_id: bundle.id,
+  });
+
+  // Google Analytics 4: add_to_cart
+  trackGAEvent("add_to_cart", {
+    currency: "USD",
+    value: bundle.total,
+    bundle_id: bundle.id,
+    items: bundle.items.map((it) => ({
+      item_id: it.variantId,
+      item_name: it.title,
+      item_category: "Bundle",
+      price: parseFloat(it.price),
+      quantity: it.quantity,
+    })),
   });
 
   // STEP 1: clean other bundle items.

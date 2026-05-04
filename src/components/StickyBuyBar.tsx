@@ -147,7 +147,7 @@ export const StickyBuyBar = ({
           <p className={`text-[11px] lg:text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 ${calmMode ? '' : 'animate-pulse'}`}>
             <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
             {isPhysical
-              ? (lang === "en" ? "LIMITED OFFER • Fast Physical Shipping • 3 FREE BONUSES" : "OFERTA LIMITADA • Envío Físico Rápido • 3 BONUS GRATIS")
+              ? (lang === "en" ? "LIMITED OFFER • FREE Shipping • Dispatch 24–72h • Digital + 3 BONUSES FREE" : "OFERTA LIMITADA • Envío GRATIS • Despacho 24–72h • Digital + 3 BONUS GRATIS")
               : (lang === "en" ? "LIMITED OFFER • Instant Digital Delivery • 3 FREE BONUSES" : "OFERTA LIMITADA • Entrega Digital Inmediata • 3 BONUS GRATIS")}
             <ShoppingCart className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white" />
           </p>

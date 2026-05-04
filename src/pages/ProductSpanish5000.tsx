@@ -950,12 +950,6 @@ const ProductSpanish5000 = () => {
       {/* Sales Notification Popup */}
       <SalesNotification lang="en" productKey="spanish5000" />
 
-      {/* Exit Intent Popup */}
-      {/* Exit-intent popup hidden in US/UK/CA — older audience converts worse with popups */}
-      {!["US", "GB", "UK", "CA"].includes(campaign.countryCode) && (
-        <ExitIntentPopup onBuyClick={handleBuyNow} discount="15%" lang="en" storageKey="exit_intent_spanish" />
-      )}
-
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />
 

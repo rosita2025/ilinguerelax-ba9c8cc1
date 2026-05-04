@@ -58,6 +58,7 @@ import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
 import { BundleSelector, addBundleToCart } from "@/components/BundleSelector";
 import { useBundleStore } from "@/stores/bundleStore";
+import { InfluencerVideoCarousel } from "@/components/InfluencerVideoCarousel";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -446,6 +447,15 @@ const ProductSpanish5000 = () => {
 
               {/* Trust Badges */}
               <TrustBadges lang="en" variant="grid" />
+
+              {/* Influencer video carousel — social proof */}
+              <div className="mt-6 -mx-4 md:-mx-0">
+                <InfluencerVideoCarousel
+                  onCta={() => {
+                    document.querySelector('[data-bundle-selector]')?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }}
+                />
+              </div>
 
               {/* Video — Learn Spanish with 3 Physical Books (Pre-order) */}
               <motion.div

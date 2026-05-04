@@ -59,6 +59,17 @@ export const StickyBuyBar = ({
 }: StickyBuyBarProps) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
+  // Compute savings = originalPrice - price (keeps the currency symbol from `price`)
+  const parseNum = (s?: string) => {
+    if (!s) return NaN;
+    const cleaned = s.replace(/[^\d.,-]/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
+    return parseFloat(cleaned);
+  };
+  const priceNum = parseNum(price);
+  const origNum = parseNum(originalPrice);
+  const savings = isFinite(priceNum) && isFinite(origNum) && origNum > priceNum ? origNum - priceNum : 0;
+  const symbol = (price.match(/^[^\d]+/)?.[0] || "$").trim();
+  const savingsLabel = savings > 0 ? `${symbol}${savings.toFixed(savings % 1 === 0 ? 0 : 2)}` : "";
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);
@@ -197,6 +208,11 @@ export const StickyBuyBar = ({
               {originalPrice && !isLongPrice && (
                 <span className="text-[11px] text-muted-foreground line-through whitespace-nowrap">{originalPrice}</span>
               )}
+              {savingsLabel && !isLongPrice && (
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded whitespace-nowrap">
+                  {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+                </span>
+              )}
               <span className="text-[10px] text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {showReviews && (
@@ -328,6 +344,11 @@ export const StickyBuyBar = ({
                 <span className="text-2xl font-bold text-foreground">{price}</span>
                 {originalPrice && (
                   <span className="text-sm text-muted-foreground line-through">{originalPrice}</span>
+                )}
+                {savingsLabel && (
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded">
+                    {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+                  </span>
                 )}
                 <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>

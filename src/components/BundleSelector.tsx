@@ -56,17 +56,17 @@ const COVER_GRAMMAR = "/images/product-grammar-patterns-a1c1.webp";
 export const bundles: Bundle[] = [
   {
     id: "digital",
-    label: "Physical Book + Digital FREE",
-    description: "📦 Physical book (in stock, ships now) + 📥 Digital PDF FREE by email",
+    label: "Spanish Relax Physical Book + Digital FREE + 3 Bonuses",
+    description: "📦 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in ~15 days) + 📥 Digital PDF FREE by email + 🎁 3 FREE bonuses",
     total: 29.99,
     retail: 54.0,
     savePct: 44,
-    freeShipping: false,
+    freeShipping: true,
     items: [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax - Physical Book + Digital 5,000 FREE",
+        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
         price: "29.99",
         image: COVER_8000,
       },
@@ -74,10 +74,10 @@ export const bundles: Bundle[] = [
   },
   {
     id: "digital_plus_2",
-    label: "2 Physical Books + Digital FREE",
+    label: "2 Physical Books + Digital FREE + 3 Bonuses",
     badge: "RECOMMENDED",
     badgeColor: "bg-amber-500 text-white",
-    description: "📦 Physical book (in stock) + 📦 3,000 Verbs (pre-order, early-bird price) + 📥 Digital PDF FREE",
+    description: "📦 Spanish Relax physical book (ships 24–72h) + 📦 3,000 Verbs (pre-order, early-bird) + 📥 Digital PDF FREE + 🎁 3 FREE bonuses",
     total: 42.99,
     retail: 84.0,
     savePct: 49,
@@ -86,7 +86,7 @@ export const bundles: Bundle[] = [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax - Physical Book + Digital 5,000 FREE",
+        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
         price: "29.99",
         image: COVER_8000,
       },
@@ -101,10 +101,10 @@ export const bundles: Bundle[] = [
   },
   {
     id: "complete",
-    label: "Complete Library — 3 Physical Books + Digital FREE",
+    label: "Complete Library — 3 Physical Books + Digital FREE + 3 Bonuses",
     badge: "BEST VALUE",
     badgeColor: "bg-rose-600 text-white",
-    description: "📦 3 physical books (early-bird pre-order pricing) + 📥 Digital PDF FREE — full mastery library",
+    description: "📦 3 physical books (Spanish Relax ships 24–72h, others early-bird pre-order) + 📥 Digital PDF FREE + 🎁 3 FREE bonuses",
     total: 54.99,
     retail: 124.0,
     savePct: 56,
@@ -113,7 +113,7 @@ export const bundles: Bundle[] = [
       {
         productId: BOOK_8000_PRODUCT,
         variantId: BOOK_8000_VARIANT,
-        title: "Spanish Relax - Physical Book + Digital 5,000 FREE",
+        title: "Spanish Relax — Physical Book + Digital FREE + 3 Bonuses",
         price: "29.99",
         image: COVER_8000,
       },

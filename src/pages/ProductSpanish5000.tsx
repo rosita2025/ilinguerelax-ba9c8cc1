@@ -461,36 +461,6 @@ const ProductSpanish5000 = () => {
                 />
               </div>
 
-              {/* Video — Learn Spanish with 3 Physical Books (Pre-order) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mt-6 rounded-2xl overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg"
-              >
-                <div className="px-4 pt-4 pb-2">
-                  <p className="text-sm font-bold text-primary flex items-center gap-2">
-                    🎬 Learn Spanish — 3 Physical Books (Pre-order from June 2026)
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    8,000 Words + 3,000 Verbs + Grammar A1–C1 · Lock in the lowest price now
-                  </p>
-                </div>
-                <video
-                  src={learnSpanish3BooksVideo}
-                  controls
-                  autoPlay
-                  muted
-                  loop
-                  controlsList="nodownload noremoteplayback noplaybackrate"
-                  disablePictureInPicture
-                  disableRemotePlayback
-                  onContextMenu={(e) => e.preventDefault()}
-                  playsInline
-                  preload="auto"
-                  className="w-full h-auto max-h-[70vh] sm:max-h-[60vh] object-contain bg-black"
-                />
-              </motion.div>
             </div>
           </div>
         </div>

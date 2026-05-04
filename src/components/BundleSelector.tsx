@@ -268,7 +268,7 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
       <div className="space-y-2">
         {bundles.map((b) => {
           const isSelected = b.id === selected;
-          const isPreorderBundle = b.id !== "digital";
+          const isMultiPack = b.id !== "single";
           return (
             <button
               key={b.id}
@@ -324,16 +324,9 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
                         <Truck className="w-2.5 h-2.5" /> Free shipping
                       </span>
                     )}
-                    {b.id === "single" && (
-                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
-                        <Package className="w-2.5 h-2.5" /> In stock
-                      </span>
-                    )}
-                    {isPreorderBundle && (
-                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded uppercase">
-                        <Truck className="w-2.5 h-2.5" /> Ships in 48h
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase">
+                      <Package className="w-2.5 h-2.5" /> In stock · ships 48h
+                    </span>
                   </div>
                   {/* Mini covers for bundles with books */}
                   {b.items.length > 1 && (
@@ -349,20 +342,16 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
                       ))}
                     </div>
                   )}
-                  {/* Inline timeline shown only on the SELECTED preorder bundle to crush confusion */}
-                  {isSelected && isPreorderBundle && (
-                    <div className="mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 space-y-1">
-                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
+                  {isSelected && isMultiPack && (
+                    <div className="mt-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-700 space-y-1">
+                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-emerald-900 dark:text-emerald-200">
                         <Zap className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>TODAY:</strong> get the digital PDF instantly by email.</span>
+                        <span><strong>INSTANT:</strong> digital PDF delivered to your email today.</span>
                       </div>
-                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-amber-900 dark:text-amber-200">
-                        <CalendarClock className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span><strong>JUNE 2026:</strong> we ship the physical books to your home (free shipping).</span>
+                      <div className="flex items-start gap-1.5 text-[10px] leading-tight text-emerald-900 dark:text-emerald-200">
+                        <Truck className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                        <span><strong>SHIPPING:</strong> physical books ship within 48h · FREE worldwide.</span>
                       </div>
-                      <p className="text-[9px] text-amber-700 dark:text-amber-300 italic pl-4">
-                        Lock in the lowest price today · price goes up in June.
-                      </p>
                     </div>
                   )}
                 </div>
@@ -385,7 +374,7 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
         ) : (
           <span className="flex flex-col items-center leading-tight">
             <span className="flex items-center gap-2 font-black">
-              {current.id === "digital" ? (
+              {current.id === "single" ? (
                 <>
                   <ShoppingCart className="w-5 h-5" />
                   GET PHYSICAL BOOK · ${current.total.toFixed(2)}
@@ -393,14 +382,12 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
               ) : (
                 <>
                   <ShoppingCart className="w-5 h-5" />
-                  RESERVE PRE-ORDER · ${current.total.toFixed(2)}
+                  GET {current.items[0].quantity} BOOKS · ${current.total.toFixed(2)}
                 </>
               )}
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
-              {current.id === "digital"
-                ? "Physical book ships now + PDF FREE in your email"
-                : "PDF today + physical books in June 2026"}
+              Ships in 48h · FREE shipping · PDF FREE in your email today
             </span>
           </span>
         )}

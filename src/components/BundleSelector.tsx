@@ -387,7 +387,9 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
               )}
             </span>
             <span className="text-[10px] font-medium opacity-90 mt-0.5">
-              Ships in 7–15 days · FREE shipping · PDF FREE in your email today
+              {current.freeShipping
+                ? "Ships in 7–15 days · FREE shipping · PDF FREE in your email today"
+                : "Ships in 7–15 days · shipping calculated at checkout · PDF FREE in your email today"}
             </span>
           </span>
         )}

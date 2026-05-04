@@ -163,12 +163,12 @@ const ProductSpanish5000 = () => {
   const selectedBundle = useBundleStore((s) => s.selected);
   // All bundles now include a physical book ("digital" bundle = 1 physical + digital free)
   const isPhysicalBundle = true;
-  const bundleId = selectedBundle?.id ?? "digital";
+  const bundleId = selectedBundle?.id ?? "single";
   const dynamicCtaText =
-    bundleId === "complete"
-      ? "RESERVE 3 BOOKS + DIGITAL FREE"
-      : bundleId === "digital_plus_2"
-      ? "RESERVE 2 BOOKS + DIGITAL FREE"
+    bundleId === "trio"
+      ? "GET 3 BOOKS · SAVE 25%"
+      : bundleId === "duo"
+      ? "GET 2 BOOKS · SAVE 15%"
       : "BUY PHYSICAL BOOK + DIGITAL FREE";
   const stickyPriceLabel = selectedBundle
     ? `$${selectedBundle.total.toFixed(2)}`
@@ -180,7 +180,7 @@ const ProductSpanish5000 = () => {
 
   // When sticky bar CTA is clicked, dispatch the currently-selected bundle (or default).
   const handleStickyBuy = async () => {
-    const targetId = (selectedBundle?.id as "digital" | "digital_plus_2" | "complete") ?? "digital";
+    const targetId = (selectedBundle?.id as "single" | "duo" | "trio") ?? "single";
     await addBundleToCart(targetId);
   };
 
@@ -425,7 +425,7 @@ const ProductSpanish5000 = () => {
 
               {/* Bundle selector - 3 options (Atlas-style upsell) */}
               <div className="mb-4" data-bundle-selector>
-                <BundleSelector defaultBundle="digital" />
+                <BundleSelector defaultBundle="single" />
               </div>
 
               {/* Recent buyer micro-testimonial — fights buyer hesitation */}

@@ -58,6 +58,7 @@ import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
 import { BundleSelector, addBundleToCart } from "@/components/BundleSelector";
 import { useBundleStore } from "@/stores/bundleStore";
+import { InfluencerVideoCarousel } from "@/components/InfluencerVideoCarousel";
 
 // Store logos
 import logoAmazon from "@/assets/logo-amazon.png";

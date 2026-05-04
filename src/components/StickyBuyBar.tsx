@@ -156,15 +156,22 @@ export const StickyBuyBar = ({
 
   if (dismissed) {
     return (
-      <button
-        type="button"
-        onClick={() => setDismissed(false)}
-        aria-label={lang === "en" ? "Show buy bar" : "Mostrar barra de compra"}
-        className={`fixed bottom-4 right-4 z-30 w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 ${calmMode ? '' : 'animate-pulse'} ${priceFlash ? 'ring-4 ring-amber-300 scale-110' : ''}`}
-      >
-        <ShoppingCart className="w-5 h-5" />
-        <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
-      </button>
+      <div className="fixed bottom-4 right-4 z-30 flex flex-col items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setDismissed(false)}
+          aria-label={lang === "en" ? "Show buy bar" : "Mostrar barra de compra"}
+          className={`w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 ${calmMode ? '' : 'animate-pulse'} ${priceFlash ? 'ring-4 ring-amber-300 scale-110' : ''}`}
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
+        </button>
+        {isPhysical && (
+          <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-md whitespace-nowrap animate-pulse">
+            {lang === "en" ? "Only 12 books left" : "Solo 12 libros quedan"}
+          </span>
+        )}
+      </div>
     );
   }
 

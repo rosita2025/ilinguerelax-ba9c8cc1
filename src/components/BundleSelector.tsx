@@ -341,9 +341,11 @@ export const BundleSelector = ({ defaultBundle = "digital" }: BundleSelectorProp
                       </p>
                     </div>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug mb-1.5">
-                    {b.description}
-                  </p>
+                  {b.description && (
+                    <p className="text-[11px] text-muted-foreground leading-snug mb-1.5">
+                      {b.description}
+                    </p>
+                  )}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="inline-flex items-center gap-0.5 text-[9px] bg-rose-500/10 text-rose-600 font-bold px-1.5 py-0.5 rounded uppercase">
                       Save {b.savePct}%

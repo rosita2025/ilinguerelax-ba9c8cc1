@@ -125,7 +125,7 @@ const ProductSpanish5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 29.99,
+    value: 34.99,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -133,7 +133,7 @@ const ProductSpanish5000 = () => {
   useTrackProductView({
     productId: "product-spanish-5000",
     productName: "Spanish Relax - 5,000 Words",
-    price: 29.99,
+    price: 34.99,
     currency: "USD",
     category: "Digital Book",
   });
@@ -193,7 +193,7 @@ const ProductSpanish5000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000"],
       content_type: "product",
-      value: 29.99,
+      value: 34.99,
       currency: "USD",
       num_items: 1,
       ab_experiment: "spanish5000_headline_v1",
@@ -209,9 +209,9 @@ const ProductSpanish5000 = () => {
         title: "Spanish Relax - 5,000 Words with English Pronunciation",
         description: "",
         handle: "spanish-relax-5-000-words-with-english-pronunciation",
-        priceRange: { minVariantPrice: { amount: "29.99", currencyCode: "USD" } },
+        priceRange: { minVariantPrice: { amount: "34.99", currencyCode: "USD" } },
         images: { edges: [{ node: { url: productSpanish5000Image, altText: "Spanish Relax - 5,000 Words" } }] },
-        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "29.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
+        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "34.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
         options: [{ name: "Title", values: ["Default Title"] }]
       }
     };
@@ -220,7 +220,7 @@ const ProductSpanish5000 = () => {
       product: shopifyProduct,
       variantId: SHOPIFY_VARIANT_ID,
       variantTitle: "Default Title",
-      price: { amount: "29.99", currencyCode: "USD" },
+      price: { amount: "34.99", currencyCode: "USD" },
       quantity: 1,
       selectedOptions: [{ name: "Title", value: "Default Title" }]
     });
@@ -229,7 +229,7 @@ const ProductSpanish5000 = () => {
     setDrawerOpen(true);
   };
   return <main className="min-h-screen bg-background">
-      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="29.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
+      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
       <Navbar />
 
       {/* Hero Section */}
@@ -691,7 +691,7 @@ const ProductSpanish5000 = () => {
         answer: "Your Spanish Relax physical book is dispatched from our warehouse within 24–72 hours and is delivered worldwide in approximately 7–15 days depending on your country. You'll receive a tracking number by email as soon as it ships.",
         icon: Truck,
       }, {
-        question: "What does Bundle 1 include? (Spanish Relax Physical Book + Digital FREE + 3 Bonuses — $29.99)",
+        question: "What does Bundle 1 include? (Spanish Relax Physical Book + Digital FREE + 3 Bonuses — $34.99)",
         answer: "1 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in 7–15 days · shipping calculated at checkout) + the 5,000 Words digital PDF FREE by email + 3 FREE bonuses (placement exam, daily planner, pronunciation cheat-sheet). FREE worldwide shipping unlocks automatically when you order 2 or more books.",
         icon: BookOpen,
       }, {

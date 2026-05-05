@@ -255,7 +255,15 @@ const ProductSpanish5000 = () => {
 
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-60 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img src={productSpanish5000BundleImage} alt="Spanish Relax - Buy the physical book, get the digital version FREE" className="w-full h-auto rounded-2xl shadow-hero" />
+                <img
+                  src={productSpanish5000BundleImage}
+                  alt="Spanish Relax - Buy the physical book, get the digital version FREE"
+                  className="w-full h-auto rounded-2xl shadow-hero"
+                  width={1200}
+                  height={1200}
+                  fetchPriority="high"
+                  decoding="async"
+                />
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg">
                   <Package className="w-3.5 h-3.5" /> PHYSICAL + DIGITAL FREE
                 </div>
@@ -465,7 +473,7 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #1
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Complete Spanish Language Exam
@@ -529,7 +537,7 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #2
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Daily Study Planner
@@ -591,7 +599,7 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #3
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Spanish Pronunciation Cheat Sheet

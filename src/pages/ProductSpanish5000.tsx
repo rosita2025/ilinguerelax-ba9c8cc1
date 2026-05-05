@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { LooxStyleReviews } from "@/components/LooxStyleReviews";
+import { MeetTheAuthor } from "@/components/MeetTheAuthor";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
@@ -470,6 +471,9 @@ const ProductSpanish5000 = () => {
 
       {/* Loox-style photo reviews from real customers */}
       <LooxStyleReviews />
+
+      {/* Meet the Author — trust block */}
+      <MeetTheAuthor />
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">

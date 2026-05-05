@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { ProductReviews } from "@/components/ProductReviews";
+import { LooxStyleReviews } from "@/components/LooxStyleReviews";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
@@ -470,6 +471,9 @@ const ProductSpanish5000 = () => {
 
       {/* Reviews carousel — moved up to build trust early (no form) */}
       <ProductReviews productType="spanish" />
+
+      {/* Loox-style photo reviews from real customers */}
+      <LooxStyleReviews />
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">

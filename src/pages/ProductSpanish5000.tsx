@@ -118,7 +118,7 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 
 const ProductSpanish5000 = () => {
   // Multi-currency display (USA / UK / Canada campaign). Display only.
-  const campaign = useCampaignPrice();
+  const campaign = useCampaignPrice(34.99, 54);
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words",

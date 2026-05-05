@@ -7,6 +7,7 @@ import looxReview5 from "@/assets/loox-review-5.png";
 import looxReview6 from "@/assets/review-book-real-1.jpg";
 import looxReview7 from "@/assets/loox-review-7.png";
 import looxReview8 from "@/assets/loox-review-8.png";
+import looxReview9 from "@/assets/loox-review-9.png";
 
 interface LooxReview {
   name: string;
@@ -19,6 +20,24 @@ interface LooxReview {
 }
 
 const reviews: LooxReview[] = [
+  {
+    name: "Emma Roberts",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "My quiet reading corner. The book feels calm and the lessons just flow.",
+    image: looxReview5,
+    timeAgo: "1 day ago",
+    initials: "ER",
+  },
+  {
+    name: "Margaret Reed",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "I'm 62 and finally learning Spanish. The font is clear and the pace is perfect for me.",
+    image: looxReview9,
+    timeAgo: "3 days ago",
+    initials: "MR",
+  },
   {
     name: "Emily Carter",
     country: "USA",
@@ -60,7 +79,7 @@ const reviews: LooxReview[] = [
     country: "USA",
     flag: "🇺🇸",
     text: "Beautiful book and super practical. I finally feel confident speaking Spanish.",
-    image: looxReview5,
+    image: looxReview8,
     timeAgo: "2 weeks ago",
     initials: "OM",
   },
@@ -87,7 +106,7 @@ const reviews: LooxReview[] = [
     country: "USA",
     flag: "🇺🇸",
     text: "My favorite reading time of the day. Calm vibes and real progress with my Spanish.",
-    image: looxReview8,
+    image: looxReview6,
     timeAgo: "1 month ago",
     initials: "AM",
   },

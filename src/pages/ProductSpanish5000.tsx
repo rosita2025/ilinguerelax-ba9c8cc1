@@ -6,7 +6,6 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { ProductReviews } from "@/components/ProductReviews";
 import { LooxStyleReviews } from "@/components/LooxStyleReviews";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
@@ -876,9 +875,6 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
-
-      {/* Review submission form — kept at the end */}
-      <ProductReviews productType="spanish" showReviewForm />
 
       {/* Bundle FAQ — Physical + Digital FREE */}
       <FAQ items={[{

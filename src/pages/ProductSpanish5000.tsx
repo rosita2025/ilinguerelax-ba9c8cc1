@@ -469,9 +469,6 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
-      {/* Reviews carousel — moved up to build trust early (no form) */}
-      <ProductReviews productType="spanish" />
-
       {/* Loox-style photo reviews from real customers */}
       <LooxStyleReviews />
 

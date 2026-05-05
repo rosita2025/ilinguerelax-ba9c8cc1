@@ -5,6 +5,8 @@ import looxReview3 from "@/assets/loox-review-3.png";
 import looxReview4 from "@/assets/loox-review-4.png";
 import looxReview5 from "@/assets/loox-review-5.png";
 import looxReview6 from "@/assets/review-book-real-1.jpg";
+import looxReview7 from "@/assets/loox-review-7.png";
+import looxReview8 from "@/assets/loox-review-8.png";
 
 interface LooxReview {
   name: string;
@@ -70,6 +72,24 @@ const reviews: LooxReview[] = [
     image: looxReview6,
     timeAgo: "3 weeks ago",
     initials: "DT",
+  },
+  {
+    name: "Crady — Author",
+    country: "iLingue Relax",
+    flag: "✍️",
+    text: "Hi! I'm the author. Every chapter is designed to make Spanish feel relaxed and natural. Thank you for trusting my work.",
+    image: looxReview7,
+    timeAgo: "Author",
+    initials: "CR",
+  },
+  {
+    name: "Ava Mitchell",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "My favorite reading time of the day. Calm vibes and real progress with my Spanish.",
+    image: looxReview8,
+    timeAgo: "1 month ago",
+    initials: "AM",
   },
 ];
 

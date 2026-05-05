@@ -197,10 +197,10 @@ export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = [
  * @param priceUSD     The current/sale price in USD (e.g. 29.99)
  * @param originalUSD  The original/strikethrough price in USD (e.g. 54)
  *
- * Backwards compatibility: called with no args defaults to (29.99, 54) — the
+ * Backwards compatibility: called with no args defaults to (34.99, 54) — the
  * Spanish 5000 product. Existing callers keep working.
  */
-export function useCampaignPrice(priceUSD: number = 29.99, originalUSD: number = 54): CampaignPrice {
+export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number = 54): CampaignPrice {
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
     if (typeof window !== "undefined") {

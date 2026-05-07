@@ -47,8 +47,6 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
-import { BundleSelector, addBundleToCart } from "@/components/BundleSelector";
-import { useBundleStore } from "@/stores/bundleStore";
 import { InfluencerVideoCarousel } from "@/components/InfluencerVideoCarousel";
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
@@ -160,30 +158,14 @@ const ProductSpanish5000 = () => {
   };
   const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "BUY NOW";
 
-  // Live-mirror selected bundle into the StickyBuyBar (price updates automatically).
-  const selectedBundle = useBundleStore((s) => s.selected);
-  // All bundles now include a physical book ("digital" bundle = 1 physical + digital free)
-  const isPhysicalBundle = true;
-  const bundleId = selectedBundle?.id ?? "single";
-  const dynamicCtaText =
-    bundleId === "trio"
-      ? "GET 3 BOOKS · SAVE 25%"
-      : bundleId === "duo"
-      ? "GET 2 BOOKS · SAVE 15%"
-      : "BUY PHYSICAL BOOK + DIGITAL FREE";
-  const stickyPriceLabel = selectedBundle
-    ? `$${selectedBundle.total.toFixed(2)}`
-    : campaign.price;
-  const stickyOriginalLabel = selectedBundle
-    ? `$${selectedBundle.retail.toFixed(2)}`
-    : campaign.originalPrice;
-  const stickyCurrency = selectedBundle ? "USD" : campaign.currency;
-
-  // When sticky bar CTA is clicked, dispatch the currently-selected bundle (or default).
+  // Digital-only product (8,000 physical pre-order has been removed).
+  const isPhysicalBundle = false;
+  const dynamicCtaText = stickyCtaText;
+  const stickyPriceLabel = campaign.price;
+  const stickyOriginalLabel = campaign.originalPrice;
+  const stickyCurrency = campaign.currency;
   const handleStickyBuy = async () => {
-    const targetId = (selectedBundle?.id as "single" | "duo" | "trio") ?? "single";
-    // Sticky bar = direct redirect to Shopify checkout (no drawer in between).
-    await addBundleToCart(targetId, { redirectToCheckout: true });
+    await handleBuyNow();
   };
 
   const handleBuyNow = async () => {

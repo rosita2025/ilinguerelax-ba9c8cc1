@@ -329,9 +329,22 @@ const ProductSpanish5000 = () => {
                 <StockCounter totalStock={50} remainingStock={15} lang="en" />
               </div>
 
-              {/* Bundle selector - 3 options (Atlas-style upsell) */}
-              <div className="mb-4" data-bundle-selector>
-                <BundleSelector defaultBundle="single" />
+              {/* Buy Now CTA */}
+              <div className="mb-4">
+                <Button
+                  type="button"
+                  size="xl"
+                  onClick={handleBuyNow}
+                  className="w-full text-base md:text-lg py-6 px-4 h-auto min-h-[64px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99]"
+                >
+                  <span className="flex items-center justify-center gap-2 font-black">
+                    <ShoppingCart className="w-5 h-5" />
+                    GET INSTANT ACCESS · {campaign.price}
+                  </span>
+                </Button>
+                <p className="text-[11px] text-center text-muted-foreground mt-2">
+                  Instant PDF download · 30-day money-back guarantee
+                </p>
               </div>
 
               {/* Recent buyer micro-testimonial — fights buyer hesitation */}
@@ -701,7 +714,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName={selectedBundle ? selectedBundle.label : "5,000 Words With English Pronunciation and includes grammatical structures"} onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible />
+      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

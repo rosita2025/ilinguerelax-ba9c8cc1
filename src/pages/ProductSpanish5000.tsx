@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { useAbTest } from "@/hooks/useAbTest";
@@ -22,13 +23,17 @@ import {
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
+import bonus1ImageAvif from "@/assets/bonus-1-spanish-exam.avif";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
+import bonus2ImageAvif from "@/assets/bonus-2-daily-planner.avif";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
+import bonus3ImageAvif from "@/assets/bonus-3-pronunciation.avif";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
 
 // Product image
 import productSpanish5000Image from "@/assets/spanish-5000-cover.webp";
 import productSpanish5000BundleImage from "@/assets/spanish-relax-physical-digital-bundle.webp";
+import productSpanish5000BundleImageAvif from "@/assets/spanish-relax-physical-digital-bundle.avif";
 import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.webp";
 import product3000VerbsImage from "@/assets/product-spanish-3000-verbs-book.webp";
 
@@ -211,6 +216,9 @@ const ProductSpanish5000 = () => {
     setDrawerOpen(true);
   };
   return <main className="min-h-screen bg-background">
+      <Helmet>
+        <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
+      </Helmet>
       <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
       <Navbar />
 
@@ -237,15 +245,19 @@ const ProductSpanish5000 = () => {
 
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-60 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img
-                  src={productSpanish5000BundleImage}
-                  alt="Spanish Relax - Buy the physical book, get the digital version FREE"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                  width={1200}
-                  height={1200}
-                  fetchPriority="high"
-                  decoding="async"
-                />
+                <picture>
+                  <source type="image/avif" srcSet={productSpanish5000BundleImageAvif} />
+                  <source type="image/webp" srcSet={productSpanish5000BundleImage} />
+                  <img
+                    src={productSpanish5000BundleImage}
+                    alt="Spanish Relax - Buy the physical book, get the digital version FREE"
+                    className="w-full h-auto rounded-2xl shadow-hero"
+                    width={1200}
+                    height={1200}
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                </picture>
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg">
                   <Package className="w-3.5 h-3.5" /> PHYSICAL + DIGITAL FREE
                 </div>
@@ -468,7 +480,11 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #1
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    <picture>
+                      <source type="image/avif" srcSet={bonus1ImageAvif} />
+                      <source type="image/webp" srcSet={bonus1Image} />
+                      <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    </picture>
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Complete Spanish Language Exam
@@ -532,7 +548,11 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #2
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    <picture>
+                      <source type="image/avif" srcSet={bonus2ImageAvif} />
+                      <source type="image/webp" srcSet={bonus2Image} />
+                      <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    </picture>
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Daily Study Planner
@@ -594,7 +614,11 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #3
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    <picture>
+                      <source type="image/avif" srcSet={bonus3ImageAvif} />
+                      <source type="image/webp" srcSet={bonus3Image} />
+                      <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    </picture>
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Spanish Pronunciation Cheat Sheet

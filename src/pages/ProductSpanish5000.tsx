@@ -476,7 +476,11 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #1
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    <picture>
+                      <source type="image/avif" srcSet={bonus1ImageAvif} />
+                      <source type="image/webp" srcSet={bonus1Image} />
+                      <img src={bonus1Image} alt="Complete Spanish Language Exam" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    </picture>
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Complete Spanish Language Exam
@@ -540,7 +544,11 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #2
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    <picture>
+                      <source type="image/avif" srcSet={bonus2ImageAvif} />
+                      <source type="image/webp" srcSet={bonus2Image} />
+                      <img src={bonus2Image} alt="Daily Study Planner — Spanish for English Speakers" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    </picture>
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Daily Study Planner
@@ -602,7 +610,11 @@ const ProductSpanish5000 = () => {
                     <Sparkles className="w-3 h-3" /> Bonus #3
                   </div>
                   <div className="mt-3 mb-3 aspect-square w-full overflow-hidden rounded-xl border border-border">
-                    <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    <picture>
+                      <source type="image/avif" srcSet={bonus3ImageAvif} />
+                      <source type="image/webp" srcSet={bonus3Image} />
+                      <img src={bonus3Image} alt="Spanish Pronunciation Cheat Sheet" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={600} />
+                    </picture>
                   </div>
                   <h4 className="text-lg font-bold text-foreground mb-2">
                     Spanish Pronunciation Cheat Sheet

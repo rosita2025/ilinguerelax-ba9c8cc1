@@ -47,8 +47,6 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
-import { BundleSelector, addBundleToCart } from "@/components/BundleSelector";
-import { useBundleStore } from "@/stores/bundleStore";
 import { InfluencerVideoCarousel } from "@/components/InfluencerVideoCarousel";
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
@@ -160,30 +158,14 @@ const ProductSpanish5000 = () => {
   };
   const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "BUY NOW";
 
-  // Live-mirror selected bundle into the StickyBuyBar (price updates automatically).
-  const selectedBundle = useBundleStore((s) => s.selected);
-  // All bundles now include a physical book ("digital" bundle = 1 physical + digital free)
-  const isPhysicalBundle = true;
-  const bundleId = selectedBundle?.id ?? "single";
-  const dynamicCtaText =
-    bundleId === "trio"
-      ? "GET 3 BOOKS · SAVE 25%"
-      : bundleId === "duo"
-      ? "GET 2 BOOKS · SAVE 15%"
-      : "BUY PHYSICAL BOOK + DIGITAL FREE";
-  const stickyPriceLabel = selectedBundle
-    ? `$${selectedBundle.total.toFixed(2)}`
-    : campaign.price;
-  const stickyOriginalLabel = selectedBundle
-    ? `$${selectedBundle.retail.toFixed(2)}`
-    : campaign.originalPrice;
-  const stickyCurrency = selectedBundle ? "USD" : campaign.currency;
-
-  // When sticky bar CTA is clicked, dispatch the currently-selected bundle (or default).
+  // Digital-only product (8,000 physical pre-order has been removed).
+  const isPhysicalBundle = false;
+  const dynamicCtaText = stickyCtaText;
+  const stickyPriceLabel = campaign.price;
+  const stickyOriginalLabel = campaign.originalPrice;
+  const stickyCurrency = campaign.currency;
   const handleStickyBuy = async () => {
-    const targetId = (selectedBundle?.id as "single" | "duo" | "trio") ?? "single";
-    // Sticky bar = direct redirect to Shopify checkout (no drawer in between).
-    await addBundleToCart(targetId, { redirectToCheckout: true });
+    await handleBuyNow();
   };
 
   const handleBuyNow = async () => {
@@ -347,9 +329,22 @@ const ProductSpanish5000 = () => {
                 <StockCounter totalStock={50} remainingStock={15} lang="en" />
               </div>
 
-              {/* Bundle selector - 3 options (Atlas-style upsell) */}
-              <div className="mb-4" data-bundle-selector>
-                <BundleSelector defaultBundle="single" />
+              {/* Buy Now CTA */}
+              <div className="mb-4">
+                <Button
+                  type="button"
+                  size="xl"
+                  onClick={handleBuyNow}
+                  className="w-full text-base md:text-lg py-6 px-4 h-auto min-h-[64px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99]"
+                >
+                  <span className="flex items-center justify-center gap-2 font-black">
+                    <ShoppingCart className="w-5 h-5" />
+                    GET INSTANT ACCESS · {campaign.price}
+                  </span>
+                </Button>
+                <p className="text-[11px] text-center text-muted-foreground mt-2">
+                  Instant PDF download · 30-day money-back guarantee
+                </p>
               </div>
 
               {/* Recent buyer micro-testimonial — fights buyer hesitation */}
@@ -719,7 +714,7 @@ const ProductSpanish5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName={selectedBundle ? selectedBundle.label : "5,000 Words With English Pronunciation and includes grammatical structures"} onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible />
+      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

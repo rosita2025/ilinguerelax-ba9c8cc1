@@ -241,15 +241,19 @@ const ProductSpanish5000 = () => {
 
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-60 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img
-                  src={productSpanish5000BundleImage}
-                  alt="Spanish Relax - Buy the physical book, get the digital version FREE"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                  width={1200}
-                  height={1200}
-                  fetchPriority="high"
-                  decoding="async"
-                />
+                <picture>
+                  <source type="image/avif" srcSet={productSpanish5000BundleImageAvif} />
+                  <source type="image/webp" srcSet={productSpanish5000BundleImage} />
+                  <img
+                    src={productSpanish5000BundleImage}
+                    alt="Spanish Relax - Buy the physical book, get the digital version FREE"
+                    className="w-full h-auto rounded-2xl shadow-hero"
+                    width={1200}
+                    height={1200}
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                </picture>
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg">
                   <Package className="w-3.5 h-3.5" /> PHYSICAL + DIGITAL FREE
                 </div>

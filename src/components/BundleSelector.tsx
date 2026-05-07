@@ -392,6 +392,9 @@ export const BundleSelector = ({ defaultBundle = "single" }: BundleSelectorProps
                           alt={it.title}
                           className="w-7 h-9 object-cover rounded border border-border"
                           loading="lazy"
+                          decoding="async"
+                          width={28}
+                          height={36}
                         />
                       ))}
                     </div>

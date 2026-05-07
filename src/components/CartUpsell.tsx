@@ -12,7 +12,6 @@ const SPANISH_5000_KEYWORDS = ["Spanish Relax - 5,000", "Spanish Relax - 5000", 
 
 // All Spanish bundle physical book variant IDs (used to detect "Spanish bundle" context).
 const SPANISH_BUNDLE_PHYSICAL_VARIANTS = new Set<string>([
-  "gid://shopify/ProductVariant/43137345749053", // 8000 Words book
   "gid://shopify/ProductVariant/43138982281277", // 3000 Verbs book
   "gid://shopify/ProductVariant/43138982314045", // Grammar A1-C1 book
 ]);
@@ -67,20 +66,7 @@ const spanishUpsellProducts = [
   },
 ];
 
-const spanishPhysicalPreorderUpsell = {
-  title: "Spanish Relax 8,000 Words — Physical Book (PRE-ORDER)",
-  description: "Lock in the lowest price ever — ships June 2026",
-  price: "15.00",
-  compareAtPrice: "35.00",
-  image: "/images/product-spanish-8000-book.webp",
-  variantId: "gid://shopify/ProductVariant/43137345749053",
-  productId: "gid://shopify/Product/7849025568829",
-  handle: "spanish-relax-8-000-words-physical-book-pre-order",
-  hotmartUrl: "",
-};
-
 const spanishPhysicalPreorderUpsells = [
-  spanishPhysicalPreorderUpsell,
   {
     title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER)",
     description: "Past, Present & Future · ships June 2026",

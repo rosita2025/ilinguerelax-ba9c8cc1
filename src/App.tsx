@@ -13,7 +13,6 @@ import Product8000 from "./pages/Product8000";
 import Product5000Book from "./pages/Product5000Book";
 import Product8000Book from "./pages/Product8000Book";
 import ProductSpanish5000 from "./pages/ProductSpanish5000";
-import ProductSpanish8000Book from "./pages/ProductSpanish8000Book";
 import ProductSpanish3000VerbsBook from "./pages/ProductSpanish3000VerbsBook";
 import ProductSpanishGrammarPatterns from "./pages/ProductSpanishGrammarPatterns";
 import ProductSpanish1000Verbs from "./pages/ProductSpanish1000Verbs";
@@ -65,7 +64,6 @@ const App = () => (
                 <Route path="/products/5-000-palabras-libro-fisico" element={<Product5000Book />} />
                 <Route path="/products/8-000-palabras-libro-fisico" element={<Product8000Book />} />
                 <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductSpanish5000 />} />
-                <Route path="/products/spanish-relax-8000-words-physical-book-preorder" element={<ProductSpanish8000Book />} />
                 <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
                 <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />
                 <Route path="/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation" element={<ProductSpanish1000Verbs />} />

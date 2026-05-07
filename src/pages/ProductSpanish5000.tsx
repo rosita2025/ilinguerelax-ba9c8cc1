@@ -22,13 +22,17 @@ import {
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
+import bonus1ImageAvif from "@/assets/bonus-1-spanish-exam.avif";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
+import bonus2ImageAvif from "@/assets/bonus-2-daily-planner.avif";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
+import bonus3ImageAvif from "@/assets/bonus-3-pronunciation.avif";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
 
 // Product image
 import productSpanish5000Image from "@/assets/spanish-5000-cover.webp";
 import productSpanish5000BundleImage from "@/assets/spanish-relax-physical-digital-bundle.webp";
+import productSpanish5000BundleImageAvif from "@/assets/spanish-relax-physical-digital-bundle.avif";
 import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.webp";
 import product3000VerbsImage from "@/assets/product-spanish-3000-verbs-book.webp";
 

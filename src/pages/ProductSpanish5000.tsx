@@ -163,7 +163,7 @@ const ProductSpanish5000 = () => {
   };
   const stickyCtaText = ctaTextByVariant[ctaVariant ?? "A_add_to_cart"] ?? "BUY NOW";
 
-  // Digital-only product (8,000 physical pre-order has been removed).
+  // Digital-only product — Spanish Relax 5,000 Words.
   const isPhysicalBundle = false;
   const dynamicCtaText = stickyCtaText;
   const stickyPriceLabel = campaign.price;
@@ -219,7 +219,7 @@ const ProductSpanish5000 = () => {
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
       </Helmet>
-      <SEO title="Digital eBook: 5,000 Spanish Words with English Pronunciation" description="Download instantly! 5,000 Spanish words with English pronunciation. PDF format, study anywhere. Special launch price." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
+      <SEO title="Spanish Relax — 5,000 Words with English Pronunciation (PDF)" description="Spanish Relax 5,000 Words: learn 5,000 essential Spanish words with English pronunciation. Instant PDF + 3 free bonuses. Special launch price $34.99." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000" keywords="Spanish Relax, 5000 Spanish words, learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation, digital Spanish book" />
       <Navbar />
 
       {/* Hero Section */}

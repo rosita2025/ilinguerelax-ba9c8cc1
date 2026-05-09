@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 const product5000BookImg = "/images/product-5000-book.webp";
 import productoPrincipalInglesRelax from "@/assets/producto-principal-ingles-relax.webp";
-import emocionaInglesRelax from "@/assets/emociona-ingles-relax.webp";
+import emocionaInglesRelax from "@/assets/oferta-5000-ingles-gramatica.png";
 import thumbProductoPrincipal from "@/assets/thumb-producto-principal.webp";
 import thumbEmociona from "@/assets/thumb-emociona.webp";
 import reviewFb1 from "@/assets/review-fb-1.jpg";

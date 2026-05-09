@@ -60,13 +60,12 @@ import previewFrases from "@/assets/preview-frases-verbos.png";
 import previewVocabulario from "@/assets/preview-vocabulario.png";
 const product5000Image = productoPrincipalInglesRelax;
 
-// Bonus images (6 regalos)
-import regalo1FormulaGramatica from "@/assets/regalo-1-formula-gramatica.webp";
-import regalo2EjemplosPreguntas from "@/assets/regalo-2-ejemplos-preguntas.webp";
-import regalo3TablaResumen from "@/assets/regalo-3-tabla-resumen-a1-b1.webp";
-import regalo4RecordatorioNiveles from "@/assets/regalo-4-recordatorio-niveles.webp";
-import regalo5MisNotas from "@/assets/regalo-5-mis-notas.webp";
-import regalo6AudioLibro from "@/assets/regalo-6-audio-libro.webp";
+// Bonus images (5 regalos)
+import bonus1Estructuras from "@/assets/bonus-1-estructuras-gramaticas.webp";
+import bonus2Verbos from "@/assets/bonus-2-1000-verbos-esenciales.webp";
+import bonus3Frases from "@/assets/bonus-3-100-frases-nativos.webp";
+import bonus4Preguntas from "@/assets/bonus-4-500-preguntas-frecuentes.webp";
+import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
 
 // About section image
 import aboutIlingueRelax from "@/assets/about-ilingue-relax.png";
@@ -149,45 +148,38 @@ const features = [
 const bonuses = [
   {
     icon: BookOpen,
-    title: "Regalo 1: La Fórmula de Gramática Para Ti",
+    title: "Regalo 1: Estructuras Gramáticas A1 a B1",
     description:
-      "Estructuras gramaticales B1 ordenadas para aprendizaje rápido. Presente continuo con fórmulas claras y ejemplos prácticos.",
-    image: regalo1FormulaGramatica,
-  },
-  {
-    icon: Globe,
-    title: "Regalo 2: Ejemplos de Estructuras para tu Uso Diario (Preguntas)",
-    description:
-      "Aprende a formular preguntas en inglés con estructuras claras: AM/IS/ARE + sujeto + verbo-ing + complemento. Incluye preguntas WH-.",
-    image: regalo2EjemplosPreguntas,
-  },
-  {
-    icon: BookOpen,
-    title: "Regalo 3: Tabla Resumen desde Nivel A1 a B1",
-    description:
-      "Resumen visual de marcas, adjetivos, comparativos y preguntas comunes. Todo lo aprendido desde A1 hasta B1 en un solo lugar.",
-    image: regalo3TablaResumen,
+      "Guía completa de estructuras gramaticales del nivel A1 al B1 para construir frases con confianza desde el primer día.",
+    image: bonus1Estructuras,
   },
   {
     icon: RefreshCw,
-    title: "Regalo 4: Recordatorio de Niveles Anteriores (Conexión A1-A2)",
+    title: "Regalo 2: 1,000 Verbos Esenciales (Presente, Pasado y Futuro)",
     description:
-      "Refuerza adjetivos posesivos, descriptivos y demostrativos (this/that/these/those) con la conexión perfecta entre A1 y A2.",
-    image: regalo4RecordatorioNiveles,
-  },
-  {
-    icon: Globe,
-    title: "Regalo 5: Mis Notas (Consejos de Crack para ti)",
-    description:
-      "Tabla resumen de todos los condicionales (Zero, First, Second, Third y Mixed) con ejemplos prácticos y espacio para tus notas.",
-    image: regalo5MisNotas,
+      "Los 1,000 verbos más usados en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.",
+    image: bonus2Verbos,
   },
   {
     icon: Sparkles,
-    title: "Regalo 6: Audio Libro Próximamente GRATIS",
+    title: "Regalo 3: 100 Frases Más Usadas por Nativos",
     description:
-      "Audio Libro próximamente como actualización gratuita, ideal para practicar la escucha de las 5,000 palabras de vocabulario.",
-    image: regalo6AudioLibro,
+      "Las expresiones reales que usan los nativos todos los días para que hables como un local desde el principio.",
+    image: bonus3Frases,
+  },
+  {
+    icon: Globe,
+    title: "Regalo 4: 500 Preguntas Frecuentes en Inglés",
+    description:
+      "Las preguntas más comunes que necesitas dominar para conversaciones reales: trabajo, viajes y vida diaria.",
+    image: bonus4Preguntas,
+  },
+  {
+    icon: BookOpen,
+    title: "Regalo 5: Cómo Estudiar Inglés en 6 Meses",
+    description:
+      "Tu plan paso a paso para hablar inglés con confianza en solo 6 meses, sin perder tiempo ni motivación.",
+    image: bonus5Estudiar,
   },
 ];
 const chapters = [
@@ -273,7 +265,7 @@ const Product5000 = () => {
     <main className="min-h-screen bg-background">
       <SEO
         title="Inglés Relax: 5,000 Palabras con Pronunciación Español y Fonética UK/USA"
-        description="Libro digital con 5,000 palabras en inglés y pronunciación para hispanohablantes. Fonética UK/USA, 52 capítulos, estructuras gramaticales A1–B1 y 6 regalos. Descarga inmediata, paga en moneda local."
+        description="Libro digital con 5,000 palabras en inglés y pronunciación para hispanohablantes. Fonética UK/USA, 52 capítulos, estructuras gramaticales A1–B1 y 5 regalos. Descarga inmediata, paga en moneda local."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/product-5000.png"
         type="product"
@@ -703,7 +695,7 @@ const Product5000 = () => {
                 INCLUIDOS GRATIS • LATINOAMÉRICA 🌎
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                🎁 6 Regalos Para Ti
+                🎁 5 Regalos Para Ti
               </h2>
               <p className="text-muted-foreground mt-2">
                 Incluye <span className="font-bold text-foreground">estructuras gramaticales</span> + pago en tu moneda local. Valorados en <span className="line-through">$62 USD</span> — <span className="font-bold text-accent">GRATIS</span> con tu compra hoy.

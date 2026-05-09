@@ -257,7 +257,7 @@ const Product5000 = () => {
       num_items: 1,
     });
     window.open(
-      "https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true",
+      "https://pay.hotmart.com/O100578526P?bid=1778299502267",
       "_blank",
     );
   };
@@ -854,7 +854,7 @@ const Product5000 = () => {
         reviewCount={800}
         showReviews={true}
         ctaText="DESCARGAR AHORA - PAGO SEGURO"
-        buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true"
+        buyUrl="https://pay.hotmart.com/O100578526P?bid=1778299502267"
       />
 
       {/* Spacer for sticky bar */}
@@ -865,7 +865,7 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup
-        buyUrl="https://pay.hotmart.com/O100578526P?off=gis8lsvy&checkoutMode=10&bid=1760824943067&fromExitPopup=true"
+        buyUrl="https://pay.hotmart.com/O100578526P?bid=1778299502267"
         discount="15%"
       />
 

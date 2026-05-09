@@ -204,8 +204,8 @@ const Product5000 = () => {
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const campaign = useCampaignPrice(15, 54);
   const campaignFull = useCampaignPrice(15, 107);
-  const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
-  const heroThumbs = [thumbProductoPrincipal, thumbEmociona];
+  const heroImages = [productoPrincipalInglesRelax];
+  const heroThumbs = [productoPrincipalInglesRelax];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL

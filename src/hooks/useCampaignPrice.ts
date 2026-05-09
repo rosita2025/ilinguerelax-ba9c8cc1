@@ -22,6 +22,25 @@ export interface CampaignPrice {
 const STORAGE_KEY = "campaign_currency_v5";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
+// Module-level dedupe: share a single ipapi.co fetch across all hook instances
+let inflightDetection: Promise<{ currency: CampaignCurrency; country: string } | null> | null = null;
+function detectOnce(): Promise<{ currency: CampaignCurrency; country: string } | null> {
+  if (inflightDetection) return inflightDetection;
+  inflightDetection = (async () => {
+    try {
+      const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const country = (data.country_code || "US").toUpperCase();
+      const currency = COUNTRY_TO_CURRENCY[country] || "USD";
+      return { currency, country };
+    } catch {
+      return null;
+    }
+  })();
+  return inflightDetection;
+}
+
 // Fixed marketing exchange rates (NOT live). Charge always happens in USD.
 const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: number; nice: (n: number) => number }> = {
   USD: { symbol: "$",    rate: 1,    decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
@@ -223,19 +242,11 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
 
     let cancelled = false;
     (async () => {
-      try {
-        const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
-        if (!res.ok) return;
-        const data = await res.json();
-        const country = (data.country_code || "US").toUpperCase();
-        const currency = COUNTRY_TO_CURRENCY[country] || "USD";
-        if (cancelled) return;
-        const payload: CachedDetection = { currency, countryCode: country, timestamp: Date.now() };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-        setState(build(currency, country, priceUSD, originalUSD));
-      } catch {
-        /* keep default */
-      }
+      const detected = await detectOnce();
+      if (cancelled || !detected) return;
+      const payload: CachedDetection = { currency: detected.currency, countryCode: detected.country, timestamp: Date.now() };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch { /* ignore */ }
+      setState(build(detected.currency, detected.country, priceUSD, originalUSD));
     })();
 
     return () => { cancelled = true; };

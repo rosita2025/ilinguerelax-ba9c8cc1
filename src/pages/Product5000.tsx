@@ -400,53 +400,6 @@ const Product5000 = () => {
                   loading="eager"
                   decoding="async"
                 />
-                {/* Preload other hero images for instant switching */}
-                {heroImages.map((img, idx) =>
-                  idx === currentHeroImage ? null : (
-                    <link key={idx} rel="preload" as="image" href={img} />
-                  )
-                )}
-                <div className="hidden">
-                  {heroImages.map((img, idx) => (
-                    <img key={idx} src={img} alt="" aria-hidden="true" />
-                  ))}
-                </div>
-                {/* Mini gallery thumbnails */}
-                {heroImages.length > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  {heroImages.map((img, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setCurrentHeroImage(idx)}
-                      aria-label={
-                        idx === 0
-                          ? "Ver portada: 5,000 palabras inglés con pronunciación y fonética UK/USA"
-                          : "Ver beneficios: aprende inglés en 6 meses con estructuras gramaticales"
-                      }
-                      className={`relative w-9 h-9 rounded-full overflow-hidden border-2 transition-all ${
-                        currentHeroImage === idx
-                          ? "border-primary ring-1 ring-primary/40"
-                          : "border-border opacity-70 hover:opacity-100"
-                      }`}
-                    >
-                      <img
-                        src={heroThumbs[idx]}
-                        width={36}
-                        height={36}
-                        loading="lazy"
-                        decoding="async"
-                        alt={
-                          idx === 0
-                            ? "Miniatura: Inglés Relax 5,000 palabras digital con fonética UK/USA"
-                            : "Miniatura: aprende inglés en 6 meses con estructuras gramaticales y pronunciación para hispanohablantes"
-                        }
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-                )}
               </div>
             </div>
 

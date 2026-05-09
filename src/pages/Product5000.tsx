@@ -501,19 +501,21 @@ const Product5000 = () => {
                 </div>
 
                 {/* Métodos de pago */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/40">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">
-                    Métodos de pago:
+                <div className="pt-2 border-t border-border/40">
+                  <span className="block text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
+                    Métodos de pago
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60">
-                    💳 Tarjetas
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60">
-                    🏦 Transferencia
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60">
-                    💵 Efectivo
-                  </span>
+                  <div className="flex flex-wrap gap-1.5 max-w-full">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60 whitespace-nowrap">
+                      💳 Tarjetas
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60 whitespace-nowrap">
+                      🏦 Transferencia
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60 whitespace-nowrap">
+                      💵 Efectivo
+                    </span>
+                  </div>
                 </div>
               </motion.div>
 

@@ -27,15 +27,15 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
   USD: { symbol: "$",    rate: 1,    decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   EUR: { symbol: "€",    rate: 0.86, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   GBP: { symbol: "£",    rate: 0.80, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  CAD: { symbol: "CA$",  rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  AUD: { symbol: "A$",   rate: 1.40, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  CAD: { symbol: "$",    rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  AUD: { symbol: "$",    rate: 1.40, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   // COP: tasa oficial ~4.000, redondeo a múltiplos de 100 terminados en 900
-  COP: { symbol: "COP$", rate: 4000, decimals: 0, nice: (n) => {
+  COP: { symbol: "$",    rate: 4000, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(900, rounded - 100); // termina en .900
   }},
   // ARS: dólar blue ~1.200, redondeo a terminaciones .990
-  ARS: { symbol: "AR$",  rate: 1200, decimals: 0, nice: (n) => {
+  ARS: { symbol: "$",    rate: 1200, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return rounded - 10; // termina en .990
   }},
@@ -45,12 +45,12 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     return rounded - 0.10; // termina en .90
   }},
   // MXN (Peso mexicano) ~20, redondeo psicológico terminado en 9
-  MXN: { symbol: "MX$",  rate: 20, decimals: 0, nice: (n) => {
+  MXN: { symbol: "$",    rate: 20, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 10) * 10;
     return Math.max(9, rounded - 1); // termina en 9 (psicológico)
   }},
   // CLP (Peso chileno) ~900, redondeo a múltiplos de 1000 - 10 => .990
-  CLP: { symbol: "CLP$", rate: 900, decimals: 0, nice: (n) => {
+  CLP: { symbol: "$",    rate: 900, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(990, rounded - 10);
   }},

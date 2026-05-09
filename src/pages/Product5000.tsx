@@ -465,46 +465,55 @@ const Product5000 = () => {
                 className="relative overflow-hidden rounded-xl px-4 py-3 border border-accent/30 mb-4 shadow-md"
                 style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.06), hsl(var(--accent) / 0.10))" }}
               >
-                <div className="flex items-center justify-between gap-3">
-                  {/* Left: price */}
-                  <div className="flex flex-col min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <Sparkles className="w-3 h-3 text-accent" />
-                      <span className="text-[10px] uppercase tracking-wider text-accent font-bold">Oferta lanzamiento</span>
-                    </div>
-                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0">
-                      <span
-                        className={`font-black text-foreground leading-none tracking-tight tabular-nums ${
-                          campaignFull.price.length > 9
-                            ? 'text-2xl sm:text-3xl'
-                            : campaignFull.price.length > 6
-                              ? 'text-3xl sm:text-4xl'
-                              : 'text-4xl sm:text-5xl'
-                        }`}
-                      >
-                        {campaignFull.price}
-                      </span>
-                      <span className="text-sm text-muted-foreground line-through tabular-nums">
-                        {campaignFull.originalPrice}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
-                      <span>💳 Pago único</span>
-                      <span>•</span>
-                      <span>🎁 6 Regalos</span>
-                      <span>•</span>
-                      <span>🌎 Moneda local</span>
-                    </div>
+                {/* Header: oferta + ahorro */}
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Sparkles className="w-3 h-3 text-accent flex-shrink-0" />
+                    <span className="text-[10px] uppercase tracking-wider text-accent font-bold truncate">
+                      Oferta lanzamiento
+                    </span>
                   </div>
-
-                  {/* Right: savings badge */}
                   <motion.span
                     animate={{ scale: [1, 1.06, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="flex-shrink-0 px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[11px] font-black tracking-wide shadow-md"
+                    className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[10px] sm:text-[11px] font-black tracking-wide shadow-md whitespace-nowrap"
                   >
-                    -89%
+                    AHORRA 89%
                   </motion.span>
+                </div>
+
+                {/* Price row */}
+                <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0 mb-2">
+                  <span
+                    className={`font-black text-foreground leading-none tracking-tight tabular-nums ${
+                      campaignFull.price.length > 9
+                        ? 'text-2xl sm:text-3xl md:text-4xl'
+                        : campaignFull.price.length > 6
+                          ? 'text-3xl sm:text-4xl md:text-5xl'
+                          : 'text-4xl sm:text-5xl md:text-6xl'
+                    }`}
+                  >
+                    {campaignFull.price}
+                  </span>
+                  <span className="text-sm md:text-base text-muted-foreground line-through tabular-nums">
+                    {campaignFull.originalPrice}
+                  </span>
+                </div>
+
+                {/* Métodos de pago */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/40">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">
+                    Métodos de pago:
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60">
+                    💳 Tarjetas
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60">
+                    🏦 Transferencia
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60">
+                    💵 Efectivo
+                  </span>
                 </div>
               </motion.div>
 

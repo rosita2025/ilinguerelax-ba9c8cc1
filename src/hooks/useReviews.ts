@@ -17,7 +17,7 @@ export const useReviews = (productType: string) => {
     queryKey: ["reviews", productType],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("reviews")
+        .from("reviews_public" as any)
         .select("*")
         .eq("product_type", productType)
         .eq("status", "approved")
@@ -36,7 +36,7 @@ export const useAllReviews = () => {
       // This will only return approved reviews due to RLS
       // Admin page will use edge function to get all
       const { data, error } = await supabase
-        .from("reviews")
+        .from("reviews_public" as any)
         .select("*")
         .order("created_at", { ascending: false });
 

@@ -609,10 +609,10 @@ const Product5000 = () => {
             <div className="text-center mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-bold mb-3">
                 <Gift className="w-4 h-4" />
-                INCLUIDOS GRATIS • LATINOAMÉRICA 🌎
+                INCLUIDOS GRATIS • LATINOAMÉRICA
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                🎁 5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
+                5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
               </h2>
               <p className="text-sm md:text-base text-muted-foreground mt-2">
                 Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local.

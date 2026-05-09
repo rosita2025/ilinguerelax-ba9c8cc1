@@ -27,7 +27,7 @@ export const products: Product[] = [
     name: "5,000 Palabras",
     flag: "🇬🇧",
     country: "Inglés UK / USA",
-    image: "/images/product-5000.webp",
+    image: "/images/product-5000.png",
     title: "Inglés Relax - 5,000 Palabras Digital",
     subtitle: "Nivel Básico a Intermedio",
     description: "Vocabulario esencial con pronunciación",

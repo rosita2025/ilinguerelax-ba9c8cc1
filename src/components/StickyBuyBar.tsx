@@ -196,28 +196,31 @@ export const StickyBuyBar = ({
               {productName}
             </p>
           )}
-          {/* Row 1: Price + Reviews compacto en una línea */}
+          {/* Row 1: Price */}
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1 min-w-0 flex-shrink">
-              <span className={`${isLongPrice ? 'text-sm' : 'text-base'} sm:text-lg font-bold text-foreground whitespace-nowrap`}>{price}</span>
-              {originalPrice && !isLongPrice && (
-                <span className="text-[11px] text-muted-foreground line-through whitespace-nowrap">{originalPrice}</span>
+            <div className="flex items-baseline gap-1.5 min-w-0 flex-shrink">
+              <span className={`${isLongPrice ? 'text-base' : 'text-lg'} sm:text-xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
+              {originalPrice && (
+                <span className="text-[11px] text-muted-foreground line-through tabular-nums whitespace-nowrap">{originalPrice}</span>
               )}
-              {savingsLabel && !isLongPrice && (
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded whitespace-nowrap">
-                  {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
-                </span>
-              )}
-              <span className="text-[10px] text-muted-foreground whitespace-nowrap">{currencyCode}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
-            {showReviews && (
-              <div className="flex items-center gap-1 text-xs flex-shrink-0">
-                {!isLongPrice && renderStars()}
-                <span className="text-foreground font-medium">★ {rating}</span>
-                <span className="text-muted-foreground">({reviewCount})</span>
-              </div>
+            {savingsLabel && (
+              <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
+                {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+              </span>
             )}
           </div>
+          {/* Row: Reviews */}
+          {showReviews && (
+            <div className="flex items-center gap-1.5 text-[11px]">
+              {renderStars()}
+              <span className="text-foreground font-bold tabular-nums">{rating}</span>
+              <span className="text-muted-foreground">
+                ({reviewCount} {lang === "en" ? "reviews" : "reseñas"})
+              </span>
+            </div>
+          )}
           
           {/* Row: Email or Button */}
           {showEmailSubscription && !isSubscribed ? (

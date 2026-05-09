@@ -457,26 +457,49 @@ const Product5000 = () => {
                 <LiveViewers minViewers={18} maxViewers={42} />
               </div>
 
-              {/* Price Section with Value Stack */}
+              {/* Price Section */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="relative overflow-hidden rounded-2xl p-6 border-2 border-accent mb-6"
-                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.18))" }}
+                className="relative overflow-hidden rounded-2xl p-5 md:p-6 border border-accent/40 mb-6 shadow-lg"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.10), hsl(var(--accent) / 0.14))" }}
               >
-                <div className="flex items-baseline gap-3 mb-1">
-                  <span className={`${campaignFull.price.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground`}>{campaignFull.price}</span>
-                  <span className="text-xl md:text-2xl text-muted-foreground line-through">{campaignFull.originalPrice}</span>
+                {/* Savings badge */}
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold uppercase tracking-wide">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Oferta de lanzamiento
+                  </span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
+                    className="px-3 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-md"
                   >
                     AHORRA 89%
                   </motion.span>
                 </div>
-                <p className="text-sm text-muted-foreground">💳 Pago único • 6 Regalos GRATIS • Paga en tu moneda local 🌎</p>
+
+                {/* Price row */}
+                <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1 mb-2">
+                  <span className={`${campaignFull.price.length > 7 ? 'text-4xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground leading-none tracking-tight`}>
+                    {campaignFull.price}
+                  </span>
+                  <span className="text-lg md:text-xl text-muted-foreground line-through">{campaignFull.originalPrice}</span>
+                </div>
+
+                {/* Trust chips */}
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/70 text-xs font-medium text-foreground border border-border">
+                    💳 Pago único
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/70 text-xs font-medium text-foreground border border-border">
+                    🎁 6 Regalos GRATIS
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/70 text-xs font-medium text-foreground border border-border">
+                    🌎 Moneda local
+                  </span>
+                </div>
               </motion.div>
 
               {/* Stock Counter - Scarcity */}

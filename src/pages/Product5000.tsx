@@ -412,6 +412,7 @@ const Product5000 = () => {
                   ))}
                 </div>
                 {/* Mini gallery thumbnails */}
+                {heroImages.length > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-3">
                   {heroImages.map((img, idx) => (
                     <button
@@ -445,6 +446,7 @@ const Product5000 = () => {
                     </button>
                   ))}
                 </div>
+                )}
               </div>
             </div>
 

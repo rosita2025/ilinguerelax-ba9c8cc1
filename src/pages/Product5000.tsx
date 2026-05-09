@@ -437,14 +437,14 @@ const Product5000 = () => {
               </p>
 
               {/* Reviews - More Prominent */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center gap-1">
+              <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-4">
+                <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="w-3.5 h-3.5 md:w-4 md:h-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <span className="font-bold text-foreground">4.8/5</span>
-                <span className="text-muted-foreground">(800+ Reseñas Verificadas)</span>
+                <span className="text-xs md:text-sm font-bold text-foreground">4.8/5</span>
+                <span className="text-[11px] md:text-xs text-muted-foreground">(800+ Reseñas Verificadas)</span>
               </div>
 
               {/* Purchase Counter - Social Proof */}

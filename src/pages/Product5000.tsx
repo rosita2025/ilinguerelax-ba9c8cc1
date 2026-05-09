@@ -204,6 +204,7 @@ const Product5000 = () => {
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const campaign = useCampaignPrice(15, 54);
   const campaignFull = useCampaignPrice(15, 107);
+  const bonusValue = useCampaignPrice(15, 62);
   const heroImages = [productoPrincipalInglesRelax];
   const heroThumbs = [productoPrincipalInglesRelax];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
@@ -726,8 +727,8 @@ const Product5000 = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 🎁 5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
               </h2>
-              <p className="text-muted-foreground mt-2">
-                Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local. Valorados en <span className="line-through">$62 USD</span> — <span className="font-bold text-accent">GRATIS</span> con tu compra hoy.
+              <p className="text-sm md:text-base text-muted-foreground mt-2">
+                Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local. Valorados en <span className="line-through tabular-nums">{bonusValue.originalPrice}</span> — <span className="font-bold text-accent">GRATIS</span> hoy.
               </p>
             </div>
 

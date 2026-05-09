@@ -24,7 +24,7 @@ export const useReviews = (productType: string) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return (data || []) as Review[];
+      return (data || []) as unknown as Review[];
     },
   });
 };
@@ -41,7 +41,7 @@ export const useAllReviews = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return (data || []) as Review[];
+      return (data || []) as unknown as Review[];
     },
   });
 };

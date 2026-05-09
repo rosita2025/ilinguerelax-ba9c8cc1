@@ -81,7 +81,6 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { ProductCrossSell } from "@/components/ProductCrossSell";
 
 const partnerLogos = [
   {
@@ -686,9 +685,6 @@ const Product5000 = () => {
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
-      {/* Cross-sell: Other Product Option */}
-      <ProductCrossSell currentProduct="5000" lang="es" />
-
       {/* FAQ Section */}
       <FAQ
         items={[

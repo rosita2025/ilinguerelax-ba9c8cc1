@@ -769,6 +769,7 @@ const Product5000 = () => {
       <StickyBuyBar
         price={campaign.price}
         originalPrice={campaign.originalPrice}
+        currencyCode={campaign.currency}
         productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)"
         rating={4.8}
         reviewCount={800}

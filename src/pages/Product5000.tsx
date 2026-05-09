@@ -502,17 +502,17 @@ const Product5000 = () => {
 
                 {/* Métodos de pago */}
                 <div className="pt-2 border-t border-border/40">
-                  <span className="block text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
+                  <span className="block text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
                     Métodos de pago
                   </span>
-                  <div className="flex flex-wrap gap-1.5 max-w-full">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60 whitespace-nowrap">
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 max-w-full">
+                    <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-background/80 text-[10px] sm:text-[11px] md:text-xs font-semibold text-foreground border border-border/60 whitespace-nowrap">
                       💳 Tarjetas
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60 whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-background/80 text-[10px] sm:text-[11px] md:text-xs font-semibold text-foreground border border-border/60 whitespace-nowrap">
                       🏦 Transferencia
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/80 text-[10px] font-semibold text-foreground border border-border/60 whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-background/80 text-[10px] sm:text-[11px] md:text-xs font-semibold text-foreground border border-border/60 whitespace-nowrap">
                       💵 Efectivo
                     </span>
                   </div>

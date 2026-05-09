@@ -724,10 +724,10 @@ const Product5000 = () => {
                 INCLUIDOS GRATIS • LATINOAMÉRICA 🌎
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                🎁 5 Regalos Para Ti
+                🎁 5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
               </h2>
               <p className="text-muted-foreground mt-2">
-                Incluye <span className="font-bold text-foreground">estructuras gramaticales</span> + pago en tu moneda local. Valorados en <span className="line-through">$62 USD</span> — <span className="font-bold text-accent">GRATIS</span> con tu compra hoy.
+                Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local. Valorados en <span className="line-through">$62 USD</span> — <span className="font-bold text-accent">GRATIS</span> con tu compra hoy.
               </p>
             </div>
 

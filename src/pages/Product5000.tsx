@@ -136,7 +136,7 @@ const features = [
   "5,000+ palabras más utilizadas en inglés",
   "Pronunciación adaptada para hispanohablantes",
   "Fonética internacional UK/USA incluida",
-  "Estructura gramatical desde Nivel Cero hasta Intermedio B1",
+  "Estructura gramatical desde Nivel Cero hasta Avanzado C1",
   "52 capítulos temáticos organizados",
   "Significado en español de cada palabra",
   "Entrega digital inmediata",
@@ -262,7 +262,7 @@ const Product5000 = () => {
     <main className="min-h-screen bg-background">
       <SEO
         title="Inglés Relax: 5,000 Palabras con Pronunciación Español y Fonética UK/USA"
-        description="Libro digital con 5,000 palabras en inglés y pronunciación para hispanohablantes. Fonética UK/USA, 52 capítulos, estructuras gramaticales A1–B1 y 5 regalos. Descarga inmediata, paga en moneda local."
+        description="Libro digital con 5,000 palabras en inglés y pronunciación para hispanohablantes. Fonética UK/USA, 52 capítulos, estructuras gramaticales desde Nivel Cero hasta Avanzado C1 y 5 regalos. Descarga inmediata, paga en moneda local."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/images/product-5000.png"
         type="product"
@@ -272,7 +272,7 @@ const Product5000 = () => {
         reviewCount="800"
         sku="ILINGUE-5000"
         availability="InStock"
-        keywords="aprender inglés, 5000 palabras inglés, vocabulario inglés con pronunciación, pronunciación inglés para hispanohablantes, fonética UK USA, inglés A1 B1, estructuras gramaticales inglés, libro digital inglés, PDF inglés descargable, inglés relax, aprender inglés en 6 meses, inglés Latinoamérica"
+        keywords="aprender inglés, 5000 palabras inglés, vocabulario inglés con pronunciación, pronunciación inglés para hispanohablantes, fonética UK USA, inglés A1 C1, estructuras gramaticales inglés, libro digital inglés, PDF inglés descargable, inglés relax, aprender inglés en 6 meses, inglés Latinoamérica"
       />
       {/* Lightbox Dialog */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
@@ -423,7 +423,7 @@ const Product5000 = () => {
                   className="inline-flex items-center gap-1 px-2.5 py-1 md:px-4 md:py-2 rounded-full bg-accent/10 text-accent text-[11px] md:text-sm font-medium whitespace-nowrap"
                 >
                   <Gift className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>6 Regalos Gratis</span>
+                  <span>5 Regalos Gratis</span>
                 </motion.div>
               </div>
 
@@ -432,8 +432,8 @@ const Product5000 = () => {
               </h1>
               <p className="text-base text-muted-foreground mb-4">
                 📚 Incluye estructura gramatical completa desde{" "}
-                <span className="font-bold text-foreground">Nivel Cero hasta Intermedio B1</span>. Perfecto para
-                principiantes.
+                <span className="font-bold text-foreground">Nivel Cero hasta Avanzado C1</span>. Perfecto para
+                principiantes y estudiantes avanzados.
               </p>
 
               {/* Reviews - More Prominent */}

@@ -220,7 +220,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      reviews_public: {
+        Row: {
+          created_at: string | null
+          customer_name: string | null
+          id: string | null
+          photo_urls: string[] | null
+          product_type: string | null
+          rating: number | null
+          review_text: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          photo_urls?: string[] | null
+          product_type?: string | null
+          rating?: number | null
+          review_text?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          photo_urls?: string[] | null
+          product_type?: string | null
+          rating?: number | null
+          review_text?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

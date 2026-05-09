@@ -615,8 +615,16 @@ const Product5000 = () => {
                 🎁 5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
               </h2>
               <p className="text-sm md:text-base text-muted-foreground mt-2">
-                Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local. Valorados en <span className="line-through tabular-nums">{bonusValue.originalPrice}</span> — <span className="font-bold text-accent">GRATIS</span> hoy.
+                Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local.
               </p>
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent/40 bg-accent/10 shadow-sm">
+                <span className="text-[11px] md:text-xs font-semibold text-muted-foreground line-through tabular-nums">
+                  {bonusValue.originalPrice}
+                </span>
+                <span className="text-[11px] md:text-xs font-black uppercase tracking-wide text-accent">
+                  GRATIS hoy
+                </span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

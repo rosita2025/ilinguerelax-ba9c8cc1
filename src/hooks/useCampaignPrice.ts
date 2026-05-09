@@ -44,8 +44,8 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     const rounded = Math.round(n);
     return rounded - 0.10; // termina en .90
   }},
-  // MXN (Peso mexicano) ~18, redondeo a terminaciones .00 menos 1 => .00 o .99
-  MXN: { symbol: "MX$",  rate: 18, decimals: 0, nice: (n) => {
+  // MXN (Peso mexicano) ~20, redondeo psicológico terminado en 9
+  MXN: { symbol: "MX$",  rate: 20, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 10) * 10;
     return Math.max(9, rounded - 1); // termina en 9 (psicológico)
   }},

@@ -399,6 +399,7 @@ const Product5000 = () => {
                   }
                   className="w-full h-auto rounded-2xl shadow-hero"
                   loading="eager"
+                  fetchPriority="high"
                   decoding="async"
                 />
               </div>
@@ -581,7 +582,7 @@ const Product5000 = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewIndice} alt="Índice Completo" className="w-full h-full object-cover object-top" />
+                  <img src={previewIndice} alt="Índice Completo" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
                   <h4 className="font-bold text-foreground text-sm">Índice Completo</h4>
@@ -590,7 +591,7 @@ const Product5000 = () => {
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewVocabulario} alt="Vocabulario" className="w-full h-full object-cover object-top" />
+                  <img src={previewVocabulario} alt="Vocabulario" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
                   <h4 className="font-bold text-foreground text-sm">5,000 Palabras</h4>
@@ -644,6 +645,7 @@ const Product5000 = () => {
                       alt={bonus.title}
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
+                      decoding="async"
                     />
                     <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-accent text-accent-foreground text-xs font-black">
                       GRATIS
@@ -753,6 +755,8 @@ const Product5000 = () => {
               <img
                 src={aboutIlingueRelax}
                 alt="Acerca del ILINGUE RELAX - Autora Crady by iLingue Relax"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto"
               />
             </div>

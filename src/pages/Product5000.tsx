@@ -436,37 +436,118 @@ const Product5000 = () => {
                 principiantes y estudiantes avanzados.
               </p>
 
-              {/* 5 Regalos incluidos */}
-              <div className="mb-4 rounded-xl border border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5 p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Gift className="w-4 h-4 text-accent" />
-                  <span className="text-xs md:text-sm font-bold uppercase tracking-wide text-accent">
-                    Incluye 5 Regalos Gratis
-                  </span>
-                </div>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[12px] md:text-sm">
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-accent font-bold flex-shrink-0">1.</span>
-                    <span><span className="font-semibold text-foreground">Estructuras Gramáticas A1–B1</span> <span className="text-muted-foreground">— frases con confianza desde el día 1</span></span>
+              {/* 5 Regalos incluidos - SEO optimized */}
+              <section
+                aria-labelledby="regalos-heading"
+                itemScope
+                itemType="https://schema.org/ItemList"
+                className="mb-4 rounded-xl border border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5 p-3"
+              >
+                <meta itemProp="numberOfItems" content="5" />
+                <meta itemProp="itemListOrder" content="https://schema.org/ItemListOrderAscending" />
+                <header className="flex items-center gap-1.5 mb-2">
+                  <Gift className="w-4 h-4 text-accent" aria-hidden="true" />
+                  <h2
+                    id="regalos-heading"
+                    itemProp="name"
+                    className="text-xs md:text-sm font-bold uppercase tracking-wide text-accent"
+                  >
+                    5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
+                  </h2>
+                </header>
+                <p className="sr-only">
+                  Bonos exclusivos para aprender inglés desde cero hasta nivel avanzado C1: gramática inglesa A1 a B1,
+                  1,000 verbos en inglés conjugados, frases de nativos, preguntas frecuentes en inglés y plan de estudio
+                  para hablar inglés en 6 meses.
+                </p>
+                <ol className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[12px] md:text-sm list-none">
+                  <li
+                    itemProp="itemListElement"
+                    itemScope
+                    itemType="https://schema.org/ListItem"
+                    className="flex items-start gap-1.5"
+                  >
+                    <meta itemProp="position" content="1" />
+                    <span className="text-accent font-bold flex-shrink-0" aria-hidden="true">1.</span>
+                    <span>
+                      <h3 className="inline font-semibold text-foreground" itemProp="name">
+                        Estructuras Gramaticales A1–B1 en Inglés
+                      </h3>{" "}
+                      <span className="text-muted-foreground" itemProp="description">
+                        — guía de gramática inglesa para construir frases correctas desde el primer día.
+                      </span>
+                    </span>
                   </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-accent font-bold flex-shrink-0">2.</span>
-                    <span><span className="font-semibold text-foreground">1,000 Verbos Esenciales</span> <span className="text-muted-foreground">— presente, pasado y futuro</span></span>
+                  <li
+                    itemProp="itemListElement"
+                    itemScope
+                    itemType="https://schema.org/ListItem"
+                    className="flex items-start gap-1.5"
+                  >
+                    <meta itemProp="position" content="2" />
+                    <span className="text-accent font-bold flex-shrink-0" aria-hidden="true">2.</span>
+                    <span>
+                      <h3 className="inline font-semibold text-foreground" itemProp="name">
+                        1,000 Verbos en Inglés Conjugados
+                      </h3>{" "}
+                      <span className="text-muted-foreground" itemProp="description">
+                        — presente, pasado y futuro con pronunciación para hispanohablantes.
+                      </span>
+                    </span>
                   </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-accent font-bold flex-shrink-0">3.</span>
-                    <span><span className="font-semibold text-foreground">100 Frases de Nativos</span> <span className="text-muted-foreground">— habla como un local</span></span>
+                  <li
+                    itemProp="itemListElement"
+                    itemScope
+                    itemType="https://schema.org/ListItem"
+                    className="flex items-start gap-1.5"
+                  >
+                    <meta itemProp="position" content="3" />
+                    <span className="text-accent font-bold flex-shrink-0" aria-hidden="true">3.</span>
+                    <span>
+                      <h3 className="inline font-semibold text-foreground" itemProp="name">
+                        100 Frases en Inglés Usadas por Nativos
+                      </h3>{" "}
+                      <span className="text-muted-foreground" itemProp="description">
+                        — expresiones reales para hablar inglés como un local.
+                      </span>
+                    </span>
                   </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-accent font-bold flex-shrink-0">4.</span>
-                    <span><span className="font-semibold text-foreground">500 Preguntas Frecuentes</span> <span className="text-muted-foreground">— trabajo, viajes y vida diaria</span></span>
+                  <li
+                    itemProp="itemListElement"
+                    itemScope
+                    itemType="https://schema.org/ListItem"
+                    className="flex items-start gap-1.5"
+                  >
+                    <meta itemProp="position" content="4" />
+                    <span className="text-accent font-bold flex-shrink-0" aria-hidden="true">4.</span>
+                    <span>
+                      <h3 className="inline font-semibold text-foreground" itemProp="name">
+                        500 Preguntas Frecuentes en Inglés
+                      </h3>{" "}
+                      <span className="text-muted-foreground" itemProp="description">
+                        — vocabulario práctico para trabajo, viajes y conversaciones diarias.
+                      </span>
+                    </span>
                   </li>
-                  <li className="flex items-start gap-1.5 sm:col-span-2">
-                    <span className="text-accent font-bold flex-shrink-0">5.</span>
-                    <span><span className="font-semibold text-foreground">Cómo Estudiar Inglés en 6 Meses</span> <span className="text-muted-foreground">— plan paso a paso</span></span>
+                  <li
+                    itemProp="itemListElement"
+                    itemScope
+                    itemType="https://schema.org/ListItem"
+                    className="flex items-start gap-1.5 sm:col-span-2"
+                  >
+                    <meta itemProp="position" content="5" />
+                    <span className="text-accent font-bold flex-shrink-0" aria-hidden="true">5.</span>
+                    <span>
+                      <h3 className="inline font-semibold text-foreground" itemProp="name">
+                        Cómo Aprender Inglés en 6 Meses
+                      </h3>{" "}
+                      <span className="text-muted-foreground" itemProp="description">
+                        — método paso a paso para hablar inglés con confianza sin perder motivación.
+                      </span>
+                    </span>
                   </li>
-                </ul>
-              </div>
+                </ol>
+              </section>
 
               {/* Reviews - More Prominent */}
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-4">

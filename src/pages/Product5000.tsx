@@ -4,10 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 const product5000BookImg = "/images/product-5000-book.webp";
-import productoPrincipalInglesRelax from "@/assets/producto-principal-ingles-relax.webp";
-import emocionaInglesRelax from "@/assets/oferta-5000-ingles-gramatica.png";
-import thumbProductoPrincipal from "@/assets/thumb-producto-principal.webp";
-import thumbEmociona from "@/assets/thumb-emociona.webp";
+import productoPrincipalInglesRelax from "@/assets/oferta-5000-ingles-gramatica.png";
 import reviewFb1 from "@/assets/review-fb-1.jpg";
 import reviewFb2 from "@/assets/review-fb-2.jpg";
 import reviewFb3 from "@/assets/review-fb-3.jpg";
@@ -207,8 +204,8 @@ const Product5000 = () => {
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const campaign = useCampaignPrice(15, 54);
   const campaignFull = useCampaignPrice(15, 107);
-  const heroImages = [productoPrincipalInglesRelax, emocionaInglesRelax];
-  const heroThumbs = [thumbProductoPrincipal, thumbEmociona];
+  const heroImages = [productoPrincipalInglesRelax];
+  const heroThumbs = [productoPrincipalInglesRelax];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
@@ -415,6 +412,7 @@ const Product5000 = () => {
                   ))}
                 </div>
                 {/* Mini gallery thumbnails */}
+                {heroImages.length > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-3">
                   {heroImages.map((img, idx) => (
                     <button
@@ -448,6 +446,7 @@ const Product5000 = () => {
                     </button>
                   ))}
                 </div>
+                )}
               </div>
             </div>
 

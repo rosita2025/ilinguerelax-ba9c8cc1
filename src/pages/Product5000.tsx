@@ -457,69 +457,54 @@ const Product5000 = () => {
                 <LiveViewers minViewers={18} maxViewers={42} />
               </div>
 
-              {/* Price Section */}
+              {/* Price Section - compact */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="relative overflow-hidden rounded-2xl p-5 md:p-6 border border-accent/30 mb-6 shadow-xl backdrop-blur-sm"
-                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--accent) / 0.12))" }}
+                className="relative overflow-hidden rounded-xl px-4 py-3 border border-accent/30 mb-4 shadow-md"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.06), hsl(var(--accent) / 0.10))" }}
               >
-                {/* Decorative glow */}
-                <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full bg-accent/20 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-primary/20 blur-3xl" />
-
-                <div className="relative">
-                  {/* Top row: badges */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/15 text-accent text-[11px] font-bold uppercase tracking-wider">
-                      <Sparkles className="w-3 h-3" />
-                      Oferta lanzamiento
-                    </span>
-                    <motion.span
-                      animate={{ scale: [1, 1.06, 1] }}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                      className="px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[11px] font-black tracking-wide shadow-md"
-                    >
-                      AHORRA 89%
-                    </motion.span>
-                  </div>
-
-                  {/* Price block */}
-                  <div className="flex flex-col gap-1 mb-3">
-                    <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">
-                      Precio hoy
-                    </span>
-                    <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+                <div className="flex items-center justify-between gap-3">
+                  {/* Left: price */}
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Sparkles className="w-3 h-3 text-accent" />
+                      <span className="text-[10px] uppercase tracking-wider text-accent font-bold">Oferta lanzamiento</span>
+                    </div>
+                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0">
                       <span
-                        className={`font-black text-foreground leading-[0.95] tracking-tight tabular-nums ${
+                        className={`font-black text-foreground leading-none tracking-tight tabular-nums ${
                           campaignFull.price.length > 9
-                            ? 'text-3xl sm:text-4xl md:text-5xl'
+                            ? 'text-2xl sm:text-3xl'
                             : campaignFull.price.length > 6
-                              ? 'text-4xl sm:text-5xl md:text-6xl'
-                              : 'text-5xl sm:text-6xl md:text-7xl'
+                              ? 'text-3xl sm:text-4xl'
+                              : 'text-4xl sm:text-5xl'
                         }`}
                       >
                         {campaignFull.price}
                       </span>
-                      <span className="text-base md:text-lg text-muted-foreground line-through tabular-nums">
+                      <span className="text-sm text-muted-foreground line-through tabular-nums">
                         {campaignFull.originalPrice}
                       </span>
                     </div>
+                    <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
+                      <span>💳 Pago único</span>
+                      <span>•</span>
+                      <span>🎁 6 Regalos</span>
+                      <span>•</span>
+                      <span>🌎 Moneda local</span>
+                    </div>
                   </div>
 
-                  {/* Trust chips */}
-                  <div className="flex flex-wrap gap-1.5 pt-3 border-t border-border/40">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/80 text-[11px] font-semibold text-foreground border border-border/60">
-                      💳 Pago único
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/80 text-[11px] font-semibold text-foreground border border-border/60">
-                      🎁 6 Regalos
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/80 text-[11px] font-semibold text-foreground border border-border/60">
-                      🌎 Moneda local
-                    </span>
-                  </div>
+                  {/* Right: savings badge */}
+                  <motion.span
+                    animate={{ scale: [1, 1.06, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="flex-shrink-0 px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[11px] font-black tracking-wide shadow-md"
+                  >
+                    -89%
+                  </motion.span>
                 </div>
               </motion.div>
 

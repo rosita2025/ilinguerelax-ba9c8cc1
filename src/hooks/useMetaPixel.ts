@@ -109,7 +109,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
-    logFunnelEvent("ViewContent", params as Record<string, unknown>);
+    logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
   }, [params.content_name]);
 };
 

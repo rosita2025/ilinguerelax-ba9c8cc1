@@ -8,6 +8,13 @@ import looxReview6 from "@/assets/review-book-real-1.jpg";
 import looxReview7 from "@/assets/loox-review-7.png";
 import looxReview8 from "@/assets/loox-review-8.png";
 import looxReview9 from "@/assets/loox-review-9.png";
+import customerBook1 from "@/assets/customer-book-1.webp";
+import customerBook2 from "@/assets/customer-book-2.webp";
+import customerBook3 from "@/assets/customer-book-3.webp";
+import customerBook4 from "@/assets/customer-book-4.webp";
+import customerBook5 from "@/assets/customer-book-5.webp";
+import customerBook6 from "@/assets/customer-book-6.webp";
+import customerBook7 from "@/assets/customer-book-7.webp";
 
 interface LooxReview {
   name: string;
@@ -109,6 +116,69 @@ const reviews: LooxReview[] = [
     image: looxReview6,
     timeAgo: "1 month ago",
     initials: "AM",
+  },
+  {
+    name: "Jennifer Hayes",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Just got my copy! The cover is beautiful and the pages feel premium. Already on chapter 3 and loving how clear everything is explained.",
+    image: customerBook1,
+    timeAgo: "2 days ago",
+    initials: "JH",
+  },
+  {
+    name: "Robert Klein",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Even my golden retriever approves! Honestly the best Spanish learning book I've bought. The pronunciation guide is a game changer.",
+    image: customerBook2,
+    timeAgo: "4 days ago",
+    initials: "RK",
+  },
+  {
+    name: "Thomas Wright",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Got this for my wife and ended up reading it myself. Super well organized and the 6-month planner keeps me consistent.",
+    image: customerBook3,
+    timeAgo: "1 week ago",
+    initials: "TW",
+  },
+  {
+    name: "Patricia Hill",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Perfect size to carry around. I read a few pages every morning with my coffee. Spanish has never felt this relaxed to learn.",
+    image: customerBook4,
+    timeAgo: "1 week ago",
+    initials: "PH",
+  },
+  {
+    name: "Rachel Foster",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Bought it for a trip to Mexico and I actually feel prepared. The thematic chapters are exactly what tourists need.",
+    image: customerBook5,
+    timeAgo: "2 weeks ago",
+    initials: "RF",
+  },
+  {
+    name: "Karen Mitchell",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Quality print, vibrant cover, easy to follow. I'm 58 and finally enjoying learning Spanish without stress. Highly recommend.",
+    image: customerBook6,
+    timeAgo: "3 weeks ago",
+    initials: "KM",
+  },
+  {
+    name: "Linda Parker",
+    country: "USA",
+    flag: "🇺🇸",
+    text: "Arrived faster than expected. Pages are clean, font is large enough, and the structure makes sense. Worth every penny!",
+    image: customerBook7,
+    timeAgo: "1 month ago",
+    initials: "LP",
   },
 ];
 

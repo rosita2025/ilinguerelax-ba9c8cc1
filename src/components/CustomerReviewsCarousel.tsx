@@ -33,13 +33,6 @@ const images = [
   { desktop: cliente1, mobile: cliente1Mobile },
   { desktop: cliente2, mobile: cliente2Mobile },
   { desktop: cliente3, mobile: cliente3Mobile },
-  { desktop: cliente4, mobile: cliente4Mobile },
-  { desktop: cliente5, mobile: cliente5Mobile },
-  { desktop: cliente6, mobile: cliente6Mobile },
-  { desktop: cliente7, mobile: cliente7Mobile },
-  { desktop: cliente8, mobile: cliente8Mobile },
-  { desktop: cliente9, mobile: cliente9Mobile },
-  { desktop: cliente10, mobile: cliente10Mobile },
 ];
 
 const scheduleIdle = (cb: () => void) => {

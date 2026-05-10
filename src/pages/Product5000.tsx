@@ -19,6 +19,7 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 import { CustomerReviewsCarousel } from "@/components/CustomerReviewsCarousel";
+import { LooxStyleReviews } from "@/components/LooxStyleReviews";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -665,6 +666,8 @@ const Product5000 = () => {
       </section>
 
       <CustomerReviewsCarousel />
+
+      <LooxStyleReviews />
 
       <CompactBuyCard
         title="Inglés Relax 5,000"

@@ -174,22 +174,7 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    // Track AddToCart event with Meta Pixel
-    trackHotmartEvent("AddToCart", {
-      content_name: "Spanish Relax - 5,000 Words",
-      content_category: "Digital Book",
-      content_ids: ["product-spanish-5000"],
-      content_type: "product",
-      value: 34.99,
-      currency: "USD",
-      num_items: 1,
-      ab_experiment: "spanish5000_headline_v1",
-      ab_variant: headlineVariant ?? "unassigned",
-      ab_cta_experiment: "spanish5000_sticky_cta_v1",
-      ab_cta_variant: ctaVariant ?? "unassigned",
-    });
-
-    // Add to cart only; checkout continues from the cart drawer
+    // AddToCart se dispara automáticamente desde cartStore.addItem
     const shopifyProduct = {
       node: {
         id: "gid://shopify/Product/7788747784253",

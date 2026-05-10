@@ -125,15 +125,7 @@ const Product8000Book = () => {
       return;
     }
     const variant = shopifyProduct.node.variants.edges[0]?.node;
-    // Meta Pixel AddToCart event
-    trackHotmartEvent("AddToCart", {
-      content_name: "Inglés Relax - 8,000 Palabras Libro Físico",
-      content_category: "Physical Book",
-      content_ids: ["product-8000-book"],
-      content_type: "product",
-      value: 25.00,
-      currency: "USD",
-    });
+    // AddToCart se dispara automáticamente desde cartStore.addItem
     await addItem({
       product: shopifyProduct,
       variantId: shopifyVariantId,

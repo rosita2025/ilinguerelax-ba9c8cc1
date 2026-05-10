@@ -1,14 +1,47 @@
 import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Gift } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowRight, Star, Gift, Search } from "lucide-react";
 import { products, getProductLink } from "@/data/products";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const Products = () => {
+  const [type, setType] = useState<"all" | "digital" | "physical">("all");
+  const [language, setLanguage] = useState<string>("all");
+  const [search, setSearch] = useState("");
+
+  const languages = useMemo(() => {
+    const map = new Map<string, { flag: string; label: string }>();
+    for (const p of products) {
+      if (!map.has(p.flag)) map.set(p.flag, { flag: p.flag, label: p.country });
+    }
+    return Array.from(map.values());
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return products.filter((p) => {
+      if (type === "digital" && p.isPhysical) return false;
+      if (type === "physical" && !p.isPhysical) return false;
+      if (language !== "all" && p.flag !== language) return false;
+      if (
+        q &&
+        !p.title.toLowerCase().includes(q) &&
+        !p.subtitle.toLowerCase().includes(q) &&
+        !p.description.toLowerCase().includes(q) &&
+        !p.country.toLowerCase().includes(q)
+      )
+        return false;
+      return true;
+    });
+  }, [type, language, search]);
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -42,11 +75,75 @@ const Products = () => {
         </div>
       </section>
 
+      {/* Filters */}
+      <section className="pt-8 pb-2">
+        <div className="container px-4 md:px-6 max-w-5xl mx-auto space-y-4">
+          <Tabs value={type} onValueChange={(v) => setType(v as typeof type)}>
+            <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
+              <TabsTrigger value="all">Todos</TabsTrigger>
+              <TabsTrigger value="digital">Digital</TabsTrigger>
+              <TabsTrigger value="physical">Físico</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar producto, idioma…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 -mx-1 px-1">
+              <button
+                type="button"
+                onClick={() => setLanguage("all")}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  language === "all"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-foreground border-border hover:bg-muted"
+                }`}
+              >
+                Todos los idiomas
+              </button>
+              {languages.map((l) => (
+                <button
+                  key={l.flag}
+                  type="button"
+                  onClick={() => setLanguage(l.flag)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors flex items-center gap-1.5 ${
+                    language === l.flag
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground border-border hover:bg-muted"
+                  }`}
+                  title={l.label}
+                >
+                  <span className="text-base">{l.flag}</span>
+                  <span className="hidden sm:inline">{l.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-sm text-muted-foreground text-center">
+            {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
+          </p>
+        </div>
+      </section>
+
       {/* Products Grid */}
-      <section className="py-20 md:py-28">
+      <section className="py-10 md:py-16">
         <div className="container px-4 md:px-6">
+          {filtered.length === 0 && (
+            <p className="text-center text-muted-foreground py-12">
+              No hay productos que coincidan con tu búsqueda.
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {products.map((product) => (
+            {filtered.map((product) => (
               <div
                 key={product.id}
                 className="group relative bg-card rounded-3xl border border-border shadow-card hover:shadow-hero transition-all duration-500 overflow-hidden"

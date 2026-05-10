@@ -667,8 +667,6 @@ const Product5000 = () => {
 
       <CustomerReviewsCarousel />
 
-      <LooxStyleReviews />
-
       <CompactBuyCard
         title="Inglés Relax 5,000"
         subtitle="Top-Rated Curso Digital con Pronunciación ES"
@@ -688,6 +686,9 @@ const Product5000 = () => {
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
+
+      <LooxStyleReviews />
+
       {/* FAQ Section */}
       <FAQ
         items={[

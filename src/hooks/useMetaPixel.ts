@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 declare global {
   interface Window {
@@ -20,6 +21,44 @@ const HOTMART_PIXEL_ID = "24959578143733255";
 // Generate unique event ID for deduplication
 const generateEventId = (): string => {
   return `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+};
+
+// Persistent session id (per browser) for funnel attribution
+const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
+const getSessionId = (): string => {
+  if (typeof window === "undefined") return "ssr";
+  try {
+    let sid = localStorage.getItem(FUNNEL_SESSION_KEY);
+    if (!sid) {
+      sid = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+      localStorage.setItem(FUNNEL_SESSION_KEY, sid);
+    }
+    return sid;
+  } catch {
+    return "anon";
+  }
+};
+
+const FUNNEL_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Purchase"]);
+
+const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
+  if (!FUNNEL_EVENTS.has(eventName)) return;
+  if (typeof window === "undefined") return;
+  try {
+    const productId = Array.isArray(params.content_ids) && params.content_ids.length
+      ? String((params.content_ids as unknown[])[0])
+      : (params.content_name ? String(params.content_name) : null);
+    void supabase.from("funnel_events").insert({
+      event_name: eventName,
+      product_id: productId,
+      value: typeof params.value === "number" ? params.value : null,
+      currency: typeof params.currency === "string" ? params.currency : null,
+      session_id: getSessionId(),
+      page_path: window.location.pathname,
+    });
+  } catch (e) {
+    console.error("funnel log error:", e);
+  }
 };
 
 // Initialize pixel ONCE globally
@@ -70,6 +109,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
+    logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
   }, [params.content_name]);
 };
 
@@ -82,6 +122,7 @@ export const trackHotmartEvent = (
     const eventId = generateEventId();
     window.fbq("track", eventName, { ...params, eventID: eventId });
   }
+  logFunnelEvent(eventName, params);
 };
 
 export const useHotmartPixelPageView = () => {

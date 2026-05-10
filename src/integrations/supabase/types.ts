@@ -104,6 +104,39 @@ export type Database = {
         }
         Relationships: []
       }
+      funnel_events: {
+        Row: {
+          created_at: string
+          currency: string | null
+          event_name: string
+          id: string
+          page_path: string | null
+          product_id: string | null
+          session_id: string | null
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          event_name: string
+          id?: string
+          page_path?: string | null
+          product_id?: string | null
+          session_id?: string | null
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          event_name?: string
+          id?: string
+          page_path?: string | null
+          product_id?: string | null
+          session_id?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       review_invitations: {
         Row: {
           created_at: string

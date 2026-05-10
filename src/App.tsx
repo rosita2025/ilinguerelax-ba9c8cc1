@@ -38,6 +38,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminReviews = lazy(() => import("./pages/AdminReviews"));
+const AdminFunnel = lazy(() => import("./pages/AdminFunnel"));
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
 
@@ -95,6 +96,7 @@ const App = () => (
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />
                   <Route path="/admin/reviews" element={<AdminReviews />} />
+                  <Route path="/admin/funnel" element={<AdminFunnel />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

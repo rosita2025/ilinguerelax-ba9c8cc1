@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { trackHotmartEvent } from '@/hooks/useMetaPixel';
 import { 
   CartItem, 
   DiscountCodeResult,
@@ -51,6 +52,19 @@ export const useCartStore = create<CartStore>()(
         const existingItem = items.find(i => i.variantId === item.variantId);
         
         set({ isLoading: true });
+        // Meta Pixel: AddToCart (centralizado para TODO el sitio)
+        try {
+          trackHotmartEvent('AddToCart', {
+            content_name: item.product?.node?.title,
+            content_ids: [item.variantId],
+            content_type: 'product',
+            value: parseFloat(item.price.amount) * item.quantity,
+            currency: item.price.currencyCode || 'USD',
+            num_items: item.quantity,
+          });
+        } catch (e) {
+          console.error('Pixel AddToCart error:', e);
+        }
         try {
           if (!cartId) {
             const result = await createShopifyCart({ ...item, lineId: null });

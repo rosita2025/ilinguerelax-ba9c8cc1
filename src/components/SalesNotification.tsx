@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Sale {
   name: string;
@@ -81,17 +82,53 @@ const SalesNotification = ({
   lang = "es",
   productKey,
 }: SalesNotificationProps) => {
-  // Optionally filter by product, then shuffle for variety
-  const [shuffledSales] = useState(() => {
+  const buildPool = (): Sale[] => {
     const pool = productKey
       ? allSales.filter((s) => s.productKey === productKey)
       : allSales;
     const list = pool.length > 0 ? pool : allSales;
     return [...list].sort(() => Math.random() - 0.5);
-  });
+  };
+
+  const [shuffledSales, setShuffledSales] = useState<Sale[]>(buildPool);
   const [currentSale, setCurrentSale] = useState<Sale>(shuffledSales[0]);
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
+
+  // For Spanish Relax, fetch REAL Shopify orders and replace the simulated pool
+  useEffect(() => {
+    if (productKey !== "spanish5000") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("shopify-spanish-sales", {
+          body: { lang },
+        });
+        if (cancelled || error) return;
+        const realSales = (data?.sales as any[] | undefined) ?? [];
+        if (realSales.length === 0) return;
+        const mapped: Sale[] = realSales.map((s) => ({
+          name: s.name,
+          country: s.country,
+          timeAgo: s.timeAgo,
+          timeAgoEn: s.timeAgo,
+          productName: s.productName,
+          productNameEn: s.productName,
+          productLabel: s.productLabel,
+          platform: "shopify",
+          productKey: "spanish5000",
+        }));
+        setShuffledSales(mapped);
+        setSaleIndex(0);
+        setCurrentSale(mapped[0]);
+      } catch (e) {
+        console.warn("Spanish sales fetch failed, using fallback", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [productKey, lang]);
 
   useEffect(() => {
     const initialTimeout = setTimeout(() => {

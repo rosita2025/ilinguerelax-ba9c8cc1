@@ -286,6 +286,23 @@ export const CartDrawer = () => {
             </div> :
           <>
               {/* Free shipping progress bar */}
+              {syncError && (
+                <div className="flex-shrink-0 mb-3 p-2.5 rounded-lg border-2 border-destructive/40 bg-destructive/5">
+                  <p className="text-xs font-bold text-destructive leading-tight">⚠️ {syncError}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
+                    Tus productos siguen guardados. No perderás el contenido del carrito.
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-2 h-7 text-xs"
+                    disabled={isSyncing || isLoading}
+                    onClick={() => retrySync()}
+                  >
+                    {isSyncing ? "Reintentando…" : "Reintentar sincronización"}
+                  </Button>
+                </div>
+              )}
               {(() => {
                 // Hide free shipping bar if cart only has digital products (no physical books)
                 const hasPhysical = items.some((item) =>

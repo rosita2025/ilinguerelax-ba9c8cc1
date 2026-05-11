@@ -485,16 +485,19 @@ export const CartDrawer = () => {
                 <Button
                 onClick={handleCheckout}
                 className="w-full shadow-lg hover:shadow-xl transition-shadow h-9 min-h-9 text-sm font-semibold"
+                aria-busy={isRedirecting}
+                aria-live="polite"
                 disabled={items.length === 0 || isRedirecting}>
                   {isRedirecting ?
                 <span className="flex items-center justify-center gap-2 leading-none">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden="true" />
+                  <span className="sr-only">Procesando, por favor espera. </span>
                   <span className="truncate">
                     {(isLoading || isSyncing) ? "Syncing cart…" : "Redirecting…"}
                   </span>
                 </span> :
                 <span className="flex items-center justify-center gap-1.5 leading-none">
-                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                       <span className="truncate">{(() => {
                         const hasPreorder = items.some((item) =>
                           isPhysicalPreorderItem(item.product.node.title)

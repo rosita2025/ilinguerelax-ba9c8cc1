@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useBundleStore } from "@/stores/bundleStore";
+import { useI18n } from "@/i18n/I18nContext";
 
 const UPSELL_COUPON = "upselldescuentos";
 
@@ -96,6 +97,7 @@ interface CartUpsellProps {
 }
 
 export const CartUpsell = ({ items }: CartUpsellProps) => {
+  const { formatPrice } = useI18n();
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
   const applyDiscount = useCartStore((s) => s.applyDiscount);

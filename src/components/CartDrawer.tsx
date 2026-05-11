@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
+import { useI18n } from "@/i18n/I18nContext";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.png";
 
 // Hotmart checkout URL mapping for digital products
@@ -55,6 +56,7 @@ const isPhysicalPreorderItem = (title: string) => {
 };
 
 export const CartDrawer = () => {
+  const { currency, formatPrice } = useI18n();
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
@@ -396,9 +398,14 @@ export const CartDrawer = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-xl font-bold">
-                      ${subtotalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
+                      {formatPrice(subtotalPrice)} {currency}
                     </span>
                   </div>
+                  {currency !== "USD" && (
+                    <p className="text-[10px] text-muted-foreground text-right">
+                      Approx. ${subtotalPrice.toFixed(2)} USD · charged in store currency at checkout
+                    </p>
+                  )}
                 </div>
                 {(() => {
                   const hasPhysical = items.some((item) =>

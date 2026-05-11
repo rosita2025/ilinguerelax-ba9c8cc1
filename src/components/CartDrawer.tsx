@@ -76,7 +76,10 @@ export const CartDrawer = () => {
     if (isDrawerOpen) syncCart();
   }, [isDrawerOpen, syncCart]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    // Prevent double-clicks but DON'T require sync to finish — redirect immediately
+    if (isRedirecting) return;
+    setIsRedirecting(true);
     // Meta Pixel: InitiateCheckout
     try {
       trackHotmartEvent("InitiateCheckout", {
@@ -116,15 +119,21 @@ export const CartDrawer = () => {
     // Check if any item has a Hotmart checkout URL
     const hotmartItem = items.find(item => HOTMART_CHECKOUT_MAP[item.variantId]);
     if (hotmartItem) {
-      setIsRedirecting(true);
       window.location.href = HOTMART_CHECKOUT_MAP[hotmartItem.variantId];
       return;
     }
-    // Fallback to Shopify checkout for physical products
-    const checkoutUrl = getCheckoutUrl();
+    // Fallback to Shopify checkout for physical products.
+    // If a sync is in progress, wait for it so we always have the freshest checkoutUrl.
+    let checkoutUrl = getCheckoutUrl();
+    if (!checkoutUrl || isSyncing) {
+      try { await syncCart(); } catch {}
+      checkoutUrl = getCheckoutUrl();
+    }
     if (checkoutUrl) {
-      setIsRedirecting(true);
       window.location.href = checkoutUrl;
+    } else {
+      setIsRedirecting(false);
+      toast.error("Checkout no disponible", { description: "Intenta de nuevo en unos segundos." });
     }
   };
 
@@ -433,11 +442,11 @@ export const CartDrawer = () => {
                 onClick={handleCheckout}
                 className="w-full shadow-lg hover:shadow-xl transition-shadow"
                 size="lg"
-                disabled={items.length === 0 || isLoading || isSyncing || isRedirecting}>
-                  {isLoading || isSyncing || isRedirecting ?
+                disabled={items.length === 0 || isRedirecting}>
+                  {isRedirecting ?
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  {isRedirecting ? "Redirecting to secure checkout…" : null}
+                  Redirecting to secure checkout…
                 </span> :
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />

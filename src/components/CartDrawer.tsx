@@ -33,10 +33,13 @@ const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compa
   },
 };
 
-// Helper: detect physical pre-order items by product title keywords
-const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
-const isPhysicalPreorderItem = (title: string) =>
-  PHYSICAL_KEYWORDS.some((kw) => title.includes(kw));
+// Helper: detect the 5,000 Spanish Relax physical pre-order book only
+const isPhysicalPreorderItem = (title: string) => {
+  const t = title.toLowerCase();
+  const isSpanish5000 = /5[\s,.]*000/.test(t) && t.includes("spanish");
+  const isDigital = t.includes("digital") || t.includes("ebook") || t.includes("e-book");
+  return isSpanish5000 && !isDigital;
+};
 
 export const CartDrawer = () => {
   const { 

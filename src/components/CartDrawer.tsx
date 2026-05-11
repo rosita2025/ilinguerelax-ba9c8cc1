@@ -452,21 +452,6 @@ export const CartDrawer = () => {
                     </>
                 }
                 </Button>
-                {/* Trust row — money-back + instant access */}
-                <div className="grid grid-cols-3 gap-1 pt-1">
-                  <div className="flex flex-col items-center text-center gap-0.5 px-1 py-1.5 rounded bg-muted/40 border border-border">
-                    <span className="text-base leading-none">🛡️</span>
-                    <span className="text-[9px] font-bold leading-tight">7-day money-back</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center gap-0.5 px-1 py-1.5 rounded bg-muted/40 border border-border">
-                    <span className="text-base leading-none">⚡</span>
-                    <span className="text-[9px] font-bold leading-tight">Instant PDF access</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center gap-0.5 px-1 py-1.5 rounded bg-muted/40 border border-border">
-                    <span className="text-base leading-none">🔒</span>
-                    <span className="text-[9px] font-bold leading-tight">SSL encrypted</span>
-                  </div>
-                </div>
                 <div className="flex flex-col items-center gap-1.5 pt-1.5">
                   <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide">
                     <span>🔒</span>

@@ -216,19 +216,18 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
           <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
         </div>
       )}
-      <div className="space-y-2">
+      <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">
         {activeUpsells
           .filter((product) => !items.some((item) => item.variantId === product.variantId))
           .map((product) => {
           const isProcessing = processingId === product.variantId;
-          const isInCart = false;
 
           return (
             <div
               key={product.variantId}
-              className={`flex items-center gap-3 p-2 border rounded-lg cursor-pointer transition-colors ${
-                isInCart ? "border-primary/50 bg-primary/5" : "border-border"
-              } ${isProcessing ? "opacity-60 pointer-events-none" : ""}`}
+              className={`snap-start shrink-0 w-[78%] sm:w-[55%] flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors border-border ${
+                isProcessing ? "opacity-60 pointer-events-none" : ""
+              }`}
               onClick={() => {
                 if (isProcessing) return;
                 handleToggle(product);
@@ -242,11 +241,10 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               <div className="flex-1 min-w-0">
                 {isSpanishContext && (
                   <span className="inline-flex items-center gap-0.5 text-[9px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
-                    <Download className="w-2.5 h-2.5" /> Digital PDF · Instant
+                    <Download className="w-2.5 h-2.5" /> Digital PDF
                   </span>
                 )}
                 <p className="text-xs font-medium truncate">{product.title}</p>
-                <p className="text-[10px] text-muted-foreground">{product.description}</p>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(product.compareAtPrice))}</span>
                   <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(product.price))}</span>
@@ -255,17 +253,9 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                   </span>
                 </div>
               </div>
-              <div
-                className={`h-7 w-7 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-colors ${
-                  isInCart
-                    ? "bg-primary border-primary text-primary-foreground"
-                    : "border-muted-foreground/30"
-                }`}
-              >
+              <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center transition-colors">
                 {isProcessing ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
-                ) : isInCart ? (
-                  <Check className="h-3.5 w-3.5" />
                 ) : (
                   <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
@@ -304,42 +294,43 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               <p className="text-[10px] text-muted-foreground leading-tight">
                 Pre-order physical books · prices go up in <strong>June 2026</strong>
               </p>
-              {visiblePreorders.map((preorder) => (
-                <div
-                  key={preorder.variantId}
-                  className={`flex items-center gap-3 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
-                    processingId === preorder.variantId ? "opacity-60 pointer-events-none" : ""
-                  }`}
-                  onClick={() => {
-                    if (processingId === preorder.variantId) return;
-                    handleToggle(preorder);
-                  }}
-                >
-                  <img
-                    src={preorder.image}
-                    alt={preorder.title}
-                    className="w-10 h-10 rounded object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
-                      <Package className="w-2.5 h-2.5" /> Physical · Pre-Order
-                    </span>
-                    <p className="text-xs font-medium truncate">{preorder.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{preorder.description}</p>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(preorder.compareAtPrice))}</span>
-                      <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(preorder.price))}</span>
+              <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">
+                {visiblePreorders.map((preorder) => (
+                  <div
+                    key={preorder.variantId}
+                    className={`snap-start shrink-0 w-[78%] sm:w-[55%] flex items-center gap-2.5 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
+                      processingId === preorder.variantId ? "opacity-60 pointer-events-none" : ""
+                    }`}
+                    onClick={() => {
+                      if (processingId === preorder.variantId) return;
+                      handleToggle(preorder);
+                    }}
+                  >
+                    <img
+                      src={preorder.image}
+                      alt={preorder.title}
+                      className="w-10 h-10 rounded object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
+                        <Package className="w-2.5 h-2.5" /> Physical · Pre-Order
+                      </span>
+                      <p className="text-xs font-medium truncate">{preorder.title}</p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(preorder.compareAtPrice))}</span>
+                        <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(preorder.price))}</span>
+                      </div>
+                    </div>
+                    <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">
+                      {processingId === preorder.variantId ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5 text-accent" />
+                      )}
                     </div>
                   </div>
-                  <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">
-                    {processingId === preorder.variantId ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Plus className="h-3.5 w-3.5 text-accent" />
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </>
         );

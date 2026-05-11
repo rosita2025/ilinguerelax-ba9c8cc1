@@ -440,7 +440,7 @@ export const CartDrawer = () => {
                 {/* Upsell for physical book buyers */}
                 <CartUpsell items={items} />
               </div>
-              <div className="flex-shrink-0 space-y-1 pt-1.5 px-2 -mx-2 border-t bg-muted/40">
+              <div className="flex-shrink-0 space-y-1 pt-1.5 px-2 -mx-2 border-t border-border/60 bg-foreground/[0.04] dark:bg-background/80">
                 {/* Coupon section - input hidden, only shows when discount already applied */}
                 {appliedDiscount && (
                   <div className="flex items-center justify-between p-1.5 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">

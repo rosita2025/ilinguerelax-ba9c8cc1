@@ -1,8 +1,8 @@
 import { Star, BadgeCheck } from "lucide-react";
 import customerBook2 from "@/assets/customer-book-2.webp";
-import englishBookPerson from "@/assets/product-5000-book-person.webp";
-import englishDigital from "@/assets/ebook-5000-mockup.webp";
-import spanishDigital from "@/assets/crady-reading-spanish-relax.webp";
+import inglesDigitalWhatsapp from "@/assets/review-ingles-digital-whatsapp.webp";
+import inglesFisico8000 from "@/assets/review-ingles-fisico-8000.jpg";
+import spanishDigitalPages from "@/assets/review-spanish-digital-pages.jpg";
 
 interface Review {
   name: string;
@@ -19,8 +19,8 @@ const reviews: Review[] = [
   {
     name: "María González",
     flag: "🇪🇸",
-    text: "Inglés Relax digital es justo lo que necesitaba. La pronunciación adaptada al español me ahorra muchísimo tiempo.",
-    image: englishDigital,
+    text: "Recibí mi Inglés Relax digital de 5,000 palabras al instante por WhatsApp con los 4 bonus gratis. Atención súper rápida.",
+    image: inglesDigitalWhatsapp,
     timeAgo: "hace 2 días",
     initials: "MG",
     product: "Inglés Relax · 5,000 Palabras",
@@ -29,18 +29,18 @@ const reviews: Review[] = [
   {
     name: "Carlos Méndez",
     flag: "🇲🇽",
-    text: "El libro físico de Inglés Relax tiene una calidad de impresión premium y la guía fonética UK/USA es clarísima.",
-    image: englishBookPerson,
+    text: "El libro físico de Inglés Relax 8,000 palabras tiene calidad premium. La fonética UK/USA y la traducción español-inglés son clarísimas.",
+    image: inglesFisico8000,
     timeAgo: "hace 5 días",
     initials: "CM",
-    product: "Inglés Relax · Libro Físico",
+    product: "Inglés Relax · Libro Físico 8,000",
     format: "Físico",
   },
   {
     name: "Emma Roberts",
     flag: "🇺🇸",
-    text: "Spanish Relax digital made learning Spanish stress-free. I read on my tablet every morning with coffee.",
-    image: spanishDigital,
+    text: "Spanish Relax digital is perfectly organized. The vocabulary tables with English pronunciation are exactly what I needed.",
+    image: spanishDigitalPages,
     timeAgo: "hace 3 días",
     initials: "ER",
     product: "Spanish Relax · 5,000 Words",

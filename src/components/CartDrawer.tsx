@@ -433,9 +433,12 @@ export const CartDrawer = () => {
                 onClick={handleCheckout}
                 className="w-full shadow-lg hover:shadow-xl transition-shadow"
                 size="lg"
-                disabled={items.length === 0 || isLoading || isSyncing}>
-                  {isLoading || isSyncing ?
-                <Loader2 className="w-4 h-4 animate-spin" /> :
+                disabled={items.length === 0 || isLoading || isSyncing || isRedirecting}>
+                  {isLoading || isSyncing || isRedirecting ?
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {isRedirecting ? "Redirecting to secure checkout…" : null}
+                </span> :
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
                       {(() => {

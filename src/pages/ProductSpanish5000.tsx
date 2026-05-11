@@ -678,6 +678,9 @@ const ProductSpanish5000 = () => {
       </section>
 
 
+      {/* Loox-style photo reviews from real customers — placed before FAQ + footer */}
+      <LooxStyleReviews />
+
       {/* Bundle FAQ — Physical + Digital FREE */}
       <FAQ items={[{
         question: "How does the \"Spanish Relax Physical Book + Digital FREE\" offer work?",

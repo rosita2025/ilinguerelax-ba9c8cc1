@@ -4,7 +4,7 @@ import { fr } from "./translations/fr";
 import { pt } from "./translations/pt";
 
 export type Language = "es" | "en" | "fr" | "pt";
-export type Currency = "USD" | "EUR" | "BRL" | "MXN" | "COP" | "ARS" | "GBP" | "CAD";
+export type Currency = "USD" | "EUR" | "BRL" | "MXN" | "COP" | "ARS" | "GBP" | "CAD" | "AUD";
 
 export const translations = {
   es,
@@ -139,6 +139,10 @@ const countryToCurrency: Record<string, Currency> = {
   
   // CAD
   CA: "CAD",
+
+  // AUD
+  AU: "AUD",
+  NZ: "AUD",
 };
 
 // Currency symbols and formatting
@@ -151,6 +155,7 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   ARS: { symbol: "$", position: "before", decimals: 0 },
   GBP: { symbol: "£", position: "before", decimals: 2 },
   CAD: { symbol: "$", position: "before", decimals: 2 },
+  AUD: { symbol: "A$", position: "before", decimals: 2 },
 };
 
 // Exchange rates from USD (approximate - would ideally fetch from API)
@@ -163,6 +168,7 @@ export const exchangeRates: Record<Currency, number> = {
   ARS: 850,
   GBP: 0.79,
   CAD: 1.36,
+  AUD: 1.52,
 };
 
 // Detect currency from country

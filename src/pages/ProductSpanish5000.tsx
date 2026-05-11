@@ -1,19 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { LooxStyleReviews } from "@/components/LooxStyleReviews";
-import { MeetTheAuthor } from "@/components/MeetTheAuthor";
-import { Top3ReviewsCarousel } from "@/components/Top3ReviewsCarousel";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
-import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -52,8 +47,15 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
-import { PdfFlipbook } from "@/components/PdfFlipbook";
-import { InfluencerVideoCarousel } from "@/components/InfluencerVideoCarousel";
+
+// Lazy-loaded below-the-fold components for faster initial load
+const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
+const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
+const MeetTheAuthor = lazy(() => import("@/components/MeetTheAuthor").then(m => ({ default: m.MeetTheAuthor })));
+const Top3ReviewsCarousel = lazy(() => import("@/components/Top3ReviewsCarousel").then(m => ({ default: m.Top3ReviewsCarousel })));
+const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
+const PdfFlipbook = lazy(() => import("@/components/PdfFlipbook").then(m => ({ default: m.PdfFlipbook })));
+const InfluencerVideoCarousel = lazy(() => import("@/components/InfluencerVideoCarousel").then(m => ({ default: m.InfluencerVideoCarousel })));
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
 // Store logos

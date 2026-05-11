@@ -369,6 +369,7 @@ const ProductSpanish5000 = () => {
 
               {/* Influencer video carousel — social proof */}
               <div className="mt-6 -mx-4 md:-mx-0">
+                <Suspense fallback={<div className="h-64" />}>
                 <InfluencerVideoCarousel
                   onCta={() => {
                     const el = document.querySelector('[data-bundle-selector]') as HTMLElement | null;
@@ -379,6 +380,7 @@ const ProductSpanish5000 = () => {
                     }
                   }}
                 />
+                </Suspense>
               </div>
 
             </div>
@@ -387,10 +389,14 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Top 3 reviews carousel — fills the gap before Meet the Author */}
-      <Top3ReviewsCarousel />
+      <Suspense fallback={<div className="h-32" />}>
+        <Top3ReviewsCarousel />
+      </Suspense>
 
       {/* Meet the Author — trust block */}
-      <MeetTheAuthor />
+      <Suspense fallback={<div className="h-32" />}>
+        <MeetTheAuthor />
+      </Suspense>
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">
@@ -685,9 +691,12 @@ const ProductSpanish5000 = () => {
 
 
       {/* Loox-style photo reviews from real customers — placed before FAQ + footer */}
-      <LooxStyleReviews />
+      <Suspense fallback={<div className="h-32" />}>
+        <LooxStyleReviews />
+      </Suspense>
 
       {/* Bundle FAQ — Physical + Digital FREE */}
+      <Suspense fallback={<div className="h-32" />}>
       <FAQ items={[{
         question: "How does the \"Spanish Relax Physical Book + Digital FREE\" offer work?",
         answer: "This is a PHYSICAL book purchase. When you buy the Spanish Relax physical book, you also receive the 5,000 Words digital PDF for FREE plus 3 FREE bonuses — all sent to your email instantly after checkout. There is no digital-only option: every order ships a real printed book.",
@@ -725,8 +734,11 @@ const ProductSpanish5000 = () => {
         answer: "No. To protect our content and guarantee the best experience, we only sell the PHYSICAL Spanish Relax book — the digital PDF and 3 bonuses are included FREE with every physical order.",
         icon: BookOpen,
       }]} title="Bundle & Shipping FAQ" subtitle="Spanish Relax physical book + digital FREE + 3 bonuses · FREE worldwide shipping when you order 2 or more books (24–72h dispatch, 7–15 days delivery)" />
+      </Suspense>
 
-      <Footer />
+      <Suspense fallback={<div className="h-32" />}>
+        <Footer />
+      </Suspense>
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="5,000 Words With English Pronunciation and includes grammatical structures" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible />

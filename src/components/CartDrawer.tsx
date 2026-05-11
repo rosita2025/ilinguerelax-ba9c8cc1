@@ -65,6 +65,7 @@ export const CartDrawer = () => {
   
   const [couponInput, setCouponInput] = useState("");
   const [isApplying, setIsApplying] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
@@ -115,14 +116,14 @@ export const CartDrawer = () => {
     // Check if any item has a Hotmart checkout URL
     const hotmartItem = items.find(item => HOTMART_CHECKOUT_MAP[item.variantId]);
     if (hotmartItem) {
-      setDrawerOpen(false);
+      setIsRedirecting(true);
       window.location.href = HOTMART_CHECKOUT_MAP[hotmartItem.variantId];
       return;
     }
     // Fallback to Shopify checkout for physical products
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
-      setDrawerOpen(false);
+      setIsRedirecting(true);
       window.location.href = checkoutUrl;
     }
   };
@@ -432,9 +433,12 @@ export const CartDrawer = () => {
                 onClick={handleCheckout}
                 className="w-full shadow-lg hover:shadow-xl transition-shadow"
                 size="lg"
-                disabled={items.length === 0 || isLoading || isSyncing}>
-                  {isLoading || isSyncing ?
-                <Loader2 className="w-4 h-4 animate-spin" /> :
+                disabled={items.length === 0 || isLoading || isSyncing || isRedirecting}>
+                  {isLoading || isSyncing || isRedirecting ?
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {isRedirecting ? "Redirecting to secure checkout…" : null}
+                </span> :
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
                       {(() => {

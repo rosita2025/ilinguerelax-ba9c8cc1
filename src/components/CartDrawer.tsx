@@ -202,7 +202,7 @@ export const CartDrawer = () => {
                   <div className="flex-shrink-0 mb-3">
                     {remaining > 0 ? (
                       <p className="text-xs text-muted-foreground mb-1.5">
-                        🚚 You're <span className="font-bold text-foreground">${remaining.toFixed(2)}</span> away from FREE shipping!
+                        🚚 You're <span className="font-bold text-foreground">{formatPrice(remaining)}</span> away from FREE shipping!
                       </p>
                     ) : (
                       <p className="text-xs font-semibold text-green-600 mb-1.5">
@@ -292,11 +292,11 @@ export const CartDrawer = () => {
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {compareNum && (
                                   <span className="text-[10px] line-through text-destructive font-medium">
-                                    ${compareNum.toFixed(2)}
+                                    {formatPrice(compareNum)}
                                   </span>
                                 )}
                                 <span className="text-xs font-bold text-primary">
-                                  ${price.toFixed(2)}
+                                  {formatPrice(price)}
                                 </span>
                                 {discountPct && (
                                   <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">

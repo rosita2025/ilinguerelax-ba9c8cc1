@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CartItem } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useBundleStore } from "@/stores/bundleStore";
+import { useI18n } from "@/i18n/I18nContext";
 
 const UPSELL_COUPON = "upselldescuentos";
 
@@ -96,6 +97,7 @@ interface CartUpsellProps {
 }
 
 export const CartUpsell = ({ items }: CartUpsellProps) => {
+  const { formatPrice } = useI18n();
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
   const applyDiscount = useCartStore((s) => s.applyDiscount);
@@ -246,8 +248,8 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 <p className="text-xs font-medium truncate">{product.title}</p>
                 <p className="text-[10px] text-muted-foreground">{product.description}</p>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] line-through text-destructive font-medium">${product.compareAtPrice}</span>
-                  <span className="text-xs font-bold text-primary">${product.price}</span>
+                  <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(product.compareAtPrice))}</span>
+                  <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(product.price))}</span>
                   <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">
                     {isSpanishContext ? "-57%" : "-30%"}
                   </span>
@@ -296,7 +298,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
               ) : (
                 <p className="text-xs font-bold text-accent flex items-center gap-1">
                   <Truck className="w-3 h-3" />
-                  Add ${remaining.toFixed(2)} more for FREE shipping (over $44)
+                  Add {formatPrice(remaining)} more for FREE shipping (over {formatPrice(44)})
                 </p>
               )}
               <p className="text-[10px] text-muted-foreground leading-tight">
@@ -325,8 +327,8 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                     <p className="text-xs font-medium truncate">{preorder.title}</p>
                     <p className="text-[10px] text-muted-foreground">{preorder.description}</p>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] line-through text-destructive font-medium">${preorder.compareAtPrice}</span>
-                      <span className="text-xs font-bold text-primary">${preorder.price}</span>
+                      <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(preorder.compareAtPrice))}</span>
+                      <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(preorder.price))}</span>
                     </div>
                   </div>
                   <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">

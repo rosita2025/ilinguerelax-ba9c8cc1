@@ -484,15 +484,18 @@ export const CartDrawer = () => {
                 })()}
                 <Button
                 onClick={handleCheckout}
-                className="w-full shadow-lg hover:shadow-xl transition-all h-11 min-h-11 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground ring-2 ring-primary/40 ring-offset-2 ring-offset-background animate-[pulse_1.6s_ease-in-out_infinite] hover:animate-none hover:scale-[1.02] motion-reduce:animate-none focus-visible:animate-none aria-busy:animate-none"
+                className="w-full transition-all h-11 min-h-11 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-[0_8px_24px_-6px_hsl(var(--primary)/0.55)] hover:shadow-[0_12px_28px_-6px_hsl(var(--primary)/0.7)] hover:scale-[1.02] focus-visible:ring-primary aria-busy:opacity-90 aria-busy:cursor-progress"
                 aria-busy={isRedirecting}
-                aria-live="polite"
+                aria-label={
+                  isRedirecting
+                    ? ((isLoading || isSyncing) ? "Sincronizando carrito, por favor espera" : "Redirigiendo al checkout seguro, por favor espera")
+                    : undefined
+                }
                 disabled={items.length === 0 || isRedirecting}>
                   {isRedirecting ?
-                <span className="flex items-center justify-center gap-2 leading-none">
+                <span className="flex items-center justify-center gap-2 leading-none" role="status" aria-live="polite">
                   <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden="true" />
-                  <span className="sr-only">Procesando, por favor espera. </span>
-                  <span className="truncate">
+                  <span className="truncate" aria-hidden="true">
                     {(isLoading || isSyncing) ? "Syncing cart…" : "Redirecting…"}
                   </span>
                 </span> :

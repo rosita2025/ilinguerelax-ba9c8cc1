@@ -440,7 +440,7 @@ export const CartDrawer = () => {
                 {/* Upsell for physical book buyers */}
                 <CartUpsell items={items} />
               </div>
-              <div className="flex-shrink-0 space-y-1.5 pt-2 border-t bg-background">
+              <div className="flex-shrink-0 space-y-1 pt-1.5 border-t bg-background">
                 {/* Coupon section - input hidden, only shows when discount already applied */}
                 {appliedDiscount && (
                   <div className="flex items-center justify-between p-1.5 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
@@ -457,54 +457,42 @@ export const CartDrawer = () => {
                 )}
 
                 {(() => {
-                  // Compute total savings from compareAt prices
                   let savings = 0;
                   items.forEach((item) => {
                     const display = CART_ITEM_DISPLAY[item.variantId];
                     const compareAt = display?.compareAt ? parseFloat(display.compareAt) : null;
                     const price = parseFloat(item.price.amount);
-                    if (compareAt && compareAt > price) {
-                      savings += (compareAt - price) * item.quantity;
-                    }
+                    if (compareAt && compareAt > price) savings += (compareAt - price) * item.quantity;
                   });
-                  if (savings <= 0) return null;
                   const compareTotal = subtotalPrice + savings;
-                  const pct = Math.round((savings / compareTotal) * 100);
+                  const pct = savings > 0 ? Math.round((savings / compareTotal) * 100) : 0;
                   return (
-                    <div className="flex items-center justify-between text-[10px] font-bold bg-destructive/10 text-destructive px-2 py-0.5 rounded">
-                      <span>🎉 You're saving</span>
-                      <span>{formatPrice(savings)} · -{pct}%</span>
+                    <div className="flex justify-between items-baseline gap-2">
+                      <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span className="text-sm font-semibold">Total</span>
+                        {savings > 0 && (
+                          <span className="text-[9px] font-bold bg-destructive/10 text-destructive px-1 py-px rounded shrink-0">
+                            -{pct}%
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-lg font-bold leading-none">
+                        {formatPrice(subtotalPrice)} {currency}
+                      </span>
                     </div>
-                  );
-                })()}
-                <div className="flex justify-between items-baseline">
-                  <span className="text-sm font-semibold">Total</span>
-                  <span className="text-lg font-bold leading-none">
-                    {formatPrice(subtotalPrice)} {currency}
-                  </span>
-                </div>
-                {(() => {
-                  const hasPhysical = items.some((item) =>
-                    isPhysicalItem(item.product.node.title)
-                  );
-                  if (!hasPhysical) return null;
-                  return (
-                    <p className="text-[10px] text-muted-foreground leading-tight">
-                      Shipping 8–13 days · taxes calculated at checkout
-                    </p>
                   );
                 })()}
                 <Button
                 onClick={handleCheckout}
-                className="w-full shadow-lg hover:shadow-xl transition-shadow h-10"
+                className="w-full shadow-lg hover:shadow-xl transition-shadow h-9"
                 disabled={items.length === 0 || isRedirecting}>
                   {isRedirecting ?
                 <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   {(isLoading || isSyncing) ? "Syncing cart…" : "Redirecting to secure checkout…"}
                 </span> :
                 <>
-                      <ExternalLink className="w-4 h-4 mr-2" />
+                      <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                       {(() => {
                         const hasPreorder = items.some((item) =>
                           isPhysicalPreorderItem(item.product.node.title)
@@ -514,7 +502,7 @@ export const CartDrawer = () => {
                     </>
                 }
                 </Button>
-                <div className="flex items-center justify-center gap-1.5 flex-nowrap max-w-full overflow-hidden">
+                <div className="flex items-center justify-center gap-1 flex-nowrap max-w-full overflow-hidden">
                   <span className="text-[9px] text-muted-foreground shrink-0">🔒</span>
                     {[
                       { label: "Visa", bg: "bg-[#1a1f71]", color: "text-white" },
@@ -527,7 +515,7 @@ export const CartDrawer = () => {
                     ].map((m) => (
                       <span
                         key={m.label}
-                        className={`${m.bg} ${m.color} text-[7px] sm:text-[9px] font-bold px-1 py-0.5 rounded leading-none shadow-sm whitespace-nowrap shrink-0`}
+                        className={`${m.bg} ${m.color} text-[6px] sm:text-[8px] font-bold px-1 py-px rounded leading-none shadow-sm whitespace-nowrap shrink-0`}
                       >
                         {m.label}
                       </span>

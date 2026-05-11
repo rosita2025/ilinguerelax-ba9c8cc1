@@ -123,11 +123,22 @@ export const CartDrawer = () => {
       return;
     }
     // Fallback to Shopify checkout for physical products.
-    // If a sync is in progress, wait for it so we always have the freshest checkoutUrl.
-    let checkoutUrl = getCheckoutUrl();
-    if (!checkoutUrl || isSyncing) {
+    // Wait for any pending cart mutations (add/remove upsell) to finish so the
+    // Shopify checkout reflects the latest line items, then redirect.
+    const waitForCartSettled = async () => {
+      const start = Date.now();
+      // Poll the live store for up to 6s while loading or syncing
+      while (Date.now() - start < 6000) {
+        const st = useCartStore.getState();
+        if (!st.isLoading && !st.isSyncing) break;
+        await new Promise((r) => setTimeout(r, 120));
+      }
+    };
+    await waitForCartSettled();
+    let checkoutUrl = useCartStore.getState().getCheckoutUrl();
+    if (!checkoutUrl) {
       try { await syncCart(); } catch {}
-      checkoutUrl = getCheckoutUrl();
+      checkoutUrl = useCartStore.getState().getCheckoutUrl();
     }
     if (checkoutUrl) {
       window.location.href = checkoutUrl;

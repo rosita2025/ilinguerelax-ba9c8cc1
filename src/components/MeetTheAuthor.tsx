@@ -1,5 +1,6 @@
 import { BadgeCheck, BookOpen, GraduationCap, Globe, Sparkles } from "lucide-react";
 import authorPhoto from "@/assets/loox-review-7.png";
+import readingPhoto from "@/assets/crady-reading-spanish-relax.webp";
 
 export const MeetTheAuthor = () => {
   return (
@@ -68,6 +69,17 @@ export const MeetTheAuthor = () => {
                 "If a method makes you feel relaxed, you'll keep going. That's how real fluency is
                 built." — Crady
               </blockquote>
+
+              {/* Lifestyle photo — reading the Spanish Relax book */}
+              <div className="mt-5 rounded-2xl overflow-hidden border border-border shadow-sm">
+                <img
+                  src={readingPhoto}
+                  alt="Reader enjoying the Spanish Relax book in a calm environment"
+                  className="w-full h-auto object-cover aspect-[16/10]"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
             </div>
           </div>
         </div>

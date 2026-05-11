@@ -366,7 +366,7 @@ export const CartDrawer = () => {
                   if (!hasPhysical) return null;
                   return (
                     <p className="text-[10px] text-muted-foreground leading-snug">
-                      Print on demand 5-10 days + Express shipping 3 days = total delivery <strong className="text-foreground">8-13 days</strong>.
+                      International express delivery: <strong className="text-foreground">8-13 days</strong>.
                     </p>
                   );
                 })()}

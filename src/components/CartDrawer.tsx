@@ -178,6 +178,23 @@ export const CartDrawer = () => {
           <SheetDescription>
             {totalItems === 0 ? "Your cart is empty" : `${totalItems} item${totalItems !== 1 ? 's' : ''} in your cart`}
           </SheetDescription>
+          {totalItems > 0 && (() => {
+            const miniReviews = [
+              { name: "María G.", text: "Thank you, Spanish Relax is the best!!" },
+              { name: "Lucas P.", text: "Amazing book, highly recommend 🙌" },
+              { name: "Sophie R.", text: "Loved it! Best Spanish resource ever." },
+              { name: "Daniel M.", text: "Spanish Relax changed my learning ❤️" },
+            ];
+            const r = miniReviews[Math.floor(Date.now() / 5000) % miniReviews.length];
+            return (
+              <div className="mt-2 flex items-center gap-2 px-2 py-1.5 bg-accent/10 border border-accent/20 rounded-md">
+                <span className="text-xs text-amber-500 leading-none">★★★★★</span>
+                <p className="text-[11px] text-muted-foreground leading-tight truncate">
+                  <span className="font-semibold text-foreground">{r.name}:</span> "{r.text}"
+                </p>
+              </div>
+            );
+          })()}
         </SheetHeader>
         <div className="flex flex-col flex-1 pt-6 min-h-0">
           {items.length === 0 ?

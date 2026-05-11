@@ -25,12 +25,23 @@ Deno.serve(async (req) => {
 
   try {
     // Prefer dedicated orders token (Custom App with read_orders scope)
-    // Try tokens in order; some may be invalid/expired
+    // Extract raw token from a value that may be a raw string OR a JSON blob like {"access_token":"..."}
+    const extract = (v: string | undefined): string | null => {
+      if (!v) return null;
+      const t = v.trim();
+      if (t.startsWith("{")) {
+        try {
+          const j = JSON.parse(t);
+          return j.access_token || j.token || j.accessToken || null;
+        } catch { return null; }
+      }
+      return t;
+    };
     const candidates = [
-      Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2"),
-      Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN"),
-      Deno.env.get("SHOPIFY_ACCESS_TOKEN"),
-      Deno.env.get("SHOPIFY_ORDERS_TOKEN"),
+      extract(Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2")),
+      extract(Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN")),
+      extract(Deno.env.get("SHOPIFY_ACCESS_TOKEN")),
+      extract(Deno.env.get("SHOPIFY_ORDERS_TOKEN")),
     ].filter(Boolean) as string[];
     let token = candidates[0];
     if (!token) {

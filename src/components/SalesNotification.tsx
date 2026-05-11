@@ -95,9 +95,47 @@ const SalesNotification = ({
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
 
-  // Note: Real Shopify order fetching disabled. The connected Shopify app does
-  // not have `read_orders` scope and the new Shopify UI no longer exposes
-  // Admin API tokens easily. Sales notifications use the simulated pool.
+  // For Spanish 5000, read REAL Shopify sales captured via webhook
+  useEffect(() => {
+    if (productKey !== "spanish5000") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("shopify_sales")
+          .select("customer_name,country,order_created_at,product_name")
+          .eq("product_key", "spanish5000")
+          .order("order_created_at", { ascending: false })
+          .limit(20);
+        if (cancelled || error || !data || data.length === 0) return;
+        const fmt = (iso: string) => {
+          const mins = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+          if (mins < 60) return lang === "en" ? `${mins} min ago` : `hace ${mins} min`;
+          const h = Math.floor(mins / 60);
+          if (h < 24) return lang === "en" ? `${h}h ago` : `hace ${h} h`;
+          const d = Math.floor(h / 24);
+          return lang === "en" ? `${d}d ago` : `hace ${d} d`;
+        };
+        const mapped: Sale[] = data.map((s: any) => ({
+          name: s.customer_name,
+          country: s.country ?? "United States",
+          timeAgo: fmt(s.order_created_at),
+          timeAgoEn: fmt(s.order_created_at),
+          productName: lang === "en" ? "5,000 Spanish Words" : "5,000 Palabras en Español",
+          productNameEn: "5,000 Spanish Words",
+          productLabel: "🇪🇸 5K",
+          platform: "shopify",
+          productKey: "spanish5000",
+        }));
+        setShuffledSales(mapped);
+        setSaleIndex(0);
+        setCurrentSale(mapped[0]);
+      } catch (e) {
+        console.warn("shopify_sales fetch failed, using fallback", e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [productKey, lang]);
 
   useEffect(() => {
     const initialTimeout = setTimeout(() => {

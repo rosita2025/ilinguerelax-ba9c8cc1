@@ -60,7 +60,7 @@ export const CartDrawer = () => {
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
-    applyDiscount, removeDiscount
+    applyDiscount, removeDiscount, syncError, retrySync
   } = useCartStore();
   
   const [couponInput, setCouponInput] = useState("");

@@ -50,8 +50,22 @@ export const useCartStore = create<CartStore>()(
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
         const existingItem = items.find(i => i.variantId === item.variantId);
-        
-        set({ isLoading: true });
+
+        // OPTIMISTIC UPDATE: show item in cart immediately for snappy UX
+        if (existingItem) {
+          set({
+            items: items.map(i => i.variantId === item.variantId
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i),
+            isLoading: true,
+          });
+        } else {
+          set({
+            items: [...items, { ...item, lineId: null }],
+            isLoading: true,
+          });
+        }
+
         // Meta Pixel: AddToCart (centralizado para TODO el sitio)
         try {
           trackHotmartEvent('AddToCart', {
@@ -72,7 +86,9 @@ export const useCartStore = create<CartStore>()(
               set({
                 cartId: result.cartId,
                 checkoutUrl: result.checkoutUrl,
-                items: [{ ...item, lineId: result.lineId }]
+                items: get().items.map(i => i.variantId === item.variantId
+                  ? { ...i, lineId: result.lineId }
+                  : i),
               });
             }
           } else if (existingItem) {
@@ -82,17 +98,16 @@ export const useCartStore = create<CartStore>()(
               return;
             }
             const result = await updateShopifyCartLine(cartId, existingItem.lineId, newQuantity);
-            if (result.success) {
-              const currentItems = get().items;
-              set({ items: currentItems.map(i => i.variantId === item.variantId ? { ...i, quantity: newQuantity } : i) });
-            } else if (result.cartNotFound) {
+            if (result.cartNotFound) {
               clearCart();
             }
           } else {
             const result = await addLineToShopifyCart(cartId, { ...item, lineId: null });
             if (result.success) {
               const currentItems = get().items;
-              set({ items: [...currentItems, { ...item, lineId: result.lineId ?? null }] });
+              set({ items: currentItems.map(i => i.variantId === item.variantId
+                ? { ...i, lineId: result.lineId ?? null }
+                : i) });
             } else if (result.cartNotFound) {
               clearCart();
             }

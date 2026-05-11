@@ -452,6 +452,22 @@ export const CartDrawer = () => {
                       </span>
                     ))}
                   </div>
+                  <div className="flex items-center justify-center gap-1.5 flex-wrap pt-0.5">
+                    {[
+                      { code: "USD", symbol: "$" },
+                      { code: "EUR", symbol: "€" },
+                      { code: "GBP", symbol: "£" },
+                      { code: "AUD", symbol: "A$" },
+                    ].map((c) => (
+                      <span
+                        key={c.code}
+                        className="flex items-center gap-0.5 text-[9px] sm:text-[10px] font-semibold text-muted-foreground bg-muted/50 border border-border px-1.5 py-0.5 rounded leading-none"
+                      >
+                        <span className="text-foreground">{c.symbol}</span>
+                        <span>{c.code}</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </>

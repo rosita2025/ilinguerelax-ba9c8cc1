@@ -25,10 +25,25 @@ Deno.serve(async (req) => {
 
   try {
     // Prefer dedicated orders token (Custom App with read_orders scope)
-    let token = Deno.env.get("SHOPIFY_ORDERS_TOKEN") ||
-                Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2") ||
-                Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN") ||
-                Deno.env.get("SHOPIFY_ACCESS_TOKEN");
+    // Extract raw token from a value that may be a raw string OR a JSON blob like {"access_token":"..."}
+    const extract = (v: string | undefined): string | null => {
+      if (!v) return null;
+      const t = v.trim();
+      if (t.startsWith("{")) {
+        try {
+          const j = JSON.parse(t);
+          return j.access_token || j.token || j.accessToken || null;
+        } catch { return null; }
+      }
+      return t;
+    };
+    const candidates = [
+      extract(Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2")),
+      extract(Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN")),
+      extract(Deno.env.get("SHOPIFY_ACCESS_TOKEN")),
+      extract(Deno.env.get("SHOPIFY_ORDERS_TOKEN")),
+    ].filter(Boolean) as string[];
+    let token = candidates[0];
     if (!token) {
       return new Response(JSON.stringify({ sales: [], error: "missing_token" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -40,21 +55,26 @@ Deno.serve(async (req) => {
     const lang = (url.searchParams.get("lang") === "en" ? "en" : "es") as "es" | "en";
 
     const ordersUrl = `https://${SHOP_DOMAIN}/admin/api/${API_VERSION}/orders.json?status=any&financial_status=paid&limit=50&fields=id,name,created_at,line_items,customer,shipping_address,billing_address`;
-    const res = await fetch(ordersUrl, {
-      headers: {
-        "X-Shopify-Access-Token": token,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      const body = await res.text();
-      console.error("Shopify orders fetch failed", res.status, body);
-      return new Response(JSON.stringify({ sales: [], error: `shopify_${res.status}` }), {
+    let res: Response | null = null;
+    let lastStatus = 0;
+    let lastBody = "";
+    let usedTokenPrefix = "";
+    for (const t of candidates) {
+      res = await fetch(ordersUrl, {
+        headers: { "X-Shopify-Access-Token": t, "Content-Type": "application/json" },
+      });
+      if (res.ok) { token = t; usedTokenPrefix = t.slice(0, 8); break; }
+      lastStatus = res.status;
+      lastBody = await res.text();
+      console.error("Shopify token failed", res.status, t.slice(0, 8), lastBody.slice(0, 200));
+    }
+    if (!res || !res.ok) {
+      return new Response(JSON.stringify({ sales: [], error: `shopify_${lastStatus}`, tried: candidates.map(c => c.slice(0,8)) }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
+    console.log("Using Shopify token prefix:", usedTokenPrefix);
 
     const data = await res.json();
     const orders = Array.isArray(data?.orders) ? data.orders : [];

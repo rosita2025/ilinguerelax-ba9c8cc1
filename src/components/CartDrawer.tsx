@@ -398,9 +398,14 @@ export const CartDrawer = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-xl font-bold">
-                      ${subtotalPrice.toFixed(2)} {items[0]?.price.currencyCode || 'USD'}
+                      {formatPrice(subtotalPrice)} {currency}
                     </span>
                   </div>
+                  {currency !== "USD" && (
+                    <p className="text-[10px] text-muted-foreground text-right">
+                      Approx. ${subtotalPrice.toFixed(2)} USD · charged in store currency at checkout
+                    </p>
+                  )}
                 </div>
                 {(() => {
                   const hasPhysical = items.some((item) =>

@@ -12,6 +12,30 @@ import {
   applyDiscountToShopifyCart
 } from '@/lib/shopify';
 
+// Retry with exponential backoff for transient Shopify slowness/failures.
+// Resolves to null if all attempts fail or return falsy.
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  options: { retries?: number; baseDelayMs?: number; maxDelayMs?: number; isSuccess?: (r: T) => boolean } = {}
+): Promise<T | null> {
+  const { retries = 3, baseDelayMs = 250, maxDelayMs = 1500, isSuccess = (r) => !!r } = options;
+  let lastResult: T | null = null;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const result = await fn();
+      if (isSuccess(result)) return result;
+      lastResult = result;
+    } catch (err) {
+      console.warn(`[cart] Shopify call failed (attempt ${attempt + 1}/${retries + 1}):`, err);
+    }
+    if (attempt < retries) {
+      const delay = Math.min(baseDelayMs * Math.pow(2, attempt), maxDelayMs);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  return lastResult;
+}
+
 interface CartStore {
   items: CartItem[];
   cartId: string | null;
@@ -81,7 +105,10 @@ export const useCartStore = create<CartStore>()(
         }
         try {
           if (!cartId) {
-            const result = await createShopifyCart({ ...item, lineId: null });
+            const result = await retryWithBackoff(
+              () => createShopifyCart({ ...item, lineId: null }),
+              { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r?.cartId && !!r?.lineId }
+            );
             if (result) {
               set({
                 cartId: result.cartId,
@@ -97,18 +124,24 @@ export const useCartStore = create<CartStore>()(
               console.error('Cannot update quantity for item without lineId:', existingItem);
               return;
             }
-            const result = await updateShopifyCartLine(cartId, existingItem.lineId, newQuantity);
-            if (result.cartNotFound) {
+            const result = await retryWithBackoff(
+              () => updateShopifyCartLine(cartId, existingItem.lineId!, newQuantity),
+              { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r && (r.success || !!r.cartNotFound) }
+            );
+            if (result?.cartNotFound) {
               clearCart();
             }
           } else {
-            const result = await addLineToShopifyCart(cartId, { ...item, lineId: null });
-            if (result.success) {
+            const result = await retryWithBackoff(
+              () => addLineToShopifyCart(cartId, { ...item, lineId: null }),
+              { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r && (r.success || !!r.cartNotFound) }
+            );
+            if (result?.success) {
               const currentItems = get().items;
               set({ items: currentItems.map(i => i.variantId === item.variantId
                 ? { ...i, lineId: result.lineId ?? null }
                 : i) });
-            } else if (result.cartNotFound) {
+            } else if (result?.cartNotFound) {
               clearCart();
             }
           }

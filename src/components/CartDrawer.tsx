@@ -484,22 +484,24 @@ export const CartDrawer = () => {
                 })()}
                 <Button
                 onClick={handleCheckout}
-                className="w-full shadow-lg hover:shadow-xl transition-shadow h-9"
+                className="w-full shadow-lg hover:shadow-xl transition-shadow h-9 min-h-9 text-sm font-semibold"
                 disabled={items.length === 0 || isRedirecting}>
                   {isRedirecting ?
-                <span className="flex items-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  {(isLoading || isSyncing) ? "Syncing cart…" : "Redirecting to secure checkout…"}
+                <span className="flex items-center justify-center gap-2 leading-none">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                  <span className="truncate">
+                    {(isLoading || isSyncing) ? "Syncing cart…" : "Redirecting…"}
+                  </span>
                 </span> :
-                <>
-                      <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                      {(() => {
+                <span className="flex items-center justify-center gap-1.5 leading-none">
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{(() => {
                         const hasPreorder = items.some((item) =>
                           isPhysicalPreorderItem(item.product.node.title)
                         );
                         return hasPreorder ? "Reserve pre-order now" : "Checkout securely";
-                      })()}
-                    </>
+                      })()}</span>
+                    </span>
                 }
                 </Button>
                 <div className="flex items-center justify-center gap-1 flex-nowrap max-w-full overflow-hidden">

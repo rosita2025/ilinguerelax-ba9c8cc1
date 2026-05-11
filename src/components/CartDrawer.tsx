@@ -394,6 +394,27 @@ export const CartDrawer = () => {
                   );
                 })()}
                 <div className="h-px bg-border" />
+                {(() => {
+                  // Compute total savings from compareAt prices
+                  let savings = 0;
+                  items.forEach((item) => {
+                    const display = CART_ITEM_DISPLAY[item.variantId];
+                    const compareAt = display?.compareAt ? parseFloat(display.compareAt) : null;
+                    const price = parseFloat(item.price.amount);
+                    if (compareAt && compareAt > price) {
+                      savings += (compareAt - price) * item.quantity;
+                    }
+                  });
+                  if (savings <= 0) return null;
+                  const compareTotal = subtotalPrice + savings;
+                  const pct = Math.round((savings / compareTotal) * 100);
+                  return (
+                    <div className="flex items-center justify-between text-[11px] font-bold bg-destructive/10 text-destructive px-2 py-1 rounded">
+                      <span>🎉 You're saving</span>
+                      <span>{formatPrice(savings)} · -{pct}%</span>
+                    </div>
+                  );
+                })()}
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
@@ -415,7 +436,7 @@ export const CartDrawer = () => {
                 })()}
                 <Button
                 onClick={handleCheckout}
-                className="w-full"
+                className="w-full shadow-lg hover:shadow-xl transition-shadow"
                 size="lg"
                 disabled={items.length === 0 || isLoading || isSyncing}>
                   {isLoading || isSyncing ?
@@ -431,6 +452,21 @@ export const CartDrawer = () => {
                     </>
                 }
                 </Button>
+                {/* Trust row — money-back + instant access */}
+                <div className="grid grid-cols-3 gap-1 pt-1">
+                  <div className="flex flex-col items-center text-center gap-0.5 px-1 py-1.5 rounded bg-muted/40 border border-border">
+                    <span className="text-base leading-none">🛡️</span>
+                    <span className="text-[9px] font-bold leading-tight">7-day money-back</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center gap-0.5 px-1 py-1.5 rounded bg-muted/40 border border-border">
+                    <span className="text-base leading-none">⚡</span>
+                    <span className="text-[9px] font-bold leading-tight">Instant PDF access</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center gap-0.5 px-1 py-1.5 rounded bg-muted/40 border border-border">
+                    <span className="text-base leading-none">🔒</span>
+                    <span className="text-[9px] font-bold leading-tight">SSL encrypted</span>
+                  </div>
+                </div>
                 <div className="flex flex-col items-center gap-1.5 pt-1.5">
                   <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide">
                     <span>🔒</span>

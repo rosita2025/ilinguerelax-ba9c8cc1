@@ -440,34 +440,22 @@ export const CartDrawer = () => {
                 {/* Upsell for physical book buyers */}
                 <CartUpsell items={items} />
               </div>
-              <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
+              <div className="flex-shrink-0 space-y-1.5 pt-2 border-t bg-background">
                 {/* Coupon section - input hidden, only shows when discount already applied */}
                 {appliedDiscount && (
-                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center justify-between p-1.5 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                      <Check className="h-3 w-3 text-green-600" />
+                      <span className="text-xs font-medium text-green-700 dark:text-green-400">
                         {appliedDiscount.code} — applied at checkout
                       </span>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRemoveCoupon} disabled={isLoading}>
+                    <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleRemoveCoupon} disabled={isLoading}>
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                 )}
 
-                {(() => {
-                  const hasPhysical = items.some((item) =>
-                    isPhysicalItem(item.product.node.title)
-                  );
-                  if (!hasPhysical) return null;
-                  return (
-                    <p className="text-[10px] text-muted-foreground leading-snug">
-                      International express delivery: <strong className="text-foreground">8-13 days</strong>.
-                    </p>
-                  );
-                })()}
-                <div className="h-px bg-border" />
                 {(() => {
                   // Compute total savings from compareAt prices
                   let savings = 0;
@@ -483,19 +471,17 @@ export const CartDrawer = () => {
                   const compareTotal = subtotalPrice + savings;
                   const pct = Math.round((savings / compareTotal) * 100);
                   return (
-                    <div className="flex items-center justify-between text-[11px] font-bold bg-destructive/10 text-destructive px-2 py-1 rounded">
+                    <div className="flex items-center justify-between text-[10px] font-bold bg-destructive/10 text-destructive px-2 py-0.5 rounded">
                       <span>🎉 You're saving</span>
                       <span>{formatPrice(savings)} · -{pct}%</span>
                     </div>
                   );
                 })()}
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold">Total</span>
-                    <span className="text-xl font-bold">
-                      {formatPrice(subtotalPrice)} {currency}
-                    </span>
-                  </div>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm font-semibold">Total</span>
+                  <span className="text-lg font-bold leading-none">
+                    {formatPrice(subtotalPrice)} {currency}
+                  </span>
                 </div>
                 {(() => {
                   const hasPhysical = items.some((item) =>
@@ -503,15 +489,14 @@ export const CartDrawer = () => {
                   );
                   if (!hasPhysical) return null;
                   return (
-                    <p className="text-xs text-muted-foreground">
-                      Taxes and shipping calculated at checkout.
+                    <p className="text-[10px] text-muted-foreground leading-tight">
+                      Shipping 8–13 days · taxes calculated at checkout
                     </p>
                   );
                 })()}
                 <Button
                 onClick={handleCheckout}
-                className="w-full shadow-lg hover:shadow-xl transition-shadow"
-                size="lg"
+                className="w-full shadow-lg hover:shadow-xl transition-shadow h-10"
                 disabled={items.length === 0 || isRedirecting}>
                   {isRedirecting ?
                 <span className="flex items-center gap-2">
@@ -529,12 +514,8 @@ export const CartDrawer = () => {
                     </>
                 }
                 </Button>
-                <div className="flex flex-col items-center gap-1.5 pt-1.5">
-                  <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide">
-                    <span>🔒</span>
-                    <span>Secure checkout powered by Shopify</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-1 flex-nowrap max-w-full overflow-hidden">
+                <div className="flex items-center justify-center gap-1.5 flex-nowrap max-w-full overflow-hidden">
+                  <span className="text-[9px] text-muted-foreground shrink-0">🔒</span>
                     {[
                       { label: "Visa", bg: "bg-[#1a1f71]", color: "text-white" },
                       { label: "Mastercard", bg: "bg-white border border-border", color: "text-[#eb001b]" },
@@ -546,12 +527,11 @@ export const CartDrawer = () => {
                     ].map((m) => (
                       <span
                         key={m.label}
-                        className={`${m.bg} ${m.color} text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md leading-none shadow-sm whitespace-nowrap shrink-0`}
+                        className={`${m.bg} ${m.color} text-[7px] sm:text-[9px] font-bold px-1 py-0.5 rounded leading-none shadow-sm whitespace-nowrap shrink-0`}
                       >
                         {m.label}
                       </span>
                     ))}
-                  </div>
                 </div>
               </div>
             </>

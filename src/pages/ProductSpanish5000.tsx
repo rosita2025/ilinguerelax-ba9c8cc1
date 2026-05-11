@@ -190,7 +190,9 @@ const ProductSpanish5000 = () => {
       }
     };
 
-    await addItem({
+    // Open drawer INSTANTLY for snappy UX; Shopify sync runs in background
+    setDrawerOpen(true);
+    addItem({
       product: shopifyProduct,
       variantId: SHOPIFY_VARIANT_ID,
       variantTitle: "Default Title",
@@ -198,9 +200,6 @@ const ProductSpanish5000 = () => {
       quantity: 1,
       selectedOptions: [{ name: "Title", value: "Default Title" }]
     });
-
-    // Open cart drawer to surface upsells before checkout
-    setDrawerOpen(true);
   };
   return <main className="min-h-screen bg-background">
       <Helmet>

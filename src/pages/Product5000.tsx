@@ -19,7 +19,6 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 import { CustomerReviewsCarousel } from "@/components/CustomerReviewsCarousel";
-import { LooxStyleReviews } from "@/components/LooxStyleReviews";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -686,9 +685,6 @@ const Product5000 = () => {
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
-
-      <LooxStyleReviews />
-
       {/* FAQ Section */}
       <FAQ
         items={[

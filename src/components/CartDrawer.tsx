@@ -457,7 +457,7 @@ export const CartDrawer = () => {
                   {isRedirecting ?
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Redirecting to secure checkout…
+                  {(isLoading || isSyncing) ? "Syncing cart…" : "Redirecting to secure checkout…"}
                 </span> :
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />

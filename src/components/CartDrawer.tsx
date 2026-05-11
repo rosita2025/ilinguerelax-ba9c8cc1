@@ -76,6 +76,82 @@ export const CartDrawer = () => {
     if (isDrawerOpen) syncCart();
   }, [isDrawerOpen, syncCart]);
 
+  useEffect(() => {
+    const resetRedirectState = () => {
+      if (document.visibilityState === "visible") {
+        setIsRedirecting(false);
+      }
+    };
+
+    window.addEventListener("pageshow", resetRedirectState);
+    document.addEventListener("visibilitychange", resetRedirectState);
+
+    return () => {
+      window.removeEventListener("pageshow", resetRedirectState);
+      document.removeEventListener("visibilitychange", resetRedirectState);
+    };
+  }, []);
+
+  const waitForCartSettled = async (timeoutMs = 6000) => {
+    const start = Date.now();
+
+    while (Date.now() - start < timeoutMs) {
+      const state = useCartStore.getState();
+      if (!state.isLoading && !state.isSyncing) return;
+      await new Promise((resolve) => setTimeout(resolve, 120));
+    }
+  };
+
+  const attemptShopifyRedirect = async () => {
+    let pageIsLeaving = false;
+
+    const markPageLeaving = () => {
+      pageIsLeaving = true;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        pageIsLeaving = true;
+      }
+    };
+
+    window.addEventListener("pagehide", markPageLeaving);
+    window.addEventListener("beforeunload", markPageLeaving);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    try {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        await waitForCartSettled();
+
+        let checkoutUrl = useCartStore.getState().getCheckoutUrl();
+
+        if (!checkoutUrl || attempt > 0) {
+          try {
+            await syncCart();
+          } catch {}
+
+          await waitForCartSettled(2500);
+          checkoutUrl = useCartStore.getState().getCheckoutUrl();
+        }
+
+        if (!checkoutUrl) continue;
+
+        window.location.assign(checkoutUrl);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
+        if (pageIsLeaving || document.visibilityState === "hidden") {
+          return true;
+        }
+      }
+
+      return false;
+    } finally {
+      window.removeEventListener("pagehide", markPageLeaving);
+      window.removeEventListener("beforeunload", markPageLeaving);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }
+  };
+
   const handleCheckout = async () => {
     // Prevent double-clicks but DON'T require sync to finish — redirect immediately
     if (isRedirecting) return;
@@ -123,26 +199,9 @@ export const CartDrawer = () => {
       return;
     }
     // Fallback to Shopify checkout for physical products.
-    // Wait for any pending cart mutations (add/remove upsell) to finish so the
-    // Shopify checkout reflects the latest line items, then redirect.
-    const waitForCartSettled = async () => {
-      const start = Date.now();
-      // Poll the live store for up to 6s while loading or syncing
-      while (Date.now() - start < 6000) {
-        const st = useCartStore.getState();
-        if (!st.isLoading && !st.isSyncing) break;
-        await new Promise((r) => setTimeout(r, 120));
-      }
-    };
-    await waitForCartSettled();
-    let checkoutUrl = useCartStore.getState().getCheckoutUrl();
-    if (!checkoutUrl) {
-      try { await syncCart(); } catch {}
-      checkoutUrl = useCartStore.getState().getCheckoutUrl();
-    }
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl;
-    } else {
+    const redirectWorked = await attemptShopifyRedirect();
+
+    if (!redirectWorked) {
       setIsRedirecting(false);
       toast.error("Checkout no disponible", { description: "Intenta de nuevo en unos segundos." });
     }

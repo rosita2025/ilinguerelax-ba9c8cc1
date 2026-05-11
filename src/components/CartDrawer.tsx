@@ -202,7 +202,7 @@ export const CartDrawer = () => {
                   <div className="flex-shrink-0 mb-3">
                     {remaining > 0 ? (
                       <p className="text-xs text-muted-foreground mb-1.5">
-                        🚚 You're <span className="font-bold text-foreground">${remaining.toFixed(2)}</span> away from FREE shipping!
+                        🚚 You're <span className="font-bold text-foreground">{formatPrice(remaining)}</span> away from FREE shipping!
                       </p>
                     ) : (
                       <p className="text-xs font-semibold text-green-600 mb-1.5">

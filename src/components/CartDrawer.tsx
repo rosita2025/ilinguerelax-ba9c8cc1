@@ -344,8 +344,8 @@ export const CartDrawer = () => {
                 <CartUpsell items={items} />
               </div>
               <div className="flex-shrink-0 space-y-3 pt-4 border-t bg-background">
-                {/* Coupon section */}
-                {appliedDiscount ? (
+                {/* Coupon section - input hidden, only shows when discount already applied */}
+                {appliedDiscount && (
                   <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
@@ -355,29 +355,6 @@ export const CartDrawer = () => {
                     </div>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRemoveCoupon} disabled={isLoading}>
                       <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input
-                        placeholder="Coupon code"
-                        value={couponInput}
-                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                        className="pl-8 h-9 text-sm uppercase"
-                        disabled={isLoading || isApplying}
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-9 px-4"
-                      onClick={handleApplyCoupon}
-                      disabled={!couponInput.trim() || isLoading || isApplying}
-                    >
-                      {isApplying ? <Loader2 className="h-3 w-3 animate-spin" /> : "Apply"}
                     </Button>
                   </div>
                 )}

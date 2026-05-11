@@ -24,7 +24,10 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const token = Deno.env.get("SHOPIFY_ACCESS_TOKEN");
+    // Try online token first (has user-granted scopes incl. read_orders), fall back to offline token
+    let token = Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2") ||
+                Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN") ||
+                Deno.env.get("SHOPIFY_ACCESS_TOKEN");
     if (!token) {
       return new Response(JSON.stringify({ sales: [], error: "missing_token" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

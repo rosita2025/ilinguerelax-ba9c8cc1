@@ -383,9 +383,6 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
-      {/* Loox-style photo reviews from real customers */}
-      <LooxStyleReviews />
-
       {/* Meet the Author — trust block */}
       <MeetTheAuthor />
 
@@ -680,6 +677,9 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
+
+      {/* Loox-style photo reviews from real customers — placed before FAQ + footer */}
+      <LooxStyleReviews />
 
       {/* Bundle FAQ — Physical + Digital FREE */}
       <FAQ items={[{

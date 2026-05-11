@@ -361,7 +361,8 @@ export const CartDrawer = () => {
                   return (
                     <div className="space-y-1 text-xs text-muted-foreground">
                       <p>📦 International shipping included (free over $45)</p>
-                      <p>⏱ Ships starting <strong className="text-foreground">June 2026</strong> · delivery 12–15 days after</p>
+                      <p>🖨 Print on demand: <strong className="text-foreground">5–10 days</strong> + 🚀 Express shipping: <strong className="text-foreground">3 days</strong></p>
+                      <p>⏱ Total delivery: <strong className="text-foreground">8–13 days</strong> after order</p>
                     </div>
                   );
                 })()}

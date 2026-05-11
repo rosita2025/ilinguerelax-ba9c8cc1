@@ -76,6 +76,15 @@ export const CartDrawer = () => {
     if (isDrawerOpen) syncCart();
   }, [isDrawerOpen, syncCart]);
 
+  // Auto-apply free shipping when subtotal >= $45 and there's a physical item
+  useEffect(() => {
+    const hasPhysical = items.some(i => isPhysicalItem(i.product.node.title));
+    const alreadyApplied = discountCodes.some(dc => dc.code === 'FREESHIP45' && dc.applicable);
+    if (hasPhysical && subtotalPrice >= 45 && !alreadyApplied && !isApplying) {
+      applyDiscount('FREESHIP45').catch(() => {});
+    }
+  }, [items, subtotalPrice, discountCodes, applyDiscount, isApplying]);
+
   useEffect(() => {
     const resetRedirectState = () => {
       if (document.visibilityState === "visible") {

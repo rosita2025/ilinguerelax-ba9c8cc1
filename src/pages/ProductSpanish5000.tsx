@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { LooxStyleReviews } from "@/components/LooxStyleReviews";
 import { MeetTheAuthor } from "@/components/MeetTheAuthor";
+import { Top3ReviewsCarousel } from "@/components/Top3ReviewsCarousel";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
@@ -382,6 +383,9 @@ const ProductSpanish5000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Top 3 reviews carousel — fills the gap before Meet the Author */}
+      <Top3ReviewsCarousel />
 
       {/* Meet the Author — trust block */}
       <MeetTheAuthor />

@@ -277,6 +277,64 @@ export const useCartStore = create<CartStore>()(
         } finally {
           set({ isSyncing: false });
         }
+      },
+
+      // Manual recovery: rebuild Shopify cart from locally persisted items without losing them.
+      retrySync: async () => {
+        const { items, cartId, isSyncing } = get();
+        if (isSyncing || items.length === 0) return false;
+
+        set({ isSyncing: true, syncError: null });
+        let allSucceeded = true;
+        try {
+          let workingCartId = cartId;
+
+          // 1. Ensure we have a Shopify cart. If not, create one with the first item.
+          if (!workingCartId) {
+            const first = items[0];
+            const created = await retryWithBackoff(
+              () => createShopifyCart({ ...first, lineId: null }),
+              { retries: 3, baseDelayMs: 250, isSuccess: (r) => !!r?.cartId && !!r?.lineId }
+            );
+            if (!created) {
+              set({ syncError: 'No se pudo conectar con Shopify. Inténtalo de nuevo en unos segundos.' });
+              return false;
+            }
+            workingCartId = created.cartId;
+            set({
+              cartId: created.cartId,
+              checkoutUrl: created.checkoutUrl,
+              items: get().items.map(i => i.variantId === first.variantId ? { ...i, lineId: created.lineId } : i),
+            });
+          }
+
+          // 2. Push any remaining items that still lack a Shopify lineId.
+          const pending = get().items.filter(i => !i.lineId);
+          for (const item of pending) {
+            const result = await retryWithBackoff(
+              () => addLineToShopifyCart(workingCartId!, { ...item, lineId: null }),
+              { retries: 3, baseDelayMs: 250, isSuccess: (r) => !!r && (r.success || !!r.cartNotFound) }
+            );
+            if (result?.success) {
+              set({ items: get().items.map(i => i.variantId === item.variantId ? { ...i, lineId: result.lineId ?? null } : i) });
+            } else {
+              allSucceeded = false;
+            }
+          }
+
+          if (!allSucceeded) {
+            set({ syncError: 'Algunos productos no se pudieron sincronizar. Vuelve a intentarlo.' });
+            return false;
+          }
+          set({ syncError: null });
+          return true;
+        } catch (error) {
+          console.error('retrySync failed:', error);
+          set({ syncError: 'No se pudo sincronizar con Shopify. Inténtalo de nuevo.' });
+          return false;
+        } finally {
+          set({ isSyncing: false });
+        }
       }
     }),
     {

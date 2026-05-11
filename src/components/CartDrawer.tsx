@@ -401,11 +401,6 @@ export const CartDrawer = () => {
                       {formatPrice(subtotalPrice)} {currency}
                     </span>
                   </div>
-                  {currency !== "USD" && (
-                    <p className="text-[10px] text-muted-foreground text-right">
-                      Approx. ${subtotalPrice.toFixed(2)} USD · charged in store currency at checkout
-                    </p>
-                  )}
                 </div>
                 {(() => {
                   const hasPhysical = items.some((item) =>

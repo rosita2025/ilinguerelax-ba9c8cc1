@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
+import { useI18n } from "@/i18n/I18nContext";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.png";
 
 // Hotmart checkout URL mapping for digital products

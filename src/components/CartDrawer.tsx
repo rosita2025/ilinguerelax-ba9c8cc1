@@ -484,7 +484,7 @@ export const CartDrawer = () => {
                 })()}
                 <Button
                 onClick={handleCheckout}
-                className="w-full shadow-lg hover:shadow-xl transition-shadow h-9 min-h-9 text-sm font-semibold"
+                className="w-full shadow-lg hover:shadow-xl transition-all h-11 min-h-11 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground ring-2 ring-primary/40 ring-offset-2 ring-offset-background animate-[pulse_1.6s_ease-in-out_infinite] hover:animate-none hover:scale-[1.02]"
                 aria-busy={isRedirecting}
                 aria-live="polite"
                 disabled={items.length === 0 || isRedirecting}>

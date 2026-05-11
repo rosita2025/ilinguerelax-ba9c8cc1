@@ -429,6 +429,30 @@ export const CartDrawer = () => {
                     </>
                 }
                 </Button>
+                <div className="flex flex-col items-center gap-1.5 pt-1">
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground uppercase tracking-wide">
+                    <span>🔒</span>
+                    <span>Secure checkout powered by Shopify</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                    {[
+                      { label: "Visa", bg: "bg-[#1a1f71]", color: "text-white" },
+                      { label: "Mastercard", bg: "bg-white border border-border", color: "text-[#eb001b]" },
+                      { label: "Amex", bg: "bg-[#2e77bb]", color: "text-white" },
+                      { label: "PayPal", bg: "bg-[#003087]", color: "text-white" },
+                      { label: "Apple Pay", bg: "bg-black", color: "text-white" },
+                      { label: "Google Pay", bg: "bg-white border border-border", color: "text-foreground" },
+                      { label: "Shop Pay", bg: "bg-[#5a31f4]", color: "text-white" },
+                    ].map((m) => (
+                      <span
+                        key={m.label}
+                        className={`${m.bg} ${m.color} text-[9px] font-bold px-1.5 py-0.5 rounded leading-none`}
+                      >
+                        {m.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </>
           }

@@ -263,10 +263,16 @@ export const CartDrawer = () => {
                             ? Math.round(((compareNum - price) / compareNum) * 100)
                             : null;
                           const isPreorder = isPhysicalPreorderItem(item.product.node.title);
+                          const isPhysical = isPhysicalItem(item.product.node.title);
                           return (
                             <>
                               <h4 className="font-semibold text-xs leading-tight truncate">{title}</h4>
-                              {isPhysicalItem(item.product.node.title) && !isPreorder && (
+                              {!isPhysical && (
+                                <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded border border-accent text-accent bg-accent/5 uppercase tracking-wide">
+                                  📄 Digital PDF
+                                </span>
+                              )}
+                              {isPhysical && !isPreorder && (
                                 <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded border border-accent text-accent bg-accent/5 uppercase tracking-wide">
                                   📦 Physical
                                 </span>

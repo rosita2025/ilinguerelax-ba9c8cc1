@@ -119,12 +119,16 @@ export const useCartStore = create<CartStore>()(
                 items: get().items.map(i => i.variantId === item.variantId
                   ? { ...i, lineId: result.lineId }
                   : i),
+                syncError: null,
               });
+            } else {
+              set({ syncError: 'No se pudo sincronizar con Shopify. Tus productos siguen en el carrito.' });
             }
           } else if (existingItem) {
             const newQuantity = existingItem.quantity + item.quantity;
             if (!existingItem.lineId) {
-              console.error('Cannot update quantity for item without lineId:', existingItem);
+              // Item never synced — trigger a retry to push it to Shopify
+              set({ syncError: 'Sincronización pendiente.' });
               return;
             }
             const result = await retryWithBackoff(
@@ -132,7 +136,12 @@ export const useCartStore = create<CartStore>()(
               { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r && (r.success || !!r.cartNotFound) }
             );
             if (result?.cartNotFound) {
-              clearCart();
+              // Cart expired in Shopify — keep local items, drop server refs so retry can rebuild
+              set({ cartId: null, checkoutUrl: null, discountCodes: [], discountTotal: null, discountSubtotal: null, items: get().items.map(i => ({ ...i, lineId: null })), syncError: 'El carrito de Shopify expiró. Pulsa Reintentar para restaurarlo.' });
+            } else if (!result?.success) {
+              set({ syncError: 'No se pudo sincronizar con Shopify. Tus productos siguen en el carrito.' });
+            } else {
+              set({ syncError: null });
             }
           } else {
             const result = await retryWithBackoff(
@@ -143,13 +152,16 @@ export const useCartStore = create<CartStore>()(
               const currentItems = get().items;
               set({ items: currentItems.map(i => i.variantId === item.variantId
                 ? { ...i, lineId: result.lineId ?? null }
-                : i) });
+                : i), syncError: null });
             } else if (result?.cartNotFound) {
-              clearCart();
+              set({ cartId: null, checkoutUrl: null, discountCodes: [], discountTotal: null, discountSubtotal: null, items: get().items.map(i => ({ ...i, lineId: null })), syncError: 'El carrito de Shopify expiró. Pulsa Reintentar para restaurarlo.' });
+            } else {
+              set({ syncError: 'No se pudo sincronizar con Shopify. Tus productos siguen en el carrito.' });
             }
           }
         } catch (error) {
           console.error('Failed to add item:', error);
+          set({ syncError: 'Error de red al sincronizar. Tus productos siguen en el carrito.' });
         } finally {
           set({ isLoading: false, isDrawerOpen: true });
         }

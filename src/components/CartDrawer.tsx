@@ -33,12 +33,17 @@ const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compa
   },
 };
 
+// Helper: detect any physical book (non-digital).
+const isPhysicalItem = (title: string) => {
+  const t = title.toLowerCase();
+  const isDigital = t.includes("digital") || t.includes("ebook") || t.includes("e-book") || t.includes("pdf");
+  return !isDigital;
+};
 // Helper: detect physical pre-order books (3,000 Verbs and Grammar only).
 // 5,000 Spanish Relax is already in stock and ships normally.
 const isPhysicalPreorderItem = (title: string) => {
+  if (!isPhysicalItem(title)) return false;
   const t = title.toLowerCase();
-  const isDigital = t.includes("digital") || t.includes("ebook") || t.includes("e-book") || t.includes("pdf");
-  if (isDigital) return false;
   const is3000Verbs = /3[\s,.]*000/.test(t) && t.includes("verb");
   const isGrammar = t.includes("grammar") || t.includes("gramática") || t.includes("gramatica");
   return is3000Verbs || isGrammar;
@@ -180,7 +185,7 @@ export const CartDrawer = () => {
               {(() => {
                 // Hide free shipping bar if cart only has digital products (no physical books)
                 const hasPhysical = items.some((item) =>
-                  isPhysicalPreorderItem(item.product.node.title)
+                  isPhysicalItem(item.product.node.title)
                 );
                 if (!hasPhysical) return null;
                 const FREE_SHIPPING_MIN = 45;
@@ -209,19 +214,19 @@ export const CartDrawer = () => {
                   </div>
                 );
               })()}
-              {/* Pre-order warning banner — shown whenever a physical book is in cart */}
+              {/* Pre-order warning banner — only for actual pre-order titles (3,000 Verbs / Grammar) */}
               {(() => {
-                const hasPhysical = items.some((item) =>
+                const hasPreorder = items.some((item) =>
                   isPhysicalPreorderItem(item.product.node.title)
                 );
-                if (!hasPhysical) return null;
+                if (!hasPreorder) return null;
                 return (
                   <div className="flex-shrink-0 mb-3 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30">
                     <p className="text-xs font-bold text-amber-900 dark:text-amber-200 leading-tight">
                       ⚠️ PRE-ORDER · Ships from June 2026
                     </p>
                     <p className="text-[10px] text-amber-800 dark:text-amber-300 mt-0.5 leading-tight">
-                      Physical books are <strong>advance pre-orders</strong>. Pay today at the lowest price and receive them starting June 2026. Digital products are delivered instantly by email.
+                      Estos libros son <strong>pre-pedidos anticipados</strong>. Paga hoy al precio más bajo y recíbelos a partir de junio 2026.
                     </p>
                   </div>
                 );
@@ -361,15 +366,13 @@ export const CartDrawer = () => {
 
                 {(() => {
                   const hasPhysical = items.some((item) =>
-                    isPhysicalPreorderItem(item.product.node.title)
+                    isPhysicalItem(item.product.node.title)
                   );
                   if (!hasPhysical) return null;
                   return (
-                    <div className="space-y-1 text-xs text-muted-foreground">
-                      <p>📦 International shipping included (free over $45)</p>
-                      <p>🖨 Print on demand: <strong className="text-foreground">5–10 days</strong> + 🚀 Express shipping: <strong className="text-foreground">3 days</strong></p>
-                      <p>⏱ Total delivery: <strong className="text-foreground">8–13 days</strong> after order</p>
-                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-snug">
+                      Impresión bajo demanda 5-10 días + Envío express 3 días = entrega total <strong className="text-foreground">8-13 días</strong>.
+                    </p>
                   );
                 })()}
                 <div className="h-px bg-border" />
@@ -383,7 +386,7 @@ export const CartDrawer = () => {
                 </div>
                 {(() => {
                   const hasPhysical = items.some((item) =>
-                    isPhysicalPreorderItem(item.product.node.title)
+                    isPhysicalItem(item.product.node.title)
                   );
                   if (!hasPhysical) return null;
                   return (
@@ -402,10 +405,10 @@ export const CartDrawer = () => {
                 <>
                       <ExternalLink className="w-4 h-4 mr-2" />
                       {(() => {
-                        const hasPhysical = items.some((item) =>
+                        const hasPreorder = items.some((item) =>
                           isPhysicalPreorderItem(item.product.node.title)
                         );
-                        return hasPhysical ? "Reserve pre-order now" : "Checkout securely";
+                        return hasPreorder ? "Reserve pre-order now" : "Checkout securely";
                       })()}
                     </>
                 }

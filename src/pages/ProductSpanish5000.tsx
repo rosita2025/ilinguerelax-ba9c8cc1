@@ -54,7 +54,6 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 const MeetTheAuthor = lazy(() => import("@/components/MeetTheAuthor").then(m => ({ default: m.MeetTheAuthor })));
 const Top3ReviewsCarousel = lazy(() => import("@/components/Top3ReviewsCarousel").then(m => ({ default: m.Top3ReviewsCarousel })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
-const PdfFlipbook = lazy(() => import("@/components/PdfFlipbook").then(m => ({ default: m.PdfFlipbook })));
 const InfluencerVideoCarousel = lazy(() => import("@/components/InfluencerVideoCarousel").then(m => ({ default: m.InfluencerVideoCarousel })));
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 

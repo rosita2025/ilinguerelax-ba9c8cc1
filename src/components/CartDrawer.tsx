@@ -261,8 +261,8 @@ export const CartDrawer = () => {
                           return (
                             <>
                               <h4 className="font-semibold text-xs leading-tight truncate">{title}</h4>
-                              {isPhysicalItem(item.product.node.title) && (
-                                <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary uppercase tracking-wide">
+                              {isPhysicalItem(item.product.node.title) && !isPreorder && (
+                                <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded border border-accent text-accent bg-accent/5 uppercase tracking-wide">
                                   📦 Physical
                                 </span>
                               )}

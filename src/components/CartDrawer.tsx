@@ -226,7 +226,7 @@ export const CartDrawer = () => {
                       ⚠️ PRE-ORDER · Ships from June 2026
                     </p>
                     <p className="text-[10px] text-amber-800 dark:text-amber-300 mt-0.5 leading-tight">
-                      Estos libros son <strong>pre-pedidos anticipados</strong>. Paga hoy al precio más bajo y recíbelos a partir de junio 2026.
+                      These books are <strong>advance pre-orders</strong>. Pay today at the lowest price and receive them starting June 2026.
                     </p>
                   </div>
                 );
@@ -263,7 +263,7 @@ export const CartDrawer = () => {
                               <h4 className="font-semibold text-xs leading-tight truncate">{title}</h4>
                               {isPhysicalItem(item.product.node.title) && (
                                 <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary uppercase tracking-wide">
-                                  📦 Físico
+                                  📦 Physical
                                 </span>
                               )}
                               {subtitle ? (
@@ -376,7 +376,7 @@ export const CartDrawer = () => {
                   if (!hasPhysical) return null;
                   return (
                     <p className="text-[10px] text-muted-foreground leading-snug">
-                      Impresión bajo demanda 5-10 días + Envío express 3 días = entrega total <strong className="text-foreground">8-13 días</strong>.
+                      Print on demand 5-10 days + Express shipping 3 days = total delivery <strong className="text-foreground">8-13 days</strong>.
                     </p>
                   );
                 })()}

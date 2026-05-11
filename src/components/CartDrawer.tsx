@@ -33,12 +33,15 @@ const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compa
   },
 };
 
-// Helper: detect the 5,000 Spanish Relax physical pre-order book only
+// Helper: detect physical pre-order books (3,000 Verbs and Grammar only).
+// 5,000 Spanish Relax is already in stock and ships normally.
 const isPhysicalPreorderItem = (title: string) => {
   const t = title.toLowerCase();
-  const isSpanish5000 = /5[\s,.]*000/.test(t) && t.includes("spanish");
-  const isDigital = t.includes("digital") || t.includes("ebook") || t.includes("e-book");
-  return isSpanish5000 && !isDigital;
+  const isDigital = t.includes("digital") || t.includes("ebook") || t.includes("e-book") || t.includes("pdf");
+  if (isDigital) return false;
+  const is3000Verbs = /3[\s,.]*000/.test(t) && t.includes("verb");
+  const isGrammar = t.includes("grammar") || t.includes("gramática") || t.includes("gramatica");
+  return is3000Verbs || isGrammar;
 };
 
 export const CartDrawer = () => {

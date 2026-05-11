@@ -56,6 +56,7 @@ const isPhysicalPreorderItem = (title: string) => {
 };
 
 export const CartDrawer = () => {
+  const { currency, formatPrice } = useI18n();
   const { 
     items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,

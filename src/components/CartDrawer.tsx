@@ -292,11 +292,11 @@ export const CartDrawer = () => {
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {compareNum && (
                                   <span className="text-[10px] line-through text-destructive font-medium">
-                                    ${compareNum.toFixed(2)}
+                                    {formatPrice(compareNum)}
                                   </span>
                                 )}
                                 <span className="text-xs font-bold text-primary">
-                                  ${price.toFixed(2)}
+                                  {formatPrice(price)}
                                 </span>
                                 {discountPct && (
                                   <span className="text-[9px] bg-destructive/10 text-destructive font-bold px-1 rounded">

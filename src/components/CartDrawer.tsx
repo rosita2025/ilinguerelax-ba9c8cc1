@@ -37,7 +37,12 @@ const CART_ITEM_DISPLAY: Record<string, { title: string; subtitle: string; compa
 const isPhysicalItem = (title: string) => {
   const t = title.toLowerCase();
   const isDigital = t.includes("digital") || t.includes("ebook") || t.includes("e-book") || t.includes("pdf");
-  return !isDigital;
+  if (isDigital) return false;
+  // Known digital upsells (sold as PDF even if title doesn't say it)
+  const is1000Verbs = /1[\s,.]*000/.test(t) && t.includes("verb");
+  const is500Questions = /500/.test(t) && (t.includes("question") || t.includes("pregunta"));
+  if (is1000Verbs || is500Questions) return false;
+  return true;
 };
 // Helper: detect physical pre-order books (3,000 Verbs and Grammar only).
 // 5,000 Spanish Relax is already in stock and ships normally.

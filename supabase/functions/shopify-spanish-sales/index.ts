@@ -24,8 +24,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    // Try online token first (has user-granted scopes incl. read_orders), fall back to offline token
-    let token = Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2") ||
+    // Prefer dedicated orders token (Custom App with read_orders scope)
+    let token = Deno.env.get("SHOPIFY_ORDERS_TOKEN") ||
+                Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2") ||
                 Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN") ||
                 Deno.env.get("SHOPIFY_ACCESS_TOKEN");
     if (!token) {

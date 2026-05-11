@@ -25,10 +25,14 @@ Deno.serve(async (req) => {
 
   try {
     // Prefer dedicated orders token (Custom App with read_orders scope)
-    let token = Deno.env.get("SHOPIFY_ORDERS_TOKEN") ||
-                Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2") ||
-                Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN") ||
-                Deno.env.get("SHOPIFY_ACCESS_TOKEN");
+    // Try tokens in order; some may be invalid/expired
+    const candidates = [
+      Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN:user:99eenseffGgb07U1zAl89Vt9wGu2"),
+      Deno.env.get("SHOPIFY_ONLINE_ACCESS_TOKEN"),
+      Deno.env.get("SHOPIFY_ACCESS_TOKEN"),
+      Deno.env.get("SHOPIFY_ORDERS_TOKEN"),
+    ].filter(Boolean) as string[];
+    let token = candidates[0];
     if (!token) {
       return new Response(JSON.stringify({ sales: [], error: "missing_token" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

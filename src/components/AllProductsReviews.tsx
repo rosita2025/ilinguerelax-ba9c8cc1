@@ -1,4 +1,5 @@
 import { Star, BadgeCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import looxReview1 from "@/assets/loox-review-1.png";
 import looxReview2 from "@/assets/loox-review-2.png";
 import looxReview3 from "@/assets/loox-review-3.png";
@@ -24,6 +25,7 @@ interface Review {
   initials: string;
   product: string;
   format: "Digital" | "Físico";
+  productSlug: string;
 }
 
 const reviews: Review[] = [
@@ -36,6 +38,7 @@ const reviews: Review[] = [
     initials: "MG",
     product: "5,000 Palabras Inglés",
     format: "Digital",
+    productSlug: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
   },
   {
     name: "Jennifer Hayes",
@@ -46,6 +49,7 @@ const reviews: Review[] = [
     initials: "JH",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Carlos Ramírez",
@@ -56,6 +60,7 @@ const reviews: Review[] = [
     initials: "CR",
     product: "1,000 Verbos Inglés",
     format: "Digital",
+    productSlug: "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
   },
   {
     name: "Robert Klein",
@@ -66,6 +71,7 @@ const reviews: Review[] = [
     initials: "RK",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Ana Martín",
@@ -76,6 +82,7 @@ const reviews: Review[] = [
     initials: "AM",
     product: "5,000 Palabras Alemán",
     format: "Digital",
+    productSlug: "5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes",
   },
   {
     name: "Emma Roberts",
@@ -86,6 +93,7 @@ const reviews: Review[] = [
     initials: "ER",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Luis Herrera",
@@ -96,6 +104,7 @@ const reviews: Review[] = [
     initials: "LH",
     product: "500 Preguntas Inglés",
     format: "Digital",
+    productSlug: "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
   },
   {
     name: "Patricia Hill",
@@ -106,6 +115,7 @@ const reviews: Review[] = [
     initials: "PH",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Sofía Pereira",
@@ -116,6 +126,7 @@ const reviews: Review[] = [
     initials: "SP",
     product: "5,000 Palabras Portugués",
     format: "Digital",
+    productSlug: "5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes",
   },
   {
     name: "Thomas Wright",
@@ -126,6 +137,7 @@ const reviews: Review[] = [
     initials: "TW",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Giulia Romano",
@@ -136,6 +148,7 @@ const reviews: Review[] = [
     initials: "GR",
     product: "5,000 Palabras Italiano",
     format: "Digital",
+    productSlug: "5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes",
   },
   {
     name: "Karen Mitchell",
@@ -146,6 +159,7 @@ const reviews: Review[] = [
     initials: "KM",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Diego Fernández",
@@ -156,6 +170,7 @@ const reviews: Review[] = [
     initials: "DF",
     product: "5,000 Palabras Inglés",
     format: "Digital",
+    productSlug: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
   },
   {
     name: "Rachel Foster",
@@ -166,6 +181,7 @@ const reviews: Review[] = [
     initials: "RF",
     product: "Spanish Relax 5,000",
     format: "Físico",
+    productSlug: "5-000-spanish-words-physical-book",
   },
   {
     name: "Lucía Ortiz",
@@ -176,6 +192,7 @@ const reviews: Review[] = [
     initials: "LO",
     product: "3,000 Verbos Español",
     format: "Físico",
+    productSlug: "3-000-spanish-verbs-mastery-physical-book-preorder",
   },
 ];
 
@@ -228,14 +245,16 @@ export const AllProductsReviews = () => {
 
 const ReviewCard = ({ review, className = "" }: { review: Review; className?: string }) => {
   return (
-    <div
-      className={`flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-gray-300 ${className}`}
+    <Link
+      to={`/products/${review.productSlug}`}
+      aria-label={`Ver ${review.product} — reseña de ${review.name}`}
+      className={`group flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${className}`}
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
         <img
           src={review.image}
           alt={`Reseña verificada de ${review.name} sobre ${review.product}`}
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           decoding="async"
         />
@@ -261,8 +280,8 @@ const ReviewCard = ({ review, className = "" }: { review: Review; className?: st
           ))}
         </div>
 
-        <div className="text-[11px] font-semibold text-primary mb-2 truncate">
-          {review.product}
+        <div className="text-[11px] font-semibold text-primary mb-2 truncate group-hover:underline">
+          {review.product} →
         </div>
 
         <div className="flex items-center gap-2.5 mb-2.5">
@@ -287,7 +306,7 @@ const ReviewCard = ({ review, className = "" }: { review: Review; className?: st
           {review.text}
         </p>
       </div>
-    </div>
+    </Link>
   );
 };
 

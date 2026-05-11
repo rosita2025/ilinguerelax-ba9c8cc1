@@ -46,12 +46,14 @@ interface CartStore {
   discountCodes: DiscountCodeResult[];
   discountTotal: string | null;
   discountSubtotal: string | null;
+  syncError: string | null;
   setDrawerOpen: (open: boolean) => void;
   addItem: (item: Omit<CartItem, 'lineId'>) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
   clearCart: () => void;
   syncCart: () => Promise<void>;
+  retrySync: () => Promise<boolean>;
   getCheckoutUrl: () => string | null;
   applyDiscount: (code: string) => Promise<boolean>;
   removeDiscount: () => Promise<void>;
@@ -69,6 +71,7 @@ export const useCartStore = create<CartStore>()(
       discountCodes: [],
       discountTotal: null,
       discountSubtotal: null,
+      syncError: null,
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
       addItem: async (item) => {

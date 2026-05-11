@@ -105,7 +105,10 @@ export const useCartStore = create<CartStore>()(
         }
         try {
           if (!cartId) {
-            const result = await createShopifyCart({ ...item, lineId: null });
+            const result = await retryWithBackoff(
+              () => createShopifyCart({ ...item, lineId: null }),
+              { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r?.cartId && !!r?.lineId }
+            );
             if (result) {
               set({
                 cartId: result.cartId,
@@ -121,18 +124,24 @@ export const useCartStore = create<CartStore>()(
               console.error('Cannot update quantity for item without lineId:', existingItem);
               return;
             }
-            const result = await updateShopifyCartLine(cartId, existingItem.lineId, newQuantity);
-            if (result.cartNotFound) {
+            const result = await retryWithBackoff(
+              () => updateShopifyCartLine(cartId, existingItem.lineId!, newQuantity),
+              { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r && (r.success || !!r.cartNotFound) }
+            );
+            if (result?.cartNotFound) {
               clearCart();
             }
           } else {
-            const result = await addLineToShopifyCart(cartId, { ...item, lineId: null });
-            if (result.success) {
+            const result = await retryWithBackoff(
+              () => addLineToShopifyCart(cartId, { ...item, lineId: null }),
+              { retries: 3, baseDelayMs: 200, isSuccess: (r) => !!r && (r.success || !!r.cartNotFound) }
+            );
+            if (result?.success) {
               const currentItems = get().items;
               set({ items: currentItems.map(i => i.variantId === item.variantId
                 ? { ...i, lineId: result.lineId ?? null }
                 : i) });
-            } else if (result.cartNotFound) {
+            } else if (result?.cartNotFound) {
               clearCart();
             }
           }

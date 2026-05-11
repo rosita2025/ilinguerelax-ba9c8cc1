@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
-import productSpanish5000Image from "@/assets/product-spanish-5000-v2.png";
+import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.jpg";
 
 // Hotmart checkout URL mapping for digital products
 const HOTMART_CHECKOUT_MAP: Record<string, string> = {
@@ -139,6 +139,10 @@ export const CartDrawer = () => {
   };
 
   const getCartItemImage = (item: typeof items[number]) => {
+    // Force local fallback for variants with curated cart imagery (e.g. physical 5,000 Spanish)
+    const fallbackImage = CART_IMAGE_FALLBACKS[item.variantId];
+    if (fallbackImage) return fallbackImage;
+
     const primaryImage = item.product.node.images?.edges?.[0]?.node;
     if (primaryImage?.url) {
       return {
@@ -146,10 +150,6 @@ export const CartDrawer = () => {
         alt: primaryImage.altText || item.product.node.title,
       };
     }
-
-    const fallbackImage = CART_IMAGE_FALLBACKS[item.variantId];
-    if (fallbackImage) return fallbackImage;
-
     return null;
   };
 
@@ -261,6 +261,11 @@ export const CartDrawer = () => {
                           return (
                             <>
                               <h4 className="font-semibold text-xs leading-tight truncate">{title}</h4>
+                              {isPhysicalItem(item.product.node.title) && (
+                                <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary uppercase tracking-wide">
+                                  📦 Físico
+                                </span>
+                              )}
                               {subtitle ? (
                                 <p className="text-[10px] text-muted-foreground leading-tight truncate">{subtitle}</p>
                               ) : item.variantTitle !== "Default Title" ? (

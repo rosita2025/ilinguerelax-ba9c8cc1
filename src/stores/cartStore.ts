@@ -12,6 +12,30 @@ import {
   applyDiscountToShopifyCart
 } from '@/lib/shopify';
 
+// Retry with exponential backoff for transient Shopify slowness/failures.
+// Resolves to null if all attempts fail or return falsy.
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  options: { retries?: number; baseDelayMs?: number; maxDelayMs?: number; isSuccess?: (r: T) => boolean } = {}
+): Promise<T | null> {
+  const { retries = 3, baseDelayMs = 250, maxDelayMs = 1500, isSuccess = (r) => !!r } = options;
+  let lastResult: T | null = null;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const result = await fn();
+      if (isSuccess(result)) return result;
+      lastResult = result;
+    } catch (err) {
+      console.warn(`[cart] Shopify call failed (attempt ${attempt + 1}/${retries + 1}):`, err);
+    }
+    if (attempt < retries) {
+      const delay = Math.min(baseDelayMs * Math.pow(2, attempt), maxDelayMs);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  return lastResult;
+}
+
 interface CartStore {
   items: CartItem[];
   cartId: string | null;

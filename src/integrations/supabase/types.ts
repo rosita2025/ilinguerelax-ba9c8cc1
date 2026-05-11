@@ -221,6 +221,39 @@ export type Database = {
         }
         Relationships: []
       }
+      shopify_sales: {
+        Row: {
+          country: string | null
+          created_at: string
+          customer_name: string
+          id: string
+          order_created_at: string
+          product_key: string
+          product_name: string
+          shopify_order_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          customer_name: string
+          id?: string
+          order_created_at: string
+          product_key?: string
+          product_name: string
+          shopify_order_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          order_created_at?: string
+          product_key?: string
+          product_name?: string
+          shopify_order_id?: string
+        }
+        Relationships: []
+      }
       store_subscribers: {
         Row: {
           announcement_sent: boolean

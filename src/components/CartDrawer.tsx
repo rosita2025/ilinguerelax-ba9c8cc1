@@ -187,7 +187,7 @@ export const CartDrawer = () => {
             ];
             const r = miniReviews[Math.floor(Date.now() / 5000) % miniReviews.length];
             return (
-              <div className="mt-2 flex items-center gap-2 px-2 py-1.5 bg-accent/10 border border-accent/20 rounded-md">
+              <div className="mt-1 flex items-center gap-2 px-2 py-1 bg-accent/10 border border-accent/20 rounded-md">
                 <span className="text-xs text-amber-500 leading-none">★★★★★</span>
                 <p className="text-[11px] text-muted-foreground leading-tight truncate">
                   <span className="font-semibold text-foreground">{r.name}:</span> "{r.text}"
@@ -196,7 +196,7 @@ export const CartDrawer = () => {
             );
           })()}
         </SheetHeader>
-        <div className="flex flex-col flex-1 pt-6 min-h-0">
+        <div className="flex flex-col flex-1 pt-2 min-h-0">
           {items.length === 0 ?
           <div className="flex-1 flex items-center justify-center">
               <div className="text-center">

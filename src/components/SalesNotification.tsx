@@ -95,40 +95,9 @@ const SalesNotification = ({
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
 
-  // For Spanish Relax, fetch REAL Shopify orders and replace the simulated pool
-  useEffect(() => {
-    if (productKey !== "spanish5000") return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("shopify-spanish-sales", {
-          body: { lang },
-        });
-        if (cancelled || error) return;
-        const realSales = (data?.sales as any[] | undefined) ?? [];
-        if (realSales.length === 0) return;
-        const mapped: Sale[] = realSales.map((s) => ({
-          name: s.name,
-          country: s.country,
-          timeAgo: s.timeAgo,
-          timeAgoEn: s.timeAgo,
-          productName: s.productName,
-          productNameEn: s.productName,
-          productLabel: s.productLabel,
-          platform: "shopify",
-          productKey: "spanish5000",
-        }));
-        setShuffledSales(mapped);
-        setSaleIndex(0);
-        setCurrentSale(mapped[0]);
-      } catch (e) {
-        console.warn("Spanish sales fetch failed, using fallback", e);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [productKey, lang]);
+  // Note: Real Shopify order fetching disabled. The connected Shopify app does
+  // not have `read_orders` scope and the new Shopify UI no longer exposes
+  // Admin API tokens easily. Sales notifications use the simulated pool.
 
   useEffect(() => {
     const initialTimeout = setTimeout(() => {

@@ -95,6 +95,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <CartSyncWrapper>
+              <RouteTracker />
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />

@@ -74,16 +74,16 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
     const productId = Array.isArray(params.content_ids) && params.content_ids.length
       ? String((params.content_ids as unknown[])[0])
       : (params.content_name ? String(params.content_name) : null);
-    supabase.from("funnel_events").insert({
-      event_name: eventName,
-      product_id: productId,
-      value: typeof params.value === "number" ? params.value : null,
-      currency: typeof params.currency === "string" ? params.currency : null,
-      session_id: getSessionId(),
-      page_path: window.location.pathname,
-      country: getCountry(),
-    }).then(({ error }) => {
-      if (error) console.error("funnel insert error:", error);
+    void supabase.functions.invoke("log-funnel-event", {
+      body: {
+        event_name: eventName,
+        product_id: productId,
+        value: typeof params.value === "number" ? params.value : null,
+        currency: typeof params.currency === "string" ? params.currency : null,
+        session_id: getSessionId(),
+        page_path: window.location.pathname,
+        country: getCountry(),
+      },
     });
   } catch (e) {
     console.error("funnel log error:", e);

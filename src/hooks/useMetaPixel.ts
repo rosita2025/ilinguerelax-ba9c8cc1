@@ -39,7 +39,7 @@ const getSessionId = (): string => {
   }
 };
 
-const FUNNEL_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
+const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
 const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead"]);
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
@@ -164,6 +164,7 @@ export const useHotmartPixelPageView = () => {
       const eventId = generateEventId();
       window.fbq("track", "PageView", { eventID: eventId });
     }
+    logFunnelEvent("PageView", {});
   }, []);
 };
 

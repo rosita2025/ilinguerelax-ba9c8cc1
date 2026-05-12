@@ -83,6 +83,7 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
         session_id: getSessionId(),
         page_path: window.location.pathname,
         country: getCountry(),
+        referrer: typeof document !== "undefined" ? document.referrer || null : null,
       },
     });
   } catch (e) {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { trackLead } from "@/hooks/useMetaPixel";
 import { useI18n } from "@/i18n/I18nContext";
 
 interface StoreSubscriptionCardProps {
@@ -53,6 +54,11 @@ export const StoreSubscriptionCard = ({
       if (error) throw error;
 
       setIsSubscribed(true);
+      trackLead(email, {
+        content_name: `Store Subscription - ${storeName}`,
+        content_category: "Marketplace Notify",
+        product_type: productType,
+      });
       toast({
         title: t.storeCards.successTitle,
         description: `${t.storeCards.successMessage} ${storeName}`,

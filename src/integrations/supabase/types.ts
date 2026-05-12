@@ -106,6 +106,7 @@ export type Database = {
       }
       funnel_events: {
         Row: {
+          country: string | null
           created_at: string
           currency: string | null
           event_name: string
@@ -116,6 +117,7 @@ export type Database = {
           value: number | null
         }
         Insert: {
+          country?: string | null
           created_at?: string
           currency?: string | null
           event_name: string
@@ -126,6 +128,7 @@ export type Database = {
           value?: number | null
         }
         Update: {
+          country?: string | null
           created_at?: string
           currency?: string | null
           event_name?: string

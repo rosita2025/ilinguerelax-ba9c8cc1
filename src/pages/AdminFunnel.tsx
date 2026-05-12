@@ -20,12 +20,13 @@ interface FunnelReport {
   };
 }
 
-const FUNNEL_STEPS = ["ViewContent", "AddToCart", "InitiateCheckout", "Purchase"] as const;
+const FUNNEL_STEPS = ["ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"] as const;
 const STEP_LABELS: Record<string, string> = {
   ViewContent: "1. Vista de producto",
-  AddToCart: "2. Agregó al carrito",
-  InitiateCheckout: "3. Inició checkout",
-  Purchase: "4. Compró",
+  Lead: "2. Lead (suscripción email)",
+  AddToCart: "3. Agregó al carrito",
+  InitiateCheckout: "4. Inició checkout",
+  Purchase: "5. Compró",
 };
 
 const AdminFunnel = () => {

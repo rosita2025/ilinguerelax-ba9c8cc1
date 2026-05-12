@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FUNNEL_EVENTS = ["ViewContent", "AddToCart", "InitiateCheckout", "Purchase"];
+const FUNNEL_EVENTS = ["ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"];
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {

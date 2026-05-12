@@ -11,6 +11,8 @@ interface FunnelReport {
   totals: Record<string, number>;
   uniques: Record<string, number>;
   byProduct: Record<string, Record<string, number>>;
+  byCountry: Record<string, Record<string, number>>;
+  revenueByCountry: Record<string, number>;
   revenue: number;
   conversionRates: {
     view_to_cart: number;
@@ -194,6 +196,52 @@ const AdminFunnel = () => {
                 <tr>
                   <td colSpan={5} className="py-6 text-center text-muted-foreground">
                     Sin datos en este periodo.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Card>
+
+        {/* Per country */}
+        <Card className="p-4 overflow-x-auto">
+          <h2 className="font-semibold mb-3">Por país</h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b">
+                <th className="py-2 pr-3">País</th>
+                {FUNNEL_STEPS.map((s) => (
+                  <th key={s} className="py-2 px-2 text-right">{s}</th>
+                ))}
+                <th className="py-2 px-2 text-right">Ingresos</th>
+                <th className="py-2 px-2 text-right">Conv %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(report.byCountry || {})
+                .sort(([, a], [, b]) => (b.ViewContent || 0) - (a.ViewContent || 0))
+                .map(([country, counts]) => {
+                  const views = counts.ViewContent || 0;
+                  const purchases = counts.Purchase || 0;
+                  const conv = views ? (purchases / views) * 100 : 0;
+                  const rev = report.revenueByCountry?.[country] || 0;
+                  return (
+                    <tr key={country} className="border-b last:border-0">
+                      <td className="py-2 pr-3 font-medium">{country}</td>
+                      {FUNNEL_STEPS.map((s) => (
+                        <td key={s} className="py-2 px-2 text-right tabular-nums">
+                          {(counts[s] || 0).toLocaleString()}
+                        </td>
+                      ))}
+                      <td className="py-2 px-2 text-right tabular-nums">${rev.toFixed(0)}</td>
+                      <td className="py-2 px-2 text-right tabular-nums">{conv.toFixed(1)}%</td>
+                    </tr>
+                  );
+                })}
+              {Object.keys(report.byCountry || {}).length === 0 && (
+                <tr>
+                  <td colSpan={FUNNEL_STEPS.length + 3} className="py-6 text-center text-muted-foreground">
+                    Sin datos por país en este periodo.
                   </td>
                 </tr>
               )}

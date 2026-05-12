@@ -35,7 +35,7 @@ serve(async (req) => {
 
     const { data, error } = await supabase
       .from("funnel_events")
-      .select("event_name, product_id, value, currency, session_id, created_at")
+      .select("event_name, product_id, value, currency, session_id, country, created_at")
       .gte("created_at", since)
       .limit(50000);
 
@@ -44,6 +44,8 @@ serve(async (req) => {
     const totals: Record<string, number> = {};
     const uniqueSessions: Record<string, Set<string>> = {};
     const byProduct: Record<string, Record<string, number>> = {};
+    const byCountry: Record<string, Record<string, number>> = {};
+    const revenueByCountry: Record<string, number> = {};
     let revenue = 0;
 
     for (const ev of FUNNEL_EVENTS) {
@@ -59,7 +61,13 @@ serve(async (req) => {
       const pid = (row.product_id as string) || "(sin producto)";
       byProduct[pid] = byProduct[pid] || {};
       byProduct[pid][ev] = (byProduct[pid][ev] || 0) + 1;
+      const country = (row.country as string) || "(desconocido)";
+      byCountry[country] = byCountry[country] || {};
+      byCountry[country][ev] = (byCountry[country][ev] || 0) + 1;
       if (ev === "Purchase" && row.value) revenue += Number(row.value);
+      if (ev === "Purchase" && row.value) {
+        revenueByCountry[country] = (revenueByCountry[country] || 0) + Number(row.value);
+      }
     }
 
     const uniques: Record<string, number> = {};
@@ -78,6 +86,8 @@ serve(async (req) => {
         totals,
         uniques,
         byProduct,
+        byCountry,
+        revenueByCountry,
         revenue,
         conversionRates,
       }),

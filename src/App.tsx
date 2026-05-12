@@ -2,11 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useCartSync } from "@/hooks/useCartSync";
 import { I18nProvider } from "@/i18n/I18nContext";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 
 const Products = lazy(() => import("./pages/Products"));
@@ -49,6 +50,36 @@ const CartSyncWrapper = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
+const getSid = () => {
+  try {
+    let sid = localStorage.getItem(FUNNEL_SESSION_KEY);
+    if (!sid) {
+      sid = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+      localStorage.setItem(FUNNEL_SESSION_KEY, sid);
+    }
+    return sid;
+  } catch { return "anon"; }
+};
+
+const RouteTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    try {
+      void supabase.functions.invoke("log-funnel-event", {
+        body: {
+          event_name: "PageView",
+          session_id: getSid(),
+          page_path: location.pathname,
+          country: localStorage.getItem("ilr_country"),
+          referrer: document.referrer || null,
+        },
+      });
+    } catch (_) { /* noop */ }
+  }, [location.pathname]);
+  return null;
+};
+
 const PageFallback = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
     <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -64,6 +95,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <CartSyncWrapper>
+              <RouteTracker />
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />

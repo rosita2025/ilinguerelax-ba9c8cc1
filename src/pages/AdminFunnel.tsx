@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, BarChart3 } from "lucide-react";
+import { Loader2, BarChart3, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -12,6 +12,9 @@ interface FunnelReport {
   uniques: Record<string, number>;
   byProduct: Record<string, Record<string, number>>;
   byCountry: Record<string, Record<string, number>>;
+  bySource: Record<string, Record<string, number>>;
+  byPage: Record<string, number>;
+  liveVisitors: number;
   revenueByCountry: Record<string, number>;
   revenue: number;
   conversionRates: {
@@ -22,13 +25,14 @@ interface FunnelReport {
   };
 }
 
-const FUNNEL_STEPS = ["ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"] as const;
+const FUNNEL_STEPS = ["PageView", "ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"] as const;
 const STEP_LABELS: Record<string, string> = {
-  ViewContent: "1. Vista de producto",
-  Lead: "2. Lead (suscripción email)",
-  AddToCart: "3. Agregó al carrito",
-  InitiateCheckout: "4. Inició checkout",
-  Purchase: "5. Compró",
+  PageView: "1. Visitas a la página",
+  ViewContent: "2. Vista de producto",
+  Lead: "3. Lead (suscripción email)",
+  AddToCart: "4. Agregó al carrito",
+  InitiateCheckout: "5. Inició checkout",
+  Purchase: "6. Compró",
 };
 
 const AdminFunnel = () => {
@@ -60,6 +64,14 @@ const AdminFunnel = () => {
       setLoading(false);
     }
   };
+
+  // Auto-refresh every 30s once authenticated
+  useEffect(() => {
+    if (!report || !adminKey) return;
+    const id = setInterval(() => { void loadReport(); }, 30000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [report, adminKey, days]);
 
   if (!report) {
     return (
@@ -107,7 +119,16 @@ const AdminFunnel = () => {
             <h1 className="text-2xl md:text-3xl font-bold">Embudo de conversión</h1>
             <p className="text-sm text-muted-foreground">Últimos {report.days} días</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary/10 border border-primary/20">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              <Users className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold tabular-nums">{report.liveVisitors}</span>
+              <span className="text-xs text-muted-foreground">en vivo (5 min)</span>
+            </div>
             <Input
               type="number"
               min={1}
@@ -242,6 +263,73 @@ const AdminFunnel = () => {
                 <tr>
                   <td colSpan={FUNNEL_STEPS.length + 3} className="py-6 text-center text-muted-foreground">
                     Sin datos por país en este periodo.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Card>
+
+        {/* Per source */}
+        <Card className="p-4 overflow-x-auto">
+          <h2 className="font-semibold mb-3">Por fuente de tráfico</h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b">
+                <th className="py-2 pr-3">Fuente</th>
+                {FUNNEL_STEPS.map((s) => (
+                  <th key={s} className="py-2 px-2 text-right">{s}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(report.bySource || {})
+                .sort(([, a], [, b]) => (b.PageView || b.ViewContent || 0) - (a.PageView || a.ViewContent || 0))
+                .map(([src, counts]) => (
+                  <tr key={src} className="border-b last:border-0">
+                    <td className="py-2 pr-3 font-medium">{src}</td>
+                    {FUNNEL_STEPS.map((s) => (
+                      <td key={s} className="py-2 px-2 text-right tabular-nums">
+                        {(counts[s] || 0).toLocaleString()}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              {Object.keys(report.bySource || {}).length === 0 && (
+                <tr>
+                  <td colSpan={FUNNEL_STEPS.length + 1} className="py-6 text-center text-muted-foreground">
+                    Sin datos de fuentes en este periodo.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Card>
+
+        {/* Top pages */}
+        <Card className="p-4 overflow-x-auto">
+          <h2 className="font-semibold mb-3">Páginas más visitadas</h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b">
+                <th className="py-2 pr-3">Ruta</th>
+                <th className="py-2 px-2 text-right">Visitas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(report.byPage || {})
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 30)
+                .map(([path, count]) => (
+                  <tr key={path} className="border-b last:border-0">
+                    <td className="py-2 pr-3 truncate max-w-[420px]" title={path}>{path}</td>
+                    <td className="py-2 px-2 text-right tabular-nums">{count.toLocaleString()}</td>
+                  </tr>
+                ))}
+              {Object.keys(report.byPage || {}).length === 0 && (
+                <tr>
+                  <td colSpan={2} className="py-6 text-center text-muted-foreground">
+                    Sin visitas registradas en este periodo.
                   </td>
                 </tr>
               )}

@@ -62,6 +62,11 @@ const sendCapiEvent = (eventName: string, eventId: string, params: Record<string
   }
 };
 
+const getCountry = (): string | null => {
+  if (typeof window === "undefined") return null;
+  try { return localStorage.getItem("ilr_country"); } catch { return null; }
+};
+
 const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
   if (!FUNNEL_EVENTS.has(eventName)) return;
   if (typeof window === "undefined") return;
@@ -76,6 +81,7 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
       currency: typeof params.currency === "string" ? params.currency : null,
       session_id: getSessionId(),
       page_path: window.location.pathname,
+      country: getCountry(),
     }).then(({ error }) => {
       if (error) console.error("funnel insert error:", error);
     });

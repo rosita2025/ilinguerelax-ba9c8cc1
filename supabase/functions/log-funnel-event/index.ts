@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const ALLOWED = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
+const ALLOWED = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
 
 // In-memory IP→country cache (lives during function instance lifetime)
 const ipCache = new Map<string, string>();
@@ -56,6 +56,7 @@ serve(async (req) => {
       session_id: body.session_id ?? null,
       page_path: body.page_path ?? null,
       country,
+      referrer: typeof body.referrer === "string" ? body.referrer.slice(0, 500) : null,
     });
 
     if (error) {

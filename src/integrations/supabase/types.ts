@@ -113,6 +113,7 @@ export type Database = {
           id: string
           page_path: string | null
           product_id: string | null
+          referrer: string | null
           session_id: string | null
           value: number | null
         }
@@ -124,6 +125,7 @@ export type Database = {
           id?: string
           page_path?: string | null
           product_id?: string | null
+          referrer?: string | null
           session_id?: string | null
           value?: number | null
         }
@@ -135,6 +137,7 @@ export type Database = {
           id?: string
           page_path?: string | null
           product_id?: string | null
+          referrer?: string | null
           session_id?: string | null
           value?: number | null
         }

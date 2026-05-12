@@ -39,11 +39,11 @@ const getSessionId = (): string => {
   }
 };
 
-const FUNNEL_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Purchase"]);
-const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout"]);
+const FUNNEL_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
+const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead"]);
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
-const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>) => {
+const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {
   if (!CAPI_EVENTS.has(eventName)) return;
   if (typeof window === "undefined") return;
   try {
@@ -54,6 +54,7 @@ const sendCapiEvent = (eventName: string, eventId: string, params: Record<string
         event_id: eventId,
         event_source_url: window.location.href,
         custom_data: { content_name, content_ids, content_type, value, currency, num_items },
+        email: email || undefined,
       },
     });
   } catch (e) {
@@ -171,6 +172,20 @@ export const useHotmartPixelContact = () => {
       });
     }
   }, []);
+};
+
+// Track Lead (newsletter / coupon email subscriptions). Fires browser Pixel + CAPI with hashed email.
+export const trackLead = (
+  email: string,
+  params: Record<string, unknown> = {}
+) => {
+  ensurePixelReady();
+  const eventId = generateEventId();
+  if (typeof window !== "undefined" && window.fbq) {
+    window.fbq("track", "Lead", { ...params, eventID: eventId });
+  }
+  sendCapiEvent("Lead", eventId, params, email);
+  logFunnelEvent("Lead", params);
 };
 
 // ============================================

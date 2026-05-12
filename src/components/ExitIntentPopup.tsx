@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { trackLead } from "@/hooks/useMetaPixel";
 
 interface ExitIntentPopupProps {
   buyUrl?: string;
@@ -82,6 +83,11 @@ export const ExitIntentPopup = ({
       if (error) throw error;
 
       setIsSubscribed(true);
+      trackLead(email, {
+        content_name: "Exit Intent Coupon",
+        content_category: "Newsletter",
+        coupon_code: couponCode,
+      });
       toast({
         title: lang === "en" ? "Coupon sent!" : "¡Cupón enviado!",
         description: lang === "en" 

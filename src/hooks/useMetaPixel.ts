@@ -40,6 +40,26 @@ const getSessionId = (): string => {
 };
 
 const FUNNEL_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Purchase"]);
+const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout"]);
+
+// Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
+const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>) => {
+  if (!CAPI_EVENTS.has(eventName)) return;
+  if (typeof window === "undefined") return;
+  try {
+    const { content_name, content_ids, content_type, value, currency, num_items } = params as Record<string, unknown>;
+    void supabase.functions.invoke("meta-capi-event", {
+      body: {
+        event_name: eventName,
+        event_id: eventId,
+        event_source_url: window.location.href,
+        custom_data: { content_name, content_ids, content_type, value, currency, num_items },
+      },
+    });
+  } catch (e) {
+    console.error("CAPI invoke error:", e);
+  }
+};
 
 const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
   if (!FUNNEL_EVENTS.has(eventName)) return;
@@ -105,10 +125,11 @@ const ensurePixelReady = () => {
 export const useHotmartPixel = (params: ViewContentParams) => {
   useEffect(() => {
     ensurePixelReady();
+    const eventId = generateEventId();
     if (typeof window !== "undefined" && window.fbq) {
-      const eventId = generateEventId();
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
+    sendCapiEvent("ViewContent", eventId, params as unknown as Record<string, unknown>);
     logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
   }, [params.content_name]);
 };
@@ -118,10 +139,11 @@ export const trackHotmartEvent = (
   params: Record<string, unknown> = {}
 ) => {
   ensurePixelReady();
+  const eventId = generateEventId();
   if (typeof window !== "undefined" && window.fbq) {
-    const eventId = generateEventId();
     window.fbq("track", eventName, { ...params, eventID: eventId });
   }
+  sendCapiEvent(eventName, eventId, params);
   logFunnelEvent(eventName, params);
 };
 

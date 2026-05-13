@@ -10,6 +10,9 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
+import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import beforeDictImg from "@/assets/diccionario-antes.webp";
+import afterTopicsImg from "@/assets/temas-categorias-despues.webp";
 import { motion } from "framer-motion";
 import {
   Check,

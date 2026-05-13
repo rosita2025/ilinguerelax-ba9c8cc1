@@ -252,6 +252,46 @@
     <priority>0.5</priority>
   </url>
 
+  <!-- Product: 3,000 Spanish Verbs Mastery (Physical, Preorder) -->
+  <url>
+    <loc>https://ilinguerelax.com/products/3-000-spanish-verbs-mastery-physical-book-preorder</loc>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product: Spanish Grammar Patterns A1-C1 Mastery (Preorder) -->
+  <url>
+    <loc>https://ilinguerelax.com/products/spanish-grammar-patterns-a1-c1-mastery-preorder</loc>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product: 1,000 Verbs in Spanish (English Pronunciation) -->
+  <url>
+    <loc>https://ilinguerelax.com/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation</loc>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product: 500 Questions in Spanish (English Pronunciation) -->
+  <url>
+    <loc>https://ilinguerelax.com/products/500-questions-in-spanish-with-english-pronunciation</loc>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product: Neerlandés (Dutch) -->
+  <url>
+    <loc>https://ilinguerelax.com/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes</loc>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- English Blog Posts - Learn Spanish (USA/Canada SEO) -->
   <url>
     <loc>https://ilinguerelax.com/blog/how-to-learn-spanish-fast-beginners-guide</loc>

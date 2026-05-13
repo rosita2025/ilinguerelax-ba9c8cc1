@@ -1,4 +1,5 @@
 import { useParams, Link, Navigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, BookOpen, Tag } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -172,6 +173,10 @@ const BlogPost = () => {
         keywords={post.tags.join(", ")}
         image={post.image}
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+      </Helmet>
       <Navbar />
       
       <main className="min-h-screen bg-background">

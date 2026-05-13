@@ -504,6 +504,9 @@ const Product8000Book = () => {
                 beforeLabel="DICCIONARIO"
                 afterLabel="iLINGUE RELAX"
               />
+              <p className="text-xs text-muted-foreground text-center mt-3">
+                👆 Arrastra el control central para ver la comparación antes/después
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {bookImages.slice(1).map((img, i) => (

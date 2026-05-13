@@ -22,8 +22,8 @@ type Slide = {
 const slides: Slide[] = [
   {
     id: "guy",
-    src: "/videos/testimonial-guy.mp4",
-    poster: "/videos/testimonial-guy.jpg",
+    src: "/videos/testimonial-girl.mp4",
+    poster: "/videos/testimonial-girl.jpg",
     title: "Speak Fluently",
     caption: "A real game changer for your Spanish. Get the results you've been waiting for.",
     quote: "Finally speaking fluently without the stress of grammar.",

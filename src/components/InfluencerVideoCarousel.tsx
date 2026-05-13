@@ -36,14 +36,6 @@ const slides: Slide[] = [
     caption: "A real game changer for your Spanish. Get the results you've been waiting for.",
     quote: "Finally speaking fluently without the stress of grammar.",
   },
-  {
-    id: "lady",
-    src: "/videos/testimonial-lady.mp4",
-    poster: "/videos/testimonial-lady.jpg",
-    title: "Loved by Students",
-    caption: "5,000 words and a full study plan. Don't wait, start your journey today!",
-    quote: "The 6-month plan is a lifesaver for busy people.",
-  },
 ];
 
 export const InfluencerVideoCarousel = ({ onCta }: { onCta?: () => void }) => {

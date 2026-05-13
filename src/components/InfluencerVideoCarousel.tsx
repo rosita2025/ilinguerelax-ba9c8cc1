@@ -21,14 +21,6 @@ type Slide = {
 
 const slides: Slide[] = [
   {
-    id: "girl",
-    src: "/videos/testimonial-girl.mp4",
-    poster: "/videos/testimonial-girl.jpg",
-    title: "The Complete System",
-    caption: "Verbs, grammar, and pronunciation in one place. Perfect for A1 to C1!",
-    quote: "The most complete system I've ever used. 10/10!",
-  },
-  {
     id: "guy",
     src: "/videos/testimonial-guy.mp4",
     poster: "/videos/testimonial-guy.jpg",

@@ -146,6 +146,7 @@ const ProductSpanish5000 = () => {
   });
   useScrollTimeTracking("product_spanish_5000");
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [isCreatingDigitalCheckout, setIsCreatingDigitalCheckout] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
 
@@ -495,19 +496,28 @@ const ProductSpanish5000 = () => {
                     size="xl"
                     variant="hero"
                     className="w-full"
+                    disabled={isCreatingDigitalCheckout}
                     onClick={async () => {
+                      if (isCreatingDigitalCheckout) return;
+
                       try {
+                        setIsCreatingDigitalCheckout(true);
                         trackHotmartEvent("InitiateCheckout", { content_name: "Spanish 5000 Digital Only", value: 29.99, currency: "USD" });
                         const { data, error } = await supabase.functions.invoke("create-spanish-digital-only", { body: {} });
                         if (error) throw error;
-                        if (data?.url) window.location.href = data.url;
+                        if (data?.url) {
+                          window.location.assign(data.url);
+                          return;
+                        }
+                        throw new Error("Checkout URL not returned");
                       } catch (e) {
                         console.error("Digital-only checkout error:", e);
+                        setIsCreatingDigitalCheckout(false);
                       }
                     }}
                   >
                     <CreditCard className="w-5 h-5" />
-                    Buy Digital Only — $29.99
+                    {isCreatingDigitalCheckout ? "Opening checkout..." : "Buy Digital Only — $29.99"}
                   </Button>
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
                     <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure Stripe checkout</span>

@@ -1,42 +1,30 @@
+## Objetivo
+Hacer que el botón **“Buy Digital Only — $29.99”** funcione al pulsarlo en el preview, sin tocar otras partes de la página.
 
-Objetivo: dejar el producto `/products/5-000-spanish-words-with-english-pronunciation` totalmente consistente en **$27.99 USD** con **48% de descuento**.
+## Qué voy a cambiar
+1. **Corregir la llamada del botón** en `src/pages/ProductSpanish5000.tsx`.
+   - Ahora mismo usa una importación dinámica y luego intenta ejecutar `m.supabase.functions.invoke(...)`.
+   - En el preview eso está llegando como `undefined`, por eso el click no hace nada y aparece el error de checkout.
+2. **Usar el patrón correcto ya existente en el proyecto**.
+   - Importar el cliente del backend de forma normal en la página.
+   - Llamar la función `create-spanish-digital-only` directamente con `supabase.functions.invoke(...)`.
+3. **Mantener el comportamiento actual del checkout**.
+   - Si la función devuelve `url`, redirigir al checkout como ya estaba previsto.
+   - Si hay error, dejarlo registrado en consola para no romper la UI.
+4. **Validar el arreglo**.
+   - Confirmar que el error `undefined is not an object (evaluating 'o.supabase.functions')` desaparece.
+   - Verificar que al pulsar el botón sí intenta abrir la URL de checkout.
 
-Lo que averigüé:
-- El pantallazo que subiste coincide con un precio viejo en la barra fija inferior.
-- En `src/pages/ProductSpanish5000.tsx` todavía hay un valor visible desactualizado:
-  - `StickyBuyBar price="$22"` al final del archivo.
-- Además encontré valores viejos en tracking/analytics del mismo producto:
-  - `value: 22` en `pixelParams`
-  - `value: 22` en `trackHotmartEvent("InitiateCheckout", ...)`
-- También hay valores viejos en páginas de compra exitosa:
-  - `src/pages/PaymentSuccess.tsx` usa `value: 17`
-  - `src/pages/HotmartSuccess.tsx` usa `value = 12` cuando el producto es Spanish
+## Hallazgo confirmado
+- La función de backend `create-spanish-digital-only` **sí existe**.
+- El problema está en el frontend, específicamente en esta línea del botón digital:
+  - `import("@/integrations/supabase/client").then(m => m.supabase.functions.invoke(...))`
+- Ese acceso es la causa directa del fallo reportado en consola.
 
-Plan de implementación:
-1. Actualizar `src/pages/ProductSpanish5000.tsx`
-   - Cambiar `StickyBuyBar price="$22"` a `price="$27.99"`.
-   - Mantener `originalPrice="$54"` para que el descuento siga siendo 48%.
-   - Cambiar los dos valores de tracking (`value: 22`) a `27.99`.
+## Sobre tus créditos
+No puedo devolver créditos desde aquí ni hacer reembolsos. Si quieres reclamarlo, tendrás que contactar con soporte. Yo sí puedo dejar el error corregido para que no siga fallando en el preview.
 
-2. Actualizar tracking de compra exitosa
-   - En `src/pages/PaymentSuccess.tsx`, cambiar `value: 17` a `27.99`.
-   - En `src/pages/HotmartSuccess.tsx`, cambiar el caso de `spanish` de `value = 12` a `27.99`.
-
-3. Verificación visual y funcional
-   - Revisar en móvil la barra fija inferior para confirmar que ya muestre:
-     - `$27.99`
-     - `$54`
-     - el producto correcto
-   - Confirmar que hero, countdown, CTA intermedio y sticky bar queden alineados con el mismo precio.
-   - Verificar que no queden rastros de `$22` visibles para ese producto.
-
-Detalles técnicos:
-- Archivo principal afectado: `src/pages/ProductSpanish5000.tsx`
-- Archivos secundarios: `src/pages/PaymentSuccess.tsx`, `src/pages/HotmartSuccess.tsx`
-- No hace falta cambiar `src/data/products.ts` porque ahí ya está correcto: `price: 27.99`, `discount: 48`.
-- El problema visible actual viene del `StickyBuyBar`, no del catálogo.
-
-Resultado esperado:
-- El usuario verá **$27.99 USD** en toda la página del producto Spanish Relax.
-- El descuento seguirá coherente contra **$54**.
-- El tracking de vista, checkout y compra quedará alineado con el nuevo precio.
+## Detalle técnico
+- Archivo a tocar: `src/pages/ProductSpanish5000.tsx`
+- Cambio principal: reemplazar importación dinámica por import estático de `supabase`
+- No hace falta cambiar la función del backend ni la configuración de pagos

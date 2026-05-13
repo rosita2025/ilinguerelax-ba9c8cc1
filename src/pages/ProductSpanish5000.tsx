@@ -2,6 +2,7 @@ import { useState, useMemo, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { supabase } from "@/integrations/supabase/client";
 import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -497,7 +498,7 @@ const ProductSpanish5000 = () => {
                     onClick={async () => {
                       try {
                         trackHotmartEvent("InitiateCheckout", { content_name: "Spanish 5000 Digital Only", value: 29.99, currency: "USD" });
-                        const { data, error } = await import("@/integrations/supabase/client").then(m => m.supabase.functions.invoke("create-spanish-digital-only", { body: {} }));
+                        const { data, error } = await supabase.functions.invoke("create-spanish-digital-only", { body: {} });
                         if (error) throw error;
                         if (data?.url) window.location.href = data.url;
                       } catch (e) {

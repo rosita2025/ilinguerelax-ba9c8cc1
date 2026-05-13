@@ -24,6 +24,7 @@ serve(async (req) => {
       if (customers.data.length > 0) customerId = customers.data[0].id;
     }
 
+    const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/$/, "") || "https://ilinguerelax.com";
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : email || undefined,
@@ -31,8 +32,8 @@ serve(async (req) => {
         { price: "price_1TWhWwBfc72Blbd9SR2MTcay", quantity: 1 },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success`,
-      cancel_url: `${req.headers.get("origin")}/products/5-000-spanish-words-with-english-pronunciation?payment=canceled`,
+      success_url: `${origin}/payment-success`,
+      cancel_url: `${origin}/products/5-000-spanish-words-with-english-pronunciation?payment=canceled`,
     });
 
     return new Response(JSON.stringify({ url: session.url }), {

@@ -431,10 +431,10 @@ const ProductSpanish5000 = () => {
       </section>
 
       {/* Digital Only Alternative */}
-      <section className="py-12 md:py-16">
+      <section className="py-14 md:py-20">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
+            <div className="text-center mb-10">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider border border-accent/20">
                 <Sparkles className="w-4 h-4" />
                 Another Option
@@ -447,26 +447,26 @@ const ProductSpanish5000 = () => {
               </p>
             </div>
 
-            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-5 sm:p-6 md:p-10 shadow-card">
-              <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
+            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-6 sm:p-8 md:p-10 shadow-card">
+              <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
                 <div className="flex justify-center">
                   <img
                     src={productSpanish5000DigitalOnlyImage}
                     alt="Spanish Relax 5,000 Words Digital Only — 3 Bonuses Free"
-                    className="w-full max-w-[280px] md:max-w-none h-auto rounded-2xl shadow-lg"
+                    className="w-full max-w-[260px] sm:max-w-[300px] md:max-w-none h-auto rounded-2xl shadow-lg"
                     loading="lazy"
                   />
                 </div>
-                <div className="space-y-4 text-center md:text-left">
+                <div className="space-y-5 text-center md:text-left">
                   <h3 className="text-2xl md:text-3xl font-bold text-foreground">
                     Digital Only — 5,000+ Words
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground leading-relaxed">
                     Spanish with English pronunciation. Instant download, study on any device, includes <strong>3 FREE bonuses</strong>.
                   </p>
-                  <ul className="space-y-2 text-left">
+                  <ul className="space-y-3 text-left">
                     {["Instant PDF download", "5,000+ Spanish words with English pronunciation", "3 exclusive bonuses included FREE", "No shipping — access in seconds", "Lifetime access on any device"].map(item => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-foreground">
+                      <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
                         <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <span>{item}</span>
                       </li>
@@ -495,7 +495,7 @@ const ProductSpanish5000 = () => {
                     <CreditCard className="w-5 h-5" />
                     Buy Digital Only — $29.99
                   </Button>
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
                     <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure Stripe checkout</span>
                     <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> Instant access</span>
                   </div>

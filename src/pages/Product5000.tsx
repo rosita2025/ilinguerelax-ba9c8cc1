@@ -242,8 +242,7 @@ const Product5000 = () => {
   const prevBonusImage = () => {
     setCurrentBonusIndex((prev) => (prev - 1 + bonuses.length) % bonuses.length);
   };
-  const handleBuy = () => {
-    // Track InitiateCheckout with Hotmart pixel
+  const handleBuyClick = () => {
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 5,000 Palabras",
       content_category: "Digital Book",
@@ -253,10 +252,12 @@ const Product5000 = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(
-      "https://pay.hotmart.com/O100578526P?bid=1778299502267",
-      "_blank",
-    );
+  };
+
+  const handleBuy = async () => {
+    handleBuyClick();
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    window.open("https://pay.hotmart.com/O100578526P?checkoutMode=10", "_blank");
   };
   return (
     <main className="min-h-screen bg-background">
@@ -528,15 +529,22 @@ const Product5000 = () => {
               {/* CTA Button - More Impactful */}
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
+                  asChild
                   variant="hero"
                   size="xl"
                   className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
-                  onClick={handleBuy}
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  ¡QUIERO COMPRAR AHORA!
-                  <ArrowRight className="w-6 h-6 ml-2" />
+                  <a
+                    href="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleBuyClick}
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    DESCARGAR AHORA
+                    <ArrowRight className="w-6 h-6 ml-2" />
+                  </a>
                 </Button>
               </motion.div>
 
@@ -780,7 +788,7 @@ const Product5000 = () => {
         reviewCount={800}
         showReviews={true}
         ctaText="DESCARGAR AHORA - PAGO SEGURO"
-        buyUrl="https://pay.hotmart.com/O100578526P?bid=1778299502267"
+        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
       />
 
       {/* Spacer for sticky bar */}
@@ -791,7 +799,7 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup
-        buyUrl="https://pay.hotmart.com/O100578526P?bid=1778299502267"
+        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
         discount="15%"
       />
 

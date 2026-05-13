@@ -50,9 +50,13 @@ export const SEO = ({
   availability = "InStock",
   isPhysical = false,
 }: SEOProps) => {
+  // Keep combined title under 60 chars to avoid SERP truncation.
+  const SUFFIX = " | iLingue Relax";
   const fullTitle = title.includes("iLingue Relax")
     ? title
-    : `${title} | iLingue Relax`;
+    : title.length + SUFFIX.length <= 60
+      ? `${title}${SUFFIX}`
+      : title;
 
   const optimizedDescription = description.length > 155 
     ? description.substring(0, 152) + "..." 

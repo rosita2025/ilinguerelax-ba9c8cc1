@@ -34,7 +34,7 @@ const Index = () => {
   return (
     <main className="min-h-screen">
       <SEO
-        title="Aprende Inglés con Pronunciación para Hispanohablantes | iLingue Relax"
+        title="Aprende Idiomas con Pronunciación"
         description="Libro digital de inglés con 5,000+ palabras, pronunciación adaptada para hispanohablantes y fonética UK/USA. Método sin estrés, descarga inmediata. ¡Empieza hoy!"
         canonicalUrl="https://ilinguerelax.com/"
         keywords="aprender inglés, pronunciación inglés hispanohablantes, vocabulario inglés, fonética inglés UK USA, libro digital inglés, curso inglés online, inglés sin estrés, inglés fácil"

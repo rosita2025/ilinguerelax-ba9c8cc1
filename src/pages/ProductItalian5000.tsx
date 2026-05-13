@@ -59,7 +59,7 @@ const ProductItalian5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Italiano con Pronunciación para Hispanohablantes y Fonética Italiana"
+        title="5,000 Palabras en Italiano con Pronunciación"
         description="Aprende 5,000 palabras en italiano con pronunciación adaptada para hispanohablantes y fonética italiana. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"

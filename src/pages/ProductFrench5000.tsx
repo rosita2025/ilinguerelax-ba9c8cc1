@@ -59,7 +59,7 @@ const ProductFrench5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Francés con Pronunciación para Hispanohablantes y Fonética Francesa"
+        title="5,000 Palabras en Francés con Pronunciación"
         description="Aprende 5,000 palabras en francés con pronunciación adaptada para hispanohablantes y fonética francesa. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"

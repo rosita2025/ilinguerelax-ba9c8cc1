@@ -1,0 +1,48 @@
+# iLingue Relax
+
+> Libros digitales y físicos para aprender idiomas con pronunciación adaptada para hispanohablantes (y español para angloparlantes). Inglés, alemán, portugués, italiano, francés, neerlandés.
+
+iLingue Relax publica diccionarios temáticos y guías de vocabulario, verbos y gramática con fonética simplificada. Productos digitales (PDF) por Hotmart y libros físicos por Shopify.
+
+## Pages
+
+- [Inicio](/): Catálogo principal y propuesta de valor.
+- [Productos](/products): Listado completo de libros y guías.
+- [Sobre nosotros](/sobre-nosotros): Historia y método iLingue Relax.
+- [Blog](/blog): Artículos sobre aprendizaje de idiomas (ES y EN).
+- [Preguntas frecuentes](/faq): FAQ sobre productos, pagos, garantía y soporte.
+- [Contacto](/contacto): Formulario y canales de soporte.
+- [Dejar reseña](/dejar-resena): Reseñas moderadas de clientes.
+
+## Productos digitales — Inglés
+
+- [5.000 Palabras en Inglés](/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa): 5.000+ palabras con fonética UK/USA.
+- [8.000 Palabras en Inglés](/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa): Versión premium con gramática.
+- [1.000 Verbos en Inglés](/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion): Verbos en presente, pasado y futuro.
+- [500 Preguntas en Inglés](/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes): Preguntas prácticas con pronunciación.
+- [1.000 Palabras GRATIS](/products/1-000-palabras-en-ingles-con-pronunciacion-gratis): Muestra gratuita.
+
+## Productos digitales — Otros idiomas
+
+- [5.000 Palabras en Alemán](/products/5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes)
+- [5.000 Palabras en Portugués](/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes)
+- [5.000 Palabras en Italiano](/products/5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes)
+- [5.000 Palabras en Francés](/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes)
+- [5.000 Palabras en Neerlandés](/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes)
+
+## Productos para angloparlantes (Spanish)
+
+- [5,000 Spanish Words with English Pronunciation](/products/5-000-spanish-words-with-english-pronunciation)
+- [1,000 Verbs in Spanish](/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation)
+- [500 Questions in Spanish](/products/500-questions-in-spanish-with-english-pronunciation)
+- [3,000 Spanish Verbs Mastery (Physical, Preorder)](/products/3-000-spanish-verbs-mastery-physical-book-preorder)
+- [Spanish Grammar Patterns A1–C1 (Preorder)](/products/spanish-grammar-patterns-a1-c1-mastery-preorder)
+
+## Libros físicos
+
+- [8.000 Palabras — Libro físico](/products/8-000-palabras-libro-fisico)
+
+## Optional
+
+- [Blog (EN) — Learn Spanish](/blog/how-to-learn-spanish-fast-beginners-guide)
+- [Blog (ES) — Aprender inglés desde cero](/blog/como-aprender-ingles-desde-cero)

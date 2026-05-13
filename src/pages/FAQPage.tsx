@@ -1,4 +1,5 @@
 import { SEO } from "@/components/SEO";
+import { Helmet } from "react-helmet-async";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
@@ -82,6 +83,18 @@ const faqItems = [
 ];
 
 const FAQPage = () => {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -90,6 +103,9 @@ const FAQPage = () => {
         canonicalUrl="https://ilinguerelax.com/faq"
         keywords="preguntas frecuentes iLingue Relax, FAQ libros inglés, dudas pronunciación inglés, garantía devolución, métodos pago"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+      </Helmet>
       <Navbar />
       <motion.main
         className="pt-20"

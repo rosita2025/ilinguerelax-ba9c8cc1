@@ -79,7 +79,7 @@ const ProductPortuguese5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Portugués con Pronunciación para Hispanohablantes y Fonética en Portugués"
+        title="5,000 Palabras en Portugués con Pronunciación"
         description="Aprende 5,000 palabras en portugués con pronunciación adaptada para hispanohablantes y fonética en portugués real. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"

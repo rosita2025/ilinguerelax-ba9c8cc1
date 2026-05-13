@@ -254,7 +254,7 @@ const Product5000 = () => {
       num_items: 1,
     });
     window.open(
-      "https://pay.hotmart.com/O100578526P?bid=1778299502267",
+      "https://pay.hotmart.com/O100578526P?checkoutMode=10",
       "_blank",
     );
   };

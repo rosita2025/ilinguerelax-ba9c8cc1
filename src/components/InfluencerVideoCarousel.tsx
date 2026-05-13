@@ -47,9 +47,11 @@ export const InfluencerVideoCarousel = ({ onCta }: { onCta?: () => void }) => {
 
   // Pause non-active videos
   useEffect(() => {
+    const currentSlide = slides[current];
+    if (!currentSlide) return;
     Object.entries(videoRefs.current).forEach(([id, v]) => {
       if (!v) return;
-      if (slides[current].id === id) {
+      if (currentSlide.id === id) {
         v.muted = muted;
         v.play().catch(() => {});
       } else {

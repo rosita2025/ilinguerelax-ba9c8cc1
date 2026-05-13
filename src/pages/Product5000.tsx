@@ -264,7 +264,7 @@ const Product5000 = () => {
         title="Inglés Relax: 5,000 Palabras con Pronunciación Español y Fonética UK/USA"
         description="Libro digital con 5,000 palabras en inglés y pronunciación para hispanohablantes. Fonética UK/USA, 52 capítulos, estructuras gramaticales desde Nivel Cero hasta Avanzado C1 y 5 regalos. Descarga inmediata, paga en moneda local."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
-        image="https://ilinguerelax.com/images/product-5000.png"
+        image="https://ilinguerelax.com/images/product-5000.webp"
         type="product"
         price="15"
         originalPrice="54"

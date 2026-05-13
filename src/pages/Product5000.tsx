@@ -242,7 +242,7 @@ const Product5000 = () => {
   const prevBonusImage = () => {
     setCurrentBonusIndex((prev) => (prev - 1 + bonuses.length) % bonuses.length);
   };
-  const handleBuy = () => {
+  const handleBuy = async () => {
     // Track InitiateCheckout with Hotmart pixel
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 5,000 Palabras",
@@ -253,6 +253,8 @@ const Product5000 = () => {
       currency: "USD",
       num_items: 1,
     });
+    // Give pixel + funnel events time to fire before redirect
+    await new Promise((resolve) => setTimeout(resolve, 500));
     window.open(
       "https://pay.hotmart.com/O100578526P?checkoutMode=10",
       "_blank",

@@ -447,24 +447,24 @@ const ProductSpanish5000 = () => {
               </p>
             </div>
 
-            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-6 md:p-10 shadow-card">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
+            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-5 sm:p-6 md:p-10 shadow-card">
+              <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
+                <div className="flex justify-center">
                   <img
                     src={productSpanish5000DigitalOnlyImage}
                     alt="Spanish Relax 5,000 Words Digital Only — 3 Bonuses Free"
-                    className="w-full h-auto rounded-2xl shadow-lg"
+                    className="w-full max-w-[280px] md:max-w-none h-auto rounded-2xl shadow-lg"
                     loading="lazy"
                   />
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-4 text-center md:text-left">
                   <h3 className="text-2xl md:text-3xl font-bold text-foreground">
                     Digital Only — 5,000+ Words
                   </h3>
                   <p className="text-muted-foreground">
                     Spanish with English pronunciation. Instant download, study on any device, includes <strong>3 FREE bonuses</strong>.
                   </p>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2 text-left">
                     {["Instant PDF download", "5,000+ Spanish words with English pronunciation", "3 exclusive bonuses included FREE", "No shipping — access in seconds", "Lifetime access on any device"].map(item => (
                       <li key={item} className="flex items-start gap-2 text-sm text-foreground">
                         <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -472,7 +472,7 @@ const ProductSpanish5000 = () => {
                       </li>
                     ))}
                   </ul>
-                  <div className="flex items-baseline gap-3 pt-2">
+                  <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
                     <span className="text-4xl font-bold text-foreground">$29.99</span>
                     <span className="text-lg text-muted-foreground line-through">$54.00</span>
                     <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 44%</span>
@@ -495,7 +495,7 @@ const ProductSpanish5000 = () => {
                     <CreditCard className="w-5 h-5" />
                     Buy Digital Only — $29.99
                   </Button>
-                  <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure Stripe checkout</span>
                     <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> Instant access</span>
                   </div>

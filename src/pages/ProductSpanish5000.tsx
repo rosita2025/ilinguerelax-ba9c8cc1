@@ -32,6 +32,7 @@ import productSpanish5000BundleImage from "@/assets/spanish-relax-physical-digit
 import productSpanish5000BundleImageAvif from "@/assets/spanish-relax-physical-digital-bundle.avif";
 import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.webp";
 import product3000VerbsImage from "@/assets/product-spanish-3000-verbs-book.webp";
+import productSpanish5000DigitalOnlyImage from "@/assets/spanish-5000-digital-only.webp";
 
 // Preview images
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
@@ -425,6 +426,82 @@ const ProductSpanish5000 = () => {
                   </div>
                 </div>
               </div>)}
+          </div>
+        </div>
+      </section>
+
+      {/* Digital Only Alternative */}
+      <section className="py-12 md:py-16">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider border border-accent/20">
+                <Sparkles className="w-4 h-4" />
+                Another Option
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-4 mb-3">
+                Just want the <span className="text-purple-600">Digital Book</span>?
+              </h2>
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+                If you only want the digital book — no physical copy, no shipping — get instant access to the PDF + 3 free bonuses.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-6 md:p-10 shadow-card">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <img
+                    src={productSpanish5000DigitalOnlyImage}
+                    alt="Spanish Relax 5,000 Words Digital Only — 3 Bonuses Free"
+                    className="w-full h-auto rounded-2xl shadow-lg"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                    Digital Only — 5,000+ Words
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Spanish with English pronunciation. Instant download, study on any device, includes <strong>3 FREE bonuses</strong>.
+                  </p>
+                  <ul className="space-y-2">
+                    {["Instant PDF download", "5,000+ Spanish words with English pronunciation", "3 exclusive bonuses included FREE", "No shipping — access in seconds", "Lifetime access on any device"].map(item => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-foreground">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex items-baseline gap-3 pt-2">
+                    <span className="text-4xl font-bold text-foreground">$29.99</span>
+                    <span className="text-lg text-muted-foreground line-through">$54.00</span>
+                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 44%</span>
+                  </div>
+                  <Button
+                    size="xl"
+                    variant="hero"
+                    className="w-full"
+                    onClick={async () => {
+                      try {
+                        trackHotmartEvent("InitiateCheckout", { content_name: "Spanish 5000 Digital Only", value: 29.99, currency: "USD" });
+                        const { data, error } = await import("@/integrations/supabase/client").then(m => m.supabase.functions.invoke("create-spanish-digital-only", { body: {} }));
+                        if (error) throw error;
+                        if (data?.url) window.location.href = data.url;
+                      } catch (e) {
+                        console.error("Digital-only checkout error:", e);
+                      }
+                    }}
+                  >
+                    <CreditCard className="w-5 h-5" />
+                    Buy Digital Only — $29.99
+                  </Button>
+                  <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure Stripe checkout</span>
+                    <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> Instant access</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

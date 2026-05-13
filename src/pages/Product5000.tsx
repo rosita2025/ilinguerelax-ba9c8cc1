@@ -535,7 +535,7 @@ const Product5000 = () => {
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                   <ShoppingCart className="w-6 h-6 mr-2" />
-                  ¡QUIERO COMPRAR AHORA!
+                  DESCARGAR AHORA
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
               </motion.div>
@@ -780,7 +780,7 @@ const Product5000 = () => {
         reviewCount={800}
         showReviews={true}
         ctaText="DESCARGAR AHORA - PAGO SEGURO"
-        buyUrl="https://pay.hotmart.com/O100578526P?bid=1778299502267"
+        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
       />
 
       {/* Spacer for sticky bar */}
@@ -791,7 +791,7 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup
-        buyUrl="https://pay.hotmart.com/O100578526P?bid=1778299502267"
+        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
         discount="15%"
       />
 

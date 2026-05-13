@@ -488,6 +488,20 @@ const Product8000Book = () => {
               📖 Mira el interior del libro
             </h2>
             <p className="text-muted-foreground mb-6">Contenido real del libro — vocabulario, gramática y pronunciación</p>
+            {/* Before / After comparison */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <p className="text-sm font-semibold text-primary mb-3">
+                🔄 Diccionario tradicional vs. iLingue Relax — arrastra el control
+              </p>
+              <BeforeAfterSlider
+                beforeSrc={beforeDictImg}
+                afterSrc={afterTopicsImg}
+                beforeAlt="Diccionario tradicional sin organización por temas"
+                afterAlt="Temas por categorías con pronunciación y fonética UK/US"
+                beforeLabel="DICCIONARIO"
+                afterLabel="iLINGUE RELAX"
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {bookImages.slice(1).map((img, i) => (
                 <div key={i} className="rounded-2xl overflow-hidden shadow-card border border-border">

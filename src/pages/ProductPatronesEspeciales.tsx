@@ -183,10 +183,10 @@ const ProductPatronesEspeciales = () => {
                     Precio de Lanzamiento
                   </span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">{priceLabel}</span>
-                  <span className="text-2xl text-muted-foreground line-through">{originalLabel}</span>
-                  <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
+                <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
+                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{priceLabel}</span>
+                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through">{originalLabel}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
                     AHORRA 75%
                   </span>
                 </div>

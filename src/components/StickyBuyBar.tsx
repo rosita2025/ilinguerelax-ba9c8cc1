@@ -59,6 +59,7 @@ export const StickyBuyBar = ({
 }: StickyBuyBarProps) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
+  const isVeryLongPrice = price.length > 10;
   // Compute savings = originalPrice - price (keeps the currency symbol from `price`)
   const parseNum = (s?: string) => {
     if (!s) return NaN;
@@ -197,16 +198,16 @@ export const StickyBuyBar = ({
             </p>
           )}
           {/* Row 1: Price */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1.5 min-w-0 flex-shrink">
-              <span className={`${isLongPrice ? 'text-base' : 'text-lg'} sm:text-xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-baseline gap-1 min-w-0 flex-shrink flex-wrap">
+              <span className={`${isVeryLongPrice ? 'text-sm' : isLongPrice ? 'text-base' : 'text-lg'} sm:text-xl font-black text-foreground tabular-nums leading-none whitespace-nowrap max-w-full`}>{price}</span>
               {originalPrice && (
-                <span className="text-[11px] text-muted-foreground line-through tabular-nums whitespace-nowrap">{originalPrice}</span>
+                <span className="text-[10px] sm:text-[11px] text-muted-foreground line-through tabular-nums whitespace-nowrap">{originalPrice}</span>
               )}
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">{currencyCode}</span>
+              <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {savingsLabel && (
-              <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
+              <span className="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
                 {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
               </span>
             )}
@@ -246,7 +247,7 @@ export const StickyBuyBar = ({
               <Button
                 type="button"
                 size="default"
-                className={`relative z-10 w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] text-base font-extrabold tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] touch-manipulation ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                className={`relative z-10 w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] ${isVeryLongPrice ? 'text-[13px]' : isLongPrice ? 'text-sm' : 'text-base'} font-extrabold transition-all hover:scale-[1.02] active:scale-[0.98] touch-manipulation px-3 sm:px-4 ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 disabled={disabled || isLoading}
               >
@@ -257,7 +258,7 @@ export const StickyBuyBar = ({
                   </>
                 ) : (
                   <>
-                    {ctaText}
+                    <span className="min-w-0 truncate">{ctaText}</span>
                     {disabled && <Clock className="w-4 h-4 ml-2" />}
                   </>
                 )}

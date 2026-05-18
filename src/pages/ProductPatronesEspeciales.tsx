@@ -40,6 +40,11 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
+  const { formatPrice, currency } = useI18n();
+  const PRICE_USD = 4.9;
+  const ORIGINAL_USD = 19.99;
+  const priceLabel = formatPrice(PRICE_USD);
+  const originalLabel = formatPrice(ORIGINAL_USD);
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
     content_category: "Digital Book",
@@ -66,7 +71,7 @@ const ProductPatronesEspeciales = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés | $4.90"
+        title={`Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés | ${priceLabel}`}
         description="Domina la pronunciación en inglés con patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Método fácil para hispanohablantes paso a paso. Ebook digital Inglés Relax."
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image="https://ilinguerelax.com/images/product-patrones-especiales.webp"

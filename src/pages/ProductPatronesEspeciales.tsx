@@ -68,6 +68,45 @@ const ProductPatronesEspeciales = () => {
     window.open(HOTMART_URL, "_blank");
   };
 
+  const productReviews = [
+    {
+      author: "María G.",
+      rating: 5,
+      text: "Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de lo que cuesta.",
+      date: "2026-04-10",
+    },
+    {
+      author: "Carlos R.",
+      rating: 5,
+      text: "Compré por curiosidad por el precio y me sorprendió la calidad. El alfabeto con sonidos reales y las letras mudas están explicadas clarísimo.",
+      date: "2026-04-12",
+    },
+    {
+      author: "Ana L.",
+      rating: 5,
+      text: "Llevaba años confundiéndome con la pronunciación. Este ebook con las combinaciones secretas me dio la confianza que necesitaba para hablar.",
+      date: "2026-04-15",
+    },
+    {
+      author: "Luis M.",
+      rating: 5,
+      text: "Los mini retos son geniales. No es teoría aburrida, es práctico y directo. Lo leí en una tarde y ya noto la diferencia al escuchar inglés.",
+      date: "2026-04-18",
+    },
+    {
+      author: "Diana S.",
+      rating: 5,
+      text: "Me encantó que incluya contracciones y habla rápida. Por fin entiendo lo que dicen en las películas sin subtítulos. Muy recomendado.",
+      date: "2026-04-20",
+    },
+    {
+      author: "Jorge H.",
+      rating: 5,
+      text: "Dudaba por el precio bajo, pero la vista previa me convenció. El PDF está bien editado, sin errores, y el método realmente funciona.",
+      date: "2026-04-22",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -82,6 +121,7 @@ const ProductPatronesEspeciales = () => {
         reviewCount="6"
         sku="ILINGUE-PATRONES-ESP"
         keywords="patrones especiales inglés, combinaciones secretas inglés, pronunciación inglés para hispanohablantes, letras mudas inglés, ebook aprender inglés, inglés relax, pronunciación fácil inglés"
+        reviews={productReviews}
       />
 
       <Navbar />

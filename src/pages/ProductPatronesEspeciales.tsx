@@ -73,7 +73,7 @@ const ProductPatronesEspeciales = () => {
         price="4.90"
         originalPrice="19.99"
         rating="4.9"
-        reviewCount="0"
+        reviewCount="6"
         sku="ILINGUE-PATRONES-ESP"
         keywords="patrones especiales inglés, combinaciones secretas inglés, pronunciación inglés para hispanohablantes, letras mudas inglés, ebook aprender inglés, inglés relax, pronunciación fácil inglés"
       />
@@ -363,8 +363,8 @@ const ProductPatronesEspeciales = () => {
         originalPrice={"19.99"}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
-        reviewCount={0}
-        showReviews={false}
+        reviewCount={6}
+        showReviews={true}
         buyUrl={HOTMART_URL}
       />
 

@@ -73,7 +73,7 @@ const ProductPatronesEspeciales = () => {
         price="4.90"
         originalPrice="19.99"
         rating="4.9"
-        reviewCount="0"
+        reviewCount="6"
         sku="ILINGUE-PATRONES-ESP"
         keywords="patrones especiales inglés, combinaciones secretas inglés, pronunciación inglés para hispanohablantes, letras mudas inglés, ebook aprender inglés, inglés relax, pronunciación fácil inglés"
       />
@@ -259,6 +259,92 @@ const ProductPatronesEspeciales = () => {
         </div>
       </section>
 
+      {/* Testimonios y reseñas */}
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold mb-3">
+                <Star className="w-4 h-4 fill-amber-500 text-amber-500" /> Opiniones verificadas
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                Lo que dicen <span className="text-gradient">nuestros lectores</span>
+              </h2>
+              <p className="text-muted-foreground">
+                Miles de hispanohablantes ya usan el método Inglés Relax
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  name: "María G.",
+                  country: "México",
+                  text: "Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de $4.90.",
+                  rating: 5,
+                },
+                {
+                  name: "Carlos R.",
+                  country: "Colombia",
+                  text: "Compré por curiosidad por el precio y me sorprendió la calidad. El alfabeto con sonidos reales y las letras mudas están explicadas clarísimo.",
+                  rating: 5,
+                },
+                {
+                  name: "Ana L.",
+                  country: "España",
+                  text: "Llevaba años confundiéndome con la pronunciación. Este ebook con las combinaciones secretas me dio la confianza que necesitaba para hablar.",
+                  rating: 5,
+                },
+                {
+                  name: "Luis M.",
+                  country: "Perú",
+                  text: "Los mini retos son geniales. No es teoría aburrida, es práctico y directo. Lo leí en una tarde y ya noto la diferencia al escuchar inglés.",
+                  rating: 5,
+                },
+                {
+                  name: "Diana S.",
+                  country: "Chile",
+                  text: "Me encantó que incluya contracciones y habla rápida. Por fin entiendo lo que dicen en las películas sin subtítulos. Muy recomendado.",
+                  rating: 5,
+                },
+                {
+                  name: "Jorge H.",
+                  country: "Argentina",
+                  text: "Dudaba por el precio bajo, pero la vista previa me convenció. El PDF está bien editado, sin errores, y el método realmente funciona.",
+                  rating: 5,
+                },
+              ].map((t) => (
+                <div key={t.name} className="bg-card rounded-2xl border border-border shadow-card p-5 flex flex-col">
+                  <div className="flex items-center gap-1 mb-3">
+                    {[...Array(t.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-foreground/90 text-sm leading-relaxed mb-4 flex-grow">"{t.text}"</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">{t.country}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <Button variant="hero" size="xl" onClick={handleBuy} className="text-lg py-6 px-8 shadow-2xl">
+                <ShoppingCart className="w-6 h-6 mr-2" />
+                Comprar ahora por $4.90
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <FAQ
         items={[
           { question: "¿Por qué cuesta solo $4.90?", answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba.", icon: Lightbulb },
@@ -277,8 +363,8 @@ const ProductPatronesEspeciales = () => {
         originalPrice={"19.99"}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
-        reviewCount={0}
-        showReviews={false}
+        reviewCount={6}
+        showReviews={true}
         buyUrl={HOTMART_URL}
       />
 

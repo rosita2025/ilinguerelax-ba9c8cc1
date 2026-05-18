@@ -122,6 +122,12 @@ const ProductPatronesEspeciales = () => {
         sku="ILINGUE-PATRONES-ESP"
         keywords="patrones especiales inglés, combinaciones secretas inglés, pronunciación inglés para hispanohablantes, letras mudas inglés, ebook aprender inglés, inglés relax, pronunciación fácil inglés"
         reviews={productReviews}
+        faqItems={[
+          { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
+          { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas." },
+          { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
+          { question: "¿Cómo realizo el pago?", answer: "Pago seguro mediante Hotmart: tarjeta de crédito/débito, PayPal y otros métodos según tu país." },
+        ]}
       />
 
       <Navbar />

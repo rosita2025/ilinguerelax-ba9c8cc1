@@ -278,6 +278,20 @@ export const SEO = ({
     ]
   } : null;
 
+  // FAQPage structured data
+  const faqStructuredData = faqItems && faqItems.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map((item) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer,
+      },
+    })),
+  } : null;
+
   // Organization structured data (for homepage/general pages)
   const organizationData = type === "website" ? {
     "@context": "https://schema.org",

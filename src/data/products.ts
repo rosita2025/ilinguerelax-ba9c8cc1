@@ -33,7 +33,7 @@ export const products: Product[] = [
     description: "Aprende patrones especiales, el alfabeto y combinaciones secretas en inglés con pronunciación clara y práctica.",
     rating: 4.9,
     reviews: 0,
-    price: 5.00,
+    price: 4.90,
     originalPrice: 19.99,
     discount: 75,
     badge: "🆕 Nuevo",

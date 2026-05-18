@@ -28,6 +28,7 @@ const ProductItalian5000 = lazy(() => import("./pages/ProductItalian5000"));
 const ProductFrench5000 = lazy(() => import("./pages/ProductFrench5000"));
 const ProductDutch5000 = lazy(() => import("./pages/ProductDutch5000"));
 const Product1000Free = lazy(() => import("./pages/Product1000Free"));
+const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const HotmartSuccess = lazy(() => import("./pages/HotmartSuccess"));
 const HotmartPending = lazy(() => import("./pages/HotmartPending"));
@@ -117,6 +118,7 @@ const App = () => (
                   <Route path="/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes" element={<ProductFrench5000 />} />
                   <Route path="/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes" element={<ProductDutch5000 />} />
                   <Route path="/products/1-000-palabras-en-ingles-con-pronunciacion-gratis" element={<Product1000Free />} />
+                  <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
                   <Route path="/hotmart-success" element={<HotmartSuccess />} />
                   <Route path="/hotmart-pending" element={<HotmartPending />} />

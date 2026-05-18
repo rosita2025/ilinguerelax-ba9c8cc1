@@ -28,6 +28,10 @@ interface SEOProps {
     text: string;
     date: string;
   }>;
+  faqItems?: Array<{
+    question: string;
+    answer: string;
+  }>;
   availability?: "InStock" | "PreOrder" | "OutOfStock";
   isPhysical?: boolean;
 }

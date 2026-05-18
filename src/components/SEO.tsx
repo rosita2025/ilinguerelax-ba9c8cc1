@@ -28,6 +28,10 @@ interface SEOProps {
     text: string;
     date: string;
   }>;
+  faqItems?: Array<{
+    question: string;
+    answer: string;
+  }>;
   availability?: "InStock" | "PreOrder" | "OutOfStock";
   isPhysical?: boolean;
 }
@@ -47,6 +51,7 @@ export const SEO = ({
   sku,
   productList,
   reviews,
+  faqItems,
   availability = "InStock",
   isPhysical = false,
 }: SEOProps) => {
@@ -273,6 +278,20 @@ export const SEO = ({
     ]
   } : null;
 
+  // FAQPage structured data
+  const faqStructuredData = faqItems && faqItems.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map((item) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer,
+      },
+    })),
+  } : null;
+
   // Organization structured data (for homepage/general pages)
   const organizationData = type === "website" ? {
     "@context": "https://schema.org",
@@ -374,6 +393,13 @@ export const SEO = ({
       {organizationData && (
         <script type="application/ld+json">
           {JSON.stringify(organizationData)}
+        </script>
+      )}
+
+      {/* FAQPage Structured Data */}
+      {faqStructuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqStructuredData)}
         </script>
       )}
     </Helmet>

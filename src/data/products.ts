@@ -22,6 +22,26 @@ export interface Product {
 
 export const products: Product[] = [
   {
+    id: "patrones-especiales",
+    slug: "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
+    name: "Patrones Especiales",
+    flag: "🇬🇧",
+    country: "Inglés para Hispanohablantes",
+    image: "/images/product-patrones-especiales.webp",
+    title: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+    subtitle: "Ingles Relax by iLingue Relax",
+    description: "Aprende patrones especiales, el alfabeto y combinaciones secretas en inglés con pronunciación clara y práctica.",
+    rating: 4.9,
+    reviews: 0,
+    price: 5.00,
+    originalPrice: 19.99,
+    discount: 75,
+    badge: "🆕 Nuevo",
+    features: ["Patrones especiales", "Alfabeto completo", "Combinaciones secretas", "Pronunciación clara"],
+    isPhysical: false,
+    externalUrl: "https://pay.hotmart.com/Q105880946X",
+  },
+  {
     id: "5000",
     slug: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
     name: "5,000 Palabras",

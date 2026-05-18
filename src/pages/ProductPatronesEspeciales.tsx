@@ -273,8 +273,8 @@ const ProductPatronesEspeciales = () => {
       <Footer />
 
       <StickyBuyBar
-        price={4.9}
-        originalPrice={19.99}
+        price={"4.90"}
+        originalPrice={"19.99"}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={0}

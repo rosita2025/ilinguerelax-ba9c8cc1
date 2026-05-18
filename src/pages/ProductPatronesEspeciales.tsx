@@ -138,8 +138,8 @@ const ProductPatronesEspeciales = () => {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$4.90</span>
-                  <span className="text-2xl text-muted-foreground line-through">$19.99</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">{priceLabel}</span>
+                  <span className="text-2xl text-muted-foreground line-through">{originalLabel}</span>
                   <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
                     AHORRA 75%
                   </span>
@@ -193,7 +193,7 @@ const ProductPatronesEspeciales = () => {
               <strong>No.</strong> El precio bajo es intencional: queremos que más hispanohablantes accedan al método Inglés Relax sin barreras. El PDF está revisado, sin errores ortográficos, y es exactamente el mismo material que usamos en nuestros libros completos.
             </p>
             <p className="text-foreground/90">
-              Para que lo compruebes tú mismo, abajo puedes ver <strong>la vista previa real de las páginas interiores</strong>. Si te gusta lo que ves, el precio de $4.90 es honesto. Si no, tienes 7 días de garantía.
+              Para que lo compruebes tú mismo, abajo puedes ver <strong>la vista previa real de las páginas interiores</strong>. Si te gusta lo que ves, el precio de {priceLabel} es honesto. Si no, tienes 7 días de garantía.
             </p>
           </div>
         </div>
@@ -234,7 +234,7 @@ const ProductPatronesEspeciales = () => {
             <div className="text-center mt-8">
               <Button variant="hero" size="xl" onClick={handleBuy} className="text-lg py-6 px-8 shadow-2xl">
                 <ShoppingCart className="w-6 h-6 mr-2" />
-                Comprar ahora por $4.90
+                Comprar ahora por {priceLabel}
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Button>
             </div>
@@ -286,7 +286,7 @@ const ProductPatronesEspeciales = () => {
                 {
                   name: "María G.",
                   country: "México",
-                  text: "Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de $4.90.",
+                  text: `Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de ${priceLabel}.`,
                   rating: 5,
                 },
                 {
@@ -343,7 +343,7 @@ const ProductPatronesEspeciales = () => {
             <div className="text-center mt-8">
               <Button variant="hero" size="xl" onClick={handleBuy} className="text-lg py-6 px-8 shadow-2xl">
                 <ShoppingCart className="w-6 h-6 mr-2" />
-                Comprar ahora por $4.90
+                Comprar ahora por {priceLabel}
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Button>
             </div>
@@ -353,7 +353,7 @@ const ProductPatronesEspeciales = () => {
 
       <FAQ
         items={[
-          { question: "¿Por qué cuesta solo $4.90?", answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba.", icon: Lightbulb },
+          { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba.", icon: Lightbulb },
           { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas.", icon: BookOpen },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo.", icon: Smartphone },
           { question: "¿Cómo realizo el pago?", answer: "Pago seguro mediante Hotmart: tarjeta de crédito/débito, PayPal y otros métodos según tu país.", icon: CreditCard },
@@ -365,8 +365,9 @@ const ProductPatronesEspeciales = () => {
       <Footer />
 
       <StickyBuyBar
-        price={"4.90"}
-        originalPrice={"19.99"}
+        price={priceLabel}
+        originalPrice={originalLabel}
+        currencyCode={currency}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={6}

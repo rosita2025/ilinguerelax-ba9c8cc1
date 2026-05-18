@@ -51,6 +51,7 @@ export const SEO = ({
   sku,
   productList,
   reviews,
+  faqItems,
   availability = "InStock",
   isPhysical = false,
 }: SEOProps) => {

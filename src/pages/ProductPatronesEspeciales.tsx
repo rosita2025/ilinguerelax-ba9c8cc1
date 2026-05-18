@@ -13,6 +13,7 @@ import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb,
 import { motion } from "framer-motion";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { useI18n } from "@/i18n/I18nContext";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X";
 const productImage = "/images/product-patrones-especiales.webp";

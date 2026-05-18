@@ -395,6 +395,13 @@ export const SEO = ({
           {JSON.stringify(organizationData)}
         </script>
       )}
+
+      {/* FAQPage Structured Data */}
+      {faqStructuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqStructuredData)}
+        </script>
+      )}
     </Helmet>
   );
 };

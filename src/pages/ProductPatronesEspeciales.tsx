@@ -41,7 +41,7 @@ const features = [
 
 const ProductPatronesEspeciales = () => {
   const { formatPrice, currency } = useI18n();
-  const PRICE_USD = 4.9;
+  const PRICE_USD = 7;
   const ORIGINAL_USD = 19.99;
   const priceLabel = formatPrice(PRICE_USD);
   const originalLabel = formatPrice(ORIGINAL_USD);
@@ -51,7 +51,7 @@ const ProductPatronesEspeciales = () => {
     content_category: "Digital Book",
     content_ids: ["patrones-especiales"],
     content_type: "product",
-    value: 4.9,
+      value: 7,
     currency: "USD",
   }), []);
   useHotmartPixel(pixelParams);
@@ -62,7 +62,7 @@ const ProductPatronesEspeciales = () => {
       content_category: "Digital Book",
       content_ids: ["patrones-especiales"],
       content_type: "product",
-      value: 4.9,
+      value: 7,
       currency: "USD",
       num_items: 1,
     });
@@ -116,7 +116,7 @@ const ProductPatronesEspeciales = () => {
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image="https://ilinguerelax.com/images/product-patrones-especiales.webp"
         type="product"
-        price="4.90"
+        price="7.00"
         originalPrice="19.99"
         rating="4.9"
         reviewCount="6"

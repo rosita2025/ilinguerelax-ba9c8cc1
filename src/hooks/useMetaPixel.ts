@@ -116,7 +116,9 @@ let pixelInitialized = false;
 
 const ensurePixelReady = () => {
   if (typeof window === "undefined") return;
-  
+  // EU consent gate: do not load fbevents.js until user accepts.
+  if (!hasPixelConsent()) return;
+
   if (pixelInitialized) return;
   
   // If fbq already exists (script loaded), just ensure our pixel is init'd

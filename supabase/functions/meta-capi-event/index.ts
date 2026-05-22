@@ -27,8 +27,9 @@ serve(async (req) => {
   try {
     const accessToken = Deno.env.get("FB_CONVERSIONS_API_TOKEN");
     if (!accessToken) {
-      return new Response(JSON.stringify({ error: "FB token not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // Silently skip when token is not configured to avoid noisy client errors
+      return new Response(JSON.stringify({ ok: true, skipped: "no_token" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -86,8 +87,9 @@ serve(async (req) => {
     const json = await res.json();
     if (!res.ok) {
       console.error("FB CAPI error", event_name, JSON.stringify(json));
-      return new Response(JSON.stringify({ error: json }), {
-        status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // Return 200 so the client doesn't surface a network error to users.
+      return new Response(JSON.stringify({ ok: false, skipped: "fb_error", error: json }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     return new Response(JSON.stringify({ ok: true, fb: json }), {

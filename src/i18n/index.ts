@@ -162,18 +162,18 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   PEN: { symbol: "S/", position: "before", decimals: 2 },
 };
 
-// Exchange rates from USD (approximate - would ideally fetch from API)
+// Exchange rates from USD (updated May 2026 — approximate)
 export const exchangeRates: Record<Currency, number> = {
   USD: 1,
-  EUR: 0.92,
-  BRL: 4.95,
-  MXN: 17.15,
-  COP: 3950,
-  ARS: 850,
-  GBP: 0.79,
-  CAD: 1.36,
-  AUD: 1.52,
-  PEN: 3.75,
+  EUR: 0.88,
+  BRL: 5.20,
+  MXN: 18.50,
+  COP: 4100,
+  ARS: 1250,
+  GBP: 0.75,
+  CAD: 1.38,
+  AUD: 1.55,
+  PEN: 3.70,
 };
 
 // Detect currency from country

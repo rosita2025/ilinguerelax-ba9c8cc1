@@ -9,6 +9,7 @@ import { useCartSync } from "@/hooks/useCartSync";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const Products = lazy(() => import("./pages/Products"));
 const Product5000 = lazy(() => import("./pages/Product5000"));
@@ -97,6 +98,7 @@ const App = () => (
           <BrowserRouter>
             <CartSyncWrapper>
               <RouteTracker />
+              <CookieConsent />
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />

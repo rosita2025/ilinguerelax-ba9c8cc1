@@ -42,10 +42,30 @@ const getSessionId = (): string => {
 const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
 const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
+// EU consent gating: in EU countries we must wait for explicit "accepted" before firing browser Pixel.
+const EU_COUNTRIES = new Set([
+  "AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT",
+  "LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH"
+]);
+const isEuUser = (): boolean => {
+  if (typeof window === "undefined") return false;
+  try {
+    const c = (localStorage.getItem("ilr_country") || "").toUpperCase();
+    return EU_COUNTRIES.has(c);
+  } catch { return false; }
+};
+const hasPixelConsent = (): boolean => {
+  if (typeof window === "undefined") return false;
+  if (!isEuUser()) return true; // non-EU: implicit consent
+  try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
+};
+
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
 const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {
   if (!CAPI_EVENTS.has(eventName)) return;
   if (typeof window === "undefined") return;
+  // For EU users without consent, skip CAPI as well (no cookies/IP profiling).
+  if (!hasPixelConsent()) return;
   try {
     const { content_name, content_ids, content_type, value, currency, num_items } = params as Record<string, unknown>;
     void supabase.functions.invoke("meta-capi-event", {

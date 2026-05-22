@@ -40,7 +40,7 @@ const getSessionId = (): string => {
 };
 
 const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
-const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead"]);
+const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
 const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {

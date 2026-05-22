@@ -8,7 +8,7 @@ const corsHeaders = {
 const FB_PIXEL_ID = "24959578143733255";
 const FB_API_VERSION = "v21.0";
 
-const ALLOWED_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead"]);
+const ALLOWED_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
 async function sha256(message: string): Promise<string> {
   const buf = new TextEncoder().encode(message);

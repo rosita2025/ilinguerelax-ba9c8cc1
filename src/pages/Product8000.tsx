@@ -493,6 +493,64 @@ const Product8000 = () => {
       {/* Preview & Bonus Sections */}
       <Product8000Preview />
 
+      {/* 5 Regalos GRATIS Section */}
+      <section className="py-10 md:py-14 bg-gradient-to-b from-accent/5 to-background">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-bold mb-3">
+                <Gift className="w-4 h-4" />
+                INCLUIDOS GRATIS
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                5 Regalos Gratis Incluidos al Comprar Inglés Relax 8,000
+              </h2>
+              <p className="text-sm md:text-base text-muted-foreground mt-2">
+                Bonos exclusivos para acelerar tu aprendizaje desde el primer día.
+              </p>
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent/40 bg-accent/10 shadow-sm">
+                <span className="text-[11px] md:text-xs font-semibold text-muted-foreground line-through tabular-nums">
+                  $62 USD
+                </span>
+                <span className="text-[11px] md:text-xs font-black uppercase tracking-wide text-accent">
+                  GRATIS hoy
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {bonuses8000.map((bonus, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-card rounded-xl border border-border shadow-card overflow-hidden group"
+                >
+                  <div className="aspect-[4/3] overflow-hidden relative">
+                    <img
+                      src={bonus.image}
+                      alt={bonus.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-accent text-accent-foreground text-xs font-black">
+                      GRATIS
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h4 className="font-bold text-foreground text-sm">{bonus.title}</h4>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{bonus.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 md:py-28 gradient-hero">
         <div className="container px-4 md:px-6">

@@ -55,6 +55,41 @@ import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ProductReviews } from "@/components/ProductReviews";
 
+// Bonus images (5 regalos - same as 5,000 page)
+import bonus1Estructuras from "@/assets/bonus-1-estructuras-gramaticas.webp";
+import bonus2Verbos from "@/assets/bonus-2-1000-verbos-esenciales.webp";
+import bonus3Frases from "@/assets/bonus-3-100-frases-nativos.webp";
+import bonus4Preguntas from "@/assets/bonus-4-500-preguntas-frecuentes.webp";
+import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
+
+const bonuses8000 = [
+  {
+    title: "Regalo 1: Estructuras Gramáticas A1 a B1",
+    description: "Guía completa de estructuras gramaticales del nivel A1 al B1 para construir frases con confianza desde el primer día.",
+    image: bonus1Estructuras,
+  },
+  {
+    title: "Regalo 2: 1,000 Verbos Esenciales (Presente, Pasado y Futuro)",
+    description: "Los 1,000 verbos más usados en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.",
+    image: bonus2Verbos,
+  },
+  {
+    title: "Regalo 3: 100 Frases Más Usadas por Nativos",
+    description: "Las expresiones reales que usan los nativos todos los días para que hables como un local desde el principio.",
+    image: bonus3Frases,
+  },
+  {
+    title: "Regalo 4: 500 Preguntas Frecuentes en Inglés",
+    description: "Las preguntas más comunes que necesitas dominar para conversaciones reales: trabajo, viajes y vida diaria.",
+    image: bonus4Preguntas,
+  },
+  {
+    title: "Regalo 5: Cómo Estudiar Inglés en 6 Meses",
+    description: "Tu plan paso a paso para hablar inglés con confianza en solo 6 meses, sin perder tiempo ni motivación.",
+    image: bonus5Estudiar,
+  },
+];
+
 const partnerLogos = [
 { src: logoAmazon, alt: "Amazon", height: "h-10 md:h-14" },
 { src: logoEtsy, alt: "Etsy", height: "h-10 md:h-14" },

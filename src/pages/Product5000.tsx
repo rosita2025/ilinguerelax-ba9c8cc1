@@ -4,7 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 const product5000BookImg = "/images/product-5000-book.webp";
-import productoPrincipalInglesRelax from "@/assets/oferta-5000-ingles-gramatica.png";
+import productoPrincipalInglesRelax from "@/assets/oferta-5000-ingles-gramatica.webp";
 import reviewFb1 from "@/assets/review-fb-1.jpg";
 import reviewFb2 from "@/assets/review-fb-2.jpg";
 import reviewFb3 from "@/assets/review-fb-3.jpg";
@@ -51,10 +51,10 @@ import {
 import { motion } from "framer-motion";
 
 // Preview images
-import previewIndice from "@/assets/preview-indice.png";
-import previewGramatica from "@/assets/preview-gramatica-estructura.png";
-import previewFrases from "@/assets/preview-frases-verbos.png";
-import previewVocabulario from "@/assets/preview-vocabulario.png";
+import previewIndice from "@/assets/preview-indice.webp";
+import previewGramatica from "@/assets/preview-gramatica-estructura.webp";
+import previewFrases from "@/assets/preview-frases-verbos.webp";
+import previewVocabulario from "@/assets/preview-vocabulario.webp";
 const product5000Image = productoPrincipalInglesRelax;
 
 // Bonus images (5 regalos)
@@ -65,7 +65,7 @@ import bonus4Preguntas from "@/assets/bonus-4-500-preguntas-frecuentes.webp";
 import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
 
 // About section image
-import aboutIlingueRelax from "@/assets/about-ilingue-relax.png";
+import aboutIlingueRelax from "@/assets/about-ilingue-relax.webp";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";

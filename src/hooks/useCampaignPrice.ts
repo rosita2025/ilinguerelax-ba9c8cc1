@@ -249,7 +249,22 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
       setState(build(detected.currency, detected.country, priceUSD, originalUSD));
     })();
 
-    return () => { cancelled = true; };
+    // Listen for currency changes from header selector (or other tabs)
+    const onChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail as string | undefined;
+      const next = (detail || readCache()?.currency) as CampaignCurrency | undefined;
+      if (next && RATES[next]) {
+        setState((prev) => build(next, prev.countryCode, priceUSD, originalUSD));
+      }
+    };
+    window.addEventListener("campaign-currency-change", onChange);
+    window.addEventListener("storage", onChange);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("campaign-currency-change", onChange);
+      window.removeEventListener("storage", onChange);
+    };
     // Re-run when prices change (different products on same page navigation)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceUSD, originalUSD]);

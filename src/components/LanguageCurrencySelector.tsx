@@ -12,7 +12,19 @@ import { Globe, DollarSign } from "lucide-react";
 export const LanguageCurrencySelector = () => {
   const { language, setLanguage, currency, setCurrency, languageNames, languageFlags } = useI18n();
 
-  const currencies: Currency[] = ["USD", "EUR", "BRL", "MXN", "GBP", "CAD"];
+  const currencies: Currency[] = ["USD", "EUR", "GBP", "CAD", "AUD", "MXN", "BRL", "ARS", "COP", "PEN"];
+
+  const handleCurrencyChange = (value: string) => {
+    setCurrency(value as Currency);
+    // Sync with the campaign pricing system used by product pages
+    try {
+      const payload = { currency: value, countryCode: "", timestamp: Date.now() };
+      localStorage.setItem("campaign_currency_v5", JSON.stringify(payload));
+      window.dispatchEvent(new CustomEvent("campaign-currency-change", { detail: value }));
+    } catch {
+      /* ignore */
+    }
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -35,7 +47,7 @@ export const LanguageCurrencySelector = () => {
       </Select>
 
       {/* Currency Selector */}
-      <Select value={currency} onValueChange={(value) => setCurrency(value as Currency)}>
+      <Select value={currency} onValueChange={handleCurrencyChange}>
         <SelectTrigger className="w-auto gap-1 border-none bg-transparent hover:bg-muted/50 focus:ring-0 px-2">
           <DollarSign className="h-4 w-4 text-muted-foreground" />
           <SelectValue>

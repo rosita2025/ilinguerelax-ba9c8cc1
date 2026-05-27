@@ -239,6 +239,9 @@ const Product5000 = () => {
   }, []);
   const isLatam = LATAM_CURRENCIES.has(detectedCurrency);
   const priceUSD = isLatam ? 14.39 : 28;
+  const buyUrl = isLatam
+    ? "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153"
+    : "https://pay.hotmart.com/C106016400K?checkoutMode=10&bid=1779846931008";
   const campaign = useCampaignPrice(priceUSD, 54);
   const campaignFull = useCampaignPrice(priceUSD, 107);
   const bonusValue = useCampaignPrice(priceUSD, 62);
@@ -295,7 +298,7 @@ const Product5000 = () => {
   const handleBuy = async () => {
     handleBuyClick();
     await new Promise((resolve) => setTimeout(resolve, 400));
-    window.open("https://pay.hotmart.com/O100578526P?checkoutMode=10", "_blank");
+    window.open(buyUrl, "_blank");
   };
   return (
     <main className="min-h-screen bg-background">
@@ -573,7 +576,7 @@ const Product5000 = () => {
                   className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
                 >
                   <a
-                    href="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+                    href={buyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleBuyClick}
@@ -826,7 +829,7 @@ const Product5000 = () => {
         reviewCount={800}
         showReviews={true}
         ctaText="DESCARGAR AHORA - PAGO SEGURO"
-        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+        buyUrl={buyUrl}
       />
 
       {/* Spacer for sticky bar */}
@@ -837,7 +840,7 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup
-        buyUrl="https://pay.hotmart.com/O100578526P?checkoutMode=10"
+        buyUrl={buyUrl}
         discount="15%"
       />
 

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -15,6 +15,36 @@ const Products = () => {
   const [type, setType] = useState<"all" | "digital" | "physical">("all");
   const [language, setLanguage] = useState<string>("all");
   const [search, setSearch] = useState("");
+
+  // IP-based regional pricing for product "5000" (Latam vs USA/EU/UK/CA/AU)
+  const LATAM = new Set(["MXN","ARS","PEN","COP","CLP","BRL","UYU","BOB","PYG","GTQ","DOP","CRC","HNL","NIO","VES"]);
+  const readCurrency = () => {
+    if (typeof window === "undefined") return "USD";
+    try {
+      const raw = localStorage.getItem("campaign_currency_v5");
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p?.currency) return String(p.currency).toUpperCase();
+      }
+    } catch { /* ignore */ }
+    return "USD";
+  };
+  const [detectedCurrency, setDetectedCurrency] = useState<string>(readCurrency);
+  useEffect(() => {
+    const sync = () => setDetectedCurrency(readCurrency());
+    sync();
+    const id = window.setInterval(sync, 1500);
+    window.addEventListener("campaign-currency-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("campaign-currency-change", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  const isLatam = LATAM.has(detectedCurrency);
+  const priceFor = (p: typeof products[number]) =>
+    p.id === "5000" ? (isLatam ? 14.39 : 28) : p.price;
 
   const languages = useMemo(() => {
     const map = new Map<string, { flag: string; label: string }>();
@@ -218,11 +248,11 @@ const Products = () => {
                     </div>
                   )}
 
-                  {/* Price */}
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <span className="text-3xl font-bold text-foreground">
-                      ${product.price}
-                    </span>
+                   {/* Price */}
+                   <div className="flex items-baseline gap-2 mb-6">
+                     <span className="text-3xl font-bold text-foreground">
+                       ${priceFor(product)}
+                     </span>
                     {product.isPhysical && (
                       <span className="text-sm text-muted-foreground">
                         (valor pack: ${product.id === "5000-book" ? "31.99" : "49.99"})

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -201,9 +201,47 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  const campaign = useCampaignPrice(14.30, 54);
-  const campaignFull = useCampaignPrice(14.30, 107);
-  const bonusValue = useCampaignPrice(14.30, 62);
+  // Regional pricing: Latam (MXN/ARS/PEN/COP/CLP/BRL/...) paga 14.39 USD,
+  // resto del mundo (USA / España / Europa / UK / CA / AU) paga 28 USD (~24.06 €).
+  const LATAM_CURRENCIES = useMemo(
+    () => new Set([
+      "MXN", "ARS", "PEN", "COP", "CLP", "BRL",
+      "UYU", "BOB", "PYG", "GTQ", "DOP", "CRC", "HNL", "NIO", "VES",
+    ]),
+    [],
+  );
+  const readDetectedCurrency = () => {
+    if (typeof window === "undefined") return "USD";
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const forced = params.get("currency")?.toUpperCase();
+      if (forced) return forced;
+      const raw = localStorage.getItem("campaign_currency_v5");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.currency) return String(parsed.currency).toUpperCase();
+      }
+    } catch { /* ignore */ }
+    return "USD";
+  };
+  const [detectedCurrency, setDetectedCurrency] = useState<string>(readDetectedCurrency);
+  useEffect(() => {
+    const sync = () => setDetectedCurrency(readDetectedCurrency());
+    sync();
+    const id = window.setInterval(sync, 1500);
+    window.addEventListener("campaign-currency-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("campaign-currency-change", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  const isLatam = LATAM_CURRENCIES.has(detectedCurrency);
+  const priceUSD = isLatam ? 14.39 : 28;
+  const campaign = useCampaignPrice(priceUSD, 54);
+  const campaignFull = useCampaignPrice(priceUSD, 107);
+  const bonusValue = useCampaignPrice(priceUSD, 62);
   const heroImages = [productoPrincipalInglesRelax];
   const heroThumbs = [productoPrincipalInglesRelax];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
@@ -215,10 +253,10 @@ const Product5000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-5000"],
       content_type: "product",
-      value: 14.30,
+      value: priceUSD,
       currency: "USD",
     }),
-    [],
+    [priceUSD],
   );
   useHotmartPixel(pixelParams);
 
@@ -248,7 +286,7 @@ const Product5000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-5000"],
       content_type: "product",
-      value: 14.30,
+      value: priceUSD,
       currency: "USD",
       num_items: 1,
     });

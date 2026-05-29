@@ -22,8 +22,7 @@ import coverImage from "@/assets/product-grammar-patterns-a1c1.webp";
 
 const COVER_IMAGE_PUBLIC = "/images/product-grammar-patterns-a1c1.webp";
 
-const PREORDER_PRICE = 15;
-const RETAIL_PRICE = 45.00;
+const PRICE = 45;
 const FREE_SHIPPING_THRESHOLD = 50;
 
 const features = [
@@ -69,18 +68,18 @@ const ProductSpanishGrammarPatterns = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const products = await fetchShopifyProducts(20, "Spanish Grammar Patterns A1-C1 Pre-Order");
+        const products = await fetchShopifyProducts(20, "Spanish Grammar Patterns A1-C1");
         const book = products.find((p: any) => {
           const t = p.node.title.toLowerCase();
           return t.includes("grammar") && t.includes("pattern");
-        }) || products.find((p: any) => p.node.handle === "spanish-grammar-patterns-a1-c1-pre-order");
+        }) || products.find((p: any) => p.node.handle?.includes("spanish-grammar-patterns-a1-c1"));
         if (book) {
           setShopifyProduct(book);
           const variant = book.node.variants.edges[0]?.node;
           if (variant) setShopifyVariantId(variant.id);
         }
       } catch (err) {
-        console.error("Failed to load Shopify pre-order product:", err);
+        console.error("Failed to load Shopify product:", err);
       }
     };
     loadProduct();
@@ -88,7 +87,7 @@ const ProductSpanishGrammarPatterns = () => {
 
   const handleAddToCart = async () => {
     if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Pre-order is not available yet. Please try again in a moment.");
+      toast.error("Product is loading. Please try again in a moment.");
       return;
     }
     const variant = shopifyProduct.node.variants.edges[0]?.node;
@@ -96,7 +95,7 @@ const ProductSpanishGrammarPatterns = () => {
       product: shopifyProduct,
       variantId: shopifyVariantId,
       variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: String(PREORDER_PRICE), currencyCode: "USD" },
+      price: variant?.price || { amount: String(PRICE), currencyCode: "USD" },
       quantity: 1,
       selectedOptions: variant?.selectedOptions || [],
     });
@@ -104,11 +103,11 @@ const ProductSpanishGrammarPatterns = () => {
 
   const pixelParams = useMemo(
     () => ({
-      content_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery (Pre-Order)",
-      content_category: "Physical Book Pre-Order",
+      content_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery",
+      content_category: "Physical Book",
       content_ids: ["spanish-grammar-patterns"],
       content_type: "product",
-      value: PREORDER_PRICE,
+      value: PRICE,
       currency: "USD",
     }),
     []
@@ -126,13 +125,13 @@ const ProductSpanishGrammarPatterns = () => {
       const { error } = await supabase.from("store_subscribers").insert({
         email,
         product_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery",
-        store_name: "Pre-Order June 2026",
+        store_name: "Grammar Patterns Updates",
       });
       if (error && !error.message.toLowerCase().includes("duplicate")) {
         throw error;
       }
       setSubscribed(true);
-      toast.success("You're on the pre-order list! We'll email you in June.");
+      toast.success("You're subscribed! We'll keep you posted.");
     } catch (err) {
       console.error(err);
       toast.error("Could not save your email. Please try again.");
@@ -144,15 +143,15 @@ const ProductSpanishGrammarPatterns = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Pre-Order: Grammar Patterns A1-C1 Mastery — Spanish Sentence Builder"
-        description="Pre-order the Grammar Patterns A1-C1 Mastery book at $15 USD (regular $45). 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Ships June 2026."
+        title="Grammar Patterns A1-C1 Mastery — Spanish Sentence Builder Book"
+        description="Grammar Patterns A1-C1 Mastery — $45 USD. 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Available now, ships worldwide."
         canonicalUrl="https://ilinguerelax.com/products/spanish-grammar-patterns-a1-c1-mastery-preorder"
         image={`https://ilinguerelax.com${COVER_IMAGE_PUBLIC}`}
         type="product"
-        price={String(PREORDER_PRICE)}
+        price={String(PRICE)}
         sku="ILINGUE-SPANISH-GRAMMAR-PATTERNS"
-        keywords="Spanish grammar patterns, A1 C1 Spanish, Spanish sentence builder, Spanish grammar book, Spanish Relax grammar, pre-order Spanish grammar"
-        availability="PreOrder"
+        keywords="Spanish grammar patterns, A1 C1 Spanish, Spanish sentence builder, Spanish grammar book, Spanish Relax grammar"
+        availability="InStock"
         isPhysical={true}
       />
       <Navbar />

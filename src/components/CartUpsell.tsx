@@ -74,14 +74,14 @@ const spanishUpsellProducts = [
 
 const spanishPhysicalPreorderUpsells = [
   {
-    title: "5,000 Spanish Words — Physical Book",
-    description: "Bestseller with English pronunciation · available now",
-    price: "34.99",
-    compareAtPrice: "49.99",
-    image: "/images/product-spanish-5000-physical.webp",
-    variantId: "gid://shopify/ProductVariant/43240706670653",
-    productId: "gid://shopify/Product/7889810456637",
-    handle: "spanish-relax-5-000-spanish-words-with-english-pronunciation-book-physical",
+    title: "Complete Structural Grammar Manual A1–C1 — Physical Book",
+    description: "The Lego sentence-building system · available now",
+    price: "38.90",
+    compareAtPrice: "54.00",
+    image: "https://cdn.shopify.com/s/files/1/0647/4409/5805/files/Learn_Spanish_Grammar_Structural_A1_to_C1.png?v=1779831945",
+    variantId: "gid://shopify/ProductVariant/43138982314045",
+    productId: "gid://shopify/Product/7849457811517",
+    handle: "spanish-relax-grammar-patterns-a1-c1-mastery-physical-book-pre-order",
     hotmartUrl: "",
   },
 ];

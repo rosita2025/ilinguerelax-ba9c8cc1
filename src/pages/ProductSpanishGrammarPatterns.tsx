@@ -68,11 +68,18 @@ const ProductSpanishGrammarPatterns = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const products = await fetchShopifyProducts(20, "Spanish Grammar Patterns A1-C1");
-        const book = products.find((p: any) => {
-          const t = p.node.title.toLowerCase();
-          return t.includes("grammar") && t.includes("pattern");
-        }) || products.find((p: any) => p.node.handle?.includes("spanish-grammar-patterns-a1-c1"));
+        const products = await fetchShopifyProducts(20, "Structural Grammar Manual");
+        // Prefer the physical book (avoid the DIGITAL variant at $15)
+        const book =
+          products.find((p: any) => {
+            const t = p.node.title.toLowerCase();
+            return t.includes("structural grammar manual") && t.includes("physical");
+          }) ||
+          products.find((p: any) => p.node.handle === "spanish-relax-grammar-patterns-a1-c1-mastery-physical-book-pre-order") ||
+          products.find((p: any) => {
+            const t = p.node.title.toLowerCase();
+            return t.includes("physical") && !t.includes("digital");
+          });
         if (book) {
           setShopifyProduct(book);
           const variant = book.node.variants.edges[0]?.node;

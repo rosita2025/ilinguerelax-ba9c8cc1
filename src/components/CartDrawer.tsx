@@ -45,14 +45,13 @@ const isPhysicalItem = (title: string) => {
   if (is1000Verbs || is500Questions) return false;
   return true;
 };
-// Helper: detect physical pre-order books (3,000 Verbs and Grammar only).
-// 5,000 Spanish Relax is already in stock and ships normally.
+// Helper: detect physical pre-order books (3,000 Verbs only).
+// 5,000 Spanish Relax and Grammar Patterns A1–C1 are already in stock and ship normally.
 const isPhysicalPreorderItem = (title: string) => {
   if (!isPhysicalItem(title)) return false;
   const t = title.toLowerCase();
   const is3000Verbs = /3[\s,.]*000/.test(t) && t.includes("verb");
-  const isGrammar = t.includes("grammar") || t.includes("gramática") || t.includes("gramatica");
-  return is3000Verbs || isGrammar;
+  return is3000Verbs;
 };
 
 export const CartDrawer = () => {

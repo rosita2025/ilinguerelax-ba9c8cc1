@@ -84,17 +84,6 @@ const spanishPhysicalPreorderUpsells = [
     handle: "spanish-relax-5-000-spanish-words-with-english-pronunciation-book-physical",
     hotmartUrl: "",
   },
-  {
-    title: "Complete Structural Grammar Manual A1–C1 — Physical Book",
-    description: "The Lego sentence-building system · available now",
-    price: "38.90",
-    compareAtPrice: "54.00",
-    image: "/images/product-grammar-patterns-a1c1.webp",
-    variantId: "gid://shopify/ProductVariant/43138982314045",
-    productId: "gid://shopify/Product/7849457811517",
-    handle: "spanish-relax-grammar-patterns-a1-c1-mastery-physical-book-pre-order",
-    hotmartUrl: "",
-  },
 ];
 
 interface CartUpsellProps {

@@ -76,8 +76,8 @@ const spanishPhysicalPreorderUpsells = [
   {
     title: "Complete Structural Grammar Manual A1–C1 — Physical Book",
     description: "The Lego sentence-building system · available now",
-    price: "38.90",
-    compareAtPrice: "54.00",
+    price: "38.25",
+    compareAtPrice: "45.00",
     image: "https://cdn.shopify.com/s/files/1/0647/4409/5805/files/Learn_Spanish_Grammar_Structural_A1_to_C1.png?v=1779831945",
     variantId: "gid://shopify/ProductVariant/43138982314045",
     productId: "gid://shopify/Product/7849457811517",

@@ -495,34 +495,34 @@ const ProductSpanishGrammarPatterns = () => {
         </div>
       </section>
 
-      {/* Pricing Timeline */}
+      {/* Highlights */}
       <section className="py-16 md:py-20 bg-[#1a1233] text-white">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-black text-center mb-10">
-              Pre-Order <span className="text-[#f4d782]">Pricing Timeline</span>
+              The <span className="text-[#f4d782]">Premium Edition</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-[#2a1f4d]/60 rounded-2xl border-2 border-[#d4af37] p-6 text-center relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#d4af37] text-[#1a1233] text-xs font-bold uppercase">
-                  Now
+                  In Stock
                 </div>
                 <Gift className="w-8 h-8 text-[#f4d782] mx-auto mb-3" />
-                <p className="text-sm text-slate-300 mb-2">Pre-order today</p>
-                <p className="text-3xl font-black text-white">${PREORDER_PRICE}</p>
-                <p className="text-xs text-slate-400 mt-2">Locked-in launch price</p>
+                <p className="text-sm text-slate-300 mb-2">Standard price</p>
+                <p className="text-3xl font-black text-white">${PRICE}</p>
+                <p className="text-xs text-slate-400 mt-2">Premium softcover</p>
               </div>
               <div className="bg-[#2a1f4d]/60 rounded-2xl border-2 border-[#a78bfa]/60 p-6 text-center">
-                <Clock className="w-8 h-8 text-[#c4b5fd] mx-auto mb-3" />
-                <p className="text-sm text-slate-300 mb-2">June 2026</p>
-                <p className="text-3xl font-black text-white">📦 Ships</p>
+                <Truck className="w-8 h-8 text-[#c4b5fd] mx-auto mb-3" />
+                <p className="text-sm text-slate-300 mb-2">Ships in</p>
+                <p className="text-3xl font-black text-white">3–7 days</p>
                 <p className="text-xs text-slate-400 mt-2">Worldwide via Amazon</p>
               </div>
-              <div className="bg-[#2a1f4d]/60 rounded-2xl border border-white/10 p-6 text-center opacity-80">
-                <TrendingUp className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-                <p className="text-sm text-slate-300 mb-2">After launch</p>
-                <p className="text-3xl font-black text-slate-500 line-through">${RETAIL_PRICE}</p>
-                <p className="text-xs text-slate-400 mt-2">Standard price</p>
+              <div className="bg-[#2a1f4d]/60 rounded-2xl border border-white/10 p-6 text-center">
+                <Shield className="w-8 h-8 text-[#f4d782] mx-auto mb-3" />
+                <p className="text-sm text-slate-300 mb-2">Guarantee</p>
+                <p className="text-3xl font-black text-white">30 days</p>
+                <p className="text-xs text-slate-400 mt-2">Money-back promise</p>
               </div>
             </div>
             <p className="text-center text-sm text-slate-300 mt-6">
@@ -537,7 +537,7 @@ const ProductSpanishGrammarPatterns = () => {
                 disabled={cartLoading || !shopifyVariantId}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                Pre-Order for ${PREORDER_PRICE}.00
+                Add to Cart — ${PRICE}.00
               </Button>
             </div>
           </div>
@@ -552,10 +552,9 @@ const ProductSpanishGrammarPatterns = () => {
               <Shield className="w-7 h-7 text-[#1a1233]" />
             </div>
             <div>
-              <p className="text-base font-bold text-white">Locked-in Pre-Order Price</p>
+              <p className="text-base font-bold text-white">30-Day Money-Back Guarantee</p>
               <p className="text-sm text-slate-200">
-                Pre-order today at ${PREORDER_PRICE}. After the June 2026 launch the standard
-                price increases to ${RETAIL_PRICE} USD.
+                Try the book risk-free. If it's not for you, email us within 30 days for a full refund.
               </p>
             </div>
           </div>
@@ -563,8 +562,8 @@ const ProductSpanishGrammarPatterns = () => {
       </section>
 
       <FAQ
-        title="Pre-Order FAQ"
-        subtitle="Everything you need to know about your pre-order"
+        title="Frequently Asked Questions"
+        subtitle="Everything you need to know about the book"
         items={[
           {
             question: "What is this book exactly?",
@@ -579,17 +578,17 @@ const ProductSpanishGrammarPatterns = () => {
           {
             question: "When will the book ship?",
             answer:
-              "Physical books ship starting June 2026 through our worldwide logistics network. You'll receive tracking by email as soon as your copy is dispatched.",
+              "Orders ship in 3–7 business days via Amazon's worldwide logistics network. You'll receive tracking by email as soon as your copy is dispatched.",
           },
           {
-            question: "Why pre-order now?",
+            question: "Is the book really available now?",
             answer:
-              "Pre-ordering locks in the launch price of $15 USD. After the June 2026 launch the standard price increases to $45 USD. You also reserve a copy from the very first print run.",
+              "Yes. The book is in stock and ships worldwide via Amazon. Most orders arrive within 3–7 business days.",
           },
           {
-            question: "Do I pay today?",
+            question: "What's included with my order?",
             answer:
-              "Yes. By pre-ordering today you lock in the $15 USD price and reserve your copy. Your card is charged at checkout and the book ships in June 2026.",
+              "You'll receive the premium softcover Grammar Patterns A1-C1 Mastery book, professionally printed and shipped worldwide via Amazon logistics.",
           },
           {
             question: "How does free shipping work?",
@@ -597,7 +596,7 @@ const ProductSpanishGrammarPatterns = () => {
               "We offer free international shipping on orders over $50 USD. You can pair this book with the 8,000 Words and 3,000 Verbs editions to complete the collection and ship everything together.",
           },
           {
-            question: "Need help with your pre-order?",
+            question: "Need help with your order?",
             answer:
               "Email us at hola@ilinguerelax.com or message us on WhatsApp at +1 575 216 0934 — we usually reply within a few hours.",
           },
@@ -608,12 +607,11 @@ const ProductSpanishGrammarPatterns = () => {
       <WhatsAppButton />
       <StickyBuyBar
         lang="en"
-        productName="Grammar Patterns A1-C1 — Pre-Order"
-        price={`$${PREORDER_PRICE}`}
-        originalPrice={`$${RETAIL_PRICE}`}
+        productName="Grammar Patterns A1-C1 Mastery"
+        price={`$${PRICE}`}
         rating={4.9}
         reviewCount={1500}
-        ctaText={`PRE-ORDER FOR $${PREORDER_PRICE}.00`}
+        ctaText={`ADD TO CART — $${PRICE}.00`}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={!shopifyVariantId}

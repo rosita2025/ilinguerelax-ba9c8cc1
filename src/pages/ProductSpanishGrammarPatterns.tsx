@@ -23,7 +23,7 @@ import coverImage from "@/assets/product-grammar-patterns-a1c1.webp";
 const COVER_IMAGE_PUBLIC = "/images/product-grammar-patterns-a1c1.webp";
 
 const PREORDER_PRICE = 15;
-const RETAIL_PRICE = 29.99;
+const RETAIL_PRICE = 45.00;
 const FREE_SHIPPING_THRESHOLD = 50;
 
 const features = [
@@ -145,7 +145,7 @@ const ProductSpanishGrammarPatterns = () => {
     <main className="min-h-screen bg-background">
       <SEO
         title="Pre-Order: Grammar Patterns A1-C1 Mastery — Spanish Sentence Builder"
-        description="Pre-order the Grammar Patterns A1-C1 Mastery book at $15 USD (regular $29.99). 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Ships June 2026."
+        description="Pre-order the Grammar Patterns A1-C1 Mastery book at $15 USD (regular $45). 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Ships June 2026."
         canonicalUrl="https://ilinguerelax.com/products/spanish-grammar-patterns-a1-c1-mastery-preorder"
         image={`https://ilinguerelax.com${COVER_IMAGE_PUBLIC}`}
         type="product"
@@ -588,7 +588,7 @@ const ProductSpanishGrammarPatterns = () => {
           {
             question: "Why pre-order now?",
             answer:
-              "Pre-ordering locks in the launch price of $15 USD. After the June 2026 launch the standard price increases to $29.99 USD. You also reserve a copy from the very first print run.",
+              "Pre-ordering locks in the launch price of $15 USD. After the June 2026 launch the standard price increases to $45 USD. You also reserve a copy from the very first print run.",
           },
           {
             question: "Do I pay today?",

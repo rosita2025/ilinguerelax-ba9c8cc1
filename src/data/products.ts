@@ -20,6 +20,8 @@ export interface Product {
   externalUrl?: string;
   /** Optional group key — products sharing the same groupId render in a single card with Digital + Physical options. */
   groupId?: string;
+  /** Optional explicit format tags shown on product cards. Defaults to ['physical'] or ['digital'] based on isPhysical. */
+  formats?: ('digital' | 'physical')[];
 }
 
 export const products: Product[] = [

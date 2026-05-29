@@ -393,19 +393,18 @@ const ProductSpanishGrammarPatterns = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/40 text-[#f4d782] text-xs font-bold uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
-              The Glue of the Spanish Relax System
+              Structural Grammar Mastery
             </div>
             <h2 className="text-3xl md:text-4xl font-black mb-5">
-              8,000 Words + 3,000 Verbs + Patterns
+              Structural Grammar,
               <br />
               <span className="bg-gradient-to-r from-[#f4d782] via-[#d4af37] to-[#f4d782] bg-clip-text text-transparent">
-                = Perfect Sentences.
+                Built to Speak.
               </span>
             </h2>
             <p className="text-lg text-slate-300 leading-relaxed">
-              Vocabulary gives you the bricks. Verbs give you the action. <strong>Grammar
-              Patterns</strong> is the glue that connects them — so the Spanish you've been
-              learning finally comes out as natural, native-sounding sentences.
+              A complete <strong>structural grammar</strong> system — 1,500+ patterns from A1 to C1
+              that turn the Spanish you know into natural, native-sounding sentences.
             </p>
           </div>
         </div>
@@ -573,7 +572,7 @@ const ProductSpanishGrammarPatterns = () => {
           {
             question: "Why is it the 'glue' of the Spanish Relax system?",
             answer:
-              "Vocabulary (8,000 words) gives you the building blocks. Verbs (3,000 verbs) give you the actions. Grammar Patterns connects both into perfect, native-sounding sentences — that's why it's the missing piece between knowing words and actually speaking.",
+              "It's the structural grammar layer of the Spanish Relax system: 1,500+ patterns that show you exactly how Spanish sentences are built, so the words and verbs you already know finally come out as natural, native-sounding speech.",
           },
           {
             question: "When will the book ship?",
@@ -593,7 +592,7 @@ const ProductSpanishGrammarPatterns = () => {
           {
             question: "How does free shipping work?",
             answer:
-              "We offer free international shipping on orders over $50 USD. You can pair this book with the 8,000 Words and 3,000 Verbs editions to complete the collection and ship everything together.",
+              "We offer free international shipping on orders over $50 USD worldwide via Amazon logistics.",
           },
           {
             question: "Need help with your order?",

@@ -372,7 +372,7 @@ const ProductSpanishGrammarPatterns = () => {
                     <div>
                       <p className="font-bold text-white">You're on the list! 🎉</p>
                       <p className="text-sm text-slate-300">
-                        We'll email you when your pre-order ships in June 2026.
+                        We'll keep you posted with bonuses, tips and updates.
                       </p>
                     </div>
                   </div>

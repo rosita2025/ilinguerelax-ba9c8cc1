@@ -239,6 +239,11 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
           <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
         </div>
       )}
+      {hasBundleCouponApplied && (
+        <div className="flex items-center gap-1 text-[10px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300">
+          <Tag className="w-3 h-3" /> ✓ BUNDLE15 applied — 15% OFF both physical books
+        </div>
+      )}
       <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">
         {activeUpsells
           .filter((product) => !items.some((item) => item.variantId === product.variantId))

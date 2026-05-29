@@ -144,6 +144,7 @@ export const products: Product[] = [
     badge: "🆕 New",
     features: ["5,000 words", "English pronunciation", "For English speakers"],
     isPhysical: false,
+    formats: ['digital', 'physical'],
   },
   {
     id: "spanish-1000-verbs",

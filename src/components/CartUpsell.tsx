@@ -292,10 +292,12 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 </p>
               )}
               <p className="text-[10px] text-muted-foreground leading-tight">
-                Pre-order physical books · prices go up in <strong>June 2026</strong>
+                Add a physical book · limited launch price
               </p>
               <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">
-                {visiblePreorders.map((preorder) => (
+                {visiblePreorders.map((preorder) => {
+                  const isPreorder = preorder.title.includes("PRE-ORDER");
+                  return (
                   <div
                     key={preorder.variantId}
                     className={`snap-start shrink-0 w-[78%] sm:w-[55%] flex items-center gap-2.5 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
@@ -313,7 +315,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                     />
                     <div className="flex-1 min-w-0">
                       <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
-                        <Package className="w-2.5 h-2.5" /> Physical · Pre-Order
+                        <Package className="w-2.5 h-2.5" /> {isPreorder ? "Physical · Pre-Order" : "Physical · Available Now"}
                       </span>
                       <p className="text-xs font-medium truncate">{preorder.title}</p>
                       <div className="flex items-center gap-1.5">
@@ -329,7 +331,8 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </>

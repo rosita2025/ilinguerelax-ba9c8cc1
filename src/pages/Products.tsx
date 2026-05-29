@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
-import { products, getProductLink } from "@/data/products";
+import { products, getProductLink, type Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -72,6 +72,32 @@ const Products = () => {
     });
   }, [type, language, search]);
 
+  // Group products that share a groupId so digital + physical appear in a single card
+  type Group = {
+    key: string;
+    primary: Product;
+    digital: Product | null;
+    physical: Product | null;
+  };
+  const grouped = useMemo<Group[]>(() => {
+    const map = new Map<string, Group>();
+    const order: string[] = [];
+    for (const p of filtered) {
+      const key = p.groupId || p.id;
+      let g = map.get(key);
+      if (!g) {
+        g = { key, primary: p, digital: null, physical: null };
+        map.set(key, g);
+        order.push(key);
+      }
+      if (p.isPhysical) g.physical = p;
+      else g.digital = p;
+      // Prefer physical product as primary visual (richer card)
+      if (p.isPhysical) g.primary = p;
+    }
+    return order.map((k) => map.get(k)!);
+  }, [filtered]);
+
   // Counts per language for the current format filter (for chip badges)
   const langCounts = useMemo(() => {
     const base = products.filter((p) => {
@@ -79,8 +105,17 @@ const Products = () => {
       if (type === "physical" && !p.isPhysical) return false;
       return true;
     });
-    const counts: Record<string, number> = { all: base.length };
-    for (const p of base) counts[p.flag] = (counts[p.flag] || 0) + 1;
+    // Count unique groups so the badge matches the rendered card count
+    const seenAll = new Set<string>();
+    const seenByFlag = new Map<string, Set<string>>();
+    for (const p of base) {
+      const key = p.groupId || p.id;
+      seenAll.add(key);
+      if (!seenByFlag.has(p.flag)) seenByFlag.set(p.flag, new Set());
+      seenByFlag.get(p.flag)!.add(key);
+    }
+    const counts: Record<string, number> = { all: seenAll.size };
+    for (const [flag, set] of seenByFlag) counts[flag] = set.size;
     return counts;
   }, [type]);
 
@@ -238,15 +273,18 @@ const Products = () => {
       {/* Products Grid */}
       <section className="py-10 md:py-16">
         <div className="container px-4 md:px-6">
-          {filtered.length === 0 && (
+          {grouped.length === 0 && (
             <p className="text-center text-muted-foreground py-12">
               No hay productos que coincidan con tu búsqueda.
             </p>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {filtered.map((product) => (
+            {grouped.map(({ key, primary, digital, physical }) => {
+              const product = primary;
+              const hasBoth = !!digital && !!physical;
+              return (
               <div
-                key={product.id}
+                key={key}
                 className="group relative bg-card rounded-3xl border border-border shadow-card hover:shadow-hero transition-all duration-500 overflow-hidden"
               >
                 {/* Badge */}
@@ -309,8 +347,8 @@ const Products = () => {
                     ))}
                   </div>
 
-                  {/* Digital Free Badge for Physical Products */}
-                  {product.isPhysical && (
+                  {/* Digital Free Badge for Physical Products (only when not grouped) */}
+                  {product.isPhysical && !hasBoth && (
                     <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
                       <Gift className="w-4 h-4 text-primary" />
                       <span className="text-sm font-medium text-foreground">
@@ -319,34 +357,74 @@ const Products = () => {
                     </div>
                   )}
 
-                   {/* Price */}
-                   <div className="flex items-baseline gap-2 mb-6">
-                     <span className="text-3xl font-bold text-foreground">
-                       ${priceFor(product)}
-                     </span>
-                    {product.isPhysical && (
-                      <span className="text-sm text-muted-foreground">
-                        (valor pack: ${product.id === "5000-book" ? "31.99" : "49.99"})
-                      </span>
-                    )}
-                    {product.originalPrice && !product.isPhysical && (
-                      <span className="text-lg text-muted-foreground line-through">
-                        ${product.originalPrice}
-                      </span>
-                    )}
-                    <span className="text-sm text-accent font-medium">USD</span>
-                  </div>
+                  {hasBoth ? (
+                    /* Combined Digital + Physical options */
+                    <div className="space-y-2.5">
+                      {[
+                        { p: digital!, icon: Download, label: "Digital", sub: "Descarga PDF" },
+                        { p: physical!, icon: BookOpen, label: "Físico", sub: "Libro impreso" },
+                      ].map(({ p, icon: Icon, label, sub }) => (
+                        <Link
+                          key={p.id}
+                          to={getProductLink(p)}
+                          className="flex items-center gap-3 p-3 rounded-2xl border-2 border-border hover:border-primary hover:bg-primary/5 transition-all group/opt"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline gap-2">
+                              <span className="font-bold text-foreground text-sm">{label}</span>
+                              <span className="text-[11px] text-muted-foreground">{sub}</span>
+                            </div>
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-lg font-black text-foreground">${priceFor(p)}</span>
+                              {p.originalPrice && p.originalPrice > p.price && (
+                                <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>
+                              )}
+                              <span className="text-[10px] text-accent font-semibold">USD</span>
+                            </div>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-muted-foreground group-hover/opt:text-primary group-hover/opt:translate-x-0.5 transition-all" />
+                        </Link>
+                      ))}
+                      <p className="text-[11px] text-center text-muted-foreground pt-1">
+                        🎁 El libro físico incluye la versión digital GRATIS
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Price */}
+                      <div className="flex items-baseline gap-2 mb-6">
+                        <span className="text-3xl font-bold text-foreground">
+                          ${priceFor(product)}
+                        </span>
+                        {product.isPhysical && (
+                          <span className="text-sm text-muted-foreground">
+                            (valor pack: ${product.id === "5000-book" ? "31.99" : "49.99"})
+                          </span>
+                        )}
+                        {product.originalPrice && !product.isPhysical && product.originalPrice > product.price && (
+                          <span className="text-lg text-muted-foreground line-through">
+                            ${product.originalPrice}
+                          </span>
+                        )}
+                        <span className="text-sm text-accent font-medium">USD</span>
+                      </div>
 
-                  {/* CTA */}
-                  <Link to={getProductLink(product)}>
-                    <Button variant="hero" size="lg" className="w-full">
-                      Ver Detalles
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
+                      {/* CTA */}
+                      <Link to={getProductLink(product)}>
+                        <Button variant="hero" size="lg" className="w-full">
+                          Ver Detalles
+                          <ArrowRight className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

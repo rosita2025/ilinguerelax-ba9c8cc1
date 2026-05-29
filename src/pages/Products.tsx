@@ -124,65 +124,114 @@ const Products = () => {
       </section>
 
       {/* Filters */}
-      <section className="pt-6 pb-2 sticky top-16 z-30 bg-background/85 backdrop-blur-md border-b border-border/50">
-        <div className="container px-4 md:px-6 max-w-5xl mx-auto">
-          <div className="bg-card/80 backdrop-blur rounded-2xl border border-border shadow-sm p-3 md:p-4 space-y-3">
-            {/* Top row: Search + Type tabs */}
-            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar producto, idioma…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-11 rounded-xl border-border/70 bg-background/70 focus-visible:ring-primary/40"
-                />
-              </div>
-              <Tabs value={type} onValueChange={(v) => setType(v as typeof type)} className="sm:w-auto">
-                <TabsList className="grid grid-cols-3 w-full sm:w-auto h-11 p-1 bg-muted/60 rounded-xl">
-                  <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm px-4">Todos</TabsTrigger>
-                  <TabsTrigger value="digital" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm px-4">Digital</TabsTrigger>
-                  <TabsTrigger value="physical" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm px-4">Físico</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-
-            {/* Language chips */}
-            <div className="flex items-center gap-2">
-              <span className="hidden md:inline text-[11px] font-semibold uppercase tracking-wider text-muted-foreground shrink-0">Idioma</span>
-              <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin flex-1">
+      <section className="pt-8 pb-4 bg-secondary/30 border-b border-border/50">
+        <div className="container px-3 md:px-6 max-w-3xl mx-auto">
+          {/* Step 1: Format */}
+          <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">
+            1. Elige el formato
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-6">
+            {formats.map((f) => {
+              const Icon = f.icon;
+              const isActive = type === f.key;
+              return (
                 <button
-                  type="button"
-                  onClick={() => setLanguage("all")}
-                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                    language === "all"
-                      ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 scale-105"
-                      : "bg-background text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5"
-                  }`}
+                  key={f.key}
+                  onClick={() => setType(isActive ? "all" : f.key)}
+                  aria-pressed={isActive}
+                  className={cn(
+                    "flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl border-2 transition-all text-left min-h-[64px] active:scale-[0.98]",
+                    isActive
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "border-border bg-card hover:border-primary/40"
+                  )}
                 >
-                  🌐 Todos
+                  <div
+                    className={cn(
+                      "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0",
+                      isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-foreground text-sm sm:text-base leading-tight">{f.label}</div>
+                    <div className="text-[11px] sm:text-xs text-muted-foreground leading-tight mt-0.5 line-clamp-2 sm:truncate">
+                      {f.desc}
+                    </div>
+                  </div>
                 </button>
-                {languages.map((l) => (
+              );
+            })}
+          </div>
+
+          {/* Step 2: Language */}
+          <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">
+            2. Elige el idioma
+          </p>
+          <div className="-mx-3 px-3 mb-4 md:mx-0 md:px-0">
+            <div className="flex md:flex-wrap md:justify-center gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+              <button
+                onClick={() => setLanguage("all")}
+                aria-pressed={language === "all"}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
+                  language === "all"
+                    ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
+                    : "bg-card text-foreground border-border hover:border-foreground/40"
+                )}
+              >
+                <span className="text-base">🌐</span>
+                <span>Todos</span>
+                <span
+                  className={cn(
+                    "text-xs px-1.5 py-0.5 rounded-full",
+                    language === "all" ? "bg-white/25" : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {langCounts.all || 0}
+                </span>
+              </button>
+              {languages.map((l) => {
+                const isActive = language === l.flag;
+                const count = langCounts[l.flag] || 0;
+                return (
                   <button
                     key={l.flag}
-                    type="button"
                     onClick={() => setLanguage(l.flag)}
-                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 ${
-                      language === l.flag
-                        ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 scale-105"
-                        : "bg-background text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5"
-                    }`}
-                    title={l.label}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
+                        : "bg-card text-foreground border-border hover:border-foreground/40"
+                    )}
                   >
-                    <span className="font-bold tracking-wide">{l.flag}</span>
-                    <span className="hidden sm:inline opacity-80">{l.label}</span>
+                    <span className="text-base font-bold">{l.flag}</span>
+                    <span>{l.label}</span>
+                    <span
+                      className={cn(
+                        "text-xs px-1.5 py-0.5 rounded-full",
+                        isActive ? "bg-white/25" : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {count}
+                    </span>
                   </button>
-                ))}
-              </div>
-              <span className="shrink-0 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                {filtered.length}
-              </span>
+                );
+              })}
             </div>
+          </div>
+
+          {/* Search */}
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar producto, idioma…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 h-11 rounded-xl border-border/70 bg-background/70 focus-visible:ring-primary/40"
+            />
           </div>
         </div>
       </section>

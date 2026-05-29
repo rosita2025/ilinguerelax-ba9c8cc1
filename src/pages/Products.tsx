@@ -311,6 +311,25 @@ const Products = () => {
                     <span className="text-sm text-muted-foreground">{product.country}</span>
                   </div>
 
+                  {/* Format tags (Digital / Physical) */}
+                  {(() => {
+                    const formats = product.formats ?? (product.isPhysical ? ['physical'] : ['digital']);
+                    return (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {formats.includes('digital') && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                            <Download className="w-3 h-3" /> Digital
+                          </span>
+                        )}
+                        {formats.includes('physical') && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[11px] font-semibold">
+                            <BookOpen className="w-3 h-3" /> Físico
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (

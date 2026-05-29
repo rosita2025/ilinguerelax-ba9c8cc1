@@ -82,8 +82,8 @@ const spanishPhysicalPreorderUpsells = [
   {
     title: "Grammar Patterns A1–C1 — Physical Book",
     description: "The Lego sentence-building system · available now",
-    price: "15.00",
-    compareAtPrice: "29.99",
+    price: "38.90",
+    compareAtPrice: "54.00",
     image: "/images/product-grammar-patterns-a1c1.webp",
     variantId: "gid://shopify/ProductVariant/43138982314045",
     productId: "gid://shopify/Product/7849457811517",

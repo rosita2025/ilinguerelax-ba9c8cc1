@@ -6,8 +6,9 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowRight, Star, Gift, Search } from "lucide-react";
+import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
 import { products, getProductLink } from "@/data/products";
+import { cn } from "@/lib/utils";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
@@ -71,6 +72,23 @@ const Products = () => {
       return true;
     });
   }, [type, language, search]);
+
+  // Counts per language for the current format filter (for chip badges)
+  const langCounts = useMemo(() => {
+    const base = products.filter((p) => {
+      if (type === "digital" && p.isPhysical) return false;
+      if (type === "physical" && !p.isPhysical) return false;
+      return true;
+    });
+    const counts: Record<string, number> = { all: base.length };
+    for (const p of base) counts[p.flag] = (counts[p.flag] || 0) + 1;
+    return counts;
+  }, [type]);
+
+  const formats: { key: "digital" | "physical"; icon: typeof Download; label: string; desc: string }[] = [
+    { key: "digital", icon: Download, label: "Digital", desc: "Descarga inmediata · PDF" },
+    { key: "physical", icon: BookOpen, label: "Físico", desc: "Libro impreso · Envío" },
+  ];
 
   return (
     <main className="min-h-screen bg-background">

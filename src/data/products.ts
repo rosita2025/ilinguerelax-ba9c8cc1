@@ -18,6 +18,8 @@ export interface Product {
   isPhysical: boolean;
   comingSoon?: boolean;
   externalUrl?: string;
+  /** Optional group key — products sharing the same groupId render in a single card with Digital + Physical options. */
+  groupId?: string;
 }
 
 export const products: Product[] = [

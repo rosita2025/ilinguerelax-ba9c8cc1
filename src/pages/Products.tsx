@@ -57,8 +57,9 @@ const Products = () => {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return products.filter((p) => {
-      if (type === "digital" && p.isPhysical) return false;
-      if (type === "physical" && !p.isPhysical) return false;
+      const formats = p.formats ?? (p.isPhysical ? ['physical'] : ['digital']);
+      if (type === "digital" && !formats.includes('digital')) return false;
+      if (type === "physical" && !formats.includes('physical')) return false;
       if (language !== "all" && p.flag !== language) return false;
       if (
         q &&
@@ -101,8 +102,9 @@ const Products = () => {
   // Counts per language for the current format filter (for chip badges)
   const langCounts = useMemo(() => {
     const base = products.filter((p) => {
-      if (type === "digital" && p.isPhysical) return false;
-      if (type === "physical" && !p.isPhysical) return false;
+      const formats = p.formats ?? (p.isPhysical ? ['physical'] : ['digital']);
+      if (type === "digital" && !formats.includes('digital')) return false;
+      if (type === "physical" && !formats.includes('physical')) return false;
       return true;
     });
     // Count unique groups so the badge matches the rendered card count

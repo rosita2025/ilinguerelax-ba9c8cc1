@@ -296,7 +296,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         return (
           <>
             <div className="border-t border-dashed border-border my-3" />
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {remaining <= 0 ? (
                 <p className="text-xs font-bold text-green-600 flex items-center gap-1">
                   <Truck className="w-3 h-3" />
@@ -308,16 +308,23 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                   Add {formatPrice(remaining)} more for FREE shipping (over {formatPrice(44)})
                 </p>
               )}
-              <p className="text-[10px] text-muted-foreground leading-tight">
-                Add this book and get <span className="font-bold text-accent">15% OFF the bundle</span> · coupon BUNDLE15 auto-applied at checkout
-              </p>
+              <div className="flex items-center gap-1.5 text-[10px] bg-gradient-to-r from-accent/10 via-accent/5 to-transparent border border-accent/20 rounded-md px-2 py-1.5">
+                <Tag className="w-3 h-3 text-accent flex-shrink-0" />
+                <p className="leading-tight text-foreground">
+                  Add this book → <span className="font-bold text-accent">15% OFF bundle</span>
+                  <span className="text-muted-foreground"> · code </span>
+                  <span className="font-mono font-bold text-accent">BUNDLE15</span>
+                  <span className="text-muted-foreground"> auto-applied</span>
+                </p>
+              </div>
               <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">
                 {visiblePreorders.map((preorder) => {
                   const isPreorder = preorder.title.includes("PRE-ORDER");
+                  const savings = parseFloat(preorder.compareAtPrice) - parseFloat(preorder.price);
                   return (
                   <div
                     key={preorder.variantId}
-                    className={`snap-start shrink-0 w-[78%] sm:w-[55%] flex items-center gap-2.5 p-2 border-2 border-accent/40 bg-accent/5 rounded-lg cursor-pointer transition-colors ${
+                    className={`relative snap-start shrink-0 w-[85%] sm:w-[60%] flex items-center gap-3 p-3 border-2 border-accent/40 bg-gradient-to-br from-accent/8 via-background to-primary/5 rounded-xl cursor-pointer transition-all duration-200 hover:border-accent hover:shadow-lg hover:shadow-accent/15 hover:-translate-y-0.5 group overflow-hidden ${
                       processingId === preorder.variantId ? "opacity-60 pointer-events-none" : ""
                     }`}
                     onClick={() => {
@@ -325,27 +332,34 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                       handleToggle(preorder);
                     }}
                   >
-                    <img
-                      src={preorder.image}
-                      alt={preorder.title}
-                      className="w-10 h-10 rounded object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase mb-0.5">
-                        <Package className="w-2.5 h-2.5" /> {isPreorder ? "Physical · Pre-Order" : "Physical · Available Now"}
+                    <div className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-bl-md rounded-tr-xl shadow-sm">
+                      −15%
+                    </div>
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={preorder.image}
+                        alt={preorder.title}
+                        className="w-14 h-14 rounded-lg object-cover shadow-md ring-1 ring-border/40 group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">
+                        <Package className="w-2.5 h-2.5" /> {isPreorder ? "Pre-Order" : "Available Now"}
                       </span>
-                      <p className="text-xs font-medium truncate">{preorder.title}</p>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(preorder.compareAtPrice))}</span>
-                        <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(preorder.price))}</span>
-                        <span className="text-[9px] bg-accent/15 text-accent font-bold px-1 rounded">+15% OFF bundle</span>
+                      <p className="text-xs font-semibold leading-tight line-clamp-2">{preorder.title}</p>
+                      <div className="flex items-baseline gap-1.5 flex-wrap">
+                        <span className="text-sm font-bold text-primary">{formatPrice(parseFloat(preorder.price))}</span>
+                        <span className="text-[10px] line-through text-muted-foreground">{formatPrice(parseFloat(preorder.compareAtPrice))}</span>
+                        <span className="text-[9px] bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded">
+                          Save {formatPrice(savings)}
+                        </span>
                       </div>
                     </div>
-                    <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">
+                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-md group-hover:scale-110 group-hover:shadow-accent/40 transition-all">
                       {processingId === preorder.variantId ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Plus className="h-3.5 w-3.5 text-accent" />
+                        <Plus className="h-4 w-4" strokeWidth={3} />
                       )}
                     </div>
                   </div>

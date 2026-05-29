@@ -106,61 +106,66 @@ const Products = () => {
       </section>
 
       {/* Filters */}
-      <section className="pt-8 pb-2">
-        <div className="container px-4 md:px-6 max-w-5xl mx-auto space-y-4">
-          <Tabs value={type} onValueChange={(v) => setType(v as typeof type)}>
-            <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
-              <TabsTrigger value="all">Todos</TabsTrigger>
-              <TabsTrigger value="digital">Digital</TabsTrigger>
-              <TabsTrigger value="physical">Físico</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar producto, idioma…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
+      <section className="pt-6 pb-2 sticky top-16 z-30 bg-background/85 backdrop-blur-md border-b border-border/50">
+        <div className="container px-4 md:px-6 max-w-5xl mx-auto">
+          <div className="bg-card/80 backdrop-blur rounded-2xl border border-border shadow-sm p-3 md:p-4 space-y-3">
+            {/* Top row: Search + Type tabs */}
+            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar producto, idioma…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 h-11 rounded-xl border-border/70 bg-background/70 focus-visible:ring-primary/40"
+                />
+              </div>
+              <Tabs value={type} onValueChange={(v) => setType(v as typeof type)} className="sm:w-auto">
+                <TabsList className="grid grid-cols-3 w-full sm:w-auto h-11 p-1 bg-muted/60 rounded-xl">
+                  <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm px-4">Todos</TabsTrigger>
+                  <TabsTrigger value="digital" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm px-4">Digital</TabsTrigger>
+                  <TabsTrigger value="physical" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm px-4">Físico</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 -mx-1 px-1">
-              <button
-                type="button"
-                onClick={() => setLanguage("all")}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                  language === "all"
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-foreground border-border hover:bg-muted"
-                }`}
-              >
-                Todos los idiomas
-              </button>
-              {languages.map((l) => (
+            {/* Language chips */}
+            <div className="flex items-center gap-2">
+              <span className="hidden md:inline text-[11px] font-semibold uppercase tracking-wider text-muted-foreground shrink-0">Idioma</span>
+              <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin flex-1">
                 <button
-                  key={l.flag}
                   type="button"
-                  onClick={() => setLanguage(l.flag)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors flex items-center gap-1.5 ${
-                    language === l.flag
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-foreground border-border hover:bg-muted"
+                  onClick={() => setLanguage("all")}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    language === "all"
+                      ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 scale-105"
+                      : "bg-background text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5"
                   }`}
-                  title={l.label}
                 >
-                  <span className="text-base">{l.flag}</span>
-                  <span className="hidden sm:inline">{l.label}</span>
+                  🌐 Todos
                 </button>
-              ))}
+                {languages.map((l) => (
+                  <button
+                    key={l.flag}
+                    type="button"
+                    onClick={() => setLanguage(l.flag)}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                      language === l.flag
+                        ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 scale-105"
+                        : "bg-background text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5"
+                    }`}
+                    title={l.label}
+                  >
+                    <span className="font-bold tracking-wide">{l.flag}</span>
+                    <span className="hidden sm:inline opacity-80">{l.label}</span>
+                  </button>
+                ))}
+              </div>
+              <span className="shrink-0 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                {filtered.length}
+              </span>
             </div>
           </div>
-
-          <p className="text-sm text-muted-foreground text-center">
-            {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
-          </p>
         </div>
       </section>
 

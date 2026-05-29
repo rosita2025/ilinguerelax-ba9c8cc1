@@ -22,8 +22,7 @@ import coverImage from "@/assets/product-grammar-patterns-a1c1.webp";
 
 const COVER_IMAGE_PUBLIC = "/images/product-grammar-patterns-a1c1.webp";
 
-const PREORDER_PRICE = 15;
-const RETAIL_PRICE = 45.00;
+const PRICE = 45;
 const FREE_SHIPPING_THRESHOLD = 50;
 
 const features = [
@@ -69,18 +68,18 @@ const ProductSpanishGrammarPatterns = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const products = await fetchShopifyProducts(20, "Spanish Grammar Patterns A1-C1 Pre-Order");
+        const products = await fetchShopifyProducts(20, "Spanish Grammar Patterns A1-C1");
         const book = products.find((p: any) => {
           const t = p.node.title.toLowerCase();
           return t.includes("grammar") && t.includes("pattern");
-        }) || products.find((p: any) => p.node.handle === "spanish-grammar-patterns-a1-c1-pre-order");
+        }) || products.find((p: any) => p.node.handle?.includes("spanish-grammar-patterns-a1-c1"));
         if (book) {
           setShopifyProduct(book);
           const variant = book.node.variants.edges[0]?.node;
           if (variant) setShopifyVariantId(variant.id);
         }
       } catch (err) {
-        console.error("Failed to load Shopify pre-order product:", err);
+        console.error("Failed to load Shopify product:", err);
       }
     };
     loadProduct();
@@ -88,7 +87,7 @@ const ProductSpanishGrammarPatterns = () => {
 
   const handleAddToCart = async () => {
     if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Pre-order is not available yet. Please try again in a moment.");
+      toast.error("Product is loading. Please try again in a moment.");
       return;
     }
     const variant = shopifyProduct.node.variants.edges[0]?.node;
@@ -96,7 +95,7 @@ const ProductSpanishGrammarPatterns = () => {
       product: shopifyProduct,
       variantId: shopifyVariantId,
       variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: String(PREORDER_PRICE), currencyCode: "USD" },
+      price: variant?.price || { amount: String(PRICE), currencyCode: "USD" },
       quantity: 1,
       selectedOptions: variant?.selectedOptions || [],
     });
@@ -104,11 +103,11 @@ const ProductSpanishGrammarPatterns = () => {
 
   const pixelParams = useMemo(
     () => ({
-      content_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery (Pre-Order)",
-      content_category: "Physical Book Pre-Order",
+      content_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery",
+      content_category: "Physical Book",
       content_ids: ["spanish-grammar-patterns"],
       content_type: "product",
-      value: PREORDER_PRICE,
+      value: PRICE,
       currency: "USD",
     }),
     []
@@ -126,13 +125,13 @@ const ProductSpanishGrammarPatterns = () => {
       const { error } = await supabase.from("store_subscribers").insert({
         email,
         product_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery",
-        store_name: "Pre-Order June 2026",
+        store_name: "Grammar Patterns Updates",
       });
       if (error && !error.message.toLowerCase().includes("duplicate")) {
         throw error;
       }
       setSubscribed(true);
-      toast.success("You're on the pre-order list! We'll email you in June.");
+      toast.success("You're subscribed! We'll keep you posted.");
     } catch (err) {
       console.error(err);
       toast.error("Could not save your email. Please try again.");
@@ -144,15 +143,15 @@ const ProductSpanishGrammarPatterns = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Pre-Order: Grammar Patterns A1-C1 Mastery — Spanish Sentence Builder"
-        description="Pre-order the Grammar Patterns A1-C1 Mastery book at $15 USD (regular $45). 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Ships June 2026."
+        title="Grammar Patterns A1-C1 Mastery — Spanish Sentence Builder Book"
+        description="Grammar Patterns A1-C1 Mastery — $45 USD. 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Available now, ships worldwide."
         canonicalUrl="https://ilinguerelax.com/products/spanish-grammar-patterns-a1-c1-mastery-preorder"
         image={`https://ilinguerelax.com${COVER_IMAGE_PUBLIC}`}
         type="product"
-        price={String(PREORDER_PRICE)}
+        price={String(PRICE)}
         sku="ILINGUE-SPANISH-GRAMMAR-PATTERNS"
-        keywords="Spanish grammar patterns, A1 C1 Spanish, Spanish sentence builder, Spanish grammar book, Spanish Relax grammar, pre-order Spanish grammar"
-        availability="PreOrder"
+        keywords="Spanish grammar patterns, A1 C1 Spanish, Spanish sentence builder, Spanish grammar book, Spanish Relax grammar"
+        availability="InStock"
         isPhysical={true}
       />
       <Navbar />
@@ -202,8 +201,8 @@ const ProductSpanishGrammarPatterns = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#d4af37]/15 text-[#f4d782] text-sm font-bold border border-[#d4af37]/40"
                 >
-                  <Clock className="w-4 h-4" />
-                  <span>🔥 PRE-ORDER — Launch Price</span>
+                  <Check className="w-4 h-4" />
+                  <span>✅ Available Now — In Stock</span>
                 </motion.div>
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
@@ -212,7 +211,7 @@ const ProductSpanishGrammarPatterns = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#a78bfa]/15 text-[#c4b5fd] text-sm font-medium border border-[#a78bfa]/40"
                 >
                   <Package className="w-4 h-4" />
-                  <span>Ships June 2026</span>
+                  <span>Ships worldwide</span>
                 </motion.div>
               </div>
 
@@ -255,34 +254,32 @@ const ProductSpanishGrammarPatterns = () => {
                 className="relative overflow-hidden rounded-2xl p-6 border-2 border-[#d4af37]/60 mb-5 bg-gradient-to-br from-[#a78bfa]/10 via-[#d4af37]/5 to-[#1a1233]/40 backdrop-blur"
               >
                 <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl bg-[#d4af37] text-[#1a1233] text-xs font-black uppercase tracking-wider">
-                  ⚡ Pre-Order Deal
+                  ⚡ Premium Edition
                 </div>
 
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp className="w-5 h-5 text-[#f4d782]" />
                   <span className="text-[#f4d782] font-bold text-sm uppercase">
-                    Launch price — only during pre-order
+                    Standard price — available worldwide
                   </span>
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1 flex-wrap">
                   <span className="text-5xl md:text-6xl font-black text-white">
-                    ${PREORDER_PRICE}
+                    ${PRICE}
                   </span>
-                  <span className="text-2xl text-slate-400 line-through">${RETAIL_PRICE}</span>
                   <span className="text-[#f4d782] font-bold">USD</span>
                 </div>
 
                 <p className="text-sm text-slate-300 mb-3">
-                  Limited time offer before the June price update to{" "}
-                  <strong className="text-white">${RETAIL_PRICE} USD</strong>.
+                  Premium softcover, printed & shipped worldwide via Amazon logistics.
                 </p>
 
                 <div className="flex flex-col gap-2 mt-3 p-3 rounded-xl bg-[#1a1233]/60 border border-white/5">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#d4af37] flex-shrink-0" />
                     <span className="text-sm text-slate-200 font-medium">
-                      Pre-order price: <strong>${PREORDER_PRICE} USD</strong>
+                      Standard price: <strong>${PRICE} USD</strong>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -303,9 +300,8 @@ const ProductSpanishGrammarPatterns = () => {
 
               {/* Important Notice */}
               <div className="mb-4 p-4 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 text-sm text-[#f4d782]">
-                <strong className="text-[#f4d782]">⚠ Important:</strong> Pre-order item.
-                Shipping begins <strong>June 2026</strong>. You're charged today to lock in your
-                copy and price.
+                <strong className="text-[#f4d782]">✅ In Stock:</strong> Available now.
+                Ships in <strong>3–7 business days</strong> worldwide via Amazon logistics.
               </div>
 
               {/* Primary CTA */}
@@ -321,11 +317,11 @@ const ProductSpanishGrammarPatterns = () => {
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
                 {shopifyVariantId
-                  ? `PRE-ORDER FOR $${PREORDER_PRICE}.00`
-                  : "Loading pre-order..."}
+                  ? `ADD TO CART — $${PRICE}.00`
+                  : "Loading..."}
               </Button>
               <p className="text-xs text-center text-slate-300 mb-5">
-                Limited time offer before the June price update to ${RETAIL_PRICE} · Secure checkout · Ships June 2026
+                Secure checkout · Free shipping over ${FREE_SHIPPING_THRESHOLD} · Ships worldwide
               </p>
 
               {/* Email reservation */}
@@ -334,7 +330,7 @@ const ProductSpanishGrammarPatterns = () => {
                   <div className="w-full border-t border-white/10" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-[#1a1233] px-3 text-slate-400">Or reserve without paying</span>
+                  <span className="bg-[#1a1233] px-3 text-slate-400">Or get updates by email</span>
                 </div>
               </div>
 
@@ -342,7 +338,7 @@ const ProductSpanishGrammarPatterns = () => {
                 <form onSubmit={handleNotify} className="space-y-3 mb-4">
                   <label className="text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Mail className="w-4 h-4 text-[#d4af37]" />
-                    Get notified when pre-orders ship
+                    Get bonuses, tips & restock updates
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
@@ -376,7 +372,7 @@ const ProductSpanishGrammarPatterns = () => {
                     <div>
                       <p className="font-bold text-white">You're on the list! 🎉</p>
                       <p className="text-sm text-slate-300">
-                        We'll email you when your pre-order ships in June 2026.
+                        We'll keep you posted with bonuses, tips and updates.
                       </p>
                     </div>
                   </div>
@@ -499,34 +495,34 @@ const ProductSpanishGrammarPatterns = () => {
         </div>
       </section>
 
-      {/* Pricing Timeline */}
+      {/* Highlights */}
       <section className="py-16 md:py-20 bg-[#1a1233] text-white">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-black text-center mb-10">
-              Pre-Order <span className="text-[#f4d782]">Pricing Timeline</span>
+              The <span className="text-[#f4d782]">Premium Edition</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-[#2a1f4d]/60 rounded-2xl border-2 border-[#d4af37] p-6 text-center relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#d4af37] text-[#1a1233] text-xs font-bold uppercase">
-                  Now
+                  In Stock
                 </div>
                 <Gift className="w-8 h-8 text-[#f4d782] mx-auto mb-3" />
-                <p className="text-sm text-slate-300 mb-2">Pre-order today</p>
-                <p className="text-3xl font-black text-white">${PREORDER_PRICE}</p>
-                <p className="text-xs text-slate-400 mt-2">Locked-in launch price</p>
+                <p className="text-sm text-slate-300 mb-2">Standard price</p>
+                <p className="text-3xl font-black text-white">${PRICE}</p>
+                <p className="text-xs text-slate-400 mt-2">Premium softcover</p>
               </div>
               <div className="bg-[#2a1f4d]/60 rounded-2xl border-2 border-[#a78bfa]/60 p-6 text-center">
-                <Clock className="w-8 h-8 text-[#c4b5fd] mx-auto mb-3" />
-                <p className="text-sm text-slate-300 mb-2">June 2026</p>
-                <p className="text-3xl font-black text-white">📦 Ships</p>
+                <Truck className="w-8 h-8 text-[#c4b5fd] mx-auto mb-3" />
+                <p className="text-sm text-slate-300 mb-2">Ships in</p>
+                <p className="text-3xl font-black text-white">3–7 days</p>
                 <p className="text-xs text-slate-400 mt-2">Worldwide via Amazon</p>
               </div>
-              <div className="bg-[#2a1f4d]/60 rounded-2xl border border-white/10 p-6 text-center opacity-80">
-                <TrendingUp className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-                <p className="text-sm text-slate-300 mb-2">After launch</p>
-                <p className="text-3xl font-black text-slate-500 line-through">${RETAIL_PRICE}</p>
-                <p className="text-xs text-slate-400 mt-2">Standard price</p>
+              <div className="bg-[#2a1f4d]/60 rounded-2xl border border-white/10 p-6 text-center">
+                <Shield className="w-8 h-8 text-[#f4d782] mx-auto mb-3" />
+                <p className="text-sm text-slate-300 mb-2">Guarantee</p>
+                <p className="text-3xl font-black text-white">30 days</p>
+                <p className="text-xs text-slate-400 mt-2">Money-back promise</p>
               </div>
             </div>
             <p className="text-center text-sm text-slate-300 mt-6">
@@ -541,7 +537,7 @@ const ProductSpanishGrammarPatterns = () => {
                 disabled={cartLoading || !shopifyVariantId}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                Pre-Order for ${PREORDER_PRICE}.00
+                Add to Cart — ${PRICE}.00
               </Button>
             </div>
           </div>
@@ -556,10 +552,9 @@ const ProductSpanishGrammarPatterns = () => {
               <Shield className="w-7 h-7 text-[#1a1233]" />
             </div>
             <div>
-              <p className="text-base font-bold text-white">Locked-in Pre-Order Price</p>
+              <p className="text-base font-bold text-white">30-Day Money-Back Guarantee</p>
               <p className="text-sm text-slate-200">
-                Pre-order today at ${PREORDER_PRICE}. After the June 2026 launch the standard
-                price increases to ${RETAIL_PRICE} USD.
+                Try the book risk-free. If it's not for you, email us within 30 days for a full refund.
               </p>
             </div>
           </div>
@@ -567,8 +562,8 @@ const ProductSpanishGrammarPatterns = () => {
       </section>
 
       <FAQ
-        title="Pre-Order FAQ"
-        subtitle="Everything you need to know about your pre-order"
+        title="Frequently Asked Questions"
+        subtitle="Everything you need to know about the book"
         items={[
           {
             question: "What is this book exactly?",
@@ -583,17 +578,17 @@ const ProductSpanishGrammarPatterns = () => {
           {
             question: "When will the book ship?",
             answer:
-              "Physical books ship starting June 2026 through our worldwide logistics network. You'll receive tracking by email as soon as your copy is dispatched.",
+              "Orders ship in 3–7 business days via Amazon's worldwide logistics network. You'll receive tracking by email as soon as your copy is dispatched.",
           },
           {
-            question: "Why pre-order now?",
+            question: "Is the book really available now?",
             answer:
-              "Pre-ordering locks in the launch price of $15 USD. After the June 2026 launch the standard price increases to $45 USD. You also reserve a copy from the very first print run.",
+              "Yes. The book is in stock and ships worldwide via Amazon. Most orders arrive within 3–7 business days.",
           },
           {
-            question: "Do I pay today?",
+            question: "What's included with my order?",
             answer:
-              "Yes. By pre-ordering today you lock in the $15 USD price and reserve your copy. Your card is charged at checkout and the book ships in June 2026.",
+              "You'll receive the premium softcover Grammar Patterns A1-C1 Mastery book, professionally printed and shipped worldwide via Amazon logistics.",
           },
           {
             question: "How does free shipping work?",
@@ -601,7 +596,7 @@ const ProductSpanishGrammarPatterns = () => {
               "We offer free international shipping on orders over $50 USD. You can pair this book with the 8,000 Words and 3,000 Verbs editions to complete the collection and ship everything together.",
           },
           {
-            question: "Need help with your pre-order?",
+            question: "Need help with your order?",
             answer:
               "Email us at hola@ilinguerelax.com or message us on WhatsApp at +1 575 216 0934 — we usually reply within a few hours.",
           },
@@ -612,12 +607,11 @@ const ProductSpanishGrammarPatterns = () => {
       <WhatsAppButton />
       <StickyBuyBar
         lang="en"
-        productName="Grammar Patterns A1-C1 — Pre-Order"
-        price={`$${PREORDER_PRICE}`}
-        originalPrice={`$${RETAIL_PRICE}`}
+        productName="Grammar Patterns A1-C1 Mastery"
+        price={`$${PRICE}`}
         rating={4.9}
         reviewCount={1500}
-        ctaText={`PRE-ORDER FOR $${PREORDER_PRICE}.00`}
+        ctaText={`ADD TO CART — $${PRICE}.00`}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={!shopifyVariantId}

@@ -315,21 +315,6 @@ const ProductSpanish5000 = () => {
                 </span>
               </div>
 
-              {/* Purchase Counter - Social Proof */}
-              <div className="mb-4">
-                <PurchaseCounter baseCount={500} lang="en" />
-              </div>
-
-              {/* Live Viewers */}
-              <div className="mb-4">
-                <LiveViewers minViewers={8} maxViewers={22} lang="en" />
-              </div>
-
-              {/* Stock Counter - Scarcity */}
-              <div className="mb-6">
-                <StockCounter totalStock={50} remainingStock={15} lang="en" />
-              </div>
-
               {/* Buy Now CTA */}
               <div className="mb-4">
                 <Button

@@ -69,17 +69,6 @@ const spanishUpsellProducts = [
 
 const spanishPhysicalPreorderUpsells = [
   {
-    title: "3,000 Spanish Verbs Mastery — Physical Book (PRE-ORDER)",
-    description: "Past, Present & Future · ships June 2026",
-    price: "17.00",
-    compareAtPrice: "29.99",
-    image: "/images/product-spanish-3000-verbs-book.webp",
-    variantId: "gid://shopify/ProductVariant/43138982281277",
-    productId: "gid://shopify/Product/7849457778749",
-    handle: "spanish-relax-3-000-spanish-verbs-mastery-physical-book-pre-order",
-    hotmartUrl: "",
-  },
-  {
     title: "Grammar Patterns A1–C1 — Physical Book",
     description: "The Lego sentence-building system · available now",
     price: "38.90",

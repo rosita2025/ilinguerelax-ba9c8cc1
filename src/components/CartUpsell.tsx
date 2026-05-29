@@ -7,6 +7,11 @@ import { useBundleStore } from "@/stores/bundleStore";
 import { useI18n } from "@/i18n/I18nContext";
 
 const UPSELL_COUPON = "upselldescuentos";
+const BUNDLE_COUPON = "BUNDLE15";
+
+// Variant IDs of the two books that trigger the BUNDLE15 15% OFF auto-coupon when both are in cart.
+const BUNDLE_PHYSICAL_5000 = "gid://shopify/ProductVariant/43240706670653";
+const BUNDLE_PHYSICAL_GRAMMAR = "gid://shopify/ProductVariant/43138982314045";
 
 const PHYSICAL_KEYWORDS = ["LIBRO FISICO", "libro fisico", "Libro Físico"];
 const SPANISH_5000_KEYWORDS = ["Spanish Relax - 5,000", "Spanish Relax - 5000", "5,000 Words with English"];
@@ -69,7 +74,18 @@ const spanishUpsellProducts = [
 
 const spanishPhysicalPreorderUpsells = [
   {
-    title: "Grammar Patterns A1–C1 — Physical Book",
+    title: "5,000 Spanish Words — Physical Book",
+    description: "Bestseller with English pronunciation · available now",
+    price: "34.99",
+    compareAtPrice: "49.99",
+    image: "/images/product-spanish-5000-physical.webp",
+    variantId: "gid://shopify/ProductVariant/43240706670653",
+    productId: "gid://shopify/Product/7889810456637",
+    handle: "spanish-relax-5-000-spanish-words-with-english-pronunciation-book-physical",
+    hotmartUrl: "",
+  },
+  {
+    title: "Complete Structural Grammar Manual A1–C1 — Physical Book",
     description: "The Lego sentence-building system · available now",
     price: "38.90",
     compareAtPrice: "54.00",
@@ -98,6 +114,10 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
 
   const hasCouponApplied = discountCodes.some(
     (dc) => dc.code.toLowerCase() === UPSELL_COUPON.toLowerCase() && dc.applicable
+  );
+
+  const hasBundleCouponApplied = discountCodes.some(
+    (dc) => dc.code.toLowerCase() === BUNDLE_COUPON.toLowerCase() && dc.applicable
   );
 
   const hasPhysicalBook = items.some((item) =>
@@ -186,6 +206,20 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         await applyDiscount(UPSELL_COUPON);
       }
     }
+
+    // Auto-apply BUNDLE15 (15% OFF) when both physical books are in cart together.
+    const variantIdsAfter = new Set<string>([
+      ...items.map((i) => i.variantId).filter((v) => v !== product.variantId),
+      ...(items.some((i) => i.variantId === product.variantId) ? [] : [product.variantId]),
+    ]);
+    const bothBundleBooks =
+      variantIdsAfter.has(BUNDLE_PHYSICAL_5000) && variantIdsAfter.has(BUNDLE_PHYSICAL_GRAMMAR);
+    if (bothBundleBooks && !hasBundleCouponApplied) {
+      await applyDiscount(BUNDLE_COUPON);
+    } else if (!bothBundleBooks && hasBundleCouponApplied) {
+      await removeDiscount();
+    }
+
     setProcessingId(null);
   };
 
@@ -203,6 +237,11 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
       {hasCouponApplied && !isSpanishContext && (
         <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
           <Tag className="w-3 h-3" /> Cupón {UPSELL_COUPON} aplicado automáticamente
+        </div>
+      )}
+      {hasBundleCouponApplied && (
+        <div className="flex items-center gap-1 text-[10px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300">
+          <Tag className="w-3 h-3" /> ✓ BUNDLE15 applied — 15% OFF both physical books
         </div>
       )}
       <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">

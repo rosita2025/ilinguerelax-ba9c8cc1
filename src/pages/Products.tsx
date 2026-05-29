@@ -5,7 +5,6 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
 import { products, getProductLink } from "@/data/products";
 import { cn } from "@/lib/utils";

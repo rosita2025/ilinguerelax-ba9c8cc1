@@ -80,8 +80,8 @@ const spanishPhysicalPreorderUpsells = [
     hotmartUrl: "",
   },
   {
-    title: "Grammar Patterns A1–C1 — Physical Book (PRE-ORDER)",
-    description: "The Lego sentence-building system · ships June 2026",
+    title: "Grammar Patterns A1–C1 — Physical Book",
+    description: "The Lego sentence-building system · available now",
     price: "15.00",
     compareAtPrice: "29.99",
     image: "/images/product-grammar-patterns-a1c1.webp",

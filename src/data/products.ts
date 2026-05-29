@@ -61,6 +61,7 @@ export const products: Product[] = [
     badge: "Más Vendido",
     features: ["5,000 palabras", "4 Bonus gratis", "Acceso de por vida"],
     isPhysical: false,
+    groupId: "ingles-5000",
   },
   {
     id: "8000",
@@ -80,6 +81,7 @@ export const products: Product[] = [
     badge: "Premium",
     features: ["8,000 palabras", "Pronunciación español", "Fonética UK/USA"],
     isPhysical: false,
+    groupId: "ingles-8000",
   },
   {
     id: "5000-book",
@@ -100,6 +102,7 @@ export const products: Product[] = [
     features: ["Tapa blanda", "250-300 páginas", "Disponible en Amazon"],
     isPhysical: true,
     externalUrl: "https://www.amazon.com/dp/B0GDTV8GWR",
+    groupId: "ingles-5000",
   },
   {
     id: "8000-book",
@@ -119,6 +122,7 @@ export const products: Product[] = [
     badge: "📖 Libro Físico",
     features: ["Tapa blanda", "300-350 páginas", "Incluye PDF"],
     isPhysical: true,
+    groupId: "ingles-8000",
   },
   {
     id: "spanish-5000",

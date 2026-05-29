@@ -189,6 +189,8 @@ export const products: Product[] = [
     rating: 4.9,
     reviews: 0,
     price: 45.00,
+    originalPrice: 45.00,
+    discount: 0,
     badge: "✅ In Stock",
     features: ["1,500+ grammar patterns", "A1 to C1 progression", "Lego-style sentence building", "Native shortcuts"],
     isPhysical: true,

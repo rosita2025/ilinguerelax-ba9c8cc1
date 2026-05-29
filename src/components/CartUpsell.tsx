@@ -309,7 +309,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                 </p>
               )}
               <p className="text-[10px] text-muted-foreground leading-tight">
-                Add a physical book · limited launch price
+                Add this book and get <span className="font-bold text-accent">15% OFF the bundle</span> · coupon BUNDLE15 auto-applied at checkout
               </p>
               <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-thin">
                 {visiblePreorders.map((preorder) => {
@@ -338,6 +338,7 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
                       <div className="flex items-center gap-1.5">
                         <span className="text-[10px] line-through text-destructive font-medium">{formatPrice(parseFloat(preorder.compareAtPrice))}</span>
                         <span className="text-xs font-bold text-primary">{formatPrice(parseFloat(preorder.price))}</span>
+                        <span className="text-[9px] bg-accent/15 text-accent font-bold px-1 rounded">+15% OFF bundle</span>
                       </div>
                     </div>
                     <div className="h-7 w-7 flex-shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center transition-colors">

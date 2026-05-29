@@ -116,6 +116,10 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
     (dc) => dc.code.toLowerCase() === UPSELL_COUPON.toLowerCase() && dc.applicable
   );
 
+  const hasBundleCouponApplied = discountCodes.some(
+    (dc) => dc.code.toLowerCase() === BUNDLE_COUPON.toLowerCase() && dc.applicable
+  );
+
   const hasPhysicalBook = items.some((item) =>
     PHYSICAL_KEYWORDS.some((kw) => item.product.node.title.includes(kw))
   );
@@ -202,6 +206,20 @@ export const CartUpsell = ({ items }: CartUpsellProps) => {
         await applyDiscount(UPSELL_COUPON);
       }
     }
+
+    // Auto-apply BUNDLE15 (15% OFF) when both physical books are in cart together.
+    const variantIdsAfter = new Set<string>([
+      ...items.map((i) => i.variantId).filter((v) => v !== product.variantId),
+      ...(items.some((i) => i.variantId === product.variantId) ? [] : [product.variantId]),
+    ]);
+    const bothBundleBooks =
+      variantIdsAfter.has(BUNDLE_PHYSICAL_5000) && variantIdsAfter.has(BUNDLE_PHYSICAL_GRAMMAR);
+    if (bothBundleBooks && !hasBundleCouponApplied) {
+      await applyDiscount(BUNDLE_COUPON);
+    } else if (!bothBundleBooks && hasBundleCouponApplied) {
+      await removeDiscount();
+    }
+
     setProcessingId(null);
   };
 

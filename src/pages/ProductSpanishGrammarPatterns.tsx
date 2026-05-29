@@ -201,8 +201,8 @@ const ProductSpanishGrammarPatterns = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#d4af37]/15 text-[#f4d782] text-sm font-bold border border-[#d4af37]/40"
                 >
-                  <Clock className="w-4 h-4" />
-                  <span>🔥 PRE-ORDER — Launch Price</span>
+                  <Check className="w-4 h-4" />
+                  <span>✅ Available Now — In Stock</span>
                 </motion.div>
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
@@ -211,7 +211,7 @@ const ProductSpanishGrammarPatterns = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#a78bfa]/15 text-[#c4b5fd] text-sm font-medium border border-[#a78bfa]/40"
                 >
                   <Package className="w-4 h-4" />
-                  <span>Ships June 2026</span>
+                  <span>Ships worldwide</span>
                 </motion.div>
               </div>
 
@@ -254,34 +254,32 @@ const ProductSpanishGrammarPatterns = () => {
                 className="relative overflow-hidden rounded-2xl p-6 border-2 border-[#d4af37]/60 mb-5 bg-gradient-to-br from-[#a78bfa]/10 via-[#d4af37]/5 to-[#1a1233]/40 backdrop-blur"
               >
                 <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl bg-[#d4af37] text-[#1a1233] text-xs font-black uppercase tracking-wider">
-                  ⚡ Pre-Order Deal
+                  ⚡ Premium Edition
                 </div>
 
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp className="w-5 h-5 text-[#f4d782]" />
                   <span className="text-[#f4d782] font-bold text-sm uppercase">
-                    Launch price — only during pre-order
+                    Standard price — available worldwide
                   </span>
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1 flex-wrap">
                   <span className="text-5xl md:text-6xl font-black text-white">
-                    ${PREORDER_PRICE}
+                    ${PRICE}
                   </span>
-                  <span className="text-2xl text-slate-400 line-through">${RETAIL_PRICE}</span>
                   <span className="text-[#f4d782] font-bold">USD</span>
                 </div>
 
                 <p className="text-sm text-slate-300 mb-3">
-                  Limited time offer before the June price update to{" "}
-                  <strong className="text-white">${RETAIL_PRICE} USD</strong>.
+                  Premium softcover, printed & shipped worldwide via Amazon logistics.
                 </p>
 
                 <div className="flex flex-col gap-2 mt-3 p-3 rounded-xl bg-[#1a1233]/60 border border-white/5">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#d4af37] flex-shrink-0" />
                     <span className="text-sm text-slate-200 font-medium">
-                      Pre-order price: <strong>${PREORDER_PRICE} USD</strong>
+                      Standard price: <strong>${PRICE} USD</strong>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -302,9 +300,8 @@ const ProductSpanishGrammarPatterns = () => {
 
               {/* Important Notice */}
               <div className="mb-4 p-4 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 text-sm text-[#f4d782]">
-                <strong className="text-[#f4d782]">⚠ Important:</strong> Pre-order item.
-                Shipping begins <strong>June 2026</strong>. You're charged today to lock in your
-                copy and price.
+                <strong className="text-[#f4d782]">✅ In Stock:</strong> Available now.
+                Ships in <strong>3–7 business days</strong> worldwide via Amazon logistics.
               </div>
 
               {/* Primary CTA */}
@@ -320,11 +317,11 @@ const ProductSpanishGrammarPatterns = () => {
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
                 {shopifyVariantId
-                  ? `PRE-ORDER FOR $${PREORDER_PRICE}.00`
-                  : "Loading pre-order..."}
+                  ? `ADD TO CART — $${PRICE}.00`
+                  : "Loading..."}
               </Button>
               <p className="text-xs text-center text-slate-300 mb-5">
-                Limited time offer before the June price update to ${RETAIL_PRICE} · Secure checkout · Ships June 2026
+                Secure checkout · Free shipping over ${FREE_SHIPPING_THRESHOLD} · Ships worldwide
               </p>
 
               {/* Email reservation */}
@@ -333,7 +330,7 @@ const ProductSpanishGrammarPatterns = () => {
                   <div className="w-full border-t border-white/10" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-[#1a1233] px-3 text-slate-400">Or reserve without paying</span>
+                  <span className="bg-[#1a1233] px-3 text-slate-400">Or get updates by email</span>
                 </div>
               </div>
 
@@ -341,7 +338,7 @@ const ProductSpanishGrammarPatterns = () => {
                 <form onSubmit={handleNotify} className="space-y-3 mb-4">
                   <label className="text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Mail className="w-4 h-4 text-[#d4af37]" />
-                    Get notified when pre-orders ship
+                    Get bonuses, tips & restock updates
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input

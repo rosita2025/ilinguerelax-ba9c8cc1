@@ -153,6 +153,41 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   SK: "EUR", SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", MT: "EUR", CY: "EUR", HR: "EUR",
 };
 
+// Map IANA timezones to country codes for an instant, synchronous best-guess
+// (avoids the $USD → local currency flicker before the IP lookup resolves).
+const TIMEZONE_TO_COUNTRY: Record<string, string> = {
+  "America/Lima": "PE",
+  "America/Bogota": "CO",
+  "America/Mexico_City": "MX", "America/Monterrey": "MX", "America/Cancun": "MX", "America/Tijuana": "MX", "America/Chihuahua": "MX", "America/Hermosillo": "MX", "America/Merida": "MX", "America/Mazatlan": "MX",
+  "America/Argentina/Buenos_Aires": "AR", "America/Argentina/Cordoba": "AR", "America/Argentina/Mendoza": "AR", "America/Argentina/Salta": "AR", "America/Argentina/Tucuman": "AR", "America/Argentina/Ushuaia": "AR", "America/Argentina/Rio_Gallegos": "AR", "America/Argentina/San_Juan": "AR", "America/Argentina/San_Luis": "AR", "America/Argentina/La_Rioja": "AR", "America/Argentina/Catamarca": "AR", "America/Argentina/Jujuy": "AR", "America/Buenos_Aires": "AR",
+  "America/Santiago": "CL", "Pacific/Easter": "CL",
+  "America/Sao_Paulo": "BR", "America/Bahia": "BR", "America/Fortaleza": "BR", "America/Recife": "BR", "America/Manaus": "BR", "America/Belem": "BR", "America/Cuiaba": "BR", "America/Maceio": "BR", "America/Noronha": "BR", "America/Porto_Velho": "BR", "America/Rio_Branco": "BR", "America/Araguaina": "BR",
+  "America/Montevideo": "UY",
+  "America/La_Paz": "BO",
+  "America/Asuncion": "PY",
+  "America/Guatemala": "GT",
+  "America/Santo_Domingo": "DO",
+  "America/Costa_Rica": "CR",
+  "America/Tegucigalpa": "HN",
+  "America/Managua": "NI",
+  "America/Caracas": "VE",
+  "America/Panama": "PA",
+  "America/Guayaquil": "EC", "Pacific/Galapagos": "EC",
+  "America/El_Salvador": "SV",
+  "America/Toronto": "CA", "America/Vancouver": "CA", "America/Edmonton": "CA", "America/Winnipeg": "CA", "America/Halifax": "CA", "America/St_Johns": "CA", "America/Montreal": "CA",
+  "Europe/Madrid": "ES", "Europe/Paris": "FR", "Europe/Berlin": "DE", "Europe/Rome": "IT", "Europe/Lisbon": "PT", "Europe/Dublin": "IE", "Europe/Amsterdam": "NL", "Europe/Brussels": "BE", "Europe/Vienna": "AT", "Europe/Helsinki": "FI", "Europe/Athens": "GR", "Europe/Luxembourg": "LU", "Europe/Bratislava": "SK", "Europe/Ljubljana": "SI", "Europe/Tallinn": "EE", "Europe/Riga": "LV", "Europe/Vilnius": "LT", "Europe/Malta": "MT", "Asia/Nicosia": "CY", "Europe/Zagreb": "HR",
+  "Europe/London": "GB",
+  "Australia/Sydney": "AU", "Australia/Melbourne": "AU", "Australia/Brisbane": "AU", "Australia/Perth": "AU", "Australia/Adelaide": "AU", "Australia/Hobart": "AU", "Australia/Darwin": "AU",
+  "Pacific/Auckland": "NZ",
+};
+
+function guessCountryFromTimezone(): string | null {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return TIMEZONE_TO_COUNTRY[tz] || null;
+  } catch { return null; }
+}
+
 interface CachedDetection {
   currency: CampaignCurrency;
   countryCode: string;
@@ -229,6 +264,13 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
     }
     const cached = readCache();
     if (cached) return build(cached.currency, cached.countryCode, priceUSD, originalUSD);
+    // No cache yet: use synchronous timezone guess so first paint already
+    // shows the visitor's local currency (avoids the USD → local flicker).
+    const guessedCountry = typeof window !== "undefined" ? guessCountryFromTimezone() : null;
+    if (guessedCountry) {
+      const guessedCurrency = COUNTRY_TO_CURRENCY[guessedCountry] || "USD";
+      return build(guessedCurrency, guessedCountry, priceUSD, originalUSD);
+    }
     return build("USD", "US", priceUSD, originalUSD);
   });
 
@@ -246,7 +288,12 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
       if (cancelled || !detected) return;
       const payload: CachedDetection = { currency: detected.currency, countryCode: detected.country, timestamp: Date.now() };
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch { /* ignore */ }
-      setState(build(detected.currency, detected.country, priceUSD, originalUSD));
+      // Only re-render if IP detection actually changed the currency vs our
+      // synchronous guess — prevents an unnecessary re-paint.
+      setState((prev) => {
+        if (prev.currency === detected.currency && prev.countryCode === detected.country) return prev;
+        return build(detected.currency, detected.country, priceUSD, originalUSD);
+      });
     })();
 
     // Listen for currency changes from header selector (or other tabs)

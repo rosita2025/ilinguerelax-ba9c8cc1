@@ -845,7 +845,7 @@ const Product5000 = () => {
       />
 
       {/* WhatsApp Support Button */}
-      <WhatsAppButton />
+      <WhatsAppButton url="https://wa.me/message/GMC4AXDBEUE3D1" label="¿Dudas?" />
 
       {/* Scroll to Top Button */}
       <ScrollToTop showAfter={500} />

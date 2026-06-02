@@ -44,7 +44,7 @@ const Products = () => {
   }, []);
   const isLatam = LATAM.has(detectedCurrency);
   const priceFor = (p: typeof products[number]) =>
-    p.id === "5000" ? (isLatam ? 14.39 : 28) : p.price;
+    p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
 
   const languages = useMemo(() => {
     const map = new Map<string, { flag: string; label: string }>();

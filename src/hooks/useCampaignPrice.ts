@@ -53,10 +53,10 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(900, rounded - 100); // termina en .900
   }},
-  // ARS: dólar blue ~1.200, redondeo a terminaciones .990
+  // ARS: dólar blue ~1.200, redondeo a centenas terminadas en 90
   ARS: { symbol: "$",    rate: 1200, decimals: 0, nice: (n) => {
-    const rounded = Math.round(n / 1000) * 1000;
-    return rounded - 10; // termina en .990
+    const rounded = Math.round(n / 100) * 100;
+    return Math.max(90, rounded - 10); // termina en .90 (ej: 16.790)
   }},
   // PEN (Sol peruano) ~3.75, redondeo a terminaciones .90
   PEN: { symbol: "S/",   rate: 3.75, decimals: 2, nice: (n) => {

@@ -238,7 +238,7 @@ const Product5000 = () => {
     };
   }, []);
   const isLatam = LATAM_CURRENCIES.has(detectedCurrency);
-  const priceUSD = isLatam ? 14.39 : 28;
+  const priceUSD = isLatam ? 13.99 : 28;
   const buyUrl = isLatam
     ? "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153"
     : "https://pay.hotmart.com/C106016400K?checkoutMode=10&bid=1779846931008";

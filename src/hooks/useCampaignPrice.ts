@@ -188,6 +188,28 @@ function guessCountryFromTimezone(): string | null {
   } catch { return null; }
 }
 
+export function readInitialCampaignCurrency(): CampaignCurrency {
+  if (typeof window !== "undefined") {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+      if (forced && RATES[forced]) return forced;
+    } catch {
+      // ignore malformed URLs
+    }
+  }
+
+  const cached = readCache();
+  if (cached?.currency && RATES[cached.currency]) return cached.currency;
+
+  const guessedCountry = typeof window !== "undefined" ? guessCountryFromTimezone() : null;
+  if (guessedCountry) {
+    return COUNTRY_TO_CURRENCY[guessedCountry] || "USD";
+  }
+
+  return "USD";
+}
+
 interface CachedDetection {
   currency: CampaignCurrency;
   countryCode: string;
@@ -258,8 +280,7 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+      const forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
       if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD);
     }
     const cached = readCache();

@@ -19,7 +19,7 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 import { CustomerReviewsCarousel } from "@/components/CustomerReviewsCarousel";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useCampaignPrice, readInitialCampaignCurrency } from "@/hooks/useCampaignPrice";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -201,7 +201,7 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  // Regional pricing: Latam (MXN/ARS/PEN/COP/CLP/BRL/...) paga 14.39 USD,
+  // Regional pricing: Latam (MXN/ARS/PEN/COP/CLP/BRL/...) paga 13.99 USD,
   // resto del mundo (USA / España / Europa / UK / CA / AU) paga 28 USD (~24.06 €).
   const LATAM_CURRENCIES = useMemo(
     () => new Set([
@@ -210,23 +210,9 @@ const Product5000 = () => {
     ]),
     [],
   );
-  const readDetectedCurrency = () => {
-    if (typeof window === "undefined") return "USD";
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const forced = params.get("currency")?.toUpperCase();
-      if (forced) return forced;
-      const raw = localStorage.getItem("campaign_currency_v5");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed?.currency) return String(parsed.currency).toUpperCase();
-      }
-    } catch { /* ignore */ }
-    return "USD";
-  };
-  const [detectedCurrency, setDetectedCurrency] = useState<string>(readDetectedCurrency);
+  const [detectedCurrency, setDetectedCurrency] = useState<string>(readInitialCampaignCurrency);
   useEffect(() => {
-    const sync = () => setDetectedCurrency(readDetectedCurrency());
+    const sync = () => setDetectedCurrency(readInitialCampaignCurrency());
     sync();
     const id = window.setInterval(sync, 1500);
     window.addEventListener("campaign-currency-change", sync);

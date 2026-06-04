@@ -102,7 +102,7 @@ const SalesNotification = ({
     (async () => {
       try {
         const { data, error } = await supabase
-          .from("shopify_sales")
+          .from("shopify_sales_public" as any)
           .select("customer_name,country,order_created_at,product_name")
           .eq("product_key", "spanish5000")
           .order("order_created_at", { ascending: false })

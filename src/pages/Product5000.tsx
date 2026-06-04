@@ -725,7 +725,9 @@ const Product5000 = () => {
         </div>
       </section>
 
-      <CustomerReviewsCarousel />
+      <Suspense fallback={null}>
+        <CustomerReviewsCarousel />
+      </Suspense>
 
       <CompactBuyCard
         title="Inglés Relax 5,000"
@@ -747,6 +749,7 @@ const Product5000 = () => {
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
       {/* FAQ Section */}
+      <Suspense fallback={null}>
       <FAQ
         items={[
           {
@@ -792,6 +795,7 @@ const Product5000 = () => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX"
       />
+      </Suspense>
 
       {/* About Me / Sobre Mí Section */}
       <section className="py-16 md:py-20 relative overflow-hidden">
@@ -887,13 +891,17 @@ const Product5000 = () => {
       <div className="h-20 md:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification />
+      <Suspense fallback={null}>
+        <SalesNotification />
+      </Suspense>
 
       {/* Exit Intent Popup */}
-      <ExitIntentPopup
-        buyUrl={buyUrl}
-        discount="15%"
-      />
+      <Suspense fallback={null}>
+        <ExitIntentPopup
+          buyUrl={buyUrl}
+          discount="15%"
+        />
+      </Suspense>
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton url="https://wa.me/message/GMC4AXDBEUE3D1" label="¿Dudas?" />

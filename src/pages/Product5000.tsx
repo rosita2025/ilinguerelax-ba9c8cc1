@@ -230,6 +230,29 @@ const Product5000 = () => {
   const campaign = useCampaignPrice(priceUSD, 54);
   const campaignFull = useCampaignPrice(priceUSD, 107);
   const bonusValue = useCampaignPrice(priceUSD, 62);
+
+  // Override de precios LOCALES exactos SOLO para esta página (Inglés 5000).
+  // No afecta a otros productos. Charge sigue siendo en USD vía Hotmart.
+  const PRICE_OVERRIDES_5000: Record<string, string> = {
+    MXN: "$199",
+    COP: "$41.000",
+    CLP: "$10.200",
+    ARS: "$16.400",
+    BRL: "R$59",
+    BOB: "Bs 80",
+    UYU: "$469",
+    PYG: "₲70.000",
+  };
+  const overridden = PRICE_OVERRIDES_5000[campaign.currency];
+  if (overridden) {
+    campaign.price = overridden;
+    campaign.priceWithCurrency = `${overridden} ${campaign.currency}`;
+    campaignFull.price = overridden;
+    campaignFull.priceWithCurrency = `${overridden} ${campaignFull.currency}`;
+    bonusValue.price = overridden;
+    bonusValue.priceWithCurrency = `${overridden} ${bonusValue.currency}`;
+  }
+
   const heroImages = [productoPrincipalInglesRelax];
   const heroThumbs = [productoPrincipalInglesRelax];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);

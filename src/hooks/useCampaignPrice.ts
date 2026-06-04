@@ -4,7 +4,9 @@ export type CampaignCurrency =
   | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
   | "COP" | "ARS" | "PEN" | "MXN" | "CLP" | "BRL"
   | "UYU" | "BOB" | "PYG" | "GTQ" | "DOP" | "CRC"
-  | "HNL" | "NIO" | "VES";
+  | "HNL" | "NIO" | "VES"
+  | "NZD" | "SEK" | "NOK" | "DKK" | "CHF"
+  | "JPY" | "KRW" | "SGD" | "HKD" | "TWD";
 
 export interface CampaignPrice {
   currency: CampaignCurrency;
@@ -44,10 +46,10 @@ function detectOnce(): Promise<{ currency: CampaignCurrency; country: string } |
 // Fixed marketing exchange rates (NOT live). Charge always happens in USD.
 const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: number; nice: (n: number) => number }> = {
   USD: { symbol: "$",    rate: 1,    decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  EUR: { symbol: "€",    rate: 0.86, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  EUR: { symbol: "€",    rate: 0.91, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   GBP: { symbol: "£",    rate: 0.80, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   CAD: { symbol: "$",    rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  AUD: { symbol: "$",    rate: 1.40, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  AUD: { symbol: "$",    rate: 1.55, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   // COP: ajustado para landing $43k-$46k a $13.99 USD
   COP: { symbol: "$",    rate: 3200, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
@@ -120,6 +122,16 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
   }},
   // VES (Bolívar venezolano) — alta volatilidad; mantener conservador
   VES: { symbol: "Bs.S", rate: 100, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  NZD: { symbol: "NZ$",  rate: 1.65, decimals: 2, nice: (n) => Math.round(n) - 0.10 },
+  SEK: { symbol: "kr ",  rate: 10,   decimals: 0, nice: (n) => Math.round(n / 10) * 10 },
+  NOK: { symbol: "kr ",  rate: 10.7, decimals: 0, nice: (n) => Math.round(n / 10) * 10 },
+  DKK: { symbol: "kr ",  rate: 7,    decimals: 0, nice: (n) => Math.round(n) },
+  CHF: { symbol: "CHF ", rate: 0.9,  decimals: 2, nice: (n) => Math.round(n) - 0.10 },
+  JPY: { symbol: "¥",    rate: 152,  decimals: 0, nice: (n) => Math.round(n / 100) * 100 },
+  KRW: { symbol: "₩",    rate: 1375, decimals: 0, nice: (n) => Math.round(n / 500) * 500 },
+  SGD: { symbol: "S$",   rate: 1.37, decimals: 2, nice: (n) => Math.round(n) - 0.10 },
+  HKD: { symbol: "HK$",  rate: 7.78, decimals: 0, nice: (n) => Math.round(n / 5) * 5 },
+  TWD: { symbol: "NT$",  rate: 32,   decimals: 0, nice: (n) => Math.round(n / 10) * 10 },
 };
 
 const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
@@ -146,7 +158,16 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   EC: "USD", // Ecuador usa USD
   SV: "USD", // El Salvador usa USD
   AU: "AUD",
-  NZ: "AUD",
+  NZ: "NZD",
+  SE: "SEK",
+  NO: "NOK",
+  DK: "DKK",
+  CH: "CHF",
+  JP: "JPY",
+  KR: "KRW",
+  SG: "SGD",
+  HK: "HKD",
+  TW: "TWD",
   // Eurozona
   ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR", IE: "EUR",
   NL: "EUR", BE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
@@ -178,7 +199,16 @@ const TIMEZONE_TO_COUNTRY: Record<string, string> = {
   "Europe/Madrid": "ES", "Europe/Paris": "FR", "Europe/Berlin": "DE", "Europe/Rome": "IT", "Europe/Lisbon": "PT", "Europe/Dublin": "IE", "Europe/Amsterdam": "NL", "Europe/Brussels": "BE", "Europe/Vienna": "AT", "Europe/Helsinki": "FI", "Europe/Athens": "GR", "Europe/Luxembourg": "LU", "Europe/Bratislava": "SK", "Europe/Ljubljana": "SI", "Europe/Tallinn": "EE", "Europe/Riga": "LV", "Europe/Vilnius": "LT", "Europe/Malta": "MT", "Asia/Nicosia": "CY", "Europe/Zagreb": "HR",
   "Europe/London": "GB",
   "Australia/Sydney": "AU", "Australia/Melbourne": "AU", "Australia/Brisbane": "AU", "Australia/Perth": "AU", "Australia/Adelaide": "AU", "Australia/Hobart": "AU", "Australia/Darwin": "AU",
-  "Pacific/Auckland": "NZ",
+  "Pacific/Auckland": "NZ", "Pacific/Chatham": "NZ",
+  "Europe/Stockholm": "SE",
+  "Europe/Oslo": "NO",
+  "Europe/Copenhagen": "DK",
+  "Europe/Zurich": "CH",
+  "Asia/Tokyo": "JP",
+  "Asia/Seoul": "KR",
+  "Asia/Singapore": "SG",
+  "Asia/Hong_Kong": "HK",
+  "Asia/Taipei": "TW",
 };
 
 function guessCountryFromTimezone(): string | null {
@@ -261,7 +291,9 @@ function build(
 }
 
 export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = [
-  "USD", "EUR", "GBP", "CAD", "AUD",
+  "USD", "EUR", "GBP", "CAD", "AUD", "NZD", "CHF",
+  "SEK", "NOK", "DKK",
+  "JPY", "KRW", "SGD", "HKD", "TWD",
   "MXN", "COP", "ARS", "PEN", "CLP", "BRL",
   "UYU", "BOB", "PYG", "GTQ", "DOP", "CRC", "HNL", "NIO", "VES",
 ];

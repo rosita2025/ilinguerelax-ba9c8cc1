@@ -21,6 +21,16 @@ const FLAGS: Record<CampaignCurrency, string> = {
   HNL: "🇭🇳",
   NIO: "🇳🇮",
   VES: "🇻🇪",
+  NZD: "🇳🇿",
+  SEK: "🇸🇪",
+  NOK: "🇳🇴",
+  DKK: "🇩🇰",
+  CHF: "🇨🇭",
+  JPY: "🇯🇵",
+  KRW: "🇰🇷",
+  SGD: "🇸🇬",
+  HKD: "🇭🇰",
+  TWD: "🇹🇼",
 };
 
 interface Props {

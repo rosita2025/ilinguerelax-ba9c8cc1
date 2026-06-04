@@ -600,6 +600,47 @@ const Product5000 = () => {
                   </p>
                 </div>
               </motion.div>
+
+              {/* Quality & Brand Trust */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-lg">⭐</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">
+                      Material PDF de marca ILINGUE RELAX — NO es basura
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Máxima calidad garantizada. Satisfacción 100% asegurada.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* WhatsApp Support */}
+              <motion.a
+                href="https://wa.link/lkvwgr"
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="mt-4 flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 hover:border-green-500/40 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+                  <span className="text-lg">💬</span>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-green-700">¿Tienes alguna pregunta hoy?</p>
+                  <p className="text-xs text-green-600">Escríbeme por WhatsApp y te respondo al instante</p>
+                </div>
+              </motion.a>
             </div>
           </div>
         </div>
@@ -609,9 +650,12 @@ const Product5000 = () => {
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
               📖 Vista Previa del Contenido
             </h2>
+            <p className="text-center text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
+              🔍 Te recomendamos ver la vista previa antes de comprar para conocer exactamente lo que recibirás.
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">

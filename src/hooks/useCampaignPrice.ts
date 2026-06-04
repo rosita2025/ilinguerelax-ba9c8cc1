@@ -48,13 +48,13 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
   GBP: { symbol: "£",    rate: 0.80, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   CAD: { symbol: "$",    rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   AUD: { symbol: "$",    rate: 1.40, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  // COP: tasa oficial ~4.000, redondeo a múltiplos de 100 terminados en 900
-  COP: { symbol: "$",    rate: 4000, decimals: 0, nice: (n) => {
+  // COP: ajustado para landing $43k-$46k a $13.99 USD
+  COP: { symbol: "$",    rate: 3200, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(900, rounded - 100); // termina en .900
   }},
-  // ARS: dólar blue ~1.200, redondeo a centenas terminadas en 90
-  ARS: { symbol: "$",    rate: 1200, decimals: 0, nice: (n) => {
+  // ARS: ajustado para landing $13k-$16k a $13.99 USD
+  ARS: { symbol: "$",    rate: 1050, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 100) * 100;
     return Math.max(90, rounded - 10); // termina en .90 (ej: 16.790)
   }},
@@ -63,33 +63,33 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     const rounded = Math.round(n);
     return rounded - 0.10; // termina en .90
   }},
-  // MXN (Peso mexicano) ~20, redondeo psicológico terminado en 9
-  MXN: { symbol: "$",    rate: 20, decimals: 0, nice: (n) => {
+  // MXN: ajustado para landing $189-$199 a $13.99 USD
+  MXN: { symbol: "$",    rate: 14, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 10) * 10;
     return Math.max(9, rounded - 1); // termina en 9 (psicológico)
   }},
-  // CLP (Peso chileno) ~900, redondeo a múltiplos de 1000 - 10 => .990
-  CLP: { symbol: "$",    rate: 900, decimals: 0, nice: (n) => {
+  // CLP: ajustado para landing $10.500-$11.500 a $13.99 USD
+  CLP: { symbol: "$",    rate: 800, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(990, rounded - 10);
   }},
-  // BRL (Real brasileño) ~5.0, redondeo .90
-  BRL: { symbol: "R$",   rate: 5.0, decimals: 2, nice: (n) => {
+  // BRL: ajustado para landing R$55-R$65 a $13.99 USD
+  BRL: { symbol: "R$",   rate: 4.3, decimals: 2, nice: (n) => {
     const rounded = Math.round(n);
     return rounded - 0.10;
   }},
-  // UYU (Peso uruguayo) ~40
-  UYU: { symbol: "$U",   rate: 40, decimals: 0, nice: (n) => {
+  // UYU: ajustado para landing $440-$500 a $13.99 USD
+  UYU: { symbol: "$U",   rate: 33, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 10) * 10;
     return Math.max(9, rounded - 1);
   }},
-  // BOB (Boliviano) ~6.9
-  BOB: { symbol: "Bs",   rate: 6.9, decimals: 2, nice: (n) => {
+  // BOB: ajustado para landing Bs 75-Bs 85 a $13.99 USD
+  BOB: { symbol: "Bs",   rate: 5.7, decimals: 2, nice: (n) => {
     const rounded = Math.round(n);
     return rounded - 0.10;
   }},
-  // PYG (Guaraní paraguayo) ~7300
-  PYG: { symbol: "₲",    rate: 7300, decimals: 0, nice: (n) => {
+  // PYG: ajustado para landing ₲80k-₲90k a $13.99 USD
+  PYG: { symbol: "₲",    rate: 6000, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(900, rounded - 100);
   }},

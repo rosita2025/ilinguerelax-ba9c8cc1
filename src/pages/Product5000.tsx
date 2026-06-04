@@ -242,8 +242,19 @@ const Product5000 = () => {
     BOB: "Bs 80",
     UYU: "$469",
     PYG: "₲70.000",
+    CRC: "₡5.300",
+    HNL: "L 305.17",
+    GTQ: "Q 89.34",
   };
-  const overridden = PRICE_OVERRIDES_5000[campaign.currency];
+  // USD se comparte entre varios países (US, EC, PR, PA, SV). Para EC y PR
+  // queremos mostrar $11 USD aunque otros países USD vean el precio normal.
+  const USD_COUNTRY_OVERRIDE: Record<string, string> = {
+    EC: "$11",
+    PR: "$11",
+  };
+  const overridden =
+    PRICE_OVERRIDES_5000[campaign.currency] ||
+    (campaign.currency === "USD" ? USD_COUNTRY_OVERRIDE[campaign.countryCode] : undefined);
   if (overridden) {
     campaign.price = overridden;
     campaign.priceWithCurrency = `${overridden} ${campaign.currency}`;

@@ -58,8 +58,8 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     const rounded = Math.round(n / 100) * 100;
     return Math.max(90, rounded - 10); // termina en .90 (ej: 16.790)
   }},
-  // PEN (Sol peruano) ~3.75, redondeo a terminaciones .90
-  PEN: { symbol: "S/",   rate: 3.75, decimals: 2, nice: (n) => {
+  // PEN: ajustado para landing S/39.90 a $13.99 USD
+  PEN: { symbol: "S/",   rate: 2.86, decimals: 2, nice: (n) => {
     const rounded = Math.round(n);
     return rounded - 0.10; // termina en .90
   }},

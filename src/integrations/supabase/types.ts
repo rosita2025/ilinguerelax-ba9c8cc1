@@ -328,6 +328,30 @@ export type Database = {
         }
         Relationships: []
       }
+      shopify_sales_public: {
+        Row: {
+          country: string | null
+          customer_name: string | null
+          order_created_at: string | null
+          product_key: string | null
+          product_name: string | null
+        }
+        Insert: {
+          country?: string | null
+          customer_name?: string | null
+          order_created_at?: string | null
+          product_key?: string | null
+          product_name?: string | null
+        }
+        Update: {
+          country?: string | null
+          customer_name?: string | null
+          order_created_at?: string | null
+          product_key?: string | null
+          product_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

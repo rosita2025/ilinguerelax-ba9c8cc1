@@ -12,7 +12,24 @@ serve(async (req) => {
   }
 
   try {
+    const url = new URL(req.url);
     const body = await req.json();
+
+    // Verify Hotmart webhook token (configure HOTMART_WEBHOOK_TOKEN secret and match in Hotmart panel)
+    const expectedToken = Deno.env.get("HOTMART_WEBHOOK_TOKEN");
+    const receivedToken =
+      body.hottok ||
+      body.data?.hottok ||
+      url.searchParams.get("hottok") ||
+      req.headers.get("x-hotmart-hottok");
+    if (!expectedToken || receivedToken !== expectedToken) {
+      console.warn("Unauthorized Hotmart webhook (invalid or missing hottok)");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     console.log("Hotmart abandoned cart webhook received:", JSON.stringify(body));
 
     // Hotmart sends buyer info in different formats depending on webhook version

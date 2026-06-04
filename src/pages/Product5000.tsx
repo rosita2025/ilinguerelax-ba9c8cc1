@@ -830,6 +830,45 @@ const Product5000 = () => {
         </div>
       </section>
 
+      {/* WhatsApp Banner - Final CTA */}
+      <section className="py-12 md:py-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.15)_0%,_transparent_70%)]" />
+        <div className="container px-4 md:px-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">💬</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+              ¿Tienes alguna pregunta antes de comprar?
+            </h2>
+            <p className="text-white/80 text-base md:text-lg mb-6 max-w-lg mx-auto">
+              Escríbeme directamente por WhatsApp y te respondo al instante. Estoy aquí para ayudarte.
+            </p>
+            <motion.a
+              href="https://wa.link/lkvwgr"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-green-700 font-bold text-lg shadow-2xl hover:shadow-green-500/30 transition-shadow"
+            >
+              <span className="text-2xl">💬</span>
+              ESCRIBIR POR WHATSAPP
+            </motion.a>
+            <p className="text-white/60 text-sm mt-4">
+              Respuesta en minutos · Sin compromiso
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       <Footer />
 
       {/* Sticky Buy Bar */}

@@ -50,30 +50,51 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
   GBP: { symbol: "£",    rate: 0.80, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   CAD: { symbol: "$",    rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   AUD: { symbol: "$",    rate: 1.55, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  // COP: ajustado para landing ~$41.000 a $34.99 USD
-  COP: { symbol: "$",    rate: 1172, decimals: 0, nice: (n) => Math.round(n / 1000) * 1000 },
-  // ARS: ajustado para landing ~$16.400 a $34.99 USD
-  ARS: { symbol: "$",    rate: 468.7, decimals: 0, nice: (n) => Math.round(n / 100) * 100 },
+  // COP: ajustado para landing $43k-$46k a $13.99 USD
+  COP: { symbol: "$",    rate: 3200, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 1000) * 1000;
+    return Math.max(900, rounded - 100); // termina en .900
+  }},
+  // ARS: ajustado para landing $13k-$16k a $13.99 USD
+  ARS: { symbol: "$",    rate: 1050, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 100) * 100;
+    return Math.max(90, rounded - 10); // termina en .90 (ej: 16.790)
+  }},
   // PEN: ajustado para landing S/39.90 a $13.99 USD
   PEN: { symbol: "S/",   rate: 2.86, decimals: 2, nice: (n) => {
     const rounded = Math.round(n);
     return rounded - 0.10; // termina en .90
   }},
-  // MXN: ajustado para landing ~$199 a $34.99 USD
-  MXN: { symbol: "$",    rate: 5.69, decimals: 0, nice: (n) => {
+  // MXN: ajustado para landing $189-$199 a $13.99 USD
+  MXN: { symbol: "$",    rate: 14, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 10) * 10;
     return Math.max(9, rounded - 1); // termina en 9 (psicológico)
   }},
-  // CLP: ajustado para landing ~$10.200 a $34.99 USD
-  CLP: { symbol: "$",    rate: 291.5, decimals: 0, nice: (n) => Math.round(n / 100) * 100 },
-  // BRL: ajustado para landing ~R$59 a $34.99 USD
-  BRL: { symbol: "R$",   rate: 1.686, decimals: 0, nice: (n) => Math.round(n) },
-  // UYU: ajustado para landing ~$469 a $34.99 USD
-  UYU: { symbol: "$U",   rate: 13.4, decimals: 0, nice: (n) => Math.round(n) },
-  // BOB: ajustado para landing ~Bs 80 a $34.99 USD
-  BOB: { symbol: "Bs ",  rate: 2.286, decimals: 0, nice: (n) => Math.round(n) },
-  // PYG: ajustado para landing ~₲70.000 a $34.99 USD
-  PYG: { symbol: "₲",    rate: 2001, decimals: 0, nice: (n) => Math.round(n / 1000) * 1000 },
+  // CLP: ajustado para landing $10.500-$11.500 a $13.99 USD
+  CLP: { symbol: "$",    rate: 800, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 1000) * 1000;
+    return Math.max(990, rounded - 10);
+  }},
+  // BRL: ajustado para landing R$55-R$65 a $13.99 USD
+  BRL: { symbol: "R$",   rate: 4.3, decimals: 2, nice: (n) => {
+    const rounded = Math.round(n);
+    return rounded - 0.10;
+  }},
+  // UYU: ajustado para landing $440-$500 a $13.99 USD
+  UYU: { symbol: "$U",   rate: 33, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 10) * 10;
+    return Math.max(9, rounded - 1);
+  }},
+  // BOB: ajustado para landing Bs 75-Bs 85 a $13.99 USD
+  BOB: { symbol: "Bs",   rate: 5.7, decimals: 2, nice: (n) => {
+    const rounded = Math.round(n);
+    return rounded - 0.10;
+  }},
+  // PYG: ajustado para landing ₲80k-₲90k a $13.99 USD
+  PYG: { symbol: "₲",    rate: 6000, decimals: 0, nice: (n) => {
+    const rounded = Math.round(n / 1000) * 1000;
+    return Math.max(900, rounded - 100);
+  }},
   // GTQ (Quetzal guatemalteco) ~7.7
   GTQ: { symbol: "Q",    rate: 7.7, decimals: 2, nice: (n) => {
     const rounded = Math.round(n);

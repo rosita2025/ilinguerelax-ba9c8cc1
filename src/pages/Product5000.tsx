@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -10,15 +10,15 @@ import reviewFb2 from "@/assets/review-fb-2.jpg";
 import reviewFb3 from "@/assets/review-fb-3.jpg";
 import reviewFb4 from "@/assets/review-fb-4.jpg";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { FAQ } from "@/components/FAQ";
-import SalesNotification from "@/components/SalesNotification";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { LiveViewers } from "@/components/LiveViewers";
-import { ComparisonTable } from "@/components/ComparisonTable";
-import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
-import { CustomerReviewsCarousel } from "@/components/CustomerReviewsCarousel";
+
+// Lazy-loaded below-the-fold components for faster initial load
+const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
+const SalesNotification = lazy(() => import("@/components/SalesNotification"));
+const ExitIntentPopup = lazy(() => import("@/components/ExitIntentPopup").then(m => ({ default: m.ExitIntentPopup })));
+const CustomerReviewsCarousel = lazy(() => import("@/components/CustomerReviewsCarousel").then(m => ({ default: m.CustomerReviewsCarousel })));
 import { useCampaignPrice, readInitialCampaignCurrency } from "@/hooks/useCampaignPrice";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -75,7 +75,6 @@ import logoShopify from "@/assets/logo-shopify.png";
 import logoKindle from "@/assets/logo-kindle.png";
 
 // Components
-import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -726,7 +725,9 @@ const Product5000 = () => {
         </div>
       </section>
 
-      <CustomerReviewsCarousel />
+      <Suspense fallback={null}>
+        <CustomerReviewsCarousel />
+      </Suspense>
 
       <CompactBuyCard
         title="Inglés Relax 5,000"
@@ -748,6 +749,7 @@ const Product5000 = () => {
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
       {/* FAQ Section */}
+      <Suspense fallback={null}>
       <FAQ
         items={[
           {
@@ -793,6 +795,7 @@ const Product5000 = () => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX"
       />
+      </Suspense>
 
       {/* About Me / Sobre Mí Section */}
       <section className="py-16 md:py-20 relative overflow-hidden">
@@ -888,13 +891,17 @@ const Product5000 = () => {
       <div className="h-20 md:h-16" />
 
       {/* Sales Notification Popup */}
-      <SalesNotification />
+      <Suspense fallback={null}>
+        <SalesNotification />
+      </Suspense>
 
       {/* Exit Intent Popup */}
-      <ExitIntentPopup
-        buyUrl={buyUrl}
-        discount="15%"
-      />
+      <Suspense fallback={null}>
+        <ExitIntentPopup
+          buyUrl={buyUrl}
+          discount="15%"
+        />
+      </Suspense>
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton url="https://wa.me/message/GMC4AXDBEUE3D1" label="¿Dudas?" />

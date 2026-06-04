@@ -583,23 +583,6 @@ const Product5000 = () => {
               {/* Trust Badges */}
               <TrustBadges lang="es" variant="grid" />
 
-              {/* Money Back Guarantee - Enhanced */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6"
-              >
-                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Shield className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <p className="text-base font-bold text-green-700">🛡️ Garantía de Devolución 100% - 7 Días</p>
-                  <p className="text-sm text-green-600">
-                    Si no estás satisfecho, te devolvemos TODO tu dinero. Sin preguntas.
-                  </p>
-                </div>
-              </motion.div>
 
               {/* Quality & Brand Trust */}
               <motion.div

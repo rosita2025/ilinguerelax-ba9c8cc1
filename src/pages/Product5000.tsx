@@ -343,6 +343,7 @@ const Product5000 = () => {
             {/* Close button */}
             <button
               onClick={() => setLightboxOpen(false)}
+              aria-label="Cerrar vista previa"
               className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <X className="w-6 h-6 text-white" />
@@ -351,6 +352,7 @@ const Product5000 = () => {
             {/* Previous button */}
             <button
               onClick={prevImage}
+              aria-label="Imagen anterior"
               className="absolute left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ChevronLeft className="w-8 h-8 text-white" />
@@ -375,6 +377,7 @@ const Product5000 = () => {
             {/* Next button */}
             <button
               onClick={nextImage}
+              aria-label="Imagen siguiente"
               className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ChevronRight className="w-8 h-8 text-white" />
@@ -391,6 +394,7 @@ const Product5000 = () => {
             {/* Close button */}
             <button
               onClick={() => setBonusLightboxOpen(false)}
+              aria-label="Cerrar vista previa"
               className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <X className="w-6 h-6 text-white" />
@@ -399,6 +403,7 @@ const Product5000 = () => {
             {/* Previous button */}
             <button
               onClick={prevBonusImage}
+              aria-label="Bonus anterior"
               className="absolute left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ChevronLeft className="w-8 h-8 text-white" />
@@ -427,6 +432,7 @@ const Product5000 = () => {
             {/* Next button */}
             <button
               onClick={nextBonusImage}
+              aria-label="Bonus siguiente"
               className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ChevronRight className="w-8 h-8 text-white" />

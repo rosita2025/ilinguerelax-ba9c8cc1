@@ -10,24 +10,32 @@ export const Footer = () => {
       products: "Productos",
       about: "Sobre Nosotros",
       contact: "Contacto",
+      privacy: "Privacidad",
+      terms: "Condiciones",
       rights: "Todos los derechos reservados",
     },
     en: {
       products: "Products",
       about: "About Us",
       contact: "Contact",
+      privacy: "Privacy",
+      terms: "Terms",
       rights: "All rights reserved",
     },
     fr: {
       products: "Produits",
       about: "À Propos",
       contact: "Contact",
+      privacy: "Confidentialité",
+      terms: "Conditions",
       rights: "Tous droits réservés",
     },
     pt: {
       products: "Produtos",
       about: "Sobre Nós",
       contact: "Contato",
+      privacy: "Privacidade",
+      terms: "Termos",
       rights: "Todos os direitos reservados",
     },
   };
@@ -44,7 +52,7 @@ export const Footer = () => {
             </span>
           </Link>
 
-          <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/70">
+          <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm text-primary-foreground/70">
             <Link to="/products" className="hover:text-primary-foreground transition-colors">
               {c.products}
             </Link>
@@ -56,6 +64,12 @@ export const Footer = () => {
             </Link>
             <Link to="/faq" className="hover:text-primary-foreground transition-colors">
               FAQ
+            </Link>
+            <Link to="/privacidad" className="hover:text-primary-foreground transition-colors">
+              {c.privacy}
+            </Link>
+            <Link to="/condiciones" className="hover:text-primary-foreground transition-colors">
+              {c.terms}
             </Link>
           </nav>
 

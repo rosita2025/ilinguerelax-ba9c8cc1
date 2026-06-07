@@ -169,7 +169,7 @@ const BlogPost = () => {
       <SEO 
         title={`${post.title} | Blog iLingue Relax`}
         description={post.excerpt}
-        canonicalUrl={`https://ilinguerelax.lovable.app/blog/${post.slug}`}
+        canonicalUrl={`https://ilinguerelax.com/blog/${post.slug}`}
         keywords={post.tags.join(", ")}
         image={post.image}
       />

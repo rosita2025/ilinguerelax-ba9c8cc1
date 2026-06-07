@@ -89,7 +89,7 @@ const AboutPage = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4">
-              Sobre Nosotros
+              Sobre iLingue Relax: Aprendizaje de Idiomas Sin Estrés
             </h1>
             <p className="text-lg text-primary-foreground/90">
               Conoce la historia detrás de iLingue Relax

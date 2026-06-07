@@ -116,7 +116,7 @@ const ProductPatronesEspeciales = () => {
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image="https://ilinguerelax.com/images/product-patrones-especiales.webp"
         type="product"
-        price="10.00"
+        price="8.08"
         originalPrice="19.99"
         rating="4.9"
         reviewCount="6"

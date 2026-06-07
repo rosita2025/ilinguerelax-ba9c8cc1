@@ -17,7 +17,7 @@ const getProductLangKey = (p: Product): LangKey => {
     return "soon";
   }
   // English-target products (for Spanish speakers learning English)
-  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas", "1000-free"];
+  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas"];
   if (englishIds.includes(p.id)) return "english";
   // Spanish-target products (for English speakers learning Spanish)
   return "spanish";

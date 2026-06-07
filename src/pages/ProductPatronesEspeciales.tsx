@@ -41,7 +41,7 @@ const features = [
 
 const ProductPatronesEspeciales = () => {
   const { formatPrice, currency } = useI18n();
-  const PRICE_USD = 10;
+  const PRICE_USD = 8.08; // ≈ S/29.90 PEN (rate 3.70)
   const ORIGINAL_USD = 19.99;
   const priceLabel = formatPrice(PRICE_USD);
   const originalLabel = formatPrice(ORIGINAL_USD);
@@ -51,7 +51,7 @@ const ProductPatronesEspeciales = () => {
     content_category: "Digital Book",
     content_ids: ["patrones-especiales"],
     content_type: "product",
-      value: 10,
+      value: 8.08,
     currency: "USD",
   }), []);
   useHotmartPixel(pixelParams);
@@ -62,7 +62,7 @@ const ProductPatronesEspeciales = () => {
       content_category: "Digital Book",
       content_ids: ["patrones-especiales"],
       content_type: "product",
-      value: 10,
+      value: 8.08,
       currency: "USD",
       num_items: 1,
     });

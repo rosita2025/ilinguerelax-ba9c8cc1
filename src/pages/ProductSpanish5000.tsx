@@ -324,8 +324,18 @@ const ProductSpanish5000 = () => {
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">
-                  Instant PDF download · 30-day money-back guarantee
+                  Secure Stripe checkout · 30-day money-back guarantee
                 </p>
+                <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/5 dark:border-emerald-500/20 p-3">
+                  <div className="flex items-start gap-2">
+                    <Truck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-xs text-foreground leading-snug">
+                      <strong>International shipping:</strong> 🇺🇸 USA · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 New Zealand — flat <strong>$8 USD</strong>.
+                      <br />
+                      <span className="text-emerald-700 dark:text-emerald-400 font-semibold">🎁 FREE shipping on orders over $50</span> (add 2+ books at checkout).
+                    </div>
+                  </div>
+                </div>
                 <Button
                   type="button"
                   variant="outline"

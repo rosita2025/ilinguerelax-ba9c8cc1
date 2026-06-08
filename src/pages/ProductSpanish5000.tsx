@@ -147,6 +147,7 @@ const ProductSpanish5000 = () => {
   useScrollTimeTracking("product_spanish_5000");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [isCreatingDigitalCheckout, setIsCreatingDigitalCheckout] = useState(false);
+  const checkoutLockRef = useRef(false);
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
 
@@ -179,7 +180,8 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    if (isCreatingDigitalCheckout) return;
+    if (checkoutLockRef.current) return;
+    checkoutLockRef.current = true;
     try {
       setIsCreatingDigitalCheckout(true);
       trackHotmartEvent("InitiateCheckout", {
@@ -197,6 +199,7 @@ const ProductSpanish5000 = () => {
     } catch (e) {
       console.error("Physical checkout error:", e);
       setIsCreatingDigitalCheckout(false);
+      checkoutLockRef.current = false;
     }
   };
   return <main className="min-h-screen bg-background">

@@ -9,10 +9,11 @@ const corsHeaders = {
 const PRICE_ID = "price_1Tg6KBBfc72Blbd9hEX3dulP"; // Spanish Relax Physical + Digital + Bonuses — $34.99
 const SHIPPING_COUNTRIES = ["US", "GB", "AU", "NZ"] as const;
 
-// Digital upsell prices ($12 each — 1,000 Spanish Verbs & 500 Spanish Questions)
+// Upsell prices: 1,000 Spanish Verbs ($12), 500 Spanish Questions ($12), Structural Grammar A1-C1 physical ($38.25)
 const UPSELL_PRICES = [
   "price_1Tg6PaBfc72Blbd93fFNj4g1",
   "price_1Tg6QsBfc72Blbd9HW4e8kCb",
+  "price_1Tg6Y2Bfc72Blbd9ri9nxVs8",
 ];
 
 // Cache shipping-rate IDs across warm invocations to avoid the extra round-trip

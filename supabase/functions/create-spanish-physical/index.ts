@@ -9,6 +9,7 @@ const corsHeaders = {
 const PRICE_ID = "price_1Tg6KBBfc72Blbd9hEX3dulP"; // Spanish Relax Physical + Digital + Bonuses — $34.99
 const SHIPPING_COUNTRIES = ["US", "GB", "AU", "NZ"] as const;
 const FREESHIP_PROMO_CODE = "FREESHIP50";
+const FREESHIP_COUPON_ID = "oDp3a99D"; // $8 off — "Free shipping over $50"
 
 // Upsell prices: 1,000 Spanish Verbs ($12), 500 Spanish Questions ($12), Structural Grammar A1-C1 physical ($38.25)
 const UPSELL_PRICES = [
@@ -20,6 +21,7 @@ const UPSELL_PRICES = [
 // Cache shipping-rate IDs across warm invocations to avoid the extra round-trip
 let cachedStandardShippingId: string | null = null;
 let cachedFreeShippingId: string | null = null;
+let freeshipPromoEnsured = false;
 
 async function getShippingRateIds(stripe: Stripe): Promise<{ standardId: string; freeId: string }> {
   if (cachedStandardShippingId && cachedFreeShippingId) {
@@ -50,6 +52,27 @@ async function getShippingRateIds(stripe: Stripe): Promise<{ standardId: string;
   return { standardId: standardShipping.id, freeId: freeShipping.id };
 }
 
+// Ensure the FREESHIP50 promotion code exists and is valid for orders >= $50.
+// Safe to call repeatedly: it short-circuits once verified per warm instance.
+async function ensureFreeshipPromo(stripe: Stripe): Promise<void> {
+  if (freeshipPromoEnsured) return;
+  try {
+    const existing = await stripe.promotionCodes.list({ code: FREESHIP_PROMO_CODE, active: true, limit: 1 });
+    if (existing.data.length > 0) {
+      freeshipPromoEnsured = true;
+      return;
+    }
+    await stripe.promotionCodes.create({
+      coupon: FREESHIP_COUPON_ID,
+      code: FREESHIP_PROMO_CODE,
+      restrictions: { minimum_amount: 5000, minimum_amount_currency: "usd" },
+    });
+    freeshipPromoEnsured = true;
+  } catch (err) {
+    console.warn("[create-spanish-physical] ensureFreeshipPromo failed:", err instanceof Error ? err.message : err);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -74,6 +97,7 @@ serve(async (req) => {
       "https://ilinguerelax.com";
 
     const { standardId } = await getShippingRateIds(stripe);
+    await ensureFreeshipPromo(stripe);
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

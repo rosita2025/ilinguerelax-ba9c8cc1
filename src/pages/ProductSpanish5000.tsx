@@ -179,30 +179,25 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    // AddToCart se dispara automáticamente desde cartStore.addItem
-    const shopifyProduct = {
-      node: {
-        id: "gid://shopify/Product/7788747784253",
-        title: "Spanish Relax - 5,000 Words with English Pronunciation",
-        description: "",
-        handle: "spanish-relax-5-000-words-with-english-pronunciation",
-        priceRange: { minVariantPrice: { amount: "34.99", currencyCode: "USD" } },
-        images: { edges: [{ node: { url: productSpanish5000Image, altText: "Spanish Relax - 5,000 Words" } }] },
-        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "34.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
-        options: [{ name: "Title", values: ["Default Title"] }]
+    if (isCreatingDigitalCheckout) return;
+    try {
+      setIsCreatingDigitalCheckout(true);
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Spanish 5000 Physical + Digital",
+        value: 34.99,
+        currency: "USD",
+      });
+      const { data, error } = await supabase.functions.invoke("create-spanish-physical", { body: {} });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.assign(data.url);
+        return;
       }
-    };
-
-    // Open drawer INSTANTLY for snappy UX; Shopify sync runs in background
-    setDrawerOpen(true);
-    addItem({
-      product: shopifyProduct,
-      variantId: SHOPIFY_VARIANT_ID,
-      variantTitle: "Default Title",
-      price: { amount: "34.99", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }]
-    });
+      throw new Error("Checkout URL not returned");
+    } catch (e) {
+      console.error("Physical checkout error:", e);
+      setIsCreatingDigitalCheckout(false);
+    }
   };
   return <main className="min-h-screen bg-background">
       <Helmet>
@@ -329,8 +324,18 @@ const ProductSpanish5000 = () => {
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">
-                  Instant PDF download · 30-day money-back guarantee
+                  Secure Stripe checkout · 30-day money-back guarantee
                 </p>
+                <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/5 dark:border-emerald-500/20 p-3">
+                  <div className="flex items-start gap-2">
+                    <Truck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-xs text-foreground leading-snug">
+                      <strong>International shipping:</strong> 🇺🇸 USA · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 New Zealand — flat <strong>$8 USD</strong>.
+                      <br />
+                      <span className="text-emerald-700 dark:text-emerald-400 font-semibold">🎁 FREE shipping on orders over $50</span> (add 2+ books at checkout).
+                    </div>
+                  </div>
+                </div>
                 <Button
                   type="button"
                   variant="outline"

@@ -29,7 +29,7 @@ async function getShippingRateIds(stripe: Stripe): Promise<{ standardId: string;
   }
   const [standardShipping, freeShipping] = await Promise.all([
     stripe.shippingRates.create({
-      display_name: "International standard ($8 — US/UK/AU/NZ)",
+      display_name: "International standard — $8",
       type: "fixed_amount",
       fixed_amount: { amount: 800, currency: "usd" },
       delivery_estimate: {
@@ -38,7 +38,7 @@ async function getShippingRateIds(stripe: Stripe): Promise<{ standardId: string;
       },
     }),
     stripe.shippingRates.create({
-      display_name: "Free shipping (orders $50+)",
+      display_name: "FREE shipping (orders $50+) — apply code FREESHIP50",
       type: "fixed_amount",
       fixed_amount: { amount: 0, currency: "usd" },
       delivery_estimate: {
@@ -96,7 +96,7 @@ serve(async (req) => {
       req.headers.get("referer")?.replace(/\/$/, "") ||
       "https://ilinguerelax.com";
 
-    const { standardId } = await getShippingRateIds(stripe);
+    const { standardId, freeId } = await getShippingRateIds(stripe);
     await ensureFreeshipPromo(stripe);
 
     const session = await stripe.checkout.sessions.create({
@@ -105,7 +105,10 @@ serve(async (req) => {
       line_items: [{ price: PRICE_ID, quantity: 1, adjustable_quantity: { enabled: true, minimum: 1, maximum: 10 } }],
       mode: "payment",
       shipping_address_collection: { allowed_countries: [...SHIPPING_COUNTRIES] },
-      shipping_options: [{ shipping_rate: standardId }],
+      shipping_options: [
+        { shipping_rate: standardId },
+        { shipping_rate: freeId },
+      ],
       // @ts-ignore — optional_items (cross-sells) supported by current Stripe API
       optional_items: UPSELL_PRICES.map((price) => ({
         price,

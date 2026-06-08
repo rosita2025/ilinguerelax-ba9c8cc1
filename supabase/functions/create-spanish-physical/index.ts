@@ -8,6 +8,7 @@ const corsHeaders = {
 
 const PRICE_ID = "price_1Tg6KBBfc72Blbd9hEX3dulP"; // Spanish Relax Physical + Digital + Bonuses — $34.99
 const SHIPPING_COUNTRIES = ["US", "GB", "AU", "NZ"] as const;
+const FREESHIP_PROMO_CODE = "FREESHIP50";
 
 // Upsell prices: 1,000 Spanish Verbs ($12), 500 Spanish Questions ($12), Structural Grammar A1-C1 physical ($38.25)
 const UPSELL_PRICES = [
@@ -72,7 +73,7 @@ serve(async (req) => {
       req.headers.get("referer")?.replace(/\/$/, "") ||
       "https://ilinguerelax.com";
 
-    const { standardId, freeId } = await getShippingRateIds(stripe);
+    const { standardId } = await getShippingRateIds(stripe);
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -80,10 +81,7 @@ serve(async (req) => {
       line_items: [{ price: PRICE_ID, quantity: 1, adjustable_quantity: { enabled: true, minimum: 1, maximum: 10 } }],
       mode: "payment",
       shipping_address_collection: { allowed_countries: [...SHIPPING_COUNTRIES] },
-      shipping_options: [
-        { shipping_rate: standardId },
-        { shipping_rate: freeId },
-      ],
+      shipping_options: [{ shipping_rate: standardId }],
       // @ts-ignore — optional_items (cross-sells) supported by current Stripe API
       optional_items: UPSELL_PRICES.map((price) => ({
         price,
@@ -91,6 +89,9 @@ serve(async (req) => {
         adjustable_quantity: { enabled: true, minimum: 0, maximum: 1 },
       })),
       allow_promotion_codes: true,
+      metadata: {
+        shipping_promo_code: FREESHIP_PROMO_CODE,
+      },
       success_url: `${origin}/payment-success`,
       cancel_url: `${origin}/products/5-000-spanish-words-with-english-pronunciation?payment=canceled`,
     });

@@ -179,30 +179,25 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    // AddToCart se dispara automáticamente desde cartStore.addItem
-    const shopifyProduct = {
-      node: {
-        id: "gid://shopify/Product/7788747784253",
-        title: "Spanish Relax - 5,000 Words with English Pronunciation",
-        description: "",
-        handle: "spanish-relax-5-000-words-with-english-pronunciation",
-        priceRange: { minVariantPrice: { amount: "34.99", currencyCode: "USD" } },
-        images: { edges: [{ node: { url: productSpanish5000Image, altText: "Spanish Relax - 5,000 Words" } }] },
-        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: "34.99", currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
-        options: [{ name: "Title", values: ["Default Title"] }]
+    if (isCreatingDigitalCheckout) return;
+    try {
+      setIsCreatingDigitalCheckout(true);
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Spanish 5000 Physical + Digital",
+        value: 34.99,
+        currency: "USD",
+      });
+      const { data, error } = await supabase.functions.invoke("create-spanish-physical", { body: {} });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.assign(data.url);
+        return;
       }
-    };
-
-    // Open drawer INSTANTLY for snappy UX; Shopify sync runs in background
-    setDrawerOpen(true);
-    addItem({
-      product: shopifyProduct,
-      variantId: SHOPIFY_VARIANT_ID,
-      variantTitle: "Default Title",
-      price: { amount: "34.99", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }]
-    });
+      throw new Error("Checkout URL not returned");
+    } catch (e) {
+      console.error("Physical checkout error:", e);
+      setIsCreatingDigitalCheckout(false);
+    }
   };
   return <main className="min-h-screen bg-background">
       <Helmet>

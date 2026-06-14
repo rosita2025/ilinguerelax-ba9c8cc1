@@ -27,6 +27,7 @@ const HOTMART_URL = "https://pay.hotmart.com/A106319098M";
 import previewA1 from "@/assets/ilr-preview-a1.png.asset.json";
 import previewComparativos from "@/assets/ilr-preview-comparativos.png.asset.json";
 import previewErrores from "@/assets/ilr-preview-errores.png.asset.json";
+import coverImage from "@/assets/estructuras-gramaticales-ingles-cover.webp.asset.json";
 
 const previewPages = [
   {
@@ -216,27 +217,12 @@ const ProductEstructurasGramaticalesIngles = () => {
               className="relative"
             >
               <div className="absolute -inset-6 bg-gradient-to-br from-[#3b82f6]/40 via-[#1d4ed8]/20 to-[#f5d57a]/20 blur-3xl rounded-full" />
-              <div className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-[#0a1d4a] to-[#04102a] p-6 md:p-8 shadow-2xl">
-                <div className="rounded-2xl border border-[#f5d57a]/30 bg-[#04102a] aspect-[3/4] p-6 md:p-8 flex flex-col justify-between overflow-hidden relative">
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_0%,rgba(96,165,250,0.6),transparent_60%)]" />
-                  <div className="relative">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#f5d57a] text-[#04102a] text-[10px] font-black tracking-widest mb-4">
-                      iLINGUE RELAX®
-                    </div>
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-[#60a5fa] mb-2">
-                      Ebook PDF · A1 – C1
-                    </p>
-                    <h2 className="text-2xl md:text-3xl font-black leading-tight">
-                      Estructuras Gramaticales de Inglés
-                    </h2>
-                  </div>
-                  <div className="relative">
-                    <p className="text-xs text-white/60 mb-1">Desde Cero hasta Avanzado</p>
-                    <div className="h-px bg-gradient-to-r from-transparent via-[#f5d57a]/60 to-transparent mb-3" />
-                    <p className="text-sm font-bold text-[#f5d57a]">300+ estructuras esenciales</p>
-                  </div>
-                </div>
-              </div>
+              <img
+                src={coverImage.url}
+                alt="Portada del ebook Estructuras Gramaticales de Inglés iLingue Relax® - Desde Cero hasta Avanzado A1 a C1"
+                className="relative w-full max-w-lg mx-auto h-auto drop-shadow-[0_25px_50px_rgba(59,130,246,0.35)]"
+                loading="eager"
+              />
             </motion.div>
           </div>
         </div>

@@ -307,6 +307,60 @@ const ProductEstructurasGramaticalesIngles = () => {
 
       {/* Audience */}
       <section className="py-14 md:py-20 bg-gradient-to-b from-[#06163a] to-[#04102a]">
+      </section>
+
+      {/* Preview pages (1:1) */}
+      <section className="py-14 md:py-20">
+        <div className="container px-4 md:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5d57a]/15 border border-[#f5d57a]/30 text-[#f5d57a] text-xs font-bold uppercase tracking-wider mb-3">
+              Vista previa del ebook
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+              Mira por dentro <span className="text-[#f5d57a]">3 páginas reales</span>
+            </h2>
+            <p className="text-white/70">
+              Así de claro y estructurado es el contenido que vas a recibir en PDF.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            {previewPages.map((page, i) => (
+              <motion.figure
+                key={page.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] hover:border-[#f5d57a]/40 transition-all hover:shadow-[0_15px_40px_-15px_rgba(245,213,122,0.35)]"
+              >
+                <div className="relative aspect-square bg-white overflow-hidden">
+                  <img
+                    src={page.src}
+                    alt={`Vista previa — ${page.title}`}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <span className="text-4xl md:text-5xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
+                      ilinguerelax.com
+                    </span>
+                  </div>
+                </div>
+                <figcaption className="p-4">
+                  <p className="font-bold text-white text-sm md:text-base">{page.title}</p>
+                  <p className="text-xs text-white/60 mt-1">{page.caption}</p>
+                </figcaption>
+              </motion.figure>
+            ))}
+          </div>
+          <p className="text-center text-xs text-white/50 mt-6">
+            Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+          </p>
+        </div>
+      </section>
+
+      {/* Audience */}
+      <section className="py-14 md:py-20 bg-gradient-to-b from-[#06163a] to-[#04102a]">
         <div className="container px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>

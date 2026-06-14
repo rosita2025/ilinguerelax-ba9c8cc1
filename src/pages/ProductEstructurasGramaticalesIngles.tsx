@@ -24,6 +24,28 @@ const Footer = lazy(() => import("@/components/Footer").then((m) => ({ default: 
 
 const HOTMART_URL = "https://pay.hotmart.com/A106319098M";
 
+import previewA1 from "@/assets/ilr-preview-a1.png.asset.json";
+import previewComparativos from "@/assets/ilr-preview-comparativos.png.asset.json";
+import previewErrores from "@/assets/ilr-preview-errores.png.asset.json";
+
+const previewPages = [
+  {
+    src: previewA1.url,
+    title: "Nivel A1 — Estructura base",
+    caption: "Article + Object · explicaciones claras paso a paso",
+  },
+  {
+    src: previewComparativos.url,
+    title: "Comparativos y superlativos",
+    caption: "Reglas, excepciones y ejemplos con pronunciación",
+  },
+  {
+    src: previewErrores.url,
+    title: "Errores comunes",
+    caption: "Aprende a evitar los fallos típicos en inglés",
+  },
+];
+
 const benefits = [
   { icon: BookOpen, text: "Más de 150 estructuras gramaticales" },
   { icon: GraduationCap, text: "Desde nivel A1 hasta C1" },

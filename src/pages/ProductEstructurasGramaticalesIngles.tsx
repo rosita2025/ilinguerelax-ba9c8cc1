@@ -307,8 +307,6 @@ const ProductEstructurasGramaticalesIngles = () => {
 
       {/* Audience */}
       <section className="py-14 md:py-20 bg-gradient-to-b from-[#06163a] to-[#04102a]">
-        {/* this section moved below preview */}
-      </section>
         <div className="container px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>

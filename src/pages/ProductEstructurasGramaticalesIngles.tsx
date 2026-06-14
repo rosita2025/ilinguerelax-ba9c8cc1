@@ -27,6 +27,7 @@ const HOTMART_URL = "https://pay.hotmart.com/A106319098M";
 import previewA1 from "@/assets/ilr-preview-a1.png.asset.json";
 import previewComparativos from "@/assets/ilr-preview-comparativos.png.asset.json";
 import previewErrores from "@/assets/ilr-preview-errores.png.asset.json";
+import previewFuturePerfect from "@/assets/ilr-preview-future-perfect.png.asset.json";
 import coverImage from "@/assets/estructuras-gramaticales-ingles-cover.webp.asset.json";
 
 const previewPages = [
@@ -44,6 +45,11 @@ const previewPages = [
     src: previewErrores.url,
     title: "Errores comunes",
     caption: "Aprende a evitar los fallos típicos en inglés",
+  },
+  {
+    src: previewFuturePerfect.url,
+    title: "Future Perfect (C1.3)",
+    caption: "Estructura, uso, ejemplos y pronunciación adaptada",
   },
 ];
 

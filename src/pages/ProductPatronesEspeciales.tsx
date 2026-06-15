@@ -18,14 +18,23 @@ import { useI18n } from "@/i18n/I18nContext";
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";
 
+import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
+import patronesPreview2 from "@/assets/patrones-preview-sufijos.webp.asset.json";
+import patronesPreview3 from "@/assets/patrones-preview-contracciones.webp.asset.json";
+import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
+import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
+import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
+
 const previews = [
-  { src: "/images/patrones-preview-1.webp", alt: "Cómo usar este libro - Método Inglés Relax" },
-  { src: "/images/patrones-preview-2.webp", alt: "Por qué los hispanohablantes se confunden con el inglés" },
-  { src: "/images/patrones-preview-3.webp", alt: "Alfabeto inglés explicado letra por letra" },
-  { src: "/images/patrones-preview-4.webp", alt: "Letras mudas en inglés con regla y ejemplos" },
-  { src: "/images/patrones-preview-5.webp", alt: "20 patrones nuevos de pronunciación en inglés" },
-  { src: "/images/patrones-preview-6.webp", alt: "Contracciones y habla rápida en inglés" },
-  { src: "/images/patrones-preview-7.webp", alt: "Mini reto: adivina la pronunciación antes de ver la respuesta" },
+  { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
+  { src: patronesPreview2.url, alt: "Sufijos y prefijos en inglés con pronunciación adaptada", caption: "Sufijos y Prefijos · cómo suenan realmente" },
+  { src: patronesPreview3.url, alt: "Contracciones y habla rápida en inglés con pronunciación", caption: "Contracciones · habla como un nativo" },
+];
+
+const bonusPreviews = [
+  { src: bono5000Indice.url, alt: "Índice del Bono 5,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
+  { src: bono5000Ropa.url, alt: "5,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
+  { src: bono5000Transporte.url, alt: "5,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
 ];
 
 const features = [

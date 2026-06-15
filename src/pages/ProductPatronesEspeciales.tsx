@@ -267,24 +267,77 @@ const ProductPatronesEspeciales = () => {
                 Mira por dentro <span className="text-gradient">antes de comprar</span>
               </h2>
               <p className="text-muted-foreground">
-                7 páginas reales del ebook. Calidad comprobada.
+                3 páginas reales del ebook. Calidad comprobada.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {previews.map((p, i) => (
-                <div key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
+                <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
                   <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
                     Página {i + 1}
                   </div>
-                  <img
-                    src={p.src}
-                    alt={p.alt}
-                    loading="lazy"
-                    className="w-full h-auto"
-                  />
-                </div>
+                  <div className="relative aspect-square bg-white overflow-hidden">
+                    <img
+                      src={p.src}
+                      alt={p.alt}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover object-top"
+                    />
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                      <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
+                        ilinguerelax.com
+                      </span>
+                    </div>
+                  </div>
+                  <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
+                    {p.caption}
+                  </figcaption>
+                </figure>
               ))}
+            </div>
+
+            {/* Bono 5,000 palabras */}
+            <div className="mt-14">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent text-sm font-bold mb-3">
+                  <Sparkles className="w-4 h-4" /> Bono incluido GRATIS
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  + Bono: <span className="text-gradient">5,000 palabras en inglés</span> con pronunciación en español
+                </h3>
+                <p className="text-muted-foreground">
+                  Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {bonusPreviews.map((p, i) => (
+                  <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-accent/30 shadow-card bg-card">
+                    <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold">
+                      Bono {i + 1}
+                    </div>
+                    <div className="relative aspect-square bg-white overflow-hidden">
+                      <img
+                        src={p.src}
+                        alt={p.alt}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover object-top"
+                      />
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                        <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
+                          ilinguerelax.com
+                        </span>
+                      </div>
+                    </div>
+                    <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
+                      {p.caption}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+              </p>
             </div>
 
             <div className="text-center mt-8">

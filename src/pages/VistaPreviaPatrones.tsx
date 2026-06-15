@@ -1,0 +1,131 @@
+import { SEO } from "@/components/SEO";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { Eye, Sparkles, BookOpen } from "lucide-react";
+
+import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
+import patronesPreview2 from "@/assets/patrones-preview-sufijos.webp.asset.json";
+import patronesPreview3 from "@/assets/patrones-preview-contracciones.webp.asset.json";
+import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
+import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
+import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
+
+const patronesPreviews = [
+  { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
+  { src: patronesPreview2.url, alt: "Sufijos y prefijos en inglés con pronunciación adaptada", caption: "Sufijos y Prefijos · cómo suenan realmente" },
+  { src: patronesPreview3.url, alt: "Contracciones y habla rápida en inglés con pronunciación", caption: "Contracciones · habla como un nativo" },
+];
+
+const bonusPreviews = [
+  { src: bono5000Indice.url, alt: "Índice del Bono 5,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
+  { src: bono5000Ropa.url, alt: "5,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
+  { src: bono5000Transporte.url, alt: "5,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+];
+
+const PreviewGrid = ({
+  items,
+  badgeLabel,
+  badgeClass,
+}: {
+  items: typeof patronesPreviews;
+  badgeLabel: string;
+  badgeClass: string;
+}) => (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {items.map((p, i) => (
+      <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
+        <div className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
+          {badgeLabel} {i + 1}
+        </div>
+        <div className="relative aspect-square bg-white overflow-hidden">
+          <img
+            src={p.src}
+            alt={p.alt}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+            <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
+              ilinguerelax.com
+            </span>
+          </div>
+        </div>
+        <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
+          {p.caption}
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+);
+
+const VistaPreviaPatrones = () => {
+  return (
+    <main className="min-h-screen bg-background">
+      <SEO
+        title="Vista Previa · Patrones Especiales + Bono 5,000 palabras | iLingue Relax®"
+        description="Mira páginas reales del ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en inglés, más el bono de 5,000 palabras con pronunciación en español."
+        canonicalUrl="https://ilinguerelax.com/vista-previa/patrones-especiales"
+      />
+      <Navbar />
+
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                <Eye className="w-4 h-4" /> Vista previa exclusiva
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+                Patrones Especiales, Alfabeto y <span className="text-gradient">Combinaciones Secretas en Inglés</span>
+              </h1>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Páginas reales del PDF para que veas la calidad antes de cualquier compra. Marca de agua incluida.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mb-5">
+              <BookOpen className="w-5 h-5 text-primary" />
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">Páginas del ebook principal</h2>
+            </div>
+            <PreviewGrid
+              items={patronesPreviews}
+              badgeLabel="Página"
+              badgeClass="bg-primary text-primary-foreground"
+            />
+
+            <div className="mt-14">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent text-sm font-bold mb-3">
+                  <Sparkles className="w-4 h-4" /> Bono incluido GRATIS
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  + Bono: <span className="text-gradient">5,000 palabras en inglés</span> con pronunciación en español
+                </h2>
+                <p className="text-muted-foreground">
+                  Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.
+                </p>
+              </div>
+              <PreviewGrid
+                items={bonusPreviews}
+                badgeLabel="Bono"
+                badgeClass="bg-accent text-accent-foreground"
+              />
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground mt-8">
+              Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+      <ScrollToTop />
+      <WhatsAppButton />
+    </main>
+  );
+};
+
+export default VistaPreviaPatrones;

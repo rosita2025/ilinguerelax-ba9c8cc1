@@ -11,6 +11,7 @@ import patronesPreview3 from "@/assets/patrones-preview-contracciones.webp.asset
 import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
 import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
 import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
+import ogImage from "@/assets/og-vista-previa-patrones.jpg.asset.json";
 
 const patronesPreviews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
@@ -67,6 +68,7 @@ const VistaPreviaPatrones = () => {
         title="Vista Previa · Patrones Especiales + Bono 5,000 palabras | iLingue Relax®"
         description="Mira páginas reales del ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en inglés, más el bono de 5,000 palabras con pronunciación en español."
         canonicalUrl="https://ilinguerelax.com/vista-previa/patrones-especiales"
+        image={`https://ilinguerelax.com${ogImage.url}`}
       />
       <Navbar />
 

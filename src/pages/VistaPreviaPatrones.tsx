@@ -40,12 +40,13 @@ const PreviewGrid = ({
         <div className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
           {badgeLabel} {i + 1}
         </div>
-        <div className="relative aspect-square bg-white overflow-hidden">
+        <div className="relative aspect-[3/4] bg-white overflow-hidden">
           <img
             src={p.src}
             alt={p.alt}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-contain"
           />
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
             <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">

@@ -143,6 +143,15 @@ const VistaPreviaPatrones = () => {
               />
             </div>
 
+            <div className="max-w-3xl mx-auto mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-5 md:p-6 shadow-card text-center">
+              <p className="text-foreground font-bold mb-2">
+                🎧 Próximamente: Audio incluido + más actualizaciones GRATIS
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Quienes adquieran el material ahora recibirán todas las actualizaciones futuras (incluido el audio) sin costo adicional. Muy pronto el precio subirá.
+              </p>
+            </div>
+
             <p className="text-center text-xs text-muted-foreground mt-8">
               Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
             </p>

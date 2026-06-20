@@ -88,6 +88,20 @@ const VistaPreviaPatrones = () => {
               </p>
             </div>
 
+            <div className="max-w-3xl mx-auto mb-10 rounded-2xl border border-border bg-card p-5 md:p-6 shadow-card">
+              <p className="text-foreground font-semibold mb-3">
+                📚 Tenemos un material digital especializado en Patrones Especiales y Combinaciones Secretas en Inglés.
+              </p>
+              <p className="text-muted-foreground mb-3">Este material está diseñado para ayudarte a:</p>
+              <ul className="space-y-2 text-foreground">
+                <li>✅ Comprender mejor el inglés</li>
+                <li>✅ Formar frases más fácilmente</li>
+                <li>✅ Aprender patrones utilizados por hablantes nativos</li>
+                <li>✅ Mejorar tu comprensión del idioma</li>
+                <li>✅ Avanzar desde nivel básico hasta intermedio</li>
+              </ul>
+            </div>
+
             <div className="flex items-center gap-2 mb-5">
               <BookOpen className="w-5 h-5 text-primary" />
               <h2 className="text-xl md:text-2xl font-bold text-foreground">Páginas del ebook principal</h2>
@@ -109,6 +123,18 @@ const VistaPreviaPatrones = () => {
                 <p className="text-muted-foreground">
                   Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.
                 </p>
+              </div>
+              <div className="max-w-3xl mx-auto mb-8 rounded-2xl border border-accent/30 bg-accent/5 p-5 md:p-6 shadow-card">
+                <p className="text-foreground font-semibold mb-3">
+                  🎁 Además recibirás un bono especial:
+                </p>
+                <p className="text-foreground font-bold mb-3">📘 1,000 Palabras en Inglés con:</p>
+                <ul className="space-y-2 text-foreground">
+                  <li>✅ Significado en español</li>
+                  <li>✅ Pronunciación para hispanohablantes</li>
+                  <li>✅ Fonética adaptada</li>
+                  <li>✅ Inglés USA y UK (Americano y Británico)</li>
+                </ul>
               </div>
               <PreviewGrid
                 items={bonusPreviews}

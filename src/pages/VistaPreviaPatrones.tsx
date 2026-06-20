@@ -20,9 +20,9 @@ const patronesPreviews = [
 ];
 
 const bonusPreviews = [
-  { src: bono5000Indice.url, alt: "Índice del Bono 5,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
-  { src: bono5000Ropa.url, alt: "5,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
-  { src: bono5000Transporte.url, alt: "5,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+  { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
+  { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
+  { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
 ];
 
 const PreviewGrid = ({
@@ -66,8 +66,8 @@ const VistaPreviaPatrones = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Vista Previa · Patrones Especiales + Bono 5,000 palabras | iLingue Relax®"
-        description="Mira páginas reales del ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en inglés, más el bono de 5,000 palabras con pronunciación en español."
+        title="Vista Previa · Patrones Especiales + Bono 1,000 palabras | iLingue Relax®"
+        description="Mira páginas reales del ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en inglés, más el bono de 1,000 palabras con pronunciación en español."
         canonicalUrl="https://ilinguerelax.com/vista-previa/patrones-especiales"
         image={`https://ilinguerelax.com${ogImage.url}`}
       />
@@ -104,7 +104,7 @@ const VistaPreviaPatrones = () => {
                   <Sparkles className="w-4 h-4" /> Bono incluido GRATIS
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  + Bono: <span className="text-gradient">5,000 palabras en inglés</span> con pronunciación en español
+                  + Bono: <span className="text-gradient">1,000 palabras en inglés</span> con pronunciación en español
                 </h2>
                 <p className="text-muted-foreground">
                   Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.

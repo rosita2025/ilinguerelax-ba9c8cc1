@@ -73,6 +73,10 @@ const VistaPreviaPatrones = () => {
       />
       <Navbar />
 
+      <div className="w-full bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 px-4 text-center text-sm font-semibold animate-pulse">
+        🎧 Audio próximamente · Actualizaciones GRATIS de por vida · ⏳ Muy pronto subirá el precio
+      </div>
+
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
@@ -141,15 +145,6 @@ const VistaPreviaPatrones = () => {
                 badgeLabel="Bono"
                 badgeClass="bg-accent text-accent-foreground"
               />
-            </div>
-
-            <div className="max-w-3xl mx-auto mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-5 md:p-6 shadow-card text-center">
-              <p className="text-foreground font-bold mb-2">
-                🎧 Próximamente: Audio incluido + más actualizaciones GRATIS
-              </p>
-              <p className="text-muted-foreground text-sm">
-                Quienes adquieran el material ahora recibirán todas las actualizaciones futuras (incluido el audio) sin costo adicional. Muy pronto el precio subirá.
-              </p>
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-8">

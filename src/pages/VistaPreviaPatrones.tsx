@@ -76,6 +76,8 @@ const PreviewGrid = ({
 );
 
 const VistaPreviaPatrones = () => {
+  const [filtro, setFiltro] = useState<"all" | "MX" | "PE">("all");
+  const visibles = filtro === "all" ? resenas : resenas.filter((r) => r.country === filtro);
   return (
     <main className="min-h-screen bg-background">
       <SEO

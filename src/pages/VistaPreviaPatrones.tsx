@@ -107,18 +107,13 @@ const VistaPreviaPatrones = () => {
               </p>
             </div>
 
-            <div className="max-w-3xl mx-auto mb-10 rounded-2xl border border-border bg-card p-5 md:p-6 shadow-card">
-              <p className="text-foreground font-semibold mb-3">
-                📚 Tenemos un material digital especializado en Patrones Especiales y Combinaciones Secretas en Inglés.
-              </p>
-              <p className="text-muted-foreground mb-3">Este material está diseñado para ayudarte a:</p>
-              <ul className="space-y-2 text-foreground">
-                <li>✅ Comprender mejor el inglés</li>
-                <li>✅ Formar frases más fácilmente</li>
-                <li>✅ Aprender patrones utilizados por hablantes nativos</li>
-                <li>✅ Mejorar tu comprensión del idioma</li>
-                <li>✅ Avanzar desde nivel básico hasta intermedio</li>
-              </ul>
+            <div className="flex justify-center mb-10">
+              <a
+                href="#testimonios"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm md:text-base font-bold shadow-card hover:opacity-90 transition-opacity"
+              >
+                <MessageCircle className="w-5 h-5" /> Ver testimonios reales 🇲🇽 🇵🇪
+              </a>
             </div>
 
             <div className="flex items-center gap-2 mb-5">
@@ -162,7 +157,7 @@ const VistaPreviaPatrones = () => {
               />
             </div>
 
-            <div className="mt-14">
+            <div id="testimonios" className="mt-14 scroll-mt-24">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
                   <MessageCircle className="w-4 h-4" /> Reseñas reales de clientes

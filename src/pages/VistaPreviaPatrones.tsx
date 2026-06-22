@@ -110,7 +110,7 @@ const VistaPreviaPatrones = () => {
             <div className="flex justify-center mb-10">
               <a
                 href="#testimonios"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm md:text-base font-bold shadow-card hover:opacity-90 transition-opacity"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-yellow-400 hover:bg-yellow-300 text-slate-900 text-sm md:text-base font-extrabold shadow-lg ring-2 ring-yellow-500/40 transition-colors"
               >
                 <MessageCircle className="w-5 h-5" /> Ver testimonios reales 🇲🇽 🇵🇪
               </a>

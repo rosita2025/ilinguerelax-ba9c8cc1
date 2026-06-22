@@ -3,7 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Eye, Sparkles, BookOpen } from "lucide-react";
+import { Eye, Sparkles, BookOpen, MessageCircle } from "lucide-react";
+import { useState } from "react";
 
 import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
 import patronesPreview2 from "@/assets/patrones-preview-sufijos.webp.asset.json";
@@ -12,6 +13,10 @@ import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
 import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
 import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
 import ogImage from "@/assets/og-vista-previa-patrones.jpg.asset.json";
+import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
+import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
+import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
+import resenaPe1 from "@/assets/resena-mx4.webp.asset.json";
 
 const patronesPreviews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
@@ -23,6 +28,14 @@ const bonusPreviews = [
   { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
   { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
   { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+];
+
+type Resena = { src: string; country: "MX" | "PE"; flag: string; label: string; alt: string };
+const resenas: Resena[] = [
+  { src: resenaMx1.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Reseña real de cliente desde México sobre el material de Patrones Especiales" },
+  { src: resenaMx2.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Testimonio de cliente mexicano sobre técnicas de aprendizaje de inglés" },
+  { src: resenaMx3.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Cliente de México comparte su experiencia con el ebook" },
+  { src: resenaPe1.url, country: "PE", flag: "🇵🇪", label: "Perú", alt: "Reseña real de cliente desde Perú sobre la pronunciación y el material" },
 ];
 
 const PreviewGrid = ({

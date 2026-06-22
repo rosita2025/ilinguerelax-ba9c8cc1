@@ -162,6 +162,66 @@ const VistaPreviaPatrones = () => {
               />
             </div>
 
+            <div className="mt-14">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                  <MessageCircle className="w-4 h-4" /> Reseñas reales de clientes
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Testimonios desde <span className="text-gradient">México y Perú</span>
+                </h2>
+                <p className="text-muted-foreground">
+                  Capturas reales de WhatsApp de clientes que ya usan el material. Filtra por país:
+                </p>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-2 mb-6">
+                {([
+                  { id: "all", label: "Todas", flag: "🌎" },
+                  { id: "MX", label: "México", flag: "🇲🇽" },
+                  { id: "PE", label: "Perú", flag: "🇵🇪" },
+                ] as const).map((b) => (
+                  <button
+                    key={b.id}
+                    onClick={() => setFiltro(b.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                      filtro === b.id
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    {b.flag} {b.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {visibles.map((r) => (
+                  <figure
+                    key={r.src}
+                    className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card"
+                  >
+                    <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground">
+                      {r.flag} {r.label}
+                    </div>
+                    <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500 text-white">
+                      ✓ Compra verificada
+                    </div>
+                    <img
+                      src={r.src}
+                      alt={r.alt}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-auto"
+                    />
+                  </figure>
+                ))}
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Datos personales y números ocultos por privacidad. Marca de agua añadida.
+              </p>
+            </div>
+
             <p className="text-center text-xs text-muted-foreground mt-8">
               Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
             </p>

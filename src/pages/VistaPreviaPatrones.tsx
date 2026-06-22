@@ -157,7 +157,7 @@ const VistaPreviaPatrones = () => {
               />
             </div>
 
-            <div className="mt-14">
+            <div id="testimonios" className="mt-14 scroll-mt-24">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
                   <MessageCircle className="w-4 h-4" /> Reseñas reales de clientes

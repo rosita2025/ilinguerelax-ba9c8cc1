@@ -3,7 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Eye, Sparkles, BookOpen } from "lucide-react";
+import { Eye, Sparkles, BookOpen, MessageCircle } from "lucide-react";
+import { useState } from "react";
 
 import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
 import patronesPreview2 from "@/assets/patrones-preview-sufijos.webp.asset.json";
@@ -12,6 +13,10 @@ import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
 import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
 import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
 import ogImage from "@/assets/og-vista-previa-patrones.jpg.asset.json";
+import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
+import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
+import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
+import resenaPe1 from "@/assets/resena-mx4.webp.asset.json";
 
 const patronesPreviews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
@@ -23,6 +28,14 @@ const bonusPreviews = [
   { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
   { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
   { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+];
+
+type Resena = { src: string; country: "MX" | "PE"; flag: string; label: string; alt: string };
+const resenas: Resena[] = [
+  { src: resenaMx1.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Reseña real de cliente desde México sobre el material de Patrones Especiales" },
+  { src: resenaMx2.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Testimonio de cliente mexicano sobre técnicas de aprendizaje de inglés" },
+  { src: resenaMx3.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Cliente de México comparte su experiencia con el ebook" },
+  { src: resenaPe1.url, country: "PE", flag: "🇵🇪", label: "Perú", alt: "Reseña real de cliente desde Perú sobre la pronunciación y el material" },
 ];
 
 const PreviewGrid = ({
@@ -63,6 +76,8 @@ const PreviewGrid = ({
 );
 
 const VistaPreviaPatrones = () => {
+  const [filtro, setFiltro] = useState<"all" | "MX" | "PE">("all");
+  const visibles = filtro === "all" ? resenas : resenas.filter((r) => r.country === filtro);
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -145,6 +160,66 @@ const VistaPreviaPatrones = () => {
                 badgeLabel="Bono"
                 badgeClass="bg-accent text-accent-foreground"
               />
+            </div>
+
+            <div className="mt-14">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                  <MessageCircle className="w-4 h-4" /> Reseñas reales de clientes
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Testimonios desde <span className="text-gradient">México y Perú</span>
+                </h2>
+                <p className="text-muted-foreground">
+                  Capturas reales de WhatsApp de clientes que ya usan el material. Filtra por país:
+                </p>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-2 mb-6">
+                {([
+                  { id: "all", label: "Todas", flag: "🌎" },
+                  { id: "MX", label: "México", flag: "🇲🇽" },
+                  { id: "PE", label: "Perú", flag: "🇵🇪" },
+                ] as const).map((b) => (
+                  <button
+                    key={b.id}
+                    onClick={() => setFiltro(b.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                      filtro === b.id
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    {b.flag} {b.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {visibles.map((r) => (
+                  <figure
+                    key={r.src}
+                    className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card"
+                  >
+                    <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground">
+                      {r.flag} {r.label}
+                    </div>
+                    <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500 text-white">
+                      ✓ Compra verificada
+                    </div>
+                    <img
+                      src={r.src}
+                      alt={r.alt}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-auto"
+                    />
+                  </figure>
+                ))}
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Datos personales y números ocultos por privacidad. Marca de agua añadida.
+              </p>
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-8">

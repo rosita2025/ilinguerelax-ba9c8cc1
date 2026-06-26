@@ -24,6 +24,10 @@ import patronesPreview3 from "@/assets/patrones-preview-contracciones.webp.asset
 import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
 import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
 import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
+import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
+import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
+import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
+import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 
 const previews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
@@ -35,6 +39,17 @@ const bonusPreviews = [
   { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
   { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
   { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+];
+
+const photoReviews = [
+  { src: resenaMx1.url, flag: "🇲🇽", country: "México", alt: "Reseña real por WhatsApp desde México sobre Patrones Especiales" },
+  { src: resenaMx2.url, flag: "🇲🇽", country: "México", alt: "Testimonio de cliente mexicano sobre el ebook" },
+  { src: resenaMx3.url, flag: "🇲🇽", country: "México", alt: "Cliente de México comparte su experiencia" },
+  { src: resenaMx4.url, flag: "🇵🇪", country: "Perú", alt: "Reseña real por WhatsApp desde Perú sobre la pronunciación" },
+  { src: resenaMx4.url, flag: "🇵🇪", country: "Perú", alt: "Cliente peruano recomienda el material" },
+  { src: resenaMx1.url, flag: "🇲🇽", country: "México", alt: "Estudiante mexicana satisfecha con el método" },
+  { src: resenaMx3.url, flag: "🇲🇽", country: "México", alt: "Reseña verificada desde México sobre combinaciones secretas" },
+  { src: resenaMx2.url, flag: "🇲🇽", country: "México", alt: "Testimonio adicional desde México sobre el ebook" },
 ];
 
 const features = [
@@ -398,6 +413,36 @@ const ProductPatronesEspeciales = () => {
               <p className="text-muted-foreground">
                 Miles de hispanohablantes ya usan el método Inglés Relax
               </p>
+            </div>
+
+            {/* Reseñas reales por WhatsApp (México y Perú) */}
+            <div className="mb-10">
+              <div className="text-center mb-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
+                  <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-foreground">
+                  Reseñas reales de clientes
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {photoReviews.map((r, i) => (
+                  <figure
+                    key={`${r.src}-${i}`}
+                    className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card"
+                  >
+                    <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
+                      {r.flag} {r.country}
+                    </div>
+                    <img
+                      src={r.src}
+                      alt={r.alt}
+                      loading="lazy"
+                      className="w-full h-auto block"
+                    />
+                  </figure>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

@@ -415,6 +415,36 @@ const ProductPatronesEspeciales = () => {
               </p>
             </div>
 
+            {/* Reseñas reales por WhatsApp (México y Perú) */}
+            <div className="mb-10">
+              <div className="text-center mb-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
+                  <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-foreground">
+                  Reseñas reales de clientes
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {photoReviews.map((r, i) => (
+                  <figure
+                    key={`${r.src}-${i}`}
+                    className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card"
+                  >
+                    <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
+                      {r.flag} {r.country}
+                    </div>
+                    <img
+                      src={r.src}
+                      alt={r.alt}
+                      loading="lazy"
+                      className="w-full h-auto block"
+                    />
+                  </figure>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
                 {

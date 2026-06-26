@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useI18n } from "@/i18n/I18nContext";
+import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";
@@ -156,6 +157,7 @@ const ProductPatronesEspeciales = () => {
       />
 
       <Navbar />
+      <SpotifyLaunchBanner />
 
       {/* Hero */}
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">

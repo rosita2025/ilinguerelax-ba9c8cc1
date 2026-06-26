@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
 import { Eye, Sparkles, BookOpen, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
@@ -91,9 +92,9 @@ const VistaPreviaPatrones = () => {
         image={`https://ilinguerelax.com${ogImage.url}`}
       />
       <Navbar />
-
+      <SpotifyLaunchBanner />
       <div className="w-full bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 px-4 text-center text-sm font-semibold animate-pulse">
-        🎧 Audio próximamente · Actualizaciones GRATIS de por vida · ⏳ Muy pronto subirá el precio
+        🎧 Actualizaciones GRATIS de por vida · ⏳ Muy pronto subirá el precio
       </div>
 
       <section className="py-10 md:py-14">

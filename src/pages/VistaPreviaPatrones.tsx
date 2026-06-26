@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
 import { Eye, Sparkles, BookOpen, MessageCircle } from "lucide-react";
 import { useState } from "react";
 

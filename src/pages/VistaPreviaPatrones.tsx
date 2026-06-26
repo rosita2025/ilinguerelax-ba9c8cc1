@@ -36,6 +36,10 @@ const resenas: Resena[] = [
   { src: resenaMx2.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Testimonio de cliente mexicano sobre técnicas de aprendizaje de inglés" },
   { src: resenaMx3.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Cliente de México comparte su experiencia con el ebook" },
   { src: resenaPe1.url, country: "PE", flag: "🇵🇪", label: "Perú", alt: "Reseña real de cliente desde Perú sobre la pronunciación y el material" },
+  { src: resenaPe1.url, country: "PE", flag: "🇵🇪", label: "Perú", alt: "Cliente peruano recomienda el material de Patrones Especiales" },
+  { src: resenaMx1.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Estudiante mexicana satisfecha con el método de pronunciación" },
+  { src: resenaMx3.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Reseña verificada desde México sobre las combinaciones secretas" },
+  { src: resenaMx2.url, country: "MX", flag: "🇲🇽", label: "México", alt: "Testimonio adicional de cliente en México sobre el ebook" },
 ];
 
 const PreviewGrid = ({

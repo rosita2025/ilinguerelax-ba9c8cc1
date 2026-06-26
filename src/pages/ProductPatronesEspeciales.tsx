@@ -32,9 +32,9 @@ const previews = [
 ];
 
 const bonusPreviews = [
-  { src: bono5000Indice.url, alt: "Índice del Bono 5,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
-  { src: bono5000Ropa.url, alt: "5,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
-  { src: bono5000Transporte.url, alt: "5,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+  { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
+  { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
+  { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
 ];
 
 const features = [
@@ -297,14 +297,14 @@ const ProductPatronesEspeciales = () => {
               ))}
             </div>
 
-            {/* Bono 5,000 palabras */}
+            {/* Bono 1,000 palabras */}
             <div className="mt-14">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent text-sm font-bold mb-3">
                   <Sparkles className="w-4 h-4" /> Bono incluido GRATIS
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  + Bono: <span className="text-gradient">5,000 palabras en inglés</span> con pronunciación en español
+                  + Bono: <span className="text-gradient">1,000 palabras en inglés</span> con pronunciación en español
                 </h3>
                 <p className="text-muted-foreground">
                   Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.

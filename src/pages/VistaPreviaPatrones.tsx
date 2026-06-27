@@ -143,6 +143,29 @@ const VistaPreviaPatrones = () => {
                   Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.
                 </p>
               </div>
+
+              <div className="max-w-2xl mx-auto mb-6 rounded-2xl border border-[#1DB954]/30 bg-[#1DB954]/10 p-4 md:p-5 flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+                <div className="shrink-0 w-10 h-10 rounded-full bg-[#1DB954] flex items-center justify-center shadow-md">
+                  <Music2 className="w-5 h-5 text-black" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-foreground">
+                    🎧 Audio disponible: escucha las 1,000 palabras en inglés en Spotify
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Podcast iLingue Relax · Gratis
+                  </p>
+                </div>
+                <a
+                  href={SPOTIFY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#1DB954] hover:bg-[#1ed760] text-black text-sm font-extrabold transition-colors"
+                >
+                  <Music2 className="w-4 h-4" /> Escuchar
+                </a>
+              </div>
+
               <div className="max-w-3xl mx-auto mb-8 rounded-2xl border border-accent/30 bg-accent/5 p-5 md:p-6 shadow-card">
                 <p className="text-foreground font-semibold mb-3">
                   🎁 Además recibirás un bono especial:

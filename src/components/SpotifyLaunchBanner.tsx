@@ -1,6 +1,7 @@
 import { Music2, Sparkles } from "lucide-react";
 
-const SPOTIFY_URL = "https://open.spotify.com/show/033EQVooL7r6tAjURcAbFn?si=97993b0d8e7348c5";
+export const SPOTIFY_URL = "https://open.spotify.com/show/033EQVooL7r6tAjURcAbFn?si=97993b0d8e7348c5";
+
 
 export const SpotifyLaunchBanner = () => {
   return (

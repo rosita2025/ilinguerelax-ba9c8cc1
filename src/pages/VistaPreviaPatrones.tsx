@@ -93,9 +93,6 @@ const VistaPreviaPatrones = () => {
       />
       <Navbar />
       <SpotifyLaunchBanner />
-      <div className="w-full bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 px-4 text-center text-sm font-semibold animate-pulse">
-        🎧 Actualizaciones GRATIS de por vida · ⏳ Muy pronto subirá el precio
-      </div>
 
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">

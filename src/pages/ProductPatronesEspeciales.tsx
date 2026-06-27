@@ -9,12 +9,12 @@ import SalesNotification from "@/components/SalesNotification";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
-import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye } from "lucide-react";
+import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useI18n } from "@/i18n/I18nContext";
-import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
+import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";

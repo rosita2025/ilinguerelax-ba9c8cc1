@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "e536053d-3ea7-406f-bc43-e276aea92c7e",
-  "project_id": "b75d74ae-47e8-4d92-80d7-ac059ae83efa",
-  "url": "/__l5e/assets-v1/e536053d-3ea7-406f-bc43-e276aea92c7e/patrones-preview-sufijos.webp",
-  "r2_key": "a/v1/b75d74ae-47e8-4d92-80d7-ac059ae83efa/e536053d-3ea7-406f-bc43-e276aea92c7e/patrones-preview-sufijos.webp",
-  "original_filename": "patrones-preview-sufijos.webp",
-  "size": 56632,
   "content_type": "image/webp",
-  "created_at": "2026-06-15T21:48:05Z"
+  "created_at": "2026-06-15T21:48:05Z",
+  "original_filename": "patrones-preview-sufijos.webp",
+  "project_id": "6a7edb5b-01a7-4b44-8afe-797a46e93020",
+  "r2_key": "a/v1/6a7edb5b-01a7-4b44-8afe-797a46e93020/e536053d-3ea7-406f-bc43-e276aea92c7e/patrones-preview-sufijos.webp",
+  "size": 56632,
+  "url": "/__l5e/assets-v1/e536053d-3ea7-406f-bc43-e276aea92c7e/patrones-preview-sufijos.webp",
+  "version": 1
 }

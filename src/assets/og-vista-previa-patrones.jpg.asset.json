@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "84c61a39-bd59-4388-a022-75c7426946fc",
-  "project_id": "b75d74ae-47e8-4d92-80d7-ac059ae83efa",
-  "url": "/__l5e/assets-v1/84c61a39-bd59-4388-a022-75c7426946fc/og-vista-previa-patrones.jpg",
-  "r2_key": "a/v1/b75d74ae-47e8-4d92-80d7-ac059ae83efa/84c61a39-bd59-4388-a022-75c7426946fc/og-vista-previa-patrones.jpg",
-  "original_filename": "og-vista-previa-patrones.jpg",
-  "size": 254702,
   "content_type": "image/jpeg",
-  "created_at": "2026-06-15T21:55:53Z"
+  "created_at": "2026-06-15T21:55:53Z",
+  "original_filename": "og-vista-previa-patrones.jpg",
+  "project_id": "6a7edb5b-01a7-4b44-8afe-797a46e93020",
+  "r2_key": "a/v1/6a7edb5b-01a7-4b44-8afe-797a46e93020/84c61a39-bd59-4388-a022-75c7426946fc/og-vista-previa-patrones.jpg",
+  "size": 254702,
+  "url": "/__l5e/assets-v1/84c61a39-bd59-4388-a022-75c7426946fc/og-vista-previa-patrones.jpg",
+  "version": 1
 }

@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "f2c9f888-f170-41cf-a537-86323bf46c04",
-  "project_id": "b75d74ae-47e8-4d92-80d7-ac059ae83efa",
-  "url": "/__l5e/assets-v1/f2c9f888-f170-41cf-a537-86323bf46c04/estructuras-gramaticales-ingles-cover.webp",
-  "r2_key": "a/v1/b75d74ae-47e8-4d92-80d7-ac059ae83efa/f2c9f888-f170-41cf-a537-86323bf46c04/estructuras-gramaticales-ingles-cover.webp",
-  "original_filename": "estructuras-gramaticales-ingles-cover.webp",
-  "size": 1315840,
   "content_type": "image/webp",
-  "created_at": "2026-06-14T01:37:32Z"
+  "created_at": "2026-06-14T01:37:32Z",
+  "original_filename": "estructuras-gramaticales-ingles-cover.webp",
+  "project_id": "6a7edb5b-01a7-4b44-8afe-797a46e93020",
+  "r2_key": "a/v1/6a7edb5b-01a7-4b44-8afe-797a46e93020/f2c9f888-f170-41cf-a537-86323bf46c04/estructuras-gramaticales-ingles-cover.webp",
+  "size": 1315840,
+  "url": "/__l5e/assets-v1/f2c9f888-f170-41cf-a537-86323bf46c04/estructuras-gramaticales-ingles-cover.webp",
+  "version": 1
 }

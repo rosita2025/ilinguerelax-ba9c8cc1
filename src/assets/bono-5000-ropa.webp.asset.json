@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "f3a77dab-ab64-437e-95cf-38837c9cee5e",
-  "project_id": "b75d74ae-47e8-4d92-80d7-ac059ae83efa",
-  "url": "/__l5e/assets-v1/f3a77dab-ab64-437e-95cf-38837c9cee5e/bono-5000-ropa.webp",
-  "r2_key": "a/v1/b75d74ae-47e8-4d92-80d7-ac059ae83efa/f3a77dab-ab64-437e-95cf-38837c9cee5e/bono-5000-ropa.webp",
-  "original_filename": "bono-5000-ropa.webp",
-  "size": 39850,
   "content_type": "image/webp",
-  "created_at": "2026-06-15T21:48:05Z"
+  "created_at": "2026-06-15T21:48:05Z",
+  "original_filename": "bono-5000-ropa.webp",
+  "project_id": "6a7edb5b-01a7-4b44-8afe-797a46e93020",
+  "r2_key": "a/v1/6a7edb5b-01a7-4b44-8afe-797a46e93020/f3a77dab-ab64-437e-95cf-38837c9cee5e/bono-5000-ropa.webp",
+  "size": 39850,
+  "url": "/__l5e/assets-v1/f3a77dab-ab64-437e-95cf-38837c9cee5e/bono-5000-ropa.webp",
+  "version": 1
 }

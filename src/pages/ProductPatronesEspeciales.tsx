@@ -47,10 +47,6 @@ const photoReviews = [
   { src: resenaMx2.url, flag: "🇲🇽", country: "México", alt: "Testimonio de cliente mexicano sobre el ebook" },
   { src: resenaMx3.url, flag: "🇲🇽", country: "México", alt: "Cliente de México comparte su experiencia" },
   { src: resenaMx4.url, flag: "🇵🇪", country: "Perú", alt: "Reseña real por WhatsApp desde Perú sobre la pronunciación" },
-  { src: resenaMx4.url, flag: "🇵🇪", country: "Perú", alt: "Cliente peruano recomienda el material" },
-  { src: resenaMx1.url, flag: "🇲🇽", country: "México", alt: "Estudiante mexicana satisfecha con el método" },
-  { src: resenaMx3.url, flag: "🇲🇽", country: "México", alt: "Reseña verificada desde México sobre combinaciones secretas" },
-  { src: resenaMx2.url, flag: "🇲🇽", country: "México", alt: "Testimonio adicional desde México sobre el ebook" },
 ];
 
 const features = [

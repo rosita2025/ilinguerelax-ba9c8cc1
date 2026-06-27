@@ -3,8 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
-import { Eye, Sparkles, BookOpen, MessageCircle } from "lucide-react";
+import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
+import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 
 import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";

@@ -1,6 +1,7 @@
 import { Music2, Sparkles } from "lucide-react";
 
-const SPOTIFY_URL = "https://open.spotify.com/show/033EQVooL7r6tAjURcAbFn?si=97993b0d8e7348c5";
+export const SPOTIFY_URL = "https://open.spotify.com/show/033EQVooL7r6tAjURcAbFn?si=97993b0d8e7348c5";
+
 
 export const SpotifyLaunchBanner = () => {
   return (
@@ -13,10 +14,10 @@ export const SpotifyLaunchBanner = () => {
             </div>
             <div className="leading-tight">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#1DB954]/20 text-[#1DB954] text-[10px] md:text-xs font-extrabold uppercase tracking-wider mb-1">
-                <Sparkles className="w-3 h-3" /> Nuevo lanzamiento
+                <Sparkles className="w-3 h-3" /> Audio disponible
               </div>
               <p className="text-sm md:text-base font-bold">
-                🎧 Audio · <span className="text-[#1DB954]">1,000 palabras en inglés</span>
+                🎧 Escucha ahora <span className="text-[#1DB954]">1,000 palabras en inglés</span>
                 <span className="hidden md:inline"> + </span>
                 <span className="block md:inline text-white/90">Podcast iLingue Relax en Spotify</span>
               </p>

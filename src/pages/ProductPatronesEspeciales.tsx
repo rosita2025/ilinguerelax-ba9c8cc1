@@ -200,8 +200,14 @@ const ProductPatronesEspeciales = () => {
                 <video
                   src={introVideo.url}
                   controls
-                  preload="metadata"
+                  controlsList="nodownload noplaybackrate noremoteplayback"
+                  disablePictureInPicture
+                  autoPlay
+                  muted
+                  loop
                   playsInline
+                  preload="metadata"
+                  onContextMenu={(e) => e.preventDefault()}
                   className="w-full h-auto block"
                   aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                 />

@@ -106,6 +106,18 @@ const VistaPreviaPatrones = () => {
               </p>
             </div>
 
+            <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
+              <video
+                src={introVideo.url}
+                controls
+                preload="metadata"
+                playsInline
+                className="w-full h-auto block"
+                aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
+              />
+            </div>
+
+
             <div className="flex justify-center mb-10">
               <a
                 href="#testimonios"

@@ -173,7 +173,7 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
-      <ProductReviews productType="korean" reviews={[]} showReviewForm />
+      <ProductReviews productType="english" reviews={[]} showReviewForm />
       <FAQ
         items={[
           { question: "¿Cuándo estará disponible?", answer: "Coreano Relax está en producción y estará disponible muy pronto. Suscríbete para ser el primero en saberlo y acceder al precio de lanzamiento.", icon: Sparkles },

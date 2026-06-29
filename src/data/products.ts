@@ -26,6 +26,26 @@ export interface Product {
 
 export const products: Product[] = [
   {
+    id: "coreano-relax",
+    slug: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
+    name: "Coreano Relax",
+    flag: "🇰🇷",
+    country: "Coreano para Hispanohablantes",
+    image: "/__l5e/assets-v1/eca48cd9-2178-471a-b4ff-b115a92d5bc2/coreano-relax-cover.webp",
+    title: "Coreano Relax® · 100 Mapas Mentales para Aprender Coreano (Hangul → C1)",
+    subtitle: "Aprende coreano de forma fácil, visual y efectiva",
+    description: "100 mapas mentales del nivel A1 al C1 con Hangul, romanización y pronunciación adaptada para hispanohablantes. Incluye 2 bonos.",
+    rating: 5.0,
+    reviews: 0,
+    price: 15.00,
+    originalPrice: 54.00,
+    discount: 72,
+    badge: "🇰🇷 Muy Pronto",
+    features: ["100 mapas mentales", "Del Hangul al C1", "Pronunciación hispanohablante", "2 bonos incluidos"],
+    isPhysical: false,
+    comingSoon: true,
+  },
+  {
     id: "patrones-especiales",
     slug: "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
     name: "Patrones Especiales",

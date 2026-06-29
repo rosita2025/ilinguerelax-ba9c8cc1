@@ -16,6 +16,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { useI18n } from "@/i18n/I18nContext";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
+import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";
@@ -196,6 +197,8 @@ const ProductPatronesEspeciales = () => {
                 <span className="font-bold text-foreground">4.9/5</span>
                 <span className="text-muted-foreground">Calidad verificada</span>
               </div>
+
+              <PrecioEconomicoBanner />
 
               <div className="mb-6 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
                 <video

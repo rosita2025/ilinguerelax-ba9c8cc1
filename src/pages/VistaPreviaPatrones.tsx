@@ -5,6 +5,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
+import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 
@@ -106,6 +107,8 @@ const VistaPreviaPatrones = () => {
                 Páginas reales del PDF para que veas la calidad antes de cualquier compra. Marca de agua incluida.
               </p>
             </div>
+
+            <PrecioEconomicoBanner />
 
             <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
               <video

@@ -16,6 +16,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { useI18n } from "@/i18n/I18nContext";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
+import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";

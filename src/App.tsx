@@ -126,6 +126,7 @@ const App = () => (
                   <Route path="/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes" element={<ProductDutch5000 />} />
                   
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
+                  <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreanoRelax />} />
                   <Route path="/products/estructuras-gramaticales-ingles-a1-c1" element={<ProductEstructurasGramaticalesIngles />} />
                   <Route path="/vista-previa/patrones-especiales" element={<VistaPreviaPatrones />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />

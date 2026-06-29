@@ -15,6 +15,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useI18n } from "@/i18n/I18nContext";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
+import { CompradoresReales } from "@/components/CompradoresReales";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";
@@ -483,6 +484,9 @@ const ProductPatronesEspeciales = () => {
                 ))}
               </div>
             </div>
+
+            <CompradoresReales />
+
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[

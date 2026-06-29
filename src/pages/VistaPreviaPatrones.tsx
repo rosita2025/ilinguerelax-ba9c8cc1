@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
+import { CompradoresReales } from "@/components/CompradoresReales";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 
@@ -256,6 +257,9 @@ const VistaPreviaPatrones = () => {
                 Datos personales y números ocultos por privacidad. Marca de agua añadida.
               </p>
             </div>
+
+            <CompradoresReales />
+
 
             <p className="text-center text-xs text-muted-foreground mt-8">
               Vistas previas con marca de agua. El PDF completo se entrega tras la compra.

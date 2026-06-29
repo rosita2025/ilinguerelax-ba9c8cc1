@@ -258,6 +258,9 @@ const VistaPreviaPatrones = () => {
               </p>
             </div>
 
+            <CompradoresReales />
+
+
             <p className="text-center text-xs text-muted-foreground mt-8">
               Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
             </p>

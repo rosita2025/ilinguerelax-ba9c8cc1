@@ -115,7 +115,7 @@ const VistaPreviaPatrones = () => {
 
             <PrecioEconomicoBanner />
 
-            <CanvaPreviewLink />
+            
 
             <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
               <video
@@ -208,6 +208,12 @@ const VistaPreviaPatrones = () => {
             </div>
 
             <SegundoBonoGramatica />
+
+            <div className="mt-10">
+              <CanvaPreviewLink />
+            </div>
+
+
 
             <div id="testimonios" className="mt-14 scroll-mt-24">
               <div className="text-center mb-6">

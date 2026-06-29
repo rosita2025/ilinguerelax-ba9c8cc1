@@ -308,7 +308,7 @@ const ProductPatronesEspeciales = () => {
               </p>
             </div>
 
-            <CanvaPreviewLink />
+            
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {previews.map((p, i) => (
@@ -401,6 +401,11 @@ const ProductPatronesEspeciales = () => {
             </div>
 
             <SegundoBonoGramatica />
+
+            <div className="mt-10">
+              <CanvaPreviewLink />
+            </div>
+
 
             <div className="text-center mt-8">
               <Button

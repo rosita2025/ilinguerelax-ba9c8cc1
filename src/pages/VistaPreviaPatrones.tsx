@@ -203,9 +203,8 @@ const VistaPreviaPatrones = () => {
               </div>
               <PreviewGrid
                 items={bonusPreviews}
-                badgeLabel="Bono"
-                badgeClass="bg-accent text-accent-foreground"
               />
+
             </div>
 
             <SegundoBonoGramatica />

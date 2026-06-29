@@ -1,4 +1,4 @@
-import { ShieldCheck, Smartphone, CreditCard, Tag, RefreshCw } from "lucide-react";
+import { ShieldCheck, Smartphone, CreditCard, RefreshCw } from "lucide-react";
 import pe1 from "@/assets/Compradoresperu1.webp.asset.json";
 import pe2 from "@/assets/Compradoresperu2.webp.asset.json";
 import pe3 from "@/assets/Compradoresperu3.webp.asset.json";

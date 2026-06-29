@@ -7,6 +7,7 @@ import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBann
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
+import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 

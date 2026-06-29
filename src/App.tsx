@@ -30,6 +30,7 @@ const ProductFrench5000 = lazy(() => import("./pages/ProductFrench5000"));
 const ProductDutch5000 = lazy(() => import("./pages/ProductDutch5000"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
+const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
 const ProductEstructurasGramaticalesIngles = lazy(() => import("./pages/ProductEstructurasGramaticalesIngles"));
 const VistaPreviaPatrones = lazy(() => import("./pages/VistaPreviaPatrones"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));

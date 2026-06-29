@@ -398,6 +398,8 @@ const ProductPatronesEspeciales = () => {
               </p>
             </div>
 
+            <SegundoBonoGramatica />
+
             <div className="text-center mt-8">
               <Button
                 variant="hero"

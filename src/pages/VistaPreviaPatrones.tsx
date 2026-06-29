@@ -6,6 +6,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
+import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 
@@ -200,6 +201,8 @@ const VistaPreviaPatrones = () => {
                 badgeClass="bg-accent text-accent-foreground"
               />
             </div>
+
+            <SegundoBonoGramatica />
 
             <div id="testimonios" className="mt-14 scroll-mt-24">
               <div className="text-center mb-6">

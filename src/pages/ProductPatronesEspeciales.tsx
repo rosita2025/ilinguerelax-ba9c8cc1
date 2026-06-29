@@ -17,6 +17,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
+import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 
 const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
 const productImage = "/images/product-patrones-especiales.webp";
@@ -397,6 +398,8 @@ const ProductPatronesEspeciales = () => {
                 Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
               </p>
             </div>
+
+            <SegundoBonoGramatica />
 
             <div className="text-center mt-8">
               <Button

@@ -13,6 +13,10 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import coverAsset from "@/assets/coreano-relax-cover.webp.asset.json";
+import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
+import mapaCasa from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
+import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
+import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
 
 const features = [
   "100 mapas mentales visuales (A1 → C1)",

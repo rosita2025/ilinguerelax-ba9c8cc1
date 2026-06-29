@@ -198,6 +198,8 @@ const ProductPatronesEspeciales = () => {
                 <span className="text-muted-foreground">Calidad verificada</span>
               </div>
 
+              <PrecioEconomicoBanner />
+
               <div className="mb-6 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
                 <video
                   src={introVideo.url}

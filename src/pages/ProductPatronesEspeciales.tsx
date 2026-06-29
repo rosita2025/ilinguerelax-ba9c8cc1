@@ -402,6 +402,11 @@ const ProductPatronesEspeciales = () => {
 
             <SegundoBonoGramatica />
 
+            <div className="mt-10">
+              <CanvaPreviewLink />
+            </div>
+
+
             <div className="text-center mt-8">
               <Button
                 variant="hero"

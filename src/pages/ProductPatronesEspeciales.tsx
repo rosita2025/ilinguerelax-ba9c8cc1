@@ -307,6 +307,8 @@ const ProductPatronesEspeciales = () => {
               </p>
             </div>
 
+            <CanvaPreviewLink />
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {previews.map((p, i) => (
                 <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">

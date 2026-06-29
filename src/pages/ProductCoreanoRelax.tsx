@@ -169,6 +169,38 @@ const ProductCoreanoRelax = () => {
                 ))}
               </div>
             </div>
+
+            <div className="mt-4">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                  <Brain className="w-4 h-4" /> Vista previa real · Alta calidad
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Así se ven los <span className="text-gradient">Mapas Mentales</span>
+                </h3>
+                <p className="text-muted-foreground">Hangul, pronunciación hispana, español, mini mapa conceptual y frases prácticas.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {[
+                  { url: mapaFamilia.url, alt: "Mapa Mental N.º 9 · La Familia (Coreano Relax)" },
+                  { url: mapaCasa.url, alt: "Mapa Mental · Objetos de la casa (Coreano Relax)" },
+                  { url: mapaRopa.url, alt: "Mapa Mental N.º 15 · Ropa, Colores y Accesorios (Coreano Relax)" },
+                  { url: mapaEscuela.url, alt: "Mapa Mental N.º 18 · Escuela, Universidad y Materiales (Coreano Relax)" },
+                ].map((m) => (
+                  <div key={m.alt} className="relative rounded-2xl overflow-hidden border border-border bg-white shadow-card">
+                    <img src={m.url} alt={m.alt} loading="lazy" className="w-full h-auto object-contain" onContextMenu={(e) => e.preventDefault()} />
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                      <span className="text-3xl md:text-5xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
+                        ilinguerelax.com
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Vista previa con marca de agua. El PDF completo se entrega tras la compra.
+              </p>
+            </div>
           </div>
         </div>
       </section>

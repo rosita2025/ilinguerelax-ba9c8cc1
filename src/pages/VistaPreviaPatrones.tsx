@@ -108,6 +108,8 @@ const VistaPreviaPatrones = () => {
               </p>
             </div>
 
+            <PrecioEconomicoBanner />
+
             <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
               <video
                 src={introVideo.url}

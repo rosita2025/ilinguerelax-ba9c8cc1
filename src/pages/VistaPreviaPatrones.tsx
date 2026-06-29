@@ -6,6 +6,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
+import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 

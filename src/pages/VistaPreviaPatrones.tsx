@@ -7,6 +7,7 @@ import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBann
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
+import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 
@@ -110,6 +111,8 @@ const VistaPreviaPatrones = () => {
             </div>
 
             <PrecioEconomicoBanner />
+
+            <CanvaPreviewLink />
 
             <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
               <video

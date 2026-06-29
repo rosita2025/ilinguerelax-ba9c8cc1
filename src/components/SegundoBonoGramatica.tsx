@@ -31,9 +31,7 @@ export const SegundoBonoGramatica = () => {
       </div>
 
       <div className="max-w-3xl mx-auto rounded-2xl overflow-hidden border border-accent/30 bg-card shadow-card">
-        <div className="absolute z-10 m-3 px-2.5 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold">
-          Bono 2
-        </div>
+
         <div className="relative bg-white">
           <img
             src={bonoGramaticaImg.url}

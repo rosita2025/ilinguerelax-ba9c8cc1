@@ -50,15 +50,18 @@ const PreviewGrid = ({
   badgeClass,
 }: {
   items: typeof patronesPreviews;
-  badgeLabel: string;
-  badgeClass: string;
+  badgeLabel?: string;
+  badgeClass?: string;
 }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
     {items.map((p, i) => (
       <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
-        <div className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
-          {badgeLabel} {i + 1}
-        </div>
+        {badgeLabel && (
+          <div className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass ?? ""}`}>
+            {badgeLabel} {i + 1}
+          </div>
+        )}
+
         <div className="relative aspect-[3/4] bg-white overflow-hidden">
           <img
             src={p.src}
@@ -200,9 +203,8 @@ const VistaPreviaPatrones = () => {
               </div>
               <PreviewGrid
                 items={bonusPreviews}
-                badgeLabel="Bono"
-                badgeClass="bg-accent text-accent-foreground"
               />
+
             </div>
 
             <SegundoBonoGramatica />

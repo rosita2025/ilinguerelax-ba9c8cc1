@@ -222,6 +222,54 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
+      <section className="py-8 md:py-10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold mb-3 border border-amber-500/20">
+                <Sparkles className="w-4 h-4" /> Incluye 2 Bonos GRATIS
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Bonos exclusivos <span className="text-gradient">incluidos</span> en tu compra
+              </h3>
+              <p className="text-muted-foreground">Llévate dos recursos adicionales sin costo extra para acelerar tu aprendizaje.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-amber-500/5 p-6 shadow-card">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3">
+                  <Sparkles className="w-3.5 h-3.5" /> Bono 1
+                </div>
+                <h4 className="text-xl font-bold text-foreground mb-2">
+                  📖 Guía Completa del Alfabeto Hangul
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Aprende a leer y escribir Hangul desde cero con explicaciones claras de cada vocal y consonante, trazos paso a paso y ejemplos de pronunciación para hispanohablantes.
+                </p>
+                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  <Check className="w-4 h-4" /> Incluido GRATIS
+                </div>
+              </div>
+
+              <div className="rounded-2xl border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-primary/5 p-6 shadow-card">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 text-xs font-bold mb-3">
+                  <Sparkles className="w-3.5 h-3.5" /> Bono 2
+                </div>
+                <h4 className="text-xl font-bold text-foreground mb-2">
+                  💬 100 Expresiones Coreanas Esenciales
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Las frases más usadas en el día a día, k-dramas y K-pop, con Hangul, pronunciación hispana y traducción al español para que hables con naturalidad desde el primer día.
+                </p>
+                <div className="flex items-center gap-2 text-sm font-semibold text-amber-600">
+                  <Check className="w-4 h-4" /> Incluido GRATIS
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <ProductReviews productType="english" reviews={[]} showReviewForm />
       <FAQ
         items={[

@@ -34,6 +34,7 @@ import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import introVideo from "@/assets/introduccion-patrones-especiales.mp4.asset.json";
+import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 
 const previews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },

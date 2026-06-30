@@ -23,6 +23,7 @@ import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaPe1 from "@/assets/resena-mx4.webp.asset.json";
 import introVideo from "@/assets/introduccion-patrones-especiales.mp4.asset.json";
+import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 
 const patronesPreviews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
@@ -117,19 +118,32 @@ const VistaPreviaPatrones = () => {
 
             
 
-            <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
+            <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
               <video
+                ref={(el) => {
+                  if (!el) return;
+                  el.muted = false;
+                  el.volume = 1;
+                  const p = el.play();
+                  if (p && typeof p.catch === "function") {
+                    p.catch(() => {
+                      el.muted = true;
+                      el.play().catch(() => {});
+                    });
+                  }
+                }}
                 src={introVideo.url}
+                poster={introPoster.url}
                 controls
                 controlsList="nodownload noplaybackrate noremoteplayback"
                 disablePictureInPicture
                 autoPlay
-                muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
                 onContextMenu={(e) => e.preventDefault()}
                 className="w-full h-auto block"
+                style={{ filter: "brightness(1.25) contrast(1.12) saturate(1.1)" }}
                 aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
               />
             </div>

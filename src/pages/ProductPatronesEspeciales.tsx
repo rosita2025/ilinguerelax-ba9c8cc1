@@ -34,6 +34,7 @@ import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import introVideo from "@/assets/introduccion-patrones-especiales.mp4.asset.json";
+import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 
 const previews = [
   { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
@@ -217,6 +218,7 @@ const ProductPatronesEspeciales = () => {
                     }
                   }}
                   src={introVideo.url}
+                  poster={introPoster.url}
                   controls
                   controlsList="nodownload noplaybackrate noremoteplayback"
                   disablePictureInPicture
@@ -226,7 +228,7 @@ const ProductPatronesEspeciales = () => {
                   preload="auto"
                   onContextMenu={(e) => e.preventDefault()}
                   className="w-full h-auto block"
-                  style={{ filter: "brightness(1.15) contrast(1.05)" }}
+                  style={{ filter: "brightness(1.25) contrast(1.12) saturate(1.1)" }}
                   aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                 />
               </div>

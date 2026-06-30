@@ -218,7 +218,7 @@ const ProductCoreanoRelax = () => {
           { question: "¿En qué formato se entrega?", answer: "PDF descargable, optimizado para leer desde celular, tablet o computadora. Puedes imprimirlo si lo deseas.", icon: Globe },
         ]}
         title="Preguntas Frecuentes"
-        subtitle="Resolvemos tus dudas sobre Coreano Relax"
+        subtitle="Resolvemos tus dudas sobre Coreano Sin Complicaciones"
       />
       <Footer />
       <WhatsAppButton />

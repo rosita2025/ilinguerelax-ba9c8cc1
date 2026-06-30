@@ -18,6 +18,7 @@ import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
 
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
+import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",

@@ -178,6 +178,23 @@ const ProductCoreanoRelax = () => {
                 </h3>
                 <p className="text-muted-foreground">Hangul, pronunciación hispana, español, mini mapa conceptual y frases prácticas.</p>
               </div>
+
+              <div className="mb-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-amber-500/10 to-primary/10 p-5 shadow-card">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
+                    <Check className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground mb-1">
+                      ✨ Producto de alta calidad · Revisado y sin errores ortográficos
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Cada mapa mental ha sido revisado cuidadosamente para garantizar una excelente calidad visual, contenido preciso y ortografía correcta tanto en coreano (Hangul) como en español. 👉 <strong>Mira la vista previa</strong> a continuación y compruébalo tú mismo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {[
                   { url: mapaFamilia.url, alt: "Mapa Mental N.º 9 · La Familia (Coreano Relax)" },

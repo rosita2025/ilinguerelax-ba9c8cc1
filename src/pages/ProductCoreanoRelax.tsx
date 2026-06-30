@@ -151,10 +151,10 @@ const ProductCoreanoRelax = () => {
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-3">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-3 text-balance leading-tight">
               Aprende coreano con <span className="text-gradient">mapas mentales</span>
             </h2>
-            <p className="text-base text-muted-foreground text-center mb-10">Método visual, claro y progresivo · k-dramas y K-pop.</p>
+            <p className="text-sm sm:text-base text-muted-foreground text-center mb-10 text-pretty">Método visual, claro y progresivo · k-dramas y K-pop.</p>
             <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (

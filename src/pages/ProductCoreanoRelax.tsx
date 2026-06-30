@@ -217,6 +217,32 @@ const ProductCoreanoRelax = () => {
       <Footer />
       <WhatsAppButton />
       <ScrollToTop showAfter={500} />
+
+      {/* Sticky Buy Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t border-border shadow-2xl">
+        <div className="container px-3 py-2.5 md:py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl md:text-2xl font-black text-foreground">$10</span>
+              <span className="text-sm text-muted-foreground line-through">$54</span>
+              <span className="hidden sm:inline text-xs font-semibold text-primary">≈ S/ 32.80</span>
+            </div>
+            <p className="text-[10px] md:text-xs text-muted-foreground leading-tight">Pago único · No incluye impuestos</p>
+          </div>
+          <a
+            href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0"
+          >
+            <Button size="lg" className="gradient-hero text-primary-foreground font-bold shadow-hero">
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              Comprar ahora
+            </Button>
+          </a>
+        </div>
+      </div>
+      <div className="h-20 md:h-24" aria-hidden />
     </main>
   );
 };

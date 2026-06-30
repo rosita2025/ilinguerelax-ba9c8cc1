@@ -330,7 +330,7 @@ const ProductCoreanoRelax = () => {
           </a>
         </div>
       </div>
-      <div className="h-20 md:h-24" aria-hidden />
+      <div className="h-28 md:h-24" aria-hidden />
     </main>
   );
 };

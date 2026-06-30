@@ -13,10 +13,11 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import coverAsset from "@/assets/coreano-relax-cover.webp.asset.json";
-import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
-import mapaCasa from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
-import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
-import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
+import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
+import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
+import mapaRestaurante from "@/assets/coreano-mapa-13-restaurante.webp.asset.json";
+import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
+import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",

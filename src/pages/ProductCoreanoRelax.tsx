@@ -137,9 +137,11 @@ const ProductCoreanoRelax = () => {
                     -81%
                   </motion.span>
                 </div>
-                <p className="text-sm font-semibold text-foreground mb-1">
-                  🇵🇪 ≈ <span className="text-primary">S/ 32.80 PEN</span>
-                </p>
+                {showLocal && (
+                  <p className="text-sm font-semibold text-foreground mb-1">
+                    {flag} ≈ <span className="text-primary">{localPrice.price} {localPrice.currency}</span>
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 

@@ -287,24 +287,23 @@ const ProductCoreanoRelax = () => {
 
       {/* Sticky Buy Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t border-border shadow-2xl">
-        <div className="container px-3 py-2.5 md:py-3 flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-2">
+        <div className="container px-3 py-2 flex items-center gap-2">
+          <div className="flex-shrink-0 leading-tight">
+            <div className="flex items-baseline gap-1.5">
               <span className="text-xl md:text-2xl font-black text-foreground">$10</span>
-              <span className="text-sm text-muted-foreground line-through">$54</span>
-              <span className="hidden sm:inline text-xs font-semibold text-primary">≈ S/ 32.80</span>
+              <span className="text-xs text-muted-foreground line-through">$54</span>
             </div>
-            <p className="text-[10px] md:text-xs text-muted-foreground leading-tight">Pago único · No incluye impuestos</p>
+            <p className="text-[10px] text-primary font-semibold">≈ S/ 32.80</p>
           </div>
           <a
             href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0"
+            className="flex-1 min-w-0"
           >
-            <Button size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-bold shadow-hero">
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Comprar ahora
+            <Button size="lg" className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-black shadow-hero text-base">
+              <ShoppingCart className="w-5 h-5 mr-1.5" />
+              COMPRAR
             </Button>
           </a>
         </div>

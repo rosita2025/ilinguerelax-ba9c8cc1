@@ -31,6 +31,7 @@ const ProductDutch5000 = lazy(() => import("./pages/ProductDutch5000"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
+const DescargaCoreano = lazy(() => import("./pages/DescargaCoreano"));
 const ProductEstructurasGramaticalesIngles = lazy(() => import("./pages/ProductEstructurasGramaticalesIngles"));
 const VistaPreviaPatrones = lazy(() => import("./pages/VistaPreviaPatrones"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
@@ -126,7 +127,8 @@ const App = () => (
                   <Route path="/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes" element={<ProductDutch5000 />} />
                   
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
-                  <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreanoRelax />} />
+                 <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreanoRelax />} />
+                 <Route path="/descarga/coreano-100-mapas" element={<DescargaCoreano />} />
                   <Route path="/products/estructuras-gramaticales-ingles-a1-c1" element={<ProductEstructurasGramaticalesIngles />} />
                   <Route path="/vista-previa/patrones-especiales" element={<VistaPreviaPatrones />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />

@@ -67,7 +67,7 @@ const ProductCoreanoRelax = () => {
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
         image={`https://ilinguerelax.com${coverAsset.url}`}
         type="product"
-        price="15"
+        price="10"
         originalPrice="54"
         sku="ILINGUE-COREANO-100MM"
         keywords="coreano sin complicaciones, aprender coreano, mapas mentales coreano, alfabeto hangul, kpop, kdramas, coreano para hispanohablantes"

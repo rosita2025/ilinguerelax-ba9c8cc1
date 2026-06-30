@@ -102,12 +102,12 @@ const ProductCoreanoRelax = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span> Visuales
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 text-balance leading-tight">
+                🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span>
               </h1>
 
-              <p className="text-base md:text-lg text-muted-foreground mb-6">
-                Aprende coreano de forma visual y entretenida, conectado con <strong>k-dramas</strong>, <strong>K-pop</strong> y cultura coreana. Sin reglas aburridas.
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 text-pretty">
+                Aprende coreano de forma visual y entretenida con <strong>k-dramas</strong>, <strong>K-pop</strong> y cultura coreana. Sin reglas aburridas.
               </p>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-5 border border-amber-500/20 mb-6">

@@ -13,10 +13,11 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import coverAsset from "@/assets/coreano-relax-cover.webp.asset.json";
-import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
-import mapaCasa from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
-import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
-import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
+import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
+import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
+import mapaRestaurante from "@/assets/coreano-mapa-13-restaurante.webp.asset.json";
+import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
+import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",
@@ -197,10 +198,11 @@ const ProductCoreanoRelax = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {[
-                  { url: mapaFamilia.url, alt: "Mapa Mental N.º 9 · La Familia (Coreano Relax)" },
-                  { url: mapaCasa.url, alt: "Mapa Mental · Objetos de la casa (Coreano Relax)" },
-                  { url: mapaRopa.url, alt: "Mapa Mental N.º 15 · Ropa, Colores y Accesorios (Coreano Relax)" },
-                  { url: mapaEscuela.url, alt: "Mapa Mental N.º 18 · Escuela, Universidad y Materiales (Coreano Relax)" },
+                  { url: mapaSaludos.url, alt: "Mapa Mental N.º 1 · Saludos y Presentaciones (Coreano Relax)" },
+                  { url: mapaVocales.url, alt: "Mapa Mental N.º 2 · Alfabeto Hangul: Vocales (Coreano Relax)" },
+                  { url: mapaRestaurante.url, alt: "Mapa Mental N.º 13 · Restaurante y Cafetería (Coreano Relax)" },
+                  { url: mapaCuerpo.url, alt: "Mapa Mental N.º 16 · Partes del Cuerpo y Salud (Coreano Relax)" },
+                  { url: mapaProfesiones.url, alt: "Mapa Mental N.º 19 · Profesiones y Lugares de Trabajo (Coreano Relax)" },
                 ].map((m) => (
                   <div key={m.alt} className="relative rounded-2xl overflow-hidden border border-border bg-white shadow-card">
                     <img src={m.url} alt={m.alt} loading="lazy" className="w-full h-auto object-contain" onContextMenu={(e) => e.preventDefault()} />

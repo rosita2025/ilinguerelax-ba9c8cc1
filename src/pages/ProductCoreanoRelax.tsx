@@ -202,10 +202,10 @@ const ProductCoreanoRelax = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-base md:text-lg font-extrabold text-foreground">
-                      👓 ¿Ves las imágenes borrosas o tienes problemas de visión?
+                      👓 ¿Ves borroso?
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Abre el <strong>demo gratis en PDF</strong> con vista nítida y haz zoom sin perder calidad. Muestras de los +100 Mapas Mentales (A1 a C2).
+                      Abre el <strong>demo gratis en PDF</strong> nítido con zoom.
                     </p>
                   </div>
                   <a

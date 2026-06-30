@@ -329,11 +329,14 @@ const ProductCoreanoRelax = () => {
       {/* Sticky Buy Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t border-border shadow-2xl">
         <div className="container px-3 py-2 flex flex-col items-stretch gap-1.5">
-          <div className="flex items-baseline justify-center gap-2 leading-none">
+          <div className="flex items-baseline justify-center gap-2 leading-none flex-wrap">
             <span className="text-xl font-black text-foreground">$10 USD</span>
+            {showLocal && (
+              <span className="text-xs font-bold text-primary">{flag} ≈ {localPrice.price}</span>
+            )}
             <span className="text-xs text-muted-foreground line-through">$54</span>
-            <span className="text-[10px] text-primary font-bold uppercase">Pago único</span>
           </div>
+
           <a
             href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
             target="_blank"

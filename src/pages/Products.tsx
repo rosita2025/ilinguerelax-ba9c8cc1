@@ -352,9 +352,6 @@ const Products = () => {
                   <p className="text-sm text-muted-foreground mb-3">
                     {product.subtitle}
                   </p>
-                  <p className="text-muted-foreground mb-4">
-                    {product.description}
-                  </p>
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-2 mb-4">

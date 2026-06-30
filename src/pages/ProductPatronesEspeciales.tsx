@@ -217,6 +217,7 @@ const ProductPatronesEspeciales = () => {
                     }
                   }}
                   src={introVideo.url}
+                  poster={introPoster.url}
                   controls
                   controlsList="nodownload noplaybackrate noremoteplayback"
                   disablePictureInPicture
@@ -226,7 +227,7 @@ const ProductPatronesEspeciales = () => {
                   preload="auto"
                   onContextMenu={(e) => e.preventDefault()}
                   className="w-full h-auto block"
-                  style={{ filter: "brightness(1.15) contrast(1.05)" }}
+                  style={{ filter: "brightness(1.25) contrast(1.12) saturate(1.1)" }}
                   aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                 />
               </div>

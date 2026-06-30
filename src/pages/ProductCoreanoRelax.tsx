@@ -94,7 +94,7 @@ const ProductCoreanoRelax = () => {
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20">
                   <Sparkles className="w-4 h-4" />
-                  <span>🇰🇷 MUY PRONTO</span>
+                  <span>🇰🇷 NUEVO LANZAMIENTO</span>
                 </motion.div>
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
                   <Brain className="w-4 h-4" /> +100 Mapas Mentales
@@ -102,7 +102,7 @@ const ProductCoreanoRelax = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                🇰🇷 Coreano Sin Complicaciones · +100 Mapas Mentales Visuales para Aprender <span className="text-gradient">Coreano</span> de Forma Natural
+                🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span> Visuales para Aprender Coreano de Forma Natural
               </h1>
 
               <p className="text-lg text-muted-foreground mb-6">

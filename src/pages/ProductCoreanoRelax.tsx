@@ -103,31 +103,29 @@ const ProductCoreanoRelax = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span> Visuales para Aprender Coreano de Forma Natural
+                🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span> Visuales
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-6">
-                Aprende coreano de manera visual, sencilla y entretenida, conectando el idioma con lo que realmente te gusta: los <strong>k-dramas</strong>, el <strong>K-pop</strong> y la cultura coreana moderna. En lugar de memorizar reglas complicadas, tu cerebro aprenderá a través de mapas mentales claros, imágenes y asociaciones fáciles de recordar.
+              <p className="text-base md:text-lg text-muted-foreground mb-6">
+                Aprende coreano de forma visual y entretenida, conectado con <strong>k-dramas</strong>, <strong>K-pop</strong> y cultura coreana. Sin reglas aburridas.
               </p>
 
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6">
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-5 border border-amber-500/20 mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-amber-600" />
-                  <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Lanzamiento</span>
+                  <span className="text-amber-600 font-semibold text-xs uppercase">Precio de Lanzamiento</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2 flex-wrap">
                   <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-sm font-bold shadow-lg">
-                    AHORRA 81%
+                  <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
+                    -81%
                   </motion.span>
                 </div>
-                <p className="text-base font-semibold text-foreground mb-1">
-                  🇵🇪 Equivale a aprox. <span className="text-primary">S/ 32.80 PEN</span> <span className="text-xs text-muted-foreground">(referencia: 1 USD = 3.28 PEN)</span>
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  🇵🇪 ≈ <span className="text-primary">S/ 32.80 PEN</span>
                 </p>
-                <p className="text-xs text-muted-foreground mb-1">El precio se cobra en USD y se convierte a tu moneda local según el tipo de cambio del día.</p>
-                <p className="text-sm text-muted-foreground">💳 Pago único · Sin suscripciones · Acceso de por vida · <strong>No incluye impuestos</strong> (pueden aplicar según tu país)</p>
-                <p className="text-xs text-muted-foreground mt-1">✅ Precio accesible · Evitamos presupuestos caros</p>
+                <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
@@ -153,10 +151,10 @@ const ProductCoreanoRelax = () => {
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-              Aprende coreano con <span className="text-gradient">mapas mentales</span> sin complicarte
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-3">
+              Aprende coreano con <span className="text-gradient">mapas mentales</span>
             </h2>
-            <p className="text-lg text-muted-foreground text-center mb-12">Método visual, claro y progresivo. Conecta el idioma con emociones y cultura real (k-dramas, K-pop).</p>
+            <p className="text-base text-muted-foreground text-center mb-10">Método visual, claro y progresivo · k-dramas y K-pop.</p>
             <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (
@@ -188,10 +186,10 @@ const ProductCoreanoRelax = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground mb-1">
-                      ✨ Producto de alta calidad · Revisado y sin errores ortográficos
+                      ✨ Alta calidad · Sin errores ortográficos
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      Cada mapa mental ha sido revisado cuidadosamente para garantizar una excelente calidad visual, contenido preciso y ortografía correcta tanto en coreano (Hangul) como en español. 👉 <strong>Mira la vista previa</strong> a continuación y compruébalo tú mismo.
+                      Revisado en Hangul y español. 👉 <strong>Mira la vista previa</strong>.
                     </p>
                   </div>
                 </div>
@@ -204,10 +202,10 @@ const ProductCoreanoRelax = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-base md:text-lg font-extrabold text-foreground">
-                      👓 ¿Ves las imágenes borrosas o tienes problemas de visión?
+                      👓 ¿Ves borroso?
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Abre el <strong>demo gratis en PDF</strong> con vista nítida y haz zoom sin perder calidad. Muestras de los +100 Mapas Mentales (A1 a C2).
+                      Abre el <strong>demo gratis en PDF</strong> nítido con zoom.
                     </p>
                   </div>
                   <a

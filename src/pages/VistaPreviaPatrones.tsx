@@ -118,19 +118,32 @@ const VistaPreviaPatrones = () => {
 
             
 
-            <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-black">
+            <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
               <video
+                ref={(el) => {
+                  if (!el) return;
+                  el.muted = false;
+                  el.volume = 1;
+                  const p = el.play();
+                  if (p && typeof p.catch === "function") {
+                    p.catch(() => {
+                      el.muted = true;
+                      el.play().catch(() => {});
+                    });
+                  }
+                }}
                 src={introVideo.url}
+                poster={introPoster.url}
                 controls
                 controlsList="nodownload noplaybackrate noremoteplayback"
                 disablePictureInPicture
                 autoPlay
-                muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
                 onContextMenu={(e) => e.preventDefault()}
                 className="w-full h-auto block"
+                style={{ filter: "brightness(1.25) contrast(1.12) saturate(1.1)" }}
                 aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
               />
             </div>

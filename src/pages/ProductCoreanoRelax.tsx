@@ -19,16 +19,16 @@ import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
 import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
 
 const features = [
-  "100 mapas mentales visuales (A1 → C1)",
-  "Alfabeto Hangul explicado paso a paso",
-  "Pronunciación adaptada para hispanohablantes",
-  "Romanización oficial + significado en español",
-  "Vocabulario organizado por temas y colores",
-  "Mini conversaciones y ejemplos prácticos",
-  "Ejercicios con respuestas en cada mapa",
-  "Bono: 100 Expresiones Coreanas Esenciales",
-  "Bono: Guía Completa del Alfabeto Hangul",
-  "PDF descargable · acceso de por vida",
+  "Más de 100 mapas mentales organizados por temas",
+  "Introducción completa al Hangul (alfabeto coreano) paso a paso",
+  "Vocabulario práctico del día a día",
+  "Verbos esenciales y estructuras básicas explicadas visualmente",
+  "Frases reales usadas en la vida cotidiana y en dramas coreanos",
+  "Expresiones comunes del K-pop y la cultura juvenil coreana",
+  "Método visual diseñado para acelerar la memorización",
+  "Ideal para principiantes (A1–A2), sin libros aburridos",
+  "Acceso de por vida · Pago único, sin mensualidades",
+  "Actualizaciones incluidas · PDF descargable",
 ];
 
 const ProductCoreanoRelax = () => {
@@ -62,15 +62,15 @@ const ProductCoreanoRelax = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Coreano Relax® · 100 Mapas Mentales para Aprender Coreano (Hangul a C1)"
-        description="Aprende coreano de forma fácil, visual y efectiva con 100 mapas mentales para hispanohablantes. Del alfabeto Hangul al nivel C1. PDF descargable."
+        title="Coreano Sin Complicaciones · +100 Mapas Mentales para Aprender Coreano de Forma Natural"
+        description="Aprende coreano de manera visual, sencilla y entretenida con +100 mapas mentales. Conecta el idioma con los k-dramas, el K-pop y la cultura coreana moderna. Ideal para principiantes (A1–A2)."
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
         image={`https://ilinguerelax.com${coverAsset.url}`}
         type="product"
         price="15"
         originalPrice="54"
         sku="ILINGUE-COREANO-100MM"
-        keywords="aprender coreano, coreano para hispanohablantes, mapas mentales coreano, alfabeto hangul, kpop kdrama, coreano relax"
+        keywords="coreano sin complicaciones, aprender coreano, mapas mentales coreano, alfabeto hangul, kpop, kdramas, coreano para hispanohablantes"
       />
       <Navbar />
 
@@ -96,16 +96,16 @@ const ProductCoreanoRelax = () => {
                   <span>🇰🇷 MUY PRONTO</span>
                 </motion.div>
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  <Brain className="w-4 h-4" /> 100 Mapas Mentales
+                  <Brain className="w-4 h-4" /> +100 Mapas Mentales
                 </span>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Coreano Relax® · 100 Mapas Mentales para Aprender <span className="text-gradient">Coreano</span> (Hangul → C1)
+                🇰🇷 Coreano Sin Complicaciones · +100 Mapas Mentales Visuales para Aprender <span className="text-gradient">Coreano</span> de Forma Natural
               </h1>
 
               <p className="text-lg text-muted-foreground mb-6">
-                Aprende coreano de forma fácil, visual y efectiva con mapas mentales pensados para hispanohablantes. Ideal para principiantes, viajeros y fans del K-Pop y K-Dramas.
+                Aprende coreano de manera visual, sencilla y entretenida, conectando el idioma con lo que realmente te gusta: los <strong>k-dramas</strong>, el <strong>K-pop</strong> y la cultura coreana moderna. En lugar de memorizar reglas complicadas, tu cerebro aprenderá a través de mapas mentales claros, imágenes y asociaciones fáciles de recordar.
               </p>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6">
@@ -158,9 +158,9 @@ const ProductCoreanoRelax = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-              Aprende coreano con <span className="text-gradient">mapas mentales</span> más rápido y recuerda para siempre
+              Aprende coreano con <span className="text-gradient">mapas mentales</span> sin complicarte
             </h2>
-            <p className="text-lg text-muted-foreground text-center mb-12">Del alfabeto Hangul al nivel C1, con pronunciación adaptada al español.</p>
+            <p className="text-lg text-muted-foreground text-center mb-12">Método visual, claro y progresivo. Conecta el idioma con emociones y cultura real (k-dramas, K-pop).</p>
             <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (
@@ -218,7 +218,7 @@ const ProductCoreanoRelax = () => {
           { question: "¿En qué formato se entrega?", answer: "PDF descargable, optimizado para leer desde celular, tablet o computadora. Puedes imprimirlo si lo deseas.", icon: Globe },
         ]}
         title="Preguntas Frecuentes"
-        subtitle="Resolvemos tus dudas sobre Coreano Relax"
+        subtitle="Resolvemos tus dudas sobre Coreano Sin Complicaciones"
       />
       <Footer />
       <WhatsAppButton />

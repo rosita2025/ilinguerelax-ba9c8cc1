@@ -113,42 +113,36 @@ const ProductCoreanoRelax = () => {
                   <Sparkles className="w-5 h-5 text-amber-600" />
                   <span className="text-amber-600 font-semibold text-sm uppercase">Precio de Lanzamiento</span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$15</span>
+                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-sm font-bold shadow-lg">
-                    AHORRA 72%
+                    AHORRA 81%
                   </motion.span>
                 </div>
-                <p className="text-sm text-muted-foreground">💳 Pago único · Sin suscripciones · Acceso de por vida</p>
+                <p className="text-base font-semibold text-foreground mb-1">
+                  🇵🇪 Equivale a aprox. <span className="text-primary">S/ 32.80 PEN</span> <span className="text-xs text-muted-foreground">(referencia: 1 USD = 3.28 PEN)</span>
+                </p>
+                <p className="text-xs text-muted-foreground mb-1">El precio se cobra en USD y se convierte a tu moneda local según el tipo de cambio del día.</p>
+                <p className="text-sm text-muted-foreground">💳 Pago único · Sin suscripciones · Acceso de por vida · <strong>No incluye impuestos</strong> (pueden aplicar según tu país)</p>
+                <p className="text-xs text-muted-foreground mt-1">✅ Precio accesible · Evitamos presupuestos caros</p>
               </motion.div>
 
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="bg-card rounded-2xl border-2 border-primary/20 p-6 mb-6">
-                {isSubscribed ? (
-                  <div className="text-center py-4">
-                    <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Check className="w-8 h-8 text-green-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">¡Gracias por suscribirte! 🎉</h3>
-                    <p className="text-muted-foreground">Te enviaremos un correo cuando Coreano Relax esté disponible.</p>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                      <Mail className="w-5 h-5 text-primary" />
-                      ¡Suscríbete y te avisamos cuando esté listo!
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4">Deja tu correo y sé el primero en recibir el lanzamiento al precio más bajo.</p>
-                    <form onSubmit={handleSubscribe} className="flex gap-2">
-                      <Input type="email" placeholder="Tu correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1" disabled={isLoading} />
-                      <Button type="submit" disabled={isLoading} className="shrink-0">
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (<><Mail className="w-4 h-4 mr-2" />Suscribirme</>)}
-                      </Button>
-                    </form>
-                  </>
-                )}
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
+                <a
+                  href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Button size="lg" className="w-full text-lg py-7 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Comprar ahora por $10 USD
+                  </Button>
+                </a>
+                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro vía Hotmart · Entrega automática por correo</p>
               </motion.div>
-              <p className="text-center text-sm text-muted-foreground mb-6">📧 Te notificaremos por correo cuando esté disponible</p>
+
             </div>
           </div>
         </div>

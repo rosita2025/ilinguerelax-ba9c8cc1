@@ -235,7 +235,7 @@ const ProductCoreanoRelax = () => {
             rel="noopener noreferrer"
             className="shrink-0"
           >
-            <Button size="lg" className="gradient-hero text-primary-foreground font-bold shadow-hero">
+            <Button size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-bold shadow-hero">
               <ShoppingCart className="w-4 h-4 mr-2" />
               Comprar ahora
             </Button>

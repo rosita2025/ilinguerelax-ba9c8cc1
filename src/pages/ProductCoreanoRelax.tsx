@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import coverAsset from "@/assets/coreano-relax-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
-import mapaRestaurante from "@/assets/coreano-mapa-13-restaurante.webp.asset.json";
+
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 
@@ -200,7 +200,7 @@ const ProductCoreanoRelax = () => {
                 {[
                   { url: mapaSaludos.url, alt: "Mapa Mental N.º 1 · Saludos y Presentaciones (Coreano Relax)" },
                   { url: mapaVocales.url, alt: "Mapa Mental N.º 2 · Alfabeto Hangul: Vocales (Coreano Relax)" },
-                  { url: mapaRestaurante.url, alt: "Mapa Mental N.º 13 · Restaurante y Cafetería (Coreano Relax)" },
+                  
                   { url: mapaCuerpo.url, alt: "Mapa Mental N.º 16 · Partes del Cuerpo y Salud (Coreano Relax)" },
                   { url: mapaProfesiones.url, alt: "Mapa Mental N.º 19 · Profesiones y Lugares de Trabajo (Coreano Relax)" },
                 ].map((m) => (

@@ -96,16 +96,16 @@ const ProductCoreanoRelax = () => {
                   <span>🇰🇷 MUY PRONTO</span>
                 </motion.div>
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  <Brain className="w-4 h-4" /> 100 Mapas Mentales
+                  <Brain className="w-4 h-4" /> +100 Mapas Mentales
                 </span>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Coreano Relax® · 100 Mapas Mentales para Aprender <span className="text-gradient">Coreano</span> (Hangul → C1)
+                🇰🇷 Coreano Sin Complicaciones · +100 Mapas Mentales Visuales para Aprender <span className="text-gradient">Coreano</span> de Forma Natural
               </h1>
 
               <p className="text-lg text-muted-foreground mb-6">
-                Aprende coreano de forma fácil, visual y efectiva con mapas mentales pensados para hispanohablantes. Ideal para principiantes, viajeros y fans del K-Pop y K-Dramas.
+                Aprende coreano de manera visual, sencilla y entretenida, conectando el idioma con lo que realmente te gusta: los <strong>k-dramas</strong>, el <strong>K-pop</strong> y la cultura coreana moderna. En lugar de memorizar reglas complicadas, tu cerebro aprenderá a través de mapas mentales claros, imágenes y asociaciones fáciles de recordar.
               </p>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-6 border border-amber-500/20 mb-6">

@@ -186,10 +186,10 @@ const ProductCoreanoRelax = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground mb-1">
-                      ✨ Producto de alta calidad · Revisado y sin errores ortográficos
+                      ✨ Alta calidad · Sin errores ortográficos
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      Cada mapa mental ha sido revisado cuidadosamente para garantizar una excelente calidad visual, contenido preciso y ortografía correcta tanto en coreano (Hangul) como en español. 👉 <strong>Mira la vista previa</strong> a continuación y compruébalo tú mismo.
+                      Revisado en Hangul y español. 👉 <strong>Mira la vista previa</strong>.
                     </p>
                   </div>
                 </div>

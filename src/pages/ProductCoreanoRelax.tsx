@@ -12,7 +12,7 @@ import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, Shop
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import coverAsset from "@/assets/coreano-relax-cover.webp.asset.json";
+import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
 

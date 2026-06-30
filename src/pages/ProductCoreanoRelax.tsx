@@ -19,16 +19,16 @@ import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
 import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
 
 const features = [
-  "100 mapas mentales visuales (A1 → C1)",
-  "Alfabeto Hangul explicado paso a paso",
-  "Pronunciación adaptada para hispanohablantes",
-  "Romanización oficial + significado en español",
-  "Vocabulario organizado por temas y colores",
-  "Mini conversaciones y ejemplos prácticos",
-  "Ejercicios con respuestas en cada mapa",
-  "Bono: 100 Expresiones Coreanas Esenciales",
-  "Bono: Guía Completa del Alfabeto Hangul",
-  "PDF descargable · acceso de por vida",
+  "Más de 100 mapas mentales organizados por temas",
+  "Introducción completa al Hangul (alfabeto coreano) paso a paso",
+  "Vocabulario práctico del día a día",
+  "Verbos esenciales y estructuras básicas explicadas visualmente",
+  "Frases reales usadas en la vida cotidiana y en dramas coreanos",
+  "Expresiones comunes del K-pop y la cultura juvenil coreana",
+  "Método visual diseñado para acelerar la memorización",
+  "Ideal para principiantes (A1–A2), sin libros aburridos",
+  "Acceso de por vida · Pago único, sin mensualidades",
+  "Actualizaciones incluidas · PDF descargable",
 ];
 
 const ProductCoreanoRelax = () => {

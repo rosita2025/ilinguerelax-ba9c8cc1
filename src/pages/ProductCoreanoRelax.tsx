@@ -12,6 +12,7 @@ import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, Shop
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
@@ -19,6 +20,16 @@ import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
+
+const COUNTRY_FLAG: Record<string, string> = {
+  US: "🇺🇸", PE: "🇵🇪", MX: "🇲🇽", CO: "🇨🇴", AR: "🇦🇷", CL: "🇨🇱", BR: "🇧🇷",
+  UY: "🇺🇾", BO: "🇧🇴", PY: "🇵🇾", GT: "🇬🇹", DO: "🇩🇴", CR: "🇨🇷", HN: "🇭🇳",
+  NI: "🇳🇮", VE: "🇻🇪", PA: "🇵🇦", EC: "🇪🇨", SV: "🇸🇻", ES: "🇪🇸", FR: "🇫🇷",
+  DE: "🇩🇪", IT: "🇮🇹", PT: "🇵🇹", GB: "🇬🇧", CA: "🇨🇦", AU: "🇦🇺", NZ: "🇳🇿",
+  JP: "🇯🇵", KR: "🇰🇷", SG: "🇸🇬", HK: "🇭🇰", TW: "🇹🇼", CH: "🇨🇭",
+  SE: "🇸🇪", NO: "🇳🇴", DK: "🇩🇰",
+};
+
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",
@@ -38,6 +49,10 @@ const ProductCoreanoRelax = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
+  const localPrice = useCampaignPrice(10, 54);
+  const flag = COUNTRY_FLAG[localPrice.countryCode] || "🌎";
+  const showLocal = localPrice.currency !== "USD";
+
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,9 +137,11 @@ const ProductCoreanoRelax = () => {
                     -81%
                   </motion.span>
                 </div>
-                <p className="text-sm font-semibold text-foreground mb-1">
-                  🇵🇪 ≈ <span className="text-primary">S/ 32.80 PEN</span>
-                </p>
+                {showLocal && (
+                  <p className="text-sm font-semibold text-foreground mb-1">
+                    {flag} ≈ <span className="text-primary">{localPrice.price} {localPrice.currency}</span>
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 
@@ -312,11 +329,14 @@ const ProductCoreanoRelax = () => {
       {/* Sticky Buy Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t border-border shadow-2xl">
         <div className="container px-3 py-2 flex flex-col items-stretch gap-1.5">
-          <div className="flex items-baseline justify-center gap-2 leading-none">
+          <div className="flex items-baseline justify-center gap-2 leading-none flex-wrap">
             <span className="text-xl font-black text-foreground">$10 USD</span>
+            {showLocal && (
+              <span className="text-xs font-bold text-primary">{flag} ≈ {localPrice.price}</span>
+            )}
             <span className="text-xs text-muted-foreground line-through">$54</span>
-            <span className="text-[10px] text-primary font-bold uppercase">Pago único</span>
           </div>
+
           <a
             href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
             target="_blank"

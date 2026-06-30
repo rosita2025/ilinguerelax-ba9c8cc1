@@ -49,6 +49,10 @@ const ProductCoreanoRelax = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
+  const localPrice = useCampaignPrice(10, 54);
+  const flag = COUNTRY_FLAG[localPrice.countryCode] || "🌎";
+  const showLocal = localPrice.currency !== "USD";
+
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();

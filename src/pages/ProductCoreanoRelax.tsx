@@ -139,10 +139,10 @@ const ProductCoreanoRelax = () => {
                 >
                   <Button size="lg" className="w-full text-lg py-7 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <ShoppingCart className="w-5 h-5 mr-2" />
-                    Comprar ahora por $10 USD
+                    Comprar $10
                   </Button>
                 </a>
-                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro vía Hotmart · Entrega automática por correo</p>
+                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática</p>
               </motion.div>
 
             </div>

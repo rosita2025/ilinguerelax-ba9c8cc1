@@ -616,6 +616,7 @@ const ProductPatronesEspeciales = () => {
         reviewCount={6}
         showReviews={true}
         buyUrl={HOTMART_URL}
+        onBuyClick={handleBuy}
       />
 
       <div className="h-20 md:h-16" />

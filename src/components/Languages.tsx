@@ -144,7 +144,7 @@ export const Languages = () => {
       reviews: "avaliações",
       buy: "Comprar",
       comingSoon: "Mais idiomas em breve",
-      tabs: { english: "Inglês", spanish: "Espanhol", portuguese: "Português", soon: "Em breve" },
+      tabs: { english: "Inglês", spanish: "Espanhol", portuguese: "Português", korean: "Coreano", soon: "Em breve" },
       soonLabel: "Em breve",
       step1: "1. Escolha o formato",
       step2: "2. Escolha o idioma",

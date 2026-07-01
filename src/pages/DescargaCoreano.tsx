@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Download, ShieldAlert, FileText, KeyRound } from "lucide-react";
 import { motion } from "framer-motion";
-import pdfAsset from "@/assets/100-mapas-mentales-coreano-v1.1.pdf.asset.json";
+import pdfAsset from "@/assets/100-mapas-mentales-coreano-completado.pdf.asset.json";
 
 const ACCESS_KEY = "123456";
-const FILE_NAME = "100+ Mapas Mentales con iLustrador Version 1.1 - Protegida";
+const FILE_NAME = "100 Mapas Mentales de Coreano - Completado";
 
 const DescargaCoreano = () => {
   const [key, setKey] = useState("");

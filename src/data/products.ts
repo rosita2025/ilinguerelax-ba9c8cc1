@@ -387,11 +387,11 @@ export const products: Product[] = [
 export const comingSoonLanguages = [
   { name: "Japonés", flag: "🇯🇵" },
   { name: "Chino", flag: "🇨🇳" },
-  { name: "Coreano", flag: "🇰🇷" },
   { name: "Ruso", flag: "🇷🇺" },
   { name: "Árabe", flag: "🇸🇦" },
   { name: "Hindi", flag: "🇮🇳" },
 ];
+
 
 // Helper to get product link
 export const getProductLink = (product: Product) => `/products/${product.slug}`;

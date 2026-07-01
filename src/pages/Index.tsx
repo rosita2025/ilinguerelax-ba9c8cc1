@@ -64,6 +64,7 @@ const Index = () => {
         </div>
       </section>
 
+      <CoreanoLaunchBanner />
       <Languages />
       <HowItWorks />
 

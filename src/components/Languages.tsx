@@ -160,7 +160,7 @@ export const Languages = () => {
 
   // Filter by selected format first, then group by language
   const grouped = useMemo(() => {
-    const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], soon: [] };
+    const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], korean: [], soon: [] };
     products
       .filter((p) => (activeFormat === "physical" ? p.isPhysical : !p.isPhysical))
       .forEach((p) => g[getProductLangKey(p)].push(p));

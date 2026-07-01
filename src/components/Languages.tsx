@@ -267,7 +267,23 @@ export const Languages = () => {
           </div>
         </div>
 
+        {/* Korean demo CTA */}
+        {activeTab === "korean" && (
+          <div className="max-w-3xl mx-auto mb-8 p-5 md:p-6 rounded-2xl border border-pink-500/30 bg-gradient-to-br from-pink-500/5 to-rose-500/10 text-center">
+            <p className="text-base md:text-lg text-foreground text-pretty">
+              ¿Te gustaría recibir una <strong>vista previa</strong> o un <strong>pequeño demo gratis</strong> para revisar la calidad del material ahora mismo? 😊✨
+            </p>
+            <Link
+              to="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1#vista-previa"
+              className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-colors"
+            >
+              📄 Ver demo gratis de Coreano
+            </Link>
+          </div>
+        )}
+
         {/* Products */}
+
         {visibleProducts.length === 0 ? (
           <div className="max-w-2xl mx-auto mb-12 p-8 text-center rounded-2xl border border-dashed border-border bg-card/50">
             <p className="text-muted-foreground">{c.empty}</p>

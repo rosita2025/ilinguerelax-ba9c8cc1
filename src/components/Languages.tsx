@@ -45,12 +45,19 @@ const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabA
     chip: "bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/30",
     tabActive: "bg-green-600 text-white border-green-600",
   },
+  korean: {
+    ring: "hover:border-pink-500/60",
+    bg: "from-pink-500/5 to-rose-500/10",
+    chip: "bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/30",
+    tabActive: "bg-pink-500 text-white border-pink-500",
+  },
   soon: {
     ring: "hover:border-muted-foreground/40",
     bg: "from-muted/30 to-muted/10",
     chip: "bg-muted text-muted-foreground border-border",
     tabActive: "bg-foreground text-background border-foreground",
   },
+
 };
 
 export const Languages = () => {

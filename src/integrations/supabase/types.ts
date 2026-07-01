@@ -143,6 +143,48 @@ export type Database = {
         }
         Relationships: []
       }
+      hotmart_purchases: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          product_code: string | null
+          product_id: string | null
+          purchased_at: string
+          raw_payload: Json | null
+          refund_deadline: string
+          status: string
+          transaction_code: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          product_code?: string | null
+          product_id?: string | null
+          purchased_at?: string
+          raw_payload?: Json | null
+          refund_deadline?: string
+          status?: string
+          transaction_code: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          product_code?: string | null
+          product_id?: string | null
+          purchased_at?: string
+          raw_payload?: Json | null
+          refund_deadline?: string
+          status?: string
+          transaction_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       review_invitations: {
         Row: {
           created_at: string

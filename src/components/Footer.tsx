@@ -95,11 +95,15 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-center">
+        <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-center space-y-1">
           <p className="text-sm text-primary-foreground/50">
             © 2026 iLingue Relax. {c.rights}.
           </p>
+          <p className="text-xs text-primary-foreground/40">
+            ilinguerelax.com is operated by Youtumundial LLC
+          </p>
         </div>
+
       </div>
     </footer>
   );

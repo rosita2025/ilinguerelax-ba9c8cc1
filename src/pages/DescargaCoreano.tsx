@@ -116,12 +116,12 @@ const DescargaCoreano = () => {
             <div className="flex flex-col gap-3 items-center">
               <Button asChild size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:from-amber-500 hover:to-yellow-600 font-bold w-full sm:w-auto">
                 <a href={pdfAsset.url} download={`${FILE_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
-                  <Download className="w-5 h-5 mr-2" /> Descargar PDF principal
+                  <Download className="w-5 h-5 mr-2" /> Descargar +100 Mapas Mentales de Coreano
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full sm:w-auto">
                 <a href={bono1Asset.url} download={`${BONO1_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
-                  <Download className="w-5 h-5 mr-2" /> 🎁 Bono 1: Guía Alfabeto Hangul
+                  <Download className="w-5 h-5 mr-2" /> 🎁 Bono 1: Guía Alfabético Hangul con Manos Escritura
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full sm:w-auto">

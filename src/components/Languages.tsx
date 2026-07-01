@@ -169,10 +169,12 @@ export const Languages = () => {
 
   const tabs: { key: LangKey; flag: string }[] = [
     { key: "english", flag: "🇬🇧" },
+    { key: "korean", flag: "🇰🇷" },
     { key: "spanish", flag: "🇪🇸" },
     { key: "portuguese", flag: "🇧🇷" },
     { key: "soon", flag: "✨" },
   ];
+
 
   const visibleProducts = grouped[activeTab];
 

@@ -6,22 +6,24 @@ import { products, comingSoonLanguages, getProductLink, type Product } from "@/d
 import { useI18n } from "@/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
-type LangKey = "english" | "spanish" | "portuguese" | "soon";
+type LangKey = "english" | "spanish" | "portuguese" | "korean" | "soon";
 type FormatKey = "digital" | "physical";
 
 // Map each product to a language tab
 const getProductLangKey = (p: Product): LangKey => {
+  if (p.id === "coreano-relax") return "korean";
   if (p.id === "portuguese-5000") return "portuguese";
   // Coming soon languages (other than portuguese) go to "soon"
   if (p.comingSoon && ["german-5000", "italian-5000", "french-5000", "dutch-5000"].includes(p.id)) {
     return "soon";
   }
   // English-target products (for Spanish speakers learning English)
-  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas"];
+  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas", "patrones-especiales"];
   if (englishIds.includes(p.id)) return "english";
   // Spanish-target products (for English speakers learning Spanish)
   return "spanish";
 };
+
 
 // Tailwind color tokens per language tab
 const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabActive: string }> = {

@@ -124,6 +124,11 @@ const DescargaCoreano = () => {
                   <Download className="w-5 h-5 mr-2" /> 🎁 Bono 1: Guía Alfabeto Hangul
                 </a>
               </Button>
+              <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full sm:w-auto">
+                <a href={bono2Asset.url} download={`${BONO2_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
+                  <Download className="w-5 h-5 mr-2" /> 🎁 Bono 2: Guía Completa Hangul (Explicativo + Notas)
+                </a>
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-6">
               🔒 Recuerda: este archivo es solo para ti. No lo reenvíes ni lo subas a redes públicas.

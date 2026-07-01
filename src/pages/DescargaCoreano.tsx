@@ -10,7 +10,8 @@ import pdfAsset from "@/assets/100-mapas-mentales-coreano-completado.pdf.asset.j
 import bono1Asset from "@/assets/bono-1-alfabeto-hangul-coreano.pdf.asset.json";
 import bono2Asset from "@/assets/bono-2-guia-completa-hangul.pdf.asset.json";
 
-const ACCESS_KEY = "123456";
+const ACCESS_KEY = "iLingueKR-2026-Relax";
+const MAX_ATTEMPTS = 5;
 const FILE_NAME = "+100 Mapas Mentales de Coreano";
 const BONO1_NAME = "Bono 1 - Guía Alfabético Hangul con Manos Escritura";
 const BONO2_NAME = "Bono 2 - Guía Completa Hangul (Explicativo + Notas)";
@@ -19,14 +20,24 @@ const DescargaCoreano = () => {
   const [key, setKey] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [blocked, setBlocked] = useState(false);
 
   const handleUnlock = (e: React.FormEvent) => {
     e.preventDefault();
+    if (blocked) return;
     if (key.trim() === ACCESS_KEY) {
       setUnlocked(true);
       setError("");
     } else {
-      setError("Clave incorrecta. Intenta de nuevo.");
+      const next = attempts + 1;
+      setAttempts(next);
+      if (next >= MAX_ATTEMPTS) {
+        setBlocked(true);
+        setError("Demasiados intentos fallidos. Escríbenos a hola@ilinguerelax.com con tu comprobante de compra.");
+      } else {
+        setError(`Clave incorrecta. Intentos restantes: ${MAX_ATTEMPTS - next}`);
+      }
     }
   };
 
@@ -64,11 +75,11 @@ const DescargaCoreano = () => {
                 ⚠️ AVISO IMPORTANTE
               </h2>
               <ul className="space-y-2 text-sm leading-relaxed">
-                <li>• <strong>NO compartas este archivo</strong> con personas desconocidas ni en grupos públicos.</li>
+                <li>• <strong>NO compartas este archivo</strong> ni la clave con personas desconocidas ni grupos públicos.</li>
                 <li>• Este material está <strong>protegido por derechos de autor</strong> y es de uso personal.</li>
-                <li>• La clave de acceso es exclusiva para compradores verificados.</li>
-                <li>• Compartirlo con terceros perjudica al autor y puede tener consecuencias legales.</li>
-                <li>• Evita que gente desconocida robe el contenido — guarda tu clave en privado.</li>
+                <li>• La clave llega <strong>por email/WhatsApp tras tu compra</strong> — es exclusiva para compradores verificados.</li>
+                <li>• ¿No la recibiste? Escríbenos a <strong>hola@ilinguerelax.com</strong> con tu comprobante.</li>
+                <li>• Compartir el contenido con terceros perjudica al autor y puede tener consecuencias legales.</li>
               </ul>
             </div>
           </div>
@@ -86,16 +97,17 @@ const DescargaCoreano = () => {
               <h3 className="text-xl font-semibold">Ingresa la clave de acceso</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              💡 La clave es <strong>123456</strong> (uso exclusivo de compradores).
+              🔐 La clave se envía <strong>por email tras tu compra</strong>. Es privada, no la compartas.
             </p>
             <Input
-              type="text"
-              inputMode="numeric"
-              placeholder="Clave de acceso"
+              type="password"
+              placeholder="Pega aquí tu clave de acceso"
               value={key}
               onChange={(e) => setKey(e.target.value)}
               className="text-lg h-12 mb-3"
               autoFocus
+              disabled={blocked}
+              autoComplete="off"
             />
             {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
             <Button type="submit" size="lg" className="w-full">

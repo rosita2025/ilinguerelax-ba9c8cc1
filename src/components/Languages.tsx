@@ -6,22 +6,24 @@ import { products, comingSoonLanguages, getProductLink, type Product } from "@/d
 import { useI18n } from "@/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
-type LangKey = "english" | "spanish" | "portuguese" | "soon";
+type LangKey = "english" | "spanish" | "portuguese" | "korean" | "soon";
 type FormatKey = "digital" | "physical";
 
 // Map each product to a language tab
 const getProductLangKey = (p: Product): LangKey => {
+  if (p.id === "coreano-relax") return "korean";
   if (p.id === "portuguese-5000") return "portuguese";
   // Coming soon languages (other than portuguese) go to "soon"
   if (p.comingSoon && ["german-5000", "italian-5000", "french-5000", "dutch-5000"].includes(p.id)) {
     return "soon";
   }
   // English-target products (for Spanish speakers learning English)
-  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas"];
+  const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas", "patrones-especiales"];
   if (englishIds.includes(p.id)) return "english";
   // Spanish-target products (for English speakers learning Spanish)
   return "spanish";
 };
+
 
 // Tailwind color tokens per language tab
 const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabActive: string }> = {
@@ -43,12 +45,19 @@ const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabA
     chip: "bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/30",
     tabActive: "bg-green-600 text-white border-green-600",
   },
+  korean: {
+    ring: "hover:border-pink-500/60",
+    bg: "from-pink-500/5 to-rose-500/10",
+    chip: "bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/30",
+    tabActive: "bg-pink-500 text-white border-pink-500",
+  },
   soon: {
     ring: "hover:border-muted-foreground/40",
     bg: "from-muted/30 to-muted/10",
     chip: "bg-muted text-muted-foreground border-border",
     tabActive: "bg-foreground text-background border-foreground",
   },
+
 };
 
 export const Languages = () => {
@@ -81,7 +90,7 @@ export const Languages = () => {
       reviews: "reseñas",
       buy: "Comprar",
       comingSoon: "Próximamente más idiomas",
-      tabs: { english: "Inglés", spanish: "Español", portuguese: "Portugués", soon: "Pronto" },
+      tabs: { english: "Inglés", spanish: "Español", portuguese: "Portugués", korean: "Coreano", soon: "Pronto" },
       soonLabel: "Muy pronto",
       step1: "1. Elige el formato",
       step2: "2. Elige el idioma",
@@ -99,7 +108,7 @@ export const Languages = () => {
       reviews: "reviews",
       buy: "Buy",
       comingSoon: "More languages coming soon",
-      tabs: { english: "English", spanish: "Spanish", portuguese: "Portuguese", soon: "Coming Soon" },
+      tabs: { english: "English", spanish: "Spanish", portuguese: "Portuguese", korean: "Korean", soon: "Coming Soon" },
       soonLabel: "Coming soon",
       step1: "1. Choose the format",
       step2: "2. Choose the language",
@@ -117,7 +126,7 @@ export const Languages = () => {
       reviews: "avis",
       buy: "Acheter",
       comingSoon: "Plus de langues bientôt",
-      tabs: { english: "Anglais", spanish: "Espagnol", portuguese: "Portugais", soon: "Bientôt" },
+      tabs: { english: "Anglais", spanish: "Espagnol", portuguese: "Portugais", korean: "Coréen", soon: "Bientôt" },
       soonLabel: "Bientôt disponible",
       step1: "1. Choisissez le format",
       step2: "2. Choisissez la langue",
@@ -135,7 +144,7 @@ export const Languages = () => {
       reviews: "avaliações",
       buy: "Comprar",
       comingSoon: "Mais idiomas em breve",
-      tabs: { english: "Inglês", spanish: "Espanhol", portuguese: "Português", soon: "Em breve" },
+      tabs: { english: "Inglês", spanish: "Espanhol", portuguese: "Português", korean: "Coreano", soon: "Em breve" },
       soonLabel: "Em breve",
       step1: "1. Escolha o formato",
       step2: "2. Escolha o idioma",
@@ -151,7 +160,7 @@ export const Languages = () => {
 
   // Filter by selected format first, then group by language
   const grouped = useMemo(() => {
-    const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], soon: [] };
+    const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], korean: [], soon: [] };
     products
       .filter((p) => (activeFormat === "physical" ? p.isPhysical : !p.isPhysical))
       .forEach((p) => g[getProductLangKey(p)].push(p));
@@ -160,10 +169,12 @@ export const Languages = () => {
 
   const tabs: { key: LangKey; flag: string }[] = [
     { key: "english", flag: "🇬🇧" },
+    { key: "korean", flag: "🇰🇷" },
     { key: "spanish", flag: "🇪🇸" },
     { key: "portuguese", flag: "🇧🇷" },
     { key: "soon", flag: "✨" },
   ];
+
 
   const visibleProducts = grouped[activeTab];
 
@@ -256,7 +267,23 @@ export const Languages = () => {
           </div>
         </div>
 
+        {/* Korean demo CTA */}
+        {activeTab === "korean" && (
+          <div className="max-w-3xl mx-auto mb-8 p-5 md:p-6 rounded-2xl border border-pink-500/30 bg-gradient-to-br from-pink-500/5 to-rose-500/10 text-center">
+            <p className="text-base md:text-lg text-foreground text-pretty">
+              ¿Te gustaría recibir una <strong>vista previa</strong> o un <strong>pequeño demo gratis</strong> para revisar la calidad del material ahora mismo? 😊✨
+            </p>
+            <Link
+              to="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1#vista-previa"
+              className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-colors"
+            >
+              📄 Ver demo gratis de Coreano
+            </Link>
+          </div>
+        )}
+
         {/* Products */}
+
         {visibleProducts.length === 0 ? (
           <div className="max-w-2xl mx-auto mb-12 p-8 text-center rounded-2xl border border-dashed border-border bg-card/50">
             <p className="text-muted-foreground">{c.empty}</p>

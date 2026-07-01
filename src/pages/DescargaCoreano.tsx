@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Lock, Download, ShieldAlert, FileText, KeyRound } from "lucide-react";
 import { motion } from "framer-motion";
 import pdfAsset from "@/assets/100-mapas-mentales-coreano-completado.pdf.asset.json";
+import bono1Asset from "@/assets/bono-1-alfabeto-hangul-coreano.pdf.asset.json";
 
 const ACCESS_KEY = "123456";
 const FILE_NAME = "100 Mapas Mentales de Coreano - Completado";
+const BONO1_NAME = "Bono 1 - Guía Alfabeto Hangul Coreano";
 
 const DescargaCoreano = () => {
   const [key, setKey] = useState("");
@@ -109,11 +111,18 @@ const DescargaCoreano = () => {
             <p className="text-muted-foreground mb-6">
               {FILE_NAME}
             </p>
-            <Button asChild size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:from-amber-500 hover:to-yellow-600 font-bold">
-              <a href={pdfAsset.url} download={`${FILE_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
-                <Download className="w-5 h-5 mr-2" /> Descargar PDF
-              </a>
-            </Button>
+            <div className="flex flex-col gap-3 items-center">
+              <Button asChild size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:from-amber-500 hover:to-yellow-600 font-bold w-full sm:w-auto">
+                <a href={pdfAsset.url} download={`${FILE_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
+                  <Download className="w-5 h-5 mr-2" /> Descargar PDF principal
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full sm:w-auto">
+                <a href={bono1Asset.url} download={`${BONO1_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
+                  <Download className="w-5 h-5 mr-2" /> 🎁 Bono 1: Guía Alfabeto Hangul
+                </a>
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground mt-6">
               🔒 Recuerda: este archivo es solo para ti. No lo reenvíes ni lo subas a redes públicas.
             </p>

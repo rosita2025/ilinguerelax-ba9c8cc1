@@ -11,9 +11,9 @@ import bono1Asset from "@/assets/bono-1-alfabeto-hangul-coreano.pdf.asset.json";
 import bono2Asset from "@/assets/bono-2-guia-completa-hangul.pdf.asset.json";
 
 const ACCESS_KEY = "123456";
-const FILE_NAME = "100 Mapas Mentales de Coreano - Completado";
-const BONO1_NAME = "Bono 1 - Guía Alfabeto Hangul Coreano";
-const BONO2_NAME = "Bono 2 - Guía Completa Hangul Explicativo y Notas";
+const FILE_NAME = "+100 Mapas Mentales de Coreano";
+const BONO1_NAME = "Bono 1 - Guía Alfabético Hangul con Manos Escritura";
+const BONO2_NAME = "Bono 2 - Guía Completa Hangul (Explicativo + Notas)";
 
 const DescargaCoreano = () => {
   const [key, setKey] = useState("");

@@ -113,20 +113,23 @@ const DescargaCoreano = () => {
             <p className="text-muted-foreground mb-6">
               {FILE_NAME}
             </p>
-            <div className="flex flex-col gap-3 items-center">
-              <Button asChild size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:from-amber-500 hover:to-yellow-600 font-bold w-full sm:w-auto">
-                <a href={pdfAsset.url} download={`${FILE_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
-                  <Download className="w-5 h-5 mr-2" /> Descargar +100 Mapas Mentales de Coreano
+            <div className="flex flex-col gap-3 items-stretch">
+              <Button asChild size="lg" className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:from-amber-500 hover:to-yellow-600 font-bold w-full whitespace-normal h-auto py-3 text-sm sm:text-base leading-tight">
+                <a href={pdfAsset.url} download={`${FILE_NAME}.pdf`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-center">
+                  <Download className="w-5 h-5 flex-shrink-0" />
+                  <span>+100 Mapas Mentales de Coreano</span>
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full sm:w-auto">
-                <a href={bono1Asset.url} download={`${BONO1_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
-                  <Download className="w-5 h-5 mr-2" /> 🎁 Bono 1: Guía Alfabético Hangul con Manos Escritura
+              <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full whitespace-normal h-auto py-3 text-sm sm:text-base leading-tight">
+                <a href={bono1Asset.url} download={`${BONO1_NAME}.pdf`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-center">
+                  <Download className="w-5 h-5 flex-shrink-0" />
+                  <span>🎁 Bono 1: Guía Alfabético Hangul</span>
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full sm:w-auto">
-                <a href={bono2Asset.url} download={`${BONO2_NAME}.pdf`} target="_blank" rel="noopener noreferrer">
-                  <Download className="w-5 h-5 mr-2" /> 🎁 Bono 2: Guía Completa Hangul (Explicativo + Notas)
+              <Button asChild size="lg" variant="outline" className="border-2 border-primary/50 font-bold w-full whitespace-normal h-auto py-3 text-sm sm:text-base leading-tight">
+                <a href={bono2Asset.url} download={`${BONO2_NAME}.pdf`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-center">
+                  <Download className="w-5 h-5 flex-shrink-0" />
+                  <span>🎁 Bono 2: Guía Completa Hangul</span>
                 </a>
               </Button>
             </div>

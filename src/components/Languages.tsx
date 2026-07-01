@@ -90,7 +90,7 @@ export const Languages = () => {
       reviews: "reseñas",
       buy: "Comprar",
       comingSoon: "Próximamente más idiomas",
-      tabs: { english: "Inglés", spanish: "Español", portuguese: "Portugués", soon: "Pronto" },
+      tabs: { english: "Inglés", spanish: "Español", portuguese: "Portugués", korean: "Coreano", soon: "Pronto" },
       soonLabel: "Muy pronto",
       step1: "1. Elige el formato",
       step2: "2. Elige el idioma",

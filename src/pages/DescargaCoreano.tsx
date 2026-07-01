@@ -10,7 +10,7 @@ import pdfAsset from "@/assets/100-mapas-mentales-coreano-completado.pdf.asset.j
 import bono1Asset from "@/assets/bono-1-alfabeto-hangul-coreano.pdf.asset.json";
 import bono2Asset from "@/assets/bono-2-guia-completa-hangul.pdf.asset.json";
 
-const ACCESS_KEY = "iLingueKR-2026-Relax";
+const ACCESS_KEY = "123456";
 const MAX_ATTEMPTS = 5;
 const FILE_NAME = "+100 Mapas Mentales de Coreano";
 const BONO1_NAME = "Bono 1 - Guía Alfabético Hangul con Manos Escritura";

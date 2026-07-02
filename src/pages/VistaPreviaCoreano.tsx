@@ -7,21 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Eye, Sparkles, BookOpen, Headphones, ShoppingCart, Check } from "lucide-react";
 
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
-import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
-import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
-import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
-import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
-import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
-import mapaCasa from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
+import mapaVocales from "@/assets/Mapa-mental-2.webp.asset.json";
+import mapaConsonantes from "@/assets/Mapa-mental-3.webp.asset.json";
+import mapaPaises from "@/assets/Mapa-mental-5.webp.asset.json";
+import mapaTransporte from "@/assets/Mapa-mental-20.webp.asset.json";
+import mapaRestaurantes from "@/assets/Mapa-mental-47.webp.asset.json";
+import bonoHangul from "@/assets/Bono-1-hangul.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 
 const previews = [
-  { src: mapaSaludos.url, alt: "Mapa Mental N.º 1 · Saludos y Presentaciones en Coreano (Hangul)", caption: "Saludos y Presentaciones" },
-  { src: mapaFamilia.url, alt: "Mapa Mental N.º 9 · La Familia en Coreano", caption: "La Familia" },
-  { src: mapaRopa.url, alt: "Mapa Mental N.º 15 · Ropa y Accesorios en Coreano", caption: "Ropa y Accesorios" },
-  { src: mapaCuerpo.url, alt: "Mapa Mental N.º 16 · Partes del Cuerpo y Salud", caption: "Cuerpo y Salud" },
-  { src: mapaEscuela.url, alt: "Mapa Mental N.º 18 · La Escuela en Coreano", caption: "La Escuela" },
-  { src: mapaCasa.url, alt: "Mapa Mental · Objetos de la Casa en Coreano", caption: "Objetos de la Casa" },
+  { src: mapaVocales.url, alt: "Mapa Mental N.º 2 · Alfabeto Hangul: Vocales", caption: "Alfabeto Hangul · Vocales" },
+  { src: mapaConsonantes.url, alt: "Mapa Mental N.º 3 · Alfabeto Hangul: Consonantes", caption: "Alfabeto Hangul · Consonantes" },
+  { src: mapaPaises.url, alt: "Mapa Mental N.º 5 · Países, Nacionalidades e Idiomas", caption: "Países y Nacionalidades" },
+  { src: mapaTransporte.url, alt: "Mapa Mental N.º 20 · Transporte y Cómo Preguntar Direcciones", caption: "Transporte y Direcciones" },
+  { src: mapaRestaurantes.url, alt: "Mapa Mental N.º 47 · Restaurantes y Pedidos Complejos", caption: "Restaurantes" },
+  { src: bonoHangul.url, alt: "Bono · Práctica de Escritura Hangul - Vocal ya", caption: "Bono · Práctica de Escritura" },
 ];
 
 const VistaPreviaCoreano = () => {

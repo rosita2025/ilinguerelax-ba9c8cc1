@@ -8,23 +8,19 @@ import { Eye, Sparkles, BookOpen, Headphones, ShoppingCart, Check } from "lucide
 
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
-import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
 import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
 import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
-import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 import mapaCasa from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 
 const previews = [
   { src: mapaSaludos.url, alt: "Mapa Mental N.º 1 · Saludos y Presentaciones en Coreano (Hangul)", caption: "Saludos y Presentaciones" },
-  { src: mapaVocales.url, alt: "Mapa Mental N.º 2 · Alfabeto Hangul Vocales", caption: "Alfabeto Hangul · Vocales" },
   { src: mapaFamilia.url, alt: "Mapa Mental N.º 9 · La Familia en Coreano", caption: "La Familia" },
   { src: mapaRopa.url, alt: "Mapa Mental N.º 15 · Ropa y Accesorios en Coreano", caption: "Ropa y Accesorios" },
   { src: mapaCuerpo.url, alt: "Mapa Mental N.º 16 · Partes del Cuerpo y Salud", caption: "Cuerpo y Salud" },
   { src: mapaEscuela.url, alt: "Mapa Mental N.º 18 · La Escuela en Coreano", caption: "La Escuela" },
-  { src: mapaProfesiones.url, alt: "Mapa Mental N.º 19 · Profesiones en Coreano", caption: "Profesiones" },
   { src: mapaCasa.url, alt: "Mapa Mental · Objetos de la Casa en Coreano", caption: "Objetos de la Casa" },
 ];
 

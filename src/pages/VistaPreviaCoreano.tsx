@@ -85,7 +85,7 @@ const VistaPreviaCoreano = () => {
                   </Button>
                 </a>
                 <a
-                  href="https://wa.me/15752160934?text=Hola%2C%20me%20interesa%20el%20ebook%20de%20%2B100%20Mapas%20Mentales%20de%20Coreano.%20%C2%BFMe%20pueden%20enviar%20precio%20y%20detalles%2C%20por%20favor%3F"
+                  href="https://wa.link/pdcwv8"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block"
@@ -156,28 +156,40 @@ const VistaPreviaCoreano = () => {
             <div className="mt-12">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold mb-3 border border-amber-500/20">
-                  <Sparkles className="w-4 h-4" /> Incluye 2 Bonos GRATIS
+                  <Sparkles className="w-4 h-4" /> Incluye 3 Bonos GRATIS
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                   Bonos <span className="text-gradient">incluidos</span> en tu compra
                 </h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-amber-500/5 p-6 shadow-card">
-                  <h3 className="text-xl font-bold text-foreground mb-2">📖 Guía Completa del Alfabeto Hangul</h3>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3">Bono 1 ✍️</div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Guía completa del Alfabeto Hangul con ejercicios de caligrafía</h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Aprende a leer y escribir Hangul desde cero: cada vocal y consonante, trazos paso a paso y pronunciación para hispanohablantes.
+                    Aprende a leer y escribir Hangul desde cero con trazos paso a paso y ejercicios prácticos de caligrafía.
                   </p>
                   <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                     <Check className="w-4 h-4" /> Incluido GRATIS
                   </div>
                 </div>
                 <div className="rounded-2xl border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-primary/5 p-6 shadow-card">
-                  <h3 className="text-xl font-bold text-foreground mb-2">💬 100 Expresiones Coreanas Esenciales</h3>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 text-xs font-bold mb-3">Bono 2 📝</div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Guía explicativa del Hangul con notas y consejos clave</h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Las frases más usadas en el día a día, k-dramas y K-pop, con Hangul, pronunciación hispana y traducción al español.
+                    Explicaciones detalladas del sistema Hangul con notas culturales y consejos clave para memorizar más rápido.
                   </p>
                   <div className="flex items-center gap-2 text-sm font-semibold text-amber-600">
+                    <Check className="w-4 h-4" /> Incluido GRATIS
+                  </div>
+                </div>
+                <div className="rounded-2xl border-2 border-[#1DB954]/40 bg-gradient-to-br from-[#1DB954]/10 to-primary/5 p-6 shadow-card">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1DB954]/15 text-[#1DB954] text-xs font-bold mb-3">Bono 3 · Compra Anticipada 🎧</div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Próximamente el audio de coreano en Spotify</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Acceso al podcast con la pronunciación real del Hangul, saludos y frases de k-dramas y K-pop. Exclusivo compra anticipada.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1DB954]">
                     <Check className="w-4 h-4" /> Incluido GRATIS
                   </div>
                 </div>
@@ -193,7 +205,7 @@ const VistaPreviaCoreano = () => {
                 Mándanos un mensaje por WhatsApp y te enviamos el <strong>precio y todos los detalles</strong> antes de comprar. 😊
               </p>
               <a
-                href="https://wa.me/15752160934?text=Hola%2C%20me%20interesa%20el%20ebook%20de%20%2B100%20Mapas%20Mentales%20de%20Coreano.%20%C2%BFMe%20pueden%20enviar%20precio%20y%20detalles%2C%20por%20favor%3F"
+                href="https://wa.link/pdcwv8"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block"

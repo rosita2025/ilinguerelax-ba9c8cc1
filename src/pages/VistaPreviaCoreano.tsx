@@ -85,18 +85,21 @@ const VistaPreviaCoreano = () => {
                   </Button>
                 </a>
                 <a
-                  href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
+                  href="https://wa.me/15752160934?text=Hola%2C%20me%20interesa%20el%20ebook%20de%20%2B100%20Mapas%20Mentales%20de%20Coreano.%20%C2%BFMe%20pueden%20enviar%20precio%20y%20detalles%2C%20por%20favor%3F"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <Button size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero">
-                    <ShoppingCart className="w-5 h-5 mr-2" /> Comprar ahora · $10
+                  <Button size="lg" className="w-full text-base py-6 bg-[#25D366] hover:bg-[#20b858] text-white font-bold shadow-hero">
+                    💬 Escríbenos antes de comprar
                   </Button>
                 </a>
-                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática</p>
+                <p className="text-center text-xs text-muted-foreground mt-2">
+                  ✍️ Si te gustaría comprar, mándanos un mensaje y te enviamos precio y detalles.
+                </p>
               </div>
             </div>
+
 
             {/* Quality card */}
             <div className="mb-8 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-amber-500/10 to-primary/10 p-5 shadow-card">
@@ -184,18 +187,19 @@ const VistaPreviaCoreano = () => {
             {/* Final CTA */}
             <div className="mt-12 rounded-3xl bg-gradient-to-br from-primary/10 via-amber-500/10 to-primary/10 border border-primary/20 p-6 md:p-8 text-center">
               <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                ¿Listo para aprender coreano de forma <span className="text-gradient">visual y natural</span>?
+                ¿Te gustaría <span className="text-gradient">comprarlo</span>?
               </h3>
-              <p className="text-muted-foreground mb-5">Precio de lanzamiento · Pago único · Acceso de por vida</p>
+              <p className="text-muted-foreground mb-5">
+                Mándanos un mensaje por WhatsApp y te enviamos el <strong>precio y todos los detalles</strong> antes de comprar. 😊
+              </p>
               <a
-                href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
+                href="https://wa.me/15752160934?text=Hola%2C%20me%20interesa%20el%20ebook%20de%20%2B100%20Mapas%20Mentales%20de%20Coreano.%20%C2%BFMe%20pueden%20enviar%20precio%20y%20detalles%2C%20por%20favor%3F"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block"
               >
-                <Button size="lg" className="text-lg py-7 px-10 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Comprar $10 · Entrega automática
+                <Button size="lg" className="text-lg py-7 px-10 bg-[#25D366] hover:bg-[#20b858] text-white font-bold shadow-hero hover:scale-[1.02] transition-transform">
+                  💬 Escríbenos por WhatsApp
                 </Button>
               </a>
             </div>

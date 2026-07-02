@@ -8,12 +8,10 @@ import { Eye, Sparkles, BookOpen, Headphones, ShoppingCart, Check } from "lucide
 
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
-import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
 import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
 import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
-import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 import mapaCasa from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 

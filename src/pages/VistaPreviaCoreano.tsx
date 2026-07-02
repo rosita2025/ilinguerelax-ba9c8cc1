@@ -50,6 +50,21 @@ const VistaPreviaCoreano = () => {
               </p>
             </div>
 
+            {/* YouTube Short */}
+            <div className="max-w-sm mx-auto mb-10">
+              <div className="relative rounded-3xl overflow-hidden shadow-hero border-2 border-primary/20 bg-black" style={{ aspectRatio: "9 / 16" }}>
+                <iframe
+                  src="https://www.youtube.com/embed/6kV0N5VKlWw?rel=0&modestbranding=1"
+                  title="Vista previa Coreano Sin Complicaciones · YouTube Short"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-2">🎬 Mira el video corto del ebook</p>
+            </div>
+
             {/* Cover + CTA */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-10">
               <div className="relative">

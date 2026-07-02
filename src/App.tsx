@@ -34,6 +34,7 @@ const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
 const DescargaCoreano = lazy(() => import("./pages/DescargaCoreano"));
 const ProductEstructurasGramaticalesIngles = lazy(() => import("./pages/ProductEstructurasGramaticalesIngles"));
 const VistaPreviaPatrones = lazy(() => import("./pages/VistaPreviaPatrones"));
+const VistaPreviaCoreano = lazy(() => import("./pages/VistaPreviaCoreano"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const HotmartSuccess = lazy(() => import("./pages/HotmartSuccess"));
 const HotmartPending = lazy(() => import("./pages/HotmartPending"));
@@ -131,6 +132,7 @@ const App = () => (
                  <Route path="/descarga/coreano-100-mapas" element={<DescargaCoreano />} />
                   <Route path="/products/estructuras-gramaticales-ingles-a1-c1" element={<ProductEstructurasGramaticalesIngles />} />
                   <Route path="/vista-previa/patrones-especiales" element={<VistaPreviaPatrones />} />
+                  <Route path="/vista-previa/coreano-100-mapas-mentales" element={<VistaPreviaCoreano />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
                   <Route path="/hotmart-success" element={<HotmartSuccess />} />
                   <Route path="/hotmart-pending" element={<HotmartPending />} />

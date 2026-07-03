@@ -20,7 +20,35 @@ import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 
-const HOTMART_URL = "https://pay.hotmart.com/Q105880946X?checkoutMode=10";
+const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
+const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
+
+const EUROPE_CODES = new Set([
+  "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",
+  "LU","CZ","HU","RO","BG","HR","SI","SK","EE","LV","LT","MT","CY","IS","LI","AD",
+  "MC","SM","VA","GB","UA","RS","BA","MK","AL","ME","MD","BY","XK",
+]);
+const ASIA_CODES = new Set([
+  "JP","KR","CN","HK","TW","SG","MY","TH","VN","ID","PH","IN","PK","BD","LK","NP",
+  "MM","KH","LA","BN","MN","MO","AE","SA","IL","QA","KW","BH","OM","JO","LB","IQ",
+  "IR","YE","SY","TR","KZ","UZ","TM","KG","TJ","AF","AZ","AM","GE",
+]);
+
+function getRegionalPricing(countryCode: string) {
+  if (countryCode === "CA") {
+    return { url: HOTMART_URL_INTL, price: "CA$ 25.20", original: "CA$ 62.00", isIntl: true };
+  }
+  if (countryCode === "US") {
+    return { url: HOTMART_URL_INTL, price: "$15.00 USD", original: "$37.00 USD", isIntl: true };
+  }
+  if (EUROPE_CODES.has(countryCode)) {
+    return { url: HOTMART_URL_INTL, price: "14,56 €", original: "36,00 €", isIntl: true };
+  }
+  if (ASIA_CODES.has(countryCode)) {
+    return { url: HOTMART_URL_INTL, price: "$15.00 USD", original: "$37.00 USD", isIntl: true };
+  }
+  return { url: HOTMART_URL_LATAM, price: null, original: null, isIntl: false };
+}
 const productImage = "/images/product-patrones-especiales.webp";
 
 import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
@@ -67,11 +95,13 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
-  const { formatPrice, currency } = useI18n();
+  const { formatPrice, currency, countryCode } = useI18n();
   const PRICE_USD = 8.08; // ≈ S/29.90 PEN (rate 3.70)
   const ORIGINAL_USD = 19.99;
-  const priceLabel = formatPrice(PRICE_USD);
-  const originalLabel = formatPrice(ORIGINAL_USD);
+  const regional = getRegionalPricing(countryCode);
+  const priceLabel = regional.isIntl ? regional.price! : formatPrice(PRICE_USD);
+  const originalLabel = regional.isIntl ? regional.original! : formatPrice(ORIGINAL_USD);
+  const HOTMART_URL = regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",

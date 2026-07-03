@@ -59,7 +59,7 @@ const ProductCoreanoRelax = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
   const localPrice = useCampaignPrice(10, 54);
-  const flag = COUNTRY_FLAG[localPrice.countryCode] || "🌎";
+  const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
   const showLocal = localPrice.currency !== "USD";
 
 

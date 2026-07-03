@@ -95,11 +95,13 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
-  const { formatPrice, currency } = useI18n();
+  const { formatPrice, currency, countryCode } = useI18n();
   const PRICE_USD = 8.08; // ≈ S/29.90 PEN (rate 3.70)
   const ORIGINAL_USD = 19.99;
-  const priceLabel = formatPrice(PRICE_USD);
-  const originalLabel = formatPrice(ORIGINAL_USD);
+  const regional = getRegionalPricing(countryCode);
+  const priceLabel = regional.isIntl ? regional.price! : formatPrice(PRICE_USD);
+  const originalLabel = regional.isIntl ? regional.original! : formatPrice(ORIGINAL_USD);
+  const HOTMART_URL = regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",

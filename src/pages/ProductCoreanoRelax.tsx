@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { CountryFlagSelector } from "@/components/CountryFlagSelector";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
@@ -29,6 +30,14 @@ const COUNTRY_FLAG: Record<string, string> = {
   JP: "🇯🇵", KR: "🇰🇷", SG: "🇸🇬", HK: "🇭🇰", TW: "🇹🇼", CH: "🇨🇭",
   SE: "🇸🇪", NO: "🇳🇴", DK: "🇩🇰",
 };
+
+const CURRENCY_FLAG: Record<string, string> = {
+  USD: "🇺🇸", CAD: "🇨🇦", EUR: "🇪🇸", GBP: "🇬🇧", AUD: "🇦🇺", NZD: "🇳🇿",
+  MXN: "🇲🇽", COP: "🇨🇴", ARS: "🇦🇷", PEN: "🇵🇪", CLP: "🇨🇱", BRL: "🇧🇷",
+  UYU: "🇺🇾", BOB: "🇧🇴", PYG: "🇵🇾", GTQ: "🇬🇹", DOP: "🇩🇴", CRC: "🇨🇷",
+  HNL: "🇭🇳", NIO: "🇳🇮", VES: "🇻🇪",
+};
+
 
 
 const features = [
@@ -50,7 +59,7 @@ const ProductCoreanoRelax = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
   const localPrice = useCampaignPrice(10, 54);
-  const flag = COUNTRY_FLAG[localPrice.countryCode] || "🌎";
+  const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
   const showLocal = localPrice.currency !== "USD";
 
 
@@ -142,6 +151,7 @@ const ProductCoreanoRelax = () => {
                     {flag} ≈ <span className="text-primary">{localPrice.price} {localPrice.currency}</span>
                   </p>
                 )}
+                <CountryFlagSelector campaign={localPrice} className="mb-2" />
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 

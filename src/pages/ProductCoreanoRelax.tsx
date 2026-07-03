@@ -143,6 +143,7 @@ const ProductCoreanoRelax = () => {
                     {flag} ≈ <span className="text-primary">{localPrice.price} {localPrice.currency}</span>
                   </p>
                 )}
+                <CountryFlagSelector campaign={localPrice} className="mb-2" />
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 

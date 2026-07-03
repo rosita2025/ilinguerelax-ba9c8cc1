@@ -31,6 +31,14 @@ const COUNTRY_FLAG: Record<string, string> = {
   SE: "🇸🇪", NO: "🇳🇴", DK: "🇩🇰",
 };
 
+const CURRENCY_FLAG: Record<string, string> = {
+  USD: "🇺🇸", CAD: "🇨🇦", EUR: "🇪🇸", GBP: "🇬🇧", AUD: "🇦🇺", NZD: "🇳🇿",
+  MXN: "🇲🇽", COP: "🇨🇴", ARS: "🇦🇷", PEN: "🇵🇪", CLP: "🇨🇱", BRL: "🇧🇷",
+  UYU: "🇺🇾", BOB: "🇧🇴", PYG: "🇵🇾", GTQ: "🇬🇹", DOP: "🇩🇴", CRC: "🇨🇷",
+  HNL: "🇭🇳", NIO: "🇳🇮", VES: "🇻🇪",
+};
+
+
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",

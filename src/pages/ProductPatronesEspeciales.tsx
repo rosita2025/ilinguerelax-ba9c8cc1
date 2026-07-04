@@ -665,14 +665,17 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl={HOTMART_URL}
-        onBuyClick={handleBuy}
+        buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
+        onBuyClick={() => window.open(usePaypalStripe ? PAYPAL_URL : HOTMART_URL, "_blank")}
+        ctaText={usePaypalStripe ? "PAGAR CON PAYPAL" : "COMPRAR AHORA"}
+        secondaryCtaText={usePaypalStripe ? "PAGAR CON STRIPE" : undefined}
+        onSecondaryClick={usePaypalStripe ? () => window.open(STRIPE_URL, "_blank") : undefined}
       />
 
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-      <ExitIntentPopup buyUrl={HOTMART_URL} discount="10%" />
+      <ExitIntentPopup buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL} discount="10%" />
       <WhatsAppButton />
       <ScrollToTop showAfter={500} />
     </main>

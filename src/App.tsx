@@ -32,6 +32,7 @@ const ProductDutch5000 = lazy(() => import("./pages/ProductDutch5000"));
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
 const DescargaCoreano = lazy(() => import("./pages/DescargaCoreano"));
+const DescargaPatrones = lazy(() => import("./pages/DescargaPatrones"));
 const ProductEstructurasGramaticalesIngles = lazy(() => import("./pages/ProductEstructurasGramaticalesIngles"));
 const VistaPreviaPatrones = lazy(() => import("./pages/VistaPreviaPatrones"));
 const VistaPreviaCoreano = lazy(() => import("./pages/VistaPreviaCoreano"));

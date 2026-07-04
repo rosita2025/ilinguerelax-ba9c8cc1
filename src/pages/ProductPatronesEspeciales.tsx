@@ -22,6 +22,9 @@ import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
+const PAYPAL_URL = "https://www.paypal.com/ncp/payment/D884C48J9VTMG";
+const STRIPE_URL = "https://buy.stripe.com/aFaeVcahadlze5i59X8IU0c";
+const PAYPAL_STRIPE_COUNTRIES = new Set(["VE","NI","CU","KR","CN","SG","TR","HN"]);
 
 const EUROPE_CODES = new Set([
   "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",

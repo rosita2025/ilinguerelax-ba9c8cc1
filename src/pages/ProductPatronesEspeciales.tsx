@@ -102,6 +102,7 @@ const ProductPatronesEspeciales = () => {
   const PRICE_USD = 8.08; // ≈ S/29.90 PEN (rate 3.70)
   const ORIGINAL_USD = 19.99;
   const regional = getRegionalPricing(countryCode);
+  const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
   const priceLabel = regional.isIntl ? regional.price! : formatPrice(PRICE_USD);
   const originalLabel = regional.isIntl ? regional.original! : formatPrice(ORIGINAL_USD);
   const HOTMART_URL = regional.url;

@@ -22,6 +22,9 @@ import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
+const PAYPAL_URL = "https://www.paypal.com/ncp/payment/D884C48J9VTMG";
+const STRIPE_URL = "https://buy.stripe.com/aFaeVcahadlze5i59X8IU0c";
+const PAYPAL_STRIPE_COUNTRIES = new Set(["VE","NI","CU","KR","CN","SG","TR","HN"]);
 
 const EUROPE_CODES = new Set([
   "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",
@@ -99,6 +102,7 @@ const ProductPatronesEspeciales = () => {
   const PRICE_USD = 8.08; // ≈ S/29.90 PEN (rate 3.70)
   const ORIGINAL_USD = 19.99;
   const regional = getRegionalPricing(countryCode);
+  const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
   const priceLabel = regional.isIntl ? regional.price! : formatPrice(PRICE_USD);
   const originalLabel = regional.isIntl ? regional.original! : formatPrice(ORIGINAL_USD);
   const HOTMART_URL = regional.url;
@@ -279,18 +283,41 @@ const ProductPatronesEspeciales = () => {
                 </p>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="hero"
-                  size="xl"
-                  className="w-full mb-4 text-lg py-6 shadow-2xl"
-                  onClick={handleBuy}
-                >
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  ¡QUIERO COMPRAR AHORA!
-                  <ArrowRight className="w-6 h-6 ml-2" />
-                </Button>
-              </motion.div>
+              {usePaypalStripe ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  <Button
+                    variant="hero"
+                    size="xl"
+                    className="w-full text-base py-6 shadow-2xl"
+                    onClick={() => window.open(PAYPAL_URL, "_blank")}
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Pagar con PayPal
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="xl"
+                    className="w-full text-base py-6"
+                    onClick={() => window.open(STRIPE_URL, "_blank")}
+                  >
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Pagar con Stripe
+                  </Button>
+                </div>
+              ) : (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="hero"
+                    size="xl"
+                    className="w-full mb-4 text-lg py-6 shadow-2xl"
+                    onClick={handleBuy}
+                  >
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    ¡QUIERO COMPRAR AHORA!
+                    <ArrowRight className="w-6 h-6 ml-2" />
+                  </Button>
+                </motion.div>
+              )}
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👇 Mira la vista previa real antes de comprar
@@ -638,14 +665,17 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl={HOTMART_URL}
-        onBuyClick={handleBuy}
+        buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
+        onBuyClick={() => window.open(usePaypalStripe ? PAYPAL_URL : HOTMART_URL, "_blank")}
+        ctaText={usePaypalStripe ? "PAGAR CON PAYPAL" : "COMPRAR AHORA"}
+        secondaryCtaText={usePaypalStripe ? "PAGAR CON STRIPE" : undefined}
+        onSecondaryClick={usePaypalStripe ? () => window.open(STRIPE_URL, "_blank") : undefined}
       />
 
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-      <ExitIntentPopup buyUrl={HOTMART_URL} discount="10%" />
+      <ExitIntentPopup buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL} discount="10%" />
       <WhatsAppButton />
       <ScrollToTop showAfter={500} />
     </main>

@@ -283,18 +283,41 @@ const ProductPatronesEspeciales = () => {
                 </p>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="hero"
-                  size="xl"
-                  className="w-full mb-4 text-lg py-6 shadow-2xl"
-                  onClick={handleBuy}
-                >
-                  <ShoppingCart className="w-6 h-6 mr-2" />
-                  ¡QUIERO COMPRAR AHORA!
-                  <ArrowRight className="w-6 h-6 ml-2" />
-                </Button>
-              </motion.div>
+              {usePaypalStripe ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  <Button
+                    variant="hero"
+                    size="xl"
+                    className="w-full text-base py-6 shadow-2xl"
+                    onClick={() => window.open(PAYPAL_URL, "_blank")}
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Pagar con PayPal
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="xl"
+                    className="w-full text-base py-6"
+                    onClick={() => window.open(STRIPE_URL, "_blank")}
+                  >
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Pagar con Stripe
+                  </Button>
+                </div>
+              ) : (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="hero"
+                    size="xl"
+                    className="w-full mb-4 text-lg py-6 shadow-2xl"
+                    onClick={handleBuy}
+                  >
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    ¡QUIERO COMPRAR AHORA!
+                    <ArrowRight className="w-6 h-6 ml-2" />
+                  </Button>
+                </motion.div>
+              )}
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👇 Mira la vista previa real antes de comprar

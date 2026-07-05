@@ -196,80 +196,6 @@ const ProductCoreanoRelax = () => {
               </div>
             </div>
 
-            <div className="mt-4">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
-                  <Brain className="w-4 h-4" /> Vista previa real · Alta calidad
-                </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  Así se ven los <span className="text-gradient">Mapas Mentales</span>
-                </h3>
-                <p className="text-muted-foreground">Hangul, pronunciación hispana, español, mini mapa conceptual y frases prácticas.</p>
-              </div>
-
-              <div className="mb-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-amber-500/10 to-primary/10 p-5 shadow-card">
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-                    <Check className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-foreground mb-1">
-                      ✨ Alta calidad · Sin errores ortográficos
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      Revisado en Hangul y español. 👉 <strong>Mira la vista previa</strong>.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6 rounded-2xl border-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 p-5 shadow-card">
-                <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                  <div className="shrink-0 w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
-                    <BookOpen className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-base md:text-lg font-extrabold text-foreground">
-                      👓 ¿Ves borroso?
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Abre el <strong>demo gratis en PDF</strong> nítido con zoom.
-                    </p>
-                  </div>
-                  <a
-                    href={demoPdfAsset.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black text-sm font-extrabold transition-colors shadow-md whitespace-nowrap"
-                  >
-                    📄 Abrir demo PDF
-                  </a>
-                </div>
-              </div>
-
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {[
-                  { url: mapaSaludos.url, alt: "Mapa Mental N.º 1 · Saludos y Presentaciones (Coreano Relax)" },
-                  { url: mapaVocales.url, alt: "Mapa Mental N.º 2 · Alfabeto Hangul: Vocales (Coreano Relax)" },
-                  
-                  { url: mapaCuerpo.url, alt: "Mapa Mental N.º 16 · Partes del Cuerpo y Salud (Coreano Relax)" },
-                  { url: mapaProfesiones.url, alt: "Mapa Mental N.º 19 · Profesiones y Lugares de Trabajo (Coreano Relax)" },
-                ].map((m) => (
-                  <div key={m.alt} className="relative rounded-2xl overflow-hidden border border-border bg-white shadow-card">
-                    <img src={m.url} alt={m.alt} loading="lazy" className="w-full h-auto object-contain" onContextMenu={(e) => e.preventDefault()} />
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                      <span className="text-3xl md:text-5xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
-                        ilinguerelax.com
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-center text-xs text-muted-foreground mt-4">
-                Vista previa con marca de agua. El PDF completo se entrega tras la compra.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -323,7 +249,7 @@ const ProductCoreanoRelax = () => {
       </section>
 
       <WhatsAppTestimoniosCoreano />
-      <ProductReviews productType="english" reviews={[]} showReviewForm />
+      
       <FAQ
         items={[
           { question: "¿Cuándo estará disponible?", answer: "Coreano Relax está en producción y estará disponible muy pronto. Suscríbete para ser el primero en saberlo y acceder al precio de lanzamiento.", icon: Sparkles },

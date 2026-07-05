@@ -91,9 +91,9 @@ const VistaPreviaCoreano = () => {
                   </p>
                 </div>
 
-                <a href={demoPdfAsset.url} target="_blank" rel="noopener noreferrer" className="block mb-3">
-                  <Button size="lg" variant="outline" className="w-full font-bold border-2 border-primary/40">
-                    📄 Abrir demo gratis en PDF
+                <a href="#testimonios-whatsapp" className="block mb-3">
+                  <Button size="lg" variant="outline" className="w-full font-bold border-2 border-green-500/40 text-green-700 dark:text-green-400 hover:bg-green-500/10">
+                    💬 Ver testimonios reales por WhatsApp
                   </Button>
                 </a>
                 <a

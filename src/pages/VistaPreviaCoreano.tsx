@@ -14,6 +14,7 @@ import mapaTransporte from "@/assets/Mapa-mental-20.webp.asset.json";
 import mapaRestaurantes from "@/assets/Mapa-mental-47.webp.asset.json";
 import bonoHangul from "@/assets/Bono-1-hangul.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
+import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCoreano";
 
 const previews = [
   { src: mapaVocales.url, alt: "Mapa Mental N.º 2 · Alfabeto Hangul: Vocales", caption: "Alfabeto Hangul · Vocales" },
@@ -233,6 +234,8 @@ const VistaPreviaCoreano = () => {
           </div>
         </div>
       </section>
+
+      <WhatsAppTestimoniosCoreano />
 
       <Footer />
       <ScrollToTop />

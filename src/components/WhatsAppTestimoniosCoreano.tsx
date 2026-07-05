@@ -14,7 +14,7 @@ const testimonios = [
 
 export const WhatsAppTestimoniosCoreano = () => {
   return (
-    <section className="py-12 md:py-16 bg-muted/30">
+    <section id="testimonios-whatsapp" className="py-12 md:py-16 bg-muted/30 scroll-mt-20">
       <div className="container px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">

@@ -249,7 +249,7 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
-      <WhatsAppTestimoniosCoreano />
+      
       <ResenasWhatsAppCoreano />
       
       <FAQ

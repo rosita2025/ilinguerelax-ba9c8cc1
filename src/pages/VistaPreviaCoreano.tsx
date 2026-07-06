@@ -236,7 +236,7 @@ const VistaPreviaCoreano = () => {
         </div>
       </section>
 
-      <WhatsAppTestimoniosCoreano />
+      
       <ResenasWhatsAppCoreano />
 
       <Footer />

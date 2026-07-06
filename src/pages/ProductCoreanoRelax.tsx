@@ -22,6 +22,7 @@ import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCoreano";
+import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 
 const COUNTRY_FLAG: Record<string, string> = {
   US: "🇺🇸", PE: "🇵🇪", MX: "🇲🇽", CO: "🇨🇴", AR: "🇦🇷", CL: "🇨🇱", BR: "🇧🇷",
@@ -249,6 +250,7 @@ const ProductCoreanoRelax = () => {
       </section>
 
       <WhatsAppTestimoniosCoreano />
+      <ResenasWhatsAppCoreano />
       
       <FAQ
         items={[

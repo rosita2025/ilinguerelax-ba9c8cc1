@@ -91,6 +91,19 @@ serve(async (req) => {
       console.log("Created abandoned cart entry for:", buyerEmail);
     }
 
+    // Save to central email contacts
+    try {
+      await supabase.from("email_contacts").insert({
+        email: buyerEmail.toLowerCase(),
+        name: buyerName,
+        source: "abandoned_cart",
+        language,
+        product_type: "english",
+      });
+    } catch (e) {
+      console.log("Contact already saved:", e);
+    }
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

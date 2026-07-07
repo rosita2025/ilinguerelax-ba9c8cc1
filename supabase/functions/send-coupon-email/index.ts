@@ -1,7 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -183,6 +188,18 @@ const handler = async (req: Request): Promise<Response> => {
         </body>
         </html>
       `;
+
+    // Save contact (ignore duplicates via unique index on lower(email)+source)
+    try {
+      await supabaseAdmin.from("email_contacts").insert({
+        email: email.toLowerCase(),
+        source: "coupon_popup",
+        language: lang,
+        metadata: { coupon_code: couponCode, discount },
+      });
+    } catch (e) {
+      console.log("Contact already saved or insert skipped:", e);
+    }
 
     // Send coupon email to customer
     const emailResponse = await resend.emails.send({

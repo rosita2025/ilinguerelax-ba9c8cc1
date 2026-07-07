@@ -189,6 +189,19 @@ const handler = async (req: Request): Promise<Response> => {
         </html>
       `;
 
+    // Save contact
+    await supabaseAdmin
+      .from("email_contacts")
+      .upsert(
+        {
+          email: email.toLowerCase(),
+          source: "coupon_popup",
+          language: lang,
+          metadata: { coupon_code: couponCode, discount },
+        },
+        { onConflict: "email,source", ignoreDuplicates: false },
+      );
+
     // Send coupon email to customer
     const emailResponse = await resend.emails.send({
       from: "iLingue Relax <hola@ilinguerelax.com>",

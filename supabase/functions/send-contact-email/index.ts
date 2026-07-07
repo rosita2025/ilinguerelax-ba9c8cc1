@@ -41,6 +41,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Save contact
+    try {
+      await supabaseAdmin.from("email_contacts").insert({
+        email: email.toLowerCase(),
+        name,
+        source: "contact_form",
+        metadata: { subject: subject || null, message: message.slice(0, 500) },
+      });
+    } catch (e) {
+      console.log("Contact already saved or insert skipped:", e);
+    }
+
     // Send notification email to admin
     const adminEmailResponse = await resend.emails.send({
       from: "iLingue Relax <hola@ilinguerelax.com>",

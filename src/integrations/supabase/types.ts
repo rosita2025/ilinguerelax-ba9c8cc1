@@ -104,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      email_contacts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          language: string | null
+          metadata: Json
+          name: string | null
+          product_type: string | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          language?: string | null
+          metadata?: Json
+          name?: string | null
+          product_type?: string | null
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          language?: string | null
+          metadata?: Json
+          name?: string | null
+          product_type?: string | null
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       funnel_events: {
         Row: {
           country: string | null

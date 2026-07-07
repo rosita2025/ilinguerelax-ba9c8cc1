@@ -189,18 +189,17 @@ const handler = async (req: Request): Promise<Response> => {
         </html>
       `;
 
-    // Save contact
-    await supabaseAdmin
-      .from("email_contacts")
-      .upsert(
-        {
-          email: email.toLowerCase(),
-          source: "coupon_popup",
-          language: lang,
-          metadata: { coupon_code: couponCode, discount },
-        },
-        { onConflict: "email,source", ignoreDuplicates: false },
-      );
+    // Save contact (ignore duplicates via unique index on lower(email)+source)
+    try {
+      await supabaseAdmin.from("email_contacts").insert({
+        email: email.toLowerCase(),
+        source: "coupon_popup",
+        language: lang,
+        metadata: { coupon_code: couponCode, discount },
+      });
+    } catch (e) {
+      console.log("Contact already saved or insert skipped:", e);
+    }
 
     // Send coupon email to customer
     const emailResponse = await resend.emails.send({

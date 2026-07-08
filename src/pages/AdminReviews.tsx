@@ -175,7 +175,8 @@ const AdminReviews = () => {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -28,7 +28,7 @@ import bonus3ImageAvif from "@/assets/bonus-3-pronunciation.avif";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
 
 // Product image
-import productSpanish5000Image from "@/assets/spanish-5000-cover.webp";
+import productSpanish5000Image from "@/assets/spanish-5000-physical-cover.webp";
 import productSpanish5000BundleImage from "@/assets/spanish-relax-physical-digital-bundle.webp";
 import productSpanish5000BundleImageAvif from "@/assets/spanish-relax-physical-digital-bundle.avif";
 import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.webp";

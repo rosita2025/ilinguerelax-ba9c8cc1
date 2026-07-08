@@ -18,6 +18,7 @@ const Product8000 = lazy(() => import("./pages/Product8000"));
 const Product5000Book = lazy(() => import("./pages/Product5000Book"));
 const Product8000Book = lazy(() => import("./pages/Product8000Book"));
 const ProductSpanish5000 = lazy(() => import("./pages/ProductSpanish5000"));
+const ProductSpanish5000Digital = lazy(() => import("./pages/ProductSpanish5000Digital"));
 const ProductSpanish3000VerbsBook = lazy(() => import("./pages/ProductSpanish3000VerbsBook"));
 const ProductSpanishGrammarPatterns = lazy(() => import("./pages/ProductSpanishGrammarPatterns"));
 const ProductSpanish1000Verbs = lazy(() => import("./pages/ProductSpanish1000Verbs"));
@@ -121,6 +122,7 @@ const App = () => (
                   <Route path="/products/5-000-palabras-libro-fisico" element={<Product5000Book />} />
                   <Route path="/products/8-000-palabras-libro-fisico" element={<Product8000Book />} />
                   <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductSpanish5000 />} />
+                  <Route path="/products/5-000-spanish-words-with-english-pronunciation-digital" element={<ProductSpanish5000Digital />} />
                   <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
                   <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />
                   <Route path="/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation" element={<ProductSpanish1000Verbs />} />

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { Star, CheckCircle, X, Trash2, Loader2, Lock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Star, CheckCircle, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+import { useAdminKey } from "@/components/admin/AdminGate";
 
 interface AdminReview {
   id: string;
@@ -19,28 +19,24 @@ interface AdminReview {
 }
 
 const AdminReviews = () => {
-  const [adminKey, setAdminKey] = useState("");
-  const [isAuth, setIsAuth] = useState(false);
+  const { adminKey } = useAdminKey();
   const [reviews, setReviews] = useState<AdminReview[]>([]);
-  const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
   const { toast } = useToast();
 
   const fetchReviews = async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("manage-reviews", {
         body: { action: "list", adminKey },
       });
       if (error) throw error;
       setReviews(data.reviews || []);
-      setIsAuth(true);
     } catch {
-      toast({ title: "Clave incorrecta o error de conexión", variant: "destructive" });
-    } finally {
-      setLoading(false);
+      toast({ title: "Error al cargar reseñas", variant: "destructive" });
     }
   };
+
+  useEffect(() => { void fetchReviews(); }, [adminKey]);
 
   const handleAction = async (action: "approve" | "reject" | "delete", reviewId: string) => {
     try {
@@ -57,34 +53,6 @@ const AdminReviews = () => {
 
   const filtered = reviews.filter(r => filter === "all" ? true : r.status === filter);
 
-  if (!isAuth) {
-    return (
-      <>
-        <AdminNav />
-        <div className="min-h-dvh flex items-center justify-center bg-background p-4">
-          <div className="bg-card border border-border rounded-xl p-8 max-w-sm w-full space-y-4">
-          <div className="text-center">
-            <Lock className="w-10 h-10 text-primary mx-auto mb-3" />
-            <h1 className="text-xl font-bold text-foreground">Admin Reseñas</h1>
-            <p className="text-sm text-muted-foreground mt-1">Ingresa la clave de administración</p>
-          </div>
-          <form onSubmit={(e) => { e.preventDefault(); fetchReviews(); }} className="space-y-3">
-            <Input
-              type="password"
-              value={adminKey}
-              onChange={(e) => setAdminKey(e.target.value)}
-              placeholder="Clave admin"
-            />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Entrar"}
-            </Button>
-          </form>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <AdminNav />
@@ -92,7 +60,6 @@ const AdminReviews = () => {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground mb-6">Moderación de Reseñas</h1>
 
-        {/* Filters */}
         <div className="flex gap-2 mb-6 flex-wrap">
           {(["pending", "approved", "rejected", "all"] as const).map((f) => (
             <Button
@@ -109,7 +76,6 @@ const AdminReviews = () => {
           ))}
         </div>
 
-        {/* Reviews list */}
         <div className="space-y-4">
           {filtered.length === 0 && (
             <p className="text-center text-muted-foreground py-8">No hay reseñas en esta categoría</p>
@@ -142,7 +108,6 @@ const AdminReviews = () => {
 
               <p className="text-sm text-foreground">"{review.review_text}"</p>
 
-              {/* Photos */}
               {review.photo_urls?.length > 0 && (
                 <div className="flex gap-2 flex-wrap">
                   {review.photo_urls.map((url, i) => (

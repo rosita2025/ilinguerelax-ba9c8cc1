@@ -341,7 +341,7 @@ const ProductSpanish5000 = () => {
                   className="w-full mt-3 text-sm md:text-base py-4 h-auto min-h-[52px] whitespace-normal border-2 border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
                 >
                   <span className="flex items-center justify-center gap-2 font-bold">
-                    Or get Digital Only — $29.99
+                    Or get Digital Only — $22
                   </span>
                 </Button>
               </div>

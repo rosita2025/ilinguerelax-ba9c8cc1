@@ -59,8 +59,10 @@ const AdminReviews = () => {
 
   if (!isAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="bg-card border border-border rounded-xl p-8 max-w-sm w-full space-y-4">
+      <>
+        <AdminNav />
+        <div className="min-h-dvh flex items-center justify-center bg-background p-4">
+          <div className="bg-card border border-border rounded-xl p-8 max-w-sm w-full space-y-4">
           <div className="text-center">
             <Lock className="w-10 h-10 text-primary mx-auto mb-3" />
             <h1 className="text-xl font-bold text-foreground">Admin Reseñas</h1>

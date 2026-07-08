@@ -732,7 +732,7 @@ const Product8000Book = () => {
       <ScrollToTop showAfter={500} />
 
       {/* WhatsApp Support Button */}
-      <WhatsAppButton />
+      <WhatsAppButton url="https://wa.link/zx3vwn" label="¿Dudas?" />
     </main>
   );
 };

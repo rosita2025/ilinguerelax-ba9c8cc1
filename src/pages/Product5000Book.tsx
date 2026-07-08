@@ -527,7 +527,7 @@ const Product5000Book = () => {
       />
       <SalesNotification />
       <ScrollToTop />
-      <WhatsAppButton />
+      <WhatsAppButton url="https://wa.link/iw9rv4" label="¿Dudas?" />
     </main>
   );
 };

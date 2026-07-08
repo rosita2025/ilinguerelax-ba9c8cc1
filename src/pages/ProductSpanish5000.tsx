@@ -919,7 +919,7 @@ const ProductSpanish5000 = () => {
       <ScrollToTop showAfter={500} />
 
       {/* WhatsApp Support Button */}
-      <WhatsAppButton />
+      <WhatsAppButton url="https://wa.link/7sr20t" label="Need help?" />
     </main>;
 };
 export default ProductSpanish5000;

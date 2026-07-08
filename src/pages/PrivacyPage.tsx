@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { Shield, Lock, Eye, Database, Mail, UserCheck, Cookie, Globe } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const sections = [
   {
@@ -161,13 +160,7 @@ const PrivacyPage = () => {
 
       <Footer />
       <WhatsAppButton />
-      <ExitIntentPopup
-        discount="10%"
-        couponCode="NEW10"
-        lang="es"
-        storageKey="exit_intent_privacy"
-      />
-    </div>
+</div>
   );
 };
 

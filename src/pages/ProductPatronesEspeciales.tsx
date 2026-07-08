@@ -6,7 +6,6 @@ import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2 } from "lucide-react";
@@ -675,8 +674,7 @@ const ProductPatronesEspeciales = () => {
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-      <ExitIntentPopup buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL} discount="10%" />
-      <WhatsAppButton />
+<WhatsAppButton />
       <ScrollToTop showAfter={500} />
     </main>
   );

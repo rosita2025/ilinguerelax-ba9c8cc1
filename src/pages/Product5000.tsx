@@ -17,7 +17,7 @@ import { CompactBuyCard } from "@/components/CompactBuyCard";
 // Lazy-loaded below-the-fold components for faster initial load
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const SalesNotification = lazy(() => import("@/components/SalesNotification"));
-const ExitIntentPopup = lazy(() => import("@/components/ExitIntentPopup").then(m => ({ default: m.ExitIntentPopup })));
+
 const CustomerReviewsCarousel = lazy(() => import("@/components/CustomerReviewsCarousel").then(m => ({ default: m.CustomerReviewsCarousel })));
 import { useCampaignPrice, readInitialCampaignCurrency } from "@/hooks/useCampaignPrice";
 import { Button } from "@/components/ui/button";
@@ -937,11 +937,7 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <Suspense fallback={null}>
-        <ExitIntentPopup
-          buyUrl={buyUrl}
-          discount="15%"
-        />
-      </Suspense>
+</Suspense>
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton url="https://wa.me/message/GMC4AXDBEUE3D1" label="¿Dudas?" />

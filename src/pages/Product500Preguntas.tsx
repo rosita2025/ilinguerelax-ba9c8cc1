@@ -8,7 +8,6 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { LiveViewers } from "@/components/LiveViewers";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { ProductReviews } from "@/components/ProductReviews";
@@ -272,8 +271,7 @@ const Product500Preguntas = () => {
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-      <ExitIntentPopup buyUrl={HOTMART_URL} discount="15%" />
-      <WhatsAppButton />
+<WhatsAppButton />
       <ScrollToTop showAfter={500} />
     </main>
   );

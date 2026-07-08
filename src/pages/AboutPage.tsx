@@ -3,7 +3,6 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookOpen, Heart, Target, Users, Award, Globe, Instagram, Facebook, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Helmet } from "react-helmet-async";
 
@@ -300,13 +299,7 @@ const AboutPage = () => {
 
       <Footer />
       <WhatsAppButton />
-      <ExitIntentPopup 
-        discount="10%"
-        couponCode="NEW10"
-        lang="es"
-        storageKey="exit_intent_about"
-      />
-    </main>
+</main>
   );
 };
 

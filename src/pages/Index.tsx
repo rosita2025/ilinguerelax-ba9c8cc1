@@ -9,7 +9,6 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { AllProductsReviews } from "@/components/AllProductsReviews";
 import { CoreanoLaunchBanner } from "@/components/CoreanoLaunchBanner";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useSpanishRelaxPixelPageView } from "@/hooks/useMetaPixel";
 
@@ -74,13 +73,7 @@ const Index = () => {
       <Contact />
       <Footer />
       <WhatsAppButton />
-      <ExitIntentPopup 
-        discount="10%"
-        couponCode="NEW10"
-        lang="es"
-        storageKey="exit_intent_home"
-      />
-    </main>
+</main>
   );
 };
 

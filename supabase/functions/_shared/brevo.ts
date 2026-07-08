@@ -31,16 +31,20 @@ export async function sendBrevoEmail(args: SendArgs): Promise<SendResult> {
     return { error: { message: "Missing LOVABLE_API_KEY or BREVO_API_KEY" } };
   }
 
-  const sender = parseAddress(args.from);
   const toList = Array.isArray(args.to) ? args.to : [args.to];
   const to = toList.map((t) => parseAddress(t));
 
-  const body: Record<string, unknown> = {
-    sender,
-    to,
-    subject: args.subject,
-    htmlContent: args.html,
-  };
+  const body: Record<string, unknown> = { to };
+  if (args.templateId) {
+    body.templateId = args.templateId;
+    if (args.params) body.params = args.params;
+    if (args.from) body.sender = parseAddress(args.from);
+    if (args.subject) body.subject = args.subject;
+  } else {
+    body.sender = parseAddress(args.from ?? "iLingue Relax <hola@ilinguerelax.com>");
+    body.subject = args.subject;
+    body.htmlContent = args.html;
+  }
   if (args.replyTo) body.replyTo = parseAddress(args.replyTo);
 
   const res = await fetch(`${GATEWAY_URL}/v3/smtp/email`, {

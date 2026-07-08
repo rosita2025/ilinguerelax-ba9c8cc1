@@ -23,6 +23,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
@@ -108,9 +109,23 @@ const BonusPreviewDialog = ({ title, subtitle, children }: { title: string; subt
   </Dialog>
 );
 
+const countryToFlag = (cc: string): string => {
+  if (!cc || cc.length !== 2) return "🌍";
+  const base = 0x1f1e6;
+  const A = "A".charCodeAt(0);
+  return String.fromCodePoint(
+    base + cc.toUpperCase().charCodeAt(0) - A,
+    base + cc.toUpperCase().charCodeAt(1) - A,
+  );
+};
+
 const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
+  const { currency, countryCode, formatPrice } = useI18n();
+  const localizedPrice = formatPrice(PRICE);
+  const localizedOriginal = formatPrice(ORIGINAL_PRICE);
+  const flag = countryToFlag(countryCode);
 
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words (Digital)",
@@ -462,11 +477,12 @@ const ProductSpanish5000Digital = () => {
 
       <StickyBuyBar
         productName="Spanish 5,000 Words — Digital PDF"
-        price={String(PRICE)}
-        originalPrice={String(ORIGINAL_PRICE)}
-        currencyCode="USD"
+        price={localizedPrice}
+        originalPrice={localizedOriginal}
+        currencyCode={currency}
+        flag={flag}
         onBuyClick={handleBuyNow}
-        ctaText="GET IT NOW"
+        ctaText={`GET IT NOW — ${localizedPrice}`}
         lang="en"
         rating={4.8}
         reviewCount={500}

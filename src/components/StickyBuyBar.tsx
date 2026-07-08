@@ -30,6 +30,8 @@ interface StickyBuyBarProps {
   currencyCode?: string;
   /** Allow user to dismiss the sticky bar (shows an X button). */
   dismissible?: boolean;
+  /** Country flag emoji shown next to the price (e.g. "🇺🇸", "🇨🇦"). */
+  flag?: string;
 }
 
 export const StickyBuyBar = ({
@@ -56,6 +58,7 @@ export const StickyBuyBar = ({
   calmMode = false,
   currencyCode = "USD",
   dismissible = false,
+  flag,
 }: StickyBuyBarProps) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
@@ -204,6 +207,7 @@ export const StickyBuyBar = ({
               {originalPrice && (
                 <span className="text-[10px] sm:text-[11px] text-muted-foreground line-through tabular-nums whitespace-nowrap">{originalPrice}</span>
               )}
+              {flag && <span className="text-sm leading-none" aria-hidden>{flag}</span>}
               <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {savingsLabel && (
@@ -349,6 +353,7 @@ export const StickyBuyBar = ({
                     {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
                   </span>
                 )}
+                {flag && <span className="text-base leading-none" aria-hidden>{flag}</span>}
                 <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>
               {!disabled && (

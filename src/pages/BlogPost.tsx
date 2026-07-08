@@ -31,7 +31,7 @@ const BlogPost = () => {
       .map((line, index) => {
         // Headers
         if (line.startsWith('# ')) {
-          return <h1 key={index} className="text-3xl font-bold mt-8 mb-4">{line.replace('# ', '')}</h1>;
+          return <h2 key={index} className="text-3xl font-bold mt-8 mb-4">{line.replace('# ', '')}</h2>;
         }
         if (line.startsWith('## ')) {
           return <h2 key={index} className="text-2xl font-bold mt-6 mb-3">{line.replace('## ', '')}</h2>;

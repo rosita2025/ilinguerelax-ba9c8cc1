@@ -344,39 +344,49 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
   const [state, setState] = useState<State>(() => {
     if (typeof window !== "undefined") {
       const forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
-      if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD);
+      if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD, "forced");
     }
     const cached = readCache();
-    if (cached) return build(cached.currency, cached.countryCode, priceUSD, originalUSD);
+    if (cached) return build(cached.currency, cached.countryCode, priceUSD, originalUSD, "cache");
     // No cache yet: use synchronous timezone guess so first paint already
     // shows the visitor's local currency (avoids the USD → local flicker).
     const guessedCountry = typeof window !== "undefined" ? guessCountryFromTimezone() : null;
     if (guessedCountry) {
       const guessedCurrency = COUNTRY_TO_CURRENCY[guessedCountry] || "USD";
-      return build(guessedCurrency, guessedCountry, priceUSD, originalUSD);
+      return build(guessedCurrency, guessedCountry, priceUSD, originalUSD, "timezone");
     }
-    return build("USD", "US", priceUSD, originalUSD);
+    return build("USD", "US", priceUSD, originalUSD, "fallback");
   });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
     if (forced && RATES[forced]) {
-      setState(build(forced, "", priceUSD, originalUSD));
+      setState(build(forced, "", priceUSD, originalUSD, "forced"));
       return;
     }
 
     let cancelled = false;
     (async () => {
       const detected = await detectOnce();
-      if (cancelled || !detected) return;
+      if (cancelled) return;
+      if (!detected) {
+        // Both IP providers failed — mark current state as fallback so the
+        // UI can nudge the user to pick their country manually.
+        setState((prev) =>
+          prev.detectionStatus === "manual" || prev.detectionStatus === "forced" || prev.detectionStatus === "cache"
+            ? prev
+            : { ...prev, detectionStatus: "fallback" },
+        );
+        return;
+      }
       const payload: CachedDetection = { currency: detected.currency, countryCode: detected.country, timestamp: Date.now() };
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch { /* ignore */ }
-      // Only re-render if IP detection actually changed the currency vs our
-      // synchronous guess — prevents an unnecessary re-paint.
       setState((prev) => {
-        if (prev.currency === detected.currency && prev.countryCode === detected.country) return prev;
-        return build(detected.currency, detected.country, priceUSD, originalUSD);
+        if (prev.currency === detected.currency && prev.countryCode === detected.country) {
+          return prev.detectionStatus === "ip" ? prev : { ...prev, detectionStatus: "ip" };
+        }
+        return build(detected.currency, detected.country, priceUSD, originalUSD, "ip");
       });
     })();
 
@@ -385,7 +395,7 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
       const detail = (e as CustomEvent).detail as string | undefined;
       const next = (detail || readCache()?.currency) as CampaignCurrency | undefined;
       if (next && RATES[next]) {
-        setState((prev) => build(next, prev.countryCode, priceUSD, originalUSD));
+        setState((prev) => build(next, prev.countryCode, priceUSD, originalUSD, "manual"));
       }
     };
     window.addEventListener("campaign-currency-change", onChange);
@@ -404,7 +414,7 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
     if (!RATES[c]) return;
     const payload: CachedDetection = { currency: c, countryCode: state.countryCode, timestamp: Date.now() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    setState(build(c, state.countryCode, priceUSD, originalUSD));
+    setState(build(c, state.countryCode, priceUSD, originalUSD, "manual"));
   };
 
   return { ...state, setCurrency };

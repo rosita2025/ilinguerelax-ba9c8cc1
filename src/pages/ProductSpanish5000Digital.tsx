@@ -109,9 +109,23 @@ const BonusPreviewDialog = ({ title, subtitle, children }: { title: string; subt
   </Dialog>
 );
 
+const countryToFlag = (cc: string): string => {
+  if (!cc || cc.length !== 2) return "🌍";
+  const base = 0x1f1e6;
+  const A = "A".charCodeAt(0);
+  return String.fromCodePoint(
+    base + cc.toUpperCase().charCodeAt(0) - A,
+    base + cc.toUpperCase().charCodeAt(1) - A,
+  );
+};
+
 const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
+  const { currency, countryCode, formatPrice } = useI18n();
+  const localizedPrice = formatPrice(PRICE);
+  const localizedOriginal = formatPrice(ORIGINAL_PRICE);
+  const flag = countryToFlag(countryCode);
 
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words (Digital)",

@@ -30,6 +30,8 @@ interface StickyBuyBarProps {
   currencyCode?: string;
   /** Allow user to dismiss the sticky bar (shows an X button). */
   dismissible?: boolean;
+  /** Country flag emoji shown next to the price (e.g. "🇺🇸", "🇨🇦"). */
+  flag?: string;
 }
 
 export const StickyBuyBar = ({
@@ -56,6 +58,7 @@ export const StickyBuyBar = ({
   calmMode = false,
   currencyCode = "USD",
   dismissible = false,
+  flag,
 }: StickyBuyBarProps) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;

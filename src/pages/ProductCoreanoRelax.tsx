@@ -337,7 +337,7 @@ const ProductCoreanoRelax = () => {
         subtitle="Resolvemos tus dudas sobre Coreano Sin Complicaciones"
       />
       <Footer />
-      <WhatsAppButton url="https://wa.me/message/GMC4AXDBEUE3D1" label="¿Dudas?" />
+      <WhatsAppButton url="https://wa.link/ghi4rw" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
 
       {/* Sticky Buy Bar */}

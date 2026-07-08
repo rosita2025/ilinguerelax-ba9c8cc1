@@ -376,7 +376,7 @@ const ProductSpanish5000Digital = () => {
       <section className="py-8 md:py-10 bg-background">
         <div className="container px-4 md:px-6 max-w-3xl">
           <a
-            href="/products/5-000-spanish-words-with-english-pronunciation"
+            href="/products/5-000-spanish-words-with-english-pronunciation-physical"
             className="block p-5 md:p-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5 hover:border-primary transition-all shadow-sm hover:shadow-md"
           >
             <div className="flex items-center justify-between gap-4">

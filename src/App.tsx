@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense, useEffect } from "react";
 import { useCartSync } from "@/hooks/useCartSync";
@@ -121,7 +121,8 @@ const App = () => (
                   <Route path="/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product8000 />} />
                   <Route path="/products/5-000-palabras-libro-fisico" element={<Product5000Book />} />
                   <Route path="/products/8-000-palabras-libro-fisico" element={<Product8000Book />} />
-                  <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductSpanish5000 />} />
+                  <Route path="/products/5-000-spanish-words-with-english-pronunciation-physical" element={<ProductSpanish5000 />} />
+                  <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<Navigate to="/products/5-000-spanish-words-with-english-pronunciation-physical" replace />} />
                   <Route path="/products/5-000-spanish-words-with-english-pronunciation-digital" element={<ProductSpanish5000Digital />} />
                   <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
                   <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />

@@ -17,10 +17,18 @@ import { CountryFlagSelector } from "@/components/CountryFlagSelector";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
-
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
+import mapaVocales2 from "@/assets/Mapa-mental-2.webp.asset.json";
+import mapaConsonantes from "@/assets/Mapa-mental-3.webp.asset.json";
+import mapaPaises from "@/assets/Mapa-mental-5.webp.asset.json";
+import mapaTransporte from "@/assets/Mapa-mental-20.webp.asset.json";
+import mapaRestaurantes from "@/assets/Mapa-mental-47.webp.asset.json";
+import bonoHangul from "@/assets/Bono-1-hangul.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { Eye } from "lucide-react";
 import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCoreano";
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 

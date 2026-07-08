@@ -152,6 +152,7 @@ const App = () => (
                   <Route path="/dejar-resena" element={<DejarResena />} />
                   <Route path="/admin/reviews" element={<AdminReviews />} />
                   <Route path="/admin/funnel" element={<AdminFunnel />} />
+                  <Route path="/admin/seo" element={<AdminSEO />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

@@ -106,6 +106,7 @@ const App = () => (
           <BrowserRouter>
             <CartSyncWrapper>
               <RouteTracker />
+              <BrevoChatToggle />
               <CookieConsent />
               <Suspense fallback={<PageFallback />}>
                 <Routes>

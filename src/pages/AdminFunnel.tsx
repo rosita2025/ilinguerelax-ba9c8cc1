@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, BarChart3, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdminNav from "@/components/admin/AdminNav";
 
 interface FunnelReport {
   days: number;

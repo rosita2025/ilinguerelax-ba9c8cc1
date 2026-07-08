@@ -79,6 +79,19 @@ export const StickyBuyBar = ({
   const [pulse, setPulse] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [priceFlash, setPriceFlash] = useState(false);
+  const flagEmojiStyle = {
+    fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+  } as const;
+  const flagBadge = flag ? (
+    <span
+      role="img"
+      aria-label={`${currencyCode} country flag`}
+      className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-1.5 text-lg leading-none shadow-sm"
+      style={flagEmojiStyle}
+    >
+      {flag}
+    </span>
+  ) : null;
 
   // Subtle pulse every 6s to grab attention without being annoying
   useEffect(() => {
@@ -168,6 +181,11 @@ export const StickyBuyBar = ({
           className={`w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 ${calmMode ? '' : 'animate-pulse'} ${priceFlash ? 'ring-4 ring-amber-300 scale-110' : ''}`}
         >
           <ShoppingCart className="w-5 h-5" />
+          {flag && (
+            <span role="img" aria-label={`${currencyCode} country flag`} className="text-base leading-none" style={flagEmojiStyle}>
+              {flag}
+            </span>
+          )}
           <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
         </button>
         {isPhysical && (
@@ -207,7 +225,7 @@ export const StickyBuyBar = ({
               {originalPrice && (
                 <span className="text-[10px] sm:text-[11px] text-muted-foreground line-through tabular-nums whitespace-nowrap">{originalPrice}</span>
               )}
-              {flag && <span className="text-sm leading-none" aria-hidden>{flag}</span>}
+              {flagBadge}
               <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {savingsLabel && (
@@ -353,7 +371,7 @@ export const StickyBuyBar = ({
                     {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
                   </span>
                 )}
-                {flag && <span className="text-base leading-none" aria-hidden>{flag}</span>}
+                {flagBadge}
                 <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>
               {!disabled && (

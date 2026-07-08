@@ -469,41 +469,22 @@ const ProductSpanish5000 = () => {
                     ))}
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">$29.99</span>
+                    <span className="text-4xl font-bold text-foreground">$22</span>
                     <span className="text-lg text-muted-foreground line-through">$54.00</span>
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 44%</span>
+                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 59%</span>
                   </div>
-                  <Button
-                    size="xl"
-                    variant="hero"
-                    className="w-full"
-                    disabled={isCreatingDigitalCheckout}
-                    onClick={async () => {
-                      if (isCreatingDigitalCheckout) return;
-
-                      try {
-                        setIsCreatingDigitalCheckout(true);
-                        trackHotmartEvent("InitiateCheckout", { content_name: "Spanish 5000 Digital Only", value: 29.99, currency: "USD" });
-                        const { data, error } = await supabase.functions.invoke("create-spanish-digital-only", { body: {} });
-                        if (error) throw error;
-                        if (data?.url) {
-                          window.location.assign(data.url);
-                          return;
-                        }
-                        throw new Error("Checkout URL not returned");
-                      } catch (e) {
-                        console.error("Digital-only checkout error:", e);
-                        setIsCreatingDigitalCheckout(false);
-                      }
-                    }}
-                  >
-                    <CreditCard className="w-5 h-5" />
-                    {isCreatingDigitalCheckout ? "Opening checkout..." : "Buy Digital Only — $29.99"}
+                  <Button asChild size="xl" variant="hero" className="w-full">
+                    <a href="/products/5-000-spanish-words-with-english-pronunciation-digital">
+                      <CreditCard className="w-5 h-5" />
+                      View Digital Version — $22
+                      <ArrowRight className="w-5 h-5" />
+                    </a>
                   </Button>
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
-                    <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure Stripe checkout</span>
+                    <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure checkout</span>
                     <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> Instant access</span>
                   </div>
+
                 </div>
               </div>
             </div>

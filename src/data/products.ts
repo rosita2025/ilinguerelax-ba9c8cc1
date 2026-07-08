@@ -172,7 +172,7 @@ export const products: Product[] = [
     name: "5,000 Words (Digital)",
     flag: "🇪🇸",
     country: "Spanish for English Speakers",
-    image: "/images/product-spanish-5000.webp",
+    image: "/images/product-spanish-5000-digital.webp",
     title: "Spanish Relax - 5,000 Words (Digital PDF)",
     subtitle: "Digital PDF · Instant download",
     description: "With English Pronunciation",

@@ -51,6 +51,7 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminReviews = lazy(() => import("./pages/AdminReviews"));
 const AdminFunnel = lazy(() => import("./pages/AdminFunnel"));
+const AdminSEO = lazy(() => import("./pages/AdminSEO"));
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
 

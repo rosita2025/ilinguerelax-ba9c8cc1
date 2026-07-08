@@ -32,30 +32,52 @@ interface Props {
   className?: string;
 }
 
-/** Manual country/flag picker for LatAm + USA, Canadá y España. */
+/** Compact country/currency picker. IP-detected by default; user can override. */
 export const CountryFlagSelector = ({ campaign, className = "" }: Props) => {
+  const current =
+    COUNTRIES.find(
+      (c) => c.currency === campaign.currency && c.code === campaign.countryCode,
+    ) ||
+    COUNTRIES.find((c) => c.currency === campaign.currency) ||
+    COUNTRIES[0];
+
   return (
-    <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
-      <span className="text-[11px] text-muted-foreground mr-1 w-full sm:w-auto">Elige tu país:</span>
-      {COUNTRIES.map((c) => {
-        const active = campaign.currency === c.currency && campaign.countryCode === c.code;
-        return (
-          <button
-            key={c.code}
-            type="button"
-            onClick={() => campaign.setCurrency(c.currency)}
-            className={`text-[11px] font-semibold px-2 py-1 rounded-full border transition-colors ${
-              active
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-foreground border-border hover:bg-muted"
-            }`}
-            aria-pressed={active}
-            title={c.label}
-          >
-            {c.flag} {c.label}
-          </button>
-        );
-      })}
+    <div className={`flex items-center gap-2 ${className}`}>
+      <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+        Detectado por tu ubicación:
+      </span>
+      <label className="relative inline-flex items-center">
+        <span className="pointer-events-none absolute left-2 text-sm">
+          {current.flag}
+        </span>
+        <select
+          value={`${current.code}|${current.currency}`}
+          onChange={(e) => {
+            const [, cur] = e.target.value.split("|");
+            campaign.setCurrency(cur as CampaignCurrency);
+          }}
+          aria-label="Cambiar país y moneda"
+          className="appearance-none pl-8 pr-6 py-1 rounded-full border border-border bg-background text-foreground text-[11px] font-semibold hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
+        >
+          {COUNTRIES.map((c) => (
+            <option key={c.code} value={`${c.code}|${c.currency}`}>
+              {c.flag} {c.label} ({c.currency})
+            </option>
+          ))}
+        </select>
+        <svg
+          className="pointer-events-none absolute right-1.5 w-3 h-3 text-muted-foreground"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </label>
     </div>
   );
 };

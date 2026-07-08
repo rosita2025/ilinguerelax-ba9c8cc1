@@ -1,68 +1,105 @@
-# Protección durante los 7 días de reembolso Hotmart
+# Plan de optimización SEO – iLingue Relax
 
-## Objetivo
-Durante los primeros 7 días desde la compra (ventana de reembolso Hotmart), el cliente **solo puede ver** el PDF en pantalla con marca de agua (su email + fecha), **sin botón de descarga ni imprimir**. Pasados los 7 días, se desbloquean los botones de descarga e impresión.
+Basado en la auditoría real del sitio (Lighthouse + agentes SEO + Google Search Console). Priorizado por impacto: primero lo que arregla lo que está roto hoy, después mejoras estructurales, y al final el link building.
 
-## Cómo funcionará (vista del cliente)
+## Fase 1 · Fixes técnicos detectados por el escáner (impacto directo)
 
-1. Hotmart envía al cliente un correo con:
-   - Enlace a `/descarga/coreano-100-mapas`
-   - Su **email de compra** y **ID de pedido Hotmart** (transaction code)
-2. En la página, el cliente ingresa `email` + `ID de pedido` (reemplaza la clave `123456` genérica).
-3. Backend valida contra la tabla de compras registradas por Hotmart.
-4. Según los días transcurridos:
-   - **Días 0–7**: modo *previsualización*. Se muestra el PDF con `react-pdf` en un visor, con marca de agua diagonal repetida (email del comprador + fecha). Sin botones de descarga ni imprimir; atajos Ctrl+P / clic derecho bloqueados por CSS/JS.
-   - **Día 8 en adelante**: se muestra un cartel "Ya finalizó tu período de reembolso — ahora puedes descargar e imprimir libremente" con los 3 botones (PDF principal + 2 bonos).
+**1. Sitemap desactualizado** (`public/sitemap.xml`)
+Faltan estas rutas reales del sitio:
+- `/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles`
+- `/products/100-mapas-mentales-para-aprender-coreano-hangul-c1`
+- `/products/estructuras-gramaticales-ingles-a1-c1`
+- `/descarga/coreano-100-mapas`
+- `/vista-previa/patrones-especiales`
+- `/vista-previa/coreano-100-mapas-mentales`
 
-## Cómo se registra la compra
-- Edge function `hotmart-purchase-webhook` (nueva). Hotmart la llama al aprobar la compra.
-- Guarda en tabla `hotmart_purchases`: `email`, `transaction_code`, `product_code`, `purchased_at`, `status` (approved / refunded / cancelled).
-- Si Hotmart notifica reembolso o chargeback, se marca `refunded` y el acceso queda bloqueado permanentemente.
+Además hay que revisar que todas las rutas activas en `src/App.tsx` estén, y quitar las obsoletas. Se mantiene el archivo estático (no se migra a generador sin confirmar).
 
-## Cómo se valida el acceso
-- Edge function `verify-coreano-access`. Recibe `email` + `transaction_code`, devuelve:
-  - `status`: `preview_only` (< 7 días), `full_access` (≥ 7 días), `refunded`, `not_found`.
-  - Un **token firmado de corta duración** (JWT propio, 30 min) que la página usa para pedir el PDF con marca de agua o los archivos completos.
-- El PDF de previsualización se genera al vuelo desde el edge function con `pdf-lib`, aplicando marca de agua con el email del comprador en cada página. El PDF original nunca sale del servidor durante los 7 días.
+**2. Múltiples H1 en el mismo documento**
+- `src/pages/BlogPost.tsx` → el markdown convierte `#` a `<h1>` dentro del post, además del H1 del título. Cambiar renderer para mapear `#` a `<h2>`.
+- `src/pages/BlogPost.tsx` → "Recursos Recomendados" pasa de `<h3>` a `<h2>` para jerarquía correcta.
 
-## Limitaciones honestas
-- Nada evita capturas de pantalla o grabación de pantalla — pero la **marca de agua con email** disuade fuertemente porque cualquier fuga se rastrea al comprador.
-- Ctrl+P y "guardar como" desde el visor se bloquean, pero un usuario técnico puede sortearlo con DevTools. El sistema cubre al 95 %+ de compradores reales.
-- Requiere que Hotmart envíe el `transaction_code` al comprador (ya lo hace por defecto en el email de confirmación).
+**3. Alt text genérico o corto en imágenes**
+- `src/pages/Index.tsx` → alt del ticker de logos: "Amazon" → "Amazon partner store", etc.
+- `src/pages/Product5000.tsx` → previews cambian de una palabra a frase descriptiva ("Vocabulario" → "Vista previa vocabulario inglés").
+
+**4. Meta titles y descriptions demasiado largos**
+- Producto 5000 palabras y 8000 palabras: `<title>` >60 chars → recortar.
+- Descriptions >160 chars → reescribir dentro del rango 50–160.
+
+**5. LCP lento (Lighthouse Performance)**
+- En cada hero (Home, productos principales) la imagen LCP recibe `width`, `height`, `fetchpriority="high"` y se le quita `loading="lazy"`.
+- Fuente Plus Jakarta Sans ya tiene `preload` — añadir `font-display: swap` si falta.
+
+**6. Contraste bajo (Lighthouse Accessibility)**
+- Reemplazar utilidades arbitrarias `text-gray-300/400`, `text-muted-foreground/50` por tokens semánticos (`text-foreground`, `text-muted-foreground` sin opacidad) donde el contraste falla.
+
+## Fase 2 · Canonical y OG por página (react-helmet-async)
+
+El componente `SEO` ya usa Helmet. Auditar en cada `Product*.tsx` que:
+- `canonicalUrl` apunta a la URL real de esa ruta (no a `/`).
+- `og:url` = canonical.
+- `og:image` absoluta con `https://ilinguerelax.com/...` (no rutas relativas).
+
+Se corrigen las páginas donde `canonical` u `og:url` apunten a otra ruta.
+
+## Fase 3 · Datos estructurados (JSON-LD) por página
+
+Hoy en `index.html` hay Organization, WebSite, FAQPage, BreadcrumbList y un Product hardcodeado (solo del producto 5000). Se mueve a **por ruta** vía Helmet:
+
+- **Product pages** (todos los `/products/*`): schema `Product` con `name`, `image`, `offers.price`, `offers.priceCurrency`, `aggregateRating` real, `brand`.
+- **BlogPost**: schema `Article` con `headline`, `datePublished`, `author`, `image`.
+- **Blog index**: `Blog` schema con `blogPost[]`.
+- **FAQ pages**: `FAQPage` schema con las preguntas reales de la página, no las del index.
+- **Breadcrumbs**: `BreadcrumbList` por ruta profunda.
+
+Se quita el `Product` hardcodeado global de `index.html` para no duplicar señales.
+
+## Fase 4 · URLs y navegación interna
+
+- URLs ya son amigables (`/products/nombre-largo-descriptivo`) — no se cambian para no romper indexación.
+- **Enlaces internos**: cada página de producto enlaza a 2–3 productos relacionados por idioma/nivel (cross-sell ya existe, se asegura `<a href>` real, no solo botones onClick).
+- Blog posts añaden enlaces internos a la página del producto que mencionan.
+- Footer con navegación por categorías (Idiomas, Libros físicos, Libros digitales, Blog) usando `<Link>` real.
+- Breadcrumbs visibles en producto y blog (además del schema).
+
+## Fase 5 · Rendimiento / Core Web Vitals
+
+- Todas las imágenes no-hero con `loading="lazy"` + `decoding="async"` + `width`/`height` explícitos para evitar CLS.
+- Componentes pesados en productos (`ProductReviews`, `FAQ`, `CustomerReviewsCarousel`) con `lazy()` + `Suspense` (ya se hace en algunos, se extiende).
+- Revisar `preconnect` en `index.html` — ya está para fonts y Facebook; añadir para Hotmart si es el destino de compra.
+
+## Fase 6 · Accesibilidad transversal
+
+- Botones con solo ícono (Navbar, Cart) reciben `aria-label`.
+- Un solo `<main>` por ruta (auditar `pages/*` — algunos envuelven dos veces).
+- Foco visible en todos los interactivos (usar tokens shadcn, no `outline:none`).
+- Verificar tap targets ≥44px en móvil (bottom bar, WhatsApp, ScrollToTop).
+
+## Fase 7 · robots.txt y Google Search Console
+
+- `public/robots.txt`: verificar que permite `/`, bloquea `/admin/*`, y declara `Sitemap: https://ilinguerelax.com/sitemap.xml`.
+- **Google Search Console no está conectado** — se pide al usuario autorizar el conector en un paso separado (no se puede hacer sin su OAuth). Después se sube el sitemap desde GSC.
+
+## Fase 8 · Marcado de findings como fixed
+
+Después de aplicar cada fix, se marcan como `fixed` en el escáner SEO para que la próxima corrida los verifique.
+
+---
+
+## Fuera de alcance de esta implementación
+
+- **Link building externo** (backlinks desde otros sitios): es trabajo de marketing/outreach, no de código. Puedo generar una lista de tácticas y objetivos pero no se implementa en el repo.
+- **Google Search Console**: requiere OAuth del dueño del dominio. Se pide en su propio turno.
+- **SSR / previews sociales exactas por ruta**: el stack actual es SPA Vite. Helmet cubre Googlebot; Facebook/LinkedIn ven solo `index.html`. Migrar a SSR es un proyecto aparte — no incluido.
 
 ## Detalles técnicos
 
-**Nueva tabla `hotmart_purchases`** (RLS habilitado, solo edge functions con service role):
-```
-id, email (citext), transaction_code (unique), product_code,
-purchased_at, refund_deadline (purchased_at + 7 días),
-status ('approved'|'refunded'|'cancelled'|'chargeback'),
-created_at, updated_at
-```
+- Stack: React 18 + Vite + React Router + react-helmet-async (ya instalado).
+- Escáner: Lighthouse + agentes internos + GSC (pendiente conectar).
+- Findings actuales: 6 (2 low, 4 mid). Fase 1 los resuelve todos menos GSC.
+- No se migra el sitemap de estático a generador sin confirmación explícita del usuario.
 
-**Nuevas edge functions:**
-- `hotmart-purchase-webhook`: recibe eventos `PURCHASE_APPROVED`, `PURCHASE_REFUNDED`, `PURCHASE_CHARGEBACK` y actualiza la tabla. Valida `HOTMART_WEBHOOK_TOKEN`.
-- `verify-coreano-access`: valida email + transaction_code, devuelve estado + JWT firmado.
-- `serve-coreano-preview`: recibe el JWT, devuelve el PDF con marca de agua (solo durante los 7 días).
+## Confirmación
 
-**Cambios en `src/pages/DescargaCoreano.tsx`:**
-- Reemplazar el formulario de clave por dos campos: email + transaction_code.
-- Añadir visor `react-pdf` para modo previsualización, con `sandbox` y sin controles de descarga.
-- Mostrar los 3 botones de descarga solo cuando `status === 'full_access'`.
-- Bloqueos front-end: `oncontextmenu`, `@media print { body { display: none } }`, listeners para Ctrl+P / Ctrl+S.
-
-**Secrets requeridos:**
-- `HOTMART_WEBHOOK_TOKEN` (te lo da Hotmart al configurar el webhook).
-- `COREANO_ACCESS_JWT_SECRET` (se genera automáticamente).
-
-## Configuración manual que necesitarás hacer tú en Hotmart
-1. Ir a Hotmart → Herramientas → Webhooks (Postback).
-2. Añadir la URL del webhook que te daré tras desplegar la edge function.
-3. Activar los eventos: `PURCHASE_APPROVED`, `PURCHASE_REFUNDED`, `PURCHASE_CHARGEBACK`, `PURCHASE_CANCELED`.
-4. Copiar el token de Hotmart y pegarlo cuando te pida `HOTMART_WEBHOOK_TOKEN`.
-5. Ajustar el email de confirmación de Hotmart para que incluya al comprador: su email, el `transaction_code` y el enlace `/descarga/coreano-100-mapas`.
-
-## Fuera de alcance (podemos hacerlo después)
-- DRM real tipo Adobe / Locklizard (requiere servicio externo de pago).
-- Bloqueo por cantidad de dispositivos o IP.
-- Expiración total del acceso pasado X tiempo.
+¿Procedo con **Fase 1–6 completa** en este turno? La Fase 7 (GSC) queda para cuando autorices el conector, y el link building externo queda como lista de recomendaciones sin código.

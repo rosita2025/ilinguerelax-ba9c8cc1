@@ -322,8 +322,8 @@ const Product5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Inglés Relax: 5,000 Palabras con Pronunciación Español y Fonética UK/USA"
-        description="Libro digital con 5,000 palabras en inglés y pronunciación para hispanohablantes. Fonética UK/USA, 52 capítulos, estructuras gramaticales desde Nivel Cero hasta Avanzado C1 y 5 regalos. Descarga inmediata, paga en moneda local."
+        title="5.000 Palabras en Inglés con Pronunciación ES"
+        description="Libro digital con 5.000 palabras en inglés, pronunciación adaptada al español y fonética UK/USA. 52 capítulos y descarga inmediata."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/images/product-5000.webp"
         type="product"
@@ -682,7 +682,7 @@ const Product5000 = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewIndice} alt="Índice Completo" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                  <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
                   <h4 className="font-bold text-foreground text-sm">Índice Completo</h4>
@@ -691,7 +691,7 @@ const Product5000 = () => {
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewVocabulario} alt="Vocabulario" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                  <img src={previewVocabulario} alt="Vista previa del vocabulario inglés con pronunciación" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
                   <h4 className="font-bold text-foreground text-sm">5,000 Palabras</h4>

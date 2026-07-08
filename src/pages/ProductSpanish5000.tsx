@@ -311,7 +311,7 @@ const ProductSpanish5000 = () => {
                   type="button"
                   size="xl"
                   onClick={handleBuyNow}
-                  className="w-full text-base md:text-lg py-6 px-4 h-auto min-h-[64px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(147,51,234,0.45)] bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition-all hover:scale-[1.02] active:scale-[0.99]"
+                  className="w-full text-base md:text-lg py-6 px-4 h-auto min-h-[64px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(234,179,8,0.45)] bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border border-amber-500 transition-all hover:scale-[1.02] active:scale-[0.99]"
                 >
                   <span className="flex items-center justify-center gap-2 font-black">
                     <ShoppingCart className="w-5 h-5" />

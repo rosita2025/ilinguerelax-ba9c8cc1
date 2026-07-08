@@ -23,6 +23,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";

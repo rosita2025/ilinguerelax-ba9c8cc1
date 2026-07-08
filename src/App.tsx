@@ -151,6 +151,7 @@ const App = () => (
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />
+                  <Route path="/admin" element={<AdminHome />} />
                   <Route path="/admin/reviews" element={<AdminReviews />} />
                   <Route path="/admin/funnel" element={<AdminFunnel />} />
                   <Route path="/admin/seo" element={<AdminSEO />} />

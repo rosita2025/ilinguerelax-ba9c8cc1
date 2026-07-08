@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Star, Search, LayoutDashboard } from "lucide-react";
+import { BarChart3, Star, Search, LayoutDashboard, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAdminKey } from "./AdminGate";
 
 const tabs = [
   { to: "/admin", label: "Inicio", icon: LayoutDashboard, end: true },
@@ -10,12 +11,13 @@ const tabs = [
 ];
 
 export const AdminNav = () => {
+  const { logout } = useAdminKey();
   return (
     <nav className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center gap-1 h-14 overflow-x-auto">
           <span className="font-bold text-sm mr-4 shrink-0">iLingue · Admin</span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-1">
             {tabs.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
@@ -35,6 +37,14 @@ export const AdminNav = () => {
               </NavLink>
             ))}
           </div>
+          <button
+            onClick={logout}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground shrink-0"
+            title="Cerrar sesión"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Salir</span>
+          </button>
         </div>
       </div>
     </nav>

@@ -36,7 +36,7 @@ const AdminHome = () => {
           <header>
             <h1 className="text-3xl font-bold">Panel de administración</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Todas tus herramientas internas en un solo lugar.
+              Todas tus herramientas internas en un solo lugar. La sesión queda activa hasta que cierres el navegador o pulses "Salir".
             </p>
           </header>
 
@@ -54,14 +54,6 @@ const AdminHome = () => {
               </Link>
             ))}
           </div>
-
-          <Card className="p-6 bg-muted/40">
-            <h3 className="font-semibold mb-2">Clave de administración</h3>
-            <p className="text-sm text-muted-foreground">
-              Cada panel te pedirá la misma clave (<code className="text-xs bg-background px-1.5 py-0.5 rounded">ADMIN_REVIEW_KEY</code>).
-              Si la olvidaste, pídele al asistente de Lovable que la actualice.
-            </p>
-          </Card>
         </div>
       </main>
     </>

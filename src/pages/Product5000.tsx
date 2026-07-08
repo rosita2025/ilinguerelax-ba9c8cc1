@@ -368,7 +368,7 @@ const Product5000 = () => {
               <div className="mt-4 text-center">
                 <h3 className="text-xl font-bold text-white">{previewImages[currentImageIndex]?.title}</h3>
                 <p className="text-white/70 mt-1">{previewImages[currentImageIndex]?.subtitle}</p>
-                <p className="text-white/50 text-sm mt-2">
+                <p className="text-white/75 text-sm mt-2">
                   {currentImageIndex + 1} / {previewImages.length}
                 </p>
               </div>
@@ -423,7 +423,7 @@ const Product5000 = () => {
                 </div>
                 <h3 className="text-xl font-bold text-white">{bonuses[currentBonusIndex]?.title}</h3>
                 <p className="text-white/70 mt-1 max-w-md">{bonuses[currentBonusIndex]?.description}</p>
-                <p className="text-white/50 text-sm mt-2">
+                <p className="text-white/75 text-sm mt-2">
                   {currentBonusIndex + 1} / {bonuses.length}
                 </p>
               </div>

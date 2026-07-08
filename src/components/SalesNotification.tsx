@@ -217,7 +217,7 @@ const SalesNotification = ({
                 <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">
                   {currentSale.name}
                 </p>
-                <span className="text-[9px] md:text-[10px] text-gray-400">•</span>
+                <span className="text-[9px] md:text-[10px] text-muted-foreground">•</span>
                 <p className="text-[9px] md:text-[10px] text-gray-500 truncate">
                   {currentSale.country}
                 </p>
@@ -235,7 +235,7 @@ const SalesNotification = ({
                     {lang === "en" ? "live now" : "en vivo"}
                   </span>
                 ) : (
-                  <span className="text-[8px] md:text-[9px] text-gray-400">
+                  <span className="text-[8px] md:text-[9px] text-muted-foreground">
                     {lang === "en" ? (currentSale.timeAgoEn ?? currentSale.timeAgo) : currentSale.timeAgo}
                   </span>
                 )}

@@ -576,7 +576,7 @@ const ProductSpanish5000 = () => {
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
                     <span className="text-4xl font-bold">$15</span>
-                    <span className="text-lg text-white/50 line-through">$45</span>
+                    <span className="text-lg text-white/75 line-through">$45</span>
                     <span className="text-xs font-bold text-accent bg-accent/15 px-2 py-1 rounded-full">SAVE 67%</span>
                   </div>
                   <Button asChild size="xl" variant="hero" className="w-full">

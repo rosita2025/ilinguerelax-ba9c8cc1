@@ -37,8 +37,8 @@ const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 const MeetTheAuthor = lazy(() => import("@/components/MeetTheAuthor").then(m => ({ default: m.MeetTheAuthor })));
 
-const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/dRmfZg2OI6Xb5yM6e18IU0d";
-const PRICE = 25;
+const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
+const PRICE = 22;
 const ORIGINAL_PRICE = 35;
 const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
 
@@ -148,8 +148,8 @@ const ProductSpanish5000Digital = () => {
         <link rel="preload" as="image" href={productDigitalImage} />
       </Helmet>
       <SEO
-        title="Spanish Relax — 5,000 Spanish Words (Digital PDF) · $25"
-        description="Digital-only PDF: 5,000 essential Spanish words with English pronunciation. 3 free bonuses included. Special launch price $25 (was $35). Instant download."
+        title="Spanish Relax — 5,000 Spanish Words (Digital PDF) · $22"
+        description="Digital-only PDF: 5,000 essential Spanish words with English pronunciation. 3 free bonuses included. Special launch price $22 (was $35). Instant download."
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
         image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
@@ -412,7 +412,7 @@ const ProductSpanish5000Digital = () => {
             },
             {
               question: "What's the difference between this and the physical book version?",
-              answer: "This is the DIGITAL-ONLY edition (PDF). No shipping, no waiting: instant download for $25. The physical book version is a separate product and includes the printed edition plus the digital PDF free.",
+              answer: "This is the DIGITAL-ONLY edition (PDF). No shipping, no waiting: instant download for $22. The physical book version is a separate product and includes the printed edition plus the digital PDF free.",
               icon: FileText,
             },
             {

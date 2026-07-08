@@ -132,7 +132,7 @@ const ProductSpanish5000 = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 34.99,
+    value: 33,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -140,7 +140,7 @@ const ProductSpanish5000 = () => {
   useTrackProductView({
     productId: "product-spanish-5000",
     productName: "Spanish Relax - 5,000 Words",
-    price: 34.99,
+    price: 33,
     currency: "USD",
     category: "Digital Book",
   });
@@ -198,7 +198,7 @@ const ProductSpanish5000 = () => {
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
       </Helmet>
-      <SEO title="Spanish Relax — 5,000 Words with English Pronunciation (Physical Book)" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="Spanish Relax, 5000 Spanish words physical book, learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation" />
+      <SEO title="Spanish Relax — 5,000 Words with English Pronunciation (Physical Book)" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="33" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="Spanish Relax, 5000 Spanish words physical book, learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation" />
       <Navbar />
 
       {/* Hero Section */}

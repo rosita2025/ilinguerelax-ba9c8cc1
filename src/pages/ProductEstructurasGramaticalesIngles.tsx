@@ -345,7 +345,7 @@ const ProductEstructurasGramaticalesIngles = () => {
               </motion.figure>
             ))}
           </div>
-          <p className="text-center text-xs text-white/50 mt-6">
+          <p className="text-center text-xs text-white/75 mt-6">
             Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
           </p>
         </div>
@@ -449,7 +449,7 @@ const ProductEstructurasGramaticalesIngles = () => {
                 </p>
 
                 <div className="flex items-baseline justify-center gap-3 mb-2">
-                  <span className="text-base text-white/50 line-through">Antes US$59</span>
+                  <span className="text-base text-white/75 line-through">Antes US$59</span>
                   <span className="px-2 py-0.5 rounded-full bg-[#f5d57a] text-[#04102a] text-[11px] font-black uppercase">
                     Hoy -80%
                   </span>

@@ -477,11 +477,12 @@ const ProductSpanish5000Digital = () => {
 
       <StickyBuyBar
         productName="Spanish 5,000 Words — Digital PDF"
-        price={String(PRICE)}
-        originalPrice={String(ORIGINAL_PRICE)}
-        currencyCode="USD"
+        price={localizedPrice}
+        originalPrice={localizedOriginal}
+        currencyCode={currency}
+        flag={flag}
         onBuyClick={handleBuyNow}
-        ctaText="GET IT NOW"
+        ctaText={`GET IT NOW — ${localizedPrice}`}
         lang="en"
         rating={4.8}
         reviewCount={500}

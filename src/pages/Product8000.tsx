@@ -689,7 +689,7 @@ const Product8000 = () => {
       <ScrollToTop showAfter={500} />
 
       {/* WhatsApp Support Button */}
-      <WhatsAppButton />
+      <WhatsAppButton url="https://wa.link/48yzry" label="¿Dudas?" />
     </main>);
 
 };

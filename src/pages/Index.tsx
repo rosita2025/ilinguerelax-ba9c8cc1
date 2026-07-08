@@ -73,13 +73,7 @@ const Index = () => {
       <Contact />
       <Footer />
       <WhatsAppButton />
-      <ExitIntentPopup 
-        discount="10%"
-        couponCode="NEW10"
-        lang="es"
-        storageKey="exit_intent_home"
-      />
-    </main>
+</main>
   );
 };
 

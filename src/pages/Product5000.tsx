@@ -937,11 +937,7 @@ const Product5000 = () => {
 
       {/* Exit Intent Popup */}
       <Suspense fallback={null}>
-        <ExitIntentPopup
-          buyUrl={buyUrl}
-          discount="15%"
-        />
-      </Suspense>
+</Suspense>
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton url="https://wa.me/message/GMC4AXDBEUE3D1" label="¿Dudas?" />

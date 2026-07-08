@@ -120,13 +120,7 @@ const FAQPage = () => {
       </motion.main>
       <Footer />
       <WhatsAppButton />
-      <ExitIntentPopup 
-        discount="10%"
-        couponCode="NEW10"
-        lang="es"
-        storageKey="exit_intent_faq"
-      />
-    </div>
+</div>
   );
 };
 

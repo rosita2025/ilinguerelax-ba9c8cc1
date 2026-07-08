@@ -674,8 +674,7 @@ const ProductPatronesEspeciales = () => {
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-      <ExitIntentPopup buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL} discount="10%" />
-      <WhatsAppButton />
+<WhatsAppButton />
       <ScrollToTop showAfter={500} />
     </main>
   );

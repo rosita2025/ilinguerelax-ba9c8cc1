@@ -262,8 +262,7 @@ const Product1000Verbos = () => {
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-      <ExitIntentPopup buyUrl={HOTMART_URL} discount="15%" />
-      <WhatsAppButton />
+<WhatsAppButton />
       <ScrollToTop showAfter={500} />
     </main>
   );

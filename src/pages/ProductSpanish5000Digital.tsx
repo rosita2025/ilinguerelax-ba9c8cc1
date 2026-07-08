@@ -230,9 +230,6 @@ const ProductSpanish5000Digital = () => {
                 <p className="text-sm text-muted-foreground mt-1">
                   One-time payment · Instant PDF download · Includes 3 free bonuses
                 </p>
-                <div className="mt-3">
-                  <CountdownTimer />
-                </div>
                 <Button
                   onClick={handleBuyNow}
                   disabled={isRedirecting}

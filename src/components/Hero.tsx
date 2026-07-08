@@ -75,13 +75,18 @@ export const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/95" />
-      </div>
+      {/* Background Image - LCP candidate */}
+      <img
+        src={heroBg}
+        alt=""
+        width={1920}
+        height={1080}
+        // @ts-ignore - fetchpriority is a valid HTML attribute
+        fetchpriority="high"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/95" />
 
       {/* Floating Elements */}
       <div className="absolute top-1/4 left-10 w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-pulse" />

@@ -63,7 +63,9 @@ const AdminSEO = () => {
   };
 
   return (
-    <main className="min-h-dvh bg-background py-10 px-4">
+    <>
+      <AdminNav />
+      <main className="min-h-dvh bg-background py-10 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold">SEO · Google Search Console</h1>

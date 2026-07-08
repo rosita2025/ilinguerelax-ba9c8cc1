@@ -4,11 +4,13 @@
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
 interface SendArgs {
-  from: string; // e.g. "iLingue Relax <hola@ilinguerelax.com>"
+  from?: string; // e.g. "iLingue Relax <hola@ilinguerelax.com>"; optional when using templateId (Brevo template sender wins)
   to: string | string[];
-  subject: string;
-  html: string;
+  subject?: string;
+  html?: string;
   replyTo?: string;
+  templateId?: number;         // Brevo template ID (Marketing → Templates)
+  params?: Record<string, unknown>; // Variables for {{ params.xxx }} in the template
 }
 
 interface SendResult {

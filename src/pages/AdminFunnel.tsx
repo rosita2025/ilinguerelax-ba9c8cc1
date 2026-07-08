@@ -343,7 +343,8 @@ const AdminFunnel = () => {
           </table>
         </Card>
       </div>
-    </main>
+      </main>
+    </>
   );
 };
 

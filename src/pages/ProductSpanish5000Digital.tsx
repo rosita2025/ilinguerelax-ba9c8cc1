@@ -24,7 +24,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
-import productDigitalImage from "@/assets/spanish-5000-digital-cover.webp";
+import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";

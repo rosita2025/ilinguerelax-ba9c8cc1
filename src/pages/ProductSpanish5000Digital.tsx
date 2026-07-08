@@ -203,7 +203,7 @@ const ProductSpanish5000Digital = () => {
 
             {/* Copy */}
             <div className="space-y-5">
-              <LiveViewers min={18} max={54} />
+              <LiveViewers minViewers={18} maxViewers={54} lang="en" />
               <PurchaseCounter />
 
               <h1 className="text-3xl md:text-5xl font-black leading-tight">
@@ -364,7 +364,7 @@ const ProductSpanish5000Digital = () => {
       <section className="py-10 md:py-14 bg-muted/30">
         <div className="container px-4 md:px-6">
           <Suspense fallback={<div className="h-40" />}>
-            <LooxStyleReviews productType="spanish-5000" />
+            <LooxStyleReviews />
           </Suspense>
         </div>
       </section>
@@ -404,7 +404,37 @@ const ProductSpanish5000Digital = () => {
       </section>
 
       <Suspense fallback={<div className="h-40" />}>
-        <FAQ />
+        <FAQ
+          title="Frequently Asked Questions"
+          subtitle="Everything about the digital PDF, bonuses, and delivery."
+          items={[
+            {
+              question: "How do I receive the PDF after purchase?",
+              answer: "As soon as your Stripe payment is confirmed, the 5,000 Words digital PDF and the 3 free bonuses are sent automatically to your email. If you don't see it, check your spam/promotions folder or write to hola@ilinguerelax.com.",
+              icon: Download,
+            },
+            {
+              question: "What's the difference between this and the physical book version?",
+              answer: "This is the DIGITAL-ONLY edition (PDF). No shipping, no waiting: instant download for $25. The physical book version is a separate product and includes the printed edition plus the digital PDF free.",
+              icon: FileText,
+            },
+            {
+              question: "Can I read it on my phone, tablet or computer?",
+              answer: "Yes. It's a standard PDF that opens on any device — iPhone, Android, iPad, Mac, PC. Read it offline anytime.",
+              icon: Smartphone,
+            },
+            {
+              question: "Is the pronunciation in English or Spanish?",
+              answer: "Every Spanish word is written with English pronunciation so you can read it the way it actually sounds — no phonetic symbols to learn.",
+              icon: Globe,
+            },
+            {
+              question: "Do you offer a refund?",
+              answer: "Yes. 30-day money-back guarantee, no questions asked. Just email hola@ilinguerelax.com.",
+              icon: Shield,
+            },
+          ]}
+        />
       </Suspense>
 
       <Suspense fallback={<div className="h-20" />}>
@@ -415,9 +445,14 @@ const ProductSpanish5000Digital = () => {
         productName="Spanish 5,000 Words — Digital PDF"
         price={String(PRICE)}
         originalPrice={String(ORIGINAL_PRICE)}
-        currency="USD"
+        currencyCode="USD"
         onBuyClick={handleBuyNow}
         ctaText="GET IT NOW"
+        lang="en"
+        rating={4.8}
+        reviewCount={500}
+        calmMode
+        dismissible
       />
       <ScrollToTop />
       <WhatsAppButton />

@@ -674,7 +674,7 @@ const ProductPatronesEspeciales = () => {
       <div className="h-20 md:h-16" />
 
       <SalesNotification />
-<WhatsAppButton />
+<WhatsAppButton url="https://wa.link/5ta2ea" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
     </main>
   );

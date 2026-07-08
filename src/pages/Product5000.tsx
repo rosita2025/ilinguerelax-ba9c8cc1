@@ -682,7 +682,7 @@ const Product5000 = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewIndice} alt="Índice Completo" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                  <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
                   <h4 className="font-bold text-foreground text-sm">Índice Completo</h4>

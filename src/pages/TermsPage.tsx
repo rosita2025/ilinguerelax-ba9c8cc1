@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { FileText, ShoppingCart, RotateCcw, BookOpen, Scale, AlertTriangle, Copyright, Gavel } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const sections = [
   {

@@ -16,7 +16,6 @@ import {
   MapPin,
   HeadphonesIcon,
 } from "lucide-react";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const faqItems = [

@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
 import { products, getProductLink, type Product } from "@/data/products";
 import { cn } from "@/lib/utils";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const Products = () => {

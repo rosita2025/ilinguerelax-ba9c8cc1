@@ -9,7 +9,6 @@ import { Mail, MessageSquare, Send, Instagram, Facebook, MapPin, Clock } from "l
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useSpanishRelaxPixelContact } from "@/hooks/useMetaPixel";
 

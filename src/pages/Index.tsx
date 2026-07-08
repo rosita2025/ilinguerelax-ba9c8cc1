@@ -20,11 +20,11 @@ import logoShopify from "@/assets/logo-shopify.png";
 import logoKindle from "@/assets/logo-kindle.png";
 
 const partnerLogos = [
-  { src: logoAmazon, alt: "Amazon", height: "h-8 md:h-12" },
-  { src: logoEtsy, alt: "Etsy", height: "h-8 md:h-12" },
-  { src: logoShopify, alt: "Shopify", height: "h-8 md:h-12" },
-  { src: logoHotmart, alt: "Hotmart", height: "h-6 md:h-10" },
-  { src: logoKindle, alt: "Amazon Kindle", height: "h-6 md:h-10" },
+  { src: logoAmazon, alt: "Amazon partner store", height: "h-8 md:h-12" },
+  { src: logoEtsy, alt: "Etsy partner store", height: "h-8 md:h-12" },
+  { src: logoShopify, alt: "Shopify partner store", height: "h-8 md:h-12" },
+  { src: logoHotmart, alt: "Hotmart platform partner", height: "h-6 md:h-10" },
+  { src: logoKindle, alt: "Amazon Kindle store", height: "h-6 md:h-10" },
 ];
 
 const Index = () => {

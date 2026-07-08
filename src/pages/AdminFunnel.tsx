@@ -76,7 +76,9 @@ const AdminFunnel = () => {
 
   if (!report) {
     return (
-      <main className="min-h-screen bg-background flex items-center justify-center p-4">
+      <>
+        <AdminNav />
+        <main className="min-h-dvh bg-background flex items-center justify-center p-4">
         <Card className="p-6 w-full max-w-md space-y-4">
           <div className="text-center">
             <BarChart3 className="w-10 h-10 mx-auto text-primary" />

@@ -1,3 +1,11 @@
+import { MapPin } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CampaignCurrency, CampaignPrice } from "@/hooks/useCampaignPrice";
 
 type Country = { code: string; flag: string; label: string; currency: CampaignCurrency };
@@ -42,42 +50,52 @@ export const CountryFlagSelector = ({ campaign, className = "" }: Props) => {
     COUNTRIES[0];
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <span className="text-[11px] text-muted-foreground whitespace-nowrap">
-        Detectado por tu ubicación:
+    <div
+      className={`inline-flex items-center gap-2 rounded-full border border-primary/20 bg-gradient-to-r from-primary/5 via-background to-accent/5 pl-3 pr-1 py-1 shadow-sm ${className}`}
+    >
+      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden />
+      <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">
+        Tu país:
       </span>
-      <label className="relative inline-flex items-center">
-        <span className="pointer-events-none absolute left-2 text-sm">
-          {current.flag}
-        </span>
-        <select
-          value={`${current.code}|${current.currency}`}
-          onChange={(e) => {
-            const [, cur] = e.target.value.split("|");
-            campaign.setCurrency(cur as CampaignCurrency);
-          }}
+      <Select
+        value={`${current.code}|${current.currency}`}
+        onValueChange={(v) => {
+          const [, cur] = v.split("|");
+          campaign.setCurrency(cur as CampaignCurrency);
+        }}
+      >
+        <SelectTrigger
           aria-label="Cambiar país y moneda"
-          className="appearance-none pl-8 pr-6 py-1 rounded-full border border-border bg-background text-foreground text-[11px] font-semibold hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
+          className="h-7 w-auto min-w-[9rem] gap-1.5 rounded-full border-primary/30 bg-background/80 px-3 text-xs font-bold text-foreground shadow-sm hover:bg-primary/10 hover:border-primary/50 focus:ring-2 focus:ring-primary/40 transition-colors"
         >
+          <SelectValue>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-base leading-none">{current.flag}</span>
+              <span className="truncate">{current.label}</span>
+              <span className="text-[10px] font-semibold text-primary/80">
+                {current.currency}
+              </span>
+            </span>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent className="max-h-72 rounded-xl border-primary/20 shadow-xl">
           {COUNTRIES.map((c) => (
-            <option key={c.code} value={`${c.code}|${c.currency}`}>
-              {c.flag} {c.label} ({c.currency})
-            </option>
+            <SelectItem
+              key={c.code}
+              value={`${c.code}|${c.currency}`}
+              className="text-xs font-medium cursor-pointer"
+            >
+              <span className="inline-flex items-center gap-2">
+                <span className="text-base leading-none">{c.flag}</span>
+                <span>{c.label}</span>
+                <span className="ml-1 text-[10px] font-semibold text-muted-foreground">
+                  {c.currency}
+                </span>
+              </span>
+            </SelectItem>
           ))}
-        </select>
-        <svg
-          className="pointer-events-none absolute right-1.5 w-3 h-3 text-muted-foreground"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </label>
+        </SelectContent>
+      </Select>
     </div>
   );
 };

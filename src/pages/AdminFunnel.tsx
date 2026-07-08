@@ -108,14 +108,17 @@ const AdminFunnel = () => {
             </Button>
           </div>
         </Card>
-      </main>
+        </main>
+      </>
     );
   }
 
   const maxCount = Math.max(...FUNNEL_STEPS.map((s) => report.totals[s] || 0), 1);
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
+    <>
+      <AdminNav />
+      <main className="min-h-dvh bg-background p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

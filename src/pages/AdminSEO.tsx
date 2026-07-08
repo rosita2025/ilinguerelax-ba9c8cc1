@@ -192,6 +192,7 @@ const AdminSEO = () => {
         )}
       </div>
     </main>
+    </>
   );
 };
 

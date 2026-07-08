@@ -303,6 +303,7 @@ function build(
   countryCode: string,
   priceUSD: number,
   originalUSD: number,
+  detectionStatus: DetectionStatus = "pending",
 ): Omit<CampaignPrice, "setCurrency"> {
   const p = format(currency, priceUSD);
   const o = format(currency, originalUSD);
@@ -316,6 +317,7 @@ function build(
     numericPrice: p.numeric,
     numericPriceUSD: priceUSD,
     countryCode,
+    detectionStatus,
   };
 }
 

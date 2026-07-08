@@ -312,4 +312,74 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Product: Patrones Especiales Alfabeto Inglés -->
+  <url>
+    <loc>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product: 100 Mapas Mentales Coreano Hangul C1 -->
+  <url>
+    <loc>https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product: Estructuras Gramaticales Inglés A1-C1 -->
+  <url>
+    <loc>https://ilinguerelax.com/products/estructuras-gramaticales-ingles-a1-c1</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Descarga: Coreano 100 Mapas -->
+  <url>
+    <loc>https://ilinguerelax.com/descarga/coreano-100-mapas</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Descarga: Patrones Inglés -->
+  <url>
+    <loc>https://ilinguerelax.com/descarga/patrones-ingles</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Vista Previa: Patrones Especiales -->
+  <url>
+    <loc>https://ilinguerelax.com/vista-previa/patrones-especiales</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Vista Previa: Coreano 100 Mapas Mentales -->
+  <url>
+    <loc>https://ilinguerelax.com/vista-previa/coreano-100-mapas-mentales</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Privacy & Terms -->
+  <url>
+    <loc>https://ilinguerelax.com/privacidad</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://ilinguerelax.com/condiciones</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
 </urlset>

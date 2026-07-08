@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
+import { useAdminKey } from "@/components/admin/AdminGate";
 
 interface GscRow {
   key: string;
@@ -23,32 +24,29 @@ interface GscReport {
 }
 
 const AdminSEO = () => {
-  const [adminKey, setAdminKey] = useState("");
+  const { adminKey } = useAdminKey();
   const [days, setDays] = useState(28);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<GscReport | null>(null);
 
   const loadReport = async () => {
-    if (!adminKey) {
-      toast.error("Ingresa la clave de administración");
-      return;
-    }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("gsc-report", {
         body: { adminKey, days, limit: 25 },
       });
       if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
       setReport(data as GscReport);
-      toast.success("Datos de Google Search Console cargados");
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err?.message ?? "Error al cargar datos");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Error al cargar datos";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => { void loadReport(); }, [adminKey]);
 
   const fmtPct = (n: number) => `${(n * 100).toFixed(1)}%`;
   const fmtPos = (n: number) => n.toFixed(1);
@@ -75,14 +73,7 @@ const AdminSEO = () => {
         </div>
 
         <Card className="p-4 space-y-4">
-          <div className="grid gap-3 md:grid-cols-[1fr_140px_auto]">
-            <Input
-              type="password"
-              placeholder="Clave de administración"
-              value={adminKey}
-              onChange={(e) => setAdminKey(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && loadReport()}
-            />
+          <div className="grid gap-3 md:grid-cols-[140px_auto_1fr]">
             <Input
               type="number"
               min={1}
@@ -92,15 +83,16 @@ const AdminSEO = () => {
               placeholder="Días"
             />
             <Button onClick={loadReport} disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Cargar"}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Recargar"}
             </Button>
+            {report && (
+              <p className="text-xs text-muted-foreground self-center">
+                Últimos {report.days} días · Sitio: {report.site}
+              </p>
+            )}
           </div>
-          {report && (
-            <p className="text-xs text-muted-foreground">
-              Últimos {report.days} días · Sitio: {report.site}
-            </p>
-          )}
         </Card>
+
 
         {report && (
           <div className="grid gap-6 lg:grid-cols-2">

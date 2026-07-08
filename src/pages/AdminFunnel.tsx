@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, BarChart3, Users } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
+import { useAdminKey } from "@/components/admin/AdminGate";
 
 interface FunnelReport {
   days: number;
@@ -37,16 +38,12 @@ const STEP_LABELS: Record<string, string> = {
 };
 
 const AdminFunnel = () => {
-  const [adminKey, setAdminKey] = useState("");
+  const { adminKey } = useAdminKey();
   const [days, setDays] = useState(7);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<FunnelReport | null>(null);
 
   const loadReport = async () => {
-    if (!adminKey) {
-      toast.error("Ingresa la clave de administración");
-      return;
-    }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("funnel-report", {
@@ -66,9 +63,11 @@ const AdminFunnel = () => {
     }
   };
 
-  // Auto-refresh every 30s once authenticated
+  useEffect(() => { void loadReport(); }, [adminKey, days]);
+
+  // Auto-refresh every 30s once we have a report
   useEffect(() => {
-    if (!report || !adminKey) return;
+    if (!report) return;
     const id = setInterval(() => { void loadReport(); }, 30000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,39 +78,12 @@ const AdminFunnel = () => {
       <>
         <AdminNav />
         <main className="min-h-dvh bg-background flex items-center justify-center p-4">
-        <Card className="p-6 w-full max-w-md space-y-4">
-          <div className="text-center">
-            <BarChart3 className="w-10 h-10 mx-auto text-primary" />
-            <h1 className="text-2xl font-bold mt-2">Reporte de embudo</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              ViewContent → AddToCart → InitiateCheckout → Purchase
-            </p>
-          </div>
-          <Input
-            type="password"
-            placeholder="Clave admin"
-            value={adminKey}
-            onChange={(e) => setAdminKey(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && loadReport()}
-          />
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              min={1}
-              max={90}
-              value={days}
-              onChange={(e) => setDays(parseInt(e.target.value) || 7)}
-              placeholder="Días"
-            />
-            <Button onClick={loadReport} disabled={loading} className="shrink-0">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ver reporte"}
-            </Button>
-          </div>
-        </Card>
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </main>
       </>
     );
   }
+
 
   const maxCount = Math.max(...FUNNEL_STEPS.map((s) => report.totals[s] || 0), 1);
 

@@ -209,6 +209,72 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
+      {/* Vista previa - Slider de mapas mentales */}
+      <section className="py-10 md:py-14 bg-gradient-to-b from-background to-primary/5">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                <Eye className="w-4 h-4" /> Vista previa · Páginas reales
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Mira dentro del <span className="text-gradient">ebook</span>
+              </h3>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Ejemplos reales de mapas mentales con Hangul, pronunciación en español y vocabulario práctico. Marca de agua incluida.
+              </p>
+            </div>
+
+            <Carousel
+              opts={{ align: "start", loop: true }}
+              plugins={[Autoplay({ delay: 4000, stopOnInteraction: true })]}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {[
+                  { src: mapaSaludos.url, caption: "Saludos y presentaciones" },
+                  { src: mapaVocales.url, caption: "Alfabeto Hangul · Vocales" },
+                  { src: mapaConsonantes.url, caption: "Alfabeto Hangul · Consonantes" },
+                  { src: mapaPaises.url, caption: "Países y nacionalidades" },
+                  { src: mapaCuerpo.url, caption: "El cuerpo humano" },
+                  { src: mapaTransporte.url, caption: "Transporte y direcciones" },
+                  { src: mapaProfesiones.url, caption: "Profesiones" },
+                  { src: mapaRestaurantes.url, caption: "Restaurantes y pedidos" },
+                  { src: bonoHangul.url, caption: "Bono · Práctica de escritura" },
+                ].map((item, i) => (
+                  <CarouselItem key={i} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                    <div className="rounded-2xl overflow-hidden border-2 border-primary/20 bg-card shadow-card">
+                      <div className="aspect-[3/4] overflow-hidden bg-muted">
+                        <img
+                          src={item.src}
+                          alt={`Vista previa mapa mental coreano - ${item.caption}`}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3 text-center">
+                        <p className="text-sm font-semibold text-foreground">{item.caption}</p>
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-4" />
+              <CarouselNext className="hidden md:flex -right-4" />
+            </Carousel>
+
+            <div className="text-center mt-6">
+              <a
+                href="/vista-previa/coreano-100-mapas-mentales"
+                className="inline-flex items-center gap-2 text-primary font-semibold hover:underline"
+              >
+                <Eye className="w-4 h-4" /> Ver vista previa completa
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">

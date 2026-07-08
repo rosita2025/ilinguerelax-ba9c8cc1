@@ -163,11 +163,11 @@ const ProductSpanish5000 = () => {
     ["A_add_to_cart", "B_i_want_to_buy", "C_download_now"] as const,
   );
   const ctaTextByVariant: Record<string, string> = {
-    A_add_to_cart: "ADD TO CART",
-    B_i_want_to_buy: "ADD TO CART",
-    C_download_now: "ADD TO CART",
+    A_add_to_cart: "BUY ON AMAZON",
+    B_i_want_to_buy: "BUY ON AMAZON",
+    C_download_now: "BUY ON AMAZON",
   };
-  const stickyCtaText = "ADD TO CART";
+  const stickyCtaText = "BUY ON AMAZON";
 
   // Digital-only product — Spanish Relax 5,000 Words.
   const isPhysicalBundle = false;

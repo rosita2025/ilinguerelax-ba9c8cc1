@@ -357,6 +357,31 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
+      {/* Physical book cross-sell */}
+      <section className="py-8 md:py-10 bg-background">
+        <div className="container px-4 md:px-6 max-w-3xl">
+          <a
+            href="/products/5-000-spanish-words-with-english-pronunciation"
+            className="block p-5 md:p-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5 hover:border-primary transition-all shadow-sm hover:shadow-md"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-primary mb-1">
+                  Are you interested?
+                </p>
+                <h3 className="text-lg md:text-xl font-black text-foreground">
+                  Get the Physical Book edition
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Printed book + digital PDF included. Ships worldwide.
+                </p>
+              </div>
+              <ArrowRight className="w-6 h-6 text-primary shrink-0" />
+            </div>
+          </a>
+        </div>
+      </section>
+
       {/* Reviews */}
       <section className="py-10 md:py-14 bg-muted/30">
         <div className="container px-4 md:px-6">
@@ -366,9 +391,6 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      <Suspense fallback={<div className="h-40" />}>
-        <MeetTheAuthor />
-      </Suspense>
 
       {/* Final CTA */}
       <section className="py-14 md:py-20 bg-gradient-to-br from-primary/10 via-background to-accent/10">

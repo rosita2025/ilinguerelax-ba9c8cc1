@@ -272,10 +272,10 @@ const BlogPost = () => {
             {relatedProducts.length > 0 && (
               <Card className="mb-8 bg-primary/5 border-primary/20">
                 <CardContent className="p-6 md:p-8">
-                  <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-primary" />
                     Recursos Recomendados
-                  </h3>
+                  </h2>
                   <p className="text-muted-foreground mb-6">
                     Acelera tu aprendizaje con nuestros diccionarios completos:
                   </p>

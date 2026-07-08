@@ -24,21 +24,47 @@ export interface CampaignPrice {
 const STORAGE_KEY = "campaign_currency_v5";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-// Module-level dedupe: share a single ipapi.co fetch across all hook instances
+// Module-level dedupe: share a single IP-detection fetch across all hook instances.
+// Tries ipapi.co first, falls back to ipwho.is if it fails, times out or rate-limits.
 let inflightDetection: Promise<{ currency: CampaignCurrency; country: string } | null> | null = null;
+
+async function fetchIpapi(): Promise<{ currency: CampaignCurrency; country: string } | null> {
+  try {
+    const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // ipapi.co returns { error: true, reason: "..." } on rate-limit with HTTP 200
+    if (data?.error) return null;
+    const country = (data.country_code || "").toUpperCase();
+    if (!country) return null;
+    return { currency: COUNTRY_TO_CURRENCY[country] || "USD", country };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchIpwho(): Promise<{ currency: CampaignCurrency; country: string } | null> {
+  try {
+    const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.success === false) return null;
+    const country = (data.country_code || "").toUpperCase();
+    if (!country) return null;
+    return { currency: COUNTRY_TO_CURRENCY[country] || "USD", country };
+  } catch {
+    return null;
+  }
+}
+
 function detectOnce(): Promise<{ currency: CampaignCurrency; country: string } | null> {
   if (inflightDetection) return inflightDetection;
   inflightDetection = (async () => {
-    try {
-      const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
-      if (!res.ok) return null;
-      const data = await res.json();
-      const country = (data.country_code || "US").toUpperCase();
-      const currency = COUNTRY_TO_CURRENCY[country] || "USD";
-      return { currency, country };
-    } catch {
-      return null;
-    }
+    const primary = await fetchIpapi();
+    if (primary) return primary;
+    const secondary = await fetchIpwho();
+    if (secondary) return secondary;
+    return null;
   })();
   return inflightDetection;
 }

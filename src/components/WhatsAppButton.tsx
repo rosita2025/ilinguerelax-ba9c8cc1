@@ -12,7 +12,7 @@ export const WhatsAppButton = ({ url, label = "¿Dudas?" }: WhatsAppButtonProps)
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed left-3 sm:left-5 bottom-[150px] md:bottom-[120px] z-[70] group"
+      className="fixed right-3 sm:right-5 bottom-[150px] md:bottom-[120px] z-[70] group"
     >
       <div className="flex items-center gap-2">
         <span className="px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-sm font-semibold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">

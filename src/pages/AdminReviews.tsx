@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import AdminNav from "@/components/admin/AdminNav";
 
 interface AdminReview {
   id: string;
@@ -58,8 +59,10 @@ const AdminReviews = () => {
 
   if (!isAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="bg-card border border-border rounded-xl p-8 max-w-sm w-full space-y-4">
+      <>
+        <AdminNav />
+        <div className="min-h-dvh flex items-center justify-center bg-background p-4">
+          <div className="bg-card border border-border rounded-xl p-8 max-w-sm w-full space-y-4">
           <div className="text-center">
             <Lock className="w-10 h-10 text-primary mx-auto mb-3" />
             <h1 className="text-xl font-bold text-foreground">Admin Reseñas</h1>
@@ -76,13 +79,16 @@ const AdminReviews = () => {
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <>
+      <AdminNav />
+      <div className="min-h-dvh bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground mb-6">Moderación de Reseñas</h1>
 
@@ -169,7 +175,8 @@ const AdminReviews = () => {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

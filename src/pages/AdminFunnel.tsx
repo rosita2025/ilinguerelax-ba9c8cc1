@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, BarChart3, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdminNav from "@/components/admin/AdminNav";
 
 interface FunnelReport {
   days: number;
@@ -75,7 +76,9 @@ const AdminFunnel = () => {
 
   if (!report) {
     return (
-      <main className="min-h-screen bg-background flex items-center justify-center p-4">
+      <>
+        <AdminNav />
+        <main className="min-h-dvh bg-background flex items-center justify-center p-4">
         <Card className="p-6 w-full max-w-md space-y-4">
           <div className="text-center">
             <BarChart3 className="w-10 h-10 mx-auto text-primary" />
@@ -105,14 +108,17 @@ const AdminFunnel = () => {
             </Button>
           </div>
         </Card>
-      </main>
+        </main>
+      </>
     );
   }
 
   const maxCount = Math.max(...FUNNEL_STEPS.map((s) => report.totals[s] || 0), 1);
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
+    <>
+      <AdminNav />
+      <main className="min-h-dvh bg-background p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -337,7 +343,8 @@ const AdminFunnel = () => {
           </table>
         </Card>
       </div>
-    </main>
+      </main>
+    </>
   );
 };
 

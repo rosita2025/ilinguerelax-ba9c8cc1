@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdminNav from "@/components/admin/AdminNav";
 
 interface GscRow {
   key: string;
@@ -62,7 +63,9 @@ const AdminSEO = () => {
   };
 
   return (
-    <main className="min-h-dvh bg-background py-10 px-4">
+    <>
+      <AdminNav />
+      <main className="min-h-dvh bg-background py-10 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold">SEO · Google Search Console</h1>
@@ -189,6 +192,7 @@ const AdminSEO = () => {
         )}
       </div>
     </main>
+    </>
   );
 };
 

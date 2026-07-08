@@ -125,14 +125,14 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 
 const ProductSpanish5000 = () => {
   // Multi-currency display (USA / UK / Canada campaign). Display only.
-  const campaign = useCampaignPrice(34.99, 54);
+  const campaign = useCampaignPrice(33, 54);
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words",
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 34.99,
+    value: 33,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -140,7 +140,7 @@ const ProductSpanish5000 = () => {
   useTrackProductView({
     productId: "product-spanish-5000",
     productName: "Spanish Relax - 5,000 Words",
-    price: 34.99,
+    price: 33,
     currency: "USD",
     category: "Digital Book",
   });
@@ -179,26 +179,18 @@ const ProductSpanish5000 = () => {
     await handleBuyNow();
   };
 
+  const AMAZON_PHYSICAL_URL = "https://amzn.to/4bgODhz";
   const handleBuyNow = async () => {
     if (checkoutLockRef.current) return;
     checkoutLockRef.current = true;
     try {
-      setIsCreatingDigitalCheckout(true);
       trackHotmartEvent("InitiateCheckout", {
-        content_name: "Spanish 5000 Physical + Digital",
-        value: 34.99,
+        content_name: "Spanish 5000 Physical (Amazon)",
+        value: 33,
         currency: "USD",
       });
-      const { data, error } = await supabase.functions.invoke("create-spanish-physical", { body: {} });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.assign(data.url);
-        return;
-      }
-      throw new Error("Checkout URL not returned");
-    } catch (e) {
-      console.error("Physical checkout error:", e);
-      setIsCreatingDigitalCheckout(false);
+      window.open(AMAZON_PHYSICAL_URL, "_blank", "noopener,noreferrer");
+    } finally {
       checkoutLockRef.current = false;
     }
   };
@@ -206,7 +198,7 @@ const ProductSpanish5000 = () => {
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
       </Helmet>
-      <SEO title="Spanish Relax — 5,000 Words with English Pronunciation (Physical Book)" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="Spanish Relax, 5000 Spanish words physical book, learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation" />
+      <SEO title="Spanish Relax — 5,000 Words with English Pronunciation (Physical Book)" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="33" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="Spanish Relax, 5000 Spanish words physical book, learn Spanish, Spanish vocabulary, Spanish for English speakers, Spanish pronunciation" />
       <Navbar />
 
       {/* Hero Section */}
@@ -323,11 +315,11 @@ const ProductSpanish5000 = () => {
                 >
                   <span className="flex items-center justify-center gap-2 font-black">
                     <ShoppingCart className="w-5 h-5" />
-                    GET INSTANT ACCESS · {campaign.price}
+                    BUY ON AMAZON · {campaign.price}
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">
-                  Secure Stripe checkout · 30-day money-back guarantee
+                  Secure Amazon checkout · Ships worldwide
                 </p>
                 <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/5 dark:border-emerald-500/20 p-3">
                   <div className="flex items-start gap-2">
@@ -807,7 +799,7 @@ const ProductSpanish5000 = () => {
         answer: "Your Spanish Relax physical book is dispatched from our warehouse within 24–72 hours and is delivered worldwide in approximately 7–15 days depending on your country. You'll receive a tracking number by email as soon as it ships.",
         icon: Truck,
       }, {
-        question: "What does Bundle 1 include? (Spanish Relax Physical Book + Digital FREE + 3 Bonuses — $34.99)",
+        question: "What does Bundle 1 include? (Spanish Relax Physical Book on Amazon — $33)",
         answer: "1 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in 7–15 days · shipping calculated at checkout) + the 5,000 Words digital PDF FREE by email + 3 FREE bonuses (placement exam, daily planner, pronunciation cheat-sheet). FREE worldwide shipping unlocks automatically when you order 2 or more books.",
         icon: BookOpen,
       }, {

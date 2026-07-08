@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { MapPin, AlertCircle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -49,13 +49,26 @@ export const CountryFlagSelector = ({ campaign, className = "" }: Props) => {
     COUNTRIES.find((c) => c.currency === campaign.currency) ||
     COUNTRIES[0];
 
+  const isFallback = campaign.detectionStatus === "fallback";
+  const Icon = isFallback ? AlertCircle : MapPin;
+  const label = isFallback ? "Selecciona tu país:" : "Tu país:";
+  const wrapperTone = isFallback
+    ? "border-accent/40 bg-gradient-to-r from-accent/10 via-background to-accent/5"
+    : "border-primary/20 bg-gradient-to-r from-primary/5 via-background to-accent/5";
+  const iconTone = isFallback ? "text-accent" : "text-primary";
+
   return (
     <div
-      className={`inline-flex items-center gap-2 rounded-full border border-primary/20 bg-gradient-to-r from-primary/5 via-background to-accent/5 pl-3 pr-1 py-1 shadow-sm ${className}`}
+      className={`inline-flex items-center gap-2 rounded-full border ${wrapperTone} pl-3 pr-1 py-1 shadow-sm ${className}`}
+      title={
+        isFallback
+          ? "No pudimos detectar tu país automáticamente. Elige el tuyo para ver el precio en tu moneda."
+          : undefined
+      }
     >
-      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden />
+      <Icon className={`w-3.5 h-3.5 ${iconTone} shrink-0`} aria-hidden />
       <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">
-        Tu país:
+        {label}
       </span>
       <Select
         value={`${current.code}|${current.currency}`}

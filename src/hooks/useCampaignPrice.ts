@@ -8,6 +8,8 @@ export type CampaignCurrency =
   | "NZD" | "SEK" | "NOK" | "DKK" | "CHF"
   | "JPY" | "KRW" | "SGD" | "HKD" | "TWD";
 
+export type DetectionStatus = "pending" | "ip" | "cache" | "timezone" | "forced" | "manual" | "fallback";
+
 export interface CampaignPrice {
   currency: CampaignCurrency;
   symbol: string;
@@ -18,6 +20,7 @@ export interface CampaignPrice {
   numericPrice: number;  // local currency value
   numericPriceUSD: number; // original USD (for tracking/checkout)
   countryCode: string;
+  detectionStatus: DetectionStatus;
   setCurrency: (c: CampaignCurrency) => void;
 }
 

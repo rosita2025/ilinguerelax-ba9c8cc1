@@ -207,6 +207,7 @@ export const StickyBuyBar = ({
               {originalPrice && (
                 <span className="text-[10px] sm:text-[11px] text-muted-foreground line-through tabular-nums whitespace-nowrap">{originalPrice}</span>
               )}
+              {flag && <span className="text-sm leading-none" aria-hidden>{flag}</span>}
               <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">{currencyCode}</span>
             </div>
             {savingsLabel && (
@@ -352,6 +353,7 @@ export const StickyBuyBar = ({
                     {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
                   </span>
                 )}
+                {flag && <span className="text-base leading-none" aria-hidden>{flag}</span>}
                 <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>
               {!disabled && (

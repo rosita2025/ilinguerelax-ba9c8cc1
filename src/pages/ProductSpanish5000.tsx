@@ -53,7 +53,7 @@ import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 // Lazy-loaded below-the-fold components for faster initial load
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
-const MeetTheAuthor = lazy(() => import("@/components/MeetTheAuthor").then(m => ({ default: m.MeetTheAuthor })));
+
 const Top3ReviewsCarousel = lazy(() => import("@/components/Top3ReviewsCarousel").then(m => ({ default: m.Top3ReviewsCarousel })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const InfluencerVideoCarousel = lazy(() => import("@/components/InfluencerVideoCarousel").then(m => ({ default: m.InfluencerVideoCarousel })));
@@ -400,10 +400,6 @@ const ProductSpanish5000 = () => {
         <Top3ReviewsCarousel />
       </Suspense>
 
-      {/* Meet the Author — trust block */}
-      <Suspense fallback={<div className="h-32" />}>
-        <MeetTheAuthor />
-      </Suspense>
 
       {/* Benefits */}
       <section className="pt-6 pb-12 md:pt-8 md:pb-16 bg-secondary/30">

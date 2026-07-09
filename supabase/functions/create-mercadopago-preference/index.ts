@@ -1,0 +1,123 @@
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { z } from "npm:zod@3.23.8";
+
+const ItemSchema = z.object({
+  id: z.string().min(1).max(64),
+  name: z.string().min(1).max(200),
+  price: z.number().positive().max(10000),
+  quantity: z.number().int().min(1).max(50),
+  image: z.string().url().optional(),
+  description: z.string().max(500).optional(),
+});
+
+const BodySchema = z.object({
+  items: z.array(ItemSchema).min(1).max(20),
+  couponPercent: z.number().min(0).max(90).default(0),
+  couponCode: z.string().max(20).optional(),
+  payerEmail: z.string().email().optional(),
+  returnUrl: z.string().url(),
+  // Peruvian Soles conversion rate (approx). Frontend can override.
+  usdToPen: z.number().positive().max(10).default(3.75),
+});
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const accessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+  if (!accessToken) {
+    return new Response(
+      JSON.stringify({ error: "MERCADOPAGO_ACCESS_TOKEN no configurado" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  try {
+    const raw = await req.json();
+    const parsed = BodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const body = parsed.data;
+    const discountMultiplier = 1 - body.couponPercent / 100;
+
+    // Convert USD -> PEN (Mercado Pago Peru operates in Soles).
+    const mpItems = body.items.map((item) => ({
+      id: item.id,
+      title: item.name.slice(0, 250),
+      description: item.description?.slice(0, 250) ?? undefined,
+      picture_url: item.image ?? undefined,
+      quantity: item.quantity,
+      currency_id: "PEN",
+      unit_price: Number((item.price * discountMultiplier * body.usdToPen).toFixed(2)),
+    }));
+
+    const preferencePayload: Record<string, unknown> = {
+      items: mpItems,
+      back_urls: {
+        success: body.returnUrl,
+        failure: body.returnUrl,
+        pending: body.returnUrl,
+      },
+      auto_return: "approved",
+      statement_descriptor: "ILINGUE RELAX",
+      binary_mode: false,
+      metadata: {
+        source: "checkout-prueba-1",
+        coupon_code: body.couponCode ?? "",
+        coupon_percent: body.couponPercent,
+        usd_to_pen: body.usdToPen,
+      },
+      // Enable common Peruvian methods (Yape, Plin, transferencias, PagoEfectivo, cards).
+      payment_methods: {
+        excluded_payment_types: [],
+        installments: 12,
+      },
+    };
+
+    if (body.payerEmail) {
+      preferencePayload.payer = { email: body.payerEmail };
+    }
+
+    const resp = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(preferencePayload),
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) {
+      console.error("MP preference error:", data);
+      return new Response(
+        JSON.stringify({ error: data?.message || "MP error", details: data }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        id: data.id,
+        init_point: data.init_point,
+        sandbox_init_point: data.sandbox_init_point,
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch (err) {
+    console.error("create-mercadopago-preference error:", err);
+    return new Response(
+      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+});

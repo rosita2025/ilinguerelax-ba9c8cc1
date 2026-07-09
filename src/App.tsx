@@ -206,6 +206,7 @@ const App = () => (
                   <Route path="/checkouts/success" element={<CheckoutSuccess />} />
                   <Route path="/checkouts/failure" element={<CheckoutFailure />} />
                   <Route path="/checkouts/pending" element={<CheckoutPending />} />
+                  <Route path="/checkouts/pendiente-manual" element={<CheckoutPendienteManual />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

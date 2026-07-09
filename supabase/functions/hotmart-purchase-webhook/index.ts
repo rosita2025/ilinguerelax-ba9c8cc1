@@ -12,6 +12,18 @@ const supabase = createClient(
 
 const WEBHOOK_TOKEN = Deno.env.get("HOTMART_WEBHOOK_TOKEN") ?? "";
 
+const labelHotmartProduct = (name: string, productCode?: string | null, productId?: string | null) => {
+  const s = `${name} ${productCode || ""} ${productId || ""}`.toLowerCase();
+  if (s.includes("coreano") || s.includes("korean")) return { id: "product-coreano-100-mapas", value: 10 };
+  if (s.includes("patrones")) return { id: "patrones-especiales", value: 8.08 };
+  if (s.includes("estructura") || s.includes("grammar")) return { id: "product-estructuras-gramaticales", value: 12 };
+  if (s.includes("8,000") || s.includes("8.000") || s.includes("8000")) return { id: "product-8000", value: 20 };
+  if (s.includes("1,000") || s.includes("1.000") || s.includes("1000") || s.includes("verbo")) return { id: "product-1000-verbos", value: 10 };
+  if (s.includes("500") && (s.includes("pregunta") || s.includes("question"))) return { id: "product-500-preguntas", value: 10 };
+  if (s.includes("spanish")) return { id: "product-spanish-5000-digital", value: 22 };
+  return { id: "product-5000", value: 12 };
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -37,6 +49,7 @@ Deno.serve(async (req) => {
     const productCode: string | undefined =
       data?.product?.ucode ?? data?.product?.id?.toString();
     const productId: string | undefined = data?.product?.id?.toString();
+    const productName: string = data?.product?.name ?? data?.product?.title ?? body?.product?.name ?? "Hotmart Purchase";
 
     if (!buyerEmail || !transactionCode) {
       return new Response(JSON.stringify({ error: "missing fields", body }), {
@@ -68,6 +81,20 @@ Deno.serve(async (req) => {
         { onConflict: "transaction_code" },
       );
       if (error) throw error;
+
+      const product = labelHotmartProduct(productName, productCode, productId);
+      const priceValue = Number(data?.purchase?.price?.value ?? data?.purchase?.full_price?.value ?? data?.purchase?.approved_price?.value ?? product.value);
+      const currency = String(data?.purchase?.price?.currency_code ?? data?.purchase?.currency_code ?? "USD").toUpperCase();
+      await supabase.from("funnel_events").insert({
+        event_name: "Purchase",
+        product_id: product.id,
+        value: Number.isFinite(priceValue) ? priceValue : product.value,
+        currency,
+        session_id: transactionCode,
+        page_path: "/hotmart-success",
+        country: data?.buyer?.address?.country || data?.purchase?.buyer?.address?.country || null,
+        referrer: "hotmart-webhook",
+      });
     } else {
       const { error } = await supabase
         .from("hotmart_purchases")

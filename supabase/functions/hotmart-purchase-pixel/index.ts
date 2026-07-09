@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -77,6 +78,33 @@ function mapHotmartProduct(productName: string): {
       name: "Inglés Relax - 500 Preguntas en Inglés",
       category: "Digital Book",
       value: 7,
+    };
+  }
+
+  if (lower.includes("coreano") || lower.includes("korean") || lower.includes("hangul")) {
+    return {
+      id: "product-coreano-100-mapas",
+      name: "Coreano Sin Complicaciones - 100 Mapas Mentales",
+      category: "Digital Book",
+      value: 10,
+    };
+  }
+
+  if (lower.includes("patrones")) {
+    return {
+      id: "patrones-especiales",
+      name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+      category: "Digital Book",
+      value: 8.08,
+    };
+  }
+
+  if (lower.includes("estructura") || lower.includes("grammar")) {
+    return {
+      id: "product-estructuras-gramaticales",
+      name: "Estructuras Gramaticales de Inglés A1-C1",
+      category: "Digital Book",
+      value: 12,
     };
   }
 
@@ -210,6 +238,7 @@ serve(async (req) => {
       body.data?.product?.name || body.product?.name || body.prod_name || "";
     const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "";
     const userAgent = req.headers.get("user-agent") || "";
+    const transactionCode = body.data?.purchase?.transaction || body.purchase?.transaction || body.transaction || `hotmart_${Date.now()}`;
 
     if (!productName) {
       console.error("No product name found in Hotmart webhook:", JSON.stringify(body));
@@ -249,6 +278,25 @@ serve(async (req) => {
       clientIp,
       userAgent,
     );
+
+    try {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      await supabase.from("funnel_events").insert({
+        event_name: "Purchase",
+        product_id: product.id,
+        value: product.value,
+        currency: "USD",
+        session_id: transactionCode,
+        page_path: "/hotmart-success",
+        country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
+        referrer: "hotmart-webhook",
+      });
+    } catch (trackingError) {
+      console.error("funnel purchase tracking error:", trackingError);
+    }
 
     return new Response(
       JSON.stringify({

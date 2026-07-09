@@ -19,6 +19,7 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 const Footer = lazy(() => import("@/components/Footer").then((m) => ({ default: m.Footer })));
 
@@ -118,6 +119,15 @@ const testimonials = [
 ];
 
 const goToCheckout = () => {
+  trackHotmartEvent("InitiateCheckout", {
+    content_name: "Estructuras Gramaticales de Inglés A1-C1",
+    content_category: "Digital Book",
+    content_ids: ["product-estructuras-gramaticales"],
+    content_type: "product",
+    value: 12,
+    currency: "USD",
+    num_items: 1,
+  });
   window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
 };
 

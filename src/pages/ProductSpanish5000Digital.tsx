@@ -150,9 +150,13 @@ const ProductSpanish5000Digital = () => {
     lockRef.current = true;
     setIsRedirecting(true);
     trackHotmartEvent("InitiateCheckout", {
-      content_name: "Spanish 5000 Digital",
+      content_name: "Spanish Relax - 5,000 Words (Digital)",
+      content_category: "Digital Book",
+      content_ids: ["product-spanish-5000-digital"],
+      content_type: "product",
       value: PRICE,
       currency: "USD",
+      num_items: 1,
     });
     window.location.assign(STRIPE_CHECKOUT_URL);
   };

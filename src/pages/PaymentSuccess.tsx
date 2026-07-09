@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
+import { getLastCheckoutForPurchase, trackSpanishRelaxEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import {
   CheckCircle,
@@ -21,30 +21,37 @@ const PaymentSuccess = () => {
   const [confetti, setConfetti] = useState(true);
 
   useEffect(() => {
+    const lastCheckout = getLastCheckoutForPurchase();
+    const contentName = typeof lastCheckout?.content_name === "string" ? lastCheckout.content_name : "Spanish Relax - 5,000 Words (Digital)";
+    const contentIds = Array.isArray(lastCheckout?.content_ids) && lastCheckout.content_ids.length ? lastCheckout.content_ids : ["product-spanish-5000-digital"];
+    const value = typeof lastCheckout?.value === "number" ? lastCheckout.value : 22;
+    const currency = typeof lastCheckout?.currency === "string" ? lastCheckout.currency : "USD";
+
     // Fire Purchase event for Meta Pixel (with eventID for deduplication)
     trackSpanishRelaxEvent("Purchase", {
-      content_name: "Spanish Relax - 5,000 Words",
+      content_name: contentName,
       content_category: "Digital Book",
-      content_ids: ["product-spanish-5000"],
+      content_ids: contentIds,
       content_type: "product",
-      value: 29.99,
-      currency: "USD",
+      value,
+      currency,
       num_items: 1,
+      __skipFunnelLog: true,
     });
 
     // Google Analytics 4: purchase (Shopify)
     const urlParams = new URLSearchParams(window.location.search);
     trackGAEvent("purchase", {
       transaction_id: urlParams.get("order") || urlParams.get("transaction") || `shopify_${Date.now()}`,
-      currency: "USD",
-      value: 29.99,
-      payment_provider: "shopify",
+      currency,
+      value,
+      payment_provider: "stripe",
       items: [
         {
-          item_id: "product-spanish-5000",
-          item_name: "Spanish Relax - 5,000 Words",
+          item_id: String(contentIds[0] || "product-spanish-5000-digital"),
+          item_name: contentName,
           item_category: "Digital Book",
-          price: 29.99,
+          price: value,
           quantity: 1,
         },
       ],

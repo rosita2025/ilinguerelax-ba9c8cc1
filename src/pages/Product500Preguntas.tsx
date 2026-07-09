@@ -266,6 +266,7 @@ const Product500Preguntas = () => {
         reviewCount={280}
         showReviews={true}
         buyUrl={HOTMART_URL}
+        onBuyClick={handleBuy}
       />
 
       <div className="h-20 md:h-16" />

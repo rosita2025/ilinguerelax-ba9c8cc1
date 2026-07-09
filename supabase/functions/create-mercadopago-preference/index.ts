@@ -67,11 +67,11 @@ Deno.serve(async (req) => {
     const preferencePayload: Record<string, unknown> = {
       items: mpItems,
       back_urls: {
-        success: body.returnUrl,
-        failure: body.returnUrl,
-        pending: body.returnUrl,
+        success: body.successUrl ?? body.returnUrl,
+        failure: body.failureUrl ?? body.returnUrl,
+        pending: body.pendingUrl ?? body.returnUrl,
       },
-      auto_return: "approved",
+      auto_return: body.autoReturn,
       statement_descriptor: "ILINGUE RELAX",
       binary_mode: false,
       metadata: {

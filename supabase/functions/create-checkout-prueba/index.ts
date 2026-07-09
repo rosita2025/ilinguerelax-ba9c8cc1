@@ -80,6 +80,32 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Resolve or create a Stripe Customer so email/name are prefilled in
+    // Embedded Checkout (Stripe still shows the email field, but it comes
+    // pre-populated and users don't need to retype it).
+    const fullName = `${body.contact.firstName} ${body.contact.lastName}`.trim().slice(0, 100);
+    let customerId: string | undefined;
+    try {
+      const existing = await stripe.customers.list({ email: body.contact.email, limit: 1 });
+      if (existing.data.length) {
+        customerId = existing.data[0].id;
+        await stripe.customers.update(customerId, {
+          name: fullName || existing.data[0].name || undefined,
+          phone: body.contact.phone || existing.data[0].phone || undefined,
+        });
+      } else {
+        const created = await stripe.customers.create({
+          email: body.contact.email,
+          name: fullName || undefined,
+          phone: body.contact.phone || undefined,
+          metadata: { source: "checkout-prueba-1", country: body.contact.country },
+        });
+        customerId = created.id;
+      }
+    } catch (e) {
+      console.warn("customer resolve failed, falling back to customer_email:", e);
+    }
+
     const productSummary = body.items
       .map((i) => `${i.quantity}x ${i.name}`)
       .join(" · ")
@@ -90,13 +116,15 @@ Deno.serve(async (req) => {
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
-      customer_email: body.contact.email,
+      ...(customerId
+        ? { customer: customerId, customer_update: { name: "auto", address: "auto" } }
+        : { customer_email: body.contact.email }),
       payment_intent_data: {
         description: `Prueba 1 · ${productSummary}`,
       },
       metadata: {
         source: "checkout-prueba-1",
-        customer_name: `${body.contact.firstName} ${body.contact.lastName}`.slice(0, 100),
+        customer_name: fullName,
         customer_phone: body.contact.phone,
         customer_country: body.contact.country,
         coupon_code: body.couponCode ?? "",

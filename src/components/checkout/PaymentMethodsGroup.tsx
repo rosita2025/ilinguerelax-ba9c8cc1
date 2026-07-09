@@ -156,8 +156,17 @@ export function PaymentMethodsGroup() {
     { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Paga escaneando el QR desde tu app", badge: `S/ ${totalPen}` },
   ];
 
+  const wasValidRef = useRef(valid);
+  const methodsAnchorRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!wasValidRef.current && valid) {
+      methodsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    wasValidRef.current = valid;
+  }, [valid]);
+
   return (
-    <div className="space-y-3">
+    <div id="payment-methods" ref={methodsAnchorRef} className="space-y-3 scroll-mt-24">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
         Elige tu método de pago
       </h2>
@@ -167,7 +176,15 @@ export function PaymentMethodsGroup() {
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
         return (
-          <div key={m.id} className="rounded-xl border bg-background overflow-hidden">
+          <div
+            key={m.id}
+            className={cn(
+              "rounded-xl border overflow-hidden transition-colors",
+              isSelected
+                ? "border-neutral-400 bg-neutral-100 dark:bg-neutral-800/60"
+                : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40",
+            )}
+          >
             <button
               type="button"
               onClick={() => handleSelect(m.id)}
@@ -175,39 +192,45 @@ export function PaymentMethodsGroup() {
               aria-disabled={!valid}
               className={cn(
                 "w-full text-left p-4 flex items-center gap-3 transition-colors",
-                isSelected ? "bg-primary/5" : "hover:bg-muted/40",
+                isSelected
+                  ? "bg-neutral-200/60 dark:bg-neutral-800"
+                  : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
                 !valid && "cursor-not-allowed",
               )}
             >
               <div className={cn(
                 "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-primary",
+                isSelected
+                  ? "bg-neutral-700 text-white"
+                  : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
               )}>
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm flex items-center gap-2">
+                <div className="font-semibold text-sm flex items-center gap-2 text-neutral-800 dark:text-neutral-100">
                   {m.title}
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
                       {m.badge}
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground mt-0.5 truncate">{m.sub}</div>
+                <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">{m.sub}</div>
               </div>
               <div className={cn(
-                "w-4 h-4 rounded-full border-2 shrink-0",
-                isSelected ? "border-primary bg-primary" : "border-muted-foreground/30",
+                "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",
+                isSelected
+                  ? "border-neutral-700 bg-neutral-700"
+                  : "border-neutral-300 dark:border-neutral-600",
               )} />
             </button>
 
             {m.id === "card" && isSelected && stripePromise && (
-              <div className="border-t bg-muted/20">
-                <div className="flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground">
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950">
+                <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
                 </div>
-                <div className="min-h-[500px] bg-background">
+                <div className="min-h-[500px] bg-white dark:bg-neutral-950">
                   <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
                     <EmbeddedCheckout />
                   </EmbeddedCheckoutProvider>
@@ -226,3 +249,4 @@ export function PaymentMethodsGroup() {
     </div>
   );
 }
+

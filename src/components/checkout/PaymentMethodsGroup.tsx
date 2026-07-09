@@ -153,8 +153,19 @@ export function PaymentMethodsGroup() {
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
     setSelected(m);
-    if (m === "cash") payMercado("cash");
-    if (m === "transfer") payMercado("transfer");
+    if (m !== "card") setShowStripe(false);
+  };
+
+  const handleBuyNow = () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    if (!selected) {
+      toast({ title: "Selecciona un método de pago", variant: "destructive" });
+      return;
+    }
+    if (selected === "card") { setShowStripe(true); return; }
+    if (selected === "transfer") { payMercado("transfer"); return; }
+    if (selected === "cash") { payMercado("cash"); return; }
+    // yape → user uses "Ya pagué" button in the manual panel
   };
 
   const handleManualPaid = () => {

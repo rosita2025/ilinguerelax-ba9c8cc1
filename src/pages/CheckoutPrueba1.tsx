@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
+import { AddProductForm } from "@/components/checkout/AddProductForm";
+import { MercadoPagoButton } from "@/components/checkout/MercadoPagoButton";
 import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
 import { toast } from "@/hooks/use-toast";
 

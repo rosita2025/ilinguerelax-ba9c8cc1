@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, ShoppingBag } from "lucide-react";
+import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, ShoppingBag, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
 
 const tabs = [
   { to: "/admin", label: "Inicio", icon: LayoutDashboard, end: true },
   { to: "/admin/live", label: "En vivo", icon: Globe },
+  { to: "/admin/checkouts", label: "Checkouts", icon: ShoppingCart },
   { to: "/admin/shopify", label: "Shopify", icon: ShoppingBag },
   { to: "/admin/reviews", label: "Reseñas", icon: Star },
   { to: "/admin/funnel", label: "Funnel", icon: BarChart3 },

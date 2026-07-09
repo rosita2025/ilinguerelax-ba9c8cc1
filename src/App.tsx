@@ -56,6 +56,7 @@ const AdminSEO = lazy(() => import("./pages/AdminSEO"));
 const AdminShopify = lazy(() => import("./pages/AdminShopify"));
 const AdminHome = lazy(() => import("./pages/AdminHome"));
 const AdminLive = lazy(() => import("./pages/AdminLive"));
+const AdminCheckouts = lazy(() => import("./pages/AdminCheckouts"));
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));

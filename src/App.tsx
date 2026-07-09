@@ -67,6 +67,7 @@ const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
 const CheckoutFailure = lazy(() => import("./pages/CheckoutFailure"));
 const CheckoutPending = lazy(() => import("./pages/CheckoutPending"));
+const CheckoutPendienteManual = lazy(() => import("./pages/CheckoutPendienteManual"));
 
 const queryClient = new QueryClient();
 
@@ -205,6 +206,7 @@ const App = () => (
                   <Route path="/checkouts/success" element={<CheckoutSuccess />} />
                   <Route path="/checkouts/failure" element={<CheckoutFailure />} />
                   <Route path="/checkouts/pending" element={<CheckoutPending />} />
+                  <Route path="/checkouts/pendiente-manual" element={<CheckoutPendienteManual />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

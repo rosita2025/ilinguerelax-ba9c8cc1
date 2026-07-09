@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { CreditCard, Building2, Banknote, Loader2, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -9,10 +10,14 @@ import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInf
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Method = "card" | "transfer" | "cash";
+type Method = "card" | "transfer" | "cash" | "yape";
 const USD_TO_PEN = 3.75;
+const YAPE_PHONE = "972119741";
+const YAPE_NAME = "Carmen Aliaga Manuel";
+const WHATSAPP_URL = "https://wa.link/unpa9n";
 
 export function PaymentMethodsGroup() {
+  const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
   const { total } = calcTotals(items, couponPercent, region.tier);
@@ -20,6 +25,7 @@ export function PaymentMethodsGroup() {
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
+  const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const valid = isBuyerValid(buyer);
 
@@ -150,10 +156,30 @@ export function PaymentMethodsGroup() {
     if (m === "transfer") payMercado("transfer");
   };
 
+  const handleManualPaid = () => {
+    const s = useCheckoutPruebaStore.getState();
+    supabase.from("email_contacts").upsert({
+      email: s.buyer.email.trim().toLowerCase(),
+      name: s.buyer.fullName.trim(),
+      source: "checkout-prueba-1",
+      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin" },
+    }, { onConflict: "email,source" }).then(() => {});
+    navigate("/checkouts/pendiente-manual");
+  };
+
+  const copyPhone = async () => {
+    try {
+      await navigator.clipboard.writeText(YAPE_PHONE);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch { /* noop */ }
+  };
+
   const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
     { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link", badge: "Stripe" },
     { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank", badge: `S/ ${totalPen}` },
     { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `S/ ${totalPen}` },
+    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `S/ ${totalPen}` },
   ];
 
   const wasValidRef = useRef(valid);
@@ -235,6 +261,58 @@ export function PaymentMethodsGroup() {
                     <EmbeddedCheckout />
                   </EmbeddedCheckoutProvider>
                 </div>
+              </div>
+            )}
+
+            {m.id === "yape" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="text-center space-y-1">
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">Envía el pago a</p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{YAPE_NAME}</p>
+                  <button
+                    type="button"
+                    onClick={copyPhone}
+                    className="inline-flex items-center gap-2 text-xl font-mono font-bold text-primary hover:opacity-80 transition"
+                  >
+                    {YAPE_PHONE}
+                    {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                  <p className="text-[11px] text-neutral-500">{copied ? "¡Copiado!" : "Toca para copiar el número"}</p>
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
+                  <p className="text-xs text-neutral-500">Monto exacto a pagar</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">S/ {totalPen}</p>
+                </div>
+
+                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
+                  <li>Abre tu app de <strong>Yape</strong> o <strong>Plin</strong>.</li>
+                  <li>Envía <strong>S/ {totalPen}</strong> al número <strong>{YAPE_PHONE}</strong> ({YAPE_NAME}).</li>
+                  <li>Guarda la captura del comprobante.</li>
+                  <li>Presiona <strong>“Ya pagué”</strong> y envíanos el comprobante por WhatsApp.</li>
+                </ol>
+
+                <button
+                  type="button"
+                  onClick={handleManualPaid}
+                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-3 rounded-xl transition-colors"
+                >
+                  Ya pagué → Enviar comprobante
+                </button>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> Enviar comprobante directo por WhatsApp
+                </a>
+
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">
+                  Nuestra <strong>Supervisora Rosa</strong> revisa los pagos manualmente desde Perú.
+                  Recibirás tu producto en <strong>1 a 24 horas</strong> tras confirmar el comprobante.
+                </p>
               </div>
             )}
           </div>

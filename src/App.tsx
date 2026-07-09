@@ -54,6 +54,7 @@ const AdminReviews = lazy(() => import("./pages/AdminReviews"));
 const AdminFunnel = lazy(() => import("./pages/AdminFunnel"));
 const AdminSEO = lazy(() => import("./pages/AdminSEO"));
 const AdminHome = lazy(() => import("./pages/AdminHome"));
+const AdminLive = lazy(() => import("./pages/AdminLive"));
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
@@ -156,6 +157,7 @@ const App = () => (
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />
                   <Route path="/admin" element={<AdminGate><AdminHome /></AdminGate>} />
+                  <Route path="/admin/live" element={<AdminGate><AdminLive /></AdminGate>} />
                   <Route path="/admin/reviews" element={<AdminGate><AdminReviews /></AdminGate>} />
                   <Route path="/admin/funnel" element={<AdminGate><AdminFunnel /></AdminGate>} />
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />

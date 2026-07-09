@@ -10,10 +10,18 @@ export interface PruebaItem {
   description?: string;
 }
 
+export interface BuyerInfo {
+  fullName: string;
+  email: string;
+  phone?: string;
+}
+
 interface PruebaStore {
   items: PruebaItem[];
   coupon: string | null;
   couponPercent: number;
+  buyer: BuyerInfo;
+  setBuyer: (patch: Partial<BuyerInfo>) => void;
   addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, qty: number) => void;
@@ -62,6 +70,10 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       items: DEFAULT_ITEMS,
       coupon: null,
       couponPercent: 0,
+      buyer: { fullName: "", email: "", phone: "" },
+
+      setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
+
 
       addItem: (item) => {
         const existing = get().items.find((i) => i.id === item.id);
@@ -107,6 +119,15 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
     {
       name: "checkout-prueba-1",
       storage: createJSONStorage(() => localStorage),
+      version: 2,
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as object),
+        buyer: {
+          ...current.buyer,
+          ...((persisted as { buyer?: BuyerInfo })?.buyer ?? {}),
+        },
+      }),
     },
   ),
 );

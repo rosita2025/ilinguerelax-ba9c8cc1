@@ -16,6 +16,8 @@ const BodySchema = z.object({
   couponPercent: z.number().min(0).max(90).default(0),
   couponCode: z.string().max(20).optional(),
   payerEmail: z.string().email().optional(),
+  payerName: z.string().max(120).optional(),
+  payerPhone: z.string().max(30).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
   returnUrl: z.string().url(),
   successUrl: z.string().url().optional(),
@@ -105,8 +107,17 @@ Deno.serve(async (req) => {
       },
     };
 
-    if (body.payerEmail) {
-      preferencePayload.payer = { email: body.payerEmail };
+    if (body.payerEmail || body.payerName) {
+      const nameParts = (body.payerName ?? "").trim().split(/\s+/);
+      const payer: Record<string, unknown> = {};
+      if (body.payerEmail) payer.email = body.payerEmail;
+      if (nameParts[0]) payer.name = nameParts[0].slice(0, 50);
+      if (nameParts.length > 1) payer.surname = nameParts.slice(1).join(" ").slice(0, 50);
+      if (body.payerPhone) {
+        const digits = body.payerPhone.replace(/\D/g, "");
+        if (digits) payer.phone = { area_code: "", number: digits };
+      }
+      preferencePayload.payer = payer;
     }
 
     const resp = await fetch("https://api.mercadopago.com/checkout/preferences", {

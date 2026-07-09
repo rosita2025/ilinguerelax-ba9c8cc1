@@ -40,9 +40,33 @@ export function MercadoPagoButton() {
       toast({ title: "Carrito vacío", variant: "destructive" });
       return;
     }
+    const b = latestCart.buyer;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email.trim());
+    if (b.fullName.trim().length < 3 || !emailOk) {
+      toast({
+        title: "Datos requeridos",
+        description: "Completa tu nombre y correo antes de pagar.",
+        variant: "destructive",
+      });
+      return;
+    }
     redirectingRef.current = true;
     setLoading(true);
     try {
+      // Guardar contacto (best-effort)
+      supabase
+        .from("email_contacts")
+        .upsert(
+          {
+            email: b.email.trim().toLowerCase(),
+            name: b.fullName.trim(),
+            source: "checkout-prueba-1",
+            metadata: { phone: b.phone ?? "", processor: "mercadopago" },
+          },
+          { onConflict: "email,source" },
+        )
+        .then(() => {});
+
       const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
         body: {
           orderId,
@@ -56,6 +80,9 @@ export function MercadoPagoButton() {
           })),
           couponPercent: latestCart.couponPercent,
           couponCode: latestCart.coupon ?? undefined,
+          payerEmail: b.email.trim(),
+          payerName: b.fullName.trim(),
+          payerPhone: b.phone ?? undefined,
           usdToPen: USD_TO_PEN,
           expectedTotalUsd: Number(latestTotals.total.toFixed(2)),
           returnUrl: `${window.location.origin}/checkouts/return`,

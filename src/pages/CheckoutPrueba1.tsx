@@ -8,11 +8,12 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { AddProductForm } from "@/components/checkout/AddProductForm";
 import { MercadoPagoButton } from "@/components/checkout/MercadoPagoButton";
+import { BuyerInfoForm, isBuyerValid } from "@/components/checkout/BuyerInfoForm";
 import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
 import { toast } from "@/hooks/use-toast";
 
 export default function CheckoutPrueba1() {
-  const { items, coupon, couponPercent, resetToDefaults } = useCheckoutPruebaStore();
+  const { items, coupon, couponPercent, buyer, resetToDefaults } = useCheckoutPruebaStore();
   const { total } = calcTotals(items, couponPercent);
   const [showStripe, setShowStripe] = useState(false);
   const cartSignature = useMemo(
@@ -32,6 +33,15 @@ export default function CheckoutPrueba1() {
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const latestCart = useCheckoutPruebaStore.getState();
     if (latestCart.items.length === 0) throw new Error("Carrito vacío");
+    const b = latestCart.buyer;
+    if (!isBuyerValid(b)) {
+      const msg = "Completa tu nombre y correo antes de pagar";
+      toast({ title: "Datos requeridos", description: msg, variant: "destructive" });
+      throw new Error(msg);
+    }
+    const parts = b.fullName.trim().split(/\s+/);
+    const firstName = parts[0].slice(0, 50);
+    const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);
     const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
       body: {
         environment: getStripeEnvironment(),
@@ -46,12 +56,11 @@ export default function CheckoutPrueba1() {
         currency: "usd",
         couponPercent: latestCart.couponPercent,
         couponCode: latestCart.coupon ?? undefined,
-        // Datos mínimos — Stripe recoge email + dirección en su propio form
         contact: {
-          email: "guest@ilinguerelax.com",
-          phone: "+10000000000",
-          firstName: "Guest",
-          lastName: "Checkout",
+          email: b.email.trim(),
+          phone: (b.phone ?? "").slice(0, 20) || "+10000000000",
+          firstName,
+          lastName,
           country: (localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
         },
         returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
@@ -62,6 +71,19 @@ export default function CheckoutPrueba1() {
       toast({ title: "Error de pago", description: msg, variant: "destructive" });
       throw new Error(msg);
     }
+    // Guardar contacto (best-effort, no bloquea)
+    supabase
+      .from("email_contacts")
+      .upsert(
+        {
+          email: b.email.trim().toLowerCase(),
+          name: b.fullName.trim(),
+          source: "checkout-prueba-1",
+          metadata: { phone: b.phone ?? "", processor: "stripe" },
+        },
+        { onConflict: "email,source" },
+      )
+      .then(() => {});
     return data.clientSecret;
   }, []); // estable para Stripe, pero toma el carrito actual al abrir
 
@@ -123,38 +145,48 @@ export default function CheckoutPrueba1() {
             </p>
           </div>
 
-          <MercadoPagoButton />
+          <BuyerInfoForm />
 
-          <div className="rounded-xl border overflow-hidden bg-background">
-            {items.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">Tu carrito está vacío.</div>
-            ) : !showStripe ? (
-              <button
-                type="button"
-                onClick={() => setShowStripe(true)}
-                className="w-full p-6 text-left hover:bg-muted/40 transition-colors flex items-center justify-between gap-3"
-              >
-                <div>
-                  <div className="font-semibold flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-primary" />
-                    Pagar con tarjeta, PayPal, Google Pay o Apple Pay
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Powered by Stripe · Toca para abrir el formulario seguro
-                  </div>
-                </div>
-                <span className="text-primary text-sm font-medium shrink-0">Abrir →</span>
-              </button>
-            ) : (
-              <div className="min-h-[500px]">
-                <EmbeddedCheckoutProvider
-                  stripe={stripePromise}
-                  options={{ fetchClientSecret }}
+          {!isBuyerValid(buyer) && (
+            <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3 text-xs text-primary">
+              Completa tu nombre y correo arriba para habilitar los métodos de pago.
+            </div>
+          )}
+
+          <div className={!isBuyerValid(buyer) ? "opacity-50 pointer-events-none select-none" : ""} aria-disabled={!isBuyerValid(buyer)}>
+            <MercadoPagoButton />
+
+            <div className="rounded-xl border overflow-hidden bg-background mt-4">
+              {items.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">Tu carrito está vacío.</div>
+              ) : !showStripe ? (
+                <button
+                  type="button"
+                  onClick={() => setShowStripe(true)}
+                  className="w-full p-6 text-left hover:bg-muted/40 transition-colors flex items-center justify-between gap-3"
                 >
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
-              </div>
-            )}
+                  <div>
+                    <div className="font-semibold flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-primary" />
+                      Pagar con tarjeta, PayPal, Google Pay o Apple Pay
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Powered by Stripe · Toca para abrir el formulario seguro
+                    </div>
+                  </div>
+                  <span className="text-primary text-sm font-medium shrink-0">Abrir →</span>
+                </button>
+              ) : (
+                <div className="min-h-[500px]">
+                  <EmbeddedCheckoutProvider
+                    stripe={stripePromise}
+                    options={{ fetchClientSecret }}
+                  >
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
+              )}
+            </div>
           </div>
 
 

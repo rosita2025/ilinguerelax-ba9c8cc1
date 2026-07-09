@@ -63,7 +63,7 @@ export default function CheckoutPrueba1() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <OrderSummary />
-          <AddProductForm />
+          
           <button
             type="button"
             onClick={resetToDefaults}

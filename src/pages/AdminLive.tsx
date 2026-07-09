@@ -83,7 +83,7 @@ const AdminLive = () => {
   const { adminKey } = useAdminKey();
   const [data, setData] = useState<LiveData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [windowMin, setWindowMin] = useState(5);
+  const [windowMin] = useState(1);
 
   const load = async () => {
     setLoading(true);
@@ -102,7 +102,7 @@ const AdminLive = () => {
   useEffect(() => { void load(); }, [adminKey, windowMin]);
   useEffect(() => {
     if (!data) return;
-    const id = setInterval(() => { void load(); }, 10000);
+    const id = setInterval(() => { void load(); }, 5000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, adminKey, windowMin]);
@@ -159,7 +159,7 @@ const AdminLive = () => {
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
               <span className="h-9 inline-flex items-center rounded-md border bg-background px-3 text-sm text-muted-foreground">
-                Últimos 5 min
+                Ahora mismo
               </span>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>
@@ -167,7 +167,7 @@ const AdminLive = () => {
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {[
-              { label: "Visitantes", value: data.total.toLocaleString(), sub: `últimos ${data.windowMinutes} min`, icon: Users },
+              { label: "Visitantes", value: data.total.toLocaleString(), sub: "ahora mismo", icon: Users },
               { label: "Vistas producto", value: (data.productViews || 0).toLocaleString(), sub: "ViewContent", icon: Eye },
               { label: "Continuar pago", value: (data.checkouts || 0).toLocaleString(), sub: `${data.checkoutSessions || 0} sesiones`, icon: CreditCard },
               { label: "Compras", value: (data.purchases || 0).toLocaleString(), sub: `${data.purchaseSessions || 0} sesiones`, icon: ShoppingBag },

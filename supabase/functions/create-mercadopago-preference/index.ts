@@ -108,9 +108,9 @@ Deno.serve(async (req) => {
           body.paymentType === "yape"
             ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "bank_transfer" }]
             : body.paymentType === "transfer"
-            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "digital_wallet" }, { id: "account_money" }]
+            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "digital_wallet" }]
             : body.paymentType === "cash"
-            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "bank_transfer" }, { id: "digital_wallet" }, { id: "account_money" }]
+            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "bank_transfer" }, { id: "digital_wallet" }]
             : [],
         installments: 12,
       },

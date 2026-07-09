@@ -67,6 +67,7 @@ const CartSyncWrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
+const FUNNEL_REF_KEY = "ilr_funnel_ref";
 const getSid = () => {
   try {
     let sid = localStorage.getItem(FUNNEL_SESSION_KEY);
@@ -78,9 +79,34 @@ const getSid = () => {
   } catch { return "anon"; }
 };
 
+const getAttributionReferrer = () => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const utmSource = params.get("utm_source");
+    if (utmSource) {
+      const ref = `utm:${utmSource}:${params.get("utm_campaign") || ""}`;
+      localStorage.setItem(FUNNEL_REF_KEY, ref);
+      return ref;
+    }
+    const saved = localStorage.getItem(FUNNEL_REF_KEY);
+    if (saved) return saved;
+    const referrer = document.referrer || null;
+    if (referrer) {
+      const refHost = new URL(referrer).hostname.replace(/^www\./, "");
+      const ownHost = window.location.hostname.replace(/^www\./, "");
+      if (refHost !== ownHost && !refHost.includes("lovable")) {
+        localStorage.setItem(FUNNEL_REF_KEY, referrer);
+        return referrer;
+      }
+    }
+  } catch { /* noop */ }
+  return null;
+};
+
 const RouteTracker = () => {
   const location = useLocation();
   useEffect(() => {
+    if (location.pathname.startsWith("/admin")) return;
     try {
       void supabase.functions.invoke("log-funnel-event", {
         body: {
@@ -88,7 +114,7 @@ const RouteTracker = () => {
           session_id: getSid(),
           page_path: location.pathname,
           country: localStorage.getItem("ilr_country"),
-          referrer: document.referrer || null,
+          referrer: getAttributionReferrer(),
         },
       });
     } catch (_) { /* noop */ }

@@ -25,6 +25,7 @@ const generateEventId = (): string => {
 
 // Persistent session id (per browser) for funnel attribution
 const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
+const FUNNEL_REF_KEY = "ilr_funnel_ref";
 const getSessionId = (): string => {
   if (typeof window === "undefined") return "ssr";
   try {
@@ -87,6 +88,31 @@ const getCountry = (): string | null => {
   try { return localStorage.getItem("ilr_country"); } catch { return null; }
 };
 
+const getAttributionReferrer = (): string | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const utmSource = params.get("utm_source");
+    if (utmSource) {
+      const ref = `utm:${utmSource}:${params.get("utm_campaign") || ""}`;
+      localStorage.setItem(FUNNEL_REF_KEY, ref);
+      return ref;
+    }
+    const saved = localStorage.getItem(FUNNEL_REF_KEY);
+    if (saved) return saved;
+    const referrer = document.referrer || null;
+    if (referrer) {
+      const refHost = new URL(referrer).hostname.replace(/^www\./, "");
+      const ownHost = window.location.hostname.replace(/^www\./, "");
+      if (refHost !== ownHost && !refHost.includes("lovable")) {
+        localStorage.setItem(FUNNEL_REF_KEY, referrer);
+        return referrer;
+      }
+    }
+  } catch { /* noop */ }
+  return null;
+};
+
 const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
   if (!FUNNEL_EVENTS.has(eventName)) return;
   if (typeof window === "undefined") return;
@@ -103,7 +129,7 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
         session_id: getSessionId(),
         page_path: window.location.pathname,
         country: getCountry(),
-        referrer: typeof document !== "undefined" ? document.referrer || null : null,
+        referrer: getAttributionReferrer(),
       },
     });
   } catch (e) {

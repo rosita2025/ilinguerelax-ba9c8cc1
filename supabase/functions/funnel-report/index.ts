@@ -9,7 +9,11 @@ const corsHeaders = {
 const FUNNEL_EVENTS = ["PageView", "ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"];
 
 const classifyReferrer = (ref: string | null): string => {
-  if (!ref) return "Direct";
+  if (!ref) return "Directo";
+  if (ref.startsWith("utm:")) {
+    const source = ref.split(":")[1] || "Campaña";
+    return source[0]?.toUpperCase() + source.slice(1);
+  }
   try {
     const host = new URL(ref).hostname.toLowerCase().replace(/^www\./, "");
     if (host.includes("google")) return "Google";
@@ -21,10 +25,15 @@ const classifyReferrer = (ref: string | null): string => {
     if (host.includes("twitter") || host === "t.co" || host.includes("x.com")) return "Twitter/X";
     if (host.includes("whatsapp") || host === "wa.me") return "WhatsApp";
     if (host.includes("hotmart")) return "Hotmart";
-    if (host.includes("ilinguerelax")) return "Direct";
+    if (host.includes("paypal")) return "PayPal";
+    if (host.includes("stripe")) return "Stripe";
+    if (host.includes("amazon")) return "Amazon";
+    if (host.includes("ilinguerelax") || host.includes("lovable")) return "Interno";
     return host;
-  } catch { return "Direct"; }
+  } catch { return "Directo"; }
 };
+
+const isAdminPath = (path: string | null): boolean => (path || "").startsWith("/admin");
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -75,7 +84,7 @@ serve(async (req) => {
       uniqueSessions[ev] = new Set();
     }
 
-    for (const row of data || []) {
+    for (const row of (data || []).filter((item) => !isAdminPath((item.page_path as string) || null))) {
       const ev = row.event_name as string;
       if (!FUNNEL_EVENTS.includes(ev)) continue;
       totals[ev] = (totals[ev] || 0) + 1;

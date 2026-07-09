@@ -159,7 +159,7 @@ const AdminLive = () => {
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
               <span className="h-9 inline-flex items-center rounded-md border bg-background px-3 text-sm text-muted-foreground">
-                Últimos 5 min
+                Ahora mismo
               </span>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>

@@ -102,9 +102,14 @@ Deno.serve(async (req) => {
         total_usd: calculatedTotalUsd,
         item_count: body.items.reduce((sum, item) => sum + item.quantity, 0),
       },
-      // Enable common Peruvian methods (Yape, Plin, transferencias, PagoEfectivo, cards).
+      // Filtrar tipos según selección del cliente
       payment_methods: {
-        excluded_payment_types: [],
+        excluded_payment_types:
+          body.paymentType === "yape"
+            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "bank_transfer" }]
+            : body.paymentType === "transfer"
+            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "digital_wallet" }, { id: "account_money" }]
+            : [],
         installments: 12,
       },
     };

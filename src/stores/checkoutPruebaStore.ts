@@ -70,6 +70,10 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       items: DEFAULT_ITEMS,
       coupon: null,
       couponPercent: 0,
+      buyer: { fullName: "", email: "", phone: "" },
+
+      setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
+
 
       addItem: (item) => {
         const existing = get().items.find((i) => i.id === item.id);

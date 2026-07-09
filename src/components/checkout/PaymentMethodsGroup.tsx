@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { CreditCard, Building2, Banknote, Loader2, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -9,8 +10,11 @@ import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInf
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Method = "card" | "transfer" | "cash";
+type Method = "card" | "transfer" | "cash" | "yape";
 const USD_TO_PEN = 3.75;
+const YAPE_PHONE = "972119741";
+const YAPE_NAME = "Carmen Aliaga Manuel";
+const WHATSAPP_URL = "https://wa.link/unpa9n";
 
 export function PaymentMethodsGroup() {
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();

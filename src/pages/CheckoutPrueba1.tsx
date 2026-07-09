@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle } from "lucide-react";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
-import { AddProductForm } from "@/components/checkout/AddProductForm";
+
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
@@ -63,7 +63,7 @@ export default function CheckoutPrueba1() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <OrderSummary />
-          <AddProductForm />
+          
           <button
             type="button"
             onClick={resetToDefaults}
@@ -74,9 +74,6 @@ export default function CheckoutPrueba1() {
         </aside>
       </div>
 
-      <div className="lg:hidden max-w-6xl mx-auto px-4 pb-8">
-        <AddProductForm />
-      </div>
     </div>
   );
 }

@@ -263,7 +263,7 @@ export function PaymentMethodsGroup() {
               )} />
             </button>
 
-            {m.id === "card" && isSelected && stripePromise && (
+            {m.id === "card" && isSelected && showStripe && stripePromise && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950">
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe

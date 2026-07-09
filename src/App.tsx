@@ -157,6 +157,7 @@ const App = () => (
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />
                   <Route path="/admin" element={<AdminGate><AdminHome /></AdminGate>} />
+                  <Route path="/admin/live" element={<AdminGate><AdminLive /></AdminGate>} />
                   <Route path="/admin/reviews" element={<AdminGate><AdminReviews /></AdminGate>} />
                   <Route path="/admin/funnel" element={<AdminGate><AdminFunnel /></AdminGate>} />
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />

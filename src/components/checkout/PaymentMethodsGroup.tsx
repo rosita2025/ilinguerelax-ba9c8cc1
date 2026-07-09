@@ -52,7 +52,7 @@ export function PaymentMethodsGroup() {
   useEffect(() => {
     if (prevSig.current !== cartSignature) {
       prevSig.current = cartSignature;
-      if (selected === "card") setSelected(null);
+      if (selected === "card") setShowStripe(false);
     }
   }, [cartSignature, selected]);
 

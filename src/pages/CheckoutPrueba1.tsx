@@ -110,6 +110,8 @@ export default function CheckoutPrueba1() {
             </p>
           </div>
 
+          <MercadoPagoButton />
+
           <div className="rounded-xl border overflow-hidden bg-background min-h-[500px]">
             {items.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">Tu carrito está vacío.</div>
@@ -122,8 +124,6 @@ export default function CheckoutPrueba1() {
               </EmbeddedCheckoutProvider>
             )}
           </div>
-
-          <MercadoPagoButton />
 
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">

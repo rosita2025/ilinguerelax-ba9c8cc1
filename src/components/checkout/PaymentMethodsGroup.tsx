@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CreditCard, Building2, Smartphone, Loader2, Lock } from "lucide-react";
+import { CreditCard, Building2, Banknote, Loader2, Lock } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -9,7 +9,7 @@ import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInf
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Method = "card" | "transfer" | "yape";
+type Method = "card" | "transfer" | "cash";
 const USD_TO_PEN = 3.75;
 
 export function PaymentMethodsGroup() {
@@ -93,7 +93,7 @@ export function PaymentMethodsGroup() {
     });
   };
 
-  const payMercado = async (paymentType: "yape" | "transfer") => {
+  const payMercado = async (paymentType: "cash" | "transfer") => {
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     const s = useCheckoutPruebaStore.getState();

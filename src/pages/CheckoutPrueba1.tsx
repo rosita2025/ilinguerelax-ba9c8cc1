@@ -25,11 +25,12 @@ export default function CheckoutPrueba1() {
   }, []);
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
-    if (items.length === 0) throw new Error("Carrito vacío");
+    const latestCart = useCheckoutPruebaStore.getState();
+    if (latestCart.items.length === 0) throw new Error("Carrito vacío");
     const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
       body: {
         environment: getStripeEnvironment(),
-        items: items.map((i) => ({
+        items: latestCart.items.map((i) => ({
           id: i.id,
           name: i.name,
           price: i.price,
@@ -38,8 +39,8 @@ export default function CheckoutPrueba1() {
           description: i.description,
         })),
         currency: "usd",
-        couponPercent,
-        couponCode: coupon ?? undefined,
+        couponPercent: latestCart.couponPercent,
+        couponCode: latestCart.coupon ?? undefined,
         // Datos mínimos — Stripe recoge email + dirección en su propio form
         contact: {
           email: "guest@ilinguerelax.com",
@@ -57,8 +58,7 @@ export default function CheckoutPrueba1() {
       throw new Error(msg);
     }
     return data.clientSecret;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // stable — Stripe no permite cambiar clientSecret después de montar
+  }, []); // estable para Stripe, pero toma el carrito actual al abrir
 
   if (!stripePromise) {
     return (

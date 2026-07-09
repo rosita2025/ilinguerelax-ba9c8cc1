@@ -123,6 +123,9 @@ export default function CheckoutPrueba1() {
             )}
           </div>
 
+          <MercadoPagoButton />
+
+
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> SSL Stripe
@@ -143,6 +146,7 @@ export default function CheckoutPrueba1() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <OrderSummary />
+          <AddProductForm />
           <button
             type="button"
             onClick={resetToDefaults}
@@ -151,6 +155,10 @@ export default function CheckoutPrueba1() {
             Restablecer productos de prueba
           </button>
         </aside>
+      </div>
+
+      <div className="lg:hidden max-w-6xl mx-auto px-4 pb-8">
+        <AddProductForm />
       </div>
     </div>
   );

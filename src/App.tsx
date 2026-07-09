@@ -63,6 +63,9 @@ const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
 const CheckoutTest = lazy(() => import("./pages/CheckoutTest"));
 const CheckoutPrueba1 = lazy(() => import("./pages/CheckoutPrueba1"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const CheckoutFailure = lazy(() => import("./pages/CheckoutFailure"));
+const CheckoutPending = lazy(() => import("./pages/CheckoutPending"));
 
 const queryClient = new QueryClient();
 

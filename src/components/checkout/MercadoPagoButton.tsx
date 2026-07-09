@@ -35,6 +35,10 @@ export function MercadoPagoButton() {
           couponCode: coupon ?? undefined,
           usdToPen: USD_TO_PEN,
           returnUrl: `${window.location.origin}/checkouts/return`,
+          successUrl: `${window.location.origin}/checkouts/success`,
+          failureUrl: `${window.location.origin}/checkouts/failure`,
+          pendingUrl: `${window.location.origin}/checkouts/pending`,
+          autoReturn: "approved",
         },
       });
       if (error || !data?.init_point) {

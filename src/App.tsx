@@ -60,6 +60,8 @@ const AdminLive = lazy(() => import("./pages/AdminLive"));
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
+const CheckoutTest = lazy(() => import("./pages/CheckoutTest"));
+const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 
 const queryClient = new QueryClient();
 
@@ -191,7 +193,8 @@ const App = () => (
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />
                   <Route path="/admin/shopify" element={<AdminGate><AdminShopify /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
-                  <Route path="/checkouts" element={<Navigate to="/admin" replace />} />
+                  <Route path="/checkouts" element={<CheckoutTest />} />
+                  <Route path="/checkouts/return" element={<CheckoutReturn />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

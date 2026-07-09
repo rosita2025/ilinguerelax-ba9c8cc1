@@ -2,3 +2,9 @@ project_id = "opyitzdvvurdyyyzkwwv"
 
 [functions.process-email-queue]
 verify_jwt = true
+
+[functions.create-test-checkout]
+verify_jwt = false
+
+[functions.payments-webhook]
+verify_jwt = false

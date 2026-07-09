@@ -16,6 +16,10 @@ const BodySchema = z.object({
   couponCode: z.string().max(20).optional(),
   payerEmail: z.string().email().optional(),
   returnUrl: z.string().url(),
+  successUrl: z.string().url().optional(),
+  failureUrl: z.string().url().optional(),
+  pendingUrl: z.string().url().optional(),
+  autoReturn: z.enum(["approved", "all"]).default("approved"),
   // Peruvian Soles conversion rate (approx). Frontend can override.
   usdToPen: z.number().positive().max(10).default(3.75),
 });

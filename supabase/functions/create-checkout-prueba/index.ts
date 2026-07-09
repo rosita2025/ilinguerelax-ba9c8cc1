@@ -116,13 +116,15 @@ Deno.serve(async (req) => {
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
-      customer_email: body.contact.email,
+      ...(customerId
+        ? { customer: customerId, customer_update: { name: "auto", address: "auto" } }
+        : { customer_email: body.contact.email }),
       payment_intent_data: {
         description: `Prueba 1 · ${productSummary}`,
       },
       metadata: {
         source: "checkout-prueba-1",
-        customer_name: `${body.contact.firstName} ${body.contact.lastName}`.slice(0, 100),
+        customer_name: fullName,
         customer_phone: body.contact.phone,
         customer_country: body.contact.country,
         coupon_code: body.couponCode ?? "",

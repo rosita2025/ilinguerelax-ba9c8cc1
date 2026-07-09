@@ -145,38 +145,48 @@ export default function CheckoutPrueba1() {
             </p>
           </div>
 
-          <MercadoPagoButton />
+          <BuyerInfoForm />
 
-          <div className="rounded-xl border overflow-hidden bg-background">
-            {items.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">Tu carrito está vacío.</div>
-            ) : !showStripe ? (
-              <button
-                type="button"
-                onClick={() => setShowStripe(true)}
-                className="w-full p-6 text-left hover:bg-muted/40 transition-colors flex items-center justify-between gap-3"
-              >
-                <div>
-                  <div className="font-semibold flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-primary" />
-                    Pagar con tarjeta, PayPal, Google Pay o Apple Pay
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Powered by Stripe · Toca para abrir el formulario seguro
-                  </div>
-                </div>
-                <span className="text-primary text-sm font-medium shrink-0">Abrir →</span>
-              </button>
-            ) : (
-              <div className="min-h-[500px]">
-                <EmbeddedCheckoutProvider
-                  stripe={stripePromise}
-                  options={{ fetchClientSecret }}
+          {!isBuyerValid(buyer) && (
+            <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3 text-xs text-primary">
+              Completa tu nombre y correo arriba para habilitar los métodos de pago.
+            </div>
+          )}
+
+          <div className={!isBuyerValid(buyer) ? "opacity-50 pointer-events-none select-none" : ""} aria-disabled={!isBuyerValid(buyer)}>
+            <MercadoPagoButton />
+
+            <div className="rounded-xl border overflow-hidden bg-background mt-4">
+              {items.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">Tu carrito está vacío.</div>
+              ) : !showStripe ? (
+                <button
+                  type="button"
+                  onClick={() => setShowStripe(true)}
+                  className="w-full p-6 text-left hover:bg-muted/40 transition-colors flex items-center justify-between gap-3"
                 >
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
-              </div>
-            )}
+                  <div>
+                    <div className="font-semibold flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-primary" />
+                      Pagar con tarjeta, PayPal, Google Pay o Apple Pay
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Powered by Stripe · Toca para abrir el formulario seguro
+                    </div>
+                  </div>
+                  <span className="text-primary text-sm font-medium shrink-0">Abrir →</span>
+                </button>
+              ) : (
+                <div className="min-h-[500px]">
+                  <EmbeddedCheckoutProvider
+                    stripe={stripePromise}
+                    options={{ fetchClientSecret }}
+                  >
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
+              )}
+            </div>
           </div>
 
 

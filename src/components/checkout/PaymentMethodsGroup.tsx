@@ -25,6 +25,7 @@ export function PaymentMethodsGroup() {
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
+  const [showStripe, setShowStripe] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const valid = isBuyerValid(buyer);

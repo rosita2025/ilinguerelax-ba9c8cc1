@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -10,6 +10,13 @@ const panels = [
     title: "Visitas en vivo",
     desc: "Mapa mundial en tiempo real con visitantes activos, país, página y fuente de tráfico.",
     color: "text-primary",
+  },
+  {
+    to: "/admin/shopify",
+    icon: ShoppingBag,
+    title: "Shopify · Ventas",
+    desc: "Panel estilo Power BI: Net Sales, AOV, LTV, repeat rate, top productos, países y métodos de pago.",
+    color: "text-emerald-600",
   },
   {
     to: "/admin/reviews",

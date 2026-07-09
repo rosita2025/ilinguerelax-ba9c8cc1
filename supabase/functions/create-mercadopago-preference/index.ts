@@ -107,8 +107,17 @@ Deno.serve(async (req) => {
       },
     };
 
-    if (body.payerEmail) {
-      preferencePayload.payer = { email: body.payerEmail };
+    if (body.payerEmail || body.payerName) {
+      const nameParts = (body.payerName ?? "").trim().split(/\s+/);
+      const payer: Record<string, unknown> = {};
+      if (body.payerEmail) payer.email = body.payerEmail;
+      if (nameParts[0]) payer.name = nameParts[0].slice(0, 50);
+      if (nameParts.length > 1) payer.surname = nameParts.slice(1).join(" ").slice(0, 50);
+      if (body.payerPhone) {
+        const digits = body.payerPhone.replace(/\D/g, "");
+        if (digits) payer.phone = { area_code: "", number: digits };
+      }
+      preferencePayload.payer = payer;
     }
 
     const resp = await fetch("https://api.mercadopago.com/checkout/preferences", {

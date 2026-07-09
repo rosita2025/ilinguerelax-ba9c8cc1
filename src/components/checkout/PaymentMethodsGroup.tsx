@@ -25,6 +25,7 @@ export function PaymentMethodsGroup() {
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
+  const [showStripe, setShowStripe] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const valid = isBuyerValid(buyer);
@@ -51,7 +52,7 @@ export function PaymentMethodsGroup() {
   useEffect(() => {
     if (prevSig.current !== cartSignature) {
       prevSig.current = cartSignature;
-      if (selected === "card") setSelected(null);
+      if (selected === "card") setShowStripe(false);
     }
   }, [cartSignature, selected]);
 
@@ -152,8 +153,19 @@ export function PaymentMethodsGroup() {
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
     setSelected(m);
-    if (m === "cash") payMercado("cash");
-    if (m === "transfer") payMercado("transfer");
+    if (m !== "card") setShowStripe(false);
+  };
+
+  const handleBuyNow = () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    if (!selected) {
+      toast({ title: "Selecciona un método de pago", variant: "destructive" });
+      return;
+    }
+    if (selected === "card") { setShowStripe(true); return; }
+    if (selected === "transfer") { payMercado("transfer"); return; }
+    if (selected === "cash") { payMercado("cash"); return; }
+    // yape → user uses "Ya pagué" button in the manual panel
   };
 
   const handleManualPaid = () => {
@@ -251,7 +263,7 @@ export function PaymentMethodsGroup() {
               )} />
             </button>
 
-            {m.id === "card" && isSelected && stripePromise && (
+            {m.id === "card" && isSelected && showStripe && stripePromise && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950">
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
@@ -323,6 +335,26 @@ export function PaymentMethodsGroup() {
         <p className="text-xs text-center text-muted-foreground pt-2">
           👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.
         </p>
+      )}
+
+      {selected !== "yape" && !(selected === "card" && showStripe) && (
+        <button
+          type="button"
+          onClick={handleBuyNow}
+          disabled={!valid || !selected || mpLoading !== null}
+          className={cn(
+            "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
+            "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "flex items-center justify-center gap-2",
+          )}
+        >
+          {mpLoading ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Redirigiendo…</>
+          ) : (
+            <><Lock className="w-4 h-4" /> Comprar ahora</>
+          )}
+        </button>
       )}
     </div>
   );

@@ -1,105 +1,122 @@
-# Plan de optimización SEO – iLingue Relax
 
-Basado en la auditoría real del sitio (Lighthouse + agentes SEO + Google Search Console). Priorizado por impacto: primero lo que arregla lo que está roto hoy, después mejoras estructurales, y al final el link building.
+# Checkout tipo Shopify — "Prueba 1"
 
-## Fase 1 · Fixes técnicos detectados por el escáner (impacto directo)
+Nueva página de prueba en `/checkouts` con diseño idéntico al checkout de Shopify (referencia adjuntada), 100% aislada — **no toca ningún producto existente** (Hotmart, Shopify, digital $22, coreano, patrones, etc.). Solo usa Stripe.
 
-**1. Sitemap desactualizado** (`public/sitemap.xml`)
-Faltan estas rutas reales del sitio:
-- `/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles`
-- `/products/100-mapas-mentales-para-aprender-coreano-hangul-c1`
-- `/products/estructuras-gramaticales-ingles-a1-c1`
-- `/descarga/coreano-100-mapas`
-- `/vista-previa/patrones-especiales`
-- `/vista-previa/coreano-100-mapas-mentales`
+## Alcance
 
-Además hay que revisar que todas las rutas activas en `src/App.tsx` estén, y quitar las obsoletas. Se mantiene el archivo estático (no se migra a generador sin confirmar).
+- Producto de prueba llamado **"Prueba 1"** con carrito multi-item editable (agregar, quitar, cambiar cantidad).
+- Layout 2 columnas desktop / 1 columna mobile con panel de resumen colapsable.
+- Express checkout arriba: Google Pay, Apple Pay, PayPal (aparecen automáticamente en Stripe).
+- Formulario: email, teléfono, nombre, apellido, país (auto-detectado por IP).
+- Cupón de descuento (compatible con `NEW10`).
+- Métodos de pago: tarjetas crédito/débito + wallets nativas de Stripe.
+- Estilo visual: paleta del proyecto (Teal `hsl(175 65% 40%)`, Coral, Plus Jakarta Sans) + estructura Shopify.
 
-**2. Múltiples H1 en el mismo documento**
-- `src/pages/BlogPost.tsx` → el markdown convierte `#` a `<h1>` dentro del post, además del H1 del título. Cambiar renderer para mapear `#` a `<h2>`.
-- `src/pages/BlogPost.tsx` → "Recursos Recomendados" pasa de `<h3>` a `<h2>` para jerarquía correcta.
+## Diseño de la página
 
-**3. Alt text genérico o corto en imágenes**
-- `src/pages/Index.tsx` → alt del ticker de logos: "Amazon" → "Amazon partner store", etc.
-- `src/pages/Product5000.tsx` → previews cambian de una palabra a frase descriptiva ("Vocabulario" → "Vista previa vocabulario inglés").
+```text
+Desktop (2 columnas):
+┌──────────────────────────────────┬───────────────────────┐
+│  ILINGUE RELAX                   │   Tu pedido           │
+│                                  │                       │
+│  ── Express checkout ──          │  [img] Prueba 1 · $X  │
+│  [Google Pay] [Apple Pay]        │  [img] Item 2  · $Y  │
+│  [    PayPal          ]          │  [img] Item 3  · $Z  │
+│                                  │                       │
+│  ─── O paga con tarjeta ───      │  Cupón [_____] Aplicar│
+│                                  │  ─────────────────    │
+│  Contacto                        │  Subtotal      $XX    │
+│  [email____________]             │  Descuento     -$X    │
+│  [teléfono_________]             │  Impuestos     incl.  │
+│                                  │  ═════════════════    │
+│  Datos                           │  Total         $XX    │
+│  [nombre] [apellido]             │                       │
+│  [país ▼ auto-IP]                │                       │
+│                                  │                       │
+│  [   Pagar $XX  →   ]            │                       │
+│  Pago 100% seguro · SSL          │                       │
+└──────────────────────────────────┴───────────────────────┘
 
-**4. Meta titles y descriptions demasiado largos**
-- Producto 5000 palabras y 8000 palabras: `<title>` >60 chars → recortar.
-- Descriptions >160 chars → reescribir dentro del rango 50–160.
+Mobile (1 columna):
+┌────────────────────────┐
+│ ILINGUE RELAX          │
+│ ▼ Ver resumen · $XX    │  ← desplegable
+├────────────────────────┤
+│ [wallets express]      │
+│ [formulario]           │
+│ [Pagar $XX →]          │
+└────────────────────────┘
+```
 
-**5. LCP lento (Lighthouse Performance)**
-- En cada hero (Home, productos principales) la imagen LCP recibe `width`, `height`, `fetchpriority="high"` y se le quita `loading="lazy"`.
-- Fuente Plus Jakarta Sans ya tiene `preload` — añadir `font-display: swap` si falta.
+## Archivos a crear
 
-**6. Contraste bajo (Lighthouse Accessibility)**
-- Reemplazar utilidades arbitrarias `text-gray-300/400`, `text-muted-foreground/50` por tokens semánticos (`text-foreground`, `text-muted-foreground` sin opacidad) donde el contraste falla.
+- `src/pages/CheckoutPrueba1.tsx` — página principal del checkout multi-item.
+- `src/components/checkout/OrderSummary.tsx` — panel derecho con lista de items + cupón + totales.
+- `src/components/checkout/ExpressCheckoutButtons.tsx` — wallets (Google/Apple Pay/PayPal) usando `<ExpressCheckoutElement>` de Stripe.
+- `src/components/checkout/ContactForm.tsx` — formulario con `react-hook-form` + validación `zod`.
+- `src/stores/checkoutPruebaStore.ts` — zustand store con items, cantidades, cupón (aislado del `cartStore` existente).
+- `supabase/functions/create-checkout-prueba/index.ts` — crea Stripe Checkout Session con `line_items` dinámicos + metadata (nombre, teléfono, país, cupón).
 
-## Fase 2 · Canonical y OG por página (react-helmet-async)
+## Archivos a modificar (mínimo)
 
-El componente `SEO` ya usa Helmet. Auditar en cada `Product*.tsx` que:
-- `canonicalUrl` apunta a la URL real de esa ruta (no a `/`).
-- `og:url` = canonical.
-- `og:image` absoluta con `https://ilinguerelax.com/...` (no rutas relativas).
+- `src/App.tsx` — añadir ruta `/checkouts/prueba-1`. **La ruta actual `/checkouts` (CheckoutTest) queda intacta.**
+- `supabase/config.toml` — registrar `create-checkout-prueba` con `verify_jwt = false`.
 
-Se corrigen las páginas donde `canonical` u `og:url` apunten a otra ruta.
+## Datos capturados
 
-## Fase 3 · Datos estructurados (JSON-LD) por página
+Formulario valida con zod:
 
-Hoy en `index.html` hay Organization, WebSite, FAQPage, BreadcrumbList y un Product hardcodeado (solo del producto 5000). Se mueve a **por ruta** vía Helmet:
+- `email` — obligatorio, formato email, ≤255 chars
+- `phone` — obligatorio, formato internacional (`+51 999 999 999`)
+- `firstName` / `lastName` — obligatorios, ≤50 chars c/u
+- `country` — auto por IP (ipapi.co) + selector manual
 
-- **Product pages** (todos los `/products/*`): schema `Product` con `name`, `image`, `offers.price`, `offers.priceCurrency`, `aggregateRating` real, `brand`.
-- **BlogPost**: schema `Article` con `headline`, `datePublished`, `author`, `image`.
-- **Blog index**: `Blog` schema con `blogPost[]`.
-- **FAQ pages**: `FAQPage` schema con las preguntas reales de la página, no las del index.
-- **Breadcrumbs**: `BreadcrumbList` por ruta profunda.
+Todo va en `session.metadata` de Stripe y se guarda en `email_contacts` vía webhook `payments-webhook`.
 
-Se quita el `Product` hardcodeado global de `index.html` para no duplicar señales.
+## Métodos de pago activos
 
-## Fase 4 · URLs y navegación interna
+Stripe Embedded Checkout maneja automáticamente:
 
-- URLs ya son amigables (`/products/nombre-largo-descriptivo`) — no se cambian para no romper indexación.
-- **Enlaces internos**: cada página de producto enlaza a 2–3 productos relacionados por idioma/nivel (cross-sell ya existe, se asegura `<a href>` real, no solo botones onClick).
-- Blog posts añaden enlaces internos a la página del producto que mencionan.
-- Footer con navegación por categorías (Idiomas, Libros físicos, Libros digitales, Blog) usando `<Link>` real.
-- Breadcrumbs visibles en producto y blog (además del schema).
+- Tarjetas Visa/Mastercard/Amex/Discover
+- Google Pay (Chrome/Android con tarjeta guardada)
+- Apple Pay (Safari/iOS)
+- Link (autofill Stripe)
+- **PayPal** — el usuario lo activa una vez en Stripe Dashboard → Settings → Payment methods → PayPal → Turn on
 
-## Fase 5 · Rendimiento / Core Web Vitals
+**No incluye** métodos LatAm (PSE, Nequi, Yape) — eso será una fase posterior con Wompi/Mercado Pago.
 
-- Todas las imágenes no-hero con `loading="lazy"` + `decoding="async"` + `width`/`height` explícitos para evitar CLS.
-- Componentes pesados en productos (`ProductReviews`, `FAQ`, `CustomerReviewsCarousel`) con `lazy()` + `Suspense` (ya se hace en algunos, se extiende).
-- Revisar `preconnect` en `index.html` — ya está para fonts y Facebook; añadir para Hotmart si es el destino de compra.
+## Backend flow
 
-## Fase 6 · Accesibilidad transversal
-
-- Botones con solo ícono (Navbar, Cart) reciben `aria-label`.
-- Un solo `<main>` por ruta (auditar `pages/*` — algunos envuelven dos veces).
-- Foco visible en todos los interactivos (usar tokens shadcn, no `outline:none`).
-- Verificar tap targets ≥44px en móvil (bottom bar, WhatsApp, ScrollToTop).
-
-## Fase 7 · robots.txt y Google Search Console
-
-- `public/robots.txt`: verificar que permite `/`, bloquea `/admin/*`, y declara `Sitemap: https://ilinguerelax.com/sitemap.xml`.
-- **Google Search Console no está conectado** — se pide al usuario autorizar el conector en un paso separado (no se puede hacer sin su OAuth). Después se sube el sitemap desde GSC.
-
-## Fase 8 · Marcado de findings como fixed
-
-Después de aplicar cada fix, se marcan como `fixed` en el escáner SEO para que la próxima corrida los verifique.
-
----
-
-## Fuera de alcance de esta implementación
-
-- **Link building externo** (backlinks desde otros sitios): es trabajo de marketing/outreach, no de código. Puedo generar una lista de tácticas y objetivos pero no se implementa en el repo.
-- **Google Search Console**: requiere OAuth del dueño del dominio. Se pide en su propio turno.
-- **SSR / previews sociales exactas por ruta**: el stack actual es SPA Vite. Helmet cubre Googlebot; Facebook/LinkedIn ven solo `index.html`. Migrar a SSR es un proyecto aparte — no incluido.
+```text
+Cliente edita carrito → click "Pagar"
+   ↓
+create-checkout-prueba (edge function):
+   - valida body con zod
+   - construye line_items dinámicos con price_data
+   - aplica cupón NEW10 si viene en body (10% off)
+   - metadata: { source: "prueba-1", name, phone, country, items }
+   - return_url: /checkouts/return?session_id={CHECKOUT_SESSION_ID}
+   ↓
+Stripe Embedded Checkout se monta inline
+   ↓
+Pago exitoso → return page /checkouts/return (ya existe)
+   ↓
+Webhook payments-webhook (ya existe) guarda contacto
+```
 
 ## Detalles técnicos
 
-- Stack: React 18 + Vite + React Router + react-helmet-async (ya instalado).
-- Escáner: Lighthouse + agentes internos + GSC (pendiente conectar).
-- Findings actuales: 6 (2 low, 4 mid). Fase 1 los resuelve todos menos GSC.
-- No se migra el sitemap de estático a generador sin confirmación explícita del usuario.
+- `<EmbeddedCheckoutProvider>` de `@stripe/react-stripe-js` (ya instalado).
+- Item schema: `{ id, name, price, quantity, image }`. Pruebas1 arranca con 3 items demo editables.
+- Cupón `NEW10` aplica 10% al subtotal (mismo comportamiento que popups actuales).
+- Trust badges pie: SSL Stripe, garantía 30 días, soporte WhatsApp.
+- Banner `PaymentTestModeBanner` visible mientras `pk_test_...` esté activo.
+- Detección país: usa `getCountryFromIP()` existente si está disponible; fallback a `ipapi.co` (ya usado en el proyecto).
 
-## Confirmación
+## Fuera de alcance (fases futuras)
 
-¿Procedo con **Fase 1–6 completa** en este turno? La Fase 7 (GSC) queda para cuando autorices el conector, y el link building externo queda como lista de recomendaciones sin código.
+- Wompi (Colombia — PSE/Nequi/Efecty)
+- Mercado Pago (Perú/Chile/Argentina/Ecuador)
+- Router `<SmartCheckout />` que decide procesador por país
+- Reemplazar checkouts de productos reales

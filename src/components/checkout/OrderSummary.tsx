@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
 import { cn } from "@/lib/utils";
 
 interface OrderSummaryProps {
@@ -12,10 +13,12 @@ interface OrderSummaryProps {
 export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
     useCheckoutPruebaStore();
+  const region = useRegionTier();
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
-  const { subtotal, discount, total } = calcTotals(items, couponPercent);
+  const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const hasRegionalItem = items.some((i) => i.regionPrices);
 
   const handleApplyCoupon = () => {
     setCouponError(null);
@@ -41,6 +44,16 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
 
       <div className={cn("p-5 space-y-4", collapsible && !expanded && "hidden lg:block")}>
         <h2 className="hidden lg:block text-lg font-semibold">Tu pedido</h2>
+
+        {hasRegionalItem && !region.loading && (
+          <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[11px] text-primary">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span>
+              <strong>{region.country || "Global"}</strong> detectado ·
+              Precio {region.tier === "latam" ? "Latinoamérica 🌎" : "Internacional 🌍"} aplicado por IP
+            </span>
+          </div>
+        )}
 
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
@@ -97,8 +110,13 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
                     </Button>
                   </div>
                 </div>
-                <div className="text-sm font-semibold shrink-0">
-                  ${(item.price * item.quantity).toFixed(2)}
+                <div className="text-sm font-semibold shrink-0 text-right">
+                  ${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}
+                  {item.regionPrices && (
+                    <div className="text-[10px] font-normal text-muted-foreground">
+                      {region.tier === "latam" ? "🌎 LatAm" : "🌍 Internacional"}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

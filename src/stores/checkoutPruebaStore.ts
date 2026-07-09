@@ -129,7 +129,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
     {
       name: "checkout-prueba-1",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       merge: (persisted, current) => ({
         ...current,
         ...(persisted as object),

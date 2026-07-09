@@ -233,11 +233,12 @@ export const trackHotmartEvent = (
 ) => {
   ensurePixelReady();
   const eventId = generateEventId();
+  const { __skipFunnelLog, ...pixelParams } = params;
   if (typeof window !== "undefined" && window.fbq) {
-    window.fbq("track", eventName, { ...params, eventID: eventId });
+    window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
   }
-  sendCapiEvent(eventName, eventId, params);
-  logFunnelEvent(eventName, params);
+  sendCapiEvent(eventName, eventId, pixelParams);
+  if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);
 };
 
 export const useHotmartPixelPageView = () => {

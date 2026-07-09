@@ -36,6 +36,7 @@ const PaymentSuccess = () => {
       value,
       currency,
       num_items: 1,
+      __skipFunnelLog: true,
     });
 
     // Google Analytics 4: purchase (Shopify)

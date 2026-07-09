@@ -87,6 +87,7 @@ const HotmartSuccess = () => {
       value: value,
       currency: "USD",
       num_items: 1,
+      __skipFunnelLog: true,
     });
 
     // Google Analytics 4: purchase (Hotmart)

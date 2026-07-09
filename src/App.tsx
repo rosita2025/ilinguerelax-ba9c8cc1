@@ -190,6 +190,8 @@ const App = () => (
                   <Route path="/admin/funnel" element={<AdminGate><AdminFunnel /></AdminGate>} />
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />
                   <Route path="/admin/shopify" element={<AdminGate><AdminShopify /></AdminGate>} />
+                  <Route path="/admin/checkouts" element={<AdminGate><AdminCheckouts /></AdminGate>} />
+                  <Route path="/checkouts" element={<AdminGate><AdminCheckouts /></AdminGate>} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

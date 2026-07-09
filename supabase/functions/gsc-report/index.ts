@@ -62,7 +62,7 @@ serve(async (req) => {
       });
     }
 
-    const safeDays = Math.min(Math.max(parseInt(String(days)) || 28, 1), 90);
+    const safeDays = Math.min(Math.max(parseInt(String(days)) || 28, 1), 480);
     const safeLimit = Math.min(Math.max(parseInt(String(limit)) || 25, 1), 100);
 
     const [queries, pages] = await Promise.all([

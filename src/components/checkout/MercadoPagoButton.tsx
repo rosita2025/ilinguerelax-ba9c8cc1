@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Smartphone, Building2, Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
 import { toast } from "@/hooks/use-toast";

@@ -8,11 +8,12 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { AddProductForm } from "@/components/checkout/AddProductForm";
 import { MercadoPagoButton } from "@/components/checkout/MercadoPagoButton";
+import { BuyerInfoForm, isBuyerValid } from "@/components/checkout/BuyerInfoForm";
 import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
 import { toast } from "@/hooks/use-toast";
 
 export default function CheckoutPrueba1() {
-  const { items, coupon, couponPercent, resetToDefaults } = useCheckoutPruebaStore();
+  const { items, coupon, couponPercent, buyer, resetToDefaults } = useCheckoutPruebaStore();
   const { total } = calcTotals(items, couponPercent);
   const [showStripe, setShowStripe] = useState(false);
   const cartSignature = useMemo(

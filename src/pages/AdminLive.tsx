@@ -167,7 +167,7 @@ const AdminLive = () => {
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {[
-              { label: "Visitantes", value: data.total.toLocaleString(), sub: `últimos ${data.windowMinutes} min`, icon: Users },
+              { label: "Visitantes", value: data.total.toLocaleString(), sub: "ahora mismo", icon: Users },
               { label: "Vistas producto", value: (data.productViews || 0).toLocaleString(), sub: "ViewContent", icon: Eye },
               { label: "Continuar pago", value: (data.checkouts || 0).toLocaleString(), sub: `${data.checkoutSessions || 0} sesiones`, icon: CreditCard },
               { label: "Compras", value: (data.purchases || 0).toLocaleString(), sub: `${data.purchaseSessions || 0} sesiones`, icon: ShoppingBag },

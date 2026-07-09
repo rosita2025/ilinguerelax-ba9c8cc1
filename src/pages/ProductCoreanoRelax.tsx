@@ -183,7 +183,7 @@ const ProductCoreanoRelax = () => {
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
                 <div className="block">
-                  <Button size="lg" className="w-full text-lg py-7 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
+                  <Button onClick={handleBuy} size="lg" className="w-full text-lg py-7 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Comprar $10
                   </Button>

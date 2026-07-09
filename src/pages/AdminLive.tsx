@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Card } from "@/components/ui/card";
-import { Loader2, Users, Globe, Eye } from "lucide-react";
+import { Activity, CreditCard, Eye, Globe, Loader2, MousePointerClick, ShoppingBag, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
@@ -16,18 +16,47 @@ interface Visitor {
   page_path: string | null;
   referrer: string | null;
   source: string;
+  source_channel: string;
   last_seen: string;
   event_count: number;
   last_event: string;
   product_id: string | null;
+  product_name: string;
+}
+interface RecentEvent {
+  session_id: string | null;
+  country: string | null;
+  page_path: string | null;
+  page_label: string;
+  source: string;
+  source_channel: string;
+  event_name: string;
+  product_id: string | null;
+  product_name: string;
+  value: number | null;
+  currency: string | null;
+  created_at: string;
 }
 interface LiveData {
   windowMinutes: number;
   total: number;
+  activeNow: number;
+  productViews: number;
+  checkouts: number;
+  checkoutSessions: number;
+  purchases: number;
+  purchaseSessions: number;
+  revenue: number;
   byCountry: Record<string, number>;
   byPage: Record<string, number>;
+  byPageLabel: Record<string, number>;
+  byProduct: Record<string, number>;
   bySource: Record<string, number>;
+  byChannel: Record<string, number>;
+  byEvent: Record<string, number>;
+  revenueByCountry: Record<string, number>;
   visitors: Visitor[];
+  recentEvents: RecentEvent[];
   generatedAt: string;
 }
 
@@ -38,6 +67,17 @@ const timeAgo = (iso: string) => {
   if (m < 60) return `${m}m`;
   return `${Math.floor(m / 60)}h`;
 };
+
+const eventLabel: Record<string, string> = {
+  PageView: "visitó página",
+  ViewContent: "vio producto",
+  AddToCart: "agregó carrito",
+  InitiateCheckout: "continuó a pago",
+  Purchase: "compró",
+  Lead: "dejó contacto",
+};
+
+const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
 const AdminLive = () => {
   const { adminKey } = useAdminKey();
@@ -89,6 +129,10 @@ const AdminLive = () => {
     .filter(Boolean) as Array<{ code: string; count: number; name: string; flag: string; coords: [number, number] }>;
 
   const radius = (count: number) => 4 + (count / maxCount) * 14;
+  const totalForPct = Math.max(1, data.total);
+  const topPages = Object.entries(data.byPageLabel || data.byPage).sort(([, a], [, b]) => b - a).slice(0, 12);
+  const topProducts = Object.entries(data.byProduct || {}).sort(([, a], [, b]) => b - a).slice(0, 12);
+  const topSources = Object.entries(data.byChannel || data.bySource).sort(([, a], [, b]) => b - a).slice(0, 8);
 
   return (
     <>
@@ -98,10 +142,10 @@ const AdminLive = () => {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-                <Globe className="w-7 h-7 text-primary" /> Visitas en vivo
+                <Globe className="w-7 h-7 text-primary" /> Plataforma en vivo
               </h1>
               <p className="text-sm text-muted-foreground">
-                Últimos {data.windowMinutes} min · actualizado {timeAgo(data.generatedAt)} atrás
+                Datos reales del sitio · productos, páginas, países, checkout y compras · actualizado {timeAgo(data.generatedAt)} atrás
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -111,7 +155,7 @@ const AdminLive = () => {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                 </span>
                 <Users className="w-4 h-4 text-primary" />
-                <span className="text-lg font-bold tabular-nums">{data.total}</span>
+                <span className="text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
               <select
@@ -128,50 +172,96 @@ const AdminLive = () => {
             </div>
           </div>
 
-          {/* World map */}
-          <Card className="p-2 md:p-4 overflow-hidden">
-            <ComposableMap
-              projectionConfig={{ scale: 140 }}
-              width={980}
-              height={460}
-              style={{ width: "100%", height: "auto" }}
-            >
-              <Geographies geography={GEO_URL}>
-                {({ geographies }) =>
-                  geographies.map((geo) => (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      style={{
-                        default: { fill: "hsl(var(--muted))", stroke: "hsl(var(--border))", strokeWidth: 0.5, outline: "none" },
-                        hover: { fill: "hsl(var(--muted))", outline: "none" },
-                        pressed: { fill: "hsl(var(--muted))", outline: "none" },
-                      }}
-                    />
-                  ))
-                }
-              </Geographies>
-              {markers.map((m) => (
-                <Marker key={m.code} coordinates={m.coords}>
-                  <circle
-                    r={radius(m.count)}
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.35}
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={1.5}
-                  >
-                    <animate attributeName="r" values={`${radius(m.count)};${radius(m.count) + 3};${radius(m.count)}`} dur="2s" repeatCount="indefinite" />
-                  </circle>
-                  <text textAnchor="middle" y={-radius(m.count) - 4} style={{ fontSize: 10, fontWeight: 700, fill: "hsl(var(--foreground))" }}>
-                    {m.count}
-                  </text>
-                </Marker>
-              ))}
-            </ComposableMap>
-          </Card>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              { label: "Visitantes", value: data.total.toLocaleString(), sub: `últimos ${data.windowMinutes} min`, icon: Users },
+              { label: "Vistas producto", value: (data.productViews || 0).toLocaleString(), sub: "ViewContent", icon: Eye },
+              { label: "Continuar pago", value: (data.checkouts || 0).toLocaleString(), sub: `${data.checkoutSessions || 0} sesiones`, icon: CreditCard },
+              { label: "Compras", value: (data.purchases || 0).toLocaleString(), sub: `${data.purchaseSessions || 0} sesiones`, icon: ShoppingBag },
+              { label: "Ingresos", value: money(data.revenue || 0), sub: "rastreados", icon: Activity },
+            ].map(({ label, value, sub, icon: Icon }) => (
+              <Card key={label} className="p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                    <div className="text-2xl font-bold tabular-nums mt-1">{value}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{sub}</div>
+                  </div>
+                  <Icon className="w-5 h-5 text-primary" />
+                </div>
+              </Card>
+            ))}
+          </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Countries list */}
+          <div className="grid gap-4 lg:grid-cols-[1.45fr_0.75fr]">
+            <Card className="p-2 md:p-4 overflow-hidden">
+              <ComposableMap
+                projectionConfig={{ scale: 140 }}
+                width={980}
+                height={460}
+                style={{ width: "100%", height: "auto" }}
+              >
+                <Geographies geography={GEO_URL}>
+                  {({ geographies }) =>
+                    geographies.map((geo) => (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        style={{
+                          default: { fill: "hsl(var(--muted))", stroke: "hsl(var(--border))", strokeWidth: 0.5, outline: "none" },
+                          hover: { fill: "hsl(var(--muted))", outline: "none" },
+                          pressed: { fill: "hsl(var(--muted))", outline: "none" },
+                        }}
+                      />
+                    ))
+                  }
+                </Geographies>
+                {markers.map((m) => (
+                  <Marker key={m.code} coordinates={m.coords}>
+                    <circle
+                      r={radius(m.count)}
+                      fill="hsl(var(--primary))"
+                      fillOpacity={0.35}
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={1.5}
+                    >
+                      <animate attributeName="r" values={`${radius(m.count)};${radius(m.count) + 3};${radius(m.count)}`} dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    <text textAnchor="middle" y={-radius(m.count) - 4} style={{ fontSize: 10, fontWeight: 700, fill: "hsl(var(--foreground))" }}>
+                      {m.count}
+                    </text>
+                  </Marker>
+                ))}
+              </ComposableMap>
+            </Card>
+
+            <Card className="p-4">
+              <h2 className="font-semibold mb-3 flex items-center gap-2">
+                <MousePointerClick className="w-4 h-4" /> Eventos ahora
+              </h2>
+              <div className="space-y-2">
+                {Object.entries(data.byEvent || {}).sort(([, a], [, b]) => b - a).map(([event, count]) => {
+                  const pct = (count / Math.max(1, Object.values(data.byEvent || {}).reduce((a, b) => a + b, 0))) * 100;
+                  return (
+                    <div key={event}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{eventLabel[event] || event}</span>
+                        <span className="tabular-nums text-muted-foreground">{count}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="h-full bg-primary" style={{ width: `${Math.max(pct, 4)}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+                {Object.keys(data.byEvent || {}).length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-8">Sin eventos reales todavía.</p>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-4">
             <Card className="p-4">
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <Globe className="w-4 h-4" /> Por país
@@ -182,7 +272,7 @@ const AdminLive = () => {
                 )}
                 {countries.map(([code, count]) => {
                   const info = getCountryInfo(code);
-                  const pct = (count / data.total) * 100;
+                  const pct = (count / totalForPct) * 100;
                   return (
                     <div key={code} className="flex items-center gap-3">
                       <span className="text-xl w-7 text-center">{info?.flag || "🌐"}</span>
@@ -201,47 +291,80 @@ const AdminLive = () => {
               </div>
             </Card>
 
-            {/* Top pages */}
             <Card className="p-4">
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <Eye className="w-4 h-4" /> Páginas activas
               </h2>
               <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
-                {Object.entries(data.byPage).sort(([, a], [, b]) => b - a).slice(0, 20).map(([path, n]) => (
-                  <div key={path} className="flex justify-between border-b last:border-0 pb-1">
-                    <span className="truncate mr-2" title={path}>{path}</span>
+                {topPages.map(([path, n]) => (
+                  <div key={path} className="flex justify-between border-b last:border-0 pb-1 gap-3">
+                    <span className="truncate" title={path}>{path}</span>
                     <span className="tabular-nums text-muted-foreground">{n}</span>
                   </div>
                 ))}
-                {Object.keys(data.byPage).length === 0 && (
+                {topPages.length === 0 && (
                   <p className="text-muted-foreground text-center py-6">Sin páginas.</p>
+                )}
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <h2 className="font-semibold mb-3 flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4" /> Productos en vivo
+              </h2>
+              <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
+                {topProducts.map(([product, n]) => (
+                  <div key={product} className="flex justify-between border-b last:border-0 pb-1 gap-3">
+                    <span className="truncate" title={product}>{product}</span>
+                    <span className="tabular-nums text-muted-foreground">{n}</span>
+                  </div>
+                ))}
+                {topProducts.length === 0 && (
+                  <p className="text-muted-foreground text-center py-6">Sin productos activos.</p>
+                )}
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <h2 className="font-semibold mb-3 flex items-center gap-2">
+                <Activity className="w-4 h-4" /> Canal
+              </h2>
+              <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
+                {topSources.map(([source, n]) => (
+                  <div key={source} className="flex justify-between border-b last:border-0 pb-1 gap-3">
+                    <span className="truncate" title={source}>{source}</span>
+                    <span className="tabular-nums text-muted-foreground">{n}</span>
+                  </div>
+                ))}
+                {topSources.length === 0 && (
+                  <p className="text-muted-foreground text-center py-6">Sin fuente.</p>
                 )}
               </div>
             </Card>
           </div>
 
-          {/* Live feed */}
           <Card className="p-4">
-            <h2 className="font-semibold mb-3">Feed en vivo</h2>
+            <h2 className="font-semibold mb-3">Feed real en vivo</h2>
             <div className="space-y-1 max-h-[400px] overflow-y-auto text-sm">
-              {data.visitors.length === 0 && (
-                <p className="text-muted-foreground text-center py-6">Sin visitantes ahora mismo.</p>
+              {(data.recentEvents || []).length === 0 && (
+                <p className="text-muted-foreground text-center py-6">Sin eventos reales ahora mismo.</p>
               )}
-              {data.visitors.map((v) => {
-                const info = getCountryInfo(v.country);
+              {(data.recentEvents || []).map((event, index) => {
+                const info = getCountryInfo(event.country);
                 return (
-                  <div key={v.session_id} className="flex items-center gap-3 py-1.5 border-b last:border-0">
+                  <div key={`${event.created_at}-${index}`} className="flex items-center gap-3 py-1.5 border-b last:border-0">
                     <span className="text-lg w-6 text-center">{info?.flag || "🌐"}</span>
                     <div className="flex-1 min-w-0">
                       <div className="truncate">
-                        <span className="font-medium">{info?.name || v.country || "—"}</span>
-                        <span className="text-muted-foreground"> · {v.page_path || "/"}</span>
+                        <span className="font-medium">{info?.name || event.country || "—"}</span>
+                        <span className="text-muted-foreground"> · {eventLabel[event.event_name] || event.event_name}</span>
+                        {event.value ? <span className="font-semibold"> · {money(event.value)}</span> : null}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {v.source} · {v.event_count} evento{v.event_count === 1 ? "" : "s"} · último: {v.last_event}
+                        {event.product_name !== "Sin producto" ? `${event.product_name} · ` : ""}{event.page_label} · {event.source_channel} · {event.source}
                       </div>
                     </div>
-                    <span className="text-xs text-muted-foreground tabular-nums shrink-0">{timeAgo(v.last_seen)}</span>
+                    <span className="text-xs text-muted-foreground tabular-nums shrink-0">{timeAgo(event.created_at)}</span>
                   </div>
                 );
               })}

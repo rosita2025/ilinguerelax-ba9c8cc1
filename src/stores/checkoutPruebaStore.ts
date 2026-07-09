@@ -10,10 +10,18 @@ export interface PruebaItem {
   description?: string;
 }
 
+export interface BuyerInfo {
+  fullName: string;
+  email: string;
+  phone?: string;
+}
+
 interface PruebaStore {
   items: PruebaItem[];
   coupon: string | null;
   couponPercent: number;
+  buyer: BuyerInfo;
+  setBuyer: (patch: Partial<BuyerInfo>) => void;
   addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, qty: number) => void;

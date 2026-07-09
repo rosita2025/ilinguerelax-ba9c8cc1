@@ -33,6 +33,15 @@ export default function CheckoutPrueba1() {
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const latestCart = useCheckoutPruebaStore.getState();
     if (latestCart.items.length === 0) throw new Error("Carrito vacío");
+    const b = latestCart.buyer;
+    if (!isBuyerValid(b)) {
+      const msg = "Completa tu nombre y correo antes de pagar";
+      toast({ title: "Datos requeridos", description: msg, variant: "destructive" });
+      throw new Error(msg);
+    }
+    const parts = b.fullName.trim().split(/\s+/);
+    const firstName = parts[0].slice(0, 50);
+    const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);
     const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
       body: {
         environment: getStripeEnvironment(),
@@ -47,12 +56,11 @@ export default function CheckoutPrueba1() {
         currency: "usd",
         couponPercent: latestCart.couponPercent,
         couponCode: latestCart.coupon ?? undefined,
-        // Datos mínimos — Stripe recoge email + dirección en su propio form
         contact: {
-          email: "guest@ilinguerelax.com",
-          phone: "+10000000000",
-          firstName: "Guest",
-          lastName: "Checkout",
+          email: b.email.trim(),
+          phone: (b.phone ?? "").slice(0, 20) || "+10000000000",
+          firstName,
+          lastName,
           country: (localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
         },
         returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
@@ -63,6 +71,19 @@ export default function CheckoutPrueba1() {
       toast({ title: "Error de pago", description: msg, variant: "destructive" });
       throw new Error(msg);
     }
+    // Guardar contacto (best-effort, no bloquea)
+    supabase
+      .from("email_contacts")
+      .upsert(
+        {
+          email: b.email.trim().toLowerCase(),
+          name: b.fullName.trim(),
+          source: "checkout-prueba-1",
+          metadata: { phone: b.phone ?? "", processor: "stripe" },
+        },
+        { onConflict: "email,source" },
+      )
+      .then(() => {});
     return data.clientSecret;
   }, []); // estable para Stripe, pero toma el carrito actual al abrir
 

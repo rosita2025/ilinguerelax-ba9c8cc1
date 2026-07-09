@@ -83,7 +83,7 @@ const AdminLive = () => {
   const { adminKey } = useAdminKey();
   const [data, setData] = useState<LiveData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [windowMin, setWindowMin] = useState(5);
+  const [windowMin] = useState(1);
 
   const load = async () => {
     setLoading(true);

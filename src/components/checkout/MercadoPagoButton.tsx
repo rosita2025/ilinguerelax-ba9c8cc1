@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Smartphone, Building2, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
 import { toast } from "@/hooks/use-toast";
 
 const USD_TO_PEN = 3.75;
 
 export function MercadoPagoButton() {
   const { items, coupon, couponPercent } = useCheckoutPruebaStore();
-  const { total } = calcTotals(items, couponPercent);
+  const region = useRegionTier();
+  const { total } = calcTotals(items, couponPercent, region.tier);
   const [loading, setLoading] = useState(false);
   const redirectingRef = useRef(false);
 
@@ -33,7 +35,7 @@ export function MercadoPagoButton() {
     if (redirectingRef.current) return;
 
     const latestCart = useCheckoutPruebaStore.getState();
-    const latestTotals = calcTotals(latestCart.items, latestCart.couponPercent);
+    const latestTotals = calcTotals(latestCart.items, latestCart.couponPercent, region.tier);
     const orderId = `ilr-prueba-${Date.now()}`;
 
     if (latestCart.items.length === 0) {
@@ -73,7 +75,7 @@ export function MercadoPagoButton() {
           items: latestCart.items.map((i) => ({
             id: i.id,
             name: i.name,
-            price: i.price,
+            price: itemPrice(i, region.tier),
             quantity: i.quantity,
             image: i.image,
             description: i.description,

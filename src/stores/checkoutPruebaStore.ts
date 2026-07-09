@@ -1,13 +1,22 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
+import type { RegionTier } from "@/hooks/useRegionTier";
+
 export interface PruebaItem {
   id: string;
   name: string;
-  price: number; // USD unit
+  price: number; // USD unit (fallback / default)
   quantity: number;
   image: string;
   description?: string;
+  /** Optional per-region prices in USD. If set, overrides `price` based on IP tier. */
+  regionPrices?: { latam: number; global: number };
+}
+
+/** Returns the effective USD unit price for an item, given the visitor's IP region tier. */
+export function itemPrice(item: PruebaItem, tier: RegionTier): number {
+  return item.regionPrices?.[tier] ?? item.price;
 }
 
 export interface BuyerInfo {
@@ -41,12 +50,13 @@ const DEFAULT_ITEMS: PruebaItem[] = [
     description: "Producto de prueba principal",
   },
   {
-    id: "prueba-2",
-    name: "Prueba 2 · Complemento",
-    price: 15,
+    id: "prueba-patrones-es",
+    name: "Patrones en Español · Precio por región",
+    price: 15, // fallback (global)
+    regionPrices: { latam: 10, global: 15 }, // 🌎 $10 LatAm · 🌍 $15 resto
     quantity: 1,
     image: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=200&h=200&fit=crop",
-    description: "Complemento digital opcional",
+    description: "Demo: precio se ajusta según tu país (IP)",
   },
   {
     id: "prueba-3",
@@ -119,7 +129,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
     {
       name: "checkout-prueba-1",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       merge: (persisted, current) => ({
         ...current,
         ...(persisted as object),
@@ -132,8 +142,8 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
   ),
 );
 
-export function calcTotals(items: PruebaItem[], couponPercent: number) {
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+export function calcTotals(items: PruebaItem[], couponPercent: number, tier: RegionTier = "global") {
+  const subtotal = items.reduce((sum, i) => sum + itemPrice(i, tier) * i.quantity, 0);
   const discount = (subtotal * couponPercent) / 100;
   const total = Math.max(0, subtotal - discount);
   return { subtotal, discount, total };

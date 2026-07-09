@@ -9,16 +9,18 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { AddProductForm } from "@/components/checkout/AddProductForm";
 import { MercadoPagoButton } from "@/components/checkout/MercadoPagoButton";
 import { BuyerInfoForm, isBuyerValid } from "@/components/checkout/BuyerInfoForm";
-import { useCheckoutPruebaStore, calcTotals } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
 import { toast } from "@/hooks/use-toast";
 
 export default function CheckoutPrueba1() {
   const { items, coupon, couponPercent, buyer, resetToDefaults } = useCheckoutPruebaStore();
-  const { total } = calcTotals(items, couponPercent);
+  const region = useRegionTier();
+  const { total } = calcTotals(items, couponPercent, region.tier);
   const [showStripe, setShowStripe] = useState(false);
   const cartSignature = useMemo(
-    () => JSON.stringify({ items: items.map(({ id, name, price, quantity }) => ({ id, name, price, quantity })), coupon, couponPercent }),
-    [items, coupon, couponPercent],
+    () => JSON.stringify({ items: items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity })), coupon, couponPercent, tier: region.tier }),
+    [items, coupon, couponPercent, region.tier],
   );
   const previousCartSignatureRef = useRef(cartSignature);
 
@@ -48,7 +50,7 @@ export default function CheckoutPrueba1() {
         items: latestCart.items.map((i) => ({
           id: i.id,
           name: i.name,
-          price: i.price,
+          price: itemPrice(i, region.tier),
           quantity: i.quantity,
           image: i.image,
           description: i.description,
@@ -61,7 +63,7 @@ export default function CheckoutPrueba1() {
           phone: (b.phone ?? "").slice(0, 20) || "+10000000000",
           firstName,
           lastName,
-          country: (localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
+          country: (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
         },
         returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
       },
@@ -85,7 +87,7 @@ export default function CheckoutPrueba1() {
       )
       .then(() => {});
     return data.clientSecret;
-  }, []); // estable para Stripe, pero toma el carrito actual al abrir
+  }, [region.tier, region.country]); // recomputa cuando cambia el tier detectado
 
   useEffect(() => {
     if (previousCartSignatureRef.current !== cartSignature) {

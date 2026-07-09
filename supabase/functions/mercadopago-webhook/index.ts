@@ -47,18 +47,24 @@ async function verifySignature(req: Request, dataId: string): Promise<boolean> {
   return expected === v1;
 }
 
-async function fetchPayment(paymentId: string) {
+async function mpGet(path: string) {
   const token = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
   if (!token) throw new Error("MERCADOPAGO_ACCESS_TOKEN missing");
-  const r = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+  const r = await fetch(`https://api.mercadopago.com${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!r.ok) {
     const t = await r.text();
-    throw new Error(`MP payment fetch failed ${r.status}: ${t}`);
+    throw new Error(`MP ${path} failed ${r.status}: ${t}`);
   }
   return await r.json();
 }
+
+const fetchPayment = (id: string) => mpGet(`/v1/payments/${id}`);
+const fetchPlan = (id: string) => mpGet(`/preapproval_plan/${id}`);
+const fetchSubscription = (id: string) => mpGet(`/preapproval/${id}`);
+const fetchInvoice = (id: string) => mpGet(`/authorized_payments/${id}`);
+const fetchMerchantOrder = (id: string) => mpGet(`/merchant_orders/${id}`);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -92,47 +98,138 @@ Deno.serve(async (req) => {
       return new Response("Invalid signature", { status: 401, headers: corsHeaders });
     }
 
-    // Only process payment events. Ignore merchant_order, plan, etc.
-    if (type !== "payment") {
-      return new Response(JSON.stringify({ received: true, ignored: type }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const payment = await fetchPayment(dataId);
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Log to funnel_events for the live admin dashboard.
-    await supabase.from("funnel_events").insert({
-      event_type: payment.status === "approved" ? "purchase" : `mp_${payment.status}`,
-      product_id: payment.metadata?.source ?? "checkout-prueba-1",
-      product_name: payment.description ?? "Mercado Pago",
-      amount: payment.transaction_amount ?? null,
-      currency: payment.currency_id ?? "PEN",
-      country: payment.payer?.address?.country_id ?? "PE",
-      metadata: {
-        provider: "mercadopago",
-        payment_id: payment.id,
-        status: payment.status,
-        status_detail: payment.status_detail,
-        payment_method: payment.payment_method_id,
-        payment_type: payment.payment_type_id,
-        payer_email: payment.payer?.email,
-        preference_id: payment.metadata?.preference_id,
-        external_reference: payment.external_reference,
-      },
-    });
+    let logged: Record<string, unknown> | null = null;
 
-    console.log("MP payment processed:", {
-      id: payment.id,
-      status: payment.status,
-      amount: payment.transaction_amount,
-      method: payment.payment_method_id,
-    });
+    switch (type) {
+      case "payment": {
+        const payment = await fetchPayment(dataId);
+        logged = {
+          event_type: payment.status === "approved" ? "purchase" : `mp_${payment.status}`,
+          product_id: payment.metadata?.source ?? "checkout-prueba-1",
+          product_name: payment.description ?? "Mercado Pago",
+          amount: payment.transaction_amount ?? null,
+          currency: payment.currency_id ?? "PEN",
+          country: payment.payer?.address?.country_id ?? "PE",
+          metadata: {
+            provider: "mercadopago",
+            kind: "payment",
+            payment_id: payment.id,
+            status: payment.status,
+            status_detail: payment.status_detail,
+            payment_method: payment.payment_method_id,
+            payment_type: payment.payment_type_id,
+            payer_email: payment.payer?.email,
+            preference_id: payment.metadata?.preference_id,
+            external_reference: payment.external_reference,
+          },
+        };
+        break;
+      }
+      case "plan": {
+        const plan = await fetchPlan(dataId);
+        logged = {
+          event_type: "mp_plan_update",
+          product_id: plan.id,
+          product_name: plan.reason ?? "MP Plan",
+          amount: plan.auto_recurring?.transaction_amount ?? null,
+          currency: plan.auto_recurring?.currency_id ?? "PEN",
+          country: "PE",
+          metadata: { provider: "mercadopago", kind: "plan", plan_id: plan.id, status: plan.status },
+        };
+        break;
+      }
+      case "subscription":
+      case "preapproval": {
+        const sub = await fetchSubscription(dataId);
+        logged = {
+          event_type: "mp_subscription_update",
+          product_id: sub.preapproval_plan_id ?? sub.id,
+          product_name: sub.reason ?? "MP Subscription",
+          amount: sub.auto_recurring?.transaction_amount ?? null,
+          currency: sub.auto_recurring?.currency_id ?? "PEN",
+          country: "PE",
+          metadata: {
+            provider: "mercadopago",
+            kind: "subscription",
+            subscription_id: sub.id,
+            status: sub.status,
+            payer_email: sub.payer_email,
+            external_reference: sub.external_reference,
+          },
+        };
+        break;
+      }
+      case "invoice":
+      case "authorized_payment": {
+        const invoice = await fetchInvoice(dataId);
+        logged = {
+          event_type: "mp_invoice_update",
+          product_id: invoice.preapproval_id ?? invoice.id,
+          product_name: invoice.reason ?? "MP Invoice",
+          amount: invoice.transaction_amount ?? null,
+          currency: invoice.currency_id ?? "PEN",
+          country: "PE",
+          metadata: {
+            provider: "mercadopago",
+            kind: "invoice",
+            invoice_id: invoice.id,
+            status: invoice.status,
+            payment_id: invoice.payment?.id,
+          },
+        };
+        break;
+      }
+      case "merchant_order": {
+        const order = await fetchMerchantOrder(dataId);
+        logged = {
+          event_type: "mp_merchant_order",
+          product_id: order.preference_id ?? order.id?.toString(),
+          product_name: "MP Merchant Order",
+          amount: order.total_amount ?? null,
+          currency: order.currency_id ?? "PEN",
+          country: "PE",
+          metadata: {
+            provider: "mercadopago",
+            kind: "merchant_order",
+            order_id: order.id,
+            status: order.status,
+            order_status: order.order_status,
+            preference_id: order.preference_id,
+            payments: (order.payments ?? []).map((p: any) => ({ id: p.id, status: p.status })),
+          },
+        };
+        break;
+      }
+      case "point_integration_wh": {
+        logged = {
+          event_type: "mp_point_integration",
+          product_id: dataId,
+          product_name: "MP Point Integration",
+          amount: null,
+          currency: "PEN",
+          country: "PE",
+          metadata: { provider: "mercadopago", kind: "point_integration_wh", raw: body },
+        };
+        break;
+      }
+      default: {
+        console.log("MP webhook ignored type:", type);
+        return new Response(JSON.stringify({ received: true, ignored: type }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    if (logged) {
+      await supabase.from("funnel_events").insert(logged);
+      console.log("MP event logged:", { type, dataId, event_type: logged.event_type });
+    }
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200,

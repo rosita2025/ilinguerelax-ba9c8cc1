@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { getLastCheckoutForPurchase, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import {
   CheckCircle,
@@ -27,12 +27,33 @@ const HotmartSuccess = () => {
     const productParam = searchParams.get("product") || "";
     const valueParam = searchParams.get("value");
     
-    // Determine product info from URL params or defaults
+    const lastCheckout = getLastCheckoutForPurchase();
+
+    // Determine product info from URL params, last checkout memory, or defaults
     let contentName = "Inglés Relax - Compra";
     let contentId = "product-5000";
     let value = 12;
 
-    if (productParam.includes("8000") || productParam.includes("8,000")) {
+    if (!productParam && lastCheckout) {
+      contentName = typeof lastCheckout.content_name === "string" ? lastCheckout.content_name : contentName;
+      const ids = Array.isArray(lastCheckout.content_ids) ? lastCheckout.content_ids : [];
+      contentId = ids.length ? String(ids[0]) : contentId;
+      value = typeof lastCheckout.value === "number" ? lastCheckout.value : value;
+    }
+
+    if (productParam.includes("coreano") || productParam.includes("korean")) {
+      contentName = "Coreano Sin Complicaciones - 100 Mapas Mentales";
+      contentId = "product-coreano-100-mapas";
+      value = 10;
+    } else if (productParam.includes("patrones")) {
+      contentName = "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés";
+      contentId = "patrones-especiales";
+      value = 8.08;
+    } else if (productParam.includes("estructuras") || productParam.includes("grammar")) {
+      contentName = "Estructuras Gramaticales de Inglés A1-C1";
+      contentId = "product-estructuras-gramaticales";
+      value = 12;
+    } else if (productParam.includes("8000") || productParam.includes("8,000")) {
       contentName = "Inglés Relax - 8,000 Palabras";
       contentId = "product-8000";
       value = 22;
@@ -51,7 +72,7 @@ const HotmartSuccess = () => {
     } else if (productParam.includes("spanish")) {
       contentName = "Spanish Relax - 5,000 Words";
       contentId = "product-spanish-5000";
-      value = 29.99;
+      value = 22;
     }
 
     if (valueParam) {

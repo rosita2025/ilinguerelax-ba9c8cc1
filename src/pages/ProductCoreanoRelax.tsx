@@ -31,6 +31,9 @@ import Autoplay from "embla-carousel-autoplay";
 import { Eye } from "lucide-react";
 import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCoreano";
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+
+const HOTMART_URL = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
 
 const COUNTRY_FLAG: Record<string, string> = {
   US: "🇺🇸", PE: "🇵🇪", MX: "🇲🇽", CO: "🇨🇴", AR: "🇦🇷", CL: "🇨🇱", BR: "🇧🇷",
@@ -71,6 +74,19 @@ const ProductCoreanoRelax = () => {
   const localPrice = useCampaignPrice(10, 54);
   const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
   const showLocal = localPrice.currency !== "USD";
+
+  const handleBuy = () => {
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Coreano Sin Complicaciones - 100 Mapas Mentales",
+      content_category: "Digital Book",
+      content_ids: ["product-coreano-100-mapas"],
+      content_type: "product",
+      value: 10,
+      currency: "USD",
+      num_items: 1,
+    });
+    window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
+  };
 
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -166,17 +182,12 @@ const ProductCoreanoRelax = () => {
               </motion.div>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
-                <a
-                  href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
+                <div className="block">
                   <Button size="lg" className="w-full text-lg py-7 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Comprar $10
                   </Button>
-                </a>
+                </div>
                 <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática</p>
               </motion.div>
 
@@ -352,9 +363,11 @@ const ProductCoreanoRelax = () => {
           </div>
 
           <a
-            href="https://pay.hotmart.com/L106545921C?checkoutMode=10"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={HOTMART_URL}
+            onClick={(event) => {
+              event.preventDefault();
+              handleBuy();
+            }}
             className="w-full"
           >
             <Button size="lg" className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-black shadow-hero text-sm sm:text-base h-11">

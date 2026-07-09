@@ -117,7 +117,15 @@ const ProductPatronesEspeciales = () => {
   useHotmartPixel(pixelParams);
 
   const handleBuy = () => {
-    // InitiateCheckout no se dispara aquí: Hotmart ya lo trackea en su propio checkout (evita duplicados).
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+      content_category: "Digital Book",
+      content_ids: ["patrones-especiales"],
+      content_type: "product",
+      value: PRICE_USD,
+      currency: "USD",
+      num_items: 1,
+    });
     window.open(HOTMART_URL, "_blank");
   };
 
@@ -288,7 +296,18 @@ const ProductPatronesEspeciales = () => {
                     variant="hero"
                     size="xl"
                     className="w-full text-base py-6 shadow-2xl"
-                    onClick={() => window.open(PAYPAL_URL, "_blank")}
+                    onClick={() => {
+                      trackHotmartEvent("InitiateCheckout", {
+                        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+                        content_category: "Digital Book",
+                        content_ids: ["patrones-especiales"],
+                        content_type: "product",
+                        value: PRICE_USD,
+                        currency: "USD",
+                        num_items: 1,
+                      });
+                      window.open(PAYPAL_URL, "_blank");
+                    }}
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Pagar con PayPal
@@ -297,7 +316,18 @@ const ProductPatronesEspeciales = () => {
                     variant="outline"
                     size="xl"
                     className="w-full text-base py-6"
-                    onClick={() => window.open(STRIPE_URL, "_blank")}
+                    onClick={() => {
+                      trackHotmartEvent("InitiateCheckout", {
+                        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+                        content_category: "Digital Book",
+                        content_ids: ["patrones-especiales"],
+                        content_type: "product",
+                        value: PRICE_USD,
+                        currency: "USD",
+                        num_items: 1,
+                      });
+                      window.open(STRIPE_URL, "_blank");
+                    }}
                   >
                     <CreditCard className="w-5 h-5 mr-2" />
                     Pagar con Stripe
@@ -665,10 +695,32 @@ const ProductPatronesEspeciales = () => {
         reviewCount={6}
         showReviews={true}
         buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
-        onBuyClick={() => window.open(usePaypalStripe ? PAYPAL_URL : HOTMART_URL, "_blank")}
+        onBuyClick={() => {
+          trackHotmartEvent("InitiateCheckout", {
+            content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+            content_category: "Digital Book",
+            content_ids: ["patrones-especiales"],
+            content_type: "product",
+            value: PRICE_USD,
+            currency: "USD",
+            num_items: 1,
+          });
+          window.open(usePaypalStripe ? PAYPAL_URL : HOTMART_URL, "_blank");
+        }}
         ctaText={usePaypalStripe ? "PAGAR CON PAYPAL" : "COMPRAR AHORA"}
         secondaryCtaText={usePaypalStripe ? "PAGAR CON STRIPE" : undefined}
-        onSecondaryClick={usePaypalStripe ? () => window.open(STRIPE_URL, "_blank") : undefined}
+        onSecondaryClick={usePaypalStripe ? () => {
+          trackHotmartEvent("InitiateCheckout", {
+            content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+            content_category: "Digital Book",
+            content_ids: ["patrones-especiales"],
+            content_type: "product",
+            value: PRICE_USD,
+            currency: "USD",
+            num_items: 1,
+          });
+          window.open(STRIPE_URL, "_blank");
+        } : undefined}
       />
 
       <div className="h-20 md:h-16" />

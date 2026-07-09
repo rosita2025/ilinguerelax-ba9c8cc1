@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { resend } from "../_shared/brevo.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2025-08-27.basil",
@@ -10,6 +11,18 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const labelStripeProduct = async (session: Stripe.Checkout.Session) => {
+  const amount = (session.amount_total || 0) / 100;
+  const currency = (session.currency || "usd").toUpperCase();
+  if (Math.round(amount) === 22) {
+    return { product_id: "product-spanish-5000-digital", content_name: "Spanish Relax - 5,000 Words (Digital)", value: amount, currency };
+  }
+  if (amount >= 30) {
+    return { product_id: "product-spanish-5000-physical", content_name: "Spanish Relax - 5,000 Words (Physical)", value: amount, currency };
+  }
+  return { product_id: "stripe-checkout", content_name: "Stripe Checkout Purchase", value: amount, currency };
 };
 
 serve(async (req) => {
@@ -58,6 +71,26 @@ serve(async (req) => {
       }
 
       console.log("Sending purchase emails to:", customerEmail);
+
+      const purchase = await labelStripeProduct(session);
+      try {
+        const adminClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        await adminClient.from("funnel_events").insert({
+          event_name: "Purchase",
+          product_id: purchase.product_id,
+          value: purchase.value,
+          currency: purchase.currency,
+          session_id: session.client_reference_id || session.id,
+          page_path: "/payment-success",
+          country: session.customer_details?.address?.country || null,
+          referrer: "stripe-webhook",
+        });
+      } catch (trackingError) {
+        console.error("purchase tracking error:", trackingError);
+      }
 
       const downloadUrl = "https://drive.google.com/file/d/1KA1IQ-WEB7a_dw3BKVWaU0pImfGsdV3i/view?usp=sharing";
 

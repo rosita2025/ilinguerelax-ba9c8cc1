@@ -925,6 +925,7 @@ const Product5000 = () => {
         showReviews={true}
         ctaText="DESCARGAR AHORA - PAGO SEGURO"
         buyUrl={buyUrl}
+        onBuyClick={handleBuy}
       />
 
       {/* Spacer for sticky bar */}

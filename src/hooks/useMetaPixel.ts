@@ -26,6 +26,7 @@ const generateEventId = (): string => {
 // Persistent session id (per browser) for funnel attribution
 const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
 const FUNNEL_REF_KEY = "ilr_funnel_ref";
+const LAST_CHECKOUT_KEY = "ilr_last_checkout";
 const getSessionId = (): string => {
   if (typeof window === "undefined") return "ssr";
   try {
@@ -120,6 +121,26 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
     const productId = Array.isArray(params.content_ids) && params.content_ids.length
       ? String((params.content_ids as unknown[])[0])
       : (params.content_name ? String(params.content_name) : null);
+    if (eventName === "InitiateCheckout") {
+      try {
+        const checkoutMemory = {
+          content_name: params.content_name || null,
+          content_ids: Array.isArray(params.content_ids) ? params.content_ids : [],
+          content_category: params.content_category || null,
+          content_type: params.content_type || null,
+          value: typeof params.value === "number" ? params.value : null,
+          currency: typeof params.currency === "string" ? params.currency : null,
+          page_path: window.location.pathname,
+          session_id: getSessionId(),
+          referrer: getAttributionReferrer(),
+          country: getCountry(),
+          created_at: new Date().toISOString(),
+        };
+        sessionStorage.setItem(LAST_CHECKOUT_KEY, JSON.stringify(checkoutMemory));
+        localStorage.setItem(LAST_CHECKOUT_KEY, JSON.stringify(checkoutMemory));
+      } catch { /* noop */ }
+    }
+
     void supabase.functions.invoke("log-funnel-event", {
       body: {
         event_name: eventName,
@@ -134,6 +155,20 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
     });
   } catch (e) {
     console.error("funnel log error:", e);
+  }
+};
+
+export const getLastCheckoutForPurchase = (): Record<string, unknown> | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(LAST_CHECKOUT_KEY) || localStorage.getItem(LAST_CHECKOUT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const createdAt = typeof parsed.created_at === "string" ? Date.parse(parsed.created_at) : 0;
+    if (Number.isFinite(createdAt) && Date.now() - createdAt > 24 * 60 * 60 * 1000) return null;
+    return parsed;
+  } catch {
+    return null;
   }
 };
 

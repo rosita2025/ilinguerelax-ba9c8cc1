@@ -82,13 +82,15 @@ serve(async (req) => {
       });
     }
 
-    const win = Math.min(Math.max(parseInt(String(windowMinutes)) || 5, 1), 60);
+    // "en vivo ahora": ventana corta de segundos (default 60s), max 5 min
+    const winSec = Math.min(Math.max(parseInt(String(windowMinutes)) * 60 || 60, 15), 300);
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const since = new Date(Date.now() - win * 60000).toISOString();
+    const since = new Date(Date.now() - winSec * 1000).toISOString();
+    const win = winSec / 60;
 
     const { data, error } = await supabase
       .from("funnel_events")

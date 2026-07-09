@@ -17,6 +17,7 @@ const YAPE_NAME = "Carmen Aliaga Manuel";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
 export function PaymentMethodsGroup() {
+  const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
   const { total } = calcTotals(items, couponPercent, region.tier);
@@ -24,6 +25,7 @@ export function PaymentMethodsGroup() {
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
+  const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const valid = isBuyerValid(buyer);
 

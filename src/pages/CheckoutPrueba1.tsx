@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Lock, ShieldCheck, MessageCircle } from "lucide-react";
@@ -15,6 +15,11 @@ export default function CheckoutPrueba1() {
   const { items, coupon, couponPercent, resetToDefaults } = useCheckoutPruebaStore();
   const { total } = calcTotals(items, couponPercent);
   const [showStripe, setShowStripe] = useState(false);
+  const cartSignature = useMemo(
+    () => JSON.stringify({ items: items.map(({ id, name, price, quantity }) => ({ id, name, price, quantity })), coupon, couponPercent }),
+    [items, coupon, couponPercent],
+  );
+  const previousCartSignatureRef = useRef(cartSignature);
 
   const stripePromise = useMemo(() => {
     try {
@@ -25,11 +30,12 @@ export default function CheckoutPrueba1() {
   }, []);
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
-    if (items.length === 0) throw new Error("Carrito vacío");
+    const latestCart = useCheckoutPruebaStore.getState();
+    if (latestCart.items.length === 0) throw new Error("Carrito vacío");
     const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
       body: {
         environment: getStripeEnvironment(),
-        items: items.map((i) => ({
+        items: latestCart.items.map((i) => ({
           id: i.id,
           name: i.name,
           price: i.price,
@@ -38,8 +44,8 @@ export default function CheckoutPrueba1() {
           description: i.description,
         })),
         currency: "usd",
-        couponPercent,
-        couponCode: coupon ?? undefined,
+        couponPercent: latestCart.couponPercent,
+        couponCode: latestCart.coupon ?? undefined,
         // Datos mínimos — Stripe recoge email + dirección en su propio form
         contact: {
           email: "guest@ilinguerelax.com",
@@ -57,8 +63,14 @@ export default function CheckoutPrueba1() {
       throw new Error(msg);
     }
     return data.clientSecret;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // stable — Stripe no permite cambiar clientSecret después de montar
+  }, []); // estable para Stripe, pero toma el carrito actual al abrir
+
+  useEffect(() => {
+    if (previousCartSignatureRef.current !== cartSignature) {
+      previousCartSignatureRef.current = cartSignature;
+      setShowStripe(false);
+    }
+  }, [cartSignature]);
 
   if (!stripePromise) {
     return (

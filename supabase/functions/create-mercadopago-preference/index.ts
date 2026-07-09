@@ -11,10 +11,12 @@ const ItemSchema = z.object({
 });
 
 const BodySchema = z.object({
+  orderId: z.string().min(1).max(80).optional(),
   items: z.array(ItemSchema).min(1).max(20),
   couponPercent: z.number().min(0).max(90).default(0),
   couponCode: z.string().max(20).optional(),
   payerEmail: z.string().email().optional(),
+  expectedTotalUsd: z.number().positive().max(200000).optional(),
   returnUrl: z.string().url(),
   successUrl: z.string().url().optional(),
   failureUrl: z.string().url().optional(),
@@ -52,6 +54,18 @@ Deno.serve(async (req) => {
     }
     const body = parsed.data;
     const discountMultiplier = 1 - body.couponPercent / 100;
+    const calculatedTotalUsd = Number(
+      body.items
+        .reduce((sum, item) => sum + item.price * item.quantity * discountMultiplier, 0)
+        .toFixed(2),
+    );
+
+    if (body.expectedTotalUsd && Math.abs(calculatedTotalUsd - body.expectedTotalUsd) > 0.01) {
+      return new Response(
+        JSON.stringify({ error: "Cart total mismatch" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     // Convert USD -> PEN (Mercado Pago Peru operates in Soles).
     const mpItems = body.items.map((item) => ({
@@ -73,12 +87,16 @@ Deno.serve(async (req) => {
       },
       auto_return: body.autoReturn,
       statement_descriptor: "ILINGUE RELAX",
+      external_reference: body.orderId ?? crypto.randomUUID(),
       binary_mode: false,
       metadata: {
         source: "checkout-prueba-1",
+        order_id: body.orderId ?? "",
         coupon_code: body.couponCode ?? "",
         coupon_percent: body.couponPercent,
         usd_to_pen: body.usdToPen,
+        total_usd: calculatedTotalUsd,
+        item_count: body.items.reduce((sum, item) => sum + item.quantity, 0),
       },
       // Enable common Peruvian methods (Yape, Plin, transferencias, PagoEfectivo, cards).
       payment_methods: {

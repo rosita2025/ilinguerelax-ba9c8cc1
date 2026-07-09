@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
+import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -84,11 +84,17 @@ export function PaymentMethodsGroup() {
     return data.clientSecret;
   };
 
+  const requestBuyerInfo = () => {
+    window.dispatchEvent(new Event(BUYER_ERRORS_EVENT));
+    toast({
+      title: "Completa tus datos primero",
+      description: "Ingresa tu nombre y correo para continuar con el pago.",
+      variant: "destructive",
+    });
+  };
+
   const payMercado = async (paymentType: "yape" | "transfer") => {
-    if (!valid) {
-      toast({ title: "Datos requeridos", description: "Completa tu nombre y correo.", variant: "destructive" });
-      return;
-    }
+    if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
@@ -138,10 +144,7 @@ export function PaymentMethodsGroup() {
   };
 
   const handleSelect = (m: Method) => {
-    if (!valid) {
-      toast({ title: "Datos requeridos", description: "Completa tu nombre y correo arriba.", variant: "destructive" });
-      return;
-    }
+    if (!valid) { requestBuyerInfo(); return; }
     setSelected(m);
     if (m === "yape") payMercado("yape");
     if (m === "transfer") payMercado("transfer");
@@ -154,13 +157,13 @@ export function PaymentMethodsGroup() {
   ];
 
   return (
-    <div className={cn("space-y-3", !valid && "opacity-60 pointer-events-none select-none")}>
+    <div className="space-y-3">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
         Elige tu método de pago
       </h2>
 
       {methods.map((m) => {
-        const isSelected = selected === m.id;
+        const isSelected = valid && selected === m.id;
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
         return (
@@ -169,9 +172,11 @@ export function PaymentMethodsGroup() {
               type="button"
               onClick={() => handleSelect(m.id)}
               disabled={isLoading}
+              aria-disabled={!valid}
               className={cn(
                 "w-full text-left p-4 flex items-center gap-3 transition-colors",
                 isSelected ? "bg-primary/5" : "hover:bg-muted/40",
+                !valid && "cursor-not-allowed",
               )}
             >
               <div className={cn(
@@ -215,7 +220,7 @@ export function PaymentMethodsGroup() {
 
       {!valid && (
         <p className="text-xs text-center text-muted-foreground pt-2">
-          Completa tu nombre y correo arriba para habilitar los métodos de pago.
+          👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.
         </p>
       )}
     </div>

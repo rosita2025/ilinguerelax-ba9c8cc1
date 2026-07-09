@@ -156,10 +156,30 @@ export function PaymentMethodsGroup() {
     if (m === "transfer") payMercado("transfer");
   };
 
+  const handleManualPaid = () => {
+    const s = useCheckoutPruebaStore.getState();
+    supabase.from("email_contacts").upsert({
+      email: s.buyer.email.trim().toLowerCase(),
+      name: s.buyer.fullName.trim(),
+      source: "checkout-prueba-1",
+      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin" },
+    }, { onConflict: "email,source" }).then(() => {});
+    navigate("/checkouts/pendiente-manual");
+  };
+
+  const copyPhone = async () => {
+    try {
+      await navigator.clipboard.writeText(YAPE_PHONE);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch { /* noop */ }
+  };
+
   const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
     { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link", badge: "Stripe" },
     { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank", badge: `S/ ${totalPen}` },
     { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `S/ ${totalPen}` },
+    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `S/ ${totalPen}` },
   ];
 
   const wasValidRef = useRef(valid);

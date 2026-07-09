@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
+  {
+    to: "/admin/live",
+    icon: Globe,
+    title: "Visitas en vivo",
+    desc: "Mapa mundial en tiempo real con visitantes activos, país, página y fuente de tráfico.",
+    color: "text-primary",
+  },
   {
     to: "/admin/reviews",
     icon: Star,

@@ -119,6 +119,15 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
     {
       name: "checkout-prueba-1",
       storage: createJSONStorage(() => localStorage),
+      version: 2,
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as object),
+        buyer: {
+          ...current.buyer,
+          ...((persisted as { buyer?: BuyerInfo })?.buyer ?? {}),
+        },
+      }),
     },
   ),
 );

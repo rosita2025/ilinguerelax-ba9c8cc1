@@ -153,8 +153,23 @@ serve(async (req) => {
     const activeFive = new Set<string>();
     const checkoutSessions = new Set<string>();
     const purchaseSessions = new Set<string>();
+    const countedPurchases = new Set<string>();
     let revenue = 0;
     const fiveMinCutoff = Date.now() - 5 * 60000;
+
+    const recordPurchase = (row: Record<string, unknown>) => {
+      const sid = row.session_id as string | null;
+      const purchaseKey = sid || `${row.product_id || "purchase"}:${row.value || 0}:${row.created_at || ""}`;
+      if (sid) purchaseSessions.add(sid);
+      if (countedPurchases.has(purchaseKey)) return;
+      countedPurchases.add(purchaseKey);
+      if (typeof row.value === "number") {
+        const val = Number(row.value || 0);
+        revenue += val;
+        const country = (row.country as string) || "??";
+        revenueByCountry[country] = (revenueByCountry[country] || 0) + val;
+      }
+    };
 
     for (const v of visitors) {
       const c = v.country || "??";
@@ -173,13 +188,7 @@ serve(async (req) => {
       byEvent[ev] = (byEvent[ev] || 0) + 1;
       const sid = row.session_id as string | null;
       if (ev === "InitiateCheckout" && sid) checkoutSessions.add(sid);
-      if (ev === "Purchase" && sid) purchaseSessions.add(sid);
-      if (ev === "Purchase" && typeof row.value === "number") {
-        const val = Number(row.value || 0);
-        revenue += val;
-        const country = (row.country as string) || "??";
-        revenueByCountry[country] = (revenueByCountry[country] || 0) + val;
-      }
+      if (ev === "Purchase") recordPurchase(row as Record<string, unknown>);
       return {
         session_id: sid,
         country: (row.country as string) || null,
@@ -201,13 +210,7 @@ serve(async (req) => {
       byEvent[ev] = (byEvent[ev] || 0) + 1;
       const sid = row.session_id as string | null;
       if (ev === "InitiateCheckout" && sid) checkoutSessions.add(sid);
-      if (ev === "Purchase" && sid) purchaseSessions.add(sid);
-      if (ev === "Purchase" && typeof row.value === "number") {
-        const val = Number(row.value || 0);
-        revenue += val;
-        const country = (row.country as string) || "??";
-        revenueByCountry[country] = (revenueByCountry[country] || 0) + val;
-      }
+      if (ev === "Purchase") recordPurchase(row as Record<string, unknown>);
     }
 
     return new Response(JSON.stringify({
@@ -217,7 +220,7 @@ serve(async (req) => {
       productViews: byEvent.ViewContent || 0,
       checkouts: byEvent.InitiateCheckout || 0,
       checkoutSessions: checkoutSessions.size,
-      purchases: byEvent.Purchase || 0,
+      purchases: purchaseSessions.size,
       purchaseSessions: purchaseSessions.size,
       revenue,
       byCountry,

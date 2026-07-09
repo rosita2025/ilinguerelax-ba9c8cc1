@@ -47,18 +47,24 @@ async function verifySignature(req: Request, dataId: string): Promise<boolean> {
   return expected === v1;
 }
 
-async function fetchPayment(paymentId: string) {
+async function mpGet(path: string) {
   const token = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
   if (!token) throw new Error("MERCADOPAGO_ACCESS_TOKEN missing");
-  const r = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+  const r = await fetch(`https://api.mercadopago.com${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!r.ok) {
     const t = await r.text();
-    throw new Error(`MP payment fetch failed ${r.status}: ${t}`);
+    throw new Error(`MP ${path} failed ${r.status}: ${t}`);
   }
   return await r.json();
 }
+
+const fetchPayment = (id: string) => mpGet(`/v1/payments/${id}`);
+const fetchPlan = (id: string) => mpGet(`/preapproval_plan/${id}`);
+const fetchSubscription = (id: string) => mpGet(`/preapproval/${id}`);
+const fetchInvoice = (id: string) => mpGet(`/authorized_payments/${id}`);
+const fetchMerchantOrder = (id: string) => mpGet(`/merchant_orders/${id}`);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

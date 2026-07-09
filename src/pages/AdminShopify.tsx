@@ -54,28 +54,17 @@ const AdminShopify = () => {
   const load = async () => {
     setLoading(true); setError(null);
     try {
-      const { data, error: fnErr } = await supabase.functions.invoke("admin-shopify-stats", {
-        body: {},
-        headers: { "x-admin-key": adminKey },
-        method: "GET",
-        // supabase-js doesn't take query params; use direct fetch instead:
-      } as any);
-      if (fnErr) throw fnErr;
-      setStats(data as Stats);
-    } catch {
-      // Fallback: direct fetch with query string
-      try {
-        const projectUrl = (import.meta as any).env.VITE_SUPABASE_URL;
-        const anon = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        const res = await fetch(`${projectUrl}/functions/v1/admin-shopify-stats?days=${days}&key=${encodeURIComponent(adminKey)}`, {
-          headers: { apikey: anon, Authorization: `Bearer ${anon}` },
-        });
-        const json = await res.json();
-        if (!res.ok || json.error) throw new Error(json.error || "load_failed");
-        setStats(json);
-      } catch (e: any) {
-        setError(e.message || "Error cargando datos");
-      }
+      const projectUrl = (import.meta as any).env.VITE_SUPABASE_URL;
+      const anon = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(
+        `${projectUrl}/functions/v1/admin-shopify-stats?days=${days}&key=${encodeURIComponent(adminKey)}`,
+        { headers: { apikey: anon, Authorization: `Bearer ${anon}` } },
+      );
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error || "load_failed");
+      setStats(json);
+    } catch (e: any) {
+      setError(e.message || "Error cargando datos");
     } finally {
       setLoading(false);
     }

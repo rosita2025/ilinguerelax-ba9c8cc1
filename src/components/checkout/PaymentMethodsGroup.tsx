@@ -336,6 +336,26 @@ export function PaymentMethodsGroup() {
           👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.
         </p>
       )}
+
+      {selected !== "yape" && !(selected === "card" && showStripe) && (
+        <button
+          type="button"
+          onClick={handleBuyNow}
+          disabled={!valid || !selected || mpLoading !== null}
+          className={cn(
+            "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
+            "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "flex items-center justify-center gap-2",
+          )}
+        >
+          {mpLoading ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Redirigiendo…</>
+          ) : (
+            <><Lock className="w-4 h-4" /> Comprar ahora</>
+          )}
+        </button>
+      )}
     </div>
   );
 }

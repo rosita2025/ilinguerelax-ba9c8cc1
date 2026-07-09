@@ -67,6 +67,7 @@ const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
 const CheckoutFailure = lazy(() => import("./pages/CheckoutFailure"));
 const CheckoutPending = lazy(() => import("./pages/CheckoutPending"));
+const CheckoutPendienteManual = lazy(() => import("./pages/CheckoutPendienteManual"));
 
 const queryClient = new QueryClient();
 

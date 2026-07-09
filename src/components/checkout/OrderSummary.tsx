@@ -45,15 +45,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
       <div className={cn("p-5 space-y-4", collapsible && !expanded && "hidden lg:block")}>
         <h2 className="hidden lg:block text-lg font-semibold">Tu pedido</h2>
 
-        {hasRegionalItem && !region.loading && (
-          <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[11px] text-primary">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span>
-              <strong>{region.country || "Global"}</strong> detectado ·
-              Precio {region.tier === "latam" ? "Latinoamérica 🌎" : "Internacional 🌍"} aplicado por IP
-            </span>
-          </div>
-        )}
+        {/* Badge de región oculto al cliente (solo se aplica el precio por IP internamente) */}
 
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">

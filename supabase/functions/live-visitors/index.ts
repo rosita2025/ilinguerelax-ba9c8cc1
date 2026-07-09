@@ -8,6 +8,8 @@ const corsHeaders = {
 
 const classifyReferrer = (ref: string | null): { source: string; channel: string } => {
   if (!ref) return { source: "Directo", channel: "Directo / manual" };
+  if (ref === "stripe-webhook") return { source: "Stripe", channel: "Pago" };
+  if (ref === "hotmart-webhook") return { source: "Hotmart", channel: "Pago" };
   if (ref.startsWith("utm:")) {
     const source = ref.split(":")[1] || "Campaña";
     const normalized = source.toLowerCase();

@@ -158,16 +158,9 @@ const AdminLive = () => {
                 <span className="text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
-              <select
-                value={windowMin}
-                onChange={(e) => setWindowMin(parseInt(e.target.value))}
-                className="h-9 rounded-md border bg-background px-2 text-sm"
-              >
-                <option value={5}>5 min</option>
-                <option value={15}>15 min</option>
-                <option value={30}>30 min</option>
-                <option value={60}>60 min</option>
-              </select>
+              <span className="h-9 inline-flex items-center rounded-md border bg-background px-3 text-sm text-muted-foreground">
+                Últimos 5 min
+              </span>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>
           </div>

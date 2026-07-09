@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CreditCard, Building2, Smartphone, Loader2, Lock } from "lucide-react";
+import { CreditCard, Building2, Banknote, Loader2, Lock } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -9,7 +9,7 @@ import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInf
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Method = "card" | "transfer" | "yape";
+type Method = "card" | "transfer" | "cash";
 const USD_TO_PEN = 3.75;
 
 export function PaymentMethodsGroup() {
@@ -93,13 +93,13 @@ export function PaymentMethodsGroup() {
     });
   };
 
-  const payMercado = async (paymentType: "yape" | "transfer") => {
+  const payMercado = async (paymentType: "cash" | "transfer") => {
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     redirectingRef.current = true;
-    setMpLoading(paymentType === "yape" ? "yape" : "transfer");
+    setMpLoading(paymentType);
     try {
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
@@ -146,14 +146,14 @@ export function PaymentMethodsGroup() {
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
     setSelected(m);
-    if (m === "yape") payMercado("yape");
+    if (m === "cash") payMercado("cash");
     if (m === "transfer") payMercado("transfer");
   };
 
   const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: "Tarjeta de crédito o débito", sub: "Visa · Mastercard · Amex · PayPal · Apple Pay · Google Pay", badge: "Stripe" },
-    { id: "transfer", icon: Building2, title: "Transferencias bancarias", sub: "BCP · BBVA · Interbank · Scotiabank y más", badge: `S/ ${totalPen}` },
-    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Paga escaneando el QR desde tu app", badge: `S/ ${totalPen}` },
+    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link", badge: "Stripe" },
+    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank", badge: `S/ ${totalPen}` },
+    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `S/ ${totalPen}` },
   ];
 
   const wasValidRef = useRef(valid);

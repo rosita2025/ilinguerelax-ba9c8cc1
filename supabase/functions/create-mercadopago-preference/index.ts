@@ -27,7 +27,7 @@ const BodySchema = z.object({
   // Peruvian Soles conversion rate (approx). Frontend can override.
   usdToPen: z.number().positive().max(10).default(3.75),
   // Filtro opcional: "yape" (solo billeteras), "transfer" (solo transferencias bancarias), "all"
-  paymentType: z.enum(["yape", "transfer", "all"]).default("all"),
+  paymentType: z.enum(["yape", "transfer", "cash", "all"]).default("all"),
 });
 
 Deno.serve(async (req) => {
@@ -109,6 +109,8 @@ Deno.serve(async (req) => {
             ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "bank_transfer" }]
             : body.paymentType === "transfer"
             ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "ticket" }, { id: "atm" }, { id: "digital_wallet" }, { id: "account_money" }]
+            : body.paymentType === "cash"
+            ? [{ id: "credit_card" }, { id: "debit_card" }, { id: "bank_transfer" }, { id: "digital_wallet" }, { id: "account_money" }]
             : [],
         installments: 12,
       },

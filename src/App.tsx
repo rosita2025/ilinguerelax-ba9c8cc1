@@ -56,6 +56,7 @@ const AdminSEO = lazy(() => import("./pages/AdminSEO"));
 const AdminShopify = lazy(() => import("./pages/AdminShopify"));
 const AdminHome = lazy(() => import("./pages/AdminHome"));
 const AdminLive = lazy(() => import("./pages/AdminLive"));
+const AdminCheckoutMethods = lazy(() => import("./pages/AdminCheckoutMethods"));
 
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
@@ -196,6 +197,7 @@ const App = () => (
                   <Route path="/admin/funnel" element={<AdminGate><AdminFunnel /></AdminGate>} />
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />
                   <Route path="/admin/shopify" element={<AdminGate><AdminShopify /></AdminGate>} />
+                  <Route path="/admin/checkout-methods" element={<AdminGate><AdminCheckoutMethods /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
                   <Route path="/checkouts" element={<CheckoutTest />} />
                   <Route path="/checkouts/prueba-1" element={<CheckoutPrueba1 />} />

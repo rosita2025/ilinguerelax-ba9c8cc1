@@ -16,6 +16,8 @@ const BodySchema = z.object({
   couponPercent: z.number().min(0).max(90).default(0),
   couponCode: z.string().max(20).optional(),
   payerEmail: z.string().email().optional(),
+  payerName: z.string().max(120).optional(),
+  payerPhone: z.string().max(30).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
   returnUrl: z.string().url(),
   successUrl: z.string().url().optional(),

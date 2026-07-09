@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 export default function CheckoutPrueba1() {
   const { items, coupon, couponPercent, resetToDefaults } = useCheckoutPruebaStore();
   const { total } = calcTotals(items, couponPercent);
+  const [showStripe, setShowStripe] = useState(false);
 
   const stripePromise = useMemo(() => {
     try {

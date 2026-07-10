@@ -72,7 +72,7 @@ export function PaymentMethodsGroup() {
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
-    if (!isBuyerValid(s.buyer)) throw new Error("Completa tus datos");
+    if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
     const parts = s.buyer.fullName.trim().split(/\s+/);
     const firstName = parts[0].slice(0, 50);
     const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);

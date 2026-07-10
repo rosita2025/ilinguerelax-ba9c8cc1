@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
+import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 
 type Method = "card" | "paypal" | "transfer" | "cash" | "yape";
 const YAPE_PHONE = "972119741";

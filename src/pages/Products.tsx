@@ -6,7 +6,8 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
-import { products, getProductLink, type Product } from "@/data/products";
+import { products as staticProducts, getProductLink, type Product } from "@/data/products";
+import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
@@ -14,6 +15,17 @@ const Products = () => {
   const [type, setType] = useState<"all" | "digital" | "physical">("all");
   const [language, setLanguage] = useState<string>("all");
   const [search, setSearch] = useState("");
+
+  // Merge static catalog with products managed from /admin/productos.
+  // DB products are appended, skipping any whose sku matches an existing static id/slug.
+  const { items: dbProducts } = useDigitalProducts();
+  const products = useMemo<Product[]>(() => {
+    const existing = new Set(staticProducts.map((p) => p.id));
+    const staticSlugs = new Set(staticProducts.map((p) => p.slug));
+    const extra = dbProducts.filter((p) => !existing.has(p.id) && !staticSlugs.has(p.slug));
+    return [...staticProducts, ...extra];
+  }, [dbProducts]);
+
 
   // IP-based regional pricing for product "5000" (Latam vs USA/EU/UK/CA/AU)
   const LATAM = new Set(["MXN","ARS","PEN","COP","CLP","BRL","UYU","BOB","PYG","GTQ","DOP","CRC","HNL","NIO","VES"]);
@@ -51,7 +63,7 @@ const Products = () => {
       if (!map.has(p.flag)) map.set(p.flag, { flag: p.flag, label: p.country });
     }
     return Array.from(map.values());
-  }, []);
+  }, [products]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -70,7 +82,7 @@ const Products = () => {
         return false;
       return true;
     });
-  }, [type, language, search]);
+  }, [type, language, search, products]);
 
   // Group products that share a groupId so digital + physical appear in a single card
   type Group = {
@@ -118,7 +130,7 @@ const Products = () => {
     const counts: Record<string, number> = { all: seenAll.size };
     for (const [flag, set] of seenByFlag) counts[flag] = set.size;
     return counts;
-  }, [type]);
+  }, [type, products]);
 
   const formats: { key: "digital" | "physical"; icon: typeof Download; label: string; desc: string }[] = [
     { key: "digital", icon: Download, label: "Digital", desc: "Descarga inmediata · PDF" },

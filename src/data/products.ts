@@ -414,7 +414,11 @@ export const comingSoonLanguages = [
 
 
 // Helper to get product link
-export const getProductLink = (product: Product) => `/products/${product.slug}`;
+export const getProductLink = (product: Product) => {
+  // Internal path override (e.g. products from the admin panel routed to /checkouts/:sku)
+  if (product.externalUrl && product.externalUrl.startsWith("/")) return product.externalUrl;
+  return `/products/${product.slug}`;
+};
 
 // Helper to get product by slug
 export const getProductBySlug = (slug: string) => products.find(p => p.slug === slug);

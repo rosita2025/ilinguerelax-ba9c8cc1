@@ -58,6 +58,7 @@ const ProductDynamic = () => {
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [simCountry, setSimCountry] = useState<string>("auto");
 
   useEffect(() => {
     if (!slug) return;
@@ -65,7 +66,7 @@ const ProductDynamic = () => {
     (async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();

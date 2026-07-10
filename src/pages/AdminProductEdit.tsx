@@ -48,6 +48,7 @@ const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
   price_usd: 0, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
   is_upsell: false, active: true, sort_order: 0,
+  bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
 };
 
 const AdminProductEdit = () => {

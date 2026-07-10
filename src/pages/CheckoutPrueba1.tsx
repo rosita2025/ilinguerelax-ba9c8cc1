@@ -6,9 +6,12 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 export default function CheckoutPrueba1() {
   const { resetToDefaults } = useCheckoutPruebaStore();
+  const region = useRegionTier();
+  const isPeru = (region.country || "").toUpperCase() === "PE";
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,8 +32,10 @@ export default function CheckoutPrueba1() {
           </span>
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
             <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-            <span className="hidden sm:inline font-medium">Stripe SSL · Mercado Pago</span>
-            <span className="sm:hidden font-medium">SSL · MP</span>
+            <span className="hidden sm:inline font-medium">
+              {isPeru ? "Stripe SSL · Mercado Pago" : "Stripe SSL · Pago seguro"}
+            </span>
+            <span className="sm:hidden font-medium">SSL</span>
           </div>
 
         </div>
@@ -49,10 +54,14 @@ export default function CheckoutPrueba1() {
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Encriptación SSL Stripe
             </span>
-            <span>·</span>
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
-            </span>
+            {isPeru && (
+              <>
+                <span>·</span>
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
+                </span>
+              </>
+            )}
             <span>·</span>
 
             <a

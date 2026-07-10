@@ -20,12 +20,16 @@ export interface MappedStripeError {
     | "incorrect_cvc"
     | "expired_card"
     | "processing"
+    | "3ds_required"
     | "3ds_failed"
+    | "3ds_canceled"
+    | "3ds_unsupported"
     | "coupon"
     | "amount"
     | "config"
     | "unknown";
   retryable: boolean;
+  instructions?: string[];
 }
 
 const DICT: Record<
@@ -92,11 +96,29 @@ const DICT: Record<
     pt: { title: "Erro no processamento", message: "Ocorreu um erro ao processar o cartão. Tente novamente." },
     fr: { title: "Erreur de traitement", message: "Erreur lors du traitement de la carte. Réessaie." },
   },
+  "3ds_required": {
+    es: { title: "Verificación 3D Secure requerida", message: "Tu banco requiere confirmar el pago. Completa el paso de verificación (SMS, app o clave) y vuelve a intentar." },
+    en: { title: "3D Secure verification required", message: "Your bank needs to confirm the payment. Complete the verification step (SMS, app or code) and try again." },
+    pt: { title: "Verificação 3D Secure necessária", message: "Seu banco precisa confirmar o pagamento. Complete a verificação (SMS, app ou código) e tente novamente." },
+    fr: { title: "Vérification 3D Secure requise", message: "Ta banque doit confirmer le paiement. Complète la vérification (SMS, appli ou code) et réessaie." },
+  },
   "3ds_failed": {
     es: { title: "Verificación 3D Secure fallida", message: "No se completó la verificación con tu banco. Intenta de nuevo o usa otra tarjeta." },
     en: { title: "3D Secure verification failed", message: "The bank verification wasn't completed. Try again or use another card." },
     pt: { title: "Falha na verificação 3D Secure", message: "A verificação do banco não foi concluída. Tente novamente ou use outro cartão." },
     fr: { title: "Échec de la vérification 3D Secure", message: "La vérification bancaire n’a pas abouti. Réessaie ou utilise une autre carte." },
+  },
+  "3ds_canceled": {
+    es: { title: "Verificación cancelada", message: "Cancelaste la verificación 3D Secure. Vuelve a intentar y completa el paso con tu banco." },
+    en: { title: "Verification canceled", message: "You canceled the 3D Secure step. Try again and complete the bank verification." },
+    pt: { title: "Verificação cancelada", message: "Você cancelou a verificação 3D Secure. Tente novamente e conclua a etapa com o banco." },
+    fr: { title: "Vérification annulée", message: "Tu as annulé l’étape 3D Secure. Réessaie et complète la vérification bancaire." },
+  },
+  "3ds_unsupported": {
+    es: { title: "Tarjeta no compatible con 3D Secure", message: "Tu tarjeta no admite la verificación requerida. Prueba con otra tarjeta o paga con PayPal." },
+    en: { title: "Card doesn't support 3D Secure", message: "Your card doesn't support the required verification. Try another card or pay with PayPal." },
+    pt: { title: "Cartão sem suporte a 3D Secure", message: "Seu cartão não suporta a verificação necessária. Use outro cartão ou pague com PayPal." },
+    fr: { title: "Carte non compatible 3D Secure", message: "Ta carte ne prend pas en charge la vérification requise. Utilise une autre carte ou paie via PayPal." },
   },
   coupon: {
     es: { title: "Cupón no válido", message: "El cupón aplicado no es válido o expiró. Quítalo e intenta de nuevo." },
@@ -124,17 +146,50 @@ const DICT: Record<
   },
 };
 
-const NON_RETRYABLE = new Set<MappedStripeError["code"]>(["config", "amount", "coupon"]);
+const NON_RETRYABLE = new Set<MappedStripeError["code"]>(["config", "amount", "coupon", "3ds_unsupported"]);
+
+const INSTRUCTIONS: Partial<Record<MappedStripeError["code"], Record<Lang, string[]>>> = {
+  "3ds_required": {
+    es: [
+      "Revisa tu app bancaria o SMS por un código de verificación.",
+      "Ingresa el código o aprueba el pago desde la app.",
+      "Vuelve aquí y presiona “Intentar de nuevo”.",
+    ],
+    en: [
+      "Check your bank app or SMS for a verification code.",
+      "Enter the code or approve the payment in the app.",
+      "Come back here and press “Try again”.",
+    ],
+    pt: [
+      "Verifique o app do seu banco ou SMS por um código.",
+      "Digite o código ou aprove o pagamento no app.",
+      "Volte aqui e clique em “Tentar novamente”.",
+    ],
+    fr: [
+      "Vérifie l’appli de ta banque ou tes SMS pour un code.",
+      "Entre le code ou approuve le paiement dans l’appli.",
+      "Reviens ici et clique sur « Réessayer ».",
+    ],
+  },
+  "3ds_failed": {
+    es: ["Asegúrate de tener señal e internet estable.", "Si el problema persiste, prueba otra tarjeta o PayPal."],
+    en: ["Make sure you have stable signal and internet.", "If it persists, try another card or PayPal."],
+    pt: ["Verifique se tem sinal e internet estáveis.", "Se persistir, tente outro cartão ou PayPal."],
+    fr: ["Assure-toi d’avoir du signal et un internet stable.", "Si le problème persiste, essaie une autre carte ou PayPal."],
+  },
+};
 
 export function mapStripeError(err: unknown, lang: Lang = "es"): MappedStripeError {
   const raw = normalize(err);
   const code = detect(raw);
   const dict = DICT[code][lang] ?? DICT[code].es;
+  const instr = INSTRUCTIONS[code]?.[lang] ?? INSTRUCTIONS[code]?.es;
   return {
     code,
     title: dict.title,
     message: dict.message,
     retryable: !NON_RETRYABLE.has(code),
+    instructions: instr,
   };
 }
 
@@ -161,7 +216,11 @@ function detect(s: string): MappedStripeError["code"] {
   if (/incorrect_cvc|invalid_cvc|cvc/.test(s)) return "incorrect_cvc";
   if (/expired_card|card.*expired|expired/.test(s)) return "expired_card";
   if (/insufficient_funds|insufficient/.test(s)) return "insufficient_funds";
-  if (/authentication_required|three.?d.?secure|3ds|3d secure/.test(s)) return "3ds_failed";
+  // 3D Secure — more specific states first
+  if (/three_d_secure_not_supported|3ds.*not.*support|not.*support.*3d/.test(s)) return "3ds_unsupported";
+  if (/three_d_secure_canceled|3ds.*cancel|authentication.*cancel|user.*cancel.*auth/.test(s)) return "3ds_canceled";
+  if (/three_d_secure_failed|3ds.*fail|authentication.*fail|auth.*fail|payment_intent_authentication_failure/.test(s)) return "3ds_failed";
+  if (/requires_action|authentication_required|three.?d.?secure|3ds|3d.?secure|redirect_status=failed/.test(s)) return "3ds_required";
   if (/card_declined|declined|do_not_honor/.test(s)) return "card_declined";
   if (/processing_error|processing/.test(s)) return "processing";
   if (/coupon|promotion|discount/.test(s)) return "coupon";
@@ -171,3 +230,4 @@ function detect(s: string): MappedStripeError["code"] {
   if (/not configured|no.*configured|misconfigured|503|502/.test(s)) return "config";
   return "unknown";
 }
+

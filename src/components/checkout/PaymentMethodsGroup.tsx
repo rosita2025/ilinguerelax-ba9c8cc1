@@ -581,6 +581,13 @@ export function PaymentMethodsGroup() {
                     <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
                       <p className="font-semibold">{stripeError.title}</p>
                       <p className="mt-1 text-xs">{stripeError.message}</p>
+                      {stripeError.instructions && stripeError.instructions.length > 0 && (
+                        <ol className="mt-2 ml-4 list-decimal space-y-0.5 text-xs">
+                          {stripeError.instructions.map((step, i) => (
+                            <li key={i}>{step}</li>
+                          ))}
+                        </ol>
+                      )}
                       <p className="mt-1 text-[10px] opacity-70">
                         {language === "en" ? "Code" : language === "pt" ? "Código" : language === "fr" ? "Code" : "Código"}: {stripeError.code}
                       </p>

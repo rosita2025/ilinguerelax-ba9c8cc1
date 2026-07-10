@@ -20,9 +20,29 @@ export default function CheckoutReturn() {
   useEffect(() => {
     const params = new URLSearchParams();
     if (sessionId) params.set("session_id", sessionId);
+    // Stripe appends `redirect_status` after 3DS/off-session redirects:
+    // succeeded | failed | requires_action | canceled
+    const redirectStatus = sp.get("redirect_status");
+    const piStatus = sp.get("payment_intent_status");
+    const failed3ds = redirectStatus === "failed" || piStatus === "requires_payment_method";
+    const pending3ds = redirectStatus === "requires_action" || piStatus === "requires_action";
+    const canceled3ds = redirectStatus === "canceled";
+
+    if (failed3ds || canceled3ds) {
+      params.set("status", "failure");
+      params.set("reason", canceled3ds ? "3ds_canceled" : "3ds_failed");
+      navigate(`/checkouts/failure?${params.toString()}`, { replace: true });
+      return;
+    }
+    if (pending3ds) {
+      params.set("status", "pending");
+      params.set("reason", "3ds_required");
+      navigate(`/checkouts/failure?${params.toString()}`, { replace: true });
+      return;
+    }
     params.set("status", "approved");
     navigate(`/checkouts/success?${params.toString()}`, { replace: true });
-  }, [sessionId, navigate]);
+  }, [sessionId, navigate, sp]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">

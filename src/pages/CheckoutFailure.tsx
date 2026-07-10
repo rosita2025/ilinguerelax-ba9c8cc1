@@ -1,21 +1,28 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { XCircle, MessageCircle, RefreshCcw } from "lucide-react";
+import { XCircle, MessageCircle, RefreshCcw, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
+import { mapStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 
 export default function CheckoutFailure() {
   const [sp] = useSearchParams();
   const status = sp.get("status") || sp.get("collection_status");
   const paymentId = sp.get("payment_id") || sp.get("collection_id");
+  const reason = sp.get("reason");
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
+
+  // If we know the specific reason (e.g. 3DS state), map to a localized
+  // title/message + instructions instead of showing the generic failure.
+  const mapped = reason ? mapStripeError(reason, language as StripeLang) : null;
+  const is3ds = mapped?.code?.startsWith("3ds");
 
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>{t.metaFailure}</title>
+        <title>{mapped?.title || t.metaFailure}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
@@ -28,23 +35,36 @@ export default function CheckoutFailure() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-16 text-center space-y-5">
-        <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
-          <XCircle className="w-11 h-11 text-red-600 dark:text-red-400" />
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto ${is3ds ? "bg-amber-100 dark:bg-amber-900/30" : "bg-red-100 dark:bg-red-900/30"}`}>
+          {is3ds ? (
+            <ShieldAlert className="w-11 h-11 text-amber-600 dark:text-amber-400" />
+          ) : (
+            <XCircle className="w-11 h-11 text-red-600 dark:text-red-400" />
+          )}
         </div>
-        <h1 className="text-3xl font-bold">{t.paymentNotCompleted}</h1>
-        <p className="text-muted-foreground">{t.failureDesc}</p>
+        <h1 className="text-3xl font-bold">{mapped?.title || t.paymentNotCompleted}</h1>
+        <p className="text-muted-foreground">{mapped?.message || t.failureDesc}</p>
 
-        {(status || paymentId) && (
+        {mapped?.instructions && mapped.instructions.length > 0 && (
+          <ol className="mx-auto max-w-sm text-left list-decimal ml-6 space-y-1 text-sm text-muted-foreground">
+            {mapped.instructions.map((step, i) => <li key={i}>{step}</li>)}
+          </ol>
+        )}
+
+        {(status || paymentId || reason) && (
           <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg p-3 text-left space-y-1">
             {status && <div>{t.paymentStatus}: <code>{status}</code></div>}
+            {reason && <div>Code: <code>{reason}</code></div>}
             {paymentId && <div>{t.paymentId}: <code className="break-all">{paymentId}</code></div>}
           </div>
         )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <Button asChild size="lg" className="gap-2">
-            <Link to="/checkouts/prueba-1"><RefreshCcw className="w-4 h-4" /> {t.tryAgain}</Link>
-          </Button>
+          {(mapped?.retryable ?? true) && (
+            <Button asChild size="lg" className="gap-2">
+              <Link to="/checkouts/prueba-1"><RefreshCcw className="w-4 h-4" /> {t.tryAgain}</Link>
+            </Button>
+          )}
           <Button asChild variant="outline" size="lg" className="gap-2">
             <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-4 h-4" /> {t.contactSupport}

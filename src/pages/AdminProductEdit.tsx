@@ -54,6 +54,7 @@ const EMPTY: Product = {
   is_upsell: false, active: true, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
+  hotmart_url: "",
 };
 
 const AdminProductEdit = () => {

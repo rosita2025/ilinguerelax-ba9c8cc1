@@ -208,7 +208,7 @@ export const es = {
       },
       {
         question: "¿iLingue Relax ofrece soporte o ayuda?",
-        answer: "Sí. Si tienes alguna duda, puedes contactarnos a través de nuestros canales oficiales: 📧 Correo: hola@ilinguerelax.com | 📱 WhatsApp: +1 575 216 0934 (USA)",
+        answer: "Sí. Si tienes alguna duda, puedes contactarnos a través de nuestros canales oficiales: 📧 Correo: hola@ilinguerelax.com | 📱 WhatsApp: +1 251 272 4704 (USA)",
       },
     ],
   },

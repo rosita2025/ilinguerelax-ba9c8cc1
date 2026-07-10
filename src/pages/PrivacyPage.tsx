@@ -35,9 +35,9 @@ const sections = [
 
 • Proveedores de pago autorizados:
    – Stripe (SSL) – tarjetas de crédito/débito internacionales, Apple Pay, Google Pay y Link. Cobertura global (Latinoamérica, Norteamérica, Europa, Asia, Oceanía) con conversión automática a moneda local.
-   – Mercado Pago – transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible desde Perú y otros países de Latinoamérica.
+   – Mercado Pago – transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible únicamente desde Perú.
    – Yape y Plin – pago manual desde Perú al número privado de nuestra Supervisora de Pagos (mostrado únicamente durante el checkout). Verificación en 1-24h.
-   – Hotmart – procesa pagos en Latinoamérica con métodos locales como Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias regionales.
+   – Hotmart – procesa pagos únicamente en Latinoamérica con métodos locales como Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias regionales.
    – Amazon – procesa los pagos de los libros físicos (próximamente) directamente en su plataforma.
    – Próximamente: dLocal y eBanx para ampliar métodos de pago locales en América Latina, África, Asia y Medio Oriente.
 • Servicios de email: Brevo y Resend, para enviar correos transaccionales y promocionales.
@@ -89,7 +89,7 @@ Para ejercer estos derechos, contáctanos en hola@ilinguerelax.com.`
     content: `Si tienes preguntas sobre esta política de privacidad o deseas ejercer tus derechos, contáctanos:
 
 • Email: hola@ilinguerelax.com
-• WhatsApp: +1 575 216 0934
+• WhatsApp: +1 251 272 4704
 
 Esta política puede actualizarse ocasionalmente. Publicaremos cualquier cambio en esta página con la fecha de última actualización.`
   },
@@ -127,7 +127,7 @@ const PrivacyPage = () => {
               Tu confianza es importante. Aquí explicamos cómo manejamos tu información.
             </p>
             <p className="text-sm text-primary-foreground/70 mt-4">
-              Última actualización: 7 de junio de 2026
+              Última actualización: 9 de julio de 2026
             </p>
           </motion.div>
         </div>

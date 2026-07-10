@@ -56,7 +56,7 @@ export default function CheckoutPrueba1() {
             <span>·</span>
 
             <a
-              href="https://wa.me/15752160934"
+              href="https://wa.me/112512724704"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 hover:text-primary"

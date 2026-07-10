@@ -134,7 +134,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
                 onClick={removeCoupon}
                 type="button"
                 className="opacity-70 hover:opacity-100"
-                aria-label="Quitar cupón"
+                aria-label={t.removeCoupon}
               >
                 <X className="w-4 h-4" />
               </button>

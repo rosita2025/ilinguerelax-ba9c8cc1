@@ -130,7 +130,7 @@ const Products = () => {
     const counts: Record<string, number> = { all: seenAll.size };
     for (const [flag, set] of seenByFlag) counts[flag] = set.size;
     return counts;
-  }, [type]);
+  }, [type, products]);
 
   const formats: { key: "digital" | "physical"; icon: typeof Download; label: string; desc: string }[] = [
     { key: "digital", icon: Download, label: "Digital", desc: "Descarga inmediata · PDF" },

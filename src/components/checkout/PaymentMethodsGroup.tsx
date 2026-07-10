@@ -343,7 +343,7 @@ export function PaymentMethodsGroup() {
                   </span>
                 ))}
                 <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-auto whitespace-nowrap">
-                  Se activa automáticamente según tu país
+                  {t.autoActivatesByCountry}
                 </span>
               </div>
             )}

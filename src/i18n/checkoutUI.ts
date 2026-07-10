@@ -1,0 +1,430 @@
+// Translations for the /checkouts/prueba-1 checkout page UI.
+// Consumed by CheckoutPrueba1, BuyerInfoForm, PaymentMethodsGroup, OrderSummary.
+import type { Language } from "./index";
+
+export interface CheckoutUIStrings {
+  // Header
+  securePayment: string;
+  stripeSSL: string;
+  stripeSslMP: string;
+
+  // BuyerInfoForm
+  yourDetails: string;
+  yourDetailsHint: string;
+  ready: string;
+  required: string;
+  fullName: string;
+  fullNamePlaceholder: string;
+  fullNameError: string;
+  email: string;
+  emailPlaceholder: string;
+  emailError: string;
+  emailHint: string;
+  whatsappOptional: string;
+
+  // PaymentMethodsGroup
+  choosePaymentMethod: string;
+  cardPayment: string;
+  cardTitlePeru: string;
+  cardTitleGlobal: string;
+  cardSubtitlePeru: (localBadge: string) => string;
+  cardSubtitleGlobal: (currency: string, localBadge: string) => string;
+  autoActivatesByCountry: string;
+  ssl256: string;
+  stripeVerified: string;
+  support24h: string;
+  processedBy: string;
+
+  bankTransfer: string;
+  bankTransferSub: (localBadge: string) => string;
+  cashPayment: string;
+  cashPaymentSub: (localBadge: string) => string;
+  yapePlin: string;
+  yapePlinSub: string;
+
+  completeDataFirst: string;
+  completeDataFirstDesc: string;
+  selectMethod: string;
+  mpError: string;
+  tryAgain: string;
+  errorPayment: string;
+  completeYourData: string;
+
+  redirecting: string;
+  buyNow: string;
+  enableMethods: string;
+
+  // Yape manual
+  sendPaymentTo: string;
+  amountToPay: string;
+  sendEquivalentSoles: string;
+  yapeStep1: string;
+  yapeStep2: (amount: string, phone: string, name: string) => string;
+  yapeStep3: string;
+  yapeStep4: string;
+  alreadyPaid: string;
+  sendReceiptWA: string;
+  yapeVerifiedBy: string;
+  copied: string;
+  tapToCopy: string;
+
+  // OrderSummary
+  hideSummary: string;
+  showSummary: string;
+  yourOrder: string;
+  emptyCart: string;
+  couponPlaceholder: string;
+  applyCoupon: string;
+  invalidCoupon: string;
+  removeCoupon: string;
+  subtotal: string;
+  discount: string;
+  taxes: string;
+  included: string;
+  total: string;
+  inYourCurrency: string;
+
+  // Footer
+  sslEncryption: string;
+  mercadoPagoPeru: string;
+  whatsappSupport: string;
+  resetTestProducts: string;
+}
+
+const es: CheckoutUIStrings = {
+  securePayment: "Pago seguro",
+  stripeSSL: "Stripe SSL · Pago seguro",
+  stripeSslMP: "Stripe SSL · Mercado Pago",
+
+  yourDetails: "Tus datos",
+  yourDetailsHint: "Recibirás el acceso al producto digital por correo.",
+  ready: "Listo",
+  required: "Requerido",
+  fullName: "Nombre completo *",
+  fullNamePlaceholder: "Ej. María López",
+  fullNameError: "Ingresa tu nombre completo.",
+  email: "Correo electrónico *",
+  emailPlaceholder: "tucorreo@email.com",
+  emailError: "Ingresa un correo válido.",
+  emailHint: "Aquí enviaremos tu acceso al producto digital.",
+  whatsappOptional: "WhatsApp (opcional)",
+
+  choosePaymentMethod: "Elige tu método de pago",
+  cardPayment: "Pago con tarjeta",
+  cardTitlePeru: "Tarjeta, Apple Pay o Link",
+  cardTitleGlobal: "Tarjeta débito o crédito",
+  cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${lb}`,
+  cardSubtitleGlobal: (curr, lb) => `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${curr}${lb}`,
+  autoActivatesByCountry: "Se activa automáticamente según tu país",
+  ssl256: "SSL 256-bit",
+  stripeVerified: "Stripe verificado",
+  support24h: "Soporte 24h",
+  processedBy: "Pago procesado de forma segura por Stripe",
+
+  bankTransfer: "Transferencia bancaria",
+  bankTransferSub: (lb) => `BCP · BBVA · Interbank · Scotiabank · Conversión automática${lb}`,
+  cashPayment: "Pago en efectivo",
+  cashPaymentSub: (lb) => `PagoEfectivo · Western Union · Tambo · Kasnet${lb}`,
+  yapePlin: "Yape o Plin",
+  yapePlinSub: "Pago manual · Verificación 1-24h por Supervisora Rosa",
+
+  completeDataFirst: "Completa tus datos primero",
+  completeDataFirstDesc: "Ingresa tu nombre y correo para continuar con el pago.",
+  selectMethod: "Selecciona un método de pago",
+  mpError: "Error Mercado Pago",
+  tryAgain: "Intenta de nuevo",
+  errorPayment: "Error de pago",
+  completeYourData: "Completa tus datos",
+
+  redirecting: "Redirigiendo…",
+  buyNow: "Comprar ahora",
+  enableMethods: "👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.",
+
+  sendPaymentTo: "Envía el pago a",
+  amountToPay: "Monto a pagar",
+  sendEquivalentSoles: "Envía el equivalente en soles al tipo de cambio del día.",
+  yapeStep1: "Abre tu app de Yape o Plin.",
+  yapeStep2: (a, p, n) => `Envía el equivalente de USD $${a} en soles al número ${p} (${n}).`,
+  yapeStep3: "Guarda la captura del comprobante.",
+  yapeStep4: "Presiona “Ya pagué” y envíanos el comprobante por WhatsApp.",
+  alreadyPaid: "Ya pagué → Enviar comprobante",
+  sendReceiptWA: "Enviar comprobante directo por WhatsApp",
+  yapeVerifiedBy: "Nuestra Supervisora Rosa revisa los pagos manualmente desde Perú. Recibirás tu producto en 1 a 24 horas tras confirmar el comprobante.",
+  copied: "¡Copiado!",
+  tapToCopy: "Toca para copiar el número",
+
+  hideSummary: "Ocultar resumen",
+  showSummary: "Ver resumen",
+  yourOrder: "Tu pedido",
+  emptyCart: "Carrito vacío",
+  couponPlaceholder: "Código de descuento",
+  applyCoupon: "Aplicar",
+  invalidCoupon: "Cupón inválido",
+  removeCoupon: "Quitar cupón",
+  subtotal: "Subtotal",
+  discount: "Descuento",
+  taxes: "Impuestos",
+  included: "Incluidos",
+  total: "Total",
+  inYourCurrency: "en tu moneda",
+
+  sslEncryption: "Encriptación SSL Stripe",
+  mercadoPagoPeru: "Mercado Pago Perú",
+  whatsappSupport: "Soporte WhatsApp",
+  resetTestProducts: "Restablecer productos de prueba",
+};
+
+const en: CheckoutUIStrings = {
+  securePayment: "Secure payment",
+  stripeSSL: "Stripe SSL · Secure payment",
+  stripeSslMP: "Stripe SSL · Mercado Pago",
+
+  yourDetails: "Your details",
+  yourDetailsHint: "You'll get access to the digital product by email.",
+  ready: "Ready",
+  required: "Required",
+  fullName: "Full name *",
+  fullNamePlaceholder: "e.g. Mary Smith",
+  fullNameError: "Please enter your full name.",
+  email: "Email address *",
+  emailPlaceholder: "you@email.com",
+  emailError: "Please enter a valid email.",
+  emailHint: "We'll send your product access here.",
+  whatsappOptional: "WhatsApp (optional)",
+
+  choosePaymentMethod: "Choose your payment method",
+  cardPayment: "Card payment",
+  cardTitlePeru: "Card, Apple Pay or Link",
+  cardTitleGlobal: "Debit or credit card",
+  cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Charged in your local currency${lb}`,
+  cardSubtitleGlobal: (curr, lb) => `Debit or credit · Apple Pay · Google Pay · Link · Charged in ${curr}${lb}`,
+  autoActivatesByCountry: "Automatically enabled for your country",
+  ssl256: "SSL 256-bit",
+  stripeVerified: "Stripe verified",
+  support24h: "24h support",
+  processedBy: "Payment securely processed by Stripe",
+
+  bankTransfer: "Bank transfer",
+  bankTransferSub: (lb) => `BCP · BBVA · Interbank · Scotiabank · Automatic conversion${lb}`,
+  cashPayment: "Cash payment",
+  cashPaymentSub: (lb) => `PagoEfectivo · Western Union · Tambo · Kasnet${lb}`,
+  yapePlin: "Yape or Plin",
+  yapePlinSub: "Manual payment · 1-24h verification by Supervisor Rosa",
+
+  completeDataFirst: "Complete your details first",
+  completeDataFirstDesc: "Enter your name and email to continue with payment.",
+  selectMethod: "Select a payment method",
+  mpError: "Mercado Pago error",
+  tryAgain: "Please try again",
+  errorPayment: "Payment error",
+  completeYourData: "Complete your details",
+
+  redirecting: "Redirecting…",
+  buyNow: "Buy now",
+  enableMethods: "👆 Complete your name and email above to enable payment methods.",
+
+  sendPaymentTo: "Send payment to",
+  amountToPay: "Amount to pay",
+  sendEquivalentSoles: "Send the equivalent in soles at today's exchange rate.",
+  yapeStep1: "Open your Yape or Plin app.",
+  yapeStep2: (a, p, n) => `Send the equivalent of USD $${a} in soles to number ${p} (${n}).`,
+  yapeStep3: "Save the payment receipt screenshot.",
+  yapeStep4: 'Press "I paid" and send us the receipt on WhatsApp.',
+  alreadyPaid: "I paid → Send receipt",
+  sendReceiptWA: "Send receipt directly via WhatsApp",
+  yapeVerifiedBy: "Our Supervisor Rosa reviews payments manually from Peru. You'll receive your product within 1 to 24 hours after receipt confirmation.",
+  copied: "Copied!",
+  tapToCopy: "Tap to copy the number",
+
+  hideSummary: "Hide summary",
+  showSummary: "Show summary",
+  yourOrder: "Your order",
+  emptyCart: "Empty cart",
+  couponPlaceholder: "Discount code",
+  applyCoupon: "Apply",
+  invalidCoupon: "Invalid coupon",
+  removeCoupon: "Remove coupon",
+  subtotal: "Subtotal",
+  discount: "Discount",
+  taxes: "Taxes",
+  included: "Included",
+  total: "Total",
+  inYourCurrency: "in your currency",
+
+  sslEncryption: "SSL Stripe encryption",
+  mercadoPagoPeru: "Mercado Pago Peru",
+  whatsappSupport: "WhatsApp support",
+  resetTestProducts: "Reset test products",
+};
+
+const pt: CheckoutUIStrings = {
+  securePayment: "Pagamento seguro",
+  stripeSSL: "Stripe SSL · Pagamento seguro",
+  stripeSslMP: "Stripe SSL · Mercado Pago",
+
+  yourDetails: "Seus dados",
+  yourDetailsHint: "Você receberá o acesso ao produto digital por e-mail.",
+  ready: "Pronto",
+  required: "Obrigatório",
+  fullName: "Nome completo *",
+  fullNamePlaceholder: "Ex. Maria Silva",
+  fullNameError: "Digite seu nome completo.",
+  email: "E-mail *",
+  emailPlaceholder: "seuemail@email.com",
+  emailError: "Digite um e-mail válido.",
+  emailHint: "Aqui enviaremos seu acesso ao produto digital.",
+  whatsappOptional: "WhatsApp (opcional)",
+
+  choosePaymentMethod: "Escolha sua forma de pagamento",
+  cardPayment: "Pagamento com cartão",
+  cardTitlePeru: "Cartão, Apple Pay ou Link",
+  cardTitleGlobal: "Cartão de débito ou crédito",
+  cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Cobrado na sua moeda local${lb}`,
+  cardSubtitleGlobal: (curr, lb) => `Débito ou crédito · Apple Pay · Google Pay · Link · Cobrado em ${curr}${lb}`,
+  autoActivatesByCountry: "Ativa-se automaticamente conforme seu país",
+  ssl256: "SSL 256-bit",
+  stripeVerified: "Stripe verificado",
+  support24h: "Suporte 24h",
+  processedBy: "Pagamento processado com segurança pela Stripe",
+
+  bankTransfer: "Transferência bancária",
+  bankTransferSub: (lb) => `BCP · BBVA · Interbank · Scotiabank · Conversão automática${lb}`,
+  cashPayment: "Pagamento em dinheiro",
+  cashPaymentSub: (lb) => `PagoEfectivo · Western Union · Tambo · Kasnet${lb}`,
+  yapePlin: "Yape ou Plin",
+  yapePlinSub: "Pagamento manual · Verificação 1-24h pela Supervisora Rosa",
+
+  completeDataFirst: "Complete seus dados primeiro",
+  completeDataFirstDesc: "Digite seu nome e e-mail para continuar com o pagamento.",
+  selectMethod: "Selecione uma forma de pagamento",
+  mpError: "Erro no Mercado Pago",
+  tryAgain: "Tente novamente",
+  errorPayment: "Erro de pagamento",
+  completeYourData: "Complete seus dados",
+
+  redirecting: "Redirecionando…",
+  buyNow: "Comprar agora",
+  enableMethods: "👆 Complete seu nome e e-mail acima para ativar as formas de pagamento.",
+
+  sendPaymentTo: "Envie o pagamento para",
+  amountToPay: "Valor a pagar",
+  sendEquivalentSoles: "Envie o equivalente em soles pela taxa de câmbio do dia.",
+  yapeStep1: "Abra seu app Yape ou Plin.",
+  yapeStep2: (a, p, n) => `Envie o equivalente de USD $${a} em soles ao número ${p} (${n}).`,
+  yapeStep3: "Salve a captura do comprovante.",
+  yapeStep4: 'Pressione "Já paguei" e nos envie o comprovante pelo WhatsApp.',
+  alreadyPaid: "Já paguei → Enviar comprovante",
+  sendReceiptWA: "Enviar comprovante direto pelo WhatsApp",
+  yapeVerifiedBy: "Nossa Supervisora Rosa revisa os pagamentos manualmente do Peru. Você receberá seu produto em 1 a 24 horas após a confirmação do comprovante.",
+  copied: "Copiado!",
+  tapToCopy: "Toque para copiar o número",
+
+  hideSummary: "Ocultar resumo",
+  showSummary: "Ver resumo",
+  yourOrder: "Seu pedido",
+  emptyCart: "Carrinho vazio",
+  couponPlaceholder: "Código de desconto",
+  applyCoupon: "Aplicar",
+  invalidCoupon: "Cupom inválido",
+  removeCoupon: "Remover cupom",
+  subtotal: "Subtotal",
+  discount: "Desconto",
+  taxes: "Impostos",
+  included: "Inclusos",
+  total: "Total",
+  inYourCurrency: "na sua moeda",
+
+  sslEncryption: "Criptografia SSL Stripe",
+  mercadoPagoPeru: "Mercado Pago Peru",
+  whatsappSupport: "Suporte WhatsApp",
+  resetTestProducts: "Redefinir produtos de teste",
+};
+
+const fr: CheckoutUIStrings = {
+  securePayment: "Paiement sécurisé",
+  stripeSSL: "Stripe SSL · Paiement sécurisé",
+  stripeSslMP: "Stripe SSL · Mercado Pago",
+
+  yourDetails: "Vos coordonnées",
+  yourDetailsHint: "Vous recevrez l'accès au produit numérique par e-mail.",
+  ready: "Prêt",
+  required: "Requis",
+  fullName: "Nom complet *",
+  fullNamePlaceholder: "Ex. Marie Dupont",
+  fullNameError: "Veuillez saisir votre nom complet.",
+  email: "Adresse e-mail *",
+  emailPlaceholder: "vous@email.com",
+  emailError: "Veuillez saisir un e-mail valide.",
+  emailHint: "Nous vous enverrons l'accès au produit ici.",
+  whatsappOptional: "WhatsApp (facultatif)",
+
+  choosePaymentMethod: "Choisissez votre mode de paiement",
+  cardPayment: "Paiement par carte",
+  cardTitlePeru: "Carte, Apple Pay ou Link",
+  cardTitleGlobal: "Carte de débit ou crédit",
+  cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Débité dans votre monnaie locale${lb}`,
+  cardSubtitleGlobal: (curr, lb) => `Débit ou crédit · Apple Pay · Google Pay · Link · Débité en ${curr}${lb}`,
+  autoActivatesByCountry: "Activé automatiquement selon votre pays",
+  ssl256: "SSL 256 bits",
+  stripeVerified: "Stripe vérifié",
+  support24h: "Support 24h",
+  processedBy: "Paiement traité en toute sécurité par Stripe",
+
+  bankTransfer: "Virement bancaire",
+  bankTransferSub: (lb) => `BCP · BBVA · Interbank · Scotiabank · Conversion automatique${lb}`,
+  cashPayment: "Paiement en espèces",
+  cashPaymentSub: (lb) => `PagoEfectivo · Western Union · Tambo · Kasnet${lb}`,
+  yapePlin: "Yape ou Plin",
+  yapePlinSub: "Paiement manuel · Vérification 1-24h par la Superviseure Rosa",
+
+  completeDataFirst: "Complétez d'abord vos coordonnées",
+  completeDataFirstDesc: "Saisissez votre nom et e-mail pour continuer.",
+  selectMethod: "Sélectionnez un mode de paiement",
+  mpError: "Erreur Mercado Pago",
+  tryAgain: "Réessayez",
+  errorPayment: "Erreur de paiement",
+  completeYourData: "Complétez vos coordonnées",
+
+  redirecting: "Redirection…",
+  buyNow: "Acheter maintenant",
+  enableMethods: "👆 Complétez votre nom et e-mail ci-dessus pour activer les modes de paiement.",
+
+  sendPaymentTo: "Envoyer le paiement à",
+  amountToPay: "Montant à payer",
+  sendEquivalentSoles: "Envoyez l'équivalent en soles au taux du jour.",
+  yapeStep1: "Ouvrez votre app Yape ou Plin.",
+  yapeStep2: (a, p, n) => `Envoyez l'équivalent de USD $${a} en soles au numéro ${p} (${n}).`,
+  yapeStep3: "Sauvegardez la capture du reçu.",
+  yapeStep4: 'Appuyez sur "J\'ai payé" et envoyez-nous le reçu par WhatsApp.',
+  alreadyPaid: "J'ai payé → Envoyer le reçu",
+  sendReceiptWA: "Envoyer le reçu directement par WhatsApp",
+  yapeVerifiedBy: "Notre Superviseure Rosa vérifie les paiements manuellement depuis le Pérou. Vous recevrez votre produit sous 1 à 24 heures après confirmation du reçu.",
+  copied: "Copié !",
+  tapToCopy: "Touchez pour copier le numéro",
+
+  hideSummary: "Masquer le résumé",
+  showSummary: "Voir le résumé",
+  yourOrder: "Votre commande",
+  emptyCart: "Panier vide",
+  couponPlaceholder: "Code de réduction",
+  applyCoupon: "Appliquer",
+  invalidCoupon: "Coupon invalide",
+  removeCoupon: "Retirer le coupon",
+  subtotal: "Sous-total",
+  discount: "Remise",
+  taxes: "Taxes",
+  included: "Incluses",
+  total: "Total",
+  inYourCurrency: "dans votre monnaie",
+
+  sslEncryption: "Chiffrement SSL Stripe",
+  mercadoPagoPeru: "Mercado Pago Pérou",
+  whatsappSupport: "Support WhatsApp",
+  resetTestProducts: "Réinitialiser les produits de test",
+};
+
+export const checkoutUIStrings: Record<Language, CheckoutUIStrings> = { es, en, pt, fr };
+
+export function getCheckoutUI(lang: Language): CheckoutUIStrings {
+  return checkoutUIStrings[lang] || checkoutUIStrings.es;
+}

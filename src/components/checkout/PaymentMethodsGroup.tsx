@@ -194,10 +194,10 @@ export function PaymentMethodsGroup() {
   };
 
   const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link", badge: "Stripe" },
-    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank", badge: `S/ ${totalPen}` },
-    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `S/ ${totalPen}` },
-    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `S/ ${totalPen}` },
+    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link · Cambio automático a tu moneda local", badge: "Stripe" },
+    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank · Conversión automática", badge: `USD $${totalUsd}` },
+    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `USD $${totalUsd}` },
+    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `USD $${totalUsd}` },
   ];
 
   const wasValidRef = useRef(valid);

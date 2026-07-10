@@ -702,7 +702,7 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl="/checkouts/patrones-ingles"
+        buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
         onBuyClick={handleBuy}
         ctaText="COMPRAR AHORA"
       />

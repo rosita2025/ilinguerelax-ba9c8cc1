@@ -26,6 +26,9 @@ interface Product {
   is_upsell: boolean;
   active: boolean;
   sort_order: number;
+  bonus_name: string | null;
+  bonus_drive_url: string | null;
+  bonus_access_key: string | null;
 }
 interface UpsellRow { upsell_sku: string; discount_pct: number; sort_order: number; }
 

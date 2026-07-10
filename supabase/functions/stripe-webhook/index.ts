@@ -163,10 +163,14 @@ serve(async (req) => {
       await sendThankYouEmail({
         customerEmail,
         customerName,
+        customerPhone: session.customer_details?.phone || undefined,
+        customerCountry: session.customer_details?.address?.country || undefined,
         productName: purchase.content_name,
         amount: purchase.value,
         currency: purchase.currency,
         provider: "stripe",
+        orderNumber: session.id ? `ILR-ST-${String(session.id).slice(-8).toUpperCase()}` : undefined,
+        idempotencyKey: session.id,
       });
 
       return new Response(

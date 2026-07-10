@@ -85,10 +85,13 @@ Deno.serve(async (req) => {
       await sendThankYouEmail({
         customerEmail: payerEmail,
         customerName: payerName,
+        customerCountry: payerCountry || undefined,
         productName,
         amount: capturedAmount ? Number(capturedAmount) : undefined,
         currency: capturedCurrency ?? "USD",
         provider: "paypal",
+        orderNumber: captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : undefined,
+        idempotencyKey: captureId || orderId,
       });
     }
     return new Response(JSON.stringify({

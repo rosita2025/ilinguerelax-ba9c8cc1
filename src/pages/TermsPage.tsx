@@ -16,10 +16,10 @@ Nos reservamos el derecho de modificar estos términos en cualquier momento. Los
   {
     icon: ShoppingCart,
     title: "Productos y Servicios",
-    content: `iLingue Relax ofrece productos educativos digitales (ebooks, guías PDF, audios) y, ocasionalmente, libros físicos. Todos los productos digitales son de descarga inmediata una vez completado el pago.
+    content: `iLingue Relax ofrece productos educativos digitales (ebooks, guías PDF, audios) y libros físicos disponibles próximamente a través de la tienda de Amazon. Todos los productos digitales son de descarga inmediata una vez completado el pago.
 
 • Productos digitales: se entregan mediante links de descarga o acceso a plataformas de terceros (Hotmart). Es tu responsabilidad descargar el contenido dentro del plazo indicado.
-• Libros físicos: se envían a través de nuestro socio Shopify y sus proveedores logísticos. Los tiempos de entrega varían según tu ubicación.
+• Libros físicos: próximamente disponibles a través de la tienda de Amazon; los tiempos de entrega, envío y devoluciones se rigen por las políticas de Amazon y sus socios logísticos.
 • Disponibilidad: nos reservamos el derecho de modificar, suspender o discontinuar cualquier producto sin previo aviso.`
   },
   {

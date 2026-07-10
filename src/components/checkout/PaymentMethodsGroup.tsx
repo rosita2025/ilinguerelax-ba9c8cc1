@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle } from "lucide-react";
+import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle, Wallet } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -13,8 +13,9 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
+import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 
-type Method = "card" | "transfer" | "cash" | "yape";
+type Method = "card" | "paypal" | "transfer" | "cash" | "yape";
 const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga Manuel";
 const WHATSAPP_URL = "https://wa.link/unpa9n";

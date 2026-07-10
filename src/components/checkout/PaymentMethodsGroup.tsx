@@ -215,14 +215,15 @@ export function PaymentMethodsGroup() {
   ];
   const methods = isPeru ? allMethods : allMethods.filter((m) => m.id === "card");
 
-  // Si el país cambia (p.ej. detección IP termina de resolver) y el método
-  // seleccionado ya no está disponible, resetea la selección a "card".
+  // Fuera de Perú solo hay un método (Stripe). Auto-seleccionarlo y auto-abrir
+  // el formulario embebido en cuanto el comprador completa sus datos, para
+  // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
-    if (!isPeru && selected && selected !== "card") {
-      setSelected("card");
-      setShowStripe(false);
+    if (!isPeru) {
+      if (selected !== "card") setSelected("card");
+      if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
-  }, [isPeru, selected]);
+  }, [isPeru, selected, valid, stripePromise, showStripe]);
 
 
   const wasValidRef = useRef(valid);

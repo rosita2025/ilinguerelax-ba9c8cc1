@@ -7,6 +7,7 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
+import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";

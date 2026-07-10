@@ -695,7 +695,7 @@ export function PaymentMethodsGroup() {
 
                 <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
                   <li>{t.yapeStep1}</li>
-                  <li>{t.yapeStep2(totalUsd, YAPE_PHONE, YAPE_NAME)}</li>
+                  <li>{t.yapeStep2(local.loading ? `USD $${totalUsd}` : local.formatted, YAPE_PHONE, YAPE_NAME)}</li>
                   <li>{t.yapeStep3}</li>
                   <li>{t.yapeStep4}</li>
                 </ol>

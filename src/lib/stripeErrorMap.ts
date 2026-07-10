@@ -20,12 +20,16 @@ export interface MappedStripeError {
     | "incorrect_cvc"
     | "expired_card"
     | "processing"
+    | "3ds_required"
     | "3ds_failed"
+    | "3ds_canceled"
+    | "3ds_unsupported"
     | "coupon"
     | "amount"
     | "config"
     | "unknown";
   retryable: boolean;
+  instructions?: string[];
 }
 
 const DICT: Record<

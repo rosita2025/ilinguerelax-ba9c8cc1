@@ -18,7 +18,8 @@ Nos reservamos el derecho de modificar estos términos en cualquier momento. Los
     title: "Productos y Servicios",
     content: `iLingue Relax ofrece productos educativos digitales (ebooks, guías PDF, audios) y libros físicos disponibles próximamente a través de la tienda de Amazon. Todos los productos digitales son de descarga inmediata una vez completado el pago.
 
-• Productos digitales: se entregan mediante links de descarga o acceso a plataformas de terceros (Hotmart). Es tu responsabilidad descargar el contenido dentro del plazo indicado.
+• Productos digitales vendidos a través de Hotmart (Latinoamérica): la entrega y el acceso se realizan directamente dentro de la plataforma de Hotmart una vez confirmado el pago.
+• Productos digitales vendidos en la tienda de iLingue Relax (Stripe, Mercado Pago, Yape/Plin): la entrega se realiza mediante una página web de descarga protegida por contraseña. La contraseña se envía por correo electrónico de forma automática (pagos con Stripe y Mercado Pago) o de forma manual (pagos con Yape/Plin, una vez que la Supervisora de Pagos verifica el comprobante en un plazo de 1 a 24 horas).
 • Libros físicos: próximamente disponibles a través de la tienda de Amazon; los tiempos de entrega, envío y devoluciones se rigen por las políticas de Amazon y sus socios logísticos.
 • Disponibilidad: nos reservamos el derecho de modificar, suspender o discontinuar cualquier producto sin previo aviso.`
   },

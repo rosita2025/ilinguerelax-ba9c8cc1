@@ -164,6 +164,26 @@ const ProductSpanish5000Digital = () => {
     window.location.assign(STRIPE_CHECKOUT_URL);
   };
 
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const handleAddToCart = () => {
+    addItem({
+      id: "5000-spanish-words",
+      name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
+      price: PRICE,
+      image: "/images/product-5000-spanish.webp",
+      description: "5,000 vocabulary words in Spanish with English pronunciation",
+      quantity: 1,
+    });
+    toast.success("Product added to cart", {
+      description: "Keep browsing or go to checkout.",
+      action: {
+        label: "Go to checkout",
+        onClick: () => navigate("/checkouts/5000-spanish-words"),
+      },
+    });
+  };
+
   return (
     <main className="min-h-screen bg-background">
       <Helmet>

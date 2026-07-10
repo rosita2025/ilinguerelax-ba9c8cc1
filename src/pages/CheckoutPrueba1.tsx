@@ -88,7 +88,7 @@ export default function CheckoutPrueba1() {
             onClick={resetToDefaults}
             className="text-xs text-muted-foreground hover:text-primary mt-3 underline underline-offset-2"
           >
-            Restablecer productos de prueba
+            {t.resetTestProducts}
           </button>
         </aside>
       </div>

@@ -62,12 +62,17 @@ export function PaymentMethodsGroup() {
     const parts = s.buyer.fullName.trim().split(/\s+/);
     const firstName = parts[0].slice(0, 50);
     const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);
+    const toAbsUrl = (u?: string) => {
+      if (!u) return undefined;
+      if (/^https?:\/\//i.test(u)) return u;
+      try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
+    };
     const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
       body: {
         environment: getStripeEnvironment(),
         items: s.items.map((i) => ({
           id: i.id, name: i.name, price: itemPrice(i, region.tier),
-          quantity: i.quantity, image: i.image, description: i.description,
+          quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
         })),
         currency: "usd",
         couponPercent: s.couponPercent,
@@ -118,10 +123,12 @@ export function PaymentMethodsGroup() {
       const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
         body: {
           orderId: `ilr-prueba-${Date.now()}`,
-          items: s.items.map((i) => ({
-            id: i.id, name: i.name, price: itemPrice(i, region.tier),
-            quantity: i.quantity, image: i.image, description: i.description,
-          })),
+          items: s.items.map((i) => {
+            const abs = i.image && /^https?:\/\//i.test(i.image)
+              ? i.image
+              : (() => { try { return i.image ? new URL(i.image, window.location.origin).toString() : undefined; } catch { return undefined; } })();
+            return { id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity, image: abs, description: i.description };
+          }),
           couponPercent: s.couponPercent,
           couponCode: s.coupon ?? undefined,
           payerEmail: s.buyer.email.trim(),

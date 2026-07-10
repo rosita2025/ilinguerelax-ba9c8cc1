@@ -235,7 +235,7 @@ export function PaymentMethodsGroup() {
   const cardBrands = cardBrandsByCountry(country);
   const cardSubtitle = isPeru
     ? `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`
-    : `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${local.currencyCode || "tu moneda local"}${localBadge}`;
+    : `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${local.currency || "tu moneda local"}${localBadge}`;
 
   const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
     { id: "card", icon: CreditCard, title: isPeru ? "Tarjeta, Apple Pay o Link" : "Tarjeta débito o crédito", sub: cardSubtitle, badge: "Stripe" },

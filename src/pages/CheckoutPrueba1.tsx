@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle } from "lucide-react";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";

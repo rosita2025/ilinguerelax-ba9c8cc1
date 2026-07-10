@@ -5,31 +5,47 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Mapa producto → material digital. Se compara por coincidencia parcial (case-insensitive)
-// contra el nombre del ítem guardado en la orden.
-const MATERIALS: Array<{ match: RegExp; productName: string; downloadUrl: string; accessKey?: string }> = [
-  {
-    match: /patrones|alfabeto|combinaciones secretas/i,
-    productName: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-    downloadUrl: "https://ilinguerelax.com/descarga/patrones-ingles",
-    accessKey: "123A",
-  },
-  {
-    match: /coreano|100 mapas|mapas mentales/i,
-    productName: "100 Mapas Mentales de Coreano",
-    downloadUrl: "https://ilinguerelax.com/descarga/coreano-100-mapas",
-  },
-];
+// Resuelve materiales digitales leyendo la tabla `digital_products`.
+// Estrategia: intenta coincidir por `sku` (si el ítem lo trae) o por match parcial en `name`.
+async function resolveMaterials(
+  admin: ReturnType<typeof createClient>,
+  items: Array<{ name?: string; sku?: string }> = []
+) {
+  if (!items.length) return [];
+  const { data: products } = await admin
+    .from("digital_products")
+    .select("sku, name, drive_url, access_key")
+    .eq("active", true);
+  if (!products) return [];
 
-function resolveMaterials(items: Array<{ name?: string }> = []) {
   const out: Array<{ productName: string; downloadUrl: string; accessKey?: string }> = [];
   const seen = new Set<string>();
+
   for (const it of items) {
-    const name = (it?.name || "").toString();
-    const hit = MATERIALS.find((m) => m.match.test(name));
-    if (hit && !seen.has(hit.downloadUrl)) {
-      seen.add(hit.downloadUrl);
-      out.push({ productName: hit.productName, downloadUrl: hit.downloadUrl, accessKey: hit.accessKey });
+    const skuHint = (it?.sku || "").toString().toLowerCase();
+    const nameHint = (it?.name || "").toString().toLowerCase();
+    if (!skuHint && !nameHint) continue;
+
+    const hit = products.find((p: { sku: string; name: string; drive_url: string | null }) => {
+      if (skuHint && p.sku.toLowerCase() === skuHint) return true;
+      if (nameHint) {
+        // Match parcial: cualquier palabra ≥4 chars del sku aparece en el nombre del ítem, o viceversa
+        const skuTokens = p.sku.split("-").filter((t) => t.length >= 4);
+        if (skuTokens.some((t) => nameHint.includes(t))) return true;
+        const productNameLc = p.name.toLowerCase();
+        const first3 = productNameLc.split(/[\s,]+/).slice(0, 3).join(" ");
+        if (first3 && nameHint.includes(first3.substring(0, Math.min(15, first3.length)))) return true;
+      }
+      return false;
+    });
+
+    if (hit && hit.drive_url && !seen.has(hit.sku)) {
+      seen.add(hit.sku);
+      out.push({
+        productName: hit.name,
+        downloadUrl: hit.drive_url,
+        accessKey: hit.access_key ?? undefined,
+      });
     }
   }
   return out;
@@ -101,7 +117,7 @@ Deno.serve(async (req) => {
       // Enviar 1) gracias por tu compra y 2) entrega de materiales
       const items = Array.isArray(order.items) ? order.items : [];
       const productNames = items.map((i: any) => i?.name).filter(Boolean).join(" + ") || "Tu pedido ILINGUE RELAX";
-      const materials = resolveMaterials(items);
+      const materials = await resolveMaterials(admin, items);
 
       await sendTemplate(admin, "thank-you", order.buyer_email, `manual-thanks-${order.order_number}`, {
         orderNumber: order.order_number,

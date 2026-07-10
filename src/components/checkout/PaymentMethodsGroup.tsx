@@ -41,6 +41,8 @@ export function PaymentMethodsGroup() {
   const [stripeError, setStripeError] = useState<string | null>(null);
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
+  const [stripeElapsed, setStripeElapsed] = useState(0);
+  const [stripeAutoRetried, setStripeAutoRetried] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -209,16 +211,18 @@ export function PaymentMethodsGroup() {
     // yape → user uses "Ya pagué" button in the manual panel
   };
 
-  const retryStripe = () => {
+  const retryStripe = useCallback(() => {
     setStripeError(null);
     setStripeLoading(false);
     setStripeFrameMounted(false);
+    setStripeElapsed(0);
     setStripeRetryKey((k) => k + 1);
-  };
+  }, []);
 
   useEffect(() => {
     if (!(showStripe && selected === "card")) return;
     setStripeFrameMounted(false);
+    setStripeElapsed(0);
     const container = stripeContainerRef.current;
     if (!container) return;
 
@@ -233,25 +237,38 @@ export function PaymentMethodsGroup() {
     if (markMounted()) return;
     const observer = new MutationObserver(markMounted);
     observer.observe(container, { childList: true, subtree: true });
-    const timeout = window.setTimeout(() => {
-      if (!markMounted()) {
-        setStripeError(
-          language === "en"
-            ? "The secure card form is taking too long to open."
-            : language === "pt"
-              ? "O formulário seguro de cartão está demorando para abrir."
-              : language === "fr"
-                ? "Le formulaire sécurisé de carte met trop de temps à s’ouvrir."
-                : "El formulario seguro de tarjeta está tardando demasiado en abrir.",
-        );
+
+    const startedAt = Date.now();
+    const tick = window.setInterval(() => {
+      const s = Math.floor((Date.now() - startedAt) / 1000);
+      setStripeElapsed(s);
+      // Auto-retry silently once at 45s if the iframe never mounted
+      if (s === 45 && !stripeAutoRetried) {
+        setStripeAutoRetried(true);
+        setStripeRetryKey((k) => k + 1);
       }
-    }, 25000);
+      // Hard failure at 90s → show retry UI
+      if (s >= 90) {
+        window.clearInterval(tick);
+        if (!container.querySelector('iframe[name="embedded-checkout"]')) {
+          setStripeError(
+            language === "en"
+              ? "The secure card form is taking too long to open. Check your connection and try again, or contact us on WhatsApp."
+              : language === "pt"
+                ? "O formulário seguro de cartão está demorando muito. Verifique sua conexão e tente novamente, ou fale conosco no WhatsApp."
+                : language === "fr"
+                  ? "Le formulaire sécurisé met trop de temps à s’ouvrir. Vérifie ta connexion et réessaie, ou contacte-nous sur WhatsApp."
+                  : "El formulario seguro está tardando demasiado. Revisa tu conexión e intenta de nuevo, o escríbenos por WhatsApp.",
+          );
+        }
+      }
+    }, 1000);
 
     return () => {
       observer.disconnect();
-      window.clearTimeout(timeout);
+      window.clearInterval(tick);
     };
-  }, [showStripe, selected, stripeRetryKey, language]);
+  }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried]);
 
   const handleManualPaid = () => {
     const s = useCheckoutPruebaStore.getState();
@@ -509,43 +526,90 @@ export function PaymentMethodsGroup() {
                   <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
                 <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
-                  {(stripeLoading || !stripeFrameMounted) && !stripeError && (
-                    <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
-                      <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        {language === "en"
-                          ? "Opening the secure Stripe form…"
-                          : language === "pt"
-                            ? "Abrindo o formulário seguro da Stripe…"
-                            : language === "fr"
-                              ? "Ouverture du formulaire sécurisé Stripe…"
-                              : "Abriendo el formulario seguro de Stripe…"}
-                      </div>
-                      <div className="mx-auto mt-6 max-w-md space-y-3">
-                        <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                        <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                  {(stripeLoading || !stripeFrameMounted) && !stripeError && (() => {
+                    const isEn = language === "en";
+                    const isPt = language === "pt";
+                    const isFr = language === "fr";
+                    const status =
+                      stripeElapsed < 15
+                        ? (isEn ? "Opening the secure Stripe form…"
+                          : isPt ? "Abrindo o formulário seguro da Stripe…"
+                          : isFr ? "Ouverture du formulaire sécurisé Stripe…"
+                          : "Abriendo el formulario seguro de Stripe…")
+                        : stripeElapsed < 45
+                        ? (isEn ? "Still loading… secure connection with Stripe."
+                          : isPt ? "Ainda carregando… conexão segura com a Stripe."
+                          : isFr ? "Chargement en cours… connexion sécurisée avec Stripe."
+                          : "Aún cargando… conexión segura con Stripe.")
+                        : stripeElapsed < 75
+                        ? (isEn ? "Taking longer than usual. Retrying automatically…"
+                          : isPt ? "Está demorando mais que o normal. Tentando novamente…"
+                          : isFr ? "Cela prend plus de temps que d’habitude. Nouvelle tentative…"
+                          : "Está tardando más de lo normal. Reintentando automáticamente…")
+                        : (isEn ? "Almost there… if it doesn't open in a few seconds you can retry."
+                          : isPt ? "Quase lá… se não abrir em poucos segundos, você pode tentar de novo."
+                          : isFr ? "Presque prêt… si rien ne s’ouvre, tu pourras réessayer."
+                          : "Casi listo… si no abre en unos segundos, podrás reintentar.");
+                    return (
+                      <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
+                        <div className="flex items-center justify-center gap-2 text-sm text-neutral-700 dark:text-neutral-200 font-medium">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>{status}</span>
                         </div>
-                        <div className="h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+                        {stripeElapsed >= 5 && (
+                          <div className="mt-1 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
+                            {stripeElapsed}s
+                          </div>
+                        )}
+                        {stripeElapsed >= 30 && (
+                          <div className="mt-3 flex justify-center">
+                            <button
+                              type="button"
+                              onClick={retryStripe}
+                              className="inline-flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                            >
+                              <Loader2 className="w-3.5 h-3.5" />
+                              {isEn ? "Retry now" : isPt ? "Tentar agora" : isFr ? "Réessayer" : "Reintentar ahora"}
+                            </button>
+                          </div>
+                        )}
+                        <div className="mx-auto mt-6 max-w-md space-y-3">
+                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                            <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                          </div>
+                          <div className="h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                   {stripeError && (
                     <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
                       <p className="font-semibold">
                         {language === "en" ? "Stripe did not load." : language === "pt" ? "Stripe não carregou." : language === "fr" ? "Stripe n’a pas chargé." : "Stripe no cargó."}
                       </p>
                       <p className="mt-1 text-xs">{stripeError}</p>
-                      <button
-                        type="button"
-                        onClick={retryStripe}
-                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
-                      >
-                        <Loader2 className="w-3.5 h-3.5" />
-                        {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
-                      </button>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={retryStripe}
+                          className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
+                        >
+                          <Loader2 className="w-3.5 h-3.5" />
+                          {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
+                        </button>
+                        <a
+                          href={WHATSAPP_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#20b858]"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          {language === "en" ? "Contact us on WhatsApp" : language === "pt" ? "Fale conosco no WhatsApp" : language === "fr" ? "Contactez-nous sur WhatsApp" : "Escríbenos por WhatsApp"}
+                        </a>
+                      </div>
                     </div>
                   )}
                   <EmbeddedCheckoutProvider key={stripeRetryKey} stripe={stripePromise} options={stripeOptions}>

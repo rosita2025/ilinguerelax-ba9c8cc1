@@ -41,12 +41,15 @@ El incumplimiento de estas condiciones puede resultar en la cancelación de tu a
   {
     icon: RotateCcw,
     title: "Política de Reembolsos y Garantía",
-    content: `Para productos digitales:
-• Ofrecemos una garantía de 7 días desde la fecha de compra. Si el producto no cumple con tus expectativas, puedes solicitar un reembolso completo contactándonos en hola@ilinguerelax.com.
-• El reembolso se procesará al método de pago original en un plazo de 5 a 10 días hábiles.
-• Nos reservamos el derecho de denegar reembolsos en casos de abuso de la política (múltiples solicitudes del mismo usuario).
+    content: `Productos digitales comprados a través de Hotmart (Latinoamérica):
+• Aplica la garantía oficial de Hotmart: puedes solicitar la devolución del 100% del importe dentro de los primeros 7 días desde la fecha de compra, directamente desde tu cuenta de comprador en Hotmart o escribiendo a hola@ilinguerelax.com.
+• El reembolso se procesa según los plazos y métodos de Hotmart (5 a 15 días hábiles).
 
-Para libros físicos (próximamente en Amazon):
+Productos digitales comprados en la tienda de iLingue Relax (Stripe, Mercado Pago, Yape/Plin):
+• Por tratarse de contenido digital de descarga inmediata y acceso protegido por contraseña, no se admiten devoluciones ni reembolsos una vez confirmado el pago y entregada la contraseña de acceso.
+• Ante cualquier problema técnico con la descarga o el acceso, contáctanos en hola@ilinguerelax.com y nuestra Supervisora de Pagos te asistirá para restablecer el acceso.
+
+Libros físicos (próximamente en Amazon):
 • Las devoluciones, cambios y reclamos por daños en el envío se gestionan directamente según la política vigente de la tienda de Amazon.`
   },
   {

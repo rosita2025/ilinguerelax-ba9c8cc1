@@ -61,7 +61,7 @@ export default function CheckoutSuccess() {
           orderId: paymentId || externalRef || undefined,
           total,
           currency: "USD",
-          paymentProvider: sp.get("session_id") ? "stripe" : sp.get("payment_id") ? "mercadopago" : "unknown",
+          paymentProvider: provider,
           items: items.map((i) => ({
             id: i.id,
             name: i.name,

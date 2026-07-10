@@ -494,14 +494,14 @@ export function PaymentMethodsGroup() {
                   )}
                 </div>
                 {m.id === "card" ? (
-                  <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                  <div className="mt-2 flex items-center gap-2 sm:gap-2.5 flex-wrap">
                     <LogoBadge src={visaLogo} alt="Visa" />
                     <LogoBadge src={mastercardLogo} alt="Mastercard" />
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
                 ) : m.id === "transfer" ? (
-                  <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                  <div className="mt-2 flex items-center gap-2 sm:gap-2.5 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
                     <BankBadge label="BBVA" bg="#004481" color="#ffffff" />
                     <BankBadge label="Interbank" bg="#00953B" color="#ffffff" />

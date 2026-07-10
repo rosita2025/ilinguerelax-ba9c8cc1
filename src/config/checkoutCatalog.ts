@@ -4,6 +4,8 @@ export interface UpsellItem {
   id: string;
   name: string;
   price: number;
+  /** Precio original (tachado) para mostrar el ahorro. Si no se define, no se muestra descuento. */
+  originalPrice?: number;
   image: string;
   description?: string;
   badge?: string;
@@ -30,14 +32,16 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
         id: "upsell-1000-verbos",
         name: "1,000 Verbos Esenciales en Inglés (PDF)",
         price: 5,
+        originalPrice: 10,
         image: "/images/product-1000-verbos.webp",
         description: "Presente, pasado y futuro con pronunciación",
-        badge: "-50% solo hoy",
+        badge: "Más vendido",
       },
       {
         id: "upsell-500-preguntas",
         name: "500 Preguntas en Inglés (PDF)",
         price: 4,
+        originalPrice: 8,
         image: "/images/product-500-preguntas.webp",
         description: "Preguntas comunes con pronunciación adaptada",
         badge: "Recomendado",
@@ -55,9 +59,19 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
         id: "upsell-patrones-ingles",
         name: "Patrones Especiales en Inglés (PDF)",
         price: 5,
+        originalPrice: 8,
         image: "/images/product-patrones-especiales.webp",
         description: "Alfabeto + combinaciones secretas del inglés",
-        badge: "-37% solo hoy",
+        badge: "Más vendido",
+      },
+      {
+        id: "upsell-500-preguntas",
+        name: "500 Preguntas en Inglés (PDF)",
+        price: 4,
+        originalPrice: 8,
+        image: "/images/product-500-preguntas.webp",
+        description: "Refuerza tu conversación diaria",
+        badge: "Combo perfecto",
       },
     ],
   },

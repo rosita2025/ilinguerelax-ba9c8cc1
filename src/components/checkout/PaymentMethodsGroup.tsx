@@ -579,19 +579,22 @@ export function PaymentMethodsGroup() {
                   })()}
                   {stripeError && (
                     <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
-                      <p className="font-semibold">
-                        {language === "en" ? "Stripe did not load." : language === "pt" ? "Stripe não carregou." : language === "fr" ? "Stripe n’a pas chargé." : "Stripe no cargó."}
+                      <p className="font-semibold">{stripeError.title}</p>
+                      <p className="mt-1 text-xs">{stripeError.message}</p>
+                      <p className="mt-1 text-[10px] opacity-70">
+                        {language === "en" ? "Code" : language === "pt" ? "Código" : language === "fr" ? "Code" : "Código"}: {stripeError.code}
                       </p>
-                      <p className="mt-1 text-xs">{stripeError}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={retryStripe}
-                          className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
-                        >
-                          <Loader2 className="w-3.5 h-3.5" />
-                          {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
-                        </button>
+                        {stripeError.retryable && (
+                          <button
+                            type="button"
+                            onClick={retryStripe}
+                            className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
+                          >
+                            <Loader2 className="w-3.5 h-3.5" />
+                            {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
+                          </button>
+                        )}
                         <a
                           href={WHATSAPP_URL}
                           target="_blank"

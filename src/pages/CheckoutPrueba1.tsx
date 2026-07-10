@@ -13,6 +13,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { getCatalogItem, CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
+import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 
 export default function CheckoutPrueba1() {
   const { slug } = useParams<{ slug?: string }>();
@@ -34,6 +35,10 @@ export default function CheckoutPrueba1() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
+
+  // Shopify-style abandoned checkout tracking: saves buyer info if they
+  // fill name+email but leave without completing card payment.
+  useAbandonedCheckoutTracker(slug, catalogItem?.name);
 
   if (slugUnknown) {
     return (

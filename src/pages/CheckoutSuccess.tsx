@@ -33,13 +33,16 @@ export default function CheckoutSuccess() {
   // Gate: only real buyers from Stripe or PayPal should see the confirmation.
   // A visitor without a valid payment reference OR without buyer info in the
   // session store is treated as public/unknown and gets a neutral screen.
-  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken);
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order"));
   const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
-  const isVerifiedBuyer =
+  const initialVerified =
     hasPaymentRef &&
     hasBuyerContext &&
     (provider === "stripe" || provider === "paypal" || provider === "mercadopago") &&
     status !== "rejected" && status !== "failure";
+  // Freeze verification at mount so clearing the cart after sending the
+  // confirmation email doesn't flip the screen to "private confirmation".
+  const [isVerifiedBuyer] = useState(initialVerified);
 
   // Send confirmation email once, then clear the cart
   useEffect(() => {

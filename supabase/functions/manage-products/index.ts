@@ -40,6 +40,8 @@ interface ProductIn {
   hotmart_url?: string | null;
   store_enabled?: boolean;
   excluded_countries?: string[] | null;
+  store_excluded_countries?: string[] | null;
+  hotmart_excluded_countries?: string[] | null;
   upsells?: UpsellIn[];
 }
 

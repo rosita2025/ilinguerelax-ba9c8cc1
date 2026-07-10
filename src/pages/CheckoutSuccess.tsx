@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 
 export default function CheckoutSuccess() {
   const [sp] = useSearchParams();

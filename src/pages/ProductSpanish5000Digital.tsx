@@ -148,6 +148,9 @@ const ProductSpanish5000Digital = () => {
   });
   useScrollTimeTracking("product_spanish_5000_digital");
 
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+
   const handleBuyNow = () => {
     if (lockRef.current) return;
     lockRef.current = true;
@@ -172,8 +175,6 @@ const ProductSpanish5000Digital = () => {
     navigate("/checkouts/5000-spanish-words");
   };
 
-  const navigate = useNavigate();
-  const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const handleAddToCart = () => {
     addItem({
       id: "5000-spanish-words",

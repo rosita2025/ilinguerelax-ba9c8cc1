@@ -229,7 +229,7 @@ const en: CheckoutUIStrings = {
   amountToPay: "Amount to pay",
   sendEquivalentSoles: "Send the equivalent in soles at today's exchange rate.",
   yapeStep1: "Open your Yape or Plin app.",
-  yapeStep2: (a, p, n) => `Send the equivalent of USD $${a} in soles to number ${p} (${n}).`,
+  yapeStep2: (a, p, n) => `Send ${a} to number ${p} (${n}).`,
   yapeStep3: "Save the payment receipt screenshot.",
   yapeStep4: 'Press "I paid" and send us the receipt on WhatsApp.',
   alreadyPaid: "I paid → Send receipt",

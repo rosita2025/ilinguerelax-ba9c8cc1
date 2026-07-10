@@ -63,7 +63,7 @@ const Products = () => {
       if (!map.has(p.flag)) map.set(p.flag, { flag: p.flag, label: p.country });
     }
     return Array.from(map.values());
-  }, []);
+  }, [products]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

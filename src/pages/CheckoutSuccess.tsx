@@ -14,6 +14,14 @@ export default function CheckoutSuccess() {
   const paymentId = sp.get("payment_id") || sp.get("collection_id") || sp.get("session_id");
   const status = sp.get("status") || sp.get("collection_status") || "approved";
   const externalRef = sp.get("external_reference") || sp.get("preference_id");
+  const paypalToken = sp.get("token") || sp.get("PayerID");
+  const provider = sp.get("session_id")
+    ? "stripe"
+    : paypalToken
+    ? "paypal"
+    : sp.get("payment_id") || sp.get("collection_id")
+    ? "mercadopago"
+    : "unknown";
 
   const { items, buyer, couponPercent, coupon, clear } = useCheckoutPruebaStore();
   const region = useRegionTier();
@@ -21,6 +29,17 @@ export default function CheckoutSuccess() {
   const sentRef = useRef(false);
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
+
+  // Gate: only real buyers from Stripe or PayPal should see the confirmation.
+  // A visitor without a valid payment reference OR without buyer info in the
+  // session store is treated as public/unknown and gets a neutral screen.
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken);
+  const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
+  const isVerifiedBuyer =
+    hasPaymentRef &&
+    hasBuyerContext &&
+    (provider === "stripe" || provider === "paypal" || provider === "mercadopago") &&
+    status !== "rejected" && status !== "failure";
 
   // Send confirmation email once, then clear the cart
   useEffect(() => {

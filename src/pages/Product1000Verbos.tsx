@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -22,8 +24,15 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
+import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 
-const HOTMART_URL = "https://pay.hotmart.com/T102978081M";
+const CART_ITEM = {
+  id: "1000-verbos-ingles",
+  name: "Inglés Relax · 1,000 Verbos Esenciales (Digital PDF)",
+  price: 10,
+  image: product1000VerbosImage,
+  description: "1,000 verbos en presente, pasado y futuro con pronunciación",
+};
 
 const features = [
   "1,000 verbos esenciales más utilizados en inglés",
@@ -38,6 +47,10 @@ const features = [
 
 const Product1000Verbos = () => {
   const campaign = useCampaignPrice(10, 54);
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const clear = useCheckoutPruebaStore((s) => s.clear);
+
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",
     content_category: "Digital Book",
@@ -58,8 +71,12 @@ const Product1000Verbos = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(HOTMART_URL, "_blank");
+    clear();
+    addItem({ ...CART_ITEM, quantity: 1 });
+    toast.success("Producto agregado al carrito");
+    navigate("/checkouts/prueba-1");
   };
+
 
   return (
     <main className="min-h-screen bg-background">
@@ -239,7 +256,7 @@ const Product1000Verbos = () => {
           { question: "¿Qué incluye este libro?", answer: "Incluye 1,000 verbos esenciales en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.", icon: BookOpen },
           { question: "¿Es un libro físico o digital?", answer: "Es un producto digital (PDF) con descarga inmediata. Puedes imprimirlo en casa si lo deseas.", icon: Smartphone },
           { question: "¿Necesito saber inglés para usarlo?", answer: "No. Puedes empezar desde cero. Cada verbo incluye su significado en español y pronunciación adaptada.", icon: Lightbulb },
-          { question: "¿Cómo realizo el pago?", answer: "Puedes pagar de forma segura mediante Hotmart, que acepta tarjetas de crédito/débito y otros métodos según tu país.", icon: CreditCard },
+          { question: "¿Cómo realizo el pago?", answer: "Al presionar Comprar Ahora se agrega al carrito y vas al checkout seguro donde puedes pagar con tarjeta (Stripe), transferencias, Yape/Plin o efectivo.", icon: CreditCard },
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre 1,000 Verbos Esenciales"
@@ -256,7 +273,7 @@ const Product1000Verbos = () => {
         rating={4.8}
         reviewCount={350}
         showReviews={true}
-        buyUrl={HOTMART_URL}
+        buyUrl="/checkouts/prueba-1"
         onBuyClick={handleBuy}
       />
 

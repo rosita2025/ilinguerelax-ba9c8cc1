@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -22,8 +24,15 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
+import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 
-const HOTMART_URL = "https://pay.hotmart.com/T102978081M";
+const CART_ITEM = {
+  id: "1000-verbos-ingles",
+  name: "Inglés Relax · 1,000 Verbos Esenciales (Digital PDF)",
+  price: 10,
+  image: product1000VerbosImage,
+  description: "1,000 verbos en presente, pasado y futuro con pronunciación",
+};
 
 const features = [
   "1,000 verbos esenciales más utilizados en inglés",

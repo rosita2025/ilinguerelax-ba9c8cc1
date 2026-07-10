@@ -13,7 +13,10 @@ export interface UpsellItem {
 
 export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
   upsells?: UpsellItem[];
+  /** Ruta de la página del producto para el enlace "Volver al producto". */
+  productPath?: string;
 }
+
 
 /**
  * Central checkout catalog — Shopify-style.

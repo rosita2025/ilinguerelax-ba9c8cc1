@@ -7,6 +7,8 @@ import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 export default function CheckoutPrueba1() {
   const { resetToDefaults } = useCheckoutPruebaStore();

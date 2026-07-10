@@ -133,10 +133,10 @@ export function BuyerInfoForm() {
             />
           </div>
           {showEmailError ? (
-            <p className="text-[11px] text-destructive mt-1">Ingresa un correo válido.</p>
+            <p className="text-[11px] text-destructive mt-1">{t.emailError}</p>
           ) : (
             <p className="text-[11px] text-muted-foreground mt-1">
-              Aquí enviaremos tu acceso al producto digital.
+              {t.emailHint}
             </p>
           )}
         </label>

@@ -120,8 +120,8 @@ export function PaymentMethodsGroup() {
   const requestBuyerInfo = () => {
     window.dispatchEvent(new Event(BUYER_ERRORS_EVENT));
     toast({
-      title: "Completa tus datos primero",
-      description: "Ingresa tu nombre y correo para continuar con el pago.",
+      title: t.completeDataFirst,
+      description: t.completeDataFirstDesc,
       variant: "destructive",
     });
   };

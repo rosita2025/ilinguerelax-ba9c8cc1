@@ -57,6 +57,8 @@ const EMPTY: Product = {
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
   hotmart_url: "",
+  store_enabled: true,
+  excluded_countries: [],
 };
 
 const AdminProductEdit = () => {

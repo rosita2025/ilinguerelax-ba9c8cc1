@@ -95,6 +95,9 @@ Deno.serve(async (req) => {
         sort_order: p.sort_order ?? 0,
         stripe_product_id: p.stripe_product_id ?? null,
         stripe_price_id: p.stripe_price_id ?? null,
+        bonus_name: p.bonus_name?.toString().trim() || null,
+        bonus_drive_url: p.bonus_drive_url?.toString().trim() || null,
+        bonus_access_key: p.bonus_access_key?.toString().trim() || null,
       };
 
       const { error: upErr } = await admin

@@ -21,7 +21,24 @@ interface DBProduct {
   is_upsell: boolean;
   active: boolean;
   bonuses: unknown;
+  hotmart_url: string | null;
 }
+
+/**
+ * Países que usan el checkout propio de la tienda (ILINGUE RELAX):
+ * Perú + Norteamérica + Europa/UK + Asia + Oceanía angloparlante.
+ * El resto de Latinoamérica ve el botón de Hotmart si el producto tiene enlace configurado.
+ */
+const STORE_CHECKOUT_COUNTRIES = new Set([
+  // LATAM excepción (Perú)
+  "PE",
+  // Angloparlantes / Norteamérica
+  "US", "CA", "GB", "IE", "AU", "NZ",
+  // Europa
+  "ES", "FR", "DE", "IT", "PT", "NL", "BE", "AT", "CH", "SE", "NO", "DK", "FI", "GR", "PL", "CZ",
+  // Asia
+  "JP", "KR", "CN", "HK", "TW", "SG", "MY", "TH", "PH", "ID", "VN", "IN", "AE", "SA", "IL", "TR",
+]);
 
 const FLAG: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",
@@ -44,7 +61,7 @@ const ProductDynamic = () => {
     (async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();
@@ -131,9 +148,26 @@ const ProductDynamic = () => {
                 </div>
               </div>
 
-              <Button asChild size="lg" className="w-full">
-                <Link to={`/checkouts/${product.sku}`}>Comprar ahora · {displayFormatted}</Link>
-              </Button>
+              {(() => {
+                // Route buy button by visitor country:
+                // - Store checkout countries (Perú, USA, Canadá, UK, Asia, Europa…) → checkout propio.
+                // - Resto de LATAM → Hotmart (si hay enlace); si no, checkout propio como fallback.
+                const useStore = STORE_CHECKOUT_COUNTRIES.has(local.country) || !product.hotmart_url;
+                if (useStore) {
+                  return (
+                    <Button asChild size="lg" className="w-full">
+                      <Link to={`/checkouts/${product.sku}`}>Comprar ahora · {displayFormatted}</Link>
+                    </Button>
+                  );
+                }
+                return (
+                  <Button asChild size="lg" className="w-full bg-[#EF4E23] hover:bg-[#d73f18] text-white">
+                    <a href={product.hotmart_url!} target="_blank" rel="noopener noreferrer">
+                      Comprar en Hotmart · {displayFormatted}
+                    </a>
+                  </Button>
+                );
+              })()}
 
               {bonusList.length > 0 && (
                 <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl">

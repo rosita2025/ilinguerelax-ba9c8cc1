@@ -30,6 +30,7 @@ interface Product {
   bonus_drive_url: string | null;
   bonus_access_key: string | null;
   bonuses: Bonus[] | null;
+  hotmart_url: string | null;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -53,6 +54,7 @@ const EMPTY: Product = {
   is_upsell: false, active: true, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
+  hotmart_url: "",
 };
 
 const AdminProductEdit = () => {
@@ -204,6 +206,23 @@ const AdminProductEdit = () => {
               </div>
             </div>
           </Card>
+
+          <Card className="p-6 space-y-4">
+            <h2 className="font-semibold">🌎 Enlace de Hotmart (opcional)</h2>
+            <div>
+              <Label>URL de compra en Hotmart</Label>
+              <Input
+                value={product.hotmart_url ?? ""}
+                onChange={(e) => update("hotmart_url", e.target.value)}
+                placeholder="https://pay.hotmart.com/…"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Si lo defines, los visitantes de <b>Latinoamérica (excepto Perú)</b> verán el botón "Comprar en Hotmart".
+                Perú, USA, Canadá, Asia y países angloparlantes usarán el checkout propio de la tienda.
+              </p>
+            </div>
+          </Card>
+
 
           <Card className="p-6 space-y-4">
             <h2 className="font-semibold">4. Entrega digital</h2>

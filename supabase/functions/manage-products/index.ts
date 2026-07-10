@@ -37,6 +37,7 @@ interface ProductIn {
   bonus_drive_url?: string | null;
   bonus_access_key?: string | null;
   bonuses?: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
+  hotmart_url?: string | null;
   upsells?: UpsellIn[];
 }
 
@@ -109,6 +110,7 @@ Deno.serve(async (req) => {
               .filter((b) => b.drive_url)
               .slice(0, 4)
           : [],
+        hotmart_url: p.hotmart_url?.toString().trim() || null,
       };
 
       const { error: upErr } = await admin

@@ -47,6 +47,17 @@ function LinkBadge() {
   );
 }
 
+function BankBadge({ label, bg, color }: { label: string; bg: string; color: string }) {
+  return (
+    <span
+      className="inline-flex items-center justify-center h-8 px-2.5 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm text-[11px] font-bold tracking-tight leading-none"
+      style={{ background: bg, color }}
+    >
+      {label}
+    </span>
+  );
+}
+
 
 
 const YAPE_PHONE = "972119741";
@@ -488,10 +499,17 @@ export function PaymentMethodsGroup() {
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
-
+                ) : m.id === "transfer" ? (
+                  <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                    <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
+                    <BankBadge label="BBVA" bg="#004481" color="#ffffff" />
+                    <BankBadge label="Interbank" bg="#00953B" color="#ffffff" />
+                    <BankBadge label="Scotiabank" bg="#EC111A" color="#ffffff" />
+                  </div>
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}
+
               </div>
               <div className={cn(
                 "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",

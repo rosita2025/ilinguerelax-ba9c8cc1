@@ -11,7 +11,6 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type Method = "card" | "transfer" | "cash" | "yape";
-const USD_TO_PEN = 3.75;
 const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga Manuel";
 const WHATSAPP_URL = "https://wa.link/unpa9n";

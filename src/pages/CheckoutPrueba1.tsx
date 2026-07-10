@@ -57,13 +57,13 @@ export default function CheckoutPrueba1() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Encriptación SSL Stripe
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.sslEncryption}
             </span>
             {isPeru && (
               <>
                 <span>·</span>
                 <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.mercadoPagoPeru}
                 </span>
               </>
             )}
@@ -75,7 +75,7 @@ export default function CheckoutPrueba1() {
               rel="noopener noreferrer"
               className="flex items-center gap-1 hover:text-primary"
             >
-              <MessageCircle className="w-3.5 h-3.5" /> Soporte WhatsApp
+              <MessageCircle className="w-3.5 h-3.5" /> {t.whatsappSupport}
             </a>
           </div>
         </div>

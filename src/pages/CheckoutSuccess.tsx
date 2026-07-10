@@ -44,7 +44,7 @@ export default function CheckoutSuccess() {
   // Send confirmation email once, then clear the cart
   useEffect(() => {
     if (sentRef.current) return;
-    if (!buyer.email || items.length === 0) return;
+    if (!isVerifiedBuyer) return;
     const key = `order-email-sent:${paymentId || externalRef || buyer.email}`;
     if (sessionStorage.getItem(key)) {
       const t = setTimeout(() => clear(), 500);

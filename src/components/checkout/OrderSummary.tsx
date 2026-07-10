@@ -120,12 +120,9 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                   )}
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
-                  ${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}
-                  {item.regionPrices && (
-                    <div className="text-[10px] font-normal text-muted-foreground">
-                      {region.tier === "latam" ? "🌎 LatAm" : "🌍 Internacional"}
-                    </div>
-                  )}
+                  {useLocal
+                    ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
+                    : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
                 </div>
               </div>
             ))}

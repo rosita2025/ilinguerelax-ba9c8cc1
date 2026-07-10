@@ -256,7 +256,7 @@ const Product1000Verbos = () => {
           { question: "¿Qué incluye este libro?", answer: "Incluye 1,000 verbos esenciales en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.", icon: BookOpen },
           { question: "¿Es un libro físico o digital?", answer: "Es un producto digital (PDF) con descarga inmediata. Puedes imprimirlo en casa si lo deseas.", icon: Smartphone },
           { question: "¿Necesito saber inglés para usarlo?", answer: "No. Puedes empezar desde cero. Cada verbo incluye su significado en español y pronunciación adaptada.", icon: Lightbulb },
-          { question: "¿Cómo realizo el pago?", answer: "Puedes pagar de forma segura mediante Hotmart, que acepta tarjetas de crédito/débito y otros métodos según tu país.", icon: CreditCard },
+          { question: "¿Cómo realizo el pago?", answer: "Al presionar Comprar Ahora se agrega al carrito y vas al checkout seguro donde puedes pagar con tarjeta (Stripe), transferencias, Yape/Plin o efectivo.", icon: CreditCard },
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre 1,000 Verbos Esenciales"

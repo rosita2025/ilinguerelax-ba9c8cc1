@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import PhoneInput from "react-phone-number-input";
+import flags from "react-phone-number-input/flags";
 import "react-phone-number-input/style.css";
 import { useRegionTier } from "@/hooks/useRegionTier";
 
@@ -151,6 +152,7 @@ export function BuyerInfoForm() {
           </span>
           <div className="mt-1 phone-input-wrap">
             <PhoneInput
+              flags={flags}
               international
               defaultCountry={(region.country as any) || "PE"}
               value={buyer.phone ?? ""}

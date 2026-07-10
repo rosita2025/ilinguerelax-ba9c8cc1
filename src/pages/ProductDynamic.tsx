@@ -21,7 +21,24 @@ interface DBProduct {
   is_upsell: boolean;
   active: boolean;
   bonuses: unknown;
+  hotmart_url: string | null;
 }
+
+/**
+ * Países que usan el checkout propio de la tienda (ILINGUE RELAX):
+ * Perú + Norteamérica + Europa/UK + Asia + Oceanía angloparlante.
+ * El resto de Latinoamérica ve el botón de Hotmart si el producto tiene enlace configurado.
+ */
+const STORE_CHECKOUT_COUNTRIES = new Set([
+  // LATAM excepción (Perú)
+  "PE",
+  // Angloparlantes / Norteamérica
+  "US", "CA", "GB", "IE", "AU", "NZ",
+  // Europa
+  "ES", "FR", "DE", "IT", "PT", "NL", "BE", "AT", "CH", "SE", "NO", "DK", "FI", "GR", "PL", "CZ",
+  // Asia
+  "JP", "KR", "CN", "HK", "TW", "SG", "MY", "TH", "PH", "ID", "VN", "IN", "AE", "SA", "IL", "TR",
+]);
 
 const FLAG: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",

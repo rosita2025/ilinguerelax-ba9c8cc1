@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X, Check } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X, Check, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { useCheckoutPruebaStore, itemPrice } from "@/stores/checkoutPruebaStore";
+import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
+import { useRegionTier } from "@/hooks/useRegionTier";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -61,15 +65,48 @@ export const CartDrawer = () => {
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
     applyDiscount, removeDiscount, syncError, retrySync
   } = useCartStore();
-  
+
+  const navigate = useNavigate();
+  const { tier } = useRegionTier();
+  const internalItems = useCheckoutPruebaStore((s) => s.items);
+  const removeInternal = useCheckoutPruebaStore((s) => s.removeItem);
+  const updateInternalQty = useCheckoutPruebaStore((s) => s.updateQuantity);
+
+  // Map internal item id -> checkout slug (first match wins)
+  const slugByInternalId = (() => {
+    const map: Record<string, string> = {};
+    for (const [slug, cat] of Object.entries(CHECKOUT_CATALOG)) {
+      if (!map[cat.id]) map[cat.id] = slug;
+    }
+    return map;
+  })();
+
+  // Only surface items that were added via product pages (i.e. have a matching checkout slug).
+  // Default seeded items without a slug shouldn't clutter the site-wide drawer.
+  const visibleInternalItems = internalItems.filter((i) => slugByInternalId[i.id]);
+  const internalCount = visibleInternalItems.reduce((s, i) => s + i.quantity, 0);
+  const internalSubtotal = visibleInternalItems.reduce(
+    (s, i) => s + itemPrice(i, tier) * i.quantity,
+    0,
+  );
+
   const [couponInput, setCouponInput] = useState("");
   const [isApplying, setIsApplying] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0) + internalCount;
   const subtotalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
-  
+
   const appliedDiscount = discountCodes.find(dc => dc.applicable);
+
+  const goToInternalCheckout = () => {
+    const first = visibleInternalItems[0];
+    if (!first) return;
+    const slug = slugByInternalId[first.id];
+    if (!slug) return;
+    setDrawerOpen(false);
+    navigate(`/checkouts/${slug}`);
+  };
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();
@@ -285,14 +322,91 @@ export const CartDrawer = () => {
           })()}
         </SheetHeader>
         <div className="flex flex-col flex-1 pt-2 min-h-0">
-          {items.length === 0 ?
-          <div className="flex-1 flex items-center justify-center">
+          {/* Internal-checkout items (added from product pages via "Agregar al carrito") */}
+          {visibleInternalItems.length > 0 && (
+            <div className="flex-shrink-0 mb-3 border border-primary/30 rounded-lg p-2.5 bg-primary/5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                  Digital · Checkout directo
+                </p>
+                <span className="text-[10px] text-muted-foreground">
+                  {internalCount} item{internalCount !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {visibleInternalItems.map((it) => {
+                  const unit = itemPrice(it, tier);
+                  return (
+                    <div key={it.id} className="flex gap-2.5 items-center">
+                      <div className="w-10 h-10 rounded-md overflow-hidden bg-secondary/20 flex-shrink-0">
+                        <img src={it.image} alt={it.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold leading-tight truncate">{it.name}</p>
+                        <p className="text-[11px] text-primary font-bold">
+                          {formatPrice(unit)} {currency}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => updateInternalQty(it.id, it.quantity - 1)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-5 text-center text-xs">{it.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => updateInternalQty(it.id, it.quantity + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => removeInternal(it.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-primary/20">
+                <span className="text-xs font-semibold">Subtotal</span>
+                <span className="text-sm font-bold text-primary">
+                  {formatPrice(internalSubtotal)} {currency}
+                </span>
+              </div>
+              <Button
+                onClick={goToInternalCheckout}
+                className="w-full mt-2 h-10 text-sm font-bold"
+              >
+                Ir al checkout
+                <ArrowRight className="w-4 h-4 ml-1.5" />
+              </Button>
+            </div>
+          )}
+
+          {items.length === 0 && visibleInternalItems.length === 0 && (
+            <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">Your cart is empty</p>
               </div>
-            </div> :
+            </div>
+          )}
+          {items.length > 0 &&
+          <></>}
+          {items.length > 0 &&
           <>
+
               {/* Free shipping progress bar */}
               {syncError && (
                 <div className="flex-shrink-0 mb-3 p-2.5 rounded-lg border-2 border-destructive/40 bg-destructive/5">

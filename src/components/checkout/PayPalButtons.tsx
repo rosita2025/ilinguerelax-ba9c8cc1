@@ -83,9 +83,14 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
   const [reloadKey, setReloadKey] = useState(0);
   const [processing, setProcessing] = useState<Phase | null>(null);
 
-  const useLocal = !!localCurrency && PAYPAL_SUPPORTED.has(localCurrency.toUpperCase()) && !!localAmount && localAmount > 0;
+  const providedLocal = !!localCurrency && localCurrency.toUpperCase() !== "USD" && !!localAmount && localAmount > 0;
+  const localSupported = providedLocal && PAYPAL_SUPPORTED.has(localCurrency!.toUpperCase());
+  const useLocal = providedLocal && localSupported;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
   const amount = useLocal ? Number(localAmount!.toFixed(2)) : Number(amountUsd.toFixed(2));
+  // Fallback ocurre cuando el comprador tiene una moneda local detectada
+  // pero PayPal no la acepta (p. ej. PEN, ARS, COP, CLP).
+  const fallbackToUsd = providedLocal && !localSupported;
 
   const correlationIdRef = useRef<string>(
     (globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)

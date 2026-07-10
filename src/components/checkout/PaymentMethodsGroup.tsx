@@ -486,7 +486,7 @@ export function PaymentMethodsGroup() {
         </p>
       )}
 
-      {selected !== "yape" && !(selected === "card" && showStripe) && (
+      {selected !== "yape" && selected !== "paypal" && !(selected === "card" && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

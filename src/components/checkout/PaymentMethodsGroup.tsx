@@ -488,10 +488,17 @@ export function PaymentMethodsGroup() {
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
-
+                ) : m.id === "transfer" ? (
+                  <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                    <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
+                    <BankBadge label="BBVA" bg="#004481" color="#ffffff" />
+                    <BankBadge label="Interbank" bg="#00953B" color="#ffffff" />
+                    <BankBadge label="Scotiabank" bg="#EC111A" color="#ffffff" />
+                  </div>
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}
+
               </div>
               <div className={cn(
                 "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",

@@ -62,18 +62,18 @@ export function BuyerInfoForm() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold">Tus datos</h2>
+          <h2 className="text-base font-semibold">{t.yourDetails}</h2>
           <p className="text-xs text-muted-foreground">
-            Recibirás el acceso al producto digital por correo.
+            {t.yourDetailsHint}
           </p>
         </div>
         {valid ? (
           <span className="flex items-center gap-1 text-xs text-primary font-medium">
-            <CheckCircle2 className="w-4 h-4" /> Listo
+            <CheckCircle2 className="w-4 h-4" /> {t.ready}
           </span>
         ) : showErrors ? (
           <span className="flex items-center gap-1 text-xs text-destructive font-medium">
-            <AlertCircle className="w-4 h-4" /> Requerido
+            <AlertCircle className="w-4 h-4" /> {t.required}
           </span>
         ) : null}
       </div>

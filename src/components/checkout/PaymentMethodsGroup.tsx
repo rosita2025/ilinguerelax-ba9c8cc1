@@ -251,15 +251,7 @@ export function PaymentMethodsGroup() {
       if (s >= 90) {
         window.clearInterval(tick);
         if (!container.querySelector('iframe[name="embedded-checkout"]')) {
-          setStripeError(
-            language === "en"
-              ? "The secure card form is taking too long to open. Check your connection and try again, or contact us on WhatsApp."
-              : language === "pt"
-                ? "O formulário seguro de cartão está demorando muito. Verifique sua conexão e tente novamente, ou fale conosco no WhatsApp."
-                : language === "fr"
-                  ? "Le formulaire sécurisé met trop de temps à s’ouvrir. Vérifie ta connexion et réessaie, ou contacte-nous sur WhatsApp."
-                  : "El formulario seguro está tardando demasiado. Revisa tu conexión e intenta de nuevo, o escríbenos por WhatsApp.",
-          );
+          setStripeError(mapStripeError(new Error("timeout: took too long to open"), language as StripeLang));
         }
       }
     }, 1000);

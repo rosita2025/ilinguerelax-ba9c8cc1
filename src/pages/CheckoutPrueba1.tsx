@@ -54,10 +54,14 @@ export default function CheckoutPrueba1() {
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Encriptación SSL Stripe
             </span>
-            <span>·</span>
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
-            </span>
+            {isPeru && (
+              <>
+                <span>·</span>
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
+                </span>
+              </>
+            )}
             <span>·</span>
 
             <a

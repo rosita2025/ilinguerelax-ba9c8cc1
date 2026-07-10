@@ -170,26 +170,26 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
 
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
-            <span>Subtotal</span>
+            <span>{t.subtotal}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
-              <span>Descuento</span>
+              <span>{t.discount}</span>
               <span>-${discount.toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
-            <span>Impuestos</span>
-            <span>Incluidos</span>
+            <span>{t.taxes}</span>
+            <span>{t.included}</span>
           </div>
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
-            <span>Total</span>
+            <span>{t.total}</span>
             <div className="text-right">
               <div>USD ${total.toFixed(2)}</div>
               {!local.isUsd && !local.loading && (
                 <div className="text-[11px] font-normal text-muted-foreground mt-0.5">
-                  ≈ {local.formatted} en tu moneda
+                  ≈ {local.formatted} {t.inYourCurrency}
                 </div>
               )}
             </div>

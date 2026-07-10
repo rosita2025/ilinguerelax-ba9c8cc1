@@ -33,39 +33,68 @@ interface I18nProviderProps {
   children: ReactNode;
 }
 
+// Subdominios activos → país ISO (misma tabla que useRegionTier)
+const SUBDOMAIN_TO_COUNTRY: Record<string, string> = {
+  US: "US", PE: "PE", MX: "MX", UK: "GB", EU: "ES",
+  CA: "CA", AU: "AU", BR: "BR", CO: "CO", AR: "AR", CL: "CL",
+  ES: "ES", FR: "FR", DE: "DE", IT: "IT", PT: "PT",
+  JP: "JP", KR: "KR", CN: "CN", IN: "IN",
+};
+
+function countryFromSubdomain(): string {
+  if (typeof window === "undefined") return "";
+  const parts = window.location.hostname.toLowerCase().split(".");
+  if (parts.length < 3) return "";
+  const sub = parts[0].toUpperCase();
+  if (sub.length !== 2) return "";
+  return SUBDOMAIN_TO_COUNTRY[sub] || "";
+}
+
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
-  // IMPORTANT: Default to "es" (Spanish) always - this is our target market
-  // Google's crawler and most users should see Spanish first
+  // Subdominio fuerza país + idioma (us. → EN, uk. → EN, eu. → ES, pe. → ES, mx. → ES).
+  const subCountry = typeof window !== "undefined" ? countryFromSubdomain() : "";
   const savedLang = typeof window !== "undefined" ? localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null : null;
   const savedCurrency = typeof window !== "undefined" ? localStorage.getItem(CURRENCY_STORAGE_KEY) as Currency | null : null;
-  
-  const [language, setLanguageState] = useState<Language>(savedLang || "es");
-  const [currency, setCurrencyState] = useState<Currency>(savedCurrency || "USD");
+
+  const initialLang: Language = subCountry
+    ? detectLanguageFromCountry(subCountry)
+    : (savedLang || "es");
+  const initialCurrency: Currency = subCountry
+    ? detectCurrency(subCountry)
+    : (savedCurrency || "USD");
+
+  const [language, setLanguageState] = useState<Language>(initialLang);
+  const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
   const savedCountry = typeof window !== "undefined" ? localStorage.getItem("ilr_country") : null;
-  const [countryCode, setCountryCode] = useState<string>(savedCountry || "US");
+  const [countryCode, setCountryCode] = useState<string>(subCountry || savedCountry || "US");
 
   // Detect country in background WITHOUT blocking render
   useEffect(() => {
-    // If user already saved preferences, skip detection
+    // Subdominio ya define el país → no llamar IP.
+    if (subCountry) {
+      try { localStorage.setItem("ilr_country", subCountry); } catch {}
+      return;
+    }
+    // Si el usuario ya guardó preferencias manuales, respetarlas.
     if (savedLang && savedCurrency) return;
 
     const detectCountry = async () => {
       try {
-        const response = await fetch("https://ipapi.co/json/", { 
-          signal: AbortSignal.timeout(3000) 
+        const response = await fetch("https://ipapi.co/json/", {
+          signal: AbortSignal.timeout(3000)
         });
         if (response.ok) {
           const data = await response.json();
           const country = data.country_code || "US";
           setCountryCode(country);
           try { localStorage.setItem("ilr_country", country); } catch {}
-          
+
           if (!savedLang) {
             const detectedLang = detectLanguageFromCountry(country);
             setLanguageState(detectedLang);
             console.log(`Country detected: ${country} → Language: ${detectedLang}`);
           }
-          
+
           if (!savedCurrency) {
             const detectedCurrency = detectCurrency(country);
             setCurrencyState(detectedCurrency);

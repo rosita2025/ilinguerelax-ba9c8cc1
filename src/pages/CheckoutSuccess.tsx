@@ -23,8 +23,21 @@ export default function CheckoutSuccess() {
     ? "mercadopago"
     : "unknown";
 
-  const { items, buyer, couponPercent, coupon, clear } = useCheckoutPruebaStore();
+  const store = useCheckoutPruebaStore();
   const region = useRegionTier();
+  // Snapshot items/buyer/totals at mount — the effect below clears the cart
+  // after sending the confirmation email, and we still want the summary shown.
+  const [snapshot] = useState(() => ({
+    items: store.items,
+    buyer: store.buyer,
+    couponPercent: store.couponPercent,
+    coupon: store.coupon,
+  }));
+  const items = snapshot.items;
+  const buyer = snapshot.buyer;
+  const couponPercent = snapshot.couponPercent;
+  const coupon = snapshot.coupon;
+  const clear = store.clear;
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
   const sentRef = useRef(false);
   const { language } = useI18n();

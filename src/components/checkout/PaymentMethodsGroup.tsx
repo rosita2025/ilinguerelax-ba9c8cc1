@@ -123,10 +123,12 @@ export function PaymentMethodsGroup() {
       const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
         body: {
           orderId: `ilr-prueba-${Date.now()}`,
-          items: s.items.map((i) => ({
-            id: i.id, name: i.name, price: itemPrice(i, region.tier),
-            quantity: i.quantity, image: i.image, description: i.description,
-          })),
+          items: s.items.map((i) => {
+            const abs = i.image && /^https?:\/\//i.test(i.image)
+              ? i.image
+              : (() => { try { return i.image ? new URL(i.image, window.location.origin).toString() : undefined; } catch { return undefined; } })();
+            return { id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity, image: abs, description: i.description };
+          }),
           couponPercent: s.couponPercent,
           couponCode: s.coupon ?? undefined,
           payerEmail: s.buyer.email.trim(),

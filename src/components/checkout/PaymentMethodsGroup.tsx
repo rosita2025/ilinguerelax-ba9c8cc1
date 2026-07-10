@@ -11,6 +11,8 @@ import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 type Method = "card" | "transfer" | "cash" | "yape";
 const YAPE_PHONE = "972119741";

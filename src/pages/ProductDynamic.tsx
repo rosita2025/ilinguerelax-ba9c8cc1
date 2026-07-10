@@ -68,7 +68,7 @@ const ProductDynamic = () => {
     (async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();

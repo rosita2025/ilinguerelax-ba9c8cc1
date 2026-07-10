@@ -83,6 +83,13 @@ Deno.serve(async (req) => {
       unit_price: Number((item.price * discountMultiplier).toFixed(2)),
     }));
 
+    // Webhook URL — Mercado Pago llamará aquí en cada cambio de estado del pago.
+    // Sin esto el webhook nunca se dispara (fue el bug encontrado en el test live).
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const notificationUrl = supabaseUrl
+      ? `${supabaseUrl}/functions/v1/mercadopago-webhook`
+      : undefined;
+
     const preferencePayload: Record<string, unknown> = {
       items: mpItems,
       back_urls: {
@@ -91,6 +98,7 @@ Deno.serve(async (req) => {
         pending: body.pendingUrl ?? body.returnUrl,
       },
       auto_return: body.autoReturn,
+      ...(notificationUrl ? { notification_url: notificationUrl } : {}),
       statement_descriptor: "ILINGUE RELAX",
       external_reference: body.orderId ?? crypto.randomUUID(),
       binary_mode: false,

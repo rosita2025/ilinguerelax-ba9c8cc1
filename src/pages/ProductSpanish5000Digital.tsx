@@ -1,4 +1,7 @@
 import { useMemo, useRef, useState, lazy, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
@@ -161,6 +164,26 @@ const ProductSpanish5000Digital = () => {
     window.location.assign(STRIPE_CHECKOUT_URL);
   };
 
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const handleAddToCart = () => {
+    addItem({
+      id: "5000-spanish-words",
+      name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
+      price: PRICE,
+      image: "/images/product-5000-spanish.webp",
+      description: "5,000 vocabulary words in Spanish with English pronunciation",
+      quantity: 1,
+    });
+    toast.success("Product added to cart", {
+      description: "Keep browsing or go to checkout.",
+      action: {
+        label: "Go to checkout",
+        onClick: () => navigate("/checkouts/5000-spanish-words"),
+      },
+    });
+  };
+
   return (
     <main className="min-h-screen bg-background">
       <Helmet>
@@ -257,6 +280,15 @@ const ProductSpanish5000Digital = () => {
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${PRICE}`}
+                </Button>
+                <Button
+                  onClick={handleAddToCart}
+                  variant="outline"
+                  size="lg"
+                  className="mt-2 w-full h-12 text-sm font-bold border-2"
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Add to cart
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2 flex items-center justify-center gap-1">
                   <Shield className="w-3 h-3" /> Secure checkout by Stripe · 30-day money-back guarantee

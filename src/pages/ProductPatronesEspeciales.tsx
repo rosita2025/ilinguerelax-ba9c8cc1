@@ -136,6 +136,25 @@ const ProductPatronesEspeciales = () => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const handleAddToCart = () => {
+    addItem({
+      id: "patrones-especiales-ingles",
+      name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
+      price: PRICE_USD,
+      image: "/images/product-patrones-especiales.webp",
+      description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
+      quantity: 1,
+    });
+    toast.success("Producto agregado al carrito", {
+      description: "Puedes seguir explorando o ir al checkout.",
+      action: {
+        label: "Ir al checkout",
+        onClick: () => navigate("/checkouts/patrones-ingles"),
+      },
+    });
+  };
+
+
 
 
   const productReviews = [
@@ -355,6 +374,18 @@ const ProductPatronesEspeciales = () => {
                   </Button>
                 </motion.div>
               )}
+
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full mb-4 text-base py-5 border-2"
+                onClick={handleAddToCart}
+              >
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                Agregar al carrito
+              </Button>
+
+
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👇 Mira la vista previa real antes de comprar

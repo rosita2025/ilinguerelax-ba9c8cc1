@@ -299,13 +299,14 @@ export function PaymentMethodsGroup() {
                 </div>
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">Monto exacto a pagar</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">S/ {totalPen}</p>
+                  <p className="text-xs text-neutral-500">Monto a pagar</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  <p className="text-[11px] text-neutral-500 mt-1">Envía el equivalente en soles al tipo de cambio del día.</p>
                 </div>
 
                 <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
                   <li>Abre tu app de <strong>Yape</strong> o <strong>Plin</strong>.</li>
-                  <li>Envía <strong>S/ {totalPen}</strong> al número <strong>{YAPE_PHONE}</strong> ({YAPE_NAME}).</li>
+                  <li>Envía el equivalente de <strong>USD ${totalUsd}</strong> en soles al número <strong>{YAPE_PHONE}</strong> ({YAPE_NAME}).</li>
                   <li>Guarda la captura del comprobante.</li>
                   <li>Presiona <strong>“Ya pagué”</strong> y envíanos el comprobante por WhatsApp.</li>
                 </ol>

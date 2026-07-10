@@ -63,7 +63,7 @@ function BankBadge({ label, bg, color }: { label: string; bg: string; color: str
 
 
 const YAPE_PHONE = "972119741";
-const YAPE_NAME = "Carmen Aliaga Manuel";
+const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
 export function PaymentMethodsGroup() {

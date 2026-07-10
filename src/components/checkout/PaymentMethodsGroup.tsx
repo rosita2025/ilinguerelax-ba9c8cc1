@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
@@ -66,7 +66,7 @@ export function PaymentMethodsGroup() {
     }
   }, [cartSignature, selected]);
 
-  const fetchClientSecret = async (): Promise<string> => {
+  const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
     if (!isBuyerValid(s.buyer)) throw new Error("Completa tus datos");
     const parts = s.buyer.fullName.trim().split(/\s+/);
@@ -104,7 +104,14 @@ export function PaymentMethodsGroup() {
       metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
     }, { onConflict: "email,source" }).then(() => {});
     return data.clientSecret;
-  };
+    // Depend only on region.tier/country — buyer/items are read fresh from
+    // the store inside the callback, so the reference stays stable across
+    // typing and avoids remounting the EmbeddedCheckoutProvider (blank screen).
+  }, [region.tier, region.country]);
+
+  // Memoize the options object per cart signature. A new object reference on
+  // every render forces Stripe to remount the iframe → blank/duplicated form.
+  const stripeOptions = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
   const requestBuyerInfo = () => {
     window.dispatchEvent(new Event(BUYER_ERRORS_EVENT));
@@ -301,7 +308,7 @@ export function PaymentMethodsGroup() {
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
                 </div>
                 <div className="min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
-                  <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
+                  <EmbeddedCheckoutProvider stripe={stripePromise} options={stripeOptions}>
                     <EmbeddedCheckout />
                   </EmbeddedCheckoutProvider>
                 </div>

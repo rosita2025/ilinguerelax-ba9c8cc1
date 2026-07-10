@@ -710,33 +710,9 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
-        onBuyClick={() => {
-          trackHotmartEvent("InitiateCheckout", {
-            content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-            content_category: "Digital Book",
-            content_ids: ["patrones-especiales"],
-            content_type: "product",
-            value: PRICE_USD,
-            currency: "USD",
-            num_items: 1,
-          });
-          window.open(usePaypalStripe ? PAYPAL_URL : HOTMART_URL, "_blank");
-        }}
-        ctaText={usePaypalStripe ? "PAGAR CON PAYPAL" : "COMPRAR AHORA"}
-        secondaryCtaText={usePaypalStripe ? "PAGAR CON STRIPE" : undefined}
-        onSecondaryClick={usePaypalStripe ? () => {
-          trackHotmartEvent("InitiateCheckout", {
-            content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-            content_category: "Digital Book",
-            content_ids: ["patrones-especiales"],
-            content_type: "product",
-            value: PRICE_USD,
-            currency: "USD",
-            num_items: 1,
-          });
-          window.open(STRIPE_URL, "_blank");
-        } : undefined}
+        buyUrl="/checkouts/prueba-1"
+        onBuyClick={handleBuy}
+        ctaText="COMPRAR AHORA"
       />
 
       <div className="h-20 md:h-16" />

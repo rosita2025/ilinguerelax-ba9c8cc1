@@ -87,7 +87,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     price: 22,
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
-    productPath: "/products/5-000-spanish-words-with-english-pronunciation",
+    productPath: "/products/5-000-spanish-words-with-english-pronunciation-digital",
   },
   "patrones-espanol": {
     id: "prueba-patrones-es",

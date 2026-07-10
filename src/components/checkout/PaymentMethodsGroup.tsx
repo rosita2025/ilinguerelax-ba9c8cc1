@@ -26,10 +26,10 @@ const applePayLogo = "/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/appl
 function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center h-9 w-14 sm:h-10 sm:w-16 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
+      className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
       style={{ background: bg }}
     >
-      <img src={src} alt={alt} className="max-h-7 sm:max-h-8 max-w-[48px] sm:max-w-[54px] object-contain" />
+      <img src={src} alt={alt} className="max-h-4 max-w-[28px] object-contain" />
     </span>
   );
 }
@@ -37,10 +37,10 @@ function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?
 function LinkBadge() {
   return (
     <span
-      className="inline-flex items-center justify-center h-9 w-14 sm:h-10 sm:w-16 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
+      className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
       style={{ background: "#00D66F" }}
     >
-      <span className="text-[13px] sm:text-[14px] font-bold tracking-tight leading-none" style={{ color: "#0A2540" }}>
+      <span className="text-[10px] font-bold tracking-tight leading-none" style={{ color: "#0A2540" }}>
         Link
       </span>
     </span>
@@ -50,13 +50,14 @@ function LinkBadge() {
 function BankBadge({ label, bg, color }: { label: string; bg: string; color: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center h-9 sm:h-10 px-3 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm text-[12px] sm:text-[13px] font-bold tracking-tight leading-none shrink-0"
+      className="inline-flex items-center justify-center h-6 px-2 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm text-[10px] font-bold tracking-tight leading-none shrink-0"
       style={{ background: bg, color }}
     >
       {label}
     </span>
   );
 }
+
 
 
 
@@ -494,14 +495,14 @@ export function PaymentMethodsGroup() {
                   )}
                 </div>
                 {m.id === "card" ? (
-                  <div className="mt-2 flex items-center gap-2 sm:gap-2.5 flex-wrap">
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <LogoBadge src={visaLogo} alt="Visa" />
                     <LogoBadge src={mastercardLogo} alt="Mastercard" />
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
                 ) : m.id === "transfer" ? (
-                  <div className="mt-2 flex items-center gap-2 sm:gap-2.5 flex-wrap">
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
                     <BankBadge label="BBVA" bg="#004481" color="#ffffff" />
                     <BankBadge label="Interbank" bg="#00953B" color="#ffffff" />

@@ -44,7 +44,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
         >
           <span className="flex items-center gap-2 text-sm font-medium">
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {expanded ? "Ocultar resumen" : "Ver resumen"}
+            {expanded ? t.hideSummary : t.showSummary}
           </span>
           <span className="text-lg font-bold">${total.toFixed(2)}</span>
         </button>

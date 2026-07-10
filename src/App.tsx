@@ -61,6 +61,7 @@ const AdminCheckoutMethods = lazy(() => import("./pages/AdminCheckoutMethods"));
 const AdminManualPayments = lazy(() => import("./pages/AdminManualPayments"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
+const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
 
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
@@ -226,6 +227,8 @@ const App = () => (
                   <Route path="/checkouts/pending" element={<CheckoutPending />} />
                   <Route path="/checkouts/pendiente-manual" element={<CheckoutPendienteManual />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
+                  {/* Dynamic product page — catches any /products/:slug not matched above (products created in /admin/productos). */}
+                  <Route path="/products/:slug" element={<ProductDynamic />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

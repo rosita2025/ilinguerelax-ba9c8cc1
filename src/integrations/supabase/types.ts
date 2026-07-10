@@ -116,6 +116,7 @@ export type Database = {
           created_at: string
           description: string | null
           drive_url: string | null
+          excluded_countries: string[]
           hotmart_url: string | null
           id: string
           is_upsell: boolean
@@ -126,6 +127,7 @@ export type Database = {
           price_usd: number
           sku: string
           sort_order: number
+          store_enabled: boolean
           stripe_price_id: string | null
           stripe_product_id: string | null
           target_language: string
@@ -142,6 +144,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           drive_url?: string | null
+          excluded_countries?: string[]
           hotmart_url?: string | null
           id?: string
           is_upsell?: boolean
@@ -152,6 +155,7 @@ export type Database = {
           price_usd?: number
           sku: string
           sort_order?: number
+          store_enabled?: boolean
           stripe_price_id?: string | null
           stripe_product_id?: string | null
           target_language?: string
@@ -168,6 +172,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           drive_url?: string | null
+          excluded_countries?: string[]
           hotmart_url?: string | null
           id?: string
           is_upsell?: boolean
@@ -178,6 +183,7 @@ export type Database = {
           price_usd?: number
           sku?: string
           sort_order?: number
+          store_enabled?: boolean
           stripe_price_id?: string | null
           stripe_product_id?: string | null
           target_language?: string

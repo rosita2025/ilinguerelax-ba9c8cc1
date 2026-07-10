@@ -119,14 +119,6 @@ export default function CheckoutPrueba1() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <OrderSummary />
-          
-          <button
-            type="button"
-            onClick={resetToDefaults}
-            className="text-xs text-muted-foreground hover:text-primary mt-3 underline underline-offset-2"
-          >
-            {t.resetTestProducts}
-          </button>
         </aside>
       </div>
 

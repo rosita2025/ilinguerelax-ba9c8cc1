@@ -109,7 +109,7 @@ export function BuyerInfoForm() {
         </label>
 
         <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">Correo electrónico *</span>
+          <span className="text-xs font-medium text-muted-foreground">{t.email}</span>
           <div className="relative mt-1">
             <Mail className={cn(
               "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",

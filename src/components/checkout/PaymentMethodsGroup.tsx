@@ -40,9 +40,11 @@ export function PaymentMethodsGroup() {
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<string | null>(null);
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
+  const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
+  const stripeContainerRef = useRef<HTMLDivElement | null>(null);
   const valid = isBuyerValid(buyer);
 
   const stripePromise = (() => {
@@ -210,8 +212,46 @@ export function PaymentMethodsGroup() {
   const retryStripe = () => {
     setStripeError(null);
     setStripeLoading(false);
+    setStripeFrameMounted(false);
     setStripeRetryKey((k) => k + 1);
   };
+
+  useEffect(() => {
+    if (!(showStripe && selected === "card")) return;
+    setStripeFrameMounted(false);
+    const container = stripeContainerRef.current;
+    if (!container) return;
+
+    const markMounted = () => {
+      if (container.querySelector('iframe[name="embedded-checkout"]')) {
+        setStripeFrameMounted(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (markMounted()) return;
+    const observer = new MutationObserver(markMounted);
+    observer.observe(container, { childList: true, subtree: true });
+    const timeout = window.setTimeout(() => {
+      if (!markMounted()) {
+        setStripeError(
+          language === "en"
+            ? "The secure card form is taking too long to open."
+            : language === "pt"
+              ? "O formulário seguro de cartão está demorando para abrir."
+              : language === "fr"
+                ? "Le formulaire sécurisé de carte met trop de temps à s’ouvrir."
+                : "El formulario seguro de tarjeta está tardando demasiado en abrir.",
+        );
+      }
+    }, 25000);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timeout);
+    };
+  }, [showStripe, selected, stripeRetryKey, language]);
 
   const handleManualPaid = () => {
     const s = useCheckoutPruebaStore.getState();
@@ -468,17 +508,28 @@ export function PaymentMethodsGroup() {
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
-                <div className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
-                  {stripeLoading && !stripeError && (
-                    <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-center gap-2 bg-white/95 dark:bg-neutral-950/95 px-4 py-6 text-sm text-neutral-600 dark:text-neutral-300">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      {language === "en"
-                        ? "Opening the secure Stripe form…"
-                        : language === "pt"
-                          ? "Abrindo o formulário seguro da Stripe…"
-                          : language === "fr"
-                            ? "Ouverture du formulaire sécurisé Stripe…"
-                            : "Abriendo el formulario seguro de Stripe…"}
+                <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
+                  {(stripeLoading || !stripeFrameMounted) && !stripeError && (
+                    <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
+                      <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {language === "en"
+                          ? "Opening the secure Stripe form…"
+                          : language === "pt"
+                            ? "Abrindo o formulário seguro da Stripe…"
+                            : language === "fr"
+                              ? "Ouverture du formulaire sécurisé Stripe…"
+                              : "Abriendo el formulario seguro de Stripe…"}
+                      </div>
+                      <div className="mx-auto mt-6 max-w-md space-y-3">
+                        <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                        <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                        </div>
+                        <div className="h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+                      </div>
                     </div>
                   )}
                   {stripeError && (

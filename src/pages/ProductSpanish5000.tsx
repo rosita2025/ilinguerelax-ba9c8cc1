@@ -769,7 +769,7 @@ const ProductSpanish5000 = () => {
         icon: User,
       }, {
         question: "Is iLingue Relax a real brand?",
-        answer: "Yes. iLingue Relax is the official brand behind all our books, PDFs and audio courses (ilinguerelax.com). We ship physical books worldwide, deliver digital content by email, and offer dedicated WhatsApp support at +1 575 216 0934 and email at hola@ilinguerelax.com.",
+        answer: "Yes. iLingue Relax is the official brand behind all our books, PDFs and audio courses (ilinguerelax.com). We ship physical books worldwide, deliver digital content by email, and offer dedicated WhatsApp support at +1 251 272 4704 and email at hola@ilinguerelax.com.",
         icon: BadgeCheck,
       }, {
         question: "How long until I receive the DIGITAL PDF by email?",

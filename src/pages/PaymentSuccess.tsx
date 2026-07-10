@@ -67,7 +67,7 @@ const PaymentSuccess = () => {
   };
 
   const handleWhatsApp = () => {
-    window.open("https://wa.me/15752160934?text=Hello!%20I%20just%20purchased%20Spanish%20Relax%205,000%20Words", "_blank");
+    window.open("https://wa.me/112512724704?text=Hello!%20I%20just%20purchased%20Spanish%20Relax%205,000%20Words", "_blank");
   };
 
   const handleEmail = () => {
@@ -201,7 +201,7 @@ const PaymentSuccess = () => {
                   className="bg-green-500/10 border-green-500/30 hover:bg-green-500/20 text-green-600"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
-                  WhatsApp: +1 575 216 0934
+                  WhatsApp: +1 251 272 4704
                 </Button>
                 <Button 
                   onClick={handleEmail}

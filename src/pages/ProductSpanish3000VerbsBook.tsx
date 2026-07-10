@@ -637,7 +637,7 @@ const ProductSpanish3000VerbsBook = () => {
           {
             question: "Need help with your pre-order?",
             answer:
-              "Email us at hola@ilinguerelax.com or message us on WhatsApp at +1 575 216 0934 — we usually reply within a few hours.",
+              "Email us at hola@ilinguerelax.com or message us on WhatsApp at +1 251 272 4704 — we usually reply within a few hours.",
           },
         ]}
       />

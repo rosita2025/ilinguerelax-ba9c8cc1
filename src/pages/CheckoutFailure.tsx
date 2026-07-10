@@ -46,7 +46,7 @@ export default function CheckoutFailure() {
             <Link to="/checkouts/prueba-1"><RefreshCcw className="w-4 h-4" /> {t.tryAgain}</Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="gap-2">
-            <a href="https://wa.me/15752160934" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-4 h-4" /> {t.contactSupport}
             </a>
           </Button>

@@ -89,7 +89,7 @@ Para ejercer estos derechos, contáctanos en hola@ilinguerelax.com.`
     content: `Si tienes preguntas sobre esta política de privacidad o deseas ejercer tus derechos, contáctanos:
 
 • Email: hola@ilinguerelax.com
-• WhatsApp: +1 575 216 0934
+• WhatsApp: +1 251 272 4704
 
 Esta política puede actualizarse ocasionalmente. Publicaremos cualquier cambio en esta página con la fecha de última actualización.`
   },

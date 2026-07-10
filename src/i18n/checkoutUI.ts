@@ -88,6 +88,7 @@ export interface CheckoutUIStrings {
   sslEncryption: string;
   mercadoPagoPeru: string;
   whatsappSupport: string;
+  returnToProduct: string;
   resetTestProducts: string;
 }
 

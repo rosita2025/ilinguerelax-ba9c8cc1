@@ -6,7 +6,8 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
-import { products, getProductLink, type Product } from "@/data/products";
+import { products as staticProducts, getProductLink, type Product } from "@/data/products";
+import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 

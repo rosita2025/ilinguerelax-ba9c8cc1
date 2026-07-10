@@ -413,7 +413,7 @@ export function PaymentMethodsGroup() {
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
                   <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{local.loading ? `USD $${totalUsd}` : local.formatted}</p>
                   <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
                 </div>
 

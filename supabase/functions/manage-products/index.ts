@@ -110,6 +110,7 @@ Deno.serve(async (req) => {
               .filter((b) => b.drive_url)
               .slice(0, 4)
           : [],
+        hotmart_url: p.hotmart_url?.toString().trim() || null,
       };
 
       const { error: upErr } = await admin

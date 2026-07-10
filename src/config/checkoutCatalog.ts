@@ -13,7 +13,10 @@ export interface UpsellItem {
 
 export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
   upsells?: UpsellItem[];
+  /** Ruta de la página del producto para el enlace "Volver al producto". */
+  productPath?: string;
 }
+
 
 /**
  * Central checkout catalog — Shopify-style.
@@ -27,6 +30,8 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     price: 8,
     image: "/images/product-patrones-especiales.webp",
     description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
+    productPath: "/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles",
+
     upsells: [
       {
         id: "upsell-1000-verbos",
@@ -54,6 +59,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     price: 10,
     image: "/images/product-1000-verbos.webp",
     description: "1,000 verbos en presente, pasado y futuro con pronunciación",
+    productPath: "/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
     upsells: [
       {
         id: "upsell-patrones-ingles",
@@ -81,6 +87,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     price: 22,
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
+    productPath: "/products/5-000-spanish-words-with-english-pronunciation",
   },
   "patrones-espanol": {
     id: "prueba-patrones-es",

@@ -145,7 +145,7 @@ const es: CheckoutUIStrings = {
   amountToPay: "Monto a pagar",
   sendEquivalentSoles: "Envía el equivalente en soles al tipo de cambio del día.",
   yapeStep1: "Abre tu app de Yape o Plin.",
-  yapeStep2: (a, p, n) => `Envía el equivalente de USD $${a} en soles al número ${p} (${n}).`,
+  yapeStep2: (a, p, n) => `Envía ${a} al número ${p} (${n}).`,
   yapeStep3: "Guarda la captura del comprobante.",
   yapeStep4: "Presiona “Ya pagué” y envíanos el comprobante por WhatsApp.",
   alreadyPaid: "Ya pagué → Enviar comprobante",

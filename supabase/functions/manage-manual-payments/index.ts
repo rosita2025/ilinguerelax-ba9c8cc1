@@ -14,7 +14,7 @@ async function resolveMaterials(
   if (!items.length) return [];
   const { data: products } = await admin
     .from("digital_products")
-    .select("sku, name, drive_url, access_key, bonus_name, bonus_drive_url, bonus_access_key")
+    .select("sku, name, drive_url, access_key, bonuses, bonus_name, bonus_drive_url, bonus_access_key")
     .eq("active", true);
   if (!products) return [];
 
@@ -45,13 +45,18 @@ async function resolveMaterials(
         downloadUrl: hit.drive_url,
         accessKey: hit.access_key ?? undefined,
       });
-      if (hit.bonus_drive_url) {
+      // Bonos múltiples desde el array `bonuses`; fallback a columnas legacy.
+      const bonusList: Array<{ name?: string; drive_url?: string; access_key?: string }> = Array.isArray(hit.bonuses) && hit.bonuses.length
+        ? hit.bonuses
+        : (hit.bonus_drive_url ? [{ name: hit.bonus_name, drive_url: hit.bonus_drive_url, access_key: hit.bonus_access_key }] : []);
+      bonusList.forEach((b, idx) => {
+        if (!b?.drive_url) return;
         out.push({
-          productName: hit.bonus_name || `🎁 Bono — ${hit.name}`,
-          downloadUrl: hit.bonus_drive_url,
-          accessKey: hit.bonus_access_key ?? undefined,
+          productName: b.name?.trim() || `🎁 Bono ${idx + 1} — ${hit.name}`,
+          downloadUrl: b.drive_url,
+          accessKey: b.access_key || undefined,
         });
-      }
+      });
     }
   }
   return out;

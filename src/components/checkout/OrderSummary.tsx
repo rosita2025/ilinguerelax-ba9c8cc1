@@ -26,7 +26,12 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
-  const local = useLocalCurrency(total);
+  const localTotal = useLocalCurrency(total);
+  const localSubtotal = useLocalCurrency(subtotal);
+  const localDiscount = useLocalCurrency(discount);
+  const useLocal = !localTotal.isUsd && !localTotal.loading;
+  const fmtMoney = (usd: number, local: { formatted: string }) =>
+    useLocal ? local.formatted : `$${usd.toFixed(2)}`;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
 

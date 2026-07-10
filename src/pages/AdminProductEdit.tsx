@@ -33,6 +33,8 @@ interface Product {
   hotmart_url: string | null;
   store_enabled: boolean;
   excluded_countries: string[];
+  store_excluded_countries: string[];
+  hotmart_excluded_countries: string[];
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;

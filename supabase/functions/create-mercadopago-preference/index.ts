@@ -24,8 +24,8 @@ const BodySchema = z.object({
   failureUrl: z.string().url().optional(),
   pendingUrl: z.string().url().optional(),
   autoReturn: z.enum(["approved", "all"]).default("approved"),
-  // Peruvian Soles conversion rate (approx). Frontend can override.
-  usdToPen: z.number().positive().max(10).default(3.75),
+  // Deprecated: la conversión ahora la hace Mercado Pago automáticamente.
+  usdToPen: z.number().positive().max(10).optional(),
   // Filtro opcional: "yape" (solo billeteras), "transfer" (solo transferencias bancarias), "all"
   paymentType: z.enum(["yape", "transfer", "cash", "all"]).default("all"),
 });

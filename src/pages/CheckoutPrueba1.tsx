@@ -7,6 +7,7 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
+import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
@@ -90,6 +91,7 @@ export default function CheckoutPrueba1() {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
         <div className="space-y-6">
           <BuyerInfoForm />
+          {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} />}
           <PaymentMethodsGroup />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

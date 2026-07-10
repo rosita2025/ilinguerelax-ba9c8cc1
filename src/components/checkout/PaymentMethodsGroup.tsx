@@ -23,6 +23,9 @@ export function PaymentMethodsGroup() {
   const region = useRegionTier();
   const { total } = calcTotals(items, couponPercent, region.tier);
   const totalUsd = total.toFixed(2);
+  const local = useLocalCurrency(total);
+  const localBadge = !local.isUsd && !local.loading ? ` · ≈ ${local.formatted}` : "";
+
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);

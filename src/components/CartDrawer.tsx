@@ -322,13 +322,95 @@ export const CartDrawer = () => {
           })()}
         </SheetHeader>
         <div className="flex flex-col flex-1 pt-2 min-h-0">
-          {items.length === 0 ?
+          {/* Internal-checkout items (added from product pages via "Agregar al carrito") */}
+          {visibleInternalItems.length > 0 && (
+            <div className="flex-shrink-0 mb-3 border border-primary/30 rounded-lg p-2.5 bg-primary/5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                  Digital · Checkout directo
+                </p>
+                <span className="text-[10px] text-muted-foreground">
+                  {internalCount} item{internalCount !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {visibleInternalItems.map((it) => {
+                  const unit = itemPrice(it, tier);
+                  return (
+                    <div key={it.id} className="flex gap-2.5 items-center">
+                      <div className="w-10 h-10 rounded-md overflow-hidden bg-secondary/20 flex-shrink-0">
+                        <img src={it.image} alt={it.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold leading-tight truncate">{it.name}</p>
+                        <p className="text-[11px] text-primary font-bold">
+                          {formatPrice(unit)} {currency}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => updateInternalQty(it.id, it.quantity - 1)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-5 text-center text-xs">{it.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => updateInternalQty(it.id, it.quantity + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => removeInternal(it.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-primary/20">
+                <span className="text-xs font-semibold">Subtotal</span>
+                <span className="text-sm font-bold text-primary">
+                  {formatPrice(internalSubtotal)} {currency}
+                </span>
+              </div>
+              <Button
+                onClick={goToInternalCheckout}
+                className="w-full mt-2 h-10 text-sm font-bold"
+              >
+                Ir al checkout
+                <ArrowRight className="w-4 h-4 ml-1.5" />
+              </Button>
+            </div>
+          )}
+
+          {items.length === 0 && visibleInternalItems.length === 0 ?
           <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">Your cart is empty</p>
               </div>
-            </div> :
+            </div> : items.length === 0 ?
+          <div className="flex-1" /> :
+          <></>}
+          {items.length > 0 &&
+          <></>}
+          {items.length > 0 ?
+          <></> : null}
+          {items.length === 0 ? null :
+          <></>}
+          {items.length > 0 &&
+
           <>
               {/* Free shipping progress bar */}
               {syncError && (

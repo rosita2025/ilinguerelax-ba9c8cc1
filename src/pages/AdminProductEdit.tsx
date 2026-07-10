@@ -61,6 +61,8 @@ const EMPTY: Product = {
   hotmart_url: "",
   store_enabled: true,
   excluded_countries: [],
+  store_excluded_countries: [],
+  hotmart_excluded_countries: [],
 };
 
 const AdminProductEdit = () => {

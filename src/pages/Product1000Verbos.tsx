@@ -47,6 +47,10 @@ const features = [
 
 const Product1000Verbos = () => {
   const campaign = useCampaignPrice(10, 54);
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const clear = useCheckoutPruebaStore((s) => s.clear);
+
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",
     content_category: "Digital Book",
@@ -67,8 +71,12 @@ const Product1000Verbos = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(HOTMART_URL, "_blank");
+    clear();
+    addItem({ ...CART_ITEM, quantity: 1 });
+    toast.success("Producto agregado al carrito");
+    navigate("/checkouts/prueba-1");
   };
+
 
   return (
     <main className="min-h-screen bg-background">

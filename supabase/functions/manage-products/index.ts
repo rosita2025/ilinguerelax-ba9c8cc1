@@ -117,9 +117,13 @@ Deno.serve(async (req) => {
         hotmart_url: p.hotmart_url?.toString().trim() || null,
         store_enabled: p.store_enabled ?? true,
         excluded_countries: Array.isArray(p.excluded_countries)
-          ? p.excluded_countries
-              .map((c) => (c ?? "").toString().trim().toUpperCase())
-              .filter((c) => /^[A-Z]{2}$/.test(c))
+          ? p.excluded_countries.map((c) => (c ?? "").toString().trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c))
+          : [],
+        store_excluded_countries: Array.isArray(p.store_excluded_countries)
+          ? p.store_excluded_countries.map((c) => (c ?? "").toString().trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c))
+          : [],
+        hotmart_excluded_countries: Array.isArray(p.hotmart_excluded_countries)
+          ? p.hotmart_excluded_countries.map((c) => (c ?? "").toString().trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c))
           : [],
       };
 

@@ -30,6 +30,7 @@ interface Product {
   bonus_drive_url: string | null;
   bonus_access_key: string | null;
   bonuses: Bonus[] | null;
+  hotmart_url: string | null;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;

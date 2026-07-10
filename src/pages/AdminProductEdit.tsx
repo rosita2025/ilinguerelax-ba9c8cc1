@@ -212,20 +212,69 @@ const AdminProductEdit = () => {
           </Card>
 
           <Card className="p-6 space-y-4">
-            <h2 className="font-semibold">🌎 Enlace de Hotmart (opcional)</h2>
-            <div>
-              <Label>URL de compra en Hotmart</Label>
+            <h2 className="font-semibold">🛒 Canales de venta por país</h2>
+            <p className="text-xs text-muted-foreground">
+              Activa uno o los dos canales. Se muestran <b>en cualquier país</b> según lo que actives, salvo los países excluidos abajo.
+            </p>
+
+            {/* Tienda ILINGUE RELAX */}
+            <div className="flex items-start justify-between gap-3 p-3 border rounded-lg">
+              <div className="flex-1">
+                <div className="font-medium text-sm">Tienda ILINGUE RELAX (checkout propio)</div>
+                <div className="text-xs text-muted-foreground">Stripe, PayPal, Yape/Plin (Perú), Mercado Pago.</div>
+              </div>
+              <Switch
+                checked={product.store_enabled}
+                onCheckedChange={(v) => update("store_enabled", v)}
+              />
+            </div>
+
+            {/* Hotmart */}
+            <div className="p-3 border rounded-lg space-y-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="font-medium text-sm">Hotmart</div>
+                  <div className="text-xs text-muted-foreground">Se activa solo si pegas el enlace de compra.</div>
+                </div>
+                <span className={`text-xs px-2 py-1 rounded ${product.hotmart_url ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                  {product.hotmart_url ? "Activo" : "Inactivo"}
+                </span>
+              </div>
               <Input
                 value={product.hotmart_url ?? ""}
                 onChange={(e) => update("hotmart_url", e.target.value)}
                 placeholder="https://pay.hotmart.com/…"
               />
+            </div>
+
+            {/* Países excluidos */}
+            <div>
+              <Label>Países excluidos (códigos ISO separados por coma)</Label>
+              <Input
+                value={(product.excluded_countries ?? []).join(", ")}
+                onChange={(e) =>
+                  update(
+                    "excluded_countries",
+                    e.target.value
+                      .split(/[,\s]+/)
+                      .map((c) => c.trim().toUpperCase())
+                      .filter((c) => /^[A-Z]{2}$/.test(c)),
+                  )
+                }
+                placeholder="Ej: BR, MX, AR"
+              />
               <p className="text-xs text-muted-foreground mt-1">
-                Si lo defines, los visitantes de <b>Latinoamérica (excepto Perú)</b> verán el botón "Comprar en Hotmart".
-                Perú, USA, Canadá, Asia y países angloparlantes usarán el checkout propio de la tienda.
+                En estos países no se mostrará ningún botón de compra. Deja vacío para vender en todos.
               </p>
             </div>
+
+            <div className="text-xs bg-muted/40 p-2 rounded">
+              <b>Ejemplos:</b> Solo Hotmart en LATAM → activa Hotmart, deja tienda ON, y excluye países si quieres bloquear la tienda.
+              Solo Tienda mundial → deja Hotmart vacío.
+              Los dos canales → ambos activos, el visitante verá los dos botones.
+            </div>
           </Card>
+
 
 
           <Card className="p-6 space-y-4">

@@ -12,7 +12,7 @@ const sections = [
     content: `Recopilamos la información necesaria para brindarte nuestros servicios y productos digitales:
 
 • Datos de contacto: nombre, correo electrónico y número de teléfono (cuando nos contactas o realizas una compra).
-• Información de pago: procesada de forma segura por nuestros proveedores autorizados (Stripe, Mercado Pago, Yape/Plin, Hotmart y Shopify). No almacenamos datos completos de tarjetas de crédito ni credenciales bancarias en nuestros servidores.
+• Información de pago: procesada de forma segura por nuestros proveedores autorizados (Stripe, Mercado Pago, Yape/Plin, Hotmart y Amazon). No almacenamos datos completos de tarjetas de crédito ni credenciales bancarias en nuestros servidores.
 • Datos de navegación: dirección IP, país de origen, tipo de dispositivo y comportamiento en el sitio (páginas visitadas, tiempo de sesión), recopilados mediante cookies y herramientas de análisis como Meta Pixel y Google Analytics.
 • Preferencias de idioma y moneda: para personalizar tu experiencia de compra.`
   },
@@ -36,9 +36,9 @@ const sections = [
 • Proveedores de pago autorizados:
    – Stripe (SSL) – tarjetas de crédito/débito internacionales, Apple Pay, Google Pay y Link. Cobertura global (Latinoamérica, Norteamérica, Europa, Asia, Oceanía) con conversión automática a moneda local.
    – Mercado Pago – transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible desde Perú y otros países de Latinoamérica.
-   – Yape y Plin – pago manual desde Perú, verificado por Supervisora Rosa (1-24h).
+   – Yape y Plin – pago manual desde Perú al número privado de nuestra Supervisora de Pagos (mostrado únicamente durante el checkout). Verificación en 1-24h.
    – Hotmart – procesa pagos en Latinoamérica con métodos locales como Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias regionales.
-   – Shopify – pasarela para libros físicos y envíos internacionales.
+   – Amazon – procesa los pagos de los libros físicos (próximamente) directamente en su plataforma.
    – Próximamente: dLocal y eBanx para ampliar métodos de pago locales en América Latina, África, Asia y Medio Oriente.
 • Servicios de email: Brevo y Resend, para enviar correos transaccionales y promocionales.
 • Análisis y publicidad: Meta (Facebook/Instagram) y Google, solo datos agregados o anonimizados para medición de campañas.
@@ -52,7 +52,7 @@ Todos nuestros proveedores cumplen con estándares de seguridad y protección de
     title: "Almacenamiento y Seguridad",
     content: `Tus datos se almacenan en servidores seguros de Supabase (infraestructura cloud con encriptación en tránsito y en reposo). Implementamos medidas de seguridad técnicas y organizativas para proteger tu información contra acceso no autorizado, alteración, divulgación o destrucción.
 
-Los productos digitales se entregan mediante links de descarga únicos o acceso a plataformas seguras (Hotmart). Los libros físicos se envían a través de Shopify y sus socios logísticos.`
+Los productos digitales se entregan mediante links de descarga únicos o acceso a plataformas seguras (Hotmart). Los libros físicos estarán disponibles próximamente a través de la tienda de Amazon y se envían mediante sus socios logísticos.`
   },
   {
     icon: Cookie,

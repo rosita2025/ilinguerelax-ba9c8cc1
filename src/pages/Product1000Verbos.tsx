@@ -77,6 +77,18 @@ const Product1000Verbos = () => {
     navigate("/checkouts/1000-verbos");
   };
 
+  const handleAddToCart = () => {
+    addItem({ ...CART_ITEM, quantity: 1 });
+    toast.success("Producto agregado al carrito", {
+      description: "Puedes seguir explorando o ir al checkout.",
+      action: {
+        label: "Ir al checkout",
+        onClick: () => navigate("/checkouts/1000-verbos"),
+      },
+    });
+  };
+
+
 
   return (
     <main className="min-h-screen bg-background">

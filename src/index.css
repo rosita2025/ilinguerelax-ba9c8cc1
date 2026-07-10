@@ -215,3 +215,13 @@ body {
 font[style*="background-color"] {
   background-color: transparent !important;
 }
+
+/* Phone input (react-phone-number-input) */
+.phone-input-wrap .PhoneInput { display: flex; align-items: center; gap: 0.5rem; }
+.phone-input-wrap .PhoneInputCountry { display: flex; align-items: center; gap: 0.35rem; }
+.phone-input-wrap .PhoneInputCountryIcon { width: 1.4rem; height: 1rem; box-shadow: none; }
+.phone-input-wrap .PhoneInputInput {
+  flex: 1; background: transparent; border: 0; outline: none;
+  font-size: 0.875rem; color: inherit;
+}
+.phone-input-wrap .PhoneInputCountrySelectArrow { opacity: 0.6; }

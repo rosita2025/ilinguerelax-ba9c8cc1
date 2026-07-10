@@ -211,16 +211,18 @@ export function PaymentMethodsGroup() {
     // yape → user uses "Ya pagué" button in the manual panel
   };
 
-  const retryStripe = () => {
+  const retryStripe = useCallback(() => {
     setStripeError(null);
     setStripeLoading(false);
     setStripeFrameMounted(false);
+    setStripeElapsed(0);
     setStripeRetryKey((k) => k + 1);
-  };
+  }, []);
 
   useEffect(() => {
     if (!(showStripe && selected === "card")) return;
     setStripeFrameMounted(false);
+    setStripeElapsed(0);
     const container = stripeContainerRef.current;
     if (!container) return;
 
@@ -235,25 +237,38 @@ export function PaymentMethodsGroup() {
     if (markMounted()) return;
     const observer = new MutationObserver(markMounted);
     observer.observe(container, { childList: true, subtree: true });
-    const timeout = window.setTimeout(() => {
-      if (!markMounted()) {
-        setStripeError(
-          language === "en"
-            ? "The secure card form is taking too long to open."
-            : language === "pt"
-              ? "O formulário seguro de cartão está demorando para abrir."
-              : language === "fr"
-                ? "Le formulaire sécurisé de carte met trop de temps à s’ouvrir."
-                : "El formulario seguro de tarjeta está tardando demasiado en abrir.",
-        );
+
+    const startedAt = Date.now();
+    const tick = window.setInterval(() => {
+      const s = Math.floor((Date.now() - startedAt) / 1000);
+      setStripeElapsed(s);
+      // Auto-retry silently once at 45s if the iframe never mounted
+      if (s === 45 && !stripeAutoRetried) {
+        setStripeAutoRetried(true);
+        setStripeRetryKey((k) => k + 1);
       }
-    }, 25000);
+      // Hard failure at 90s → show retry UI
+      if (s >= 90) {
+        window.clearInterval(tick);
+        if (!container.querySelector('iframe[name="embedded-checkout"]')) {
+          setStripeError(
+            language === "en"
+              ? "The secure card form is taking too long to open. Check your connection and try again, or contact us on WhatsApp."
+              : language === "pt"
+                ? "O formulário seguro de cartão está demorando muito. Verifique sua conexão e tente novamente, ou fale conosco no WhatsApp."
+                : language === "fr"
+                  ? "Le formulaire sécurisé met trop de temps à s’ouvrir. Vérifie ta connexion et réessaie, ou contacte-nous sur WhatsApp."
+                  : "El formulario seguro está tardando demasiado. Revisa tu conexión e intenta de nuevo, o escríbenos por WhatsApp.",
+          );
+        }
+      }
+    }, 1000);
 
     return () => {
       observer.disconnect();
-      window.clearTimeout(timeout);
+      window.clearInterval(tick);
     };
-  }, [showStripe, selected, stripeRetryKey, language]);
+  }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried]);
 
   const handleManualPaid = () => {
     const s = useCheckoutPruebaStore.getState();

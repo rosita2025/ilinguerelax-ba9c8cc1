@@ -74,6 +74,8 @@ const VALID_COUPONS: Record<string, number> = {
   RELAX15: 15,
   TEST100: 100,
   GRATIS100: 100,
+  DOLAR1: 90,
+  PRUEBA1: 90,
 };
 
 export const useCheckoutPruebaStore = create<PruebaStore>()(

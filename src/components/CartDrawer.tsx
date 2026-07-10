@@ -67,7 +67,7 @@ export const CartDrawer = () => {
   } = useCartStore();
 
   const navigate = useNavigate();
-  const tier = useRegionTier();
+  const { tier } = useRegionTier();
   const internalItems = useCheckoutPruebaStore((s) => s.items);
   const removeInternal = useCheckoutPruebaStore((s) => s.removeItem);
   const updateInternalQty = useCheckoutPruebaStore((s) => s.updateQuantity);

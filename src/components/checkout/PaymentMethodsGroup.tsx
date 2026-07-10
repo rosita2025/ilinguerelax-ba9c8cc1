@@ -42,6 +42,7 @@ export function PaymentMethodsGroup() {
   const [showStripe, setShowStripe] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
+  const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
   const valid = isBuyerValid(buyer);
 
   const stripePromise = (() => {

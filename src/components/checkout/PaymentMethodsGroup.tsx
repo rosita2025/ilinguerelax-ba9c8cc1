@@ -18,37 +18,29 @@ import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from 
 
 type Method = "card" | "paypal" | "transfer" | "cash" | "yape";
 
-function BrandBadge({
-  label,
-  bg,
-  color,
-  border,
-  prefix,
-}: {
-  label: string;
-  bg: string;
-  color: string;
-  border?: boolean;
-  prefix?: "apple";
-}) {
+import visaLogo from "@/assets/payment-logos/visa.svg.asset.json";
+import mastercardLogo from "@/assets/payment-logos/mastercard.svg.asset.json";
+import applePayLogo from "@/assets/payment-logos/apple-pay.svg.asset.json";
+
+function LogoBadge({ src, alt }: { src: string; alt: string }) {
   return (
-    <span
-      className="inline-flex items-center h-5 px-1.5 rounded text-[9px] font-bold tracking-wide leading-none"
-      style={{
-        background: bg,
-        color,
-        border: border ? "1px solid #E5E7EB" : "none",
-      }}
-    >
-      {prefix === "apple" && (
-        <svg viewBox="0 0 24 24" width="10" height="10" fill={color} className="mr-0.5" aria-hidden>
-          <path d="M16.365 12.06c-.02-2.06 1.68-3.05 1.76-3.1-.96-1.4-2.46-1.6-2.99-1.62-1.27-.13-2.48.75-3.13.75-.65 0-1.65-.73-2.72-.71-1.4.02-2.69.81-3.41 2.06-1.45 2.52-.37 6.25 1.05 8.29.69 1 1.51 2.13 2.58 2.09 1.04-.04 1.43-.67 2.68-.67s1.6.67 2.69.65c1.11-.02 1.81-1.02 2.49-2.03.78-1.16 1.11-2.28 1.13-2.34-.03-.01-2.17-.83-2.19-3.28zM14.32 5.36c.57-.69.95-1.65.85-2.6-.82.03-1.81.55-2.4 1.23-.52.6-.98 1.58-.86 2.51.91.07 1.84-.46 2.41-1.14z"/>
-        </svg>
-      )}
-      {label}
+    <span className="inline-flex items-center justify-center h-6 px-1.5 rounded-md bg-white border border-neutral-200 shadow-sm">
+      <img src={src} alt={alt} className="h-3.5 w-auto object-contain" loading="lazy" />
     </span>
   );
 }
+
+function LinkBadge() {
+  // Stripe Link logo (inline SVG — verde oficial #00D66F)
+  return (
+    <span className="inline-flex items-center justify-center h-6 px-2 rounded-md" style={{ background: "#00D66F" }}>
+      <svg viewBox="0 0 40 16" height="10" aria-label="Link" role="img">
+        <text x="0" y="12" fontFamily="system-ui, -apple-system, sans-serif" fontSize="13" fontWeight="700" fill="#0A2540">Link</text>
+      </svg>
+    </span>
+  );
+}
+
 
 const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga Manuel";

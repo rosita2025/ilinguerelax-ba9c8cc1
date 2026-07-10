@@ -196,7 +196,7 @@ const Product1000Verbos = () => {
                 <Button
                   variant="hero"
                   size="xl"
-                  className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
+                  className="w-full mb-3 text-lg py-6 shadow-2xl relative overflow-hidden group"
                   onClick={handleBuy}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
@@ -206,9 +206,22 @@ const Product1000Verbos = () => {
                 </Button>
               </motion.div>
 
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full mb-4 text-base py-5 border-2"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Agregar al carrito
+                </Button>
+              </motion.div>
+
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👆 Haz clic para asegurar tu copia al precio de oferta
               </p>
+
 
               <TrustBadges lang="es" variant="grid" />
 

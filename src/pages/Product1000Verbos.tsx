@@ -74,7 +74,7 @@ const Product1000Verbos = () => {
     clear();
     addItem({ ...CART_ITEM, quantity: 1 });
     toast.success("Producto agregado al carrito");
-    navigate("/checkout/1000-verbos");
+    navigate("/checkouts/1000-verbos");
   };
 
 
@@ -273,7 +273,7 @@ const Product1000Verbos = () => {
         rating={4.8}
         reviewCount={350}
         showReviews={true}
-        buyUrl="/checkout/1000-verbos"
+        buyUrl="/checkouts/1000-verbos"
         onBuyClick={handleBuy}
       />
 

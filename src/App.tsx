@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense, useEffect } from "react";
 import { useCartSync } from "@/hooks/useCartSync";
@@ -139,6 +139,13 @@ const PageFallback = () => (
   </div>
 );
 
+const CheckoutSlugRedirect = () => {
+  const { slug } = useParams();
+  return <Navigate to={slug ? `/checkouts/${slug}` : "/checkouts"} replace />;
+};
+
+
+
 const App = () => (
   <HelmetProvider>
     <I18nProvider>
@@ -202,10 +209,11 @@ const App = () => (
                   <Route path="/admin/shopify" element={<AdminGate><AdminShopify /></AdminGate>} />
                   <Route path="/admin/checkout-methods" element={<AdminGate><AdminCheckoutMethods /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
-                  <Route path="/checkouts" element={<CheckoutTest />} />
-                  <Route path="/checkout" element={<CheckoutPrueba1 />} />
-                  <Route path="/checkout/:slug" element={<CheckoutPrueba1 />} />
-                  <Route path="/checkouts/prueba-1" element={<Navigate to="/checkout" replace />} />
+                  <Route path="/checkouts" element={<CheckoutPrueba1 />} />
+                  <Route path="/checkouts/:slug" element={<CheckoutPrueba1 />} />
+                  <Route path="/checkout" element={<Navigate to="/checkouts" replace />} />
+                  <Route path="/checkout/:slug" element={<CheckoutSlugRedirect />} />
+                  <Route path="/checkouts/prueba-1" element={<Navigate to="/checkouts" replace />} />
                   <Route path="/checkouts/return" element={<CheckoutReturn />} />
                   <Route path="/checkouts/success" element={<CheckoutSuccess />} />
                   <Route path="/checkouts/failure" element={<CheckoutFailure />} />

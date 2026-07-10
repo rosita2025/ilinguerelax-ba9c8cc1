@@ -1,11 +1,24 @@
-import { Link } from "react-router-dom";
-import { Clock, MessageCircle, ShieldCheck } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Clock, MessageCircle, ShieldCheck, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
+import { useState } from "react";
 
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
 export default function CheckoutPendienteManual() {
+  const [params] = useSearchParams();
+  const orderNumber = params.get("order") || "";
+  const [copied, setCopied] = useState(false);
+
+  const copyOrder = async () => {
+    try {
+      await navigator.clipboard.writeText(orderNumber);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch { /* noop */ }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
       <Helmet>
@@ -17,11 +30,30 @@ export default function CheckoutPendienteManual() {
           <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
         </div>
         <h1 className="text-2xl font-bold">Thank you! Your manual payment is under review</h1>
+
+        {orderNumber && (
+          <div className="rounded-xl border bg-muted/40 p-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Order number</p>
+            <button
+              type="button"
+              onClick={copyOrder}
+              className="mt-1 inline-flex items-center gap-2 text-xl font-mono font-bold text-primary hover:opacity-80"
+            >
+              {orderNumber}
+              {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+            </button>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {copied ? "Copied ✔" : "Tap to copy — include it when contacting support"}
+            </p>
+          </div>
+        )}
+
         <p className="text-muted-foreground">
           Our <strong>Supervisor Rosa</strong> will review your payment receipt from Peru within
           the next <strong>1 to 24 hours</strong>. As soon as it is confirmed, we will send your
           product via WhatsApp.
         </p>
+
 
         <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-left text-sm space-y-2">
           <p className="font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-2">

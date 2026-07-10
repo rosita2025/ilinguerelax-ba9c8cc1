@@ -208,6 +208,23 @@ const AdminProductEdit = () => {
           </Card>
 
           <Card className="p-6 space-y-4">
+            <h2 className="font-semibold">🌎 Enlace de Hotmart (opcional)</h2>
+            <div>
+              <Label>URL de compra en Hotmart</Label>
+              <Input
+                value={product.hotmart_url ?? ""}
+                onChange={(e) => update("hotmart_url", e.target.value)}
+                placeholder="https://pay.hotmart.com/…"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Si lo defines, los visitantes de <b>Latinoamérica (excepto Perú)</b> verán el botón "Comprar en Hotmart".
+                Perú, USA, Canadá, Asia y países angloparlantes usarán el checkout propio de la tienda.
+              </p>
+            </div>
+          </Card>
+
+
+          <Card className="p-6 space-y-4">
             <h2 className="font-semibold">4. Entrega digital</h2>
             <div>
               <Label>Enlace de Google Drive (PDF)</Label>

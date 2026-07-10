@@ -29,7 +29,10 @@ interface Product {
   bonus_name: string | null;
   bonus_drive_url: string | null;
   bonus_access_key: string | null;
+  bonuses: Bonus[] | null;
 }
+interface Bonus { name: string; drive_url: string; access_key: string; }
+const MAX_BONUSES = 4;
 interface UpsellRow { upsell_sku: string; discount_pct: number; sort_order: number; }
 
 const LANGS = [

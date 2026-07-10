@@ -13,6 +13,8 @@ import { getCheckoutUI } from "@/i18n/checkoutUI";
 export default function CheckoutPrueba1() {
   const { resetToDefaults } = useCheckoutPruebaStore();
   const region = useRegionTier();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
 
   return (

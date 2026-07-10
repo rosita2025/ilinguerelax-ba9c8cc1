@@ -18,6 +18,8 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
     useCheckoutPruebaStore();
   const region = useRegionTier();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);

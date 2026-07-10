@@ -28,10 +28,11 @@ export default function CheckoutPrueba1() {
             ILINGUE <span className="text-primary">RELAX</span>
           </span>
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
-            <Lock className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden sm:inline">Pago 100% seguro</span>
-            <span className="sm:hidden">Seguro</span>
+            <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+            <span className="hidden sm:inline font-medium">Stripe SSL · Mercado Pago</span>
+            <span className="sm:hidden font-medium">SSL · MP</span>
           </div>
+
         </div>
       </header>
 
@@ -44,13 +45,16 @@ export default function CheckoutPrueba1() {
           <BuyerInfoForm />
           <PaymentMethodsGroup />
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> SSL Stripe
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Encriptación SSL Stripe
             </span>
             <span>·</span>
-            <span>Garantía 30 días</span>
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
+            </span>
             <span>·</span>
+
             <a
               href="https://wa.me/15752160934"
               target="_blank"

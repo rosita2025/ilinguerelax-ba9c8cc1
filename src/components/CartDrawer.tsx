@@ -394,24 +394,19 @@ export const CartDrawer = () => {
             </div>
           )}
 
-          {items.length === 0 && visibleInternalItems.length === 0 ?
-          <div className="flex-1 flex items-center justify-center">
+          {items.length === 0 && visibleInternalItems.length === 0 && (
+            <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">Your cart is empty</p>
               </div>
-            </div> : items.length === 0 ?
-          <div className="flex-1" /> :
-          <></>}
+            </div>
+          )}
           {items.length > 0 &&
           <></>}
-          {items.length > 0 ?
-          <></> : null}
-          {items.length === 0 ? null :
-          <></>}
           {items.length > 0 &&
-
           <>
+
               {/* Free shipping progress bar */}
               {syncError && (
                 <div className="flex-shrink-0 mb-3 p-2.5 rounded-lg border-2 border-destructive/40 bg-destructive/5">

@@ -1,0 +1,76 @@
+import { useEffect, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useI18n } from "@/i18n/I18nContext";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const SENT_KEY = "abandoned-cart-sent-v1";
+
+function alreadySent(email: string, slug: string) {
+  try {
+    const raw = localStorage.getItem(SENT_KEY);
+    const map = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    const key = `${email}::${slug}`;
+    const last = map[key];
+    // Re-track after 6 hours
+    return last && Date.now() - last < 6 * 60 * 60 * 1000;
+  } catch {
+    return false;
+  }
+}
+
+function markSent(email: string, slug: string) {
+  try {
+    const raw = localStorage.getItem(SENT_KEY);
+    const map = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    map[`${email}::${slug}`] = Date.now();
+    localStorage.setItem(SENT_KEY, JSON.stringify(map));
+  } catch { /* ignore */ }
+}
+
+/**
+ * Tracks abandoned checkout: when the buyer has entered a valid name+email
+ * but hasn't completed payment, saves to `abandoned_carts` so the 6-step
+ * recovery email sequence kicks in. Fires once per (email, slug) per 6h.
+ */
+export function useAbandonedCheckoutTracker(slug: string | undefined, productName?: string) {
+  const buyer = useCheckoutPruebaStore((s) => s.buyer);
+  const { language } = useI18n();
+  const timer = useRef<number | null>(null);
+  const trackedRef = useRef<string>("");
+
+  useEffect(() => {
+    const email = buyer.email.trim().toLowerCase();
+    const name = buyer.fullName.trim();
+
+    if (!EMAIL_RE.test(email) || name.length < 3) return;
+
+    const slugKey = slug || productName || "checkout";
+    const fingerprint = `${email}::${slugKey}`;
+    if (trackedRef.current === fingerprint) return;
+    if (alreadySent(email, slugKey)) return;
+
+    if (timer.current) window.clearTimeout(timer.current);
+    // Debounce 2s so we don't ping while user is still typing
+    timer.current = window.setTimeout(async () => {
+      try {
+        await supabase.functions.invoke("track-abandoned-checkout", {
+          body: {
+            email,
+            name,
+            product_type: slugKey,
+            language,
+          },
+        });
+        trackedRef.current = fingerprint;
+        markSent(email, slugKey);
+      } catch (err) {
+        console.warn("abandoned-cart track failed", err);
+      }
+    }, 2000);
+
+    return () => {
+      if (timer.current) window.clearTimeout(timer.current);
+    };
+  }, [buyer.email, buyer.fullName, slug, productName, language]);
+}

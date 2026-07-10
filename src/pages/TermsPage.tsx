@@ -54,9 +54,9 @@ Para libros físicos (próximamente en Amazon):
     content: `• Todos los precios mostrados en el sitio pueden aparecer en USD o en tu moneda local (según detección automática de país por IP). Los precios locales son aproximaciones y pueden variar ligeramente según la tasa de cambio del día del pago aplicada por el procesador.
 • Los pagos se procesan de forma segura a través de los siguientes proveedores autorizados:
    – Stripe: tarjetas de crédito/débito (Visa, Mastercard, Amex), Apple Pay, Google Pay y Link. Disponible en Latinoamérica, Norteamérica, Europa, Asia y Oceanía con conversión automática a tu moneda local.
-   – Mercado Pago: transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible desde Perú y otros países de Latinoamérica.
+   – Mercado Pago: transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible únicamente desde Perú.
    – Yape y Plin: pago manual desde Perú al número privado de nuestra Supervisora de Pagos, mostrado únicamente durante el proceso de checkout. Verificación en 1 a 24 horas.
-   – Hotmart: procesa pagos en Latinoamérica con múltiples métodos locales, incluyendo Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias bancarias regionales.
+   – Hotmart: procesa pagos únicamente en Latinoamérica con múltiples métodos locales, incluyendo Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias bancarias regionales.
    – Amazon: procesa los pagos de los libros físicos (próximamente) directamente en su plataforma.
    – Próximamente: dLocal y eBanx para ampliar cobertura de métodos de pago locales en América Latina, África, Asia y Medio Oriente.
 • Los precios están sujetos a cambio sin previo aviso. Las promociones y descuentos tienen fechas de vigencia específicas.

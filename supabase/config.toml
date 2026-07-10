@@ -21,3 +21,12 @@ verify_jwt = false
 [functions.send-order-confirmation]
 verify_jwt = false
 
+[functions.paypal-config]
+verify_jwt = false
+
+[functions.paypal-create-order]
+verify_jwt = false
+
+[functions.paypal-capture-order]
+verify_jwt = false
+

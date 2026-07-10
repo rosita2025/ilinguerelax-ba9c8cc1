@@ -45,9 +45,8 @@ El incumplimiento de estas condiciones puede resultar en la cancelación de tu a
 • El reembolso se procesará al método de pago original en un plazo de 5 a 10 días hábiles.
 • Nos reservamos el derecho de denegar reembolsos en casos de abuso de la política (múltiples solicitudes del mismo usuario).
 
-Para libros físicos:
-• Aplica la política de devoluciones de Shopify y el proveedor logístico correspondiente.
-• Los productos dañados durante el envío deben reportarse dentro de 48 horas de recibido.`
+Para libros físicos (próximamente en Amazon):
+• Las devoluciones, cambios y reclamos por daños en el envío se gestionan directamente según la política vigente de la tienda de Amazon.`
   },
   {
     icon: Scale,
@@ -56,9 +55,9 @@ Para libros físicos:
 • Los pagos se procesan de forma segura a través de los siguientes proveedores autorizados:
    – Stripe: tarjetas de crédito/débito (Visa, Mastercard, Amex), Apple Pay, Google Pay y Link. Disponible en Latinoamérica, Norteamérica, Europa, Asia y Oceanía con conversión automática a tu moneda local.
    – Mercado Pago: transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible desde Perú y otros países de Latinoamérica.
-   – Yape y Plin: pago manual desde Perú al número 972119741 (Carmen Aliaga Manuel). Verificación en 1 a 24 horas por Supervisora Rosa.
+   – Yape y Plin: pago manual desde Perú al número privado de nuestra Supervisora de Pagos, mostrado únicamente durante el proceso de checkout. Verificación en 1 a 24 horas.
    – Hotmart: procesa pagos en Latinoamérica con múltiples métodos locales, incluyendo Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias bancarias regionales.
-   – Shopify: pasarela para libros físicos y envíos internacionales.
+   – Amazon: procesa los pagos de los libros físicos (próximamente) directamente en su plataforma.
    – Próximamente: dLocal y eBanx para ampliar cobertura de métodos de pago locales en América Latina, África, Asia y Medio Oriente.
 • Los precios están sujetos a cambio sin previo aviso. Las promociones y descuentos tienen fechas de vigencia específicas.
 • Los impuestos aplicables (IVA, GST, IGV, etc.) se calculan según la legislación de tu país y se muestran en el checkout antes de confirmar la compra.`

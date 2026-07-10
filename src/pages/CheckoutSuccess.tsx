@@ -19,6 +19,8 @@ export default function CheckoutSuccess() {
   const region = useRegionTier();
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
   const sentRef = useRef(false);
+  const { language } = useI18n();
+  const t = getCheckoutStrings(language);
 
   // Send confirmation email once, then clear the cart
   useEffect(() => {

@@ -165,14 +165,14 @@ export function PaymentMethodsGroup() {
           paymentType,
         },
       });
-      if (error || !data?.init_point) throw new Error(error?.message || "No se pudo crear la preferencia");
+      if (error || !data?.init_point) throw new Error(error?.message || t.mpError);
       window.location.assign(data.init_point);
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
       toast({
-        title: "Error Mercado Pago",
-        description: err instanceof Error ? err.message : "Intenta de nuevo",
+        title: t.mpError,
+        description: err instanceof Error ? err.message : t.tryAgain,
         variant: "destructive",
       });
     }

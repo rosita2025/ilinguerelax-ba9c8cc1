@@ -468,24 +468,8 @@ export function PaymentMethodsGroup() {
               )} />
             </button>
 
-            {/* Strip visual de marcas — visible SIEMPRE en la tarjeta de "card",
-                también cuando el embed aún no se abrió. Da confianza inmediata
-                al reconocer Visa/Mastercard/Apple Pay/etc. */}
-            {m.id === "card" && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-neutral-900/60 px-3 sm:px-4 py-2.5 flex flex-wrap items-center gap-1.5">
-                {cardBrands.map((b) => (
-                  <span
-                    key={b}
-                    className="text-[10px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 shadow-sm"
-                  >
-                    {b}
-                  </span>
-                ))}
-                <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-auto whitespace-nowrap">
-                  {t.autoActivatesByCountry}
-                </span>
-              </div>
-            )}
+
+
 
             {m.id === "card" && isSelected && showStripe && stripePromise && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">

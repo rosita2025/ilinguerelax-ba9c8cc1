@@ -53,6 +53,8 @@ const Product1000Verbos = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clear = useCheckoutPruebaStore((s) => s.clear);
+  const { country } = useRegionTier();
+  const isPeru = country === "PE";
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",
@@ -74,10 +76,14 @@ const Product1000Verbos = () => {
       currency: "USD",
       num_items: 1,
     });
-    clear();
-    addItem({ ...CART_ITEM, quantity: 1 });
-    toast.success("Producto agregado al carrito");
-    navigate("/checkouts/1000-verbos");
+    if (isPeru) {
+      clear();
+      addItem({ ...CART_ITEM, quantity: 1 });
+      toast.success("Producto agregado al carrito");
+      navigate("/checkouts/1000-verbos");
+    } else {
+      window.location.href = HOTMART_URL;
+    }
   };
 
   const handleAddToCart = () => {

@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { User, Mail, Phone, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, Mail, CheckCircle2, AlertCircle } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

@@ -23,6 +23,8 @@ export function PaymentMethodsGroup() {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const { total } = calcTotals(items, couponPercent, region.tier);
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);

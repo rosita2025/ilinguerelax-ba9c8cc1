@@ -14,7 +14,7 @@ async function resolveMaterials(
   if (!items.length) return [];
   const { data: products } = await admin
     .from("digital_products")
-    .select("sku, name, drive_url, access_key")
+    .select("sku, name, drive_url, access_key, bonus_name, bonus_drive_url, bonus_access_key")
     .eq("active", true);
   if (!products) return [];
 
@@ -26,12 +26,11 @@ async function resolveMaterials(
     const nameHint = (it?.name || "").toString().toLowerCase();
     if (!skuHint && !nameHint) continue;
 
-    const hit = products.find((p: { sku: string; name: string; drive_url: string | null }) => {
+    const hit = products.find((p: any) => {
       if (skuHint && p.sku.toLowerCase() === skuHint) return true;
       if (nameHint) {
-        // Match parcial: cualquier palabra ≥4 chars del sku aparece en el nombre del ítem, o viceversa
-        const skuTokens = p.sku.split("-").filter((t) => t.length >= 4);
-        if (skuTokens.some((t) => nameHint.includes(t))) return true;
+        const skuTokens = p.sku.split("-").filter((t: string) => t.length >= 4);
+        if (skuTokens.some((t: string) => nameHint.includes(t))) return true;
         const productNameLc = p.name.toLowerCase();
         const first3 = productNameLc.split(/[\s,]+/).slice(0, 3).join(" ");
         if (first3 && nameHint.includes(first3.substring(0, Math.min(15, first3.length)))) return true;
@@ -46,6 +45,13 @@ async function resolveMaterials(
         downloadUrl: hit.drive_url,
         accessKey: hit.access_key ?? undefined,
       });
+      if (hit.bonus_drive_url) {
+        out.push({
+          productName: hit.bonus_name || `🎁 Bono — ${hit.name}`,
+          downloadUrl: hit.bonus_drive_url,
+          accessKey: hit.bonus_access_key ?? undefined,
+        });
+      }
     }
   }
   return out;

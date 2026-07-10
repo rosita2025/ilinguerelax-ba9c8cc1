@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
+
 
 interface OrderSummaryProps {
   collapsible?: boolean;
@@ -18,7 +20,9 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const local = useLocalCurrency(total);
   const hasRegionalItem = items.some((i) => i.regionPrices);
+
 
   const handleApplyCoupon = () => {
     setCouponError(null);
@@ -175,10 +179,18 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
             <span>Impuestos</span>
             <span>Incluidos</span>
           </div>
-          <div className="flex justify-between text-base font-bold pt-2 border-t">
+          <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>Total</span>
-            <span>USD ${total.toFixed(2)}</span>
+            <div className="text-right">
+              <div>USD ${total.toFixed(2)}</div>
+              {!local.isUsd && !local.loading && (
+                <div className="text-[11px] font-normal text-muted-foreground mt-0.5">
+                  ≈ {local.formatted} en tu moneda
+                </div>
+              )}
+            </div>
           </div>
+
         </div>
       </div>
     </div>

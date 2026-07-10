@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,9 @@ export function PaymentMethodsGroup() {
   const region = useRegionTier();
   const { total } = calcTotals(items, couponPercent, region.tier);
   const totalUsd = total.toFixed(2);
+  const local = useLocalCurrency(total);
+  const localBadge = !local.isUsd && !local.loading ? ` · ≈ ${local.formatted}` : "";
+
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
@@ -194,11 +199,12 @@ export function PaymentMethodsGroup() {
   };
 
   const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link · Cambio automático a tu moneda local", badge: "Stripe" },
-    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank · Conversión automática", badge: `USD $${totalUsd}` },
-    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `USD $${totalUsd}` },
+    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`, badge: "Stripe" },
+    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: `BCP · BBVA · Interbank · Scotiabank · Conversión automática${localBadge}`, badge: `USD $${totalUsd}` },
+    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: `PagoEfectivo · Western Union · Tambo · Kasnet${localBadge}`, badge: `USD $${totalUsd}` },
     { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `USD $${totalUsd}` },
   ];
+
 
   const wasValidRef = useRef(valid);
   const methodsAnchorRef = useRef<HTMLDivElement | null>(null);

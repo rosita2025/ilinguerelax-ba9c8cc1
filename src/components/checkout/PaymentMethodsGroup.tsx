@@ -289,18 +289,9 @@ export function PaymentMethodsGroup() {
   // automáticamente según el país del comprador; nosotros solo mostramos los
   // logos correctos para que el cliente reconozca sus opciones y confíe.
   const country = (region.country || "").toUpperCase();
-  const cardBrandsByCountry = (c: string): string[] => {
-    // Base universal
-    const base = ["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay", "Link"];
-    // USA / Canadá
-    if (["US", "CA"].includes(c)) return [...base, "Discover"];
-    // Europa (Cash App no aplica; añadimos wallets locales relevantes)
-    if (["ES","FR","DE","IT","PT","NL","BE","IE","GB","UK","AT","FI","LU","DK","SE","NO","PL","CH"].includes(c)) {
-      return ["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay", "Link", "Klarna"];
-    }
-    // Asia / Angloparlantes (AU/NZ/SG/HK/JP)
-    if (["AU","NZ","SG","HK","JP","KR"].includes(c)) return base;
-    return base;
+  const cardBrandsByCountry = (_c: string): string[] => {
+    // Solo mostramos las marcas principales para mantener el badge limpio.
+    return ["Visa", "Mastercard", "Apple Pay", "Link"];
   };
   const cardBrands = cardBrandsByCountry(country);
   const cardSubtitle = isPeru

@@ -16,6 +16,17 @@ const Products = () => {
   const [language, setLanguage] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  // Merge static catalog with products managed from /admin/productos.
+  // DB products are appended, skipping any whose sku matches an existing static id/slug.
+  const { items: dbProducts } = useDigitalProducts();
+  const products = useMemo<Product[]>(() => {
+    const existing = new Set(staticProducts.map((p) => p.id));
+    const staticSlugs = new Set(staticProducts.map((p) => p.slug));
+    const extra = dbProducts.filter((p) => !existing.has(p.id) && !staticSlugs.has(p.slug));
+    return [...staticProducts, ...extra];
+  }, [dbProducts]);
+
+
   // IP-based regional pricing for product "5000" (Latam vs USA/EU/UK/CA/AU)
   const LATAM = new Set(["MXN","ARS","PEN","COP","CLP","BRL","UYU","BOB","PYG","GTQ","DOP","CRC","HNL","NIO","VES"]);
   const readCurrency = () => {

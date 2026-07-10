@@ -124,7 +124,7 @@ serve(async (req) => {
     console.log("Webhook event received:", event.type);
 
     if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object as any;
       
       // Check if this is a Spanish Relax purchase
       const customerEmail = session.customer_email || session.customer_details?.email;

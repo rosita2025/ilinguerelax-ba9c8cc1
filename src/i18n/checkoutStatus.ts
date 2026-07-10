@@ -13,7 +13,7 @@ export interface CheckoutStatusStrings {
   orderConfirmed: string;
   orderNumber: string;
   thanks: (name?: string) => string;
-  successIntro: (email?: string) => React.ReactNode | string;
+  successIntro: (email?: string) => string;
   whatsNext: string;
   checkInbox: string;
   checkInboxDesc: string;

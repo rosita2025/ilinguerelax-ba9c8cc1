@@ -205,7 +205,7 @@ const App = () => (
                   <Route path="/checkouts" element={<CheckoutPrueba1 />} />
                   <Route path="/checkouts/:slug" element={<CheckoutPrueba1 />} />
                   <Route path="/checkout" element={<Navigate to="/checkouts" replace />} />
-                  <Route path="/checkout/:slug" element={<Navigate to="/checkouts" replace />} />
+                  <Route path="/checkout/:slug" element={<CheckoutSlugRedirect />} />
                   <Route path="/checkouts/prueba-1" element={<Navigate to="/checkouts" replace />} />
                   <Route path="/checkouts/return" element={<CheckoutReturn />} />
                   <Route path="/checkouts/success" element={<CheckoutSuccess />} />

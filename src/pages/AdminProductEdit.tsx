@@ -212,6 +212,25 @@ const AdminProductEdit = () => {
               <Label>Clave de acceso (opcional)</Label>
               <Input value={product.access_key ?? ""} onChange={(e) => update("access_key", e.target.value)} placeholder="Solo si el PDF la requiere" />
             </div>
+
+            <div className="pt-4 border-t border-border space-y-4">
+              <div>
+                <h3 className="font-medium text-sm">🎁 Bono adicional (opcional)</h3>
+                <p className="text-xs text-muted-foreground">Se enviará junto con el producto principal en el mismo correo.</p>
+              </div>
+              <div>
+                <Label>Nombre del bono</Label>
+                <Input value={product.bonus_name ?? ""} onChange={(e) => update("bonus_name", e.target.value)} placeholder="Ej: Bono — Guía completa del Hangul" />
+              </div>
+              <div>
+                <Label>Enlace Google Drive del bono</Label>
+                <Input value={product.bonus_drive_url ?? ""} onChange={(e) => update("bonus_drive_url", e.target.value)} placeholder="https://drive.google.com/file/d/…" />
+              </div>
+              <div>
+                <Label>Clave de acceso del bono (opcional)</Label>
+                <Input value={product.bonus_access_key ?? ""} onChange={(e) => update("bonus_access_key", e.target.value)} placeholder="Solo si el PDF la requiere" />
+              </div>
+            </div>
           </Card>
 
           <Card className="p-6 space-y-4">

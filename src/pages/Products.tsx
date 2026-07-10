@@ -82,7 +82,7 @@ const Products = () => {
         return false;
       return true;
     });
-  }, [type, language, search]);
+  }, [type, language, search, products]);
 
   // Group products that share a groupId so digital + physical appear in a single card
   type Group = {

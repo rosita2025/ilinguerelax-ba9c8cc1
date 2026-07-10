@@ -111,6 +111,7 @@ export type Database = {
           bonus_access_key: string | null
           bonus_drive_url: string | null
           bonus_name: string | null
+          bonuses: Json
           cover_image_url: string | null
           created_at: string
           description: string | null
@@ -135,6 +136,7 @@ export type Database = {
           bonus_access_key?: string | null
           bonus_drive_url?: string | null
           bonus_name?: string | null
+          bonuses?: Json
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -159,6 +161,7 @@ export type Database = {
           bonus_access_key?: string | null
           bonus_drive_url?: string | null
           bonus_name?: string | null
+          bonuses?: Json
           cover_image_url?: string | null
           created_at?: string
           description?: string | null

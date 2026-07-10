@@ -452,13 +452,17 @@ export function PaymentMethodsGroup() {
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
                   <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                    {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
+                  </p>
                   {!local.isUsd && !local.loading && (
-                    <p className="text-[11px] text-neutral-500 mt-1">≈ {local.formatted}</p>
+                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
                   )}
                 </div>
                 <PayPalButtons
                   amountUsd={Number(totalUsd)}
+                  localCurrency={local.currency}
+                  localAmount={local.amount}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "ILINGUE RELAX"}
                   buyerEmail={buyer.email.trim() || undefined}
                   onApproved={(orderId) => {
@@ -471,6 +475,7 @@ export function PaymentMethodsGroup() {
                     navigate(`/checkouts/success?paypal_order=${encodeURIComponent(orderId)}`);
                   }}
                 />
+
                 <p className="text-[11px] text-center text-neutral-500">
                   {language === "en" ? "Secure checkout by PayPal." : language === "pt" ? "Checkout seguro pelo PayPal." : language === "fr" ? "Paiement sécurisé par PayPal." : "Pago seguro procesado por PayPal."}
                 </p>

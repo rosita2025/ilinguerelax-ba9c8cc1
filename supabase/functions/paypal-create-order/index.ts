@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
     }
 
     console.log(JSON.stringify({
-      trace: traceId, fn: "paypal-create-order", phase: "input",
+      corr: correlationId, trace: traceId, fn: "paypal-create-order", phase: "input",
       env: PAYPAL_ENV, country: country ?? null,
       requested: { currency: currencyReq, amount: amountReq, amountUsd: amountUsdHint ?? null },
       resolved: { currency, amount },
@@ -69,18 +69,25 @@ Deno.serve(async (req) => {
     }));
 
     if (!amount || amount < 1) {
-      console.warn(JSON.stringify({ trace: traceId, fn: "paypal-create-order", phase: "reject", reason: "invalid_amount", amount }));
-      return new Response(JSON.stringify({ error: "Invalid amount", trace: traceId }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.warn(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-create-order", phase: "reject", reason: "invalid_amount", amount }));
+      return new Response(JSON.stringify({ error: "Invalid amount", trace: traceId, correlationId }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
       });
     }
     const token = await getAccessToken();
     const orderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        // Idempotency: PayPal dedupes repeat POSTs with the same key for 6h.
+        "PayPal-Request-Id": correlationId,
+      },
       body: JSON.stringify({
         intent: "CAPTURE",
         purchase_units: [{
+          reference_id: correlationId.slice(0, 255),
+          custom_id: correlationId.slice(0, 127),
           amount: { currency_code: currency, value: amount.toFixed(2) },
           description,
         }],
@@ -95,21 +102,21 @@ Deno.serve(async (req) => {
     const data = await orderRes.json();
     if (!orderRes.ok) {
       console.error(JSON.stringify({
-        trace: traceId, fn: "paypal-create-order", phase: "paypal_error",
+        corr: correlationId, trace: traceId, fn: "paypal-create-order", phase: "paypal_error",
         status: orderRes.status, error: data, currency, amount,
         ms: Date.now() - t0,
       }));
-      return new Response(JSON.stringify({ error: data, trace: traceId }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ error: data, trace: traceId, correlationId }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
       });
     }
     console.log(JSON.stringify({
-      trace: traceId, fn: "paypal-create-order", phase: "created",
+      corr: correlationId, trace: traceId, fn: "paypal-create-order", phase: "created",
       orderId: data.id, status: data.status, currency, amount,
       fallback: fallbackApplied, ms: Date.now() - t0,
     }));
-    return new Response(JSON.stringify({ id: data.id, currency, amount, fallbackApplied, trace: traceId }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ id: data.id, currency, amount, fallbackApplied, trace: traceId, correlationId }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
     });
   } catch (e) {
     console.error(JSON.stringify({ trace: traceId, fn: "paypal-create-order", phase: "exception", error: (e as Error).message, ms: Date.now() - t0 }));
@@ -118,4 +125,5 @@ Deno.serve(async (req) => {
     });
   }
 });
+
 

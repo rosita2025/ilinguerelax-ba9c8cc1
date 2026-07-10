@@ -6,9 +6,12 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 export default function CheckoutPrueba1() {
   const { resetToDefaults } = useCheckoutPruebaStore();
+  const region = useRegionTier();
+  const isPeru = (region.country || "").toUpperCase() === "PE";
 
   return (
     <div className="min-h-screen bg-background">

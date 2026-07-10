@@ -51,13 +51,13 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
       )}
 
       <div className={cn("p-5 space-y-4", collapsible && !expanded && "hidden lg:block")}>
-        <h2 className="hidden lg:block text-lg font-semibold">Tu pedido</h2>
+        <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
 
         {/* Badge de región oculto al cliente (solo se aplica el precio por IP internamente) */}
 
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            Carrito vacío
+            {t.emptyCart}
           </p>
         ) : (
           <div className="space-y-3">

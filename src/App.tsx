@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";
 import { BrevoChatToggle } from "@/components/BrevoChatToggle";
+import { AutoTranslate } from "@/components/AutoTranslate";
 
 const Products = lazy(() => import("./pages/Products"));
 const Product5000 = lazy(() => import("./pages/Product5000"));

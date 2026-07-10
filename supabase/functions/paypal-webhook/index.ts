@@ -158,17 +158,32 @@ Deno.serve(async (req) => {
     // Business-level side effects per event type. Keep light — heavy work
     // should be queued so we always ACK PayPal quickly.
     switch (eventType) {
-      case "PAYMENT.CAPTURE.COMPLETED":
+      case "PAYMENT.CAPTURE.COMPLETED": {
+        const payer = resource.payer ?? event.resource?.payer ?? {};
+        const payerEmail = payer.email_address ?? null;
+        const payerName = [payer.name?.given_name, payer.name?.surname].filter(Boolean).join(" ").trim() || undefined;
         log("capture_completed", {
           corr: correlationId,
           captureId: resource.id ?? null,
           amount: resource.amount?.value ?? null,
           currency: resource.amount?.currency_code ?? null,
-          payerCountry: resource.payer?.address?.country_code
-            ?? event.resource?.payer?.address?.country_code
-            ?? null,
+          payerCountry: payer.address?.country_code ?? null,
+          payerEmail: payerEmail ? "present" : "missing",
         });
+        if (payerEmail) {
+          const amt = resource.amount?.value ? Number(resource.amount.value) : undefined;
+          await sendThankYouEmail({
+            customerEmail: payerEmail,
+            customerName: payerName,
+            productName: pu.description || pu.items?.[0]?.name || "Pedido ILINGUE RELAX",
+            amount: Number.isFinite(amt) ? amt : undefined,
+            currency: resource.amount?.currency_code ?? "USD",
+            provider: "paypal",
+          });
+        }
         break;
+      }
+
       case "PAYMENT.CAPTURE.DENIED":
       case "PAYMENT.CAPTURE.REVERSED":
       case "PAYMENT.CAPTURE.REFUNDED":

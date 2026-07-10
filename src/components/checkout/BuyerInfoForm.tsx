@@ -80,7 +80,7 @@ export function BuyerInfoForm() {
 
       <div className="space-y-3">
         <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">Nombre completo *</span>
+          <span className="text-xs font-medium text-muted-foreground">{t.fullName}</span>
           <div className="relative mt-1">
             <User className={cn(
               "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",

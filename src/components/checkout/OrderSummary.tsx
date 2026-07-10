@@ -31,7 +31,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const handleApplyCoupon = () => {
     setCouponError(null);
     const ok = applyCoupon(couponInput);
-    if (!ok) setCouponError("Cupón inválido");
+    if (!ok) setCouponError(t.invalidCoupon);
     else setCouponInput("");
   };
 

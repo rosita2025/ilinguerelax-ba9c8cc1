@@ -25,6 +25,9 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
+
+const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
 
 const CART_ITEM = {
   id: "1000-verbos-ingles",
@@ -50,6 +53,8 @@ const Product1000Verbos = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clear = useCheckoutPruebaStore((s) => s.clear);
+  const { country } = useRegionTier();
+  const isPeru = country === "PE";
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",
@@ -71,10 +76,14 @@ const Product1000Verbos = () => {
       currency: "USD",
       num_items: 1,
     });
-    clear();
-    addItem({ ...CART_ITEM, quantity: 1 });
-    toast.success("Producto agregado al carrito");
-    navigate("/checkouts/1000-verbos");
+    if (isPeru) {
+      clear();
+      addItem({ ...CART_ITEM, quantity: 1 });
+      toast.success("Producto agregado al carrito");
+      navigate("/checkouts/1000-verbos");
+    } else {
+      window.location.href = HOTMART_URL;
+    }
   };
 
   const handleAddToCart = () => {
@@ -206,17 +215,19 @@ const Product1000Verbos = () => {
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full mb-4 text-base py-5 border-2"
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Agregar al carrito
-                </Button>
-              </motion.div>
+              {isPeru && (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full mb-4 text-base py-5 border-2"
+                    onClick={handleAddToCart}
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Agregar al carrito
+                  </Button>
+                </motion.div>
+              )}
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👆 Haz clic para asegurar tu copia al precio de oferta
@@ -298,7 +309,7 @@ const Product1000Verbos = () => {
         rating={4.8}
         reviewCount={350}
         showReviews={true}
-        buyUrl="/checkouts/1000-verbos"
+        buyUrl={isPeru ? "/checkouts/1000-verbos" : HOTMART_URL}
         onBuyClick={handleBuy}
       />
 

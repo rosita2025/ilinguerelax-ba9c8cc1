@@ -65,15 +65,48 @@ export const CartDrawer = () => {
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
     applyDiscount, removeDiscount, syncError, retrySync
   } = useCartStore();
-  
+
+  const navigate = useNavigate();
+  const tier = useRegionTier();
+  const internalItems = useCheckoutPruebaStore((s) => s.items);
+  const removeInternal = useCheckoutPruebaStore((s) => s.removeItem);
+  const updateInternalQty = useCheckoutPruebaStore((s) => s.updateQuantity);
+
+  // Map internal item id -> checkout slug (first match wins)
+  const slugByInternalId = (() => {
+    const map: Record<string, string> = {};
+    for (const [slug, cat] of Object.entries(CHECKOUT_CATALOG)) {
+      if (!map[cat.id]) map[cat.id] = slug;
+    }
+    return map;
+  })();
+
+  // Only surface items that were added via product pages (i.e. have a matching checkout slug).
+  // Default seeded items without a slug shouldn't clutter the site-wide drawer.
+  const visibleInternalItems = internalItems.filter((i) => slugByInternalId[i.id]);
+  const internalCount = visibleInternalItems.reduce((s, i) => s + i.quantity, 0);
+  const internalSubtotal = visibleInternalItems.reduce(
+    (s, i) => s + itemPrice(i, tier) * i.quantity,
+    0,
+  );
+
   const [couponInput, setCouponInput] = useState("");
   const [isApplying, setIsApplying] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0) + internalCount;
   const subtotalPrice = items.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
-  
+
   const appliedDiscount = discountCodes.find(dc => dc.applicable);
+
+  const goToInternalCheckout = () => {
+    const first = visibleInternalItems[0];
+    if (!first) return;
+    const slug = slugByInternalId[first.id];
+    if (!slug) return;
+    setDrawerOpen(false);
+    navigate(`/checkouts/${slug}`);
+  };
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();

@@ -172,13 +172,17 @@ Deno.serve(async (req) => {
         });
         if (payerEmail) {
           const amt = resource.amount?.value ? Number(resource.amount.value) : undefined;
+          const captureId2 = resource.id ?? null;
           await sendThankYouEmail({
             customerEmail: payerEmail,
             customerName: payerName,
+            customerCountry: payer.address?.country_code || undefined,
             productName: pu.description || pu.items?.[0]?.name || "Pedido ILINGUE RELAX",
             amount: Number.isFinite(amt) ? amt : undefined,
             currency: resource.amount?.currency_code ?? "USD",
             provider: "paypal",
+            orderNumber: captureId2 ? `ILR-PP-${String(captureId2).slice(-8).toUpperCase()}` : undefined,
+            idempotencyKey: captureId2 || undefined,
           });
         }
         break;

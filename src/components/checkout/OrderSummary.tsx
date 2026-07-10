@@ -158,7 +158,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
                   onClick={handleApplyCoupon}
                   disabled={!couponInput.trim()}
                 >
-                  Aplicar
+                  {t.applyCoupon}
                 </Button>
               </div>
               {couponError && (

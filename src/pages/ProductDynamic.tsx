@@ -22,23 +22,27 @@ interface DBProduct {
   active: boolean;
   bonuses: unknown;
   hotmart_url: string | null;
+  store_enabled: boolean;
+  excluded_countries: string[] | null;
 }
 
-/**
- * Países que usan el checkout propio de la tienda (ILINGUE RELAX):
- * Perú + Norteamérica + Europa/UK + Asia + Oceanía angloparlante.
- * El resto de Latinoamérica ve el botón de Hotmart si el producto tiene enlace configurado.
- */
-const STORE_CHECKOUT_COUNTRIES = new Set([
-  // LATAM excepción (Perú)
-  "PE",
-  // Angloparlantes / Norteamérica
-  "US", "CA", "GB", "IE", "AU", "NZ",
-  // Europa
-  "ES", "FR", "DE", "IT", "PT", "NL", "BE", "AT", "CH", "SE", "NO", "DK", "FI", "GR", "PL", "CZ",
-  // Asia
-  "JP", "KR", "CN", "HK", "TW", "SG", "MY", "TH", "PH", "ID", "VN", "IN", "AE", "SA", "IL", "TR",
-]);
+const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [
+  { code: "auto", label: "🌐 Auto (detectar por IP)" },
+  { code: "PE", label: "🇵🇪 Perú" },
+  { code: "MX", label: "🇲🇽 México" },
+  { code: "CO", label: "🇨🇴 Colombia" },
+  { code: "AR", label: "🇦🇷 Argentina" },
+  { code: "CL", label: "🇨🇱 Chile" },
+  { code: "BR", label: "🇧🇷 Brasil" },
+  { code: "US", label: "🇺🇸 Estados Unidos" },
+  { code: "CA", label: "🇨🇦 Canadá" },
+  { code: "GB", label: "🇬🇧 Reino Unido" },
+  { code: "ES", label: "🇪🇸 España" },
+  { code: "FR", label: "🇫🇷 Francia" },
+  { code: "DE", label: "🇩🇪 Alemania" },
+  { code: "JP", label: "🇯🇵 Japón" },
+  { code: "KR", label: "🇰🇷 Corea" },
+];
 
 const FLAG: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",

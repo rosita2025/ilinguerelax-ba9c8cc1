@@ -17,7 +17,7 @@ export default function CheckoutSuccess() {
   const paypalToken = sp.get("token") || sp.get("PayerID");
   const provider = sp.get("session_id")
     ? "stripe"
-    : paypalToken
+    : (paypalToken || sp.get("paypal_order"))
     ? "paypal"
     : sp.get("payment_id") || sp.get("collection_id")
     ? "mercadopago"

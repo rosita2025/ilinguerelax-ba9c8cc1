@@ -214,8 +214,31 @@ export function PaymentMethodsGroup() {
   // Métodos locales de Perú (Mercado Pago transferencias/efectivo + Yape/Plin manual)
   // SOLO se muestran cuando el visitante está en Perú. Fuera de Perú, únicamente Stripe.
   const isPeru = (region.country || "").toUpperCase() === "PE";
+
+  // Marcas de tarjeta / wallets visibles por región. Stripe activa el método real
+  // automáticamente según el país del comprador; nosotros solo mostramos los
+  // logos correctos para que el cliente reconozca sus opciones y confíe.
+  const country = (region.country || "").toUpperCase();
+  const cardBrandsByCountry = (c: string): string[] => {
+    // Base universal
+    const base = ["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay", "Link"];
+    // USA / Canadá
+    if (["US", "CA"].includes(c)) return [...base, "Discover"];
+    // Europa (Cash App no aplica; añadimos wallets locales relevantes)
+    if (["ES","FR","DE","IT","PT","NL","BE","IE","GB","UK","AT","FI","LU","DK","SE","NO","PL","CH"].includes(c)) {
+      return ["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay", "Link", "Klarna"];
+    }
+    // Asia / Angloparlantes (AU/NZ/SG/HK/JP)
+    if (["AU","NZ","SG","HK","JP","KR"].includes(c)) return base;
+    return base;
+  };
+  const cardBrands = cardBrandsByCountry(country);
+  const cardSubtitle = isPeru
+    ? `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`
+    : `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${local.currency || "tu moneda local"}${localBadge}`;
+
   const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`, badge: "Stripe" },
+    { id: "card", icon: CreditCard, title: isPeru ? "Tarjeta, Apple Pay o Link" : "Tarjeta débito o crédito", sub: cardSubtitle, badge: "Stripe" },
     { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: `BCP · BBVA · Interbank · Scotiabank · Conversión automática${localBadge}`, badge: priceBadge },
     { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: `PagoEfectivo · Western Union · Tambo · Kasnet${localBadge}`, badge: priceBadge },
     { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: priceBadge },
@@ -302,8 +325,42 @@ export function PaymentMethodsGroup() {
               )} />
             </button>
 
+            {/* Strip visual de marcas — visible SIEMPRE en la tarjeta de "card",
+                también cuando el embed aún no se abrió. Da confianza inmediata
+                al reconocer Visa/Mastercard/Apple Pay/etc. */}
+            {m.id === "card" && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-neutral-900/60 px-3 sm:px-4 py-2.5 flex flex-wrap items-center gap-1.5">
+                {cardBrands.map((b) => (
+                  <span
+                    key={b}
+                    className="text-[10px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 shadow-sm"
+                  >
+                    {b}
+                  </span>
+                ))}
+                <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-auto whitespace-nowrap">
+                  Se activa automáticamente según tu país
+                </span>
+              </div>
+            )}
+
             {m.id === "card" && isSelected && showStripe && stripePromise && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950">
+                {/* Trust row encima del embed */}
+                <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="font-medium">SSL 256-bit</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-[8px] font-bold shrink-0">✓</span>
+                    <span className="font-medium">Stripe verificado</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 justify-end">
+                    <MessageCircle className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
+                    <span className="font-medium">Soporte 24h</span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
                 </div>
@@ -314,6 +371,7 @@ export function PaymentMethodsGroup() {
                 </div>
               </div>
             )}
+
 
             {m.id === "yape" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">

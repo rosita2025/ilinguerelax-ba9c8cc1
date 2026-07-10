@@ -152,6 +152,7 @@ export function BuyerInfoForm() {
           </span>
           <div className="mt-1 phone-input-wrap">
             <PhoneInput
+              flags={flags}
               international
               defaultCountry={(region.country as any) || "PE"}
               value={buyer.phone ?? ""}

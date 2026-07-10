@@ -52,7 +52,7 @@ Todos nuestros proveedores cumplen con estándares de seguridad y protección de
     title: "Almacenamiento y Seguridad",
     content: `Tus datos se almacenan en servidores seguros de Supabase (infraestructura cloud con encriptación en tránsito y en reposo). Implementamos medidas de seguridad técnicas y organizativas para proteger tu información contra acceso no autorizado, alteración, divulgación o destrucción.
 
-Los productos digitales se entregan mediante links de descarga únicos o acceso a plataformas seguras (Hotmart). Los libros físicos se envían a través de Shopify y sus socios logísticos.`
+Los productos digitales se entregan mediante links de descarga únicos o acceso a plataformas seguras (Hotmart). Los libros físicos estarán disponibles próximamente a través de la tienda de Amazon y se envían mediante sus socios logísticos.`
   },
   {
     icon: Cookie,

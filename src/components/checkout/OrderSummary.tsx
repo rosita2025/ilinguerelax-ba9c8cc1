@@ -20,7 +20,9 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const local = useLocalCurrency(total);
   const hasRegionalItem = items.some((i) => i.regionPrices);
+
 
   const handleApplyCoupon = () => {
     setCouponError(null);

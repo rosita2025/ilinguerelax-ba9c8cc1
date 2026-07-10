@@ -273,7 +273,7 @@ const Product1000Verbos = () => {
         rating={4.8}
         reviewCount={350}
         showReviews={true}
-        buyUrl={HOTMART_URL}
+        buyUrl="/checkouts/prueba-1"
         onBuyClick={handleBuy}
       />
 

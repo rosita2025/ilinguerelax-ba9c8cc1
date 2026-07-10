@@ -41,6 +41,8 @@ export function PaymentMethodsGroup() {
   const [stripeError, setStripeError] = useState<string | null>(null);
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
+  const [stripeElapsed, setStripeElapsed] = useState(0);
+  const [stripeAutoRetried, setStripeAutoRetried] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);

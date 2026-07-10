@@ -109,7 +109,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
     })();
     return () => { cancelled = true; };
     // Re-render buttons when amount/email/description change.
-  }, [amountUsd, description, buyerEmail]);
+  }, [amount, currency, description, buyerEmail]);
 
   return (
     <div className="space-y-2">

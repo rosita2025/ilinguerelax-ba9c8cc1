@@ -361,7 +361,17 @@ export function PaymentMethodsGroup() {
             )}
 
             {m.id === "card" && isSelected && showStripe && stripePromise && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950">
+              <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
+                {/* Aviso claro: falta 1 paso más (llenar tarjeta y pagar dentro de Stripe) */}
+                <div className="px-3 sm:px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-[12px] sm:text-sm text-amber-900 dark:text-amber-200 font-medium text-center">
+                  ⬇️ {language === "en"
+                    ? "Last step: enter your card and press Pay below."
+                    : language === "pt"
+                      ? "Último passo: digite seu cartão e toque em Pagar abaixo."
+                      : language === "fr"
+                        ? "Dernière étape : saisis ta carte et appuie sur Payer ci-dessous."
+                        : "Último paso: ingresa tu tarjeta y pulsa Pagar aquí abajo."}
+                </div>
                 {/* Trust row encima del embed */}
                 <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300">
                   <div className="flex items-center gap-1.5">

@@ -22,16 +22,51 @@ async function getAccessToken(): Promise<string> {
   return data.access_token;
 }
 
+// PayPal-supported currencies (server-side allowlist). Anything else -> USD fallback.
+const PAYPAL_SUPPORTED = new Set([
+  "AUD","BRL","CAD","CNY","CZK","DKK","EUR","HKD","HUF","ILS","JPY",
+  "MYR","MXN","TWD","NZD","NOK","PHP","PLN","GBP","RUB","SGD","SEK","CHF","THB","USD",
+]);
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const traceId = crypto.randomUUID();
+  const t0 = Date.now();
   try {
     const body = await req.json().catch(() => ({}));
-    const amount = Number(body.amount);
-    const currency = String(body.currency ?? "USD").toUpperCase().slice(0, 3);
+    const amountReq = Number(body.amount);
+    const currencyReq = String(body.currency ?? "USD").toUpperCase().slice(0, 3);
+    const amountUsdHint = body.amountUsd != null ? Number(body.amountUsd) : undefined;
+    const country = body.country ? String(body.country).toUpperCase().slice(0, 2) : undefined;
     const description = String(body.description ?? "ILINGUE RELAX").slice(0, 127);
     const buyerEmail = body.buyerEmail ? String(body.buyerEmail).slice(0, 254) : undefined;
+
+    // Decide currency + amount with explicit fallback trace.
+    let currency = currencyReq;
+    let amount = amountReq;
+    let fallbackApplied = false;
+    let fallbackReason: string | null = null;
+    if (!PAYPAL_SUPPORTED.has(currency)) {
+      fallbackApplied = true;
+      fallbackReason = `currency_not_supported:${currency}`;
+      currency = "USD";
+      if (Number.isFinite(amountUsdHint) && (amountUsdHint as number) > 0) {
+        amount = amountUsdHint as number;
+      }
+    }
+
+    console.log(JSON.stringify({
+      trace: traceId, fn: "paypal-create-order", phase: "input",
+      env: PAYPAL_ENV, country: country ?? null,
+      requested: { currency: currencyReq, amount: amountReq, amountUsd: amountUsdHint ?? null },
+      resolved: { currency, amount },
+      fallback: { applied: fallbackApplied, reason: fallbackReason },
+      hasEmail: !!buyerEmail,
+    }));
+
     if (!amount || amount < 1) {
-      return new Response(JSON.stringify({ error: "Invalid amount" }), {
+      console.warn(JSON.stringify({ trace: traceId, fn: "paypal-create-order", phase: "reject", reason: "invalid_amount", amount }));
+      return new Response(JSON.stringify({ error: "Invalid amount", trace: traceId }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -55,16 +90,28 @@ Deno.serve(async (req) => {
     });
     const data = await orderRes.json();
     if (!orderRes.ok) {
-      return new Response(JSON.stringify({ error: data }), {
+      console.error(JSON.stringify({
+        trace: traceId, fn: "paypal-create-order", phase: "paypal_error",
+        status: orderRes.status, error: data, currency, amount,
+        ms: Date.now() - t0,
+      }));
+      return new Response(JSON.stringify({ error: data, trace: traceId }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    return new Response(JSON.stringify({ id: data.id }), {
+    console.log(JSON.stringify({
+      trace: traceId, fn: "paypal-create-order", phase: "created",
+      orderId: data.id, status: data.status, currency, amount,
+      fallback: fallbackApplied, ms: Date.now() - t0,
+    }));
+    return new Response(JSON.stringify({ id: data.id, currency, amount, fallbackApplied, trace: traceId }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: (e as Error).message }), {
+    console.error(JSON.stringify({ trace: traceId, fn: "paypal-create-order", phase: "exception", error: (e as Error).message, ms: Date.now() - t0 }));
+    return new Response(JSON.stringify({ error: (e as Error).message, trace: traceId }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
+

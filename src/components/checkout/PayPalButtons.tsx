@@ -77,7 +77,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
           style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 },
           createOrder: async () => {
             const { data, error } = await supabase.functions.invoke("paypal-create-order", {
-              body: { amount, currency, description, buyerEmail },
+              body: { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail },
             });
 
             if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");

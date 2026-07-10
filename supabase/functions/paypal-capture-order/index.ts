@@ -23,11 +23,15 @@ async function getAccessToken(): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const traceId = crypto.randomUUID();
+  const t0 = Date.now();
   try {
     const body = await req.json().catch(() => ({}));
     const orderId = String(body.orderId ?? "").trim();
+    console.log(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "input", env: PAYPAL_ENV, orderId }));
     if (!/^[A-Z0-9]{5,32}$/i.test(orderId)) {
-      return new Response(JSON.stringify({ error: "Invalid orderId" }), {
+      console.warn(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "reject", reason: "invalid_orderId", orderId }));
+      return new Response(JSON.stringify({ error: "Invalid orderId", trace: traceId }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -38,17 +42,41 @@ Deno.serve(async (req) => {
     });
     const data = await res.json();
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: data }), {
+      console.error(JSON.stringify({
+        trace: traceId, fn: "paypal-capture-order", phase: "paypal_error",
+        status: res.status, error: data, orderId, ms: Date.now() - t0,
+      }));
+      return new Response(JSON.stringify({ error: data, trace: traceId }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     const status = data.status; // COMPLETED expected
-    return new Response(JSON.stringify({ status, order: data }), {
+    // Extract audit-friendly amounts from the capture payload.
+    const pu = Array.isArray(data.purchase_units) ? data.purchase_units[0] : undefined;
+    const cap = pu?.payments?.captures?.[0];
+    const capturedAmount = cap?.amount?.value ?? null;
+    const capturedCurrency = cap?.amount?.currency_code ?? null;
+    const captureId = cap?.id ?? null;
+    const payerEmail = data.payer?.email_address ?? null;
+    const payerCountry = data.payer?.address?.country_code ?? null;
+    console.log(JSON.stringify({
+      trace: traceId, fn: "paypal-capture-order", phase: "captured",
+      orderId, captureId, status,
+      amount: capturedAmount, currency: capturedCurrency,
+      payerCountry, hasPayerEmail: !!payerEmail,
+      ms: Date.now() - t0,
+    }));
+    return new Response(JSON.stringify({
+      status, order: data, trace: traceId,
+      audit: { orderId, captureId, amount: capturedAmount, currency: capturedCurrency, payerCountry },
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: (e as Error).message }), {
+    console.error(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "exception", error: (e as Error).message, ms: Date.now() - t0 }));
+    return new Response(JSON.stringify({ error: (e as Error).message, trace: traceId }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
+

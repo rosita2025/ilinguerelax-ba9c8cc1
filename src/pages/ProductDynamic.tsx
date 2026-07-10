@@ -85,7 +85,7 @@ const ProductDynamic = () => {
         title={`${product.name} | ILINGUE RELAX`}
         description={product.description || `${product.name} — descarga digital inmediata.`}
         canonicalUrl={canonical}
-        ogImage={cover}
+        image={cover}
       />
       <Navbar />
       <main className="min-h-dvh bg-background pt-4 pb-16">

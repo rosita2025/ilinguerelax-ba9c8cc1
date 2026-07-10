@@ -47,6 +47,17 @@ function LinkBadge() {
   );
 }
 
+function BankBadge({ label, bg, color }: { label: string; bg: string; color: string }) {
+  return (
+    <span
+      className="inline-flex items-center justify-center h-8 px-2.5 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm text-[11px] font-bold tracking-tight leading-none"
+      style={{ background: bg, color }}
+    >
+      {label}
+    </span>
+  );
+}
+
 
 
 const YAPE_PHONE = "972119741";

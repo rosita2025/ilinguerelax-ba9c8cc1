@@ -449,9 +449,9 @@ export function PaymentMethodsGroup() {
           )}
         >
           {mpLoading ? (
-            <><Loader2 className="w-5 h-5 animate-spin" /> Redirigiendo…</>
+            <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : (
-            <><Lock className="w-4 h-4" /> Comprar ahora</>
+            <><Lock className="w-4 h-4" /> {t.buyNow}</>
           )}
         </button>
       )}

@@ -24,6 +24,12 @@ export function PaymentMethodsGroup() {
   const { total } = calcTotals(items, couponPercent, region.tier);
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
+  // Badge principal: moneda local si el país no usa USD; si usa USD, muestra USD.
+  const priceBadge = local.loading
+    ? `USD $${totalUsd}`
+    : local.isUsd
+      ? `USD $${totalUsd}`
+      : `${local.formatted} · USD $${totalUsd}`;
   const localBadge = !local.isUsd && !local.loading ? ` · ≈ ${local.formatted}` : "";
 
 

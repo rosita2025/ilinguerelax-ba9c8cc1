@@ -204,12 +204,25 @@ export function PaymentMethodsGroup() {
     } catch { /* noop */ }
   };
 
-  const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
+  // Métodos locales de Perú (Mercado Pago transferencias/efectivo + Yape/Plin manual)
+  // SOLO se muestran cuando el visitante está en Perú. Fuera de Perú, únicamente Stripe.
+  const isPeru = (region.country || "").toUpperCase() === "PE";
+  const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
     { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`, badge: "Stripe" },
     { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: `BCP · BBVA · Interbank · Scotiabank · Conversión automática${localBadge}`, badge: priceBadge },
     { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: `PagoEfectivo · Western Union · Tambo · Kasnet${localBadge}`, badge: priceBadge },
     { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: priceBadge },
   ];
+  const methods = isPeru ? allMethods : allMethods.filter((m) => m.id === "card");
+
+  // Si el país cambia (p.ej. detección IP termina de resolver) y el método
+  // seleccionado ya no está disponible, resetea la selección a "card".
+  useEffect(() => {
+    if (!isPeru && selected && selected !== "card") {
+      setSelected("card");
+      setShowStripe(false);
+    }
+  }, [isPeru, selected]);
 
 
   const wasValidRef = useRef(valid);

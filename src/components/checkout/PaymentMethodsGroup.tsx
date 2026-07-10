@@ -449,7 +449,16 @@ export function PaymentMethodsGroup() {
                     </span>
                   )}
                 </div>
-                <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
+                {m.id === "card" ? (
+                  <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                    <BrandBadge label="VISA" bg="#1A1F71" color="#fff" />
+                    <BrandBadge label="MC" bg="#fff" color="#EB001B" border />
+                    <BrandBadge label=" Pay" bg="#000" color="#fff" prefix="apple" />
+                    <BrandBadge label="Link" bg="#00D66F" color="#0A2540" />
+                  </div>
+                ) : (
+                  <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
+                )}
               </div>
               <div className={cn(
                 "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",

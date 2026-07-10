@@ -1,19 +1,48 @@
 import type { PruebaItem } from "@/stores/checkoutPruebaStore";
 
+export interface UpsellItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  description?: string;
+  badge?: string;
+}
+
+export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
+  upsells?: UpsellItem[];
+}
+
 /**
  * Central checkout catalog — Shopify-style.
  * URL: /checkouts/:slug  →  auto-loads the matching product into the cart.
- *
- * Add new products by extending this map. Slugs should be short, kebab-case,
- * and stable (they appear in URLs, analytics and shared links).
+ * Optional `upsells` render as order-bumps the buyer can toggle.
  */
-export const CHECKOUT_CATALOG: Record<string, Omit<PruebaItem, "quantity">> = {
+export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "patrones-ingles": {
     id: "patrones-especiales-ingles",
     name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
-    price: 8, // ≈ S/29.90 PEN (Stripe/MP convierten auto)
+    price: 8,
     image: "/images/product-patrones-especiales.webp",
     description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
+    upsells: [
+      {
+        id: "upsell-1000-verbos",
+        name: "1,000 Verbos Esenciales en Inglés (PDF)",
+        price: 5,
+        image: "/images/product-1000-verbos.webp",
+        description: "Presente, pasado y futuro con pronunciación",
+        badge: "-50% solo hoy",
+      },
+      {
+        id: "upsell-500-preguntas",
+        name: "500 Preguntas en Inglés (PDF)",
+        price: 4,
+        image: "/images/product-500-preguntas.webp",
+        description: "Preguntas comunes con pronunciación adaptada",
+        badge: "Recomendado",
+      },
+    ],
   },
   "1000-verbos": {
     id: "1000-verbos-ingles",
@@ -21,6 +50,16 @@ export const CHECKOUT_CATALOG: Record<string, Omit<PruebaItem, "quantity">> = {
     price: 10,
     image: "/images/product-1000-verbos.webp",
     description: "1,000 verbos en presente, pasado y futuro con pronunciación",
+    upsells: [
+      {
+        id: "upsell-patrones-ingles",
+        name: "Patrones Especiales en Inglés (PDF)",
+        price: 5,
+        image: "/images/product-patrones-especiales.webp",
+        description: "Alfabeto + combinaciones secretas del inglés",
+        badge: "-37% solo hoy",
+      },
+    ],
   },
   "5000-spanish-words": {
     id: "5000-spanish-words",
@@ -39,7 +78,7 @@ export const CHECKOUT_CATALOG: Record<string, Omit<PruebaItem, "quantity">> = {
   },
 };
 
-export function getCatalogItem(slug: string | undefined): Omit<PruebaItem, "quantity"> | null {
+export function getCatalogItem(slug: string | undefined): CatalogItem | null {
   if (!slug) return null;
   return CHECKOUT_CATALOG[slug] ?? null;
 }

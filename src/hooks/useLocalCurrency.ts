@@ -82,6 +82,24 @@ const COUNTRY_TO_CURRENCY: Record<string, CurrencyInfo> = {
 
 const DEFAULT: CurrencyInfo = { code: "USD", symbol: "$", rate: 1, locale: "en-US" };
 
+/** Formatea un monto USD a la moneda local del país (no-hook, útil dentro de .map()). */
+export function formatLocalAmount(usdAmount: number, country: string): { formatted: string; isUsd: boolean } {
+  const info = COUNTRY_TO_CURRENCY[country] || DEFAULT;
+  const amount = roundNicely(usdAmount * info.rate);
+  const isUsd = info.code === "USD";
+  let formatted: string;
+  try {
+    formatted = new Intl.NumberFormat(info.locale, {
+      style: "currency",
+      currency: info.code,
+      maximumFractionDigits: amount >= 100 ? 0 : 2,
+    }).format(amount);
+  } catch {
+    formatted = `${info.symbol} ${amount.toLocaleString()}`;
+  }
+  return { formatted, isUsd };
+}
+
 export interface LocalPrice {
   country: string;
   currency: string;

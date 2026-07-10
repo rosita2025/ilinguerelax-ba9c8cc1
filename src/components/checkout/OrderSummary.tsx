@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency, formatLocalAmount } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
@@ -26,7 +26,12 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
-  const local = useLocalCurrency(total);
+  const localTotal = useLocalCurrency(total);
+  const localSubtotal = useLocalCurrency(subtotal);
+  const localDiscount = useLocalCurrency(discount);
+  const useLocal = !localTotal.isUsd && !localTotal.loading;
+  const fmtMoney = (usd: number, local: { formatted: string }) =>
+    useLocal ? local.formatted : `$${usd.toFixed(2)}`;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
 
@@ -48,7 +53,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             {expanded ? t.hideSummary : t.showSummary}
           </span>
-          <span className="text-lg font-bold">${total.toFixed(2)}</span>
+          <span className="text-lg font-bold">{fmtMoney(total, localTotal)}</span>
         </button>
       )}
 
@@ -115,12 +120,9 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                   )}
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
-                  ${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}
-                  {item.regionPrices && (
-                    <div className="text-[10px] font-normal text-muted-foreground">
-                      {region.tier === "latam" ? "🌎 LatAm" : "🌍 Internacional"}
-                    </div>
-                  )}
+                  {useLocal
+                    ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
+                    : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
                 </div>
               </div>
             ))}
@@ -175,12 +177,12 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{fmtMoney(subtotal, localSubtotal)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-${discount.toFixed(2)}</span>
+              <span>-{fmtMoney(discount, localDiscount)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
@@ -190,12 +192,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>USD ${total.toFixed(2)}</div>
-              {!local.isUsd && !local.loading && (
-                <div className="text-[11px] font-normal text-muted-foreground mt-0.5">
-                  ≈ {local.formatted} {t.inYourCurrency}
-                </div>
-              )}
+              <div>{useLocal ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
             </div>
           </div>
 

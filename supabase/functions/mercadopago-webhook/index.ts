@@ -161,6 +161,12 @@ Deno.serve(async (req) => {
     console.log("MP webhook received:", { type, dataId, action: body?.action });
 
     if (!dataId) {
+      await raiseAlert({
+        reason: "Webhook sin data.id",
+        severity: "warn",
+        event_type: type,
+        payload: body,
+      });
       return new Response(JSON.stringify({ received: true, ignored: "no data.id" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -169,7 +175,14 @@ Deno.serve(async (req) => {
 
     const ok = await verifySignature(req, dataId);
     if (!ok) {
-      console.error("Invalid MP signature");
+      await raiseAlert({
+        reason: "Firma HMAC inválida",
+        severity: "critical",
+        data_id: dataId,
+        event_type: type,
+        http_status: 401,
+        payload: body,
+      });
       return new Response("Invalid signature", { status: 401, headers: corsHeaders });
     }
 

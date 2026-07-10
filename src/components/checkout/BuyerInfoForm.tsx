@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { User, Mail, Phone, CheckCircle2, AlertCircle } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -14,6 +16,8 @@ export const BUYER_ERRORS_EVENT = "checkout:showBuyerErrors";
 
 export function BuyerInfoForm() {
   const { buyer, setBuyer } = useCheckoutPruebaStore();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const valid = isBuyerValid(buyer);
   const [showErrors, setShowErrors] = useState(false);
   const [shake, setShake] = useState(false);
@@ -58,25 +62,25 @@ export function BuyerInfoForm() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold">Tus datos</h2>
+          <h2 className="text-base font-semibold">{t.yourDetails}</h2>
           <p className="text-xs text-muted-foreground">
-            Recibirás el acceso al producto digital por correo.
+            {t.yourDetailsHint}
           </p>
         </div>
         {valid ? (
           <span className="flex items-center gap-1 text-xs text-primary font-medium">
-            <CheckCircle2 className="w-4 h-4" /> Listo
+            <CheckCircle2 className="w-4 h-4" /> {t.ready}
           </span>
         ) : showErrors ? (
           <span className="flex items-center gap-1 text-xs text-destructive font-medium">
-            <AlertCircle className="w-4 h-4" /> Requerido
+            <AlertCircle className="w-4 h-4" /> {t.required}
           </span>
         ) : null}
       </div>
 
       <div className="space-y-3">
         <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">Nombre completo *</span>
+          <span className="text-xs font-medium text-muted-foreground">{t.fullName}</span>
           <div className="relative mt-1">
             <User className={cn(
               "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",
@@ -89,7 +93,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.fullName}
               onChange={(e) => setBuyer({ fullName: e.target.value })}
-              placeholder="Ej. María López"
+              placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
               className={cn(
                 "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",
@@ -100,12 +104,12 @@ export function BuyerInfoForm() {
             />
           </div>
           {showNameError && (
-            <p className="text-[11px] text-destructive mt-1">Ingresa tu nombre completo.</p>
+            <p className="text-[11px] text-destructive mt-1">{t.fullNameError}</p>
           )}
         </label>
 
         <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">Correo electrónico *</span>
+          <span className="text-xs font-medium text-muted-foreground">{t.email}</span>
           <div className="relative mt-1">
             <Mail className={cn(
               "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",
@@ -118,7 +122,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.email}
               onChange={(e) => setBuyer({ email: e.target.value.trim() })}
-              placeholder="tucorreo@email.com"
+              placeholder={t.emailPlaceholder}
               aria-invalid={showEmailError}
               className={cn(
                 "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",
@@ -129,17 +133,17 @@ export function BuyerInfoForm() {
             />
           </div>
           {showEmailError ? (
-            <p className="text-[11px] text-destructive mt-1">Ingresa un correo válido.</p>
+            <p className="text-[11px] text-destructive mt-1">{t.emailError}</p>
           ) : (
             <p className="text-[11px] text-muted-foreground mt-1">
-              Aquí enviaremos tu acceso al producto digital.
+              {t.emailHint}
             </p>
           )}
         </label>
 
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            WhatsApp (opcional)
+            {t.whatsappOptional}
           </span>
           <div className="relative mt-1">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

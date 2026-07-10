@@ -7,10 +7,14 @@ import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 export default function CheckoutPrueba1() {
   const { resetToDefaults } = useCheckoutPruebaStore();
   const region = useRegionTier();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
 
   return (
@@ -33,10 +37,11 @@ export default function CheckoutPrueba1() {
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
             <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
             <span className="hidden sm:inline font-medium">
-              {isPeru ? "Stripe SSL · Mercado Pago" : "Stripe SSL · Pago seguro"}
+              {isPeru ? t.stripeSslMP : t.stripeSSL}
             </span>
             <span className="sm:hidden font-medium">SSL</span>
           </div>
+
 
         </div>
       </header>
@@ -52,13 +57,13 @@ export default function CheckoutPrueba1() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Encriptación SSL Stripe
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.sslEncryption}
             </span>
             {isPeru && (
               <>
                 <span>·</span>
                 <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Mercado Pago Perú
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.mercadoPagoPeru}
                 </span>
               </>
             )}
@@ -70,7 +75,7 @@ export default function CheckoutPrueba1() {
               rel="noopener noreferrer"
               className="flex items-center gap-1 hover:text-primary"
             >
-              <MessageCircle className="w-3.5 h-3.5" /> Soporte WhatsApp
+              <MessageCircle className="w-3.5 h-3.5" /> {t.whatsappSupport}
             </a>
           </div>
         </div>
@@ -83,7 +88,7 @@ export default function CheckoutPrueba1() {
             onClick={resetToDefaults}
             className="text-xs text-muted-foreground hover:text-primary mt-3 underline underline-offset-2"
           >
-            Restablecer productos de prueba
+            {t.resetTestProducts}
           </button>
         </aside>
       </div>

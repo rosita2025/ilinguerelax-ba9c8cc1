@@ -11,6 +11,8 @@ import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 type Method = "card" | "transfer" | "cash" | "yape";
 const YAPE_PHONE = "972119741";
@@ -21,6 +23,8 @@ export function PaymentMethodsGroup() {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const { total } = calcTotals(items, couponPercent, region.tier);
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
@@ -68,7 +72,7 @@ export function PaymentMethodsGroup() {
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
-    if (!isBuyerValid(s.buyer)) throw new Error("Completa tus datos");
+    if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
     const parts = s.buyer.fullName.trim().split(/\s+/);
     const firstName = parts[0].slice(0, 50);
     const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);
@@ -96,7 +100,7 @@ export function PaymentMethodsGroup() {
         returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
       },
     });
-    if (error || !data?.clientSecret) throw new Error(error?.message || "Error de pago");
+    if (error || !data?.clientSecret) throw new Error(error?.message || t.errorPayment);
     supabase.from("email_contacts").upsert({
       email: s.buyer.email.trim().toLowerCase(),
       name: s.buyer.fullName.trim(),
@@ -116,8 +120,8 @@ export function PaymentMethodsGroup() {
   const requestBuyerInfo = () => {
     window.dispatchEvent(new Event(BUYER_ERRORS_EVENT));
     toast({
-      title: "Completa tus datos primero",
-      description: "Ingresa tu nombre y correo para continuar con el pago.",
+      title: t.completeDataFirst,
+      description: t.completeDataFirstDesc,
       variant: "destructive",
     });
   };
@@ -161,14 +165,14 @@ export function PaymentMethodsGroup() {
           paymentType,
         },
       });
-      if (error || !data?.init_point) throw new Error(error?.message || "No se pudo crear la preferencia");
+      if (error || !data?.init_point) throw new Error(error?.message || t.mpError);
       window.location.assign(data.init_point);
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
       toast({
-        title: "Error Mercado Pago",
-        description: err instanceof Error ? err.message : "Intenta de nuevo",
+        title: t.mpError,
+        description: err instanceof Error ? err.message : t.tryAgain,
         variant: "destructive",
       });
     }
@@ -183,7 +187,7 @@ export function PaymentMethodsGroup() {
   const handleBuyNow = () => {
     if (!valid) { requestBuyerInfo(); return; }
     if (!selected) {
-      toast({ title: "Selecciona un método de pago", variant: "destructive" });
+      toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
     if (selected === "card") { setShowStripe(true); return; }
@@ -234,14 +238,14 @@ export function PaymentMethodsGroup() {
   };
   const cardBrands = cardBrandsByCountry(country);
   const cardSubtitle = isPeru
-    ? `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`
-    : `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${local.currency || "tu moneda local"}${localBadge}`;
+    ? t.cardSubtitlePeru(localBadge)
+    : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
 
   const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: isPeru ? "Tarjeta, Apple Pay o Link" : "Tarjeta débito o crédito", sub: cardSubtitle, badge: "Stripe" },
-    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: `BCP · BBVA · Interbank · Scotiabank · Conversión automática${localBadge}`, badge: priceBadge },
-    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: `PagoEfectivo · Western Union · Tambo · Kasnet${localBadge}`, badge: priceBadge },
-    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: priceBadge },
+    { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
+    { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
+    { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
+    { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
   ];
   const methods = isPeru ? allMethods : allMethods.filter((m) => m.id === "card");
 
@@ -268,7 +272,7 @@ export function PaymentMethodsGroup() {
   return (
     <div id="payment-methods" ref={methodsAnchorRef} className="space-y-3 scroll-mt-24">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {isPeru ? "Elige tu método de pago" : "Pago con tarjeta"}
+        {isPeru ? t.choosePaymentMethod : t.cardPayment}
       </h2>
 
       {methods.map((m) => {
@@ -339,7 +343,7 @@ export function PaymentMethodsGroup() {
                   </span>
                 ))}
                 <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-auto whitespace-nowrap">
-                  Se activa automáticamente según tu país
+                  {t.autoActivatesByCountry}
                 </span>
               </div>
             )}
@@ -350,19 +354,19 @@ export function PaymentMethodsGroup() {
                 <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300">
                   <div className="flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="font-medium">SSL 256-bit</span>
+                    <span className="font-medium">{t.ssl256}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-[8px] font-bold shrink-0">✓</span>
-                    <span className="font-medium">Stripe verificado</span>
+                    <span className="font-medium">{t.stripeVerified}</span>
                   </div>
                   <div className="flex items-center gap-1.5 justify-end">
                     <MessageCircle className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-                    <span className="font-medium">Soporte 24h</span>
+                    <span className="font-medium">{t.support24h}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
+                  <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
                 <div className="min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
                   <EmbeddedCheckoutProvider stripe={stripePromise} options={stripeOptions}>
@@ -376,7 +380,7 @@ export function PaymentMethodsGroup() {
             {m.id === "yape" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
                 <div className="text-center space-y-1">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">Envía el pago a</p>
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">{t.sendPaymentTo}</p>
                   <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{YAPE_NAME}</p>
                   <button
                     type="button"
@@ -386,20 +390,20 @@ export function PaymentMethodsGroup() {
                     {YAPE_PHONE}
                     {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                   </button>
-                  <p className="text-[11px] text-neutral-500">{copied ? "¡Copiado!" : "Toca para copiar el número"}</p>
+                  <p className="text-[11px] text-neutral-500">{copied ? t.copied : t.tapToCopy}</p>
                 </div>
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">Monto a pagar</p>
+                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
                   <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
-                  <p className="text-[11px] text-neutral-500 mt-1">Envía el equivalente en soles al tipo de cambio del día.</p>
+                  <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
                 </div>
 
                 <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
-                  <li>Abre tu app de <strong>Yape</strong> o <strong>Plin</strong>.</li>
-                  <li>Envía el equivalente de <strong>USD ${totalUsd}</strong> en soles al número <strong>{YAPE_PHONE}</strong> ({YAPE_NAME}).</li>
-                  <li>Guarda la captura del comprobante.</li>
-                  <li>Presiona <strong>“Ya pagué”</strong> y envíanos el comprobante por WhatsApp.</li>
+                  <li>{t.yapeStep1}</li>
+                  <li>{t.yapeStep2(totalUsd, YAPE_PHONE, YAPE_NAME)}</li>
+                  <li>{t.yapeStep3}</li>
+                  <li>{t.yapeStep4}</li>
                 </ol>
 
                 <button
@@ -407,7 +411,7 @@ export function PaymentMethodsGroup() {
                   onClick={handleManualPaid}
                   className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-3 rounded-xl transition-colors"
                 >
-                  Ya pagué → Enviar comprobante
+                  {t.alreadyPaid}
                 </button>
 
                 <a
@@ -416,13 +420,10 @@ export function PaymentMethodsGroup() {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
                 >
-                  <MessageCircle className="w-3.5 h-3.5" /> Enviar comprobante directo por WhatsApp
+                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
                 </a>
 
-                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">
-                  Nuestra <strong>Supervisora Rosa</strong> revisa los pagos manualmente desde Perú.
-                  Recibirás tu producto en <strong>1 a 24 horas</strong> tras confirmar el comprobante.
-                </p>
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
             )}
           </div>
@@ -431,7 +432,7 @@ export function PaymentMethodsGroup() {
 
       {!valid && (
         <p className="text-xs text-center text-muted-foreground pt-2">
-          👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.
+          {t.enableMethods}
         </p>
       )}
 
@@ -448,9 +449,9 @@ export function PaymentMethodsGroup() {
           )}
         >
           {mpLoading ? (
-            <><Loader2 className="w-5 h-5 animate-spin" /> Redirigiendo…</>
+            <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : (
-            <><Lock className="w-4 h-4" /> Comprar ahora</>
+            <><Lock className="w-4 h-4" /> {t.buyNow}</>
           )}
         </button>
       )}

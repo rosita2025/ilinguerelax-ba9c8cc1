@@ -6,6 +6,8 @@ import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkout
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 
 interface OrderSummaryProps {
@@ -16,6 +18,8 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
     useCheckoutPruebaStore();
   const region = useRegionTier();
+  const { language } = useI18n();
+  const t = getCheckoutUI(language);
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
@@ -27,7 +31,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
   const handleApplyCoupon = () => {
     setCouponError(null);
     const ok = applyCoupon(couponInput);
-    if (!ok) setCouponError("Cupón inválido");
+    if (!ok) setCouponError(t.invalidCoupon);
     else setCouponInput("");
   };
 
@@ -40,20 +44,20 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
         >
           <span className="flex items-center gap-2 text-sm font-medium">
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {expanded ? "Ocultar resumen" : "Ver resumen"}
+            {expanded ? t.hideSummary : t.showSummary}
           </span>
           <span className="text-lg font-bold">${total.toFixed(2)}</span>
         </button>
       )}
 
       <div className={cn("p-5 space-y-4", collapsible && !expanded && "hidden lg:block")}>
-        <h2 className="hidden lg:block text-lg font-semibold">Tu pedido</h2>
+        <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
 
         {/* Badge de región oculto al cliente (solo se aplica el precio por IP internamente) */}
 
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            Carrito vacío
+            {t.emptyCart}
           </p>
         ) : (
           <div className="space-y-3">
@@ -130,7 +134,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
                 onClick={removeCoupon}
                 type="button"
                 className="opacity-70 hover:opacity-100"
-                aria-label="Quitar cupón"
+                aria-label={t.removeCoupon}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -139,7 +143,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
             <div>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Código de descuento"
+                  placeholder={t.couponPlaceholder}
                   value={couponInput}
                   onChange={(e) => {
                     setCouponInput(e.target.value);
@@ -154,7 +158,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
                   onClick={handleApplyCoupon}
                   disabled={!couponInput.trim()}
                 >
-                  Aplicar
+                  {t.applyCoupon}
                 </Button>
               </div>
               {couponError && (
@@ -166,26 +170,26 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
 
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
-            <span>Subtotal</span>
+            <span>{t.subtotal}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
-              <span>Descuento</span>
+              <span>{t.discount}</span>
               <span>-${discount.toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
-            <span>Impuestos</span>
-            <span>Incluidos</span>
+            <span>{t.taxes}</span>
+            <span>{t.included}</span>
           </div>
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
-            <span>Total</span>
+            <span>{t.total}</span>
             <div className="text-right">
               <div>USD ${total.toFixed(2)}</div>
               {!local.isUsd && !local.loading && (
                 <div className="text-[11px] font-normal text-muted-foreground mt-0.5">
-                  ≈ {local.formatted} en tu moneda
+                  ≈ {local.formatted} {t.inYourCurrency}
                 </div>
               )}
             </div>

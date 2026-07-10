@@ -84,7 +84,7 @@ export default function CheckoutPrueba1() {
       </header>
 
       <div className="lg:hidden max-w-6xl mx-auto px-3 sm:px-4 pt-3">
-        <OrderSummary collapsible />
+        <OrderSummary collapsible locked={!!catalogItem} />
       </div>
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
@@ -118,7 +118,7 @@ export default function CheckoutPrueba1() {
         </div>
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
-          <OrderSummary />
+          <OrderSummary locked={!!catalogItem} />
         </aside>
       </div>
 

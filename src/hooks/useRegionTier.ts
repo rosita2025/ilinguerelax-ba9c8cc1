@@ -71,6 +71,21 @@ export interface RegionInfo {
  */
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
+    // Override manual para pruebas: ?country=US en la URL o localStorage("ilr_country_override")
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlOverride = params.get("country")?.toUpperCase();
+      if (urlOverride) {
+        try { localStorage.setItem("ilr_country_override", urlOverride); } catch { /* ignore */ }
+      }
+      const override = urlOverride || (() => {
+        try { return localStorage.getItem("ilr_country_override")?.toUpperCase() || ""; } catch { return ""; }
+      })();
+      if (override) {
+        try { localStorage.setItem("ilr_country", override); } catch { /* ignore */ }
+        return { tier: classify(override), country: override, loading: false };
+      }
+    }
     const cached = readCache();
     if (cached) return { tier: cached.tier, country: cached.country, loading: false };
     return { tier: "global", country: "", loading: true };

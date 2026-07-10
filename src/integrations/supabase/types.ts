@@ -116,6 +116,7 @@ export type Database = {
           created_at: string
           description: string | null
           drive_url: string | null
+          hotmart_url: string | null
           id: string
           is_upsell: boolean
           learner_language: string
@@ -141,6 +142,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           drive_url?: string | null
+          hotmart_url?: string | null
           id?: string
           is_upsell?: boolean
           learner_language?: string
@@ -166,6 +168,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           drive_url?: string | null
+          hotmart_url?: string | null
           id?: string
           is_upsell?: boolean
           learner_language?: string

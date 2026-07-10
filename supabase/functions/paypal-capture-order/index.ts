@@ -1,5 +1,6 @@
 // Capture a PayPal order server-side after buyer approves in the popup.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
@@ -78,6 +79,18 @@ Deno.serve(async (req) => {
       echoedCorr, corrMatches,
       ms: Date.now() - t0,
     }));
+    if (status === "COMPLETED" && payerEmail) {
+      const payerName = [data.payer?.name?.given_name, data.payer?.name?.surname].filter(Boolean).join(" ").trim() || undefined;
+      const productName = pu?.description || pu?.items?.[0]?.name || "Pedido ILINGUE RELAX";
+      await sendThankYouEmail({
+        customerEmail: payerEmail,
+        customerName: payerName,
+        productName,
+        amount: capturedAmount ? Number(capturedAmount) : undefined,
+        currency: capturedCurrency ?? "USD",
+        provider: "paypal",
+      });
+    }
     return new Response(JSON.stringify({
       status, order: data, trace: traceId, correlationId,
       audit: { orderId, captureId, amount: capturedAmount, currency: capturedCurrency, payerCountry, corrMatches },

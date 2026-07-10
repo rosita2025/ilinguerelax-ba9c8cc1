@@ -1,4 +1,7 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -98,7 +101,10 @@ const features = [
 
 const ProductPatronesEspeciales = () => {
   const { formatPrice, currency, countryCode } = useI18n();
-  const PRICE_USD = 8.08; // ≈ S/29.90 PEN (rate 3.70)
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const clearCart = useCheckoutPruebaStore((s) => s.clear);
+  const PRICE_USD = 8; // ≈ S/29.90 PEN — Stripe/Mercado Pago convierten automáticamente
   const ORIGINAL_USD = 19.99;
   const regional = getRegionalPricing(countryCode);
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
@@ -111,7 +117,7 @@ const ProductPatronesEspeciales = () => {
     content_category: "Digital Book",
     content_ids: ["patrones-especiales"],
     content_type: "product",
-      value: 8.08,
+    value: PRICE_USD,
     currency: "USD",
   }), []);
   useHotmartPixel(pixelParams);
@@ -126,7 +132,17 @@ const ProductPatronesEspeciales = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(HOTMART_URL, "_blank");
+    clearCart();
+    addItem({
+      id: "patrones-especiales-ingles",
+      name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
+      price: PRICE_USD,
+      image: productImage,
+      description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
+      quantity: 1,
+    });
+    toast.success("Producto agregado al carrito");
+    navigate("/checkouts/prueba-1");
   };
 
 
@@ -694,33 +710,9 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
-        onBuyClick={() => {
-          trackHotmartEvent("InitiateCheckout", {
-            content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-            content_category: "Digital Book",
-            content_ids: ["patrones-especiales"],
-            content_type: "product",
-            value: PRICE_USD,
-            currency: "USD",
-            num_items: 1,
-          });
-          window.open(usePaypalStripe ? PAYPAL_URL : HOTMART_URL, "_blank");
-        }}
-        ctaText={usePaypalStripe ? "PAGAR CON PAYPAL" : "COMPRAR AHORA"}
-        secondaryCtaText={usePaypalStripe ? "PAGAR CON STRIPE" : undefined}
-        onSecondaryClick={usePaypalStripe ? () => {
-          trackHotmartEvent("InitiateCheckout", {
-            content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-            content_category: "Digital Book",
-            content_ids: ["patrones-especiales"],
-            content_type: "product",
-            value: PRICE_USD,
-            currency: "USD",
-            num_items: 1,
-          });
-          window.open(STRIPE_URL, "_blank");
-        } : undefined}
+        buyUrl="/checkouts/prueba-1"
+        onBuyClick={handleBuy}
+        ctaText="COMPRAR AHORA"
       />
 
       <div className="h-20 md:h-16" />

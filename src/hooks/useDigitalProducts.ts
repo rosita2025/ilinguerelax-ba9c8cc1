@@ -49,8 +49,8 @@ function toProduct(p: DBProduct): Product {
     features: [],
     isPhysical: false,
     formats: ["digital"],
-    // Route DB products to their checkout page (no product page exists).
-    externalUrl: `/checkouts/${p.sku}`,
+    // Route DB products to their dynamic product page (Shopify-style /products/:sku).
+    externalUrl: `/products/${p.sku}`,
   };
 }
 

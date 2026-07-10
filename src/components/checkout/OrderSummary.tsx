@@ -12,9 +12,11 @@ import { getCheckoutUI } from "@/i18n/checkoutUI";
 
 interface OrderSummaryProps {
   collapsible?: boolean;
+  /** When true, hides quantity +/- and remove buttons (fixed single-product checkout). */
+  locked?: boolean;
 }
 
-export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
+export function OrderSummary({ collapsible = false, locked = false }: OrderSummaryProps) {
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
     useCheckoutPruebaStore();
   const region = useRegionTier();
@@ -79,36 +81,38 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
                   {item.description && (
                     <p className="text-xs text-muted-foreground truncate">{item.description}</p>
                   )}
-                  <div className="flex items-center gap-1 mt-1.5">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    <span className="text-xs w-6 text-center">{item.quantity}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 ml-auto text-muted-foreground hover:text-destructive"
-                      onClick={() => removeItem(item.id)}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
+                  {!locked && (
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      >
+                        <Minus className="w-3 h-3" />
+                      </Button>
+                      <span className="text-xs w-6 text-center">{item.quantity}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 ml-auto text-muted-foreground hover:text-destructive"
+                        onClick={() => removeItem(item.id)}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
                   ${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}

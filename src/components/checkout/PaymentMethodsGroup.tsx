@@ -255,11 +255,11 @@ export function PaymentMethodsGroup() {
   // el formulario embebido en cuanto el comprador completa sus datos, para
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
-    if (!isPeru) {
+    if (!isPeru && !(total <= 0 && items.length > 0)) {
       if (selected !== "card") setSelected("card");
       if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
-  }, [isPeru, selected, valid, stripePromise, showStripe]);
+  }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
 
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".

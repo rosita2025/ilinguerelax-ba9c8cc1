@@ -1,19 +1,96 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { resend } from "../_shared/brevo.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-  apiVersion: "2025-08-27.basil",
-});
-
+// NOTE: We do NOT instantiate the Stripe SDK here. There is no STRIPE_SECRET_KEY
+// in this project; API keys are opaque gateway connection IDs. Webhook signature
+// verification only needs HMAC-SHA256 against PAYMENTS_*_WEBHOOK_SECRET, so we
+// verify manually (same approach as the shared verifyWebhook helper) and try
+// both live and sandbox secrets so one endpoint serves both environments.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const labelStripeProduct = async (session: Stripe.Checkout.Session) => {
+const encoder = new TextEncoder();
+const toHex = (buf: ArrayBuffer) =>
+  Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+
+async function hmacSha256Hex(secret: string, message: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw", encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+  );
+  return toHex(await crypto.subtle.sign("HMAC", key, encoder.encode(message)));
+}
+
+function parseStripeSig(header: string): { t?: string; v1: string[] } {
+  const v1: string[] = [];
+  let t: string | undefined;
+  for (const part of header.split(",")) {
+    const [k, v] = part.split("=", 2);
+    if (k === "t") t = v;
+    if (k === "v1") v1.push(v);
+  }
+  return { t, v1 };
+}
+
+async function verifyStripeSignature(body: string, sigHeader: string): Promise<
+  { ok: true; env: "live" | "sandbox" } | { ok: false; reason: string }
+> {
+  const { t, v1 } = parseStripeSig(sigHeader);
+  if (!t || v1.length === 0) return { ok: false, reason: "malformed stripe-signature header" };
+  // 5 min tolerance
+  const age = Math.abs(Date.now() / 1000 - Number(t));
+  if (!Number.isFinite(age) || age > 300) return { ok: false, reason: `timestamp out of tolerance (${age}s)` };
+
+  const candidates: Array<{ env: "live" | "sandbox"; secret: string }> = [];
+  const live = Deno.env.get("PAYMENTS_LIVE_WEBHOOK_SECRET");
+  const sandbox = Deno.env.get("PAYMENTS_SANDBOX_WEBHOOK_SECRET");
+  if (live) candidates.push({ env: "live", secret: live });
+  if (sandbox) candidates.push({ env: "sandbox", secret: sandbox });
+  if (candidates.length === 0) return { ok: false, reason: "no webhook secret configured" };
+
+  for (const c of candidates) {
+    const expected = await hmacSha256Hex(c.secret, `${t}.${body}`);
+    if (v1.includes(expected)) return { ok: true, env: c.env };
+  }
+  return { ok: false, reason: "no matching v1 signature" };
+}
+
+async function raiseStripeAlert(reason: string, severity: "warn" | "error" | "critical", extra: Record<string, unknown> = {}) {
+  console.error(`[Stripe ALERT ${severity}] ${reason}`, extra);
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    let notified = false;
+    if (severity !== "warn") {
+      try {
+        const r = await resend.emails.send({
+          from: "Alertas ILINGUE <hola@ilinguerelax.com>",
+          to: ["hola@ilinguerelax.com"],
+          subject: `[Stripe Webhook ${severity.toUpperCase()}] ${reason}`,
+          html: `<h2>Stripe Webhook Alert</h2>
+            <p><b>Severity:</b> ${severity}</p>
+            <p><b>Reason:</b> ${reason}</p>
+            <pre style="background:#f4f4f4;padding:8px;overflow:auto;font-size:12px">${JSON.stringify(extra, null, 2).slice(0, 3000)}</pre>`,
+        });
+        notified = !!r;
+      } catch (e) { console.error("Stripe alert email failed:", e); }
+    }
+    await admin.from("webhook_alerts").insert({
+      provider: "stripe", severity, reason,
+      event_type: (extra.event_type as string) ?? null,
+      http_status: (extra.http_status as number) ?? null,
+      payload: extra, notified,
+    });
+  } catch (e) { console.error("raiseStripeAlert failed:", e); }
+}
+
+const labelStripeProduct = (session: any) => {
   const amount = (session.amount_total || 0) / 100;
   const currency = (session.currency || "usd").toUpperCase();
   if (Math.round(amount) === 22) {
@@ -26,46 +103,23 @@ const labelStripeProduct = async (session: Stripe.Checkout.Session) => {
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
-
-    // Try live secret first, then sandbox, then legacy STRIPE_WEBHOOK_SECRET.
-    // Stripe signs with ONE secret per endpoint, so we attempt each until one
-    // verifies. This lets the same handler serve both prod and test webhooks.
-    const candidates = [
-      Deno.env.get("PAYMENTS_LIVE_WEBHOOK_SECRET"),
-      Deno.env.get("PAYMENTS_SANDBOX_WEBHOOK_SECRET"),
-      Deno.env.get("STRIPE_WEBHOOK_SECRET"),
-    ].filter((s): s is string => !!s);
-
-    if (candidates.length === 0) {
-      console.error("No Stripe webhook secret configured (PAYMENTS_LIVE_WEBHOOK_SECRET / PAYMENTS_SANDBOX_WEBHOOK_SECRET)");
-      return new Response("Webhook secret not configured", { status: 500 });
-    }
     if (!sig) {
-      console.warn("Missing stripe-signature header");
+      await raiseStripeAlert("Missing stripe-signature header", "warn", { http_status: 400 });
       return new Response("Missing signature", { status: 400 });
     }
 
-    let event;
-    let lastErr = "";
-    for (const secret of candidates) {
-      try {
-        event = await stripe.webhooks.constructEventAsync(body, sig, secret);
-        break;
-      } catch (err) {
-        lastErr = err instanceof Error ? err.message : String(err);
-      }
+    const verified = await verifyStripeSignature(body, sig);
+    if (!verified.ok) {
+      await raiseStripeAlert(`Firma inválida: ${verified.reason}`, "critical", { http_status: 401 });
+      return new Response("Invalid signature", { status: 401 });
     }
-    if (!event) {
-      console.error("Stripe signature verification failed against all secrets:", lastErr);
-      return new Response("Invalid signature", { status: 400 });
-    }
+
+    const event = JSON.parse(body);
 
     console.log("Webhook event received:", event.type);
 

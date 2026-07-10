@@ -118,8 +118,7 @@ export function PaymentMethodsGroup() {
       }, { onConflict: "email,source" }).then(() => {});
       return data.clientSecret;
     } catch (err) {
-      const message = err instanceof Error ? err.message : t.errorPayment;
-      setStripeError(message);
+      setStripeError(mapStripeError(err, language as StripeLang));
       throw err;
     } finally {
       setStripeLoading(false);

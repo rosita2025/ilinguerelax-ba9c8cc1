@@ -354,19 +354,19 @@ export function PaymentMethodsGroup() {
                 <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300">
                   <div className="flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="font-medium">SSL 256-bit</span>
+                    <span className="font-medium">{t.ssl256}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-[8px] font-bold shrink-0">✓</span>
-                    <span className="font-medium">Stripe verificado</span>
+                    <span className="font-medium">{t.stripeVerified}</span>
                   </div>
                   <div className="flex items-center gap-1.5 justify-end">
                     <MessageCircle className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-                    <span className="font-medium">Soporte 24h</span>
+                    <span className="font-medium">{t.support24h}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
+                  <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
                 <div className="min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
                   <EmbeddedCheckoutProvider stripe={stripePromise} options={stripeOptions}>

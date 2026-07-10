@@ -214,8 +214,31 @@ export function PaymentMethodsGroup() {
   // Métodos locales de Perú (Mercado Pago transferencias/efectivo + Yape/Plin manual)
   // SOLO se muestran cuando el visitante está en Perú. Fuera de Perú, únicamente Stripe.
   const isPeru = (region.country || "").toUpperCase() === "PE";
+
+  // Marcas de tarjeta / wallets visibles por región. Stripe activa el método real
+  // automáticamente según el país del comprador; nosotros solo mostramos los
+  // logos correctos para que el cliente reconozca sus opciones y confíe.
+  const country = (region.country || "").toUpperCase();
+  const cardBrandsByCountry = (c: string): string[] => {
+    // Base universal
+    const base = ["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay", "Link"];
+    // USA / Canadá
+    if (["US", "CA"].includes(c)) return [...base, "Discover"];
+    // Europa (Cash App no aplica; añadimos wallets locales relevantes)
+    if (["ES","FR","DE","IT","PT","NL","BE","IE","GB","UK","AT","FI","LU","DK","SE","NO","PL","CH"].includes(c)) {
+      return ["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay", "Link", "Klarna"];
+    }
+    // Asia / Angloparlantes (AU/NZ/SG/HK/JP)
+    if (["AU","NZ","SG","HK","JP","KR"].includes(c)) return base;
+    return base;
+  };
+  const cardBrands = cardBrandsByCountry(country);
+  const cardSubtitle = isPeru
+    ? `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`
+    : `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${local.currencyCode || "tu moneda local"}${localBadge}`;
+
   const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${localBadge}`, badge: "Stripe" },
+    { id: "card", icon: CreditCard, title: isPeru ? "Tarjeta, Apple Pay o Link" : "Tarjeta débito o crédito", sub: cardSubtitle, badge: "Stripe" },
     { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: `BCP · BBVA · Interbank · Scotiabank · Conversión automática${localBadge}`, badge: priceBadge },
     { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: `PagoEfectivo · Western Union · Tambo · Kasnet${localBadge}`, badge: priceBadge },
     { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: priceBadge },

@@ -96,11 +96,29 @@ const DICT: Record<
     pt: { title: "Erro no processamento", message: "Ocorreu um erro ao processar o cartão. Tente novamente." },
     fr: { title: "Erreur de traitement", message: "Erreur lors du traitement de la carte. Réessaie." },
   },
+  "3ds_required": {
+    es: { title: "Verificación 3D Secure requerida", message: "Tu banco requiere confirmar el pago. Completa el paso de verificación (SMS, app o clave) y vuelve a intentar." },
+    en: { title: "3D Secure verification required", message: "Your bank needs to confirm the payment. Complete the verification step (SMS, app or code) and try again." },
+    pt: { title: "Verificação 3D Secure necessária", message: "Seu banco precisa confirmar o pagamento. Complete a verificação (SMS, app ou código) e tente novamente." },
+    fr: { title: "Vérification 3D Secure requise", message: "Ta banque doit confirmer le paiement. Complète la vérification (SMS, appli ou code) et réessaie." },
+  },
   "3ds_failed": {
     es: { title: "Verificación 3D Secure fallida", message: "No se completó la verificación con tu banco. Intenta de nuevo o usa otra tarjeta." },
     en: { title: "3D Secure verification failed", message: "The bank verification wasn't completed. Try again or use another card." },
     pt: { title: "Falha na verificação 3D Secure", message: "A verificação do banco não foi concluída. Tente novamente ou use outro cartão." },
     fr: { title: "Échec de la vérification 3D Secure", message: "La vérification bancaire n’a pas abouti. Réessaie ou utilise une autre carte." },
+  },
+  "3ds_canceled": {
+    es: { title: "Verificación cancelada", message: "Cancelaste la verificación 3D Secure. Vuelve a intentar y completa el paso con tu banco." },
+    en: { title: "Verification canceled", message: "You canceled the 3D Secure step. Try again and complete the bank verification." },
+    pt: { title: "Verificação cancelada", message: "Você cancelou a verificação 3D Secure. Tente novamente e conclua a etapa com o banco." },
+    fr: { title: "Vérification annulée", message: "Tu as annulé l’étape 3D Secure. Réessaie et complète la vérification bancaire." },
+  },
+  "3ds_unsupported": {
+    es: { title: "Tarjeta no compatible con 3D Secure", message: "Tu tarjeta no admite la verificación requerida. Prueba con otra tarjeta o paga con PayPal." },
+    en: { title: "Card doesn't support 3D Secure", message: "Your card doesn't support the required verification. Try another card or pay with PayPal." },
+    pt: { title: "Cartão sem suporte a 3D Secure", message: "Seu cartão não suporta a verificação necessária. Use outro cartão ou pague com PayPal." },
+    fr: { title: "Carte non compatible 3D Secure", message: "Ta carte ne prend pas en charge la vérification requise. Utilise une autre carte ou paie via PayPal." },
   },
   coupon: {
     es: { title: "Cupón no válido", message: "El cupón aplicado no es válido o expiró. Quítalo e intenta de nuevo." },

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle } from "lucide-react";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -9,13 +11,48 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
+import { getCatalogItem, CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 
 export default function CheckoutPrueba1() {
-  const { resetToDefaults } = useCheckoutPruebaStore();
+  const { slug } = useParams<{ slug?: string }>();
+  const clear = useCheckoutPruebaStore((s) => s.clear);
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const region = useRegionTier();
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
+
+  const catalogItem = getCatalogItem(slug);
+  const slugUnknown = !!slug && !catalogItem;
+
+  // Auto-load product from URL slug (Shopify-style)
+  useEffect(() => {
+    if (catalogItem) {
+      clear();
+      addItem(catalogItem);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
+
+  if (slugUnknown) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="max-w-md text-center space-y-4">
+          <h1 className="text-2xl font-bold">Producto no encontrado</h1>
+          <p className="text-muted-foreground">
+            El producto <code className="px-1.5 py-0.5 rounded bg-muted">{slug}</code> no existe en el catálogo.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Slugs disponibles: {Object.keys(CHECKOUT_CATALOG).join(", ")}
+          </p>
+          <Link to="/" className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium">
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -82,14 +119,6 @@ export default function CheckoutPrueba1() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <OrderSummary />
-          
-          <button
-            type="button"
-            onClick={resetToDefaults}
-            className="text-xs text-muted-foreground hover:text-primary mt-3 underline underline-offset-2"
-          >
-            {t.resetTestProducts}
-          </button>
         </aside>
       </div>
 

@@ -203,7 +203,9 @@ const App = () => (
                   <Route path="/admin/checkout-methods" element={<AdminGate><AdminCheckoutMethods /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
                   <Route path="/checkouts" element={<CheckoutTest />} />
-                  <Route path="/checkouts/prueba-1" element={<CheckoutPrueba1 />} />
+                  <Route path="/checkout" element={<CheckoutPrueba1 />} />
+                  <Route path="/checkout/:slug" element={<CheckoutPrueba1 />} />
+                  <Route path="/checkouts/prueba-1" element={<Navigate to="/checkout" replace />} />
                   <Route path="/checkouts/return" element={<CheckoutReturn />} />
                   <Route path="/checkouts/success" element={<CheckoutSuccess />} />
                   <Route path="/checkouts/failure" element={<CheckoutFailure />} />

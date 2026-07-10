@@ -1,122 +1,76 @@
+## Objetivo
 
-# Checkout tipo Shopify — "Prueba 1"
+Cambiar la URL del checkout de `/checkouts/prueba-1` a `/checkout/:slug` estilo Shopify, donde el `slug` identifica el producto y se carga automáticamente en el carrito. Ejemplos:
 
-Nueva página de prueba en `/checkouts` con diseño idéntico al checkout de Shopify (referencia adjuntada), 100% aislada — **no toca ningún producto existente** (Hotmart, Shopify, digital $22, coreano, patrones, etc.). Solo usa Stripe.
+- `/checkout/patrones-ingles` → carga "Patrones Especiales en Inglés" ($8 USD)
+- `/checkout/1000-verbos` → carga "1,000 Verbos en Inglés" ($15 USD)
+- `/checkout/5000-spanish-words` → carga "5,000 Spanish Words" ($22 USD)
+- `/checkout` (sin slug) → muestra carrito actual (mantiene compatibilidad)
 
-## Alcance
+## Cambios
 
-- Producto de prueba llamado **"Prueba 1"** con carrito multi-item editable (agregar, quitar, cambiar cantidad).
-- Layout 2 columnas desktop / 1 columna mobile con panel de resumen colapsable.
-- Express checkout arriba: Google Pay, Apple Pay, PayPal (aparecen automáticamente en Stripe).
-- Formulario: email, teléfono, nombre, apellido, país (auto-detectado por IP).
-- Cupón de descuento (compatible con `NEW10`).
-- Métodos de pago: tarjetas crédito/débito + wallets nativas de Stripe.
-- Estilo visual: paleta del proyecto (Teal `hsl(175 65% 40%)`, Coral, Plus Jakarta Sans) + estructura Shopify.
+### 1. Catálogo central de productos (nuevo archivo)
 
-## Diseño de la página
+`src/config/checkoutCatalog.ts` — mapa `slug → PruebaItem`:
 
-```text
-Desktop (2 columnas):
-┌──────────────────────────────────┬───────────────────────┐
-│  ILINGUE RELAX                   │   Tu pedido           │
-│                                  │                       │
-│  ── Express checkout ──          │  [img] Prueba 1 · $X  │
-│  [Google Pay] [Apple Pay]        │  [img] Item 2  · $Y  │
-│  [    PayPal          ]          │  [img] Item 3  · $Z  │
-│                                  │                       │
-│  ─── O paga con tarjeta ───      │  Cupón [_____] Aplicar│
-│                                  │  ─────────────────    │
-│  Contacto                        │  Subtotal      $XX    │
-│  [email____________]             │  Descuento     -$X    │
-│  [teléfono_________]             │  Impuestos     incl.  │
-│                                  │  ═════════════════    │
-│  Datos                           │  Total         $XX    │
-│  [nombre] [apellido]             │                       │
-│  [país ▼ auto-IP]                │                       │
-│                                  │                       │
-│  [   Pagar $XX  →   ]            │                       │
-│  Pago 100% seguro · SSL          │                       │
-└──────────────────────────────────┴───────────────────────┘
-
-Mobile (1 columna):
-┌────────────────────────┐
-│ ILINGUE RELAX          │
-│ ▼ Ver resumen · $XX    │  ← desplegable
-├────────────────────────┤
-│ [wallets express]      │
-│ [formulario]           │
-│ [Pagar $XX →]          │
-└────────────────────────┘
+```ts
+export const CHECKOUT_CATALOG: Record<string, PruebaItem> = {
+  "patrones-ingles": {
+    id: "patrones-especiales-ingles",
+    name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
+    price: 8,
+    image: patronesImg,
+    quantity: 1,
+  },
+  "1000-verbos": { id: "1000-verbos-ingles", name: "1,000 Verbos en Inglés (PDF)", price: 15, ... },
+  "5000-spanish-words": { ... $22 ... },
+  "patrones-espanol": { id: "patrones-espanol", price: 15, regionPrices: { latam: 10, global: 15 } },
+  // se puede extender fácilmente
+};
 ```
 
-## Archivos a crear
+### 2. Nueva ruta con slug
 
-- `src/pages/CheckoutPrueba1.tsx` — página principal del checkout multi-item.
-- `src/components/checkout/OrderSummary.tsx` — panel derecho con lista de items + cupón + totales.
-- `src/components/checkout/ExpressCheckoutButtons.tsx` — wallets (Google/Apple Pay/PayPal) usando `<ExpressCheckoutElement>` de Stripe.
-- `src/components/checkout/ContactForm.tsx` — formulario con `react-hook-form` + validación `zod`.
-- `src/stores/checkoutPruebaStore.ts` — zustand store con items, cantidades, cupón (aislado del `cartStore` existente).
-- `supabase/functions/create-checkout-prueba/index.ts` — crea Stripe Checkout Session con `line_items` dinámicos + metadata (nombre, teléfono, país, cupón).
+`src/App.tsx`:
+- Agregar `<Route path="/checkout/:slug?" element={<CheckoutPrueba1 />} />`
+- Mantener `/checkouts/prueba-1` como alias (redirige a `/checkout`) para no romper enlaces existentes.
 
-## Archivos a modificar (mínimo)
+### 3. Auto-carga por slug en `CheckoutPrueba1.tsx`
 
-- `src/App.tsx` — añadir ruta `/checkouts/prueba-1`. **La ruta actual `/checkouts` (CheckoutTest) queda intacta.**
-- `supabase/config.toml` — registrar `create-checkout-prueba` con `verify_jwt = false`.
-
-## Datos capturados
-
-Formulario valida con zod:
-
-- `email` — obligatorio, formato email, ≤255 chars
-- `phone` — obligatorio, formato internacional (`+51 999 999 999`)
-- `firstName` / `lastName` — obligatorios, ≤50 chars c/u
-- `country` — auto por IP (ipapi.co) + selector manual
-
-Todo va en `session.metadata` de Stripe y se guarda en `email_contacts` vía webhook `payments-webhook`.
-
-## Métodos de pago activos
-
-Stripe Embedded Checkout maneja automáticamente:
-
-- Tarjetas Visa/Mastercard/Amex/Discover
-- Google Pay (Chrome/Android con tarjeta guardada)
-- Apple Pay (Safari/iOS)
-- Link (autofill Stripe)
-- **PayPal** — el usuario lo activa una vez en Stripe Dashboard → Settings → Payment methods → PayPal → Turn on
-
-**No incluye** métodos LatAm (PSE, Nequi, Yape) — eso será una fase posterior con Wompi/Mercado Pago.
-
-## Backend flow
-
-```text
-Cliente edita carrito → click "Pagar"
-   ↓
-create-checkout-prueba (edge function):
-   - valida body con zod
-   - construye line_items dinámicos con price_data
-   - aplica cupón NEW10 si viene en body (10% off)
-   - metadata: { source: "prueba-1", name, phone, country, items }
-   - return_url: /checkouts/return?session_id={CHECKOUT_SESSION_ID}
-   ↓
-Stripe Embedded Checkout se monta inline
-   ↓
-Pago exitoso → return page /checkouts/return (ya existe)
-   ↓
-Webhook payments-webhook (ya existe) guarda contacto
+Al montar la página:
+```ts
+const { slug } = useParams();
+useEffect(() => {
+  if (slug && CHECKOUT_CATALOG[slug]) {
+    clear();
+    addItem(CHECKOUT_CATALOG[slug]);
+  }
+}, [slug]);
 ```
 
-## Detalles técnicos
+Si el slug no existe en el catálogo → mostrar mensaje "Producto no encontrado" con botón volver al home.
 
-- `<EmbeddedCheckoutProvider>` de `@stripe/react-stripe-js` (ya instalado).
-- Item schema: `{ id, name, price, quantity, image }`. Pruebas1 arranca con 3 items demo editables.
-- Cupón `NEW10` aplica 10% al subtotal (mismo comportamiento que popups actuales).
-- Trust badges pie: SSL Stripe, garantía 30 días, soporte WhatsApp.
-- Banner `PaymentTestModeBanner` visible mientras `pk_test_...` esté activo.
-- Detección país: usa `getCountryFromIP()` existente si está disponible; fallback a `ipapi.co` (ya usado en el proyecto).
+### 4. Actualizar páginas de producto
 
-## Fuera de alcance (fases futuras)
+Reemplazar la lógica actual (add manual + navigate) por navegación directa al slug:
 
-- Wompi (Colombia — PSE/Nequi/Efecty)
-- Mercado Pago (Perú/Chile/Argentina/Ecuador)
-- Router `<SmartCheckout />` que decide procesador por país
-- Reemplazar checkouts de productos reales
+- `ProductPatronesEspeciales.tsx` → `navigate("/checkout/patrones-ingles")`
+- `Product1000Verbos.tsx` → `navigate("/checkout/1000-verbos")`
+- `ProductSpanish5000Digital.tsx` → `navigate("/checkout/5000-spanish-words")`
+
+El carrito se limpia y se carga el producto correcto automáticamente por la URL — igual que Shopify.
+
+### 5. Compatibilidad
+
+- `/checkouts/prueba-1` seguirá funcionando (redirect suave a `/checkout`).
+- Los emails de confirmación, páginas success/failure/pending no cambian.
+- Las edge functions (`create-checkout`, `create-mercadopago-preference`) siguen recibiendo `line_items` dinámicos — no requieren cambios.
+
+## Ventajas
+
+- URLs limpias y compartibles: `ilinguerelax.com/checkout/patrones-ingles`
+- Producto identificado por URL (no depende de estado del carrito).
+- Fácil agregar nuevos productos: solo añadir una entrada al catálogo.
+- SEO-friendly y trackeable en analytics por slug.
+
+¿Procedo con la implementación?

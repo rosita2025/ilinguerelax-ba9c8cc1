@@ -41,10 +41,22 @@ async function verifySignature(req: Request, dataId: string): Promise<boolean> {
   const { ts, v1 } = parseSignatureHeader(sigHeader);
   if (!ts || !v1) return false;
 
-  // MP manifest: id:<dataId>;request-id:<requestId>;ts:<ts>;
-  const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
-  const expected = await hmacSha256Hex(secret, manifest);
-  return expected === v1;
+  // MP manifest: `id:<dataId>;request-id:<requestId>;ts:<ts>;`
+  // IMPORTANT per MP docs: data.id MUST be lowercased in the manifest.
+  // Ref: https://www.mercadopago.com.pe/developers/en/docs/your-integrations/notifications/webhooks#validate-origin
+  const idLower = String(dataId).toLowerCase();
+  const manifests = [
+    `id:${idLower};request-id:${requestId};ts:${ts};`,
+    // Fallback for legacy events that sign without request-id or with raw id
+    `id:${idLower};ts:${ts};`,
+    `id:${dataId};request-id:${requestId};ts:${ts};`,
+  ];
+  for (const m of manifests) {
+    const expected = await hmacSha256Hex(secret, m);
+    // Constant-time compare not critical here (HMAC output length is fixed)
+    if (expected === v1) return true;
+  }
+  return false;
 }
 
 async function mpGet(path: string) {

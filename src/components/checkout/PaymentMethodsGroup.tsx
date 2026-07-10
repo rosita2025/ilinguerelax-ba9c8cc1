@@ -309,14 +309,30 @@ export function PaymentMethodsGroup() {
 
   const handleManualPaid = () => {
     const s = useCheckoutPruebaStore.getState();
+    const orderNumber = `ILR-YP-${Math.floor(1000 + Math.random() * 9000)}`;
+    const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
+    const productList = s.items.map((i) => `• ${i.title} x${i.quantity}`).join("\n");
+    const msg =
+      `Hola! 👋 Acabo de pagar por Yape/Plin.\n\n` +
+      `📦 Orden: ${orderNumber}\n` +
+      `👤 Nombre: ${s.buyer.fullName.trim()}\n` +
+      `📧 Email: ${s.buyer.email.trim()}\n` +
+      `💰 Monto: ${amountText}\n\n` +
+      `Productos:\n${productList}\n\n` +
+      `Adjunto captura del pago. Gracias!`;
+    const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
+
     supabase.from("email_contacts").upsert({
       email: s.buyer.email.trim().toLowerCase(),
       name: s.buyer.fullName.trim(),
       source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin" },
+      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin", orderNumber },
     }, { onConflict: "email,source" }).then(() => {});
-    navigate("/checkouts/pendiente-manual");
+
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+    navigate(`/checkouts/pendiente-manual?order=${orderNumber}`);
   };
+
 
   const copyPhone = async () => {
     try {

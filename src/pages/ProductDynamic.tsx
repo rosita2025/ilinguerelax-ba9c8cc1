@@ -24,6 +24,8 @@ interface DBProduct {
   hotmart_url: string | null;
   store_enabled: boolean;
   excluded_countries: string[] | null;
+  store_excluded_countries: string[] | null;
+  hotmart_excluded_countries: string[] | null;
 }
 
 const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [

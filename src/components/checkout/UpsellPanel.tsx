@@ -1,10 +1,85 @@
 import { useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 interface Props {
   upsells: UpsellItem[];
+}
+
+/** Renders a USD price with local currency estimate underneath (S/, R$, €…). */
+function PriceWithLocal({
+  usd,
+  strike = false,
+  emphasis = false,
+  added = false,
+}: {
+  usd: number;
+  strike?: boolean;
+  emphasis?: boolean;
+  added?: boolean;
+}) {
+  const local = useLocalCurrency(usd);
+  const showLocal = !local.isUsd && !local.loading;
+
+  if (strike) {
+    return (
+      <div className="text-right leading-tight">
+        <p className="text-[11px] text-muted-foreground line-through">
+          ${usd.toFixed(2)}
+        </p>
+        {showLocal && (
+          <p className="text-[10px] text-muted-foreground/70 line-through">
+            {local.formatted}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-right leading-tight">
+      <p
+        className={`font-black ${emphasis ? "text-base sm:text-lg" : "text-sm"} ${
+          added ? "text-primary" : "text-foreground"
+        }`}
+      >
+        +${usd.toFixed(2)}
+      </p>
+      {showLocal && (
+        <p
+          className={`text-[10px] font-semibold ${
+            added ? "text-primary/80" : "text-muted-foreground"
+          }`}
+        >
+          ≈ {local.formatted}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function SavingsBadge({ usd }: { usd: number }) {
+  const local = useLocalCurrency(usd);
+  const showLocal = !local.isUsd && !local.loading;
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[11px] font-bold whitespace-nowrap">
+      <Tag className="w-3 h-3" /> Ahorras ${usd.toFixed(2)}
+      {showLocal && <span className="opacity-80">· ≈ {local.formatted}</span>}
+    </span>
+  );
+}
+
+function SavingsInline({ usd }: { usd: number }) {
+  const local = useLocalCurrency(usd);
+  const showLocal = !local.isUsd && !local.loading;
+  return (
+    <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">
+      Ahorras ${usd.toFixed(2)}
+      {showLocal && <span className="opacity-80"> · {local.formatted}</span>}
+    </p>
+  );
 }
 
 export function UpsellPanel({ upsells }: Props) {
@@ -40,11 +115,7 @@ export function UpsellPanel({ upsells }: Props) {
             </p>
           </div>
         </div>
-        {totalSavings > 0 && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[11px] font-bold whitespace-nowrap">
-            <Tag className="w-3 h-3" /> Ahorras ${totalSavings.toFixed(2)}
-          </span>
-        )}
+        {totalSavings > 0 && <SavingsBadge usd={totalSavings} />}
       </div>
 
       <div className="space-y-2.5">
@@ -133,24 +204,10 @@ export function UpsellPanel({ upsells }: Props) {
                 </p>
               </div>
 
-              <div className="text-right shrink-0">
-                {hasDiscount && (
-                  <p className="text-[11px] text-muted-foreground line-through leading-none">
-                    ${u.originalPrice!.toFixed(2)}
-                  </p>
-                )}
-                <p
-                  className={`font-black text-base sm:text-lg leading-tight ${
-                    added ? "text-primary" : "text-foreground"
-                  }`}
-                >
-                  +${u.price.toFixed(2)}
-                </p>
-                {hasDiscount && (
-                  <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">
-                    Ahorras ${(u.originalPrice! - u.price).toFixed(2)}
-                  </p>
-                )}
+              <div className="text-right shrink-0 space-y-0.5">
+                {hasDiscount && <PriceWithLocal usd={u.originalPrice!} strike />}
+                <PriceWithLocal usd={u.price} emphasis added={added} />
+                {hasDiscount && <SavingsInline usd={u.originalPrice! - u.price} />}
               </div>
             </button>
           );

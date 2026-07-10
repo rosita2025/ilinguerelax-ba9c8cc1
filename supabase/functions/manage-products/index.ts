@@ -37,6 +37,7 @@ interface ProductIn {
   bonus_drive_url?: string | null;
   bonus_access_key?: string | null;
   bonuses?: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
+  hotmart_url?: string | null;
   upsells?: UpsellIn[];
 }
 

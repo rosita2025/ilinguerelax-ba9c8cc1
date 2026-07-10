@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -45,6 +45,13 @@ const panels = [
     title: "Métodos de pago Stripe",
     desc: "Qué métodos verá cada comprador por país (DE, UK, JP, US, LatAm, Asia) y cuáles tienes activados.",
     color: "text-indigo-500",
+  },
+  {
+    to: "/admin/manual-payments",
+    icon: Wallet,
+    title: "Pagos manuales · Yape/Plin",
+    desc: "Órdenes generadas al pulsar 'Ya pagué'. Verifica el pago recibido en Yape/Plin y marca como verificada.",
+    color: "text-fuchsia-500",
   },
 ];
 

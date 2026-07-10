@@ -33,12 +33,19 @@ const sections = [
     title: "Compartición de Datos",
     content: `No vendemos ni alquilamos tu información personal. Solo compartimos datos con:
 
-• Proveedores de pago: Stripe, Hotmart y Shopify, para procesar transacciones de forma segura.
-• Servicios de email: Resend, para enviar correos transaccionales y promocionales.
+• Proveedores de pago autorizados:
+   – Stripe (SSL) – tarjetas de crédito/débito internacionales, Apple Pay, Google Pay y Link. Cobertura global (Latinoamérica, Norteamérica, Europa, Asia, Oceanía) con conversión automática a moneda local.
+   – Mercado Pago – transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible desde Perú y otros países de Latinoamérica.
+   – Yape y Plin – pago manual desde Perú, verificado por Supervisora Rosa (1-24h).
+   – Hotmart – procesa pagos en Latinoamérica con métodos locales como Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias regionales.
+   – Shopify – pasarela para libros físicos y envíos internacionales.
+   – Próximamente: dLocal y eBanx para ampliar métodos de pago locales en América Latina, África, Asia y Medio Oriente.
+• Servicios de email: Brevo y Resend, para enviar correos transaccionales y promocionales.
 • Análisis y publicidad: Meta (Facebook/Instagram) y Google, solo datos agregados o anonimizados para medición de campañas.
 • Cumplimiento legal: cuando sea requerido por ley o para proteger nuestros derechos legales.
 
-Todos nuestros proveedores cumplen con estándares de seguridad y protección de datos (GDPR, CCPA).`
+Todos nuestros proveedores cumplen con estándares de seguridad y protección de datos (GDPR, CCPA, PCI-DSS cuando aplica).`
+
   },
   {
     icon: Database,

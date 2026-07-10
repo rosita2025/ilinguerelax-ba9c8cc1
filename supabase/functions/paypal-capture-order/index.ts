@@ -28,26 +28,34 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const orderId = String(body.orderId ?? "").trim();
-    console.log(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "input", env: PAYPAL_ENV, orderId }));
+    // Correlation id from header or body; falls back to server-side trace.
+    const rawCorr = String(req.headers.get("x-correlation-id") ?? body.correlationId ?? "").slice(0, 64);
+    const clientCorr = /^[A-Za-z0-9._:-]{6,64}$/.test(rawCorr) ? rawCorr : null;
+    const correlationId = clientCorr ?? `srv-${traceId}`;
+    console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "input", env: PAYPAL_ENV, orderId, clientProvided: !!clientCorr }));
     if (!/^[A-Z0-9]{5,32}$/i.test(orderId)) {
-      console.warn(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "reject", reason: "invalid_orderId", orderId }));
-      return new Response(JSON.stringify({ error: "Invalid orderId", trace: traceId }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.warn(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "reject", reason: "invalid_orderId", orderId }));
+      return new Response(JSON.stringify({ error: "Invalid orderId", trace: traceId, correlationId }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
       });
     }
     const token = await getAccessToken();
     const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${orderId}/capture`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "PayPal-Request-Id": `cap-${correlationId}`,
+      },
     });
     const data = await res.json();
     if (!res.ok) {
       console.error(JSON.stringify({
-        trace: traceId, fn: "paypal-capture-order", phase: "paypal_error",
+        corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "paypal_error",
         status: res.status, error: data, orderId, ms: Date.now() - t0,
       }));
-      return new Response(JSON.stringify({ error: data, trace: traceId }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ error: data, trace: traceId, correlationId }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
       });
     }
     const status = data.status; // COMPLETED expected
@@ -59,18 +67,22 @@ Deno.serve(async (req) => {
     const captureId = cap?.id ?? null;
     const payerEmail = data.payer?.email_address ?? null;
     const payerCountry = data.payer?.address?.country_code ?? null;
+    // Confirm the correlation id we sent on create came back on the order.
+    const echoedCorr = pu?.reference_id ?? pu?.custom_id ?? null;
+    const corrMatches = echoedCorr === correlationId;
     console.log(JSON.stringify({
-      trace: traceId, fn: "paypal-capture-order", phase: "captured",
+      corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "captured",
       orderId, captureId, status,
       amount: capturedAmount, currency: capturedCurrency,
       payerCountry, hasPayerEmail: !!payerEmail,
+      echoedCorr, corrMatches,
       ms: Date.now() - t0,
     }));
     return new Response(JSON.stringify({
-      status, order: data, trace: traceId,
-      audit: { orderId, captureId, amount: capturedAmount, currency: capturedCurrency, payerCountry },
+      status, order: data, trace: traceId, correlationId,
+      audit: { orderId, captureId, amount: capturedAmount, currency: capturedCurrency, payerCountry, corrMatches },
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
     });
   } catch (e) {
     console.error(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "exception", error: (e as Error).message, ms: Date.now() - t0 }));
@@ -79,4 +91,5 @@ Deno.serve(async (req) => {
     });
   }
 });
+
 

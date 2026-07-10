@@ -108,6 +108,9 @@ export type Database = {
         Row: {
           access_key: string | null
           active: boolean
+          bonus_access_key: string | null
+          bonus_drive_url: string | null
+          bonus_name: string | null
           cover_image_url: string | null
           created_at: string
           description: string | null
@@ -129,6 +132,9 @@ export type Database = {
         Insert: {
           access_key?: string | null
           active?: boolean
+          bonus_access_key?: string | null
+          bonus_drive_url?: string | null
+          bonus_name?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -150,6 +156,9 @@ export type Database = {
         Update: {
           access_key?: string | null
           active?: boolean
+          bonus_access_key?: string | null
+          bonus_drive_url?: string | null
+          bonus_name?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null

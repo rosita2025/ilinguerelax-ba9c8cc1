@@ -26,6 +26,9 @@ interface Product {
   is_upsell: boolean;
   active: boolean;
   sort_order: number;
+  bonus_name: string | null;
+  bonus_drive_url: string | null;
+  bonus_access_key: string | null;
 }
 interface UpsellRow { upsell_sku: string; discount_pct: number; sort_order: number; }
 
@@ -45,6 +48,7 @@ const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
   price_usd: 0, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
   is_upsell: false, active: true, sort_order: 0,
+  bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
 };
 
 const AdminProductEdit = () => {
@@ -207,6 +211,25 @@ const AdminProductEdit = () => {
             <div>
               <Label>Clave de acceso (opcional)</Label>
               <Input value={product.access_key ?? ""} onChange={(e) => update("access_key", e.target.value)} placeholder="Solo si el PDF la requiere" />
+            </div>
+
+            <div className="pt-4 border-t border-border space-y-4">
+              <div>
+                <h3 className="font-medium text-sm">🎁 Bono adicional (opcional)</h3>
+                <p className="text-xs text-muted-foreground">Se enviará junto con el producto principal en el mismo correo.</p>
+              </div>
+              <div>
+                <Label>Nombre del bono</Label>
+                <Input value={product.bonus_name ?? ""} onChange={(e) => update("bonus_name", e.target.value)} placeholder="Ej: Bono — Guía completa del Hangul" />
+              </div>
+              <div>
+                <Label>Enlace Google Drive del bono</Label>
+                <Input value={product.bonus_drive_url ?? ""} onChange={(e) => update("bonus_drive_url", e.target.value)} placeholder="https://drive.google.com/file/d/…" />
+              </div>
+              <div>
+                <Label>Clave de acceso del bono (opcional)</Label>
+                <Input value={product.bonus_access_key ?? ""} onChange={(e) => update("bonus_access_key", e.target.value)} placeholder="Solo si el PDF la requiere" />
+              </div>
             </div>
           </Card>
 

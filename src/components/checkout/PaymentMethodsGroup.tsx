@@ -282,13 +282,71 @@ export function PaymentMethodsGroup() {
     wasValidRef.current = valid;
   }, [valid]);
 
+  const isFree = total <= 0 && items.length > 0;
+  const [freeLoading, setFreeLoading] = useState(false);
+  const submitFreeOrder = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    setFreeLoading(true);
+    const s = useCheckoutPruebaStore.getState();
+    const orderId = `ilr-free-${Date.now()}`;
+    try {
+      await supabase.functions.invoke("send-order-confirmation", {
+        body: {
+          customerEmail: s.buyer.email.trim(),
+          customerName: s.buyer.fullName.trim(),
+          orderId,
+          total: 0,
+          currency: "USD",
+          paymentProvider: "free-coupon",
+          items: s.items.map((i) => ({
+            id: i.id, name: i.name, quantity: i.quantity,
+            price: itemPrice(i, region.tier), image: i.image,
+          })),
+        },
+      });
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { processor: "free-coupon", coupon: s.coupon ?? "" },
+      }, { onConflict: "email,source" }).then(() => {});
+    } catch (e) {
+      console.error("free order confirmation failed", e);
+    } finally {
+      navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
+    }
+  };
+
   return (
     <div id="payment-methods" ref={methodsAnchorRef} className="space-y-3 scroll-mt-24">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {isPeru ? t.choosePaymentMethod : t.cardPayment}
+        {isFree ? (language === "en" ? "Free order" : language === "pt" ? "Pedido grátis" : language === "fr" ? "Commande gratuite" : "Pedido gratis") : (isPeru ? t.choosePaymentMethod : t.cardPayment)}
       </h2>
 
-      {methods.map((m) => {
+      {isFree && (
+        <div className="rounded-xl border border-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800 p-4 space-y-3">
+          <p className="text-sm text-emerald-800 dark:text-emerald-200">
+            {language === "en"
+              ? "Your coupon covers 100% of the order. No payment is required — just confirm to receive your products by email."
+              : language === "pt"
+              ? "Seu cupom cobre 100% do pedido. Não é necessário pagar — confirme para receber seus produtos por email."
+              : language === "fr"
+              ? "Votre coupon couvre 100% de la commande. Aucun paiement requis — confirmez pour recevoir vos produits par email."
+              : "Tu cupón cubre el 100% del pedido. No hay que pagar — confirma para recibir tus productos por correo."}
+          </p>
+          <button
+            type="button"
+            onClick={submitFreeOrder}
+            disabled={freeLoading || !valid}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 disabled:opacity-60"
+          >
+            {freeLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+            {language === "en" ? "Confirm free order" : language === "pt" ? "Confirmar pedido grátis" : language === "fr" ? "Confirmer la commande gratuite" : "Confirmar pedido gratis"}
+          </button>
+        </div>
+      )}
+
+      {!isFree && methods.map((m) => {
         const isSelected = valid && selected === m.id;
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;

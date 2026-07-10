@@ -28,13 +28,9 @@ export function PaymentMethodsGroup() {
   const { total } = calcTotals(items, couponPercent, region.tier);
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
-  // Badge principal: moneda local si el país no usa USD; si usa USD, muestra USD.
-  const priceBadge = local.loading
-    ? `USD $${totalUsd}`
-    : local.isUsd
-      ? `USD $${totalUsd}`
-      : `${local.formatted} · USD $${totalUsd}`;
-  const localBadge = !local.isUsd && !local.loading ? ` · ≈ ${local.formatted}` : "";
+  // Badge principal: SIEMPRE en moneda local del país (USD, CAD, EUR, MXN, ARS, PEN, etc.)
+  const priceBadge = local.loading ? `USD $${totalUsd}` : local.formatted;
+  const localBadge = "";
 
 
   const [selected, setSelected] = useState<Method | null>(null);
@@ -417,7 +413,7 @@ export function PaymentMethodsGroup() {
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
                   <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{local.loading ? `USD $${totalUsd}` : local.formatted}</p>
                   <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
                 </div>
 

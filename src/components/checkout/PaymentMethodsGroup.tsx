@@ -241,11 +241,13 @@ export function PaymentMethodsGroup() {
 
   const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
     { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
+    { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: priceBadge },
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
   ];
-  const methods = isPeru ? allMethods : allMethods.filter((m) => m.id === "card");
+  // PayPal is available worldwide (including Peru); local rails only in Peru.
+  const methods = isPeru ? allMethods : allMethods.filter((m) => m.id === "card" || m.id === "paypal");
 
   // Fuera de Perú solo hay un método (Stripe). Auto-seleccionarlo y auto-abrir
   // el formulario embebido en cuanto el comprador completa sus datos, para

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, AlertTriangle, RefreshCw, Copy, Check } from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw, Copy, Check, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 declare global {

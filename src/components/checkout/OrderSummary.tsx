@@ -177,12 +177,12 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{fmtMoney(subtotal, localSubtotal)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-${discount.toFixed(2)}</span>
+              <span>-{fmtMoney(discount, localDiscount)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
@@ -192,12 +192,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>USD ${total.toFixed(2)}</div>
-              {!local.isUsd && !local.loading && (
-                <div className="text-[11px] font-normal text-muted-foreground mt-0.5">
-                  ≈ {local.formatted} {t.inYourCurrency}
-                </div>
-              )}
+              <div>{useLocal ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
             </div>
           </div>
 

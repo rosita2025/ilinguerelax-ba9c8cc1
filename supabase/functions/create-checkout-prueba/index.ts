@@ -80,31 +80,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Resolve or create a Stripe Customer so email/name are prefilled in
-    // Embedded Checkout (Stripe still shows the email field, but it comes
-    // pre-populated and users don't need to retype it).
+    // Guest checkout: keep this function fast. Avoid customer list/update/create
+    // calls before opening the payment form; Stripe will collect/prefill the
+    // buyer email directly on the Checkout Session.
     const fullName = `${body.contact.firstName} ${body.contact.lastName}`.trim().slice(0, 100);
-    let customerId: string | undefined;
-    try {
-      const existing = await stripe.customers.list({ email: body.contact.email, limit: 1 });
-      if (existing.data.length) {
-        customerId = existing.data[0].id;
-        await stripe.customers.update(customerId, {
-          name: fullName || existing.data[0].name || undefined,
-          phone: body.contact.phone || existing.data[0].phone || undefined,
-        });
-      } else {
-        const created = await stripe.customers.create({
-          email: body.contact.email,
-          name: fullName || undefined,
-          phone: body.contact.phone || undefined,
-          metadata: { source: "checkout-prueba-1", country: body.contact.country },
-        });
-        customerId = created.id;
-      }
-    } catch (e) {
-      console.warn("customer resolve failed, falling back to customer_email:", e);
-    }
 
     const productSummary = body.items
       .map((i) => `${i.quantity}x ${i.name}`)
@@ -118,9 +97,7 @@ Deno.serve(async (req) => {
       return_url: body.returnUrl,
       // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
       adaptive_pricing: { enabled: true },
-      ...(customerId
-        ? { customer: customerId, customer_update: { name: "auto", address: "auto" } }
-        : { customer_email: body.contact.email }),
+      customer_email: body.contact.email,
       payment_intent_data: {
         description: `Prueba 1 · ${productSummary}`,
       },

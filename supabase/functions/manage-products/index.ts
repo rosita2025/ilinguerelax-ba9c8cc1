@@ -36,6 +36,7 @@ interface ProductIn {
   bonus_name?: string | null;
   bonus_drive_url?: string | null;
   bonus_access_key?: string | null;
+  bonuses?: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
   upsells?: UpsellIn[];
 }
 
@@ -98,6 +99,16 @@ Deno.serve(async (req) => {
         bonus_name: p.bonus_name?.toString().trim() || null,
         bonus_drive_url: p.bonus_drive_url?.toString().trim() || null,
         bonus_access_key: p.bonus_access_key?.toString().trim() || null,
+        bonuses: Array.isArray(p.bonuses)
+          ? p.bonuses
+              .map((b) => ({
+                name: (b?.name ?? "").toString().trim(),
+                drive_url: (b?.drive_url ?? "").toString().trim(),
+                access_key: (b?.access_key ?? "").toString().trim(),
+              }))
+              .filter((b) => b.drive_url)
+              .slice(0, 4)
+          : [],
       };
 
       const { error: upErr } = await admin

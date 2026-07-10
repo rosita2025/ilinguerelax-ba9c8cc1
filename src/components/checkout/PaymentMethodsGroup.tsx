@@ -37,9 +37,14 @@ export function PaymentMethodsGroup() {
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeError, setStripeError] = useState<string | null>(null);
+  const [stripeRetryKey, setStripeRetryKey] = useState(0);
+  const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
+  const stripeContainerRef = useRef<HTMLDivElement | null>(null);
   const valid = isBuyerValid(buyer);
 
   const stripePromise = (() => {
@@ -71,6 +76,8 @@ export function PaymentMethodsGroup() {
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
     if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
+    setStripeLoading(true);
+    setStripeError(null);
     const parts = s.buyer.fullName.trim().split(/\s+/);
     const firstName = parts[0].slice(0, 50);
     const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);
@@ -79,33 +86,41 @@ export function PaymentMethodsGroup() {
       if (/^https?:\/\//i.test(u)) return u;
       try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
     };
-    const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
-      body: {
-        environment: getStripeEnvironment(),
-        items: s.items.map((i) => ({
-          id: i.id, name: i.name, price: itemPrice(i, region.tier),
-          quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
-        })),
-        currency: "usd",
-        couponPercent: s.couponPercent,
-        couponCode: s.coupon ?? undefined,
-        contact: {
-          email: s.buyer.email.trim(),
-          phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
-          firstName, lastName,
-          country: (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
+        body: {
+          environment: getStripeEnvironment(),
+          items: s.items.map((i) => ({
+            id: i.id, name: i.name, price: itemPrice(i, region.tier),
+            quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
+          })),
+          currency: "usd",
+          couponPercent: s.couponPercent,
+          couponCode: s.coupon ?? undefined,
+          contact: {
+            email: s.buyer.email.trim(),
+            phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
+            firstName, lastName,
+            country: (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
+          },
+          returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
         },
-        returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
-      },
-    });
-    if (error || !data?.clientSecret) throw new Error(error?.message || t.errorPayment);
-    supabase.from("email_contacts").upsert({
-      email: s.buyer.email.trim().toLowerCase(),
-      name: s.buyer.fullName.trim(),
-      source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
-    }, { onConflict: "email,source" }).then(() => {});
-    return data.clientSecret;
+      });
+      if (error || !data?.clientSecret) throw new Error(error?.message || t.errorPayment);
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
+      }, { onConflict: "email,source" }).then(() => {});
+      return data.clientSecret;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : t.errorPayment;
+      setStripeError(message);
+      throw err;
+    } finally {
+      setStripeLoading(false);
+    }
     // Depend only on region.tier/country — buyer/items are read fresh from
     // the store inside the callback, so the reference stays stable across
     // typing and avoids remounting the EmbeddedCheckoutProvider (blank screen).
@@ -193,6 +208,50 @@ export function PaymentMethodsGroup() {
     if (selected === "cash") { payMercado("cash"); return; }
     // yape → user uses "Ya pagué" button in the manual panel
   };
+
+  const retryStripe = () => {
+    setStripeError(null);
+    setStripeLoading(false);
+    setStripeFrameMounted(false);
+    setStripeRetryKey((k) => k + 1);
+  };
+
+  useEffect(() => {
+    if (!(showStripe && selected === "card")) return;
+    setStripeFrameMounted(false);
+    const container = stripeContainerRef.current;
+    if (!container) return;
+
+    const markMounted = () => {
+      if (container.querySelector('iframe[name="embedded-checkout"]')) {
+        setStripeFrameMounted(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (markMounted()) return;
+    const observer = new MutationObserver(markMounted);
+    observer.observe(container, { childList: true, subtree: true });
+    const timeout = window.setTimeout(() => {
+      if (!markMounted()) {
+        setStripeError(
+          language === "en"
+            ? "The secure card form is taking too long to open."
+            : language === "pt"
+              ? "O formulário seguro de cartão está demorando para abrir."
+              : language === "fr"
+                ? "Le formulaire sécurisé de carte met trop de temps à s’ouvrir."
+                : "El formulario seguro de tarjeta está tardando demasiado en abrir.",
+        );
+      }
+    }, 25000);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timeout);
+    };
+  }, [showStripe, selected, stripeRetryKey, language]);
 
   const handleManualPaid = () => {
     const s = useCheckoutPruebaStore.getState();
@@ -449,8 +508,47 @@ export function PaymentMethodsGroup() {
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
-                <div className="min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
-                  <EmbeddedCheckoutProvider stripe={stripePromise} options={stripeOptions}>
+                <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
+                  {(stripeLoading || !stripeFrameMounted) && !stripeError && (
+                    <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
+                      <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {language === "en"
+                          ? "Opening the secure Stripe form…"
+                          : language === "pt"
+                            ? "Abrindo o formulário seguro da Stripe…"
+                            : language === "fr"
+                              ? "Ouverture du formulaire sécurisé Stripe…"
+                              : "Abriendo el formulario seguro de Stripe…"}
+                      </div>
+                      <div className="mx-auto mt-6 max-w-md space-y-3">
+                        <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                        <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                        </div>
+                        <div className="h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+                      </div>
+                    </div>
+                  )}
+                  {stripeError && (
+                    <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
+                      <p className="font-semibold">
+                        {language === "en" ? "Stripe did not load." : language === "pt" ? "Stripe não carregou." : language === "fr" ? "Stripe n’a pas chargé." : "Stripe no cargó."}
+                      </p>
+                      <p className="mt-1 text-xs">{stripeError}</p>
+                      <button
+                        type="button"
+                        onClick={retryStripe}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
+                      >
+                        <Loader2 className="w-3.5 h-3.5" />
+                        {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
+                      </button>
+                    </div>
+                  )}
+                  <EmbeddedCheckoutProvider key={stripeRetryKey} stripe={stripePromise} options={stripeOptions}>
                     <EmbeddedCheckout />
                   </EmbeddedCheckoutProvider>
                 </div>

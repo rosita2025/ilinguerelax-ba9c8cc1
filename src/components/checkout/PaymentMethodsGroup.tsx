@@ -508,6 +508,13 @@ export function PaymentMethodsGroup() {
                     <BankBadge label="Interbank" bg="#00953B" color="#ffffff" />
                     <BankBadge label="Scotiabank" bg="#EC111A" color="#ffffff" />
                   </div>
+                ) : m.id === "cash" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="PagoEfectivo" bg="#EC0928" color="#ffffff" />
+                    <BankBadge label="Western Union" bg="#FFDD00" color="#000000" />
+                    <BankBadge label="Tambo" bg="#E30613" color="#FFED00" />
+                    <BankBadge label="Kasnet" bg="#F58220" color="#ffffff" />
+                  </div>
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}

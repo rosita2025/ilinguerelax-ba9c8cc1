@@ -2,7 +2,7 @@ import type { PruebaItem } from "@/stores/checkoutPruebaStore";
 
 /**
  * Central checkout catalog — Shopify-style.
- * URL: /checkout/:slug  →  auto-loads the matching product into the cart.
+ * URL: /checkouts/:slug  →  auto-loads the matching product into the cart.
  *
  * Add new products by extending this map. Slugs should be short, kebab-case,
  * and stable (they appear in URLs, analytics and shared links).

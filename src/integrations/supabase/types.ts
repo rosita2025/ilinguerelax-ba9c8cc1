@@ -308,6 +308,66 @@ export type Database = {
         }
         Relationships: []
       }
+      manual_payments: {
+        Row: {
+          amount_local: number | null
+          amount_usd: number
+          buyer_country: string | null
+          buyer_email: string
+          buyer_name: string
+          buyer_phone: string | null
+          created_at: string
+          currency_local: string | null
+          id: string
+          items: Json
+          method: string
+          notes: string | null
+          order_number: string
+          status: string
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          amount_local?: number | null
+          amount_usd: number
+          buyer_country?: string | null
+          buyer_email: string
+          buyer_name: string
+          buyer_phone?: string | null
+          created_at?: string
+          currency_local?: string | null
+          id?: string
+          items?: Json
+          method?: string
+          notes?: string | null
+          order_number: string
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          amount_local?: number | null
+          amount_usd?: number
+          buyer_country?: string | null
+          buyer_email?: string
+          buyer_name?: string
+          buyer_phone?: string | null
+          created_at?: string
+          currency_local?: string | null
+          id?: string
+          items?: Json
+          method?: string
+          notes?: string | null
+          order_number?: string
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       paypal_webhook_events: {
         Row: {
           correlation_id: string | null

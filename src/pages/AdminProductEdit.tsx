@@ -33,6 +33,8 @@ interface Product {
   hotmart_url: string | null;
   store_enabled: boolean;
   excluded_countries: string[];
+  store_excluded_countries: string[];
+  hotmart_excluded_countries: string[];
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -59,6 +61,8 @@ const EMPTY: Product = {
   hotmart_url: "",
   store_enabled: true,
   excluded_countries: [],
+  store_excluded_countries: [],
+  hotmart_excluded_countries: [],
 };
 
 const AdminProductEdit = () => {
@@ -247,31 +251,46 @@ const AdminProductEdit = () => {
               />
             </div>
 
-            {/* Países excluidos */}
-            <div>
-              <Label>Países excluidos (códigos ISO separados por coma)</Label>
-              <Input
-                value={(product.excluded_countries ?? []).join(", ")}
-                onChange={(e) =>
-                  update(
-                    "excluded_countries",
-                    e.target.value
-                      .split(/[,\s]+/)
-                      .map((c) => c.trim().toUpperCase())
-                      .filter((c) => /^[A-Z]{2}$/.test(c)),
-                  )
-                }
-                placeholder="Ej: BR, MX, AR"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                En estos países no se mostrará ningún botón de compra. Deja vacío para vender en todos.
-              </p>
+            {/* Países excluidos POR CANAL */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>🚫 Excluir de la Tienda</Label>
+                <Input
+                  value={(product.store_excluded_countries ?? []).join(", ")}
+                  onChange={(e) =>
+                    update(
+                      "store_excluded_countries",
+                      e.target.value.split(/[,\s]+/).map((c) => c.trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c)),
+                    )
+                  }
+                  placeholder="Ej: MX, CO, AR"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  En estos países <b>no</b> se mostrará el botón de la Tienda ILINGUE RELAX.
+                </p>
+              </div>
+              <div>
+                <Label>🚫 Excluir de Hotmart</Label>
+                <Input
+                  value={(product.hotmart_excluded_countries ?? []).join(", ")}
+                  onChange={(e) =>
+                    update(
+                      "hotmart_excluded_countries",
+                      e.target.value.split(/[,\s]+/).map((c) => c.trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c)),
+                    )
+                  }
+                  placeholder="Ej: US, CA, GB, ES"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  En estos países <b>no</b> se mostrará el botón de Hotmart.
+                </p>
+              </div>
             </div>
 
-            <div className="text-xs bg-muted/40 p-2 rounded">
-              <b>Ejemplos:</b> Solo Hotmart en LATAM → activa Hotmart, deja tienda ON, y excluye países si quieres bloquear la tienda.
-              Solo Tienda mundial → deja Hotmart vacío.
-              Los dos canales → ambos activos, el visitante verá los dos botones.
+            <div className="text-xs bg-muted/40 p-2 rounded space-y-1">
+              <div><b>Ejemplo 1:</b> Solo Hotmart en LATAM → Tienda ON + excluir tienda en LATAM (MX, CO, AR…), Hotmart con enlace y excluir Hotmart en angloparlantes (US, CA, GB, ES).</div>
+              <div><b>Ejemplo 2:</b> Solo Tienda mundial → deja Hotmart vacío.</div>
+              <div><b>Ejemplo 3:</b> Los dos canales en todos lados → ambos activos, sin exclusiones.</div>
             </div>
           </Card>
 

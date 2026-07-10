@@ -24,6 +24,8 @@ interface DBProduct {
   hotmart_url: string | null;
   store_enabled: boolean;
   excluded_countries: string[] | null;
+  store_excluded_countries: string[] | null;
+  hotmart_excluded_countries: string[] | null;
 }
 
 const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [
@@ -66,7 +68,7 @@ const ProductDynamic = () => {
     (async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();
@@ -155,9 +157,11 @@ const ProductDynamic = () => {
 
               {(() => {
                 const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
-                const excluded = (product.excluded_countries ?? []).includes(effectiveCountry);
-                const storeOn = product.store_enabled && !excluded;
-                const hotmartOn = !!product.hotmart_url && !excluded;
+                const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
+                const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
+                const hotmartExcluded = globalExcluded || (product.hotmart_excluded_countries ?? []).includes(effectiveCountry);
+                const storeOn = product.store_enabled && !storeExcluded;
+                const hotmartOn = !!product.hotmart_url && !hotmartExcluded;
 
                 if (!storeOn && !hotmartOn) {
                   return (

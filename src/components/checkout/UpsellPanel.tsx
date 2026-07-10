@@ -188,9 +188,8 @@ export function UpsellPanel({ upsells }: Props) {
               </div>
 
               <div className="text-right shrink-0 space-y-0.5">
-                {hasDiscount && <PriceWithLocal usd={u.originalPrice!} strike />}
-                <PriceWithLocal usd={u.price} emphasis added={added} />
-                {hasDiscount && <SavingsInline usd={u.originalPrice! - u.price} />}
+                {hasDiscount && <Price usd={u.originalPrice!} strike />}
+                <Price usd={u.price} emphasis added={added} prefix="+" />
               </div>
             </button>
           );

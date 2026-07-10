@@ -122,7 +122,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.email}
               onChange={(e) => setBuyer({ email: e.target.value.trim() })}
-              placeholder="tucorreo@email.com"
+              placeholder={t.emailPlaceholder}
               aria-invalid={showEmailError}
               className={cn(
                 "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",

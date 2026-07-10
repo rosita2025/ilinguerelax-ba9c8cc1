@@ -472,6 +472,14 @@ export function PaymentMethodsGroup() {
         >
           {mpLoading ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
+          ) : selected === "card" ? (
+            <><Lock className="w-4 h-4" /> {language === "en"
+              ? "Continue → enter card"
+              : language === "pt"
+                ? "Continuar → digitar cartão"
+                : language === "fr"
+                  ? "Continuer → saisir la carte"
+                  : "Continuar → ingresar tarjeta"}</>
           ) : (
             <><Lock className="w-4 h-4" /> {t.buyNow}</>
           )}

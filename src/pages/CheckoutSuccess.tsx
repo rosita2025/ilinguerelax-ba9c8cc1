@@ -63,7 +63,7 @@ export default function CheckoutSuccess() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Thanks for your purchase · ILINGUE RELAX</title>
+        <title>{t.metaSuccess}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

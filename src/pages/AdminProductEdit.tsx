@@ -218,22 +218,88 @@ const AdminProductEdit = () => {
             </div>
 
             <div className="pt-4 border-t border-border space-y-4">
-              <div>
-                <h3 className="font-medium text-sm">🎁 Bono adicional (opcional)</h3>
-                <p className="text-xs text-muted-foreground">Se enviará junto con el producto principal en el mismo correo.</p>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-medium text-sm">🎁 Bonos adicionales (opcional)</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Hasta {MAX_BONUSES} bonos. Se envían junto con el producto principal en el mismo correo.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={(product.bonuses?.length ?? 0) >= MAX_BONUSES}
+                  onClick={() => {
+                    const list = [...(product.bonuses ?? [])];
+                    if (list.length >= MAX_BONUSES) return;
+                    list.push({ name: "", drive_url: "", access_key: "" });
+                    update("bonuses", list);
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Añadir bono
+                </Button>
               </div>
-              <div>
-                <Label>Nombre del bono</Label>
-                <Input value={product.bonus_name ?? ""} onChange={(e) => update("bonus_name", e.target.value)} placeholder="Ej: Bono — Guía completa del Hangul" />
-              </div>
-              <div>
-                <Label>Enlace Google Drive del bono</Label>
-                <Input value={product.bonus_drive_url ?? ""} onChange={(e) => update("bonus_drive_url", e.target.value)} placeholder="https://drive.google.com/file/d/…" />
-              </div>
-              <div>
-                <Label>Clave de acceso del bono (opcional)</Label>
-                <Input value={product.bonus_access_key ?? ""} onChange={(e) => update("bonus_access_key", e.target.value)} placeholder="Solo si el PDF la requiere" />
-              </div>
+
+              {(product.bonuses ?? []).length === 0 && (
+                <p className="text-sm text-muted-foreground italic">Sin bonos configurados.</p>
+              )}
+
+              {(product.bonuses ?? []).map((b, i) => (
+                <div key={i} className="bg-muted/40 p-3 rounded-lg space-y-3 relative">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">Bono #{i + 1}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const list = [...(product.bonuses ?? [])];
+                        list.splice(i, 1);
+                        update("bonuses", list);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div>
+                    <Label>Nombre del bono</Label>
+                    <Input
+                      value={b.name}
+                      onChange={(e) => {
+                        const list = [...(product.bonuses ?? [])];
+                        list[i] = { ...list[i], name: e.target.value };
+                        update("bonuses", list);
+                      }}
+                      placeholder="Ej: Guía completa del Hangul"
+                    />
+                  </div>
+                  <div>
+                    <Label>Enlace Google Drive</Label>
+                    <Input
+                      value={b.drive_url}
+                      onChange={(e) => {
+                        const list = [...(product.bonuses ?? [])];
+                        list[i] = { ...list[i], drive_url: e.target.value };
+                        update("bonuses", list);
+                      }}
+                      placeholder="https://drive.google.com/file/d/…"
+                    />
+                  </div>
+                  <div>
+                    <Label>Clave de acceso (opcional)</Label>
+                    <Input
+                      value={b.access_key}
+                      onChange={(e) => {
+                        const list = [...(product.bonuses ?? [])];
+                        list[i] = { ...list[i], access_key: e.target.value };
+                        update("bonuses", list);
+                      }}
+                      placeholder="Solo si el PDF la requiere"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
 

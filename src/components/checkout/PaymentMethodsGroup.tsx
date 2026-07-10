@@ -311,7 +311,7 @@ export function PaymentMethodsGroup() {
     const s = useCheckoutPruebaStore.getState();
     const orderNumber = `ILR-YP-${Math.floor(1000 + Math.random() * 9000)}`;
     const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
-    const productList = s.items.map((i) => `• ${i.title} x${i.quantity}`).join("\n");
+    const productList = s.items.map((i) => `• ${i.name} x${i.quantity}`).join("\n");
     const msg =
       `Hola! 👋 Acabo de pagar por Yape/Plin.\n\n` +
       `📦 Orden: ${orderNumber}\n` +

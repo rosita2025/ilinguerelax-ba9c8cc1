@@ -143,7 +143,7 @@ export function BuyerInfoForm() {
 
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            WhatsApp (opcional)
+            {t.whatsappOptional}
           </span>
           <div className="relative mt-1">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

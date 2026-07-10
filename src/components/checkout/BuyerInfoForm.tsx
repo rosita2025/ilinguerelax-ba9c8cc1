@@ -148,15 +148,14 @@ export function BuyerInfoForm() {
           <span className="text-xs font-medium text-muted-foreground">
             {t.whatsappOptional}
           </span>
-          <div className="relative mt-1">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="tel"
-              autoComplete="tel"
+          <div className="mt-1 phone-input-wrap">
+            <PhoneInput
+              international
+              defaultCountry={(region.country as any) || "PE"}
               value={buyer.phone ?? ""}
-              onChange={(e) => setBuyer({ phone: e.target.value })}
-              placeholder="+51 999 999 999"
-              className="w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              onChange={(v) => setBuyer({ phone: v ?? "" })}
+              placeholder="999 999 999"
+              className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/40"
             />
           </div>
         </label>

@@ -326,7 +326,14 @@ Deno.serve(async (req) => {
       };
       const { error: insErr } = await supabase.from("funnel_events").insert(row);
       if (insErr) {
-        console.error("MP funnel_events insert error:", insErr, row);
+        await raiseAlert({
+          reason: "Insert en funnel_events falló",
+          severity: "error",
+          data_id: dataId,
+          event_type: type,
+          payload: row,
+          error_message: insErr.message,
+        });
       } else {
         console.log("MP event logged:", { type, dataId, event_name: row.event_name, value: row.value, currency: row.currency });
       }
@@ -337,7 +344,12 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("MP webhook error:", err);
+    await raiseAlert({
+      reason: "Excepción no controlada en webhook MP",
+      severity: "critical",
+      error_message: err instanceof Error ? err.message : String(err),
+      payload: { stack: err instanceof Error ? err.stack : undefined },
+    });
     // Return 200 to avoid infinite retries when the problem is on our side.
     return new Response(JSON.stringify({ received: true, error: String(err) }), {
       status: 200,

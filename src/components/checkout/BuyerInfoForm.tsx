@@ -19,6 +19,7 @@ export const BUYER_ERRORS_EVENT = "checkout:showBuyerErrors";
 
 export function BuyerInfoForm() {
   const { buyer, setBuyer } = useCheckoutPruebaStore();
+  const region = useRegionTier();
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const valid = isBuyerValid(buyer);

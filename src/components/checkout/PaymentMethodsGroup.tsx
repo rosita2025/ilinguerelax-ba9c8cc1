@@ -100,7 +100,7 @@ export function PaymentMethodsGroup() {
         returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
       },
     });
-    if (error || !data?.clientSecret) throw new Error(error?.message || "Error de pago");
+    if (error || !data?.clientSecret) throw new Error(error?.message || t.errorPayment);
     supabase.from("email_contacts").upsert({
       email: s.buyer.email.trim().toLowerCase(),
       name: s.buyer.fullName.trim(),

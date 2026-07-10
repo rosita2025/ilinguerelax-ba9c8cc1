@@ -227,8 +227,21 @@ Deno.serve(async (req) => {
     }
 
     if (logged) {
-      await supabase.from("funnel_events").insert(logged);
-      console.log("MP event logged:", { type, dataId, event_type: logged.event_type });
+      const row = {
+        event_name: logged.event_type as string,
+        product_id: (logged.product_id as string) ?? null,
+        value: (logged.amount as number) ?? null,
+        currency: (logged.currency as string) ?? null,
+        country: (logged.country as string) ?? null,
+        page_path: `mp-webhook:${type}`,
+        referrer: JSON.stringify(logged.metadata ?? {}).slice(0, 2000),
+      };
+      const { error: insErr } = await supabase.from("funnel_events").insert(row);
+      if (insErr) {
+        console.error("MP funnel_events insert error:", insErr, row);
+      } else {
+        console.log("MP event logged:", { type, dataId, event_name: row.event_name, value: row.value, currency: row.currency });
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {

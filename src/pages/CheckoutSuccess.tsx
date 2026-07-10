@@ -14,6 +14,14 @@ export default function CheckoutSuccess() {
   const paymentId = sp.get("payment_id") || sp.get("collection_id") || sp.get("session_id");
   const status = sp.get("status") || sp.get("collection_status") || "approved";
   const externalRef = sp.get("external_reference") || sp.get("preference_id");
+  const paypalToken = sp.get("token") || sp.get("PayerID");
+  const provider = sp.get("session_id")
+    ? "stripe"
+    : paypalToken
+    ? "paypal"
+    : sp.get("payment_id") || sp.get("collection_id")
+    ? "mercadopago"
+    : "unknown";
 
   const { items, buyer, couponPercent, coupon, clear } = useCheckoutPruebaStore();
   const region = useRegionTier();
@@ -22,10 +30,21 @@ export default function CheckoutSuccess() {
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
 
+  // Gate: only real buyers from Stripe or PayPal should see the confirmation.
+  // A visitor without a valid payment reference OR without buyer info in the
+  // session store is treated as public/unknown and gets a neutral screen.
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken);
+  const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
+  const isVerifiedBuyer =
+    hasPaymentRef &&
+    hasBuyerContext &&
+    (provider === "stripe" || provider === "paypal" || provider === "mercadopago") &&
+    status !== "rejected" && status !== "failure";
+
   // Send confirmation email once, then clear the cart
   useEffect(() => {
     if (sentRef.current) return;
-    if (!buyer.email || items.length === 0) return;
+    if (!isVerifiedBuyer) return;
     const key = `order-email-sent:${paymentId || externalRef || buyer.email}`;
     if (sessionStorage.getItem(key)) {
       const t = setTimeout(() => clear(), 500);
@@ -42,7 +61,7 @@ export default function CheckoutSuccess() {
           orderId: paymentId || externalRef || undefined,
           total,
           currency: "USD",
-          paymentProvider: sp.get("session_id") ? "stripe" : sp.get("payment_id") ? "mercadopago" : "unknown",
+          paymentProvider: provider,
           items: items.map((i) => ({
             id: i.id,
             name: i.name,
@@ -59,6 +78,60 @@ export default function CheckoutSuccess() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Localized copy for the public / unverified screen (IP-based via useI18n)
+  const publicCopy = {
+    es: {
+      title: "Página privada de confirmación",
+      body: "Esta página muestra los detalles de un pedido reciente y solo está disponible para compradores verificados con un pago aprobado en Stripe o PayPal.",
+      cta: "Ir a la tienda",
+    },
+    en: {
+      title: "Private order confirmation",
+      body: "This page shows details of a recent order and is only available to verified buyers with an approved payment in Stripe or PayPal.",
+      cta: "Go to store",
+    },
+    fr: {
+      title: "Confirmation de commande privée",
+      body: "Cette page affiche les détails d'une commande récente et n'est accessible qu'aux acheteurs vérifiés avec un paiement approuvé sur Stripe ou PayPal.",
+      cta: "Aller à la boutique",
+    },
+    pt: {
+      title: "Confirmação de pedido privada",
+      body: "Esta página mostra os detalhes de um pedido recente e está disponível apenas para compradores verificados com um pagamento aprovado no Stripe ou PayPal.",
+      cta: "Ir para a loja",
+    },
+  } as const;
+  const pc = (publicCopy as any)[language] || publicCopy.es;
+
+  if (!isVerifiedBuyer) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Helmet>
+          <title>{pc.title}</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <header className="border-b bg-background/95">
+          <div className="max-w-3xl mx-auto px-4 py-4">
+            <Link to="/" className="text-xl font-bold tracking-tight" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+              ILINGUE <span className="text-primary">RELAX</span>
+            </Link>
+          </div>
+        </header>
+        <main className="flex-1 flex items-center justify-center px-4 py-16">
+          <div className="max-w-md text-center space-y-5">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
+              <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h1 className="text-2xl font-bold">{pc.title}</h1>
+            <p className="text-muted-foreground text-sm">{pc.body}</p>
+            <Button asChild size="lg">
+              <Link to="/">{pc.cta}</Link>
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

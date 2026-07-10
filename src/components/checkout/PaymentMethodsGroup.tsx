@@ -39,7 +39,7 @@ export function PaymentMethodsGroup() {
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
-  const [stripeError, setStripeError] = useState<string | null>(null);
+  const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [stripeElapsed, setStripeElapsed] = useState(0);

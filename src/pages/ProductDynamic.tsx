@@ -148,9 +148,26 @@ const ProductDynamic = () => {
                 </div>
               </div>
 
-              <Button asChild size="lg" className="w-full">
-                <Link to={`/checkouts/${product.sku}`}>Comprar ahora · {displayFormatted}</Link>
-              </Button>
+              {(() => {
+                // Route buy button by visitor country:
+                // - Store checkout countries (Perú, USA, Canadá, UK, Asia, Europa…) → checkout propio.
+                // - Resto de LATAM → Hotmart (si hay enlace); si no, checkout propio como fallback.
+                const useStore = STORE_CHECKOUT_COUNTRIES.has(local.country) || !product.hotmart_url;
+                if (useStore) {
+                  return (
+                    <Button asChild size="lg" className="w-full">
+                      <Link to={`/checkouts/${product.sku}`}>Comprar ahora · {displayFormatted}</Link>
+                    </Button>
+                  );
+                }
+                return (
+                  <Button asChild size="lg" className="w-full bg-[#EF4E23] hover:bg-[#d73f18] text-white">
+                    <a href={product.hotmart_url!} target="_blank" rel="noopener noreferrer">
+                      Comprar en Hotmart · {displayFormatted}
+                    </a>
+                  </Button>
+                );
+              })()}
 
               {bonusList.length > 0 && (
                 <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl">

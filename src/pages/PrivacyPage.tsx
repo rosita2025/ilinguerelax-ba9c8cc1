@@ -12,7 +12,7 @@ const sections = [
     content: `Recopilamos la información necesaria para brindarte nuestros servicios y productos digitales:
 
 • Datos de contacto: nombre, correo electrónico y número de teléfono (cuando nos contactas o realizas una compra).
-• Información de pago: procesada de forma segura por nuestros proveedores autorizados (Stripe, Mercado Pago, Yape/Plin, Hotmart y Shopify). No almacenamos datos completos de tarjetas de crédito ni credenciales bancarias en nuestros servidores.
+• Información de pago: procesada de forma segura por nuestros proveedores autorizados (Stripe, Mercado Pago, Yape/Plin, Hotmart y Amazon). No almacenamos datos completos de tarjetas de crédito ni credenciales bancarias en nuestros servidores.
 • Datos de navegación: dirección IP, país de origen, tipo de dispositivo y comportamiento en el sitio (páginas visitadas, tiempo de sesión), recopilados mediante cookies y herramientas de análisis como Meta Pixel y Google Analytics.
 • Preferencias de idioma y moneda: para personalizar tu experiencia de compra.`
   },

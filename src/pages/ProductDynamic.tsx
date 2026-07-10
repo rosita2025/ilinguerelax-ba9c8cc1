@@ -22,23 +22,27 @@ interface DBProduct {
   active: boolean;
   bonuses: unknown;
   hotmart_url: string | null;
+  store_enabled: boolean;
+  excluded_countries: string[] | null;
 }
 
-/**
- * Países que usan el checkout propio de la tienda (ILINGUE RELAX):
- * Perú + Norteamérica + Europa/UK + Asia + Oceanía angloparlante.
- * El resto de Latinoamérica ve el botón de Hotmart si el producto tiene enlace configurado.
- */
-const STORE_CHECKOUT_COUNTRIES = new Set([
-  // LATAM excepción (Perú)
-  "PE",
-  // Angloparlantes / Norteamérica
-  "US", "CA", "GB", "IE", "AU", "NZ",
-  // Europa
-  "ES", "FR", "DE", "IT", "PT", "NL", "BE", "AT", "CH", "SE", "NO", "DK", "FI", "GR", "PL", "CZ",
-  // Asia
-  "JP", "KR", "CN", "HK", "TW", "SG", "MY", "TH", "PH", "ID", "VN", "IN", "AE", "SA", "IL", "TR",
-]);
+const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [
+  { code: "auto", label: "🌐 Auto (detectar por IP)" },
+  { code: "PE", label: "🇵🇪 Perú" },
+  { code: "MX", label: "🇲🇽 México" },
+  { code: "CO", label: "🇨🇴 Colombia" },
+  { code: "AR", label: "🇦🇷 Argentina" },
+  { code: "CL", label: "🇨🇱 Chile" },
+  { code: "BR", label: "🇧🇷 Brasil" },
+  { code: "US", label: "🇺🇸 Estados Unidos" },
+  { code: "CA", label: "🇨🇦 Canadá" },
+  { code: "GB", label: "🇬🇧 Reino Unido" },
+  { code: "ES", label: "🇪🇸 España" },
+  { code: "FR", label: "🇫🇷 Francia" },
+  { code: "DE", label: "🇩🇪 Alemania" },
+  { code: "JP", label: "🇯🇵 Japón" },
+  { code: "KR", label: "🇰🇷 Corea" },
+];
 
 const FLAG: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",
@@ -54,6 +58,7 @@ const ProductDynamic = () => {
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [simCountry, setSimCountry] = useState<string>("auto");
 
   useEffect(() => {
     if (!slug) return;
@@ -61,7 +66,7 @@ const ProductDynamic = () => {
     (async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();
@@ -149,25 +154,53 @@ const ProductDynamic = () => {
               </div>
 
               {(() => {
-                // Route buy button by visitor country:
-                // - Store checkout countries (Perú, USA, Canadá, UK, Asia, Europa…) → checkout propio.
-                // - Resto de LATAM → Hotmart (si hay enlace); si no, checkout propio como fallback.
-                const useStore = STORE_CHECKOUT_COUNTRIES.has(local.country) || !product.hotmart_url;
-                if (useStore) {
+                const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
+                const excluded = (product.excluded_countries ?? []).includes(effectiveCountry);
+                const storeOn = product.store_enabled && !excluded;
+                const hotmartOn = !!product.hotmart_url && !excluded;
+
+                if (!storeOn && !hotmartOn) {
                   return (
-                    <Button asChild size="lg" className="w-full">
-                      <Link to={`/checkouts/${product.sku}`}>Comprar ahora · {displayFormatted}</Link>
-                    </Button>
+                    <div className="p-4 rounded-lg border bg-muted/40 text-sm text-center text-muted-foreground">
+                      Este producto no está disponible en tu país por ahora.
+                    </div>
                   );
                 }
+
                 return (
-                  <Button asChild size="lg" className="w-full bg-[#EF4E23] hover:bg-[#d73f18] text-white">
-                    <a href={product.hotmart_url!} target="_blank" rel="noopener noreferrer">
-                      Comprar en Hotmart · {displayFormatted}
-                    </a>
-                  </Button>
+                  <div className="space-y-2">
+                    {storeOn && (
+                      <Button asChild size="lg" className="w-full">
+                        <Link to={`/checkouts/${product.sku}`}>
+                          {hotmartOn ? "Comprar en la tienda" : "Comprar ahora"} · {displayFormatted}
+                        </Link>
+                      </Button>
+                    )}
+                    {hotmartOn && (
+                      <Button asChild size="lg" className="w-full bg-[#EF4E23] hover:bg-[#d73f18] text-white">
+                        <a href={product.hotmart_url!} target="_blank" rel="noopener noreferrer">
+                          Comprar en Hotmart · {displayFormatted}
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 );
               })()}
+
+              {/* Simulador de región (solo visual, para pruebas) */}
+              <details className="mt-3 text-xs text-muted-foreground">
+                <summary className="cursor-pointer select-none">🧪 Simular país (pruebas)</summary>
+                <select
+                  value={simCountry}
+                  onChange={(e) => setSimCountry(e.target.value)}
+                  className="mt-2 w-full border rounded px-2 py-1 bg-background"
+                >
+                  {COUNTRY_OPTIONS.map((c) => (
+                    <option key={c.code} value={c.code}>{c.label}</option>
+                  ))}
+                </select>
+                <p className="mt-1">País detectado por IP: <b>{local.country || "?"}</b></p>
+              </details>
 
               {bonusList.length > 0 && (
                 <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl">

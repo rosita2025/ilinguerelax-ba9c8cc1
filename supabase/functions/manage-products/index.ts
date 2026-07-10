@@ -38,6 +38,8 @@ interface ProductIn {
   bonus_access_key?: string | null;
   bonuses?: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
   hotmart_url?: string | null;
+  store_enabled?: boolean;
+  excluded_countries?: string[] | null;
   upsells?: UpsellIn[];
 }
 
@@ -111,6 +113,12 @@ Deno.serve(async (req) => {
               .slice(0, 4)
           : [],
         hotmart_url: p.hotmart_url?.toString().trim() || null,
+        store_enabled: p.store_enabled ?? true,
+        excluded_countries: Array.isArray(p.excluded_countries)
+          ? p.excluded_countries
+              .map((c) => (c ?? "").toString().trim().toUpperCase())
+              .filter((c) => /^[A-Z]{2}$/.test(c))
+          : [],
       };
 
       const { error: upErr } = await admin

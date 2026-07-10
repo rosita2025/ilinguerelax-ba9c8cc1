@@ -246,6 +246,14 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
           {processing === "create" ? "Creando orden…" : "Confirmando pago…"}
         </div>
       )}
+      {!loading && fallbackToUsd && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800">
+          <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+          <p className="flex-1">
+            PayPal no procesa pagos en <span className="font-semibold">{localCurrency!.toUpperCase()}</span>, por eso el cobro se hará en <span className="font-semibold">USD ${amountUsd.toFixed(2)}</span>. Tu banco convertirá al tipo de cambio del día. Es un cobro normal y seguro.
+          </p>
+        </div>
+      )}
       <div ref={ref} />
       {err && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 space-y-2">

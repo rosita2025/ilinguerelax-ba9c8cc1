@@ -215,17 +215,19 @@ const Product1000Verbos = () => {
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full mb-4 text-base py-5 border-2"
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Agregar al carrito
-                </Button>
-              </motion.div>
+              {isPeru && (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full mb-4 text-base py-5 border-2"
+                    onClick={handleAddToCart}
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Agregar al carrito
+                  </Button>
+                </motion.div>
+              )}
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👆 Haz clic para asegurar tu copia al precio de oferta

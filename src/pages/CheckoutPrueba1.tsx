@@ -37,10 +37,11 @@ export default function CheckoutPrueba1() {
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
             <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
             <span className="hidden sm:inline font-medium">
-              {isPeru ? "Stripe SSL · Mercado Pago" : "Stripe SSL · Pago seguro"}
+              {isPeru ? t.stripeSslMP : t.stripeSSL}
             </span>
             <span className="sm:hidden font-medium">SSL</span>
           </div>
+
 
         </div>
       </header>

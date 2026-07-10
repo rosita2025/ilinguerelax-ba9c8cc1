@@ -104,7 +104,7 @@ export function BuyerInfoForm() {
             />
           </div>
           {showNameError && (
-            <p className="text-[11px] text-destructive mt-1">Ingresa tu nombre completo.</p>
+            <p className="text-[11px] text-destructive mt-1">{t.fullNameError}</p>
           )}
         </label>
 

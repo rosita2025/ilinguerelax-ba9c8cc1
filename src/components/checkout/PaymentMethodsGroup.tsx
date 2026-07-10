@@ -272,7 +272,7 @@ export function PaymentMethodsGroup() {
   return (
     <div id="payment-methods" ref={methodsAnchorRef} className="space-y-3 scroll-mt-24">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {isPeru ? "Elige tu método de pago" : "Pago con tarjeta"}
+        {isPeru ? t.choosePaymentMethod : t.cardPayment}
       </h2>
 
       {methods.map((m) => {

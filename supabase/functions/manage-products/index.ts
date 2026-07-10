@@ -33,6 +33,9 @@ interface ProductIn {
   sort_order?: number;
   stripe_product_id?: string | null;
   stripe_price_id?: string | null;
+  bonus_name?: string | null;
+  bonus_drive_url?: string | null;
+  bonus_access_key?: string | null;
   upsells?: UpsellIn[];
 }
 

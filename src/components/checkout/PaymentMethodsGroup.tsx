@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";

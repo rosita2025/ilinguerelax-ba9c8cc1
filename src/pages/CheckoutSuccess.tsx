@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function CheckoutSuccess() {
   const [sp] = useSearchParams();
@@ -15,12 +16,45 @@ export default function CheckoutSuccess() {
   const { items, buyer, couponPercent, coupon, clear } = useCheckoutPruebaStore();
   const region = useRegionTier();
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const sentRef = useRef(false);
 
-  // Snapshot cart before clearing (Shopify-style: order confirmation shows what was bought)
+  // Send confirmation email once, then clear the cart
   useEffect(() => {
-    const timer = setTimeout(() => clear(), 500);
-    return () => clearTimeout(timer);
-  }, [clear]);
+    if (sentRef.current) return;
+    if (!buyer.email || items.length === 0) return;
+    const key = `order-email-sent:${paymentId || externalRef || buyer.email}`;
+    if (sessionStorage.getItem(key)) {
+      const t = setTimeout(() => clear(), 500);
+      return () => clearTimeout(t);
+    }
+    sentRef.current = true;
+    sessionStorage.setItem(key, "1");
+
+    supabase.functions
+      .invoke("send-order-confirmation", {
+        body: {
+          customerEmail: buyer.email,
+          customerName: buyer.fullName,
+          orderId: paymentId || externalRef || undefined,
+          total,
+          currency: "USD",
+          paymentProvider: sp.get("session_id") ? "stripe" : sp.get("payment_id") ? "mercadopago" : "unknown",
+          items: items.map((i) => ({
+            id: i.id,
+            name: i.name,
+            quantity: i.quantity,
+            price: itemPrice(i, region.tier),
+            image: i.image,
+          })),
+        },
+      })
+      .catch((e) => console.error("send-order-confirmation failed", e))
+      .finally(() => {
+        setTimeout(() => clear(), 800);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-background">

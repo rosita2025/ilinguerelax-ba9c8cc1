@@ -66,6 +66,81 @@ const fetchSubscription = (id: string) => mpGet(`/preapproval/${id}`);
 const fetchInvoice = (id: string) => mpGet(`/authorized_payments/${id}`);
 const fetchMerchantOrder = (id: string) => mpGet(`/merchant_orders/${id}`);
 
+const ALERT_TO = "hola@ilinguerelax.com";
+const ALERT_FROM = "Alertas ILINGUE <hola@ilinguerelax.com>";
+
+async function raiseAlert(params: {
+  reason: string;
+  severity?: "warn" | "error" | "critical";
+  data_id?: string;
+  event_type?: string;
+  http_status?: number;
+  payload?: unknown;
+  error_message?: string;
+}) {
+  const severity = params.severity ?? "error";
+  console.error(`[MP ALERT ${severity}] ${params.reason}`, params);
+
+  // 1. Log to DB (best-effort)
+  let notified = false;
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    // 2. Send email via Resend (best-effort, only for error/critical)
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (resendKey && severity !== "warn") {
+      try {
+        const r = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: ALERT_FROM,
+            to: [ALERT_TO],
+            subject: `[MP Webhook ${severity.toUpperCase()}] ${params.reason}`,
+            html: `
+              <h2>Mercado Pago Webhook Alert</h2>
+              <p><b>Severity:</b> ${severity}</p>
+              <p><b>Reason:</b> ${params.reason}</p>
+              <p><b>Event type:</b> ${params.event_type ?? "n/a"}</p>
+              <p><b>Data ID:</b> ${params.data_id ?? "n/a"}</p>
+              <p><b>HTTP status:</b> ${params.http_status ?? "n/a"}</p>
+              <p><b>Error:</b> <code>${(params.error_message ?? "").slice(0, 500)}</code></p>
+              <pre style="background:#f4f4f4;padding:8px;overflow:auto;font-size:12px">
+${JSON.stringify(params.payload ?? {}, null, 2).slice(0, 3000)}
+              </pre>
+              <p style="color:#666;font-size:12px">Revisa el panel de Mercado Pago si el problema persiste.</p>
+            `,
+          }),
+        });
+        notified = r.ok;
+        if (!r.ok) console.error("Resend alert failed:", r.status, await r.text());
+      } catch (e) {
+        console.error("Resend alert threw:", e);
+      }
+    }
+
+    await supabase.from("webhook_alerts").insert({
+      provider: "mercadopago",
+      severity,
+      reason: params.reason,
+      data_id: params.data_id ?? null,
+      event_type: params.event_type ?? null,
+      http_status: params.http_status ?? null,
+      payload: params.payload ?? null,
+      error_message: params.error_message ?? null,
+      notified,
+    });
+  } catch (e) {
+    console.error("raiseAlert failed:", e);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
@@ -86,6 +161,12 @@ Deno.serve(async (req) => {
     console.log("MP webhook received:", { type, dataId, action: body?.action });
 
     if (!dataId) {
+      await raiseAlert({
+        reason: "Webhook sin data.id",
+        severity: "warn",
+        event_type: type,
+        payload: body,
+      });
       return new Response(JSON.stringify({ received: true, ignored: "no data.id" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -94,7 +175,14 @@ Deno.serve(async (req) => {
 
     const ok = await verifySignature(req, dataId);
     if (!ok) {
-      console.error("Invalid MP signature");
+      await raiseAlert({
+        reason: "Firma HMAC inválida",
+        severity: "critical",
+        data_id: dataId,
+        event_type: type,
+        http_status: 401,
+        payload: body,
+      });
       return new Response("Invalid signature", { status: 401, headers: corsHeaders });
     }
 
@@ -238,7 +326,14 @@ Deno.serve(async (req) => {
       };
       const { error: insErr } = await supabase.from("funnel_events").insert(row);
       if (insErr) {
-        console.error("MP funnel_events insert error:", insErr, row);
+        await raiseAlert({
+          reason: "Insert en funnel_events falló",
+          severity: "error",
+          data_id: dataId,
+          event_type: type,
+          payload: row,
+          error_message: insErr.message,
+        });
       } else {
         console.log("MP event logged:", { type, dataId, event_name: row.event_name, value: row.value, currency: row.currency });
       }
@@ -249,7 +344,12 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("MP webhook error:", err);
+    await raiseAlert({
+      reason: "Excepción no controlada en webhook MP",
+      severity: "critical",
+      error_message: err instanceof Error ? err.message : String(err),
+      payload: { stack: err instanceof Error ? err.stack : undefined },
+    });
     // Return 200 to avoid infinite retries when the problem is on our side.
     return new Response(JSON.stringify({ received: true, error: String(err) }), {
       status: 200,

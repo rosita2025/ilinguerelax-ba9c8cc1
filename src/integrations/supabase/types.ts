@@ -509,6 +509,48 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_alerts: {
+        Row: {
+          created_at: string
+          data_id: string | null
+          error_message: string | null
+          event_type: string | null
+          http_status: number | null
+          id: string
+          notified: boolean
+          payload: Json | null
+          provider: string
+          reason: string
+          severity: string
+        }
+        Insert: {
+          created_at?: string
+          data_id?: string | null
+          error_message?: string | null
+          event_type?: string | null
+          http_status?: number | null
+          id?: string
+          notified?: boolean
+          payload?: Json | null
+          provider: string
+          reason: string
+          severity?: string
+        }
+        Update: {
+          created_at?: string
+          data_id?: string | null
+          error_message?: string | null
+          event_type?: string | null
+          http_status?: number | null
+          id?: string
+          notified?: boolean
+          payload?: Json | null
+          provider?: string
+          reason?: string
+          severity?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       reviews_public: {

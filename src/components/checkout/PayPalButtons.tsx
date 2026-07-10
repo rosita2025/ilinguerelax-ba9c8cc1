@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, AlertTriangle, RefreshCw, Copy, Check } from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw, Copy, Check, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 declare global {
@@ -83,9 +83,14 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
   const [reloadKey, setReloadKey] = useState(0);
   const [processing, setProcessing] = useState<Phase | null>(null);
 
-  const useLocal = !!localCurrency && PAYPAL_SUPPORTED.has(localCurrency.toUpperCase()) && !!localAmount && localAmount > 0;
+  const providedLocal = !!localCurrency && localCurrency.toUpperCase() !== "USD" && !!localAmount && localAmount > 0;
+  const localSupported = providedLocal && PAYPAL_SUPPORTED.has(localCurrency!.toUpperCase());
+  const useLocal = providedLocal && localSupported;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
   const amount = useLocal ? Number(localAmount!.toFixed(2)) : Number(amountUsd.toFixed(2));
+  // Fallback ocurre cuando el comprador tiene una moneda local detectada
+  // pero PayPal no la acepta (p. ej. PEN, ARS, COP, CLP).
+  const fallbackToUsd = providedLocal && !localSupported;
 
   const correlationIdRef = useRef<string>(
     (globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
@@ -239,6 +244,14 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
         <div className="flex items-center justify-center py-2 text-xs text-neutral-500">
           <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
           {processing === "create" ? "Creando orden…" : "Confirmando pago…"}
+        </div>
+      )}
+      {!loading && fallbackToUsd && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800">
+          <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+          <p className="flex-1">
+            PayPal no procesa pagos en <span className="font-semibold">{localCurrency!.toUpperCase()}</span>, por eso el cobro se hará en <span className="font-semibold">USD ${amountUsd.toFixed(2)}</span>. Tu banco convertirá al tipo de cambio del día. Es un cobro normal y seguro.
+          </p>
         </div>
       )}
       <div ref={ref} />

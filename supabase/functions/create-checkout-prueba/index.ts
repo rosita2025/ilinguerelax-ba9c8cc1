@@ -116,6 +116,8 @@ Deno.serve(async (req) => {
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
+      // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
+      adaptive_pricing: { enabled: true },
       ...(customerId
         ? { customer: customerId, customer_update: { name: "auto", address: "auto" } }
         : { customer_email: body.contact.email }),

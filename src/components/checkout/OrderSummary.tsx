@@ -143,7 +143,7 @@ export function OrderSummary({ collapsible = false }: OrderSummaryProps) {
             <div>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Código de descuento"
+                  placeholder={t.couponPlaceholder}
                   value={couponInput}
                   onChange={(e) => {
                     setCouponInput(e.target.value);

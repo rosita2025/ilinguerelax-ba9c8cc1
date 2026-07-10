@@ -482,11 +482,12 @@ export function PaymentMethodsGroup() {
                 </div>
                 {m.id === "card" ? (
                   <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                    <TextBadge label="VISA" bg="#1A1F71" color="#ffffff" />
-                    <TextBadge label="Mastercard" bg="#EB001B" color="#ffffff" />
-                    <TextBadge label=" Pay" bg="#000000" color="#ffffff" prefix="apple" />
-                    <TextBadge label="Link" bg="#00D66F" color="#0A2540" />
+                    <LogoBadge src={visaLogo} alt="Visa" />
+                    <LogoBadge src={mastercardLogo} alt="Mastercard" />
+                    <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
+                    <LinkBadge />
                   </div>
+
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}

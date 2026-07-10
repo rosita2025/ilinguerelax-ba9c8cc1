@@ -432,7 +432,7 @@ export function PaymentMethodsGroup() {
 
       {!valid && (
         <p className="text-xs text-center text-muted-foreground pt-2">
-          👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.
+          {t.enableMethods}
         </p>
       )}
 

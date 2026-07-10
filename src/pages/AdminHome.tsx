@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -52,6 +52,13 @@ const panels = [
     title: "Pagos manuales · Yape/Plin",
     desc: "Órdenes generadas al pulsar 'Ya pagué'. Verifica el pago recibido en Yape/Plin y marca como verificada.",
     color: "text-fuchsia-500",
+  },
+  {
+    to: "/admin/productos",
+    icon: Package,
+    title: "Productos digitales",
+    desc: "Catálogo tipo Shopify: crea productos, precios, enlaces de Drive y upsells sin tocar código. Se sincroniza con checkout y correos.",
+    color: "text-teal-600",
   },
 ];
 

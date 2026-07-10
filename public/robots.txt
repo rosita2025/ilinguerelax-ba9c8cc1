@@ -41,11 +41,12 @@ Crawl-delay: 2
 # Sitemap location
 Sitemap: https://ilinguerelax.com/sitemap.xml
 
-# Disallow admin and private paths
+# Disallow admin, private and download paths
 Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
 Disallow: /private/
+Disallow: /descarga/
 Disallow: /*.json$
 
 # Allow important resources

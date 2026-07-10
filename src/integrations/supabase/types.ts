@@ -104,6 +104,72 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_products: {
+        Row: {
+          access_key: string | null
+          active: boolean
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          drive_url: string | null
+          id: string
+          is_upsell: boolean
+          learner_language: string
+          mp_preference_template: Json | null
+          name: string
+          price_pen: number | null
+          price_usd: number
+          sku: string
+          sort_order: number
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          target_language: string
+          updated_at: string
+        }
+        Insert: {
+          access_key?: string | null
+          active?: boolean
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          drive_url?: string | null
+          id?: string
+          is_upsell?: boolean
+          learner_language?: string
+          mp_preference_template?: Json | null
+          name: string
+          price_pen?: number | null
+          price_usd?: number
+          sku: string
+          sort_order?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          target_language?: string
+          updated_at?: string
+        }
+        Update: {
+          access_key?: string | null
+          active?: boolean
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          drive_url?: string | null
+          id?: string
+          is_upsell?: boolean
+          learner_language?: string
+          mp_preference_template?: Json | null
+          name?: string
+          price_pen?: number | null
+          price_usd?: number
+          sku?: string
+          sort_order?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          target_language?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_contacts: {
         Row: {
           created_at: string
@@ -397,6 +463,48 @@ export type Database = {
           resource_id?: string | null
         }
         Relationships: []
+      }
+      product_upsells: {
+        Row: {
+          created_at: string
+          discount_pct: number
+          id: string
+          product_sku: string
+          sort_order: number
+          upsell_sku: string
+        }
+        Insert: {
+          created_at?: string
+          discount_pct?: number
+          id?: string
+          product_sku: string
+          sort_order?: number
+          upsell_sku: string
+        }
+        Update: {
+          created_at?: string
+          discount_pct?: number
+          id?: string
+          product_sku?: string
+          sort_order?: number
+          upsell_sku?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_upsells_product_sku_fkey"
+            columns: ["product_sku"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["sku"]
+          },
+          {
+            foreignKeyName: "product_upsells_upsell_sku_fkey"
+            columns: ["upsell_sku"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["sku"]
+          },
+        ]
       }
       review_invitations: {
         Row: {

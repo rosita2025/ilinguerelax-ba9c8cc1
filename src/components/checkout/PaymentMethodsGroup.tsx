@@ -325,8 +325,42 @@ export function PaymentMethodsGroup() {
               )} />
             </button>
 
+            {/* Strip visual de marcas — visible SIEMPRE en la tarjeta de "card",
+                también cuando el embed aún no se abrió. Da confianza inmediata
+                al reconocer Visa/Mastercard/Apple Pay/etc. */}
+            {m.id === "card" && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-neutral-900/60 px-3 sm:px-4 py-2.5 flex flex-wrap items-center gap-1.5">
+                {cardBrands.map((b) => (
+                  <span
+                    key={b}
+                    className="text-[10px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 shadow-sm"
+                  >
+                    {b}
+                  </span>
+                ))}
+                <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-auto whitespace-nowrap">
+                  Se activa automáticamente según tu país
+                </span>
+              </div>
+            )}
+
             {m.id === "card" && isSelected && showStripe && stripePromise && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950">
+                {/* Trust row encima del embed */}
+                <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="font-medium">SSL 256-bit</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-[8px] font-bold shrink-0">✓</span>
+                    <span className="font-medium">Stripe verificado</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 justify-end">
+                    <MessageCircle className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
+                    <span className="font-medium">Soporte 24h</span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
                 </div>
@@ -337,6 +371,7 @@ export function PaymentMethodsGroup() {
                 </div>
               </div>
             )}
+
 
             {m.id === "yape" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">

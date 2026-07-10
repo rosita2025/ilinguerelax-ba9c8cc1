@@ -142,7 +142,7 @@ const ProductPatronesEspeciales = () => {
       quantity: 1,
     });
     toast.success("Producto agregado al carrito");
-    navigate("/checkouts/prueba-1");
+    navigate("/checkout/patrones-ingles");
   };
 
 
@@ -710,7 +710,7 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl="/checkouts/prueba-1"
+        buyUrl="/checkout/patrones-ingles"
         onBuyClick={handleBuy}
         ctaText="COMPRAR AHORA"
       />

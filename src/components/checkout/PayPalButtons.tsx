@@ -63,6 +63,11 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
   const useLocal = !!localCurrency && PAYPAL_SUPPORTED.has(localCurrency.toUpperCase()) && !!localAmount && localAmount > 0;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
   const amount = useLocal ? Number(localAmount!.toFixed(2)) : Number(amountUsd.toFixed(2));
+  // Correlation ID that ties one buyer's full PayPal journey together across
+  // both edge functions (create + capture) and the client console.
+  const correlationIdRef = useRef<string>(
+    (globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -76,17 +81,24 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
         window.paypal.Buttons({
           style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 },
           createOrder: async () => {
+            const correlationId = correlationIdRef.current;
+            console.info("[paypal] createOrder", { correlationId, currency, amount, amountUsd });
             const { data, error } = await supabase.functions.invoke("paypal-create-order", {
-              body: { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail },
+              body: { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, correlationId },
+              headers: { "x-correlation-id": correlationId },
             });
 
             if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");
             return data.id as string;
           },
           onApprove: async (data: { orderID: string }) => {
+            const correlationId = correlationIdRef.current;
+            console.info("[paypal] onApprove", { correlationId, orderId: data.orderID });
             const { data: cap, error } = await supabase.functions.invoke("paypal-capture-order", {
-              body: { orderId: data.orderID },
+              body: { orderId: data.orderID, correlationId },
+              headers: { "x-correlation-id": correlationId },
             });
+
             if (error || cap?.status !== "COMPLETED") {
               const msg = error?.message || "El pago no se completó";
               setErr(msg);

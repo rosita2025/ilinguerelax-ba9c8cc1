@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency, formatLocalAmount } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package } from "lucide-react";
@@ -17,14 +17,27 @@ export default function CheckoutSuccess() {
   const paypalToken = sp.get("token") || sp.get("PayerID");
   const provider = sp.get("session_id")
     ? "stripe"
-    : paypalToken
+    : (paypalToken || sp.get("paypal_order"))
     ? "paypal"
     : sp.get("payment_id") || sp.get("collection_id")
     ? "mercadopago"
     : "unknown";
 
-  const { items, buyer, couponPercent, coupon, clear } = useCheckoutPruebaStore();
+  const store = useCheckoutPruebaStore();
   const region = useRegionTier();
+  // Snapshot items/buyer/totals at mount — the effect below clears the cart
+  // after sending the confirmation email, and we still want the summary shown.
+  const [snapshot] = useState(() => ({
+    items: store.items,
+    buyer: store.buyer,
+    couponPercent: store.couponPercent,
+    coupon: store.coupon,
+  }));
+  const items = snapshot.items;
+  const buyer = snapshot.buyer;
+  const couponPercent = snapshot.couponPercent;
+  const coupon = snapshot.coupon;
+  const clear = store.clear;
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
   const sentRef = useRef(false);
   const { language } = useI18n();
@@ -33,13 +46,16 @@ export default function CheckoutSuccess() {
   // Gate: only real buyers from Stripe or PayPal should see the confirmation.
   // A visitor without a valid payment reference OR without buyer info in the
   // session store is treated as public/unknown and gets a neutral screen.
-  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken);
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order"));
   const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
-  const isVerifiedBuyer =
+  const initialVerified =
     hasPaymentRef &&
     hasBuyerContext &&
     (provider === "stripe" || provider === "paypal" || provider === "mercadopago") &&
     status !== "rejected" && status !== "failure";
+  // Freeze verification at mount so clearing the cart after sending the
+  // confirmation email doesn't flip the screen to "private confirmation".
+  const [isVerifiedBuyer] = useState(initialVerified);
 
   // Send confirmation email once, then clear the cart
   useEffect(() => {

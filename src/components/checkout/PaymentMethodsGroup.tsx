@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
+import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 
 type Method = "card" | "paypal" | "transfer" | "cash" | "yape";
 const YAPE_PHONE = "972119741";
@@ -38,7 +39,7 @@ export function PaymentMethodsGroup() {
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
-  const [stripeError, setStripeError] = useState<string | null>(null);
+  const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [stripeElapsed, setStripeElapsed] = useState(0);
@@ -117,8 +118,7 @@ export function PaymentMethodsGroup() {
       }, { onConflict: "email,source" }).then(() => {});
       return data.clientSecret;
     } catch (err) {
-      const message = err instanceof Error ? err.message : t.errorPayment;
-      setStripeError(message);
+      setStripeError(mapStripeError(err, language as StripeLang));
       throw err;
     } finally {
       setStripeLoading(false);
@@ -251,15 +251,7 @@ export function PaymentMethodsGroup() {
       if (s >= 90) {
         window.clearInterval(tick);
         if (!container.querySelector('iframe[name="embedded-checkout"]')) {
-          setStripeError(
-            language === "en"
-              ? "The secure card form is taking too long to open. Check your connection and try again, or contact us on WhatsApp."
-              : language === "pt"
-                ? "O formulário seguro de cartão está demorando muito. Verifique sua conexão e tente novamente, ou fale conosco no WhatsApp."
-                : language === "fr"
-                  ? "Le formulaire sécurisé met trop de temps à s’ouvrir. Vérifie ta connexion et réessaie, ou contacte-nous sur WhatsApp."
-                  : "El formulario seguro está tardando demasiado. Revisa tu conexión e intenta de nuevo, o escríbenos por WhatsApp.",
-          );
+          setStripeError(mapStripeError(new Error("timeout: took too long to open"), language as StripeLang));
         }
       }
     }, 1000);
@@ -587,19 +579,22 @@ export function PaymentMethodsGroup() {
                   })()}
                   {stripeError && (
                     <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
-                      <p className="font-semibold">
-                        {language === "en" ? "Stripe did not load." : language === "pt" ? "Stripe não carregou." : language === "fr" ? "Stripe n’a pas chargé." : "Stripe no cargó."}
+                      <p className="font-semibold">{stripeError.title}</p>
+                      <p className="mt-1 text-xs">{stripeError.message}</p>
+                      <p className="mt-1 text-[10px] opacity-70">
+                        {language === "en" ? "Code" : language === "pt" ? "Código" : language === "fr" ? "Code" : "Código"}: {stripeError.code}
                       </p>
-                      <p className="mt-1 text-xs">{stripeError}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={retryStripe}
-                          className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
-                        >
-                          <Loader2 className="w-3.5 h-3.5" />
-                          {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
-                        </button>
+                        {stripeError.retryable && (
+                          <button
+                            type="button"
+                            onClick={retryStripe}
+                            className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
+                          >
+                            <Loader2 className="w-3.5 h-3.5" />
+                            {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
+                          </button>
+                        )}
                         <a
                           href={WHATSAPP_URL}
                           target="_blank"

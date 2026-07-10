@@ -236,7 +236,7 @@ export function PaymentMethodsGroup() {
               disabled={isLoading}
               aria-disabled={!valid}
               className={cn(
-                "w-full text-left p-4 flex items-center gap-3 transition-colors",
+                "w-full text-left p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 transition-colors",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
@@ -244,7 +244,7 @@ export function PaymentMethodsGroup() {
               )}
             >
               <div className={cn(
-                "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                "w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0",
                 isSelected
                   ? "bg-neutral-700 text-white"
                   : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
@@ -252,15 +252,15 @@ export function PaymentMethodsGroup() {
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm flex items-center gap-2 text-neutral-800 dark:text-neutral-100">
-                  {m.title}
+                <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
+                  <span className="min-w-0 break-words">{m.title}</span>
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 whitespace-nowrap">
                       {m.badge}
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">{m.sub}</div>
+                <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
               </div>
               <div className={cn(
                 "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",

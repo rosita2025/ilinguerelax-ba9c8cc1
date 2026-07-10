@@ -307,7 +307,7 @@ export function PaymentMethodsGroup() {
     };
   }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried]);
 
-  const handleManualPaid = () => {
+  const handleManualPaid = async () => {
     const s = useCheckoutPruebaStore.getState();
     const orderNumber = `ILR-YP-${Math.floor(1000 + Math.random() * 9000)}`;
     const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
@@ -322,6 +322,25 @@ export function PaymentMethodsGroup() {
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
 
+    // Guardar en base de datos para que Rosa lo vea en el admin
+    try {
+      await supabase.from("manual_payments").insert({
+        order_number: orderNumber,
+        buyer_name: s.buyer.fullName.trim(),
+        buyer_email: s.buyer.email.trim().toLowerCase(),
+        buyer_phone: s.buyer.phone ?? null,
+        buyer_country: (region.country || "").toUpperCase() || null,
+        amount_usd: Number(totalUsd),
+        amount_local: local.loading ? null : Number(local.amount ?? totalUsd),
+        currency_local: local.currency || "USD",
+        method: "yape_plin",
+        items: s.items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+        status: "pending",
+      });
+    } catch (e) {
+      console.warn("[manual_payments] insert failed", e);
+    }
+
     supabase.from("email_contacts").upsert({
       email: s.buyer.email.trim().toLowerCase(),
       name: s.buyer.fullName.trim(),
@@ -332,6 +351,7 @@ export function PaymentMethodsGroup() {
     window.open(waUrl, "_blank", "noopener,noreferrer");
     navigate(`/checkouts/pendiente-manual?order=${orderNumber}`);
   };
+
 
 
   const copyPhone = async () => {

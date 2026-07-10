@@ -24,8 +24,8 @@ const BodySchema = z.object({
   failureUrl: z.string().url().optional(),
   pendingUrl: z.string().url().optional(),
   autoReturn: z.enum(["approved", "all"]).default("approved"),
-  // Peruvian Soles conversion rate (approx). Frontend can override.
-  usdToPen: z.number().positive().max(10).default(3.75),
+  // Deprecated: la conversión ahora la hace Mercado Pago automáticamente.
+  usdToPen: z.number().positive().max(10).optional(),
   // Filtro opcional: "yape" (solo billeteras), "transfer" (solo transferencias bancarias), "all"
   paymentType: z.enum(["yape", "transfer", "cash", "all"]).default("all"),
 });
@@ -71,15 +71,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Convert USD -> PEN (Mercado Pago Peru operates in Soles).
+    // Enviamos precios en USD y dejamos que Mercado Pago aplique el tipo de
+    // cambio local del comprador automáticamente (no hacemos conversión manual).
     const mpItems = body.items.map((item) => ({
       id: item.id,
       title: item.name.slice(0, 250),
       description: item.description?.slice(0, 250) ?? undefined,
       picture_url: item.image ?? undefined,
       quantity: item.quantity,
-      currency_id: "PEN",
-      unit_price: Number((item.price * discountMultiplier * body.usdToPen).toFixed(2)),
+      currency_id: "USD",
+      unit_price: Number((item.price * discountMultiplier).toFixed(2)),
     }));
 
     const preferencePayload: Record<string, unknown> = {
@@ -98,7 +99,6 @@ Deno.serve(async (req) => {
         order_id: body.orderId ?? "",
         coupon_code: body.couponCode ?? "",
         coupon_percent: body.couponPercent,
-        usd_to_pen: body.usdToPen,
         total_usd: calculatedTotalUsd,
         item_count: body.items.reduce((sum, item) => sum + item.quantity, 0),
       },

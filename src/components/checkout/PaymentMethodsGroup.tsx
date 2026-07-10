@@ -11,7 +11,6 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type Method = "card" | "transfer" | "cash" | "yape";
-const USD_TO_PEN = 3.75;
 const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga Manuel";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
@@ -21,7 +20,7 @@ export function PaymentMethodsGroup() {
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
   const { total } = calcTotals(items, couponPercent, region.tier);
-  const totalPen = (total * USD_TO_PEN).toFixed(2);
+  const totalUsd = total.toFixed(2);
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
@@ -134,7 +133,7 @@ export function PaymentMethodsGroup() {
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
-          usdToPen: USD_TO_PEN,
+          // Mercado Pago aplica el tipo de cambio local automáticamente (USD → moneda del comprador).
           expectedTotalUsd: Number(totals.total.toFixed(2)),
           returnUrl: `${window.location.origin}/checkouts/return`,
           successUrl: `${window.location.origin}/checkouts/success`,
@@ -195,10 +194,10 @@ export function PaymentMethodsGroup() {
   };
 
   const methods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
-    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link", badge: "Stripe" },
-    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank", badge: `S/ ${totalPen}` },
-    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `S/ ${totalPen}` },
-    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `S/ ${totalPen}` },
+    { id: "card", icon: CreditCard, title: "Tarjeta, Apple Pay o Link", sub: "Visa · Mastercard · Amex · Apple Pay · Link · Cambio automático a tu moneda local", badge: "Stripe" },
+    { id: "transfer", icon: Building2, title: "Transferencia bancaria", sub: "BCP · BBVA · Interbank · Scotiabank · Conversión automática", badge: `USD $${totalUsd}` },
+    { id: "cash", icon: Banknote, title: "Pago en efectivo", sub: "PagoEfectivo · Western Union · Tambo · Kasnet", badge: `USD $${totalUsd}` },
+    { id: "yape", icon: Smartphone, title: "Yape o Plin", sub: "Pago manual · Verificación 1-24h por Supervisora Rosa", badge: `USD $${totalUsd}` },
   ];
 
   const wasValidRef = useRef(valid);
@@ -300,13 +299,14 @@ export function PaymentMethodsGroup() {
                 </div>
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">Monto exacto a pagar</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">S/ {totalPen}</p>
+                  <p className="text-xs text-neutral-500">Monto a pagar</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  <p className="text-[11px] text-neutral-500 mt-1">Envía el equivalente en soles al tipo de cambio del día.</p>
                 </div>
 
                 <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
                   <li>Abre tu app de <strong>Yape</strong> o <strong>Plin</strong>.</li>
-                  <li>Envía <strong>S/ {totalPen}</strong> al número <strong>{YAPE_PHONE}</strong> ({YAPE_NAME}).</li>
+                  <li>Envía el equivalente de <strong>USD ${totalUsd}</strong> en soles al número <strong>{YAPE_PHONE}</strong> ({YAPE_NAME}).</li>
                   <li>Guarda la captura del comprobante.</li>
                   <li>Presiona <strong>“Ya pagué”</strong> y envíanos el comprobante por WhatsApp.</li>
                 </ol>

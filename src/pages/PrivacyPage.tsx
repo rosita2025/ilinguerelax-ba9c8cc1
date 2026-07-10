@@ -36,9 +36,9 @@ const sections = [
 • Proveedores de pago autorizados:
    – Stripe (SSL) – tarjetas de crédito/débito internacionales, Apple Pay, Google Pay y Link. Cobertura global (Latinoamérica, Norteamérica, Europa, Asia, Oceanía) con conversión automática a moneda local.
    – Mercado Pago – transferencias bancarias (BCP, BBVA, Interbank, Scotiabank), PagoEfectivo, Western Union, Tambo y Kasnet. Disponible desde Perú y otros países de Latinoamérica.
-   – Yape y Plin – pago manual desde Perú, verificado por Supervisora Rosa (1-24h).
+   – Yape y Plin – pago manual desde Perú al número privado de nuestra Supervisora de Pagos (mostrado únicamente durante el checkout). Verificación en 1-24h.
    – Hotmart – procesa pagos en Latinoamérica con métodos locales como Nequi (Colombia), PIX (Brasil), OXXO (México), Boleto, tarjetas locales y transferencias regionales.
-   – Shopify – pasarela para libros físicos y envíos internacionales.
+   – Amazon – procesa los pagos de los libros físicos (próximamente) directamente en su plataforma.
    – Próximamente: dLocal y eBanx para ampliar métodos de pago locales en América Latina, África, Asia y Medio Oriente.
 • Servicios de email: Brevo y Resend, para enviar correos transaccionales y promocionales.
 • Análisis y publicidad: Meta (Facebook/Instagram) y Google, solo datos agregados o anonimizados para medición de campañas.

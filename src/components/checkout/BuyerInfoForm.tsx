@@ -93,7 +93,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.fullName}
               onChange={(e) => setBuyer({ fullName: e.target.value })}
-              placeholder="Ej. María López"
+              placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
               className={cn(
                 "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",

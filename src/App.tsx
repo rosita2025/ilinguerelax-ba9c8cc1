@@ -149,6 +149,7 @@ const App = () => (
           <BrowserRouter>
             <CartSyncWrapper>
               <RouteTracker />
+              <AutoTranslate />
               <BrevoChatToggle />
               <CookieConsent />
               <Suspense fallback={<PageFallback />}>

@@ -8,76 +8,59 @@ interface Props {
   upsells: UpsellItem[];
 }
 
-/** Renders a USD price with local currency estimate underneath (S/, R$, €…). */
-function PriceWithLocal({
+/** Muestra el precio en moneda local si aplica; si no, en USD. Una sola moneda. */
+function Price({
   usd,
   strike = false,
   emphasis = false,
   added = false,
+  prefix = "",
 }: {
   usd: number;
   strike?: boolean;
   emphasis?: boolean;
   added?: boolean;
+  prefix?: string;
 }) {
   const local = useLocalCurrency(usd);
-  const showLocal = !local.isUsd && !local.loading;
+  const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
 
   if (strike) {
     return (
-      <div className="text-right leading-tight">
-        <p className="text-[11px] text-muted-foreground line-through">
-          ${usd.toFixed(2)}
-        </p>
-        {showLocal && (
-          <p className="text-[10px] text-muted-foreground/70 line-through">
-            {local.formatted}
-          </p>
-        )}
-      </div>
+      <p className="text-[11px] text-muted-foreground line-through leading-none">
+        {label}
+      </p>
     );
   }
 
   return (
-    <div className="text-right leading-tight">
-      <p
-        className={`font-black ${emphasis ? "text-base sm:text-lg" : "text-sm"} ${
-          added ? "text-primary" : "text-foreground"
-        }`}
-      >
-        +${usd.toFixed(2)}
-      </p>
-      {showLocal && (
-        <p
-          className={`text-[10px] font-semibold ${
-            added ? "text-primary/80" : "text-muted-foreground"
-          }`}
-        >
-          ≈ {local.formatted}
-        </p>
-      )}
-    </div>
+    <p
+      className={`font-black leading-tight ${
+        emphasis ? "text-base sm:text-lg" : "text-sm"
+      } ${added ? "text-primary" : "text-foreground"}`}
+    >
+      {prefix}
+      {label}
+    </p>
   );
 }
 
 function SavingsBadge({ usd }: { usd: number }) {
   const local = useLocalCurrency(usd);
-  const showLocal = !local.isUsd && !local.loading;
+  const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[11px] font-bold whitespace-nowrap">
-      <Tag className="w-3 h-3" /> Ahorras ${usd.toFixed(2)}
-      {showLocal && <span className="opacity-80">· ≈ {local.formatted}</span>}
+      <Tag className="w-3 h-3" /> Ahorras {label}
     </span>
   );
 }
 
 function SavingsInline({ usd }: { usd: number }) {
   const local = useLocalCurrency(usd);
-  const showLocal = !local.isUsd && !local.loading;
+  const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
   return (
     <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">
-      Ahorras ${usd.toFixed(2)}
-      {showLocal && <span className="opacity-80"> · {local.formatted}</span>}
+      Ahorras {label}
     </p>
   );
 }
@@ -205,9 +188,8 @@ export function UpsellPanel({ upsells }: Props) {
               </div>
 
               <div className="text-right shrink-0 space-y-0.5">
-                {hasDiscount && <PriceWithLocal usd={u.originalPrice!} strike />}
-                <PriceWithLocal usd={u.price} emphasis added={added} />
-                {hasDiscount && <SavingsInline usd={u.originalPrice! - u.price} />}
+                {hasDiscount && <Price usd={u.originalPrice!} strike />}
+                <Price usd={u.price} emphasis added={added} prefix="+" />
               </div>
             </button>
           );

@@ -260,6 +260,17 @@ export function PaymentMethodsGroup() {
     }
   }, [isPeru, selected, valid, stripePromise, showStripe]);
 
+  // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
+  // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".
+  useEffect(() => {
+    if (showStripe && selected === "card") {
+      const id = window.setTimeout(() => {
+        stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 250);
+      return () => window.clearTimeout(id);
+    }
+  }, [showStripe, selected]);
+
 
   const wasValidRef = useRef(valid);
   const methodsAnchorRef = useRef<HTMLDivElement | null>(null);

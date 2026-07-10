@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { ShoppingCart, Check, ArrowLeft, Download, Shield, Zap } from "lucide-react";
+import { Check, ArrowLeft, Download, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import SEO from "@/components/SEO";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { useCartStore } from "@/stores/cartStore";
+import { SEO } from "@/components/SEO";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
-import { toast } from "@/hooks/use-toast";
 
 interface DBProduct {
   id: string;
@@ -22,7 +20,7 @@ interface DBProduct {
   cover_image_url: string | null;
   is_upsell: boolean;
   active: boolean;
-  bonuses: Array<{ name: string; drive_url: string }> | null;
+  bonuses: unknown;
 }
 
 const FLAG: Record<string, string> = {
@@ -39,8 +37,6 @@ const ProductDynamic = () => {
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const addItem = useCartStore((s) => s.addItem);
-  const { currency, symbol } = useLocalCurrency();
 
   useEffect(() => {
     if (!slug) return;
@@ -48,17 +44,19 @@ const ProductDynamic = () => {
     (async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("*")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();
       if (cancelled) return;
       if (error || !data) setNotFound(true);
-      else setProduct(data as DBProduct);
+      else setProduct(data as unknown as DBProduct);
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [slug]);
+
+  const local = useLocalCurrency(product ? Number(product.price_usd) : 0);
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
@@ -69,23 +67,16 @@ const ProductDynamic = () => {
     );
   }
 
-  const isPEN = currency === "PEN" && product.price_pen != null;
-  const displayPrice = isPEN ? Number(product.price_pen) : Number(product.price_usd);
-  const displaySymbol = isPEN ? "S/" : "$";
-
-  const handleAdd = () => {
-    addItem({
-      id: product.sku,
-      name: product.name,
-      price: Number(product.price_usd),
-      image: product.cover_image_url || "/placeholder.svg",
-      quantity: 1,
-    });
-    toast({ title: "Añadido al carrito", description: product.name });
-  };
+  const isPEN = local.country === "PE" && product.price_pen != null;
+  const displayPrice = isPEN ? Number(product.price_pen) : local.amount;
+  const displayFormatted = isPEN
+    ? `S/ ${Number(product.price_pen).toFixed(2)}`
+    : local.formatted;
 
   const cover = product.cover_image_url || "/placeholder.svg";
-  const bonuses = Array.isArray(product.bonuses) ? product.bonuses.filter((b) => b?.name) : [];
+  const bonusList = Array.isArray(product.bonuses)
+    ? (product.bonuses as Array<{ name?: string }>).filter((b) => b?.name)
+    : [];
   const canonical = `https://ilinguerelax.com/products/${product.sku}`;
 
   return (
@@ -119,38 +110,36 @@ const ProductDynamic = () => {
               )}
 
               <div className="flex items-baseline gap-3 mb-5">
-                <span className="text-4xl font-bold text-primary">{displaySymbol} {displayPrice.toFixed(2)}</span>
+                <span className="text-4xl font-bold text-primary">{displayFormatted}</span>
+                {!isPEN && !local.isUsd && (
+                  <span className="text-sm text-muted-foreground">≈ ${Number(product.price_usd).toFixed(2)} USD</span>
+                )}
                 {isPEN && (
                   <span className="text-sm text-muted-foreground">≈ ${Number(product.price_usd).toFixed(2)} USD</span>
                 )}
               </div>
 
               <div className="grid grid-cols-3 gap-2 mb-6 text-xs">
-                <div className="flex flex-col items-center gap-1 p-3 bg-muted/40 rounded-lg">
+                <div className="flex flex-col items-center gap-1 p-3 bg-muted/40 rounded-lg text-center">
                   <Zap className="w-4 h-4 text-primary" /> <span>Acceso instantáneo</span>
                 </div>
-                <div className="flex flex-col items-center gap-1 p-3 bg-muted/40 rounded-lg">
+                <div className="flex flex-col items-center gap-1 p-3 bg-muted/40 rounded-lg text-center">
                   <Download className="w-4 h-4 text-primary" /> <span>Descarga digital</span>
                 </div>
-                <div className="flex flex-col items-center gap-1 p-3 bg-muted/40 rounded-lg">
+                <div className="flex flex-col items-center gap-1 p-3 bg-muted/40 rounded-lg text-center">
                   <Shield className="w-4 h-4 text-primary" /> <span>Pago seguro</span>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild size="lg" className="flex-1">
-                  <Link to={`/checkouts/${product.sku}`}>Comprar ahora</Link>
-                </Button>
-                <Button onClick={handleAdd} size="lg" variant="outline" className="flex-1">
-                  <ShoppingCart className="w-4 h-4 mr-2" /> Añadir al carrito
-                </Button>
-              </div>
+              <Button asChild size="lg" className="w-full">
+                <Link to={`/checkouts/${product.sku}`}>Comprar ahora · {displayFormatted}</Link>
+              </Button>
 
-              {bonuses.length > 0 && (
+              {bonusList.length > 0 && (
                 <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl">
-                  <p className="font-semibold text-sm mb-2">🎁 Incluye {bonuses.length} bono{bonuses.length > 1 ? "s" : ""} gratis:</p>
+                  <p className="font-semibold text-sm mb-2">🎁 Incluye {bonusList.length} bono{bonusList.length > 1 ? "s" : ""} gratis:</p>
                   <ul className="space-y-1 text-sm">
-                    {bonuses.map((b, i) => (
+                    {bonusList.map((b, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" /> {b.name}
                       </li>

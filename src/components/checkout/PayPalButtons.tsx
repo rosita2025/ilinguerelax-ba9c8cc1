@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 declare global {
@@ -16,10 +16,8 @@ async function loadPayPalSdk(currency: string): Promise<void> {
   const { data, error } = await supabase.functions.invoke("paypal-config", { method: "GET" });
   if (error || !data?.clientId) throw new Error("PayPal no está configurado");
   const clientId = data.clientId as string;
-  // If SDK is already loaded with a different client id or currency, reload it.
   if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
   if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
-  // Remove any previous script
   document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => s.remove());
   delete (window as any).paypal;
   loadedClientId = clientId;
@@ -37,7 +35,6 @@ async function loadPayPalSdk(currency: string): Promise<void> {
 }
 
 // Currencies natively supported by PayPal. Others fall back to USD.
-// Ref: https://developer.paypal.com/api/rest/reference/currency-codes/
 const PAYPAL_SUPPORTED = new Set([
   "AUD","BRL","CAD","CNY","CZK","DKK","EUR","HKD","HUF","ILS","JPY",
   "MYR","MXN","TWD","NZD","NOK","PHP","PLN","GBP","RUB","SGD","SEK","CHF","THB","USD",
@@ -47,27 +44,86 @@ interface Props {
   amountUsd: number;
   description: string;
   buyerEmail?: string;
-  /** Local currency code detected by IP (e.g. MXN, EUR, CAD). */
   localCurrency?: string;
-  /** Local amount already converted from USD. */
   localAmount?: number;
   onApproved: (orderId: string) => void;
   onError?: (err: unknown) => void;
 }
 
+type Phase = "create" | "capture" | "sdk";
+
+interface ErrState {
+  message: string;
+  phase: Phase;
+  attempt: number;
+  canRetry: boolean;
+}
+
+const MAX_ATTEMPTS = 3;
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function friendlyMessage(phase: Phase, raw: string): string {
+  const r = (raw || "").toLowerCase();
+  if (r.includes("failed to fetch") || r.includes("network")) {
+    return "Problema de conexión. Verifica tu internet e intenta de nuevo.";
+  }
+  if (r.includes("no está configurado") || r.includes("clientid")) {
+    return "PayPal no está disponible en este momento.";
+  }
+  if (phase === "create") return "No se pudo crear la orden en PayPal.";
+  if (phase === "capture") return "El pago no se pudo confirmar. Si se cobró, escríbenos con el ID para verificar.";
+  return raw || "Ocurrió un error con PayPal.";
+}
+
 export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrency, localAmount, onApproved, onError }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-  // Use the local currency when PayPal supports it, otherwise fall back to USD.
+  const [err, setErr] = useState<ErrState | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [processing, setProcessing] = useState<Phase | null>(null);
+
   const useLocal = !!localCurrency && PAYPAL_SUPPORTED.has(localCurrency.toUpperCase()) && !!localAmount && localAmount > 0;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
   const amount = useLocal ? Number(localAmount!.toFixed(2)) : Number(amountUsd.toFixed(2));
-  // Correlation ID that ties one buyer's full PayPal journey together across
-  // both edge functions (create + capture) and the client console.
+
   const correlationIdRef = useRef<string>(
     (globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
   );
+
+  async function invokeWithRetry<T>(
+    fnName: string,
+    body: Record<string, unknown>,
+    phase: Phase,
+  ): Promise<T> {
+    const correlationId = correlationIdRef.current;
+    let lastErr: unknown = null;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const { data, error } = await supabase.functions.invoke(fnName, {
+          body: { ...body, correlationId },
+          headers: { "x-correlation-id": correlationId },
+        });
+        if (error) throw new Error(error.message || `Error en ${fnName}`);
+        console.info(`[paypal] ${fnName} ok`, { correlationId, attempt });
+        return data as T;
+      } catch (e) {
+        lastErr = e;
+        console.warn(`[paypal] ${fnName} attempt ${attempt} failed`, { correlationId, error: (e as Error).message });
+        if (attempt < MAX_ATTEMPTS) {
+          setErr({
+            message: `${friendlyMessage(phase, (e as Error).message)} Reintentando (${attempt}/${MAX_ATTEMPTS})…`,
+            phase,
+            attempt,
+            canRetry: false,
+          });
+          // Exponential backoff: 600ms, 1500ms
+          await wait(attempt === 1 ? 600 : 1500);
+        }
+      }
+    }
+    throw lastErr instanceof Error ? lastErr : new Error("Error desconocido");
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -83,45 +139,94 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
           createOrder: async () => {
             const correlationId = correlationIdRef.current;
             console.info("[paypal] createOrder", { correlationId, currency, amount, amountUsd });
-            const { data, error } = await supabase.functions.invoke("paypal-create-order", {
-              body: { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, correlationId },
-              headers: { "x-correlation-id": correlationId },
-            });
-
-            if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");
-            return data.id as string;
+            setErr(null);
+            setProcessing("create");
+            try {
+              const data = await invokeWithRetry<{ id: string }>(
+                "paypal-create-order",
+                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail },
+                "create",
+              );
+              if (!data?.id) throw new Error("No se pudo crear la orden");
+              setErr(null);
+              setProcessing(null);
+              return data.id;
+            } catch (e) {
+              const msg = friendlyMessage("create", (e as Error).message);
+              setErr({ message: msg, phase: "create", attempt: MAX_ATTEMPTS, canRetry: true });
+              setProcessing(null);
+              onError?.(e);
+              throw e;
+            }
           },
           onApprove: async (data: { orderID: string }) => {
             const correlationId = correlationIdRef.current;
             console.info("[paypal] onApprove", { correlationId, orderId: data.orderID });
-            const { data: cap, error } = await supabase.functions.invoke("paypal-capture-order", {
-              body: { orderId: data.orderID, correlationId },
-              headers: { "x-correlation-id": correlationId },
-            });
-
-            if (error || cap?.status !== "COMPLETED") {
-              const msg = error?.message || "El pago no se completó";
-              setErr(msg);
-              onError?.(new Error(msg));
-              return;
+            setErr(null);
+            setProcessing("capture");
+            try {
+              const cap = await invokeWithRetry<{ status: string }>(
+                "paypal-capture-order",
+                { orderId: data.orderID },
+                "capture",
+              );
+              if (cap?.status !== "COMPLETED") {
+                throw new Error(`Estado inesperado: ${cap?.status ?? "desconocido"}`);
+              }
+              setErr(null);
+              setProcessing(null);
+              onApproved(data.orderID);
+            } catch (e) {
+              const msg = friendlyMessage("capture", (e as Error).message);
+              setErr({ message: msg, phase: "capture", attempt: MAX_ATTEMPTS, canRetry: false });
+              setProcessing(null);
+              onError?.(e);
             }
-            onApproved(data.orderID);
           },
           onError: (e: unknown) => {
-            setErr("Ocurrió un error con PayPal. Intenta de nuevo.");
+            console.warn("[paypal] sdk onError", e);
+            setErr({
+              message: "Ocurrió un error con PayPal. Intenta de nuevo.",
+              phase: "sdk",
+              attempt: 1,
+              canRetry: true,
+            });
+            setProcessing(null);
             onError?.(e);
+          },
+          onCancel: () => {
+            setProcessing(null);
           },
         }).render(ref.current);
         setLoading(false);
       } catch (e) {
         if (cancelled) return;
-        setErr((e as Error).message);
+        setErr({
+          message: friendlyMessage("sdk", (e as Error).message),
+          phase: "sdk",
+          attempt: 1,
+          canRetry: true,
+        });
         setLoading(false);
       }
     })();
     return () => { cancelled = true; };
-    // Re-render buttons when amount/email/description change.
-  }, [amount, currency, description, buyerEmail]);
+  }, [amount, currency, description, buyerEmail, reloadKey]);
+
+  const correlationId = correlationIdRef.current;
+
+  const copyCorrelation = async () => {
+    try {
+      await navigator.clipboard.writeText(correlationId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {}
+  };
+
+  const handleReload = () => {
+    setErr(null);
+    setReloadKey((k) => k + 1);
+  };
 
   return (
     <div className="space-y-2">
@@ -130,8 +235,41 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
           <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando PayPal…
         </div>
       )}
+      {processing && !err && (
+        <div className="flex items-center justify-center py-2 text-xs text-neutral-500">
+          <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
+          {processing === "create" ? "Creando orden…" : "Confirmando pago…"}
+        </div>
+      )}
       <div ref={ref} />
-      {err && <p className="text-xs text-red-600 text-center">{err}</p>}
+      {err && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 space-y-2">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <p className="flex-1">{err.message}</p>
+          </div>
+          {err.canRetry && (
+            <button
+              type="button"
+              onClick={handleReload}
+              className="inline-flex items-center gap-1.5 rounded-md bg-red-600 text-white px-3 py-1.5 font-medium hover:bg-red-700 transition"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Reintentar
+            </button>
+          )}
+          <div className="flex items-center gap-2 pt-1 border-t border-red-200 text-[11px] text-red-600/80">
+            <span className="font-mono truncate">ID: {correlationId}</span>
+            <button
+              type="button"
+              onClick={copyCorrelation}
+              className="inline-flex items-center gap-1 hover:text-red-800"
+              aria-label="Copiar ID de referencia"
+            >
+              {copied ? <><Check className="w-3 h-3" /> Copiado</> : <><Copy className="w-3 h-3" /> Copiar</>}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

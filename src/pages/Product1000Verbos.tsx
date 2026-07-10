@@ -25,6 +25,9 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useRegionTier } from "@/hooks/useRegionTier";
+
+const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
 
 const CART_ITEM = {
   id: "1000-verbos-ingles",

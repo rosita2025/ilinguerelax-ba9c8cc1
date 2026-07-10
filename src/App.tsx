@@ -139,6 +139,13 @@ const PageFallback = () => (
   </div>
 );
 
+const CheckoutSlugRedirect = () => {
+  const { slug } = useParams();
+  return <Navigate to={slug ? `/checkouts/${slug}` : "/checkouts"} replace />;
+};
+
+
+
 const App = () => (
   <HelmetProvider>
     <I18nProvider>

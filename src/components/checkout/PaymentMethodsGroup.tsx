@@ -66,7 +66,7 @@ export function PaymentMethodsGroup() {
     }
   }, [cartSignature, selected]);
 
-  const fetchClientSecret = async (): Promise<string> => {
+  const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
     if (!isBuyerValid(s.buyer)) throw new Error("Completa tus datos");
     const parts = s.buyer.fullName.trim().split(/\s+/);
@@ -104,7 +104,14 @@ export function PaymentMethodsGroup() {
       metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
     }, { onConflict: "email,source" }).then(() => {});
     return data.clientSecret;
-  };
+    // Depend only on region.tier/country — buyer/items are read fresh from
+    // the store inside the callback, so the reference stays stable across
+    // typing and avoids remounting the EmbeddedCheckoutProvider (blank screen).
+  }, [region.tier, region.country]);
+
+  // Memoize the options object per cart signature. A new object reference on
+  // every render forces Stripe to remount the iframe → blank/duplicated form.
+  const stripeOptions = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
   const requestBuyerInfo = () => {
     window.dispatchEvent(new Event(BUYER_ERRORS_EVENT));

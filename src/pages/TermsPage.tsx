@@ -124,7 +124,7 @@ const TermsPage = () => {
               Términos y condiciones que rigen el uso de nuestros servicios y productos.
             </p>
             <p className="text-sm text-primary-foreground/70 mt-4">
-              Última actualización: 7 de junio de 2026
+              Última actualización: 9 de julio de 2026
             </p>
           </motion.div>
         </div>

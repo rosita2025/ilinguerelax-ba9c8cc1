@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
+
 
 interface OrderSummaryProps {
   collapsible?: boolean;

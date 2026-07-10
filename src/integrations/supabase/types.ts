@@ -308,6 +308,36 @@ export type Database = {
         }
         Relationships: []
       }
+      paypal_webhook_events: {
+        Row: {
+          correlation_id: string | null
+          created_at: string
+          event_id: string
+          event_type: string
+          id: string
+          payload: Json
+          resource_id: string | null
+        }
+        Insert: {
+          correlation_id?: string | null
+          created_at?: string
+          event_id: string
+          event_type: string
+          id?: string
+          payload: Json
+          resource_id?: string | null
+        }
+        Update: {
+          correlation_id?: string | null
+          created_at?: string
+          event_id?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          resource_id?: string | null
+        }
+        Relationships: []
+      }
       review_invitations: {
         Row: {
           created_at: string

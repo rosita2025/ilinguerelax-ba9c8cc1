@@ -172,6 +172,7 @@ const es: CheckoutUIStrings = {
   sslEncryption: "Encriptación SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Perú",
   whatsappSupport: "Soporte WhatsApp",
+  returnToProduct: "Volver al producto",
   resetTestProducts: "Restablecer productos de prueba",
 };
 
@@ -255,6 +256,7 @@ const en: CheckoutUIStrings = {
   sslEncryption: "SSL Stripe encryption",
   mercadoPagoPeru: "Mercado Pago Peru",
   whatsappSupport: "WhatsApp support",
+  returnToProduct: "Return to product",
   resetTestProducts: "Reset test products",
 };
 
@@ -338,6 +340,7 @@ const pt: CheckoutUIStrings = {
   sslEncryption: "Criptografia SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Peru",
   whatsappSupport: "Suporte WhatsApp",
+  returnToProduct: "Voltar ao produto",
   resetTestProducts: "Redefinir produtos de teste",
 };
 
@@ -421,6 +424,7 @@ const fr: CheckoutUIStrings = {
   sslEncryption: "Chiffrement SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Pérou",
   whatsappSupport: "Support WhatsApp",
+  returnToProduct: "Retour au produit",
   resetTestProducts: "Réinitialiser les produits de test",
 };
 

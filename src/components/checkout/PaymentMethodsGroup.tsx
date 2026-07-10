@@ -20,7 +20,7 @@ export function PaymentMethodsGroup() {
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
   const { total } = calcTotals(items, couponPercent, region.tier);
-  const totalPen = (total * USD_TO_PEN).toFixed(2);
+  const totalUsd = total.toFixed(2);
 
   const [selected, setSelected] = useState<Method | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);

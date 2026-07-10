@@ -187,7 +187,7 @@ export function PaymentMethodsGroup() {
   const handleBuyNow = () => {
     if (!valid) { requestBuyerInfo(); return; }
     if (!selected) {
-      toast({ title: "Selecciona un método de pago", variant: "destructive" });
+      toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
     if (selected === "card") { setShowStripe(true); return; }

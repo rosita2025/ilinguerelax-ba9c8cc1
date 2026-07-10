@@ -157,9 +157,11 @@ const ProductDynamic = () => {
 
               {(() => {
                 const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
-                const excluded = (product.excluded_countries ?? []).includes(effectiveCountry);
-                const storeOn = product.store_enabled && !excluded;
-                const hotmartOn = !!product.hotmart_url && !excluded;
+                const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
+                const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
+                const hotmartExcluded = globalExcluded || (product.hotmart_excluded_countries ?? []).includes(effectiveCountry);
+                const storeOn = product.store_enabled && !storeExcluded;
+                const hotmartOn = !!product.hotmart_url && !hotmartExcluded;
 
                 if (!storeOn && !hotmartOn) {
                   return (

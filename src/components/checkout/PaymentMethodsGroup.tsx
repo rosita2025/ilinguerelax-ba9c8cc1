@@ -133,7 +133,7 @@ export function PaymentMethodsGroup() {
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
-          usdToPen: USD_TO_PEN,
+          // Mercado Pago aplica el tipo de cambio local automáticamente (USD → moneda del comprador).
           expectedTotalUsd: Number(totals.total.toFixed(2)),
           returnUrl: `${window.location.origin}/checkouts/return`,
           successUrl: `${window.location.origin}/checkouts/success`,

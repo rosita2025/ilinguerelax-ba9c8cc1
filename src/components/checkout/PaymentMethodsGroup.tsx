@@ -275,7 +275,7 @@ export function PaymentMethodsGroup() {
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> Pago procesado de forma segura por Stripe
                 </div>
-                <div className="min-h-[500px] bg-white dark:bg-neutral-950">
+                <div className="min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
                   <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
                     <EmbeddedCheckout />
                   </EmbeddedCheckoutProvider>

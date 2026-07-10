@@ -34,10 +34,17 @@ serve(async (req) => {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
 
-    // Verify Stripe webhook signature to prevent forged events
-    const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-    if (!webhookSecret) {
-      console.error("STRIPE_WEBHOOK_SECRET is not configured");
+    // Try live secret first, then sandbox, then legacy STRIPE_WEBHOOK_SECRET.
+    // Stripe signs with ONE secret per endpoint, so we attempt each until one
+    // verifies. This lets the same handler serve both prod and test webhooks.
+    const candidates = [
+      Deno.env.get("PAYMENTS_LIVE_WEBHOOK_SECRET"),
+      Deno.env.get("PAYMENTS_SANDBOX_WEBHOOK_SECRET"),
+      Deno.env.get("STRIPE_WEBHOOK_SECRET"),
+    ].filter((s): s is string => !!s);
+
+    if (candidates.length === 0) {
+      console.error("No Stripe webhook secret configured (PAYMENTS_LIVE_WEBHOOK_SECRET / PAYMENTS_SANDBOX_WEBHOOK_SECRET)");
       return new Response("Webhook secret not configured", { status: 500 });
     }
     if (!sig) {
@@ -46,11 +53,17 @@ serve(async (req) => {
     }
 
     let event;
-    try {
-      event = await stripe.webhooks.constructEventAsync(body, sig, webhookSecret);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error("Webhook signature verification failed:", msg);
+    let lastErr = "";
+    for (const secret of candidates) {
+      try {
+        event = await stripe.webhooks.constructEventAsync(body, sig, secret);
+        break;
+      } catch (err) {
+        lastErr = err instanceof Error ? err.message : String(err);
+      }
+    }
+    if (!event) {
+      console.error("Stripe signature verification failed against all secrets:", lastErr);
       return new Response("Invalid signature", { status: 400 });
     }
 

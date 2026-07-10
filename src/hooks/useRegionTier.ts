@@ -69,10 +69,37 @@ export interface RegionInfo {
  * Cached 24h. This is source-of-truth for regional pricing — the user cannot
  * change it manually (the header currency selector only affects display).
  */
+// Subdominios de 2 letras válidos → país ISO
+// us.ilinguerelax.com → US, pe.ilinguerelax.com → PE, etc.
+const VALID_SUBDOMAIN_COUNTRIES = new Set([
+  "US", "PE", "MX", "CO", "AR", "CL", "BR", "EC", "VE", "BO", "PY", "UY",
+  "CR", "GT", "DO", "PA", "SV", "HN", "NI", "PR",
+  "ES", "FR", "DE", "IT", "PT", "NL", "GB", "IE", "CH", "SE", "NO", "DK",
+  "CA", "AU", "NZ",
+  "JP", "CN", "KR", "IN", "ID", "TH", "VN", "PH", "MY", "SG", "HK", "TW",
+]);
+
+function detectFromSubdomain(): string {
+  if (typeof window === "undefined") return "";
+  const host = window.location.hostname.toLowerCase();
+  const parts = host.split(".");
+  // Necesita al menos sub.dominio.tld (3 partes) y el subdominio de 2 letras
+  if (parts.length < 3) return "";
+  const sub = parts[0].toUpperCase();
+  if (sub.length !== 2) return "";
+  return VALID_SUBDOMAIN_COUNTRIES.has(sub) ? sub : "";
+}
+
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
-    // Override manual para pruebas: ?country=US en la URL o localStorage("ilr_country_override")
     if (typeof window !== "undefined") {
+      // Prioridad 1: subdominio (us.ilinguerelax.com, pe.ilinguerelax.com…)
+      const fromSub = detectFromSubdomain();
+      if (fromSub) {
+        try { localStorage.setItem("ilr_country", fromSub); } catch { /* ignore */ }
+        return { tier: classify(fromSub), country: fromSub, loading: false };
+      }
+      // Prioridad 2: ?country=XX manual (pruebas)
       const params = new URLSearchParams(window.location.search);
       const urlOverride = params.get("country")?.toUpperCase();
       if (urlOverride) {
@@ -86,6 +113,7 @@ export function useRegionTier(): RegionInfo {
         return { tier: classify(override), country: override, loading: false };
       }
     }
+    // Prioridad 3: cache de detección por IP
     const cached = readCache();
     if (cached) return { tier: cached.tier, country: cached.country, loading: false };
     return { tier: "global", country: "", loading: true };

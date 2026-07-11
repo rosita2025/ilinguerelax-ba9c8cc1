@@ -183,6 +183,26 @@ serve(async (req) => {
         last_event_at: new Date().toISOString(),
       }, { onConflict: "idempotency_key" });
 
+    // Sync buyer to Brevo "Clientes iLingue Relax" list. Runs after the email
+    // to avoid blocking delivery if Brevo is slow; failures only log.
+    try {
+      await upsertBrevoContact({
+        email: customerEmail,
+        name: customerName,
+        phone: customerPhone,
+        country: customerCountry,
+        productName: products.map((p) => p.name).filter(Boolean).join(" + "),
+        skus,
+        amount,
+        currency,
+        orderNumber: orderId,
+        provider,
+      });
+    } catch (e) {
+      console.error("[send-digital-ilinguerelax] brevo upsert failed", e);
+    }
+
+
     return new Response(JSON.stringify({ success: true, sent: products.length, result: r }), {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
     });

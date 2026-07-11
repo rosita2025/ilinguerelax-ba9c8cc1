@@ -2,6 +2,7 @@ import { template as thankYou } from './thank-you.tsx'
 import { template as adminSale } from './admin-sale.tsx'
 import { template as materialDelivery } from './material-delivery.tsx'
 import { template as adminManualPending } from './admin-manual-pending.tsx'
+import { template as customerManualPending } from './customer-manual-pending.tsx'
 
 export interface TemplateEntry {
   component: (props: any) => any
@@ -16,4 +17,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-sale': adminSale,
   'material-delivery': materialDelivery,
   'admin-manual-pending': adminManualPending,
+  'customer-manual-pending': customerManualPending,
 }

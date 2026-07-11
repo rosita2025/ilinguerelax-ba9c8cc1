@@ -361,6 +361,24 @@ export function PaymentMethodsGroup() {
       },
     }).catch((err) => console.warn("[admin-manual-pending] notify failed", err));
 
+    // Confirmación al cliente — para no perder la orden si se cierra la página o se apaga la batería
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "customer-manual-pending",
+        recipientEmail: s.buyer.email.trim().toLowerCase(),
+        idempotencyKey: `customer-manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "USD",
+          method: "Yape/Plin",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[customer-manual-pending] notify failed", err));
+
     supabase.from("email_contacts").upsert({
       email: s.buyer.email.trim().toLowerCase(),
       name: s.buyer.fullName.trim(),

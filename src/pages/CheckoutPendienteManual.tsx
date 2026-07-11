@@ -22,18 +22,18 @@ export default function CheckoutPendienteManual() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
       <Helmet>
-        <title>Manual payment pending verification · ILINGUE RELAX</title>
+        <title>Pago manual en revisión · ILINGUE RELAX</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <div className="max-w-lg w-full text-center space-y-5">
         <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mx-auto">
           <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
         </div>
-        <h1 className="text-2xl font-bold">Thank you! Your manual payment is under review</h1>
+        <h1 className="text-2xl font-bold">¡Gracias! Tu pago está en revisión</h1>
 
         {orderNumber && (
           <div className="rounded-xl border bg-muted/40 p-4">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Order number</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Número de orden</p>
             <button
               type="button"
               onClick={copyOrder}
@@ -43,25 +43,25 @@ export default function CheckoutPendienteManual() {
               {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
             </button>
             <p className="text-[11px] text-muted-foreground mt-1">
-              {copied ? "Copied ✔" : "Tap to copy — include it when contacting support"}
+              {copied ? "¡Copiado! ✔" : "Toca para copiar — inclúyelo al contactarnos"}
             </p>
           </div>
         )}
 
         <p className="text-muted-foreground">
-          Our <strong>Supervisor Rosa</strong> will review your payment receipt from Peru within
-          the next <strong>1 to 24 hours</strong>. As soon as it is confirmed, we will send your
-          product via WhatsApp.
+          Nuestra <strong>Supervisora Rosa</strong> revisará tu pago desde Perú en las próximas
+          <strong> 1 a 24 horas</strong>. Apenas lo confirmemos, te enviaremos tu material digital
+          por correo electrónico.
         </p>
 
 
         <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-left text-sm space-y-2">
           <p className="font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-2">
-            <MessageCircle className="w-4 h-4" /> Important step
+            <MessageCircle className="w-4 h-4" /> Paso importante
           </p>
           <p className="text-amber-900/90 dark:text-amber-100/90">
-            Please send us your <strong>payment receipt</strong> (Yape or Plin screenshot) via
-            WhatsApp to speed up verification and receive your product as soon as possible.
+            Por favor envíanos tu <strong>captura de pago</strong> (Yape o Plin) por WhatsApp
+            para agilizar la verificación y recibir tu producto lo antes posible.
           </p>
         </div>
 
@@ -72,16 +72,16 @@ export default function CheckoutPendienteManual() {
           className="inline-flex items-center gap-2 w-full justify-center bg-[#25D366] hover:bg-[#20b358] text-white font-semibold py-3 rounded-xl transition-colors"
         >
           <MessageCircle className="w-5 h-5" />
-          Send receipt via WhatsApp
+          Enviar comprobante por WhatsApp
         </a>
 
         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
-          <ShieldCheck className="w-3.5 h-3.5" /> Secure manual verification from Peru
+          <ShieldCheck className="w-3.5 h-3.5" /> Verificación manual segura desde Perú
         </div>
 
         <div className="flex gap-2 justify-center pt-2">
-          <Button asChild variant="outline"><Link to="/checkouts">Back to checkout</Link></Button>
-          <Button asChild><Link to="/">Go to home</Link></Button>
+          <Button asChild variant="outline"><Link to="/checkouts">Volver al checkout</Link></Button>
+          <Button asChild><Link to="/">Ir al inicio</Link></Button>
         </div>
       </div>
     </div>

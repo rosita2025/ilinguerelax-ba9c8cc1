@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
           customer_name: name,
           product_type: productType,
           language,
-          next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+          next_email_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq("id", existing.id);
@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
         customer_email: email,
         product_type: productType,
         language,
-        next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+        next_email_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       });
     }
 

@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
+import { markAbandonedCartConverted } from "../_shared/thankYouEmail.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -162,6 +163,8 @@ Deno.serve(async (req) => {
         orderNumber: order.order_number,
         provider: "yape_plin",
       });
+
+      await markAbandonedCartConverted(order.buyer_email);
 
       return new Response(JSON.stringify({ success: true, materialsSent: materials.length }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -8,15 +8,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Email intervals: after how many seconds from cart creation each email should be sent
+// Simplified schedule: Day 1, Day 7, Day 15, Day 30 from cart creation.
+// delayMs = time to wait *after the previous email* before sending the next.
+const DAY = 24 * 60 * 60 * 1000;
 const EMAIL_SCHEDULE = [
-  { index: 0, delayMs: 0 },                          // Email 1: immediate (already scheduled at 1h)
-  { index: 1, delayMs: 24 * 60 * 60 * 1000 },        // Email 2: +1 day
-  { index: 2, delayMs: 3 * 24 * 60 * 60 * 1000 },    // Email 3: +3 days (4 days total)
-  { index: 3, delayMs: 3 * 24 * 60 * 60 * 1000 },    // Email 4: +3 days (7 days total)
-  { index: 4, delayMs: 8 * 24 * 60 * 60 * 1000 },    // Email 5: +8 days (15 days total)
-  { index: 5, delayMs: 15 * 24 * 60 * 60 * 1000 },   // Email 6: +15 days (30 days total)
+  { index: 0, delayMs: 0 },        // Email 1: Day 1  (scheduled at cart creation +1d)
+  { index: 1, delayMs: 6 * DAY },  // Email 2: Day 7  (+6d after email 1)
+  { index: 2, delayMs: 8 * DAY },  // Email 3: Day 15 (+8d after email 2)
+  { index: 3, delayMs: 15 * DAY }, // Email 4: Day 30 (+15d after email 3)
 ];
+const MAX_EMAILS = EMAIL_SCHEDULE.length;
 
 const SITE_URL = "https://ilinguerelax.com";
 const COUPON_CODE = "NEW10";
@@ -90,9 +91,8 @@ serve(async (req) => {
     for (const cart of pendingCarts) {
       try {
         const emailIndex = cart.emails_sent;
-        
-        if (emailIndex >= 6) {
-          // Max emails reached, mark as completed
+
+        if (emailIndex >= MAX_EMAILS) {
           await supabase
             .from("abandoned_carts")
             .update({ is_completed: true })
@@ -100,9 +100,20 @@ serve(async (req) => {
           continue;
         }
 
+        // Safety: re-check conversion right before sending to avoid a race where
+        // the customer paid between the query and the send.
+        const { data: fresh } = await supabase
+          .from("abandoned_carts")
+          .select("converted, is_completed")
+          .eq("id", cart.id)
+          .maybeSingle();
+        if (fresh?.converted || fresh?.is_completed) {
+          continue;
+        }
+
         const productUrl = getProductUrl(cart.product_type);
         const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, productUrl, cart.product_type);
-        
+
         const emailResponse = await resend.emails.send({
           from: "iLingue Relax <hola@ilinguerelax.com>",
           to: [cart.customer_email],
@@ -110,11 +121,10 @@ serve(async (req) => {
           html: emailContent.html,
         });
 
-        console.log(`Email ${emailIndex + 1}/6 sent to ${cart.customer_email} (product: ${cart.product_type}):`, emailResponse);
+        console.log(`Email ${emailIndex + 1}/${MAX_EMAILS} sent to ${cart.customer_email} (product: ${cart.product_type}):`, emailResponse);
 
-        // Calculate next email time
         const nextEmailIndex = emailIndex + 1;
-        const isLastEmail = nextEmailIndex >= 6;
+        const isLastEmail = nextEmailIndex >= MAX_EMAILS;
 
         const updateData: Record<string, unknown> = {
           emails_sent: nextEmailIndex,

@@ -156,21 +156,6 @@ const AdminProducts = () => {
                       {p.price_pen != null && <div className="text-xs text-muted-foreground">S/ {Number(p.price_pen).toFixed(2)}</div>}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {(() => {
-                        const preset = detectPolicyPreset(p);
-                        const meta = POLICY_META[preset];
-                        return (
-                          <span
-                            title={meta.description}
-                            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${meta.className}`}
-                          >
-                            <span>{meta.icon}</span>
-                            <span className="font-medium">{meta.label}</span>
-                          </span>
-                        );
-                      })()}
-                    </td>
-                    <td className="px-4 py-3 text-center">
                       {p.drive_url ? (
                         <a href={p.drive_url} target="_blank" rel="noreferrer" className="text-primary inline-flex items-center gap-1">
                           <ExternalLink className="w-4 h-4" />

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { toast } from 'sonner';
 import { trackHotmartEvent } from '@/hooks/useMetaPixel';
+import { isBlockedVariant } from '@/config/blockedVariants';
 import { 
   CartItem, 
   DiscountCodeResult,
@@ -75,6 +77,15 @@ export const useCartStore = create<CartStore>()(
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
       addItem: async (item) => {
+        // Defensive guard: never allow phantom/deprecated Shopify variants into the cart.
+        if (isBlockedVariant(item.variantId)) {
+          console.warn('[cart] Blocked phantom variant attempted:', item.variantId);
+          toast.error('Este producto ya no está disponible en el carrito de Shopify', {
+            description: 'Ve a la página del producto y usa "Comprar ahora" para el checkout directo.',
+          });
+          return;
+        }
+
         const { items, cartId, clearCart } = get();
         const existingItem = items.find(i => i.variantId === item.variantId);
 

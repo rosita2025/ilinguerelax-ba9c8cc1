@@ -15,18 +15,13 @@ import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { useI18n } from "@/i18n/I18nContext";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.png";
+import { BLOCKED_VARIANTS, isBlockedVariant } from "@/config/blockedVariants";
 
 // Hotmart checkout URL mapping for digital products
 const HOTMART_CHECKOUT_MAP: Record<string, string> = {
   "gid://shopify/ProductVariant/43094791454781": "https://pay.hotmart.com/U103990323W?checkoutMode=10&bid=1775682596079", // 8,000 Palabras Digital
   "gid://shopify/ProductVariant/43062338191421": "https://pay.hotmart.com/T102978081M?bid=1775682831595", // 1,000 Verbos Digital
 };
-
-// Variants that must NEVER appear in the Shopify cart (phantom / deprecated Shopify listings
-// that now sell exclusively through the internal /checkouts flow).
-const BLOCKED_VARIANTS = new Set<string>([
-  "gid://shopify/ProductVariant/43120267100221", // Spanish Relax - 1,000 Verbs in Spanish
-]);
 
 const CART_IMAGE_FALLBACKS: Record<string, { url: string; alt: string }> = {
   "gid://shopify/ProductVariant/42931924795453": {

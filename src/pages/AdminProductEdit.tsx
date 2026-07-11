@@ -304,69 +304,7 @@ const AdminProductEdit = () => {
               </Button>
             </div>
 
-            {/* Países excluidos POR CANAL */}
-            {(["store_excluded_countries", "hotmart_excluded_countries"] as const).map((field) => {
-              const isStore = field === "store_excluded_countries";
-              const current = (product[field] ?? []) as string[];
-              const setList = (list: string[]) => {
-                const uniq = Array.from(new Set(list.map((c) => c.toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c))));
-                update(field, uniq);
-              };
-              const addRegion = (key: string) => setList([...current, ...REGIONS[key].codes]);
-              const removeRegion = (key: string) => {
-                const rm = new Set(REGIONS[key].codes);
-                setList(current.filter((c) => !rm.has(c)));
-              };
-              return (
-                <div key={field} className="space-y-2 p-3 border rounded-lg">
-                  <Label>
-                    {isStore ? "🚫 Excluir de la Tienda" : "🚫 Excluir de Hotmart"}
-                    <span className="ml-2 text-xs text-muted-foreground">({current.length} países)</span>
-                  </Label>
-                  <Input
-                    value={current.join(", ")}
-                    onChange={(e) =>
-                      setList(e.target.value.split(/[,\s]+/).map((c) => c.trim()))
-                    }
-                    placeholder={isStore ? "Ej: MX, CO, AR" : "Ej: US, CA, GB, ES"}
-                  />
-                  <div className="flex flex-wrap gap-1.5">
-                    {REGION_KEYS.map((key) => {
-                      const codes = REGIONS[key].codes;
-                      const allIn = codes.every((c) => current.includes(c));
-                      return (
-                        <button
-                          type="button"
-                          key={key}
-                          onClick={() => (allIn ? removeRegion(key) : addRegion(key))}
-                          className={`text-xs px-2 py-1 rounded-full border transition ${
-                            allIn
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-background hover:bg-muted border-border"
-                          }`}
-                          title={codes.join(", ")}
-                        >
-                          {allIn ? "✓ " : "+ "}{REGIONS[key].label}
-                        </button>
-                      );
-                    })}
-                    {current.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setList([])}
-                        className="text-xs px-2 py-1 rounded-full border border-destructive/40 text-destructive hover:bg-destructive/10"
-                      >
-                        🗑️ Limpiar todo
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Toca una región para <b>añadir</b> sus países; tócala de nuevo para <b>quitarlos</b>. También puedes editar la lista manualmente arriba.
-                  </p>
-                </div>
-              );
-            })}
-
+            {/* Resumen de cobertura */}
             {orphanCountries.length > 0 ? (
               <div className="text-xs p-3 rounded border border-destructive/40 bg-destructive/10 text-destructive space-y-1">
                 <div className="font-semibold">⚠️ {orphanCountries.length} país(es) sin ningún botón de compra:</div>
@@ -378,7 +316,7 @@ const AdminProductEdit = () => {
                   ))}
                   {orphanCountries.length > 40 && <span>+{orphanCountries.length - 40} más</span>}
                 </div>
-                <div className="text-[11px] opacity-80">Quítalos de las exclusiones o activa el otro canal para cubrirlos.</div>
+                <div className="text-[11px] opacity-80">Toca «Aplicar política estándar» arriba para cubrirlos automáticamente.</div>
               </div>
             ) : (
               <div className="text-xs p-2 rounded border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400">
@@ -386,10 +324,10 @@ const AdminProductEdit = () => {
               </div>
             )}
 
-            <div className="text-xs bg-muted/40 p-2 rounded space-y-1">
-              <div><b>Preset típico "Hotmart solo LATAM":</b> en <i>Excluir de la Tienda</i> toca 🌎 LATAM; en <i>Excluir de Hotmart</i> toca 🇺🇸 Angloparlantes + 🇪🇺 Europa + 🌏 Asia + 🇵🇪 Solo Perú.</div>
-              <div><b>Tienda mundial:</b> deja Hotmart vacío y ambas listas vacías.</div>
+            <div className="text-xs text-muted-foreground">
+              Tienda excluida en <b>{(product.store_excluded_countries ?? []).length}</b> país(es) · Hotmart excluido en <b>{(product.hotmart_excluded_countries ?? []).length}</b> país(es).
             </div>
+
 
           </Card>
 

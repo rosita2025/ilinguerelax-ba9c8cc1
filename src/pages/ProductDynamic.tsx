@@ -28,23 +28,15 @@ interface DBProduct {
   hotmart_excluded_countries: string[] | null;
 }
 
+import { COUNTRY_INFO } from "@/lib/countryInfo";
+
 const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [
   { code: "auto", label: "🌐 Auto (detectar por IP)" },
-  { code: "PE", label: "🇵🇪 Perú" },
-  { code: "MX", label: "🇲🇽 México" },
-  { code: "CO", label: "🇨🇴 Colombia" },
-  { code: "AR", label: "🇦🇷 Argentina" },
-  { code: "CL", label: "🇨🇱 Chile" },
-  { code: "BR", label: "🇧🇷 Brasil" },
-  { code: "US", label: "🇺🇸 Estados Unidos" },
-  { code: "CA", label: "🇨🇦 Canadá" },
-  { code: "GB", label: "🇬🇧 Reino Unido" },
-  { code: "ES", label: "🇪🇸 España" },
-  { code: "FR", label: "🇫🇷 Francia" },
-  { code: "DE", label: "🇩🇪 Alemania" },
-  { code: "JP", label: "🇯🇵 Japón" },
-  { code: "KR", label: "🇰🇷 Corea" },
+  ...Object.entries(COUNTRY_INFO)
+    .map(([code, info]) => ({ code, label: `${info.flag} ${info.name}` }))
+    .sort((a, b) => a.label.localeCompare(b.label)),
 ];
+
 
 const FLAG: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",
@@ -191,20 +183,64 @@ const ProductDynamic = () => {
                 );
               })()}
 
-              {/* Simulador de región (solo visual, para pruebas) */}
-              <details className="mt-3 text-xs text-muted-foreground">
-                <summary className="cursor-pointer select-none">🧪 Simular país (pruebas)</summary>
-                <select
-                  value={simCountry}
-                  onChange={(e) => setSimCountry(e.target.value)}
-                  className="mt-2 w-full border rounded px-2 py-1 bg-background"
-                >
-                  {COUNTRY_OPTIONS.map((c) => (
-                    <option key={c.code} value={c.code}>{c.label}</option>
-                  ))}
-                </select>
-                <p className="mt-1">País detectado por IP: <b>{local.country || "?"}</b></p>
-              </details>
+              {/* Simulador de país (pruebas) */}
+              {(() => {
+                const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
+                const info = COUNTRY_INFO[effectiveCountry];
+                const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
+                const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
+                const hotmartExcluded = globalExcluded || (product.hotmart_excluded_countries ?? []).includes(effectiveCountry);
+                const storeOn = product.store_enabled && !storeExcluded;
+                const hotmartOn = !!product.hotmart_url && !hotmartExcluded;
+                return (
+                  <div className="mt-4 p-3 border border-dashed border-primary/40 rounded-lg bg-muted/30 text-xs space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold">🧪 Simulador de país</span>
+                      <span className="text-muted-foreground">IP real: <b>{local.country || "?"}</b></span>
+                    </div>
+                    <select
+                      value={simCountry}
+                      onChange={(e) => setSimCountry(e.target.value)}
+                      className="w-full border rounded px-2 py-1 bg-background"
+                    >
+                      {COUNTRY_OPTIONS.map((c) => (
+                        <option key={c.code} value={c.code}>{c.label}</option>
+                      ))}
+                    </select>
+                    <div className="p-2 rounded bg-background border">
+                      <div className="mb-1">
+                        Para <b>{info ? `${info.flag} ${info.name}` : effectiveCountry || "?"}</b> se mostrará:
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {storeOn && (
+                          <span className="px-2 py-1 rounded bg-primary/10 text-primary border border-primary/30">
+                            ✅ Botón Tienda ILINGUE RELAX
+                          </span>
+                        )}
+                        {hotmartOn && (
+                          <span className="px-2 py-1 rounded bg-[#EF4E23]/10 text-[#EF4E23] border border-[#EF4E23]/30">
+                            ✅ Botón Hotmart
+                          </span>
+                        )}
+                        {!storeOn && !hotmartOn && (
+                          <span className="px-2 py-1 rounded bg-destructive/10 text-destructive border border-destructive/30">
+                            ❌ Ningún botón (país sin canal)
+                          </span>
+                        )}
+                      </div>
+                      {(storeExcluded || hotmartExcluded) && (
+                        <div className="mt-2 text-muted-foreground space-y-0.5">
+                          {storeExcluded && <div>• Tienda excluida en este país</div>}
+                          {hotmartExcluded && <div>• Hotmart excluido en este país</div>}
+                          {!product.store_enabled && <div>• Tienda desactivada globalmente</div>}
+                          {!product.hotmart_url && <div>• Hotmart sin enlace configurado</div>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
 
               {bonusList.length > 0 && (
                 <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl">

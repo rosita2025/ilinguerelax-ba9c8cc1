@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
+import { COUNTRY_INFO } from "@/lib/countryInfo";
 
 interface Product {
   sku: string;
@@ -113,9 +114,30 @@ const AdminProductEdit = () => {
 
   const update = <K extends keyof Product>(k: K, v: Product[K]) => setProduct((p) => ({ ...p, [k]: v }));
 
-  const save = async () => {
+  // Países sin ningún canal disponible: ni Tienda (activa y no excluye) ni Hotmart (con enlace y no excluye)
+  const orphanCountries = useMemo(() => {
+    const storeOn = product.store_enabled;
+    const hotmartOn = !!product.hotmart_url?.trim();
+    if (!storeOn && !hotmartOn) return Object.keys(COUNTRY_INFO);
+    const storeExc = new Set(product.store_excluded_countries ?? []);
+    const hotExc = new Set(product.hotmart_excluded_countries ?? []);
+    return Object.keys(COUNTRY_INFO).filter((c) => {
+      const storeCovers = storeOn && !storeExc.has(c);
+      const hotCovers = hotmartOn && !hotExc.has(c);
+      return !storeCovers && !hotCovers;
+    });
+  }, [product.store_enabled, product.hotmart_url, product.store_excluded_countries, product.hotmart_excluded_countries]);
+
+  const save = async (opts: { force?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });
+    if (!opts.force && orphanCountries.length > 0) {
+      const list = orphanCountries.map((c) => `${COUNTRY_INFO[c]?.flag ?? ""} ${c}`).join(", ");
+      const ok = window.confirm(
+        `⚠️ ${orphanCountries.length} país(es) no verán NINGÚN botón de compra:\n\n${list}\n\n¿Guardar de todas formas?`,
+      );
+      if (!ok) return;
+    }
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("manage-products", {
@@ -135,6 +157,7 @@ const AdminProductEdit = () => {
     }
   };
 
+
   if (loading) return (
     <><AdminNav /><div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div></>
   );
@@ -146,7 +169,7 @@ const AdminProductEdit = () => {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <Button variant="ghost" asChild><Link to="/admin/productos"><ArrowLeft className="w-4 h-4 mr-1" /> Volver</Link></Button>
-            <Button onClick={save} disabled={saving}>
+            <Button onClick={() => save()} disabled={saving}>
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
               Guardar
             </Button>
@@ -315,10 +338,30 @@ const AdminProductEdit = () => {
               );
             })}
 
+            {orphanCountries.length > 0 ? (
+              <div className="text-xs p-3 rounded border border-destructive/40 bg-destructive/10 text-destructive space-y-1">
+                <div className="font-semibold">⚠️ {orphanCountries.length} país(es) sin ningún botón de compra:</div>
+                <div className="flex flex-wrap gap-1">
+                  {orphanCountries.slice(0, 40).map((c) => (
+                    <span key={c} className="px-1.5 py-0.5 bg-background/60 rounded">
+                      {COUNTRY_INFO[c]?.flag} {c}
+                    </span>
+                  ))}
+                  {orphanCountries.length > 40 && <span>+{orphanCountries.length - 40} más</span>}
+                </div>
+                <div className="text-[11px] opacity-80">Quítalos de las exclusiones o activa el otro canal para cubrirlos.</div>
+              </div>
+            ) : (
+              <div className="text-xs p-2 rounded border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400">
+                ✅ Todos los países del catálogo tienen al menos un canal de compra disponible.
+              </div>
+            )}
+
             <div className="text-xs bg-muted/40 p-2 rounded space-y-1">
-              <div><b>Preset típico "Hotmart solo LATAM":</b> en <i>Excluir de la Tienda</i> toca 🌎 LATAM; en <i>Excluir de Hotmart</i> toca 🇺🇸 Angloparlantes + 🇪🇺 Europa + 🌏 Asia.</div>
+              <div><b>Preset típico "Hotmart solo LATAM":</b> en <i>Excluir de la Tienda</i> toca 🌎 LATAM; en <i>Excluir de Hotmart</i> toca 🇺🇸 Angloparlantes + 🇪🇺 Europa + 🌏 Asia + 🇵🇪 Solo Perú.</div>
               <div><b>Tienda mundial:</b> deja Hotmart vacío y ambas listas vacías.</div>
             </div>
+
           </Card>
 
 
@@ -489,7 +532,7 @@ const AdminProductEdit = () => {
           </Card>
 
           <div className="flex justify-end">
-            <Button onClick={save} disabled={saving} size="lg">
+            <Button onClick={() => save()} disabled={saving} size="lg">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
               Guardar producto
             </Button>

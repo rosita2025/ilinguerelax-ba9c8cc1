@@ -45,6 +45,15 @@ export const REGIONS: Record<string, { label: string; codes: string[] }> = {
     label: "🇪🇸 Solo España",
     codes: ["ES"],
   },
+  peru_only: {
+    label: "🇵🇪 Solo Perú",
+    codes: ["PE"],
+  },
+  usa_only: {
+    label: "🇺🇸 Solo USA",
+    codes: ["US"],
+  },
+
 };
 
 export const REGION_KEYS = Object.keys(REGIONS);

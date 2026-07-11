@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
+import { detectPolicyPreset, POLICY_META } from "@/lib/productPolicy";
 
 interface Product {
   id: string;
@@ -21,6 +22,10 @@ interface Product {
   active: boolean;
   sort_order: number;
   cover_image_url: string | null;
+  hotmart_url: string | null;
+  store_enabled: boolean;
+  store_excluded_countries: string[] | null;
+  hotmart_excluded_countries: string[] | null;
 }
 
 const FLAGS: Record<string, string> = {
@@ -126,6 +131,7 @@ const AdminProducts = () => {
                   <th className="text-left px-4 py-3">Producto</th>
                   <th className="text-left px-4 py-3">Categoría</th>
                   <th className="text-right px-4 py-3">Precio</th>
+                  <th className="text-center px-4 py-3">Preset</th>
                   <th className="text-center px-4 py-3">Drive</th>
                   <th className="text-center px-4 py-3">Tipo</th>
                   <th className="text-center px-4 py-3">Estado</th>
@@ -134,7 +140,7 @@ const AdminProducts = () => {
               </thead>
               <tbody>
                 {filtered.length === 0 && (
-                  <tr><td colSpan={7} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
+                  <tr><td colSpan={8} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
                 )}
                 {filtered.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">
@@ -148,6 +154,21 @@ const AdminProducts = () => {
                     <td className="px-4 py-3 text-right">
                       <div className="font-semibold">${Number(p.price_usd).toFixed(2)}</div>
                       {p.price_pen != null && <div className="text-xs text-muted-foreground">S/ {Number(p.price_pen).toFixed(2)}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {(() => {
+                        const preset = detectPolicyPreset(p);
+                        const meta = POLICY_META[preset];
+                        return (
+                          <span
+                            title={meta.description}
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${meta.className}`}
+                          >
+                            <span>{meta.icon}</span>
+                            <span className="font-medium">{meta.label}</span>
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {p.drive_url ? (

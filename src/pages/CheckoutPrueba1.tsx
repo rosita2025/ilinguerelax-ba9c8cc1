@@ -120,14 +120,30 @@ export default function CheckoutPrueba1() {
   const catalogItem = staticItem ?? dbItem;
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
 
-  // Auto-load product from URL slug (Shopify-style)
+  // Auto-load product from URL slug (Shopify-style). Also live-syncs price/image/upsells
+  // when the admin edits the catalog and pushes an update — without dropping items or state.
   useEffect(() => {
-    if (catalogItem) {
+    if (!catalogItem) return;
+    const existing = items.find((i) => i.id === catalogItem.id);
+    if (!existing) {
       clear();
       addItem(catalogItem);
+    } else {
+      // Same product already in cart → just update mutable fields (price, image, regionPrices…).
+      syncItem(catalogItem);
     }
+    // Fingerprint intentionally includes price + region prices + upsell prices so
+    // any admin edit refreshes the cart line immediately.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [catalogItem?.id]);
+  }, [
+    catalogItem?.id,
+    catalogItem?.price,
+    catalogItem?.regionPrices?.latam,
+    catalogItem?.regionPrices?.global,
+    catalogItem?.image,
+    catalogItem?.name,
+    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.originalPrice]) ?? []),
+  ]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.

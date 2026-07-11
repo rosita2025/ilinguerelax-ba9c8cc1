@@ -310,12 +310,6 @@ const AdminProductEdit = () => {
           <Card className="p-6 space-y-4">
             <h2 className="font-semibold">3. Precios por región</h2>
 
-            <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-xs text-sky-900 space-y-1">
-              <div className="font-semibold">🌐 Dos precios USD distintos según el país del comprador</div>
-              <div>🌎 <b>Latinoamérica</b> (tienda propia, sin Hotmart): sugerido <b>$8 – $15 USD</b></div>
-              <div>🇺🇸🇨🇦🇪🇺🇬🇧🇦🇺🇯🇵 <b>USA, Canadá, Europa, UK, Australia, Asia</b> (resto del mundo): sugerido <b>$17 – $20 USD</b></div>
-              <div className="text-[11px] text-sky-800/80">Si LATAM va por Hotmart, Hotmart usa su propio precio y este campo se ignora en esos países.</div>
-            </div>
 
             <div className="grid md:grid-cols-3 gap-4">
               <div>

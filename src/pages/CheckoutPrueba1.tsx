@@ -27,7 +27,7 @@ export default function CheckoutPrueba1() {
 
   const staticItem = getCatalogItem(slug);
   const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
-  const [loadingDb, setLoadingDb] = useState(!staticItem && !!slug);
+  const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
 
   // If slug not in static catalog, try to load from digital_products table

@@ -237,6 +237,7 @@ serve(async (req) => {
       JSON.stringify({
         source: "ga4",
         days: safeDays,
+        range: { startDate: ga4Start, endDate: ga4End },
         propertyId,
         totals,
         engagementRate,

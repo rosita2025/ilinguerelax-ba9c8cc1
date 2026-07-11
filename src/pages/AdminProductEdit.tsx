@@ -186,13 +186,21 @@ const AdminProductEdit = () => {
         },
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
-      // Broadcast catalog change so open product/checkout tabs refetch instantly.
+      // Revalidate: read the fresh updated_at from the DB so we broadcast a real version stamp.
+      let version = Date.now();
       try {
-        const stamp = Date.now();
-        localStorage.setItem("ilr-catalog-updated", String(stamp));
+        const { data: fresh } = await supabase
+          .from("digital_products")
+          .select("updated_at")
+          .eq("sku", product.sku)
+          .maybeSingle();
+        if (fresh?.updated_at) version = new Date(fresh.updated_at).getTime();
+      } catch { /* ignore */ }
+      try {
+        localStorage.setItem("ilr-catalog-updated", `${product.sku}:${version}`);
         if ("BroadcastChannel" in window) {
           const bc = new BroadcastChannel("ilr-catalog");
-          bc.postMessage({ type: "product-updated", sku: product.sku, at: stamp });
+          bc.postMessage({ type: "product-updated", sku: product.sku, at: version });
           bc.close();
         }
       } catch { /* ignore */ }

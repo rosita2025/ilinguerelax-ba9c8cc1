@@ -128,6 +128,23 @@ const AdminProductEdit = () => {
     });
   }, [product.store_enabled, product.hotmart_url, product.store_excluded_countries, product.hotmart_excluded_countries]);
 
+  // Detecta si las exclusiones coinciden con la "política estándar"
+  const policyStatus = useMemo(() => {
+    const LATAM = REGIONS.latam.codes;
+    const HOTMART_BLOCKED = ["CU", "VE", "NI"];
+    const expectedStore = new Set(LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c)));
+    const expectedHot = new Set([
+      ...Object.keys(COUNTRY_INFO).filter((c) => !LATAM.includes(c)),
+      ...HOTMART_BLOCKED,
+    ]);
+    const store = new Set(product.store_excluded_countries ?? []);
+    const hot = new Set(product.hotmart_excluded_countries ?? []);
+    const eq = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((x) => b.has(x));
+    if (eq(store, expectedStore) && eq(hot, expectedHot)) return "standard" as const;
+    if (store.size === 0 && hot.size === 0) return "worldwide" as const;
+    return "custom" as const;
+  }, [product.store_excluded_countries, product.hotmart_excluded_countries]);
+
   const save = async (opts: { force?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });

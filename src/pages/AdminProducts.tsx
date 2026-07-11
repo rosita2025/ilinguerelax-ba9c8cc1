@@ -194,6 +194,9 @@ const AdminProducts = () => {
                         <Button size="sm" variant="ghost" onClick={() => toggle(p.sku, p.active)} title={p.active ? "Ocultar" : "Publicar"}>
                           {p.active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </Button>
+                        <Button size="sm" variant="ghost" onClick={() => remove(p.sku, p.name)} title="Eliminar" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </td>
                   </tr>

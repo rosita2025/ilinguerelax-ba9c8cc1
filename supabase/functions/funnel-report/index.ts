@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,37 +9,80 @@ const corsHeaders = {
 
 const FUNNEL_EVENTS = ["PageView", "ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"];
 
-const classifyReferrer = (ref: string | null): string => {
-  if (!ref) return "Directo";
-  if (ref.startsWith("utm:")) {
-    const source = ref.split(":")[1] || "Campaña";
-    return source[0]?.toUpperCase() + source.slice(1);
-  }
-  try {
-    const host = new URL(ref).hostname.toLowerCase().replace(/^www\./, "");
-    if (host.includes("google")) return "Google";
-    if (host.includes("facebook") || host.includes("fb.")) return "Facebook";
-    if (host.includes("instagram")) return "Instagram";
-    if (host.includes("tiktok")) return "TikTok";
-    if (host.includes("youtube") || host === "youtu.be") return "YouTube";
-    if (host.includes("bing")) return "Bing";
-    if (host.includes("twitter") || host === "t.co" || host.includes("x.com")) return "Twitter/X";
-    if (host.includes("whatsapp") || host === "wa.me") return "WhatsApp";
-    if (host.includes("hotmart")) return "Hotmart";
-    if (host.includes("paypal")) return "PayPal";
-    if (host.includes("stripe")) return "Stripe";
-    if (host.includes("amazon")) return "Amazon";
-    if (host.includes("ilinguerelax") || host.includes("lovable")) return "Interno";
-    return host;
-  } catch { return "Directo"; }
-};
+// ---------- GA4 auth ----------
+async function getGa4AccessToken(): Promise<string> {
+  const raw = Deno.env.get("GA4_SERVICE_ACCOUNT_JSON");
+  if (!raw) throw new Error("GA4_SERVICE_ACCOUNT_JSON not set");
+  const sa = JSON.parse(raw);
 
-const isAdminPath = (path: string | null): boolean => (path || "").startsWith("/admin");
+  // Convert PEM PKCS8 -> CryptoKey
+  const pem = sa.private_key
+    .replace(/-----BEGIN PRIVATE KEY-----/, "")
+    .replace(/-----END PRIVATE KEY-----/, "")
+    .replace(/\s+/g, "");
+  const der = Uint8Array.from(atob(pem), (c) => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey(
+    "pkcs8",
+    der,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+
+  const jwt = await create(
+    { alg: "RS256", typ: "JWT" },
+    {
+      iss: sa.client_email,
+      scope: "https://www.googleapis.com/auth/analytics.readonly",
+      aud: "https://oauth2.googleapis.com/token",
+      exp: getNumericDate(3600),
+      iat: getNumericDate(0),
+    },
+    key,
+  );
+
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt,
+    }),
+  });
+  if (!res.ok) throw new Error(`GA4 token error [${res.status}]: ${await res.text()}`);
+  const json = await res.json();
+  return json.access_token as string;
+}
+
+async function ga4Run(propertyId: string, token: string, body: unknown) {
+  const res = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  if (!res.ok) throw new Error(`GA4 report error [${res.status}]: ${await res.text()}`);
+  return await res.json();
+}
+
+async function ga4Realtime(propertyId: string, token: string) {
+  const res = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runRealtimeReport`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ metrics: [{ name: "activeUsers" }] }),
+    },
+  );
+  if (!res.ok) return 0;
+  const json = await res.json();
+  return parseInt(json?.rows?.[0]?.metricValues?.[0]?.value ?? "0", 10) || 0;
+}
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const { adminKey, days = 7 } = await req.json().catch(() => ({}));
@@ -52,90 +96,138 @@ serve(async (req) => {
     }
 
     const safeDays = Math.min(Math.max(parseInt(String(days)) || 7, 1), 90);
+    const propertyId = Deno.env.get("GA4_PROPERTY_ID");
+    if (!propertyId) throw new Error("GA4_PROPERTY_ID not set");
 
+    const token = await getGa4AccessToken();
+    const dateRange = { startDate: `${safeDays}daysAgo`, endDate: "today" };
+
+    // Parallel GA4 queries
+    const [totalsRes, countryRes, sourceRes, pageRes, liveVisitors] = await Promise.all([
+      ga4Run(propertyId, token, {
+        dateRanges: [dateRange],
+        metrics: [
+          { name: "screenPageViews" },
+          { name: "sessions" },
+          { name: "totalUsers" },
+          { name: "activeUsers" },
+          { name: "engagedSessions" },
+          { name: "userEngagementDuration" },
+        ],
+      }),
+      ga4Run(propertyId, token, {
+        dateRanges: [dateRange],
+        dimensions: [{ name: "country" }],
+        metrics: [{ name: "screenPageViews" }, { name: "sessions" }, { name: "totalUsers" }],
+        limit: 50,
+        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+      }),
+      ga4Run(propertyId, token, {
+        dateRanges: [dateRange],
+        dimensions: [{ name: "sessionDefaultChannelGroup" }, { name: "sessionSource" }],
+        metrics: [{ name: "sessions" }, { name: "totalUsers" }],
+        limit: 50,
+        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+      }),
+      ga4Run(propertyId, token, {
+        dateRanges: [dateRange],
+        dimensions: [{ name: "pagePath" }],
+        metrics: [{ name: "screenPageViews" }, { name: "totalUsers" }],
+        limit: 50,
+        orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+      }),
+      ga4Realtime(propertyId, token),
+    ]);
+
+    // Totals row
+    const tRow = totalsRes.rows?.[0]?.metricValues ?? [];
+    const num = (i: number) => parseFloat(tRow[i]?.value ?? "0") || 0;
+    const totals = {
+      pageViews: num(0),
+      sessions: num(1),
+      totalUsers: num(2),
+      activeUsers: num(3),
+      engagedSessions: num(4),
+      engagementSeconds: num(5),
+    };
+    const engagementRate = totals.sessions ? (totals.engagedSessions / totals.sessions) * 100 : 0;
+    const avgSessionSeconds = totals.sessions ? totals.engagementSeconds / totals.sessions : 0;
+
+    // Country breakdown
+    const byCountry = (countryRes.rows ?? []).map((r: any) => ({
+      country: r.dimensionValues?.[0]?.value || "(desconocido)",
+      pageViews: parseInt(r.metricValues?.[0]?.value ?? "0", 10),
+      sessions: parseInt(r.metricValues?.[1]?.value ?? "0", 10),
+      users: parseInt(r.metricValues?.[2]?.value ?? "0", 10),
+    }));
+
+    // Source/channel breakdown
+    const bySource = (sourceRes.rows ?? []).map((r: any) => ({
+      channel: r.dimensionValues?.[0]?.value || "(direct)",
+      source: r.dimensionValues?.[1]?.value || "(direct)",
+      sessions: parseInt(r.metricValues?.[0]?.value ?? "0", 10),
+      users: parseInt(r.metricValues?.[1]?.value ?? "0", 10),
+    }));
+
+    // Top pages
+    const byPage = (pageRes.rows ?? [])
+      .filter((r: any) => !(r.dimensionValues?.[0]?.value || "").startsWith("/admin"))
+      .map((r: any) => ({
+        path: r.dimensionValues?.[0]?.value || "/",
+        pageViews: parseInt(r.metricValues?.[0]?.value ?? "0", 10),
+        users: parseInt(r.metricValues?.[1]?.value ?? "0", 10),
+      }));
+
+    // Also pull conversion events (AddToCart/Purchase) from internal funnel_events for the same range
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
-
     const since = new Date(Date.now() - safeDays * 86400000).toISOString();
-
-    const { data, error } = await supabase
+    const { data: convData } = await supabase
       .from("funnel_events")
-      .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at")
+      .select("event_name, value, product_id")
       .gte("created_at", since)
+      .in("event_name", FUNNEL_EVENTS)
       .limit(50000);
 
-    if (error) throw error;
-
-    const totals: Record<string, number> = {};
-    const uniqueSessions: Record<string, Set<string>> = {};
+    const eventCounts: Record<string, number> = {};
     const byProduct: Record<string, Record<string, number>> = {};
-    const byCountry: Record<string, Record<string, number>> = {};
-    const bySource: Record<string, Record<string, number>> = {};
-    const byPage: Record<string, number> = {};
-    const revenueByCountry: Record<string, number> = {};
     let revenue = 0;
-    const liveCutoff = Date.now() - 5 * 60 * 1000;
-    const liveSessions = new Set<string>();
-
-    for (const ev of FUNNEL_EVENTS) {
-      totals[ev] = 0;
-      uniqueSessions[ev] = new Set();
-    }
-
-    for (const row of (data || []).filter((item) => !isAdminPath((item.page_path as string) || null))) {
+    for (const row of convData ?? []) {
       const ev = row.event_name as string;
-      if (!FUNNEL_EVENTS.includes(ev)) continue;
-      totals[ev] = (totals[ev] || 0) + 1;
-      if (row.session_id) uniqueSessions[ev].add(row.session_id);
+      eventCounts[ev] = (eventCounts[ev] || 0) + 1;
       const pid = (row.product_id as string) || "(sin producto)";
       byProduct[pid] = byProduct[pid] || {};
       byProduct[pid][ev] = (byProduct[pid][ev] || 0) + 1;
-      const country = (row.country as string) || "(desconocido)";
-      byCountry[country] = byCountry[country] || {};
-      byCountry[country][ev] = (byCountry[country][ev] || 0) + 1;
-      const src = classifyReferrer((row.referrer as string) || null);
-      bySource[src] = bySource[src] || {};
-      bySource[src][ev] = (bySource[src][ev] || 0) + 1;
-      if (ev === "PageView") {
-        const pp = (row.page_path as string) || "/";
-        byPage[pp] = (byPage[pp] || 0) + 1;
-      }
-      if (row.session_id && new Date(row.created_at as string).getTime() >= liveCutoff) {
-        liveSessions.add(row.session_id as string);
-      }
       if (ev === "Purchase" && row.value) revenue += Number(row.value);
-      if (ev === "Purchase" && row.value) {
-        revenueByCountry[country] = (revenueByCountry[country] || 0) + Number(row.value);
-      }
     }
 
-    const uniques: Record<string, number> = {};
-    for (const ev of FUNNEL_EVENTS) uniques[ev] = uniqueSessions[ev].size;
-
     const conversionRates = {
-      view_to_cart: totals.ViewContent ? (totals.AddToCart / totals.ViewContent) * 100 : 0,
-      cart_to_checkout: totals.AddToCart ? (totals.InitiateCheckout / totals.AddToCart) * 100 : 0,
-      checkout_to_purchase: totals.InitiateCheckout ? (totals.Purchase / totals.InitiateCheckout) * 100 : 0,
-      view_to_purchase: totals.ViewContent ? (totals.Purchase / totals.ViewContent) * 100 : 0,
+      view_to_cart: eventCounts.ViewContent ? ((eventCounts.AddToCart || 0) / eventCounts.ViewContent) * 100 : 0,
+      cart_to_checkout: eventCounts.AddToCart ? ((eventCounts.InitiateCheckout || 0) / eventCounts.AddToCart) * 100 : 0,
+      checkout_to_purchase: eventCounts.InitiateCheckout ? ((eventCounts.Purchase || 0) / eventCounts.InitiateCheckout) * 100 : 0,
+      session_to_purchase: totals.sessions ? ((eventCounts.Purchase || 0) / totals.sessions) * 100 : 0,
     };
 
     return new Response(
       JSON.stringify({
+        source: "ga4",
         days: safeDays,
+        propertyId,
         totals,
-        uniques,
-        byProduct,
+        engagementRate,
+        avgSessionSeconds,
+        liveVisitors,
         byCountry,
         bySource,
         byPage,
-        liveVisitors: liveSessions.size,
-        revenueByCountry,
+        eventCounts,
+        byProduct,
         revenue,
         conversionRates,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
     );
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

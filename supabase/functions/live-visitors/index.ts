@@ -1,10 +1,102 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// ---------- GA4 auth ----------
+async function getGa4AccessToken(): Promise<string> {
+  const raw = Deno.env.get("GA4_SERVICE_ACCOUNT_JSON");
+  if (!raw) throw new Error("GA4_SERVICE_ACCOUNT_JSON not set");
+  const sa = JSON.parse(raw);
+  const pem = sa.private_key
+    .replace(/-----BEGIN PRIVATE KEY-----/, "")
+    .replace(/-----END PRIVATE KEY-----/, "")
+    .replace(/\s+/g, "");
+  const der = Uint8Array.from(atob(pem), (c) => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey(
+    "pkcs8", der,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false, ["sign"],
+  );
+  const jwt = await create(
+    { alg: "RS256", typ: "JWT" },
+    {
+      iss: sa.client_email,
+      scope: "https://www.googleapis.com/auth/analytics.readonly",
+      aud: "https://oauth2.googleapis.com/token",
+      exp: getNumericDate(3600),
+      iat: getNumericDate(0),
+    },
+    key,
+  );
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt,
+    }),
+  });
+  if (!res.ok) throw new Error(`GA4 token error [${res.status}]: ${await res.text()}`);
+  return (await res.json()).access_token as string;
+}
+
+async function ga4Realtime(propertyId: string, token: string, body: unknown) {
+  const res = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runRealtimeReport`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  if (!res.ok) { console.warn("GA4 realtime failed", res.status, await res.text()); return null; }
+  return await res.json();
+}
+
+interface Ga4Live {
+  activeUsers: number;
+  byCountry: Record<string, number>;
+  byPage: Record<string, number>;
+  byEvent: Record<string, number>;
+}
+
+async function fetchGa4Live(): Promise<Ga4Live | null> {
+  try {
+    const propertyId = Deno.env.get("GA4_PROPERTY_ID");
+    if (!propertyId) return null;
+    const token = await getGa4AccessToken();
+    const [total, byCountry, byPage, byEvent] = await Promise.all([
+      ga4Realtime(propertyId, token, { metrics: [{ name: "activeUsers" }] }),
+      ga4Realtime(propertyId, token, { dimensions: [{ name: "countryId" }], metrics: [{ name: "activeUsers" }], limit: 50 }),
+      ga4Realtime(propertyId, token, { dimensions: [{ name: "unifiedScreenName" }], metrics: [{ name: "screenPageViews" }], limit: 20 }),
+      ga4Realtime(propertyId, token, { dimensions: [{ name: "eventName" }], metrics: [{ name: "eventCount" }], limit: 30 }),
+    ]);
+    const readMap = (r: unknown): Record<string, number> => {
+      const out: Record<string, number> = {};
+      const rows = (r as { rows?: Array<{ dimensionValues?: Array<{ value?: string }>; metricValues?: Array<{ value?: string }> }> })?.rows || [];
+      for (const row of rows) {
+        const k = row.dimensionValues?.[0]?.value || "";
+        const v = parseInt(row.metricValues?.[0]?.value || "0", 10) || 0;
+        if (k) out[k] = (out[k] || 0) + v;
+      }
+      return out;
+    };
+    return {
+      activeUsers: parseInt((total as { rows?: Array<{ metricValues?: Array<{ value?: string }> }> })?.rows?.[0]?.metricValues?.[0]?.value || "0", 10) || 0,
+      byCountry: readMap(byCountry),
+      byPage: readMap(byPage),
+      byEvent: readMap(byEvent),
+    };
+  } catch (e) {
+    console.warn("GA4 live fetch failed:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
 
 const classifyReferrer = (ref: string | null): { source: string; channel: string } => {
   if (!ref) return { source: "Directo", channel: "Directo / manual" };
@@ -92,12 +184,15 @@ serve(async (req) => {
     const since = new Date(Date.now() - winSec * 1000).toISOString();
     const win = winSec / 60;
 
-    const { data, error } = await supabase
-      .from("funnel_events")
-      .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at")
-      .gte("created_at", since)
-      .order("created_at", { ascending: false })
-      .limit(5000);
+    const [{ data, error }, ga4] = await Promise.all([
+      supabase
+        .from("funnel_events")
+        .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at")
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(5000),
+      fetchGa4Live(),
+    ]);
     if (error) throw error;
 
     const rows = (data || []).filter((row) => !isAdminPath((row.page_path as string) || null));
@@ -215,23 +310,44 @@ serve(async (req) => {
       if (ev === "Purchase") recordPurchase(row as Record<string, unknown>);
     }
 
+    // ---- Merge GA4 realtime into the live snapshot ----
+    const mergedByCountry = { ...byCountry };
+    const mergedByPageLabel = { ...byPageLabel };
+    const mergedByEvent = { ...byEvent };
+    if (ga4) {
+      for (const [c, n] of Object.entries(ga4.byCountry)) {
+        mergedByCountry[c] = Math.max(mergedByCountry[c] || 0, n);
+      }
+      for (const [p, n] of Object.entries(ga4.byPage)) {
+        mergedByPageLabel[p] = Math.max(mergedByPageLabel[p] || 0, n);
+      }
+      for (const [e, n] of Object.entries(ga4.byEvent)) {
+        mergedByEvent[e] = Math.max(mergedByEvent[e] || 0, n);
+      }
+    }
+    const ga4Active = ga4?.activeUsers || 0;
+    const activeNow = Math.max(activeFive.size, ga4Active);
+    const totalOut = Math.max(visitors.length, ga4Active);
+
     return new Response(JSON.stringify({
       windowMinutes: win,
-      total: visitors.length,
-      activeNow: activeFive.size,
-      productViews: byEvent.ViewContent || 0,
-      checkouts: byEvent.InitiateCheckout || 0,
+      total: totalOut,
+      activeNow,
+      ga4ActiveUsers: ga4Active,
+      ga4Available: !!ga4,
+      productViews: mergedByEvent.ViewContent || mergedByEvent.view_item || 0,
+      checkouts: byEvent.InitiateCheckout || mergedByEvent.begin_checkout || 0,
       checkoutSessions: checkoutSessions.size,
       purchases: purchaseSessions.size,
       purchaseSessions: purchaseSessions.size,
       revenue,
-      byCountry,
+      byCountry: mergedByCountry,
       byPage,
-      byPageLabel,
+      byPageLabel: mergedByPageLabel,
       byProduct,
       bySource,
       byChannel,
-      byEvent,
+      byEvent: mergedByEvent,
       revenueByCountry,
       visitors: visitors.slice(0, 200),
       recentEvents,

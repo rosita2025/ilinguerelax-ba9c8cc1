@@ -98,22 +98,38 @@ serve(async (req) => {
         </div>`;
     }).join("");
 
+    const hasMultiple = products.length > 1;
+    const productWord = hasMultiple ? "productos" : "producto";
+    const intro = hasMultiple
+      ? `Gracias por confiar en iLingue Relax. Tu compra incluye <strong>${products.length} ${productWord}</strong> (producto principal + adicional). Abajo tienes el enlace de descarga de cada uno.`
+      : `Gracias por confiar en iLingue Relax. Aquí tienes el enlace de descarga de tu producto.`;
+
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
 <body style="font-family:'Segoe UI',Tahoma,sans-serif;margin:0;padding:0;background:#f4f4f5;">
   <div style="max-width:640px;margin:0 auto;padding:32px 20px;">
     <div style="background:linear-gradient(135deg,#0ea5e9 0%,#10b981 100%);border-radius:16px 16px 0 0;padding:36px;text-align:center;">
-      <div style="font-size:44px;line-height:1;">📥</div>
-      <h1 style="color:#fff;margin:12px 0 0;font-size:26px;">Aquí está tu material, ${esc(firstName)}</h1>
-      <p style="color:rgba(255,255,255,.9);margin:10px 0 0;font-size:14px;">Enlaces de descarga + bonos incluidos</p>
+      <div style="font-size:44px;line-height:1;">🎉</div>
+      <h1 style="color:#fff;margin:12px 0 0;font-size:26px;">¡Gracias por su compra, ${esc(firstName)}!</h1>
+      <p style="color:rgba(255,255,255,.9);margin:10px 0 0;font-size:14px;">Aquí están tus enlaces de descarga</p>
       ${orderRef ? `<p style="color:rgba(255,255,255,.85);margin:10px 0 0;font-size:12px;letter-spacing:1px;">Orden ${orderRef}</p>` : ""}
     </div>
     <div style="background:#fafafa;padding:24px;border-radius:0 0 16px 16px;box-shadow:0 4px 6px rgba(0,0,0,.08);">
-      <p style="font-size:15px;color:#374151;line-height:1.6;margin:0 0 8px;">
-        Todos los productos que compraste están abajo. Haz clic en cada botón verde para abrir el archivo en Google Drive y guardarlo en tu dispositivo.
-      </p>
+      <p style="font-size:15px;color:#374151;line-height:1.6;margin:0 0 12px;">${intro}</p>
+
+      <div style="background:#eff6ff;border-left:4px solid #0ea5e9;border-radius:8px;padding:14px 18px;margin:0 0 18px;font-size:13px;color:#1e40af;line-height:1.6;">
+        📖 <strong>Cómo descargar${hasMultiple ? " cada producto" : ""}:</strong>
+        <ol style="margin:8px 0 0;padding-left:20px;">
+          <li>Haz clic en el botón verde <strong>"Descargar / Ver en Drive"</strong> de cada producto.</li>
+          <li>Se abrirá Google Drive → pulsa el ícono ⬇ arriba a la derecha para guardar el PDF.</li>
+          <li>Si el producto pide una <strong>clave de acceso</strong>, cópiala del email.</li>
+          ${hasMultiple ? `<li>Repite el paso 1 con el <strong>producto adicional (upsell)</strong> que aparece más abajo — cada uno tiene su propio enlace y clave.</li>` : ""}
+        </ol>
+      </div>
+
       ${productBlocks}
+
       <div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:8px;padding:14px 18px;margin:20px 0;font-size:13px;color:#78350f;">
-        💡 <strong>Consejo:</strong> descarga los PDFs a tu teléfono o computadora para tenerlos siempre disponibles, incluso sin internet.
+        💡 <strong>Consejo:</strong> guarda los PDFs en tu teléfono o computadora para tenerlos siempre disponibles, incluso sin internet.
       </div>
       <div style="text-align:center;margin:20px 0 0;">
         <a href="https://wa.me/15752160934" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:600;font-size:14px;">💬 ¿Problemas con la descarga? Escríbenos</a>
@@ -131,7 +147,7 @@ serve(async (req) => {
     const r = await resend.emails.send({
       from: "iLingue Relax <hola@ilinguerelax.com>",
       to: [customerEmail],
-      subject: `📥 Tu material digital ${orderRef ? `(${orderRef})` : ""} — enlaces de descarga`,
+      subject: `🎉 Gracias por su compra ${orderRef ? `— ${orderRef}` : ""} · enlaces de descarga${hasMultiple ? " (incluye producto adicional)" : ""}`,
       html,
     });
 

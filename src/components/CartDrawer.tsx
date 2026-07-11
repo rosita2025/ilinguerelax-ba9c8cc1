@@ -122,12 +122,12 @@ export const CartDrawer = () => {
 
   // Auto-remove phantom/deprecated Shopify line items on mount and whenever items change.
   useEffect(() => {
-    items.forEach((it) => {
+    rawItems.forEach((it) => {
       if (BLOCKED_VARIANTS.has(it.variantId)) {
         removeItem(it.variantId).catch(() => {});
       }
     });
-  }, [items, removeItem]);
+  }, [rawItems, removeItem]);
 
   // Auto-apply free shipping when subtotal >= $45 and there's a physical item
   useEffect(() => {

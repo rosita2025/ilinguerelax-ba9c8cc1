@@ -55,15 +55,30 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { action, adminKey } = body as { action?: string; adminKey?: string };
 
-    const expected = Deno.env.get("ADMIN_REVIEW_KEY");
-    if (!expected || adminKey !== expected) {
-      return json({ error: "Unauthorized" }, 401);
-    }
-
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    // Public action: returns delivery info (drive_url + bonuses) for known SKUs.
+    // Used by /checkout/success after a real payment reference is present.
+    if (action === "get_delivery") {
+      const skus = Array.isArray((body as { skus?: unknown }).skus)
+        ? ((body as { skus: string[] }).skus).filter(Boolean).slice(0, 20)
+        : [];
+      if (!skus.length) return json({ items: [] });
+      const { data, error } = await admin
+        .from("digital_products")
+        .select("sku,name,drive_url,access_key,bonus_name,bonus_drive_url,bonus_access_key,bonuses,cover_image_url")
+        .in("sku", skus);
+      if (error) throw error;
+      return json({ items: data ?? [] });
+    }
+
+    const expected = Deno.env.get("ADMIN_REVIEW_KEY");
+    if (!expected || adminKey !== expected) {
+      return json({ error: "Unauthorized" }, 401);
+    }
 
     if (action === "list") {
       const { data: products, error } = await admin

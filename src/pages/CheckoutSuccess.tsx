@@ -56,6 +56,9 @@ export default function CheckoutSuccess() {
   const sentRef = useRef(false);
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
+  const { toast } = useToast();
+  const [delivery, setDelivery] = useState<DeliveryItem[]>([]);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
 
   // Build a friendly order number: ILR-<PROVIDER>-<6 chars>
   // Deterministic from the payment reference so the same payment always maps

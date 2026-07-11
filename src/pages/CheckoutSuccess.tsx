@@ -385,9 +385,14 @@ export default function CheckoutSuccess() {
                 );
               })}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Guarda esta página o revisa tu correo <strong>{buyer.email}</strong> — también te enviamos los enlaces por email.
-            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Button size="sm" variant="outline" onClick={resendDigital} disabled={resending} className="gap-1.5">
+                <Mail className="w-4 h-4" /> {resending ? "Reenviando…" : "Reenviar enlaces a mi correo"}
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                También te lo enviamos automáticamente a <strong>{buyer.email}</strong>.
+              </span>
+            </div>
           </section>
         )}
 

@@ -44,7 +44,7 @@ export default function CheckoutPrueba1() {
         .select("sku, name, description, price_usd, price_pen, cover_image_url, updated_at")
         .eq("sku", slug)
         .eq("active", true)
-        .gt("price_usd", -1 - (cb % 1)) // no-op inequality that changes the request signature
+        .gt("price_usd", -1 - (cb % 7) * 0.0000001) // varies request signature to bust caches
         .maybeSingle();
       if (cancelled) return;
       if (error || !data) {

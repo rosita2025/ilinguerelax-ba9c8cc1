@@ -38,7 +38,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { customerEmail, customerName, orderId, skus }: Body = await req.json();
+    const { customerEmail, customerName, orderId, skus, idempotencyKey, force }: Body = await req.json();
     if (!customerEmail || !Array.isArray(skus) || skus.length === 0) {
       return new Response(JSON.stringify({ error: "customerEmail and skus required" }), {
         status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -49,6 +49,24 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    // Idempotency: same order+email+skus should send at most once unless force=true
+    const idemKey = idempotencyKey
+      || `digital:${(orderId || customerEmail).toLowerCase()}:${[...skus].sort().join(",")}`;
+
+    if (!force) {
+      const { data: existing } = await supabase
+        .from("digital_email_sends")
+        .select("id, created_at")
+        .eq("idempotency_key", idemKey)
+        .maybeSingle();
+      if (existing) {
+        console.log("send-digital-ilinguerelax: duplicate skipped", idemKey);
+        return new Response(JSON.stringify({ success: true, duplicate: true, sentAt: existing.created_at }), {
+          status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+    }
 
     const { data, error } = await supabase
       .from("digital_products")

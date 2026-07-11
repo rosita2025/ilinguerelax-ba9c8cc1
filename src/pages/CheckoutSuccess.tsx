@@ -175,25 +175,19 @@ export default function CheckoutSuccess() {
               purpose: "transactional",
             },
           }),
+          // Digital delivery: send immediately (no 90s delay) so it goes out
+          // even if the buyer closes the tab. Idempotency key dedupes retries.
+          sendDigitalEmail().catch((e) => console.error("send-digital-ilinguerelax failed", e)),
         ]);
       } catch (e) {
         console.error("thank-you fallback failed", e);
       }
 
-      digitalTimer = setTimeout(async () => {
-        try {
-          await sendDigitalEmail();
-        } catch (e) {
-          console.error("send-digital-ilinguerelax failed", e);
-        }
-      }, 90_000);
-      setTimeout(() => clear(), 800);
+      setTimeout(() => clear(), 1500);
     })();
 
-    return () => {
-      if (digitalTimer) clearTimeout(digitalTimer);
+    return () => {};
 
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

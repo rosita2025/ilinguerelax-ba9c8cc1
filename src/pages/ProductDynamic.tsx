@@ -71,8 +71,25 @@ const ProductDynamic = () => {
     };
     load();
     const onVis = () => { if (document.visibilityState === "visible") load(); };
+    const onFocus = () => load();
+    const onStorage = (e: StorageEvent) => { if (e.key === "ilr-catalog-updated") load(); };
+    let bc: BroadcastChannel | null = null;
+    if ("BroadcastChannel" in window) {
+      bc = new BroadcastChannel("ilr-catalog");
+      bc.onmessage = (ev) => {
+        if (ev.data?.type === "product-updated" && (!ev.data.sku || ev.data.sku === slug)) load();
+      };
+    }
     document.addEventListener("visibilitychange", onVis);
-    return () => { cancelled = true; document.removeEventListener("visibilitychange", onVis); };
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("storage", onStorage);
+      bc?.close();
+    };
   }, [slug]);
 
   const local = useLocalCurrency(product ? Number(product.price_usd) : 0);

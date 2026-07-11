@@ -142,7 +142,8 @@ const handler = async (req: Request): Promise<Response> => {
       html: `<h2>New order</h2>
         <p><strong>Customer:</strong> ${name} &lt;${customerEmail}&gt;</p>
         <p><strong>Provider:</strong> ${paymentProvider || "n/a"}</p>
-        <p><strong>Order:</strong> ${orderId || "n/a"}</p>
+        <p><strong>Order number:</strong> ${orderId || "n/a"}</p>
+        <p><strong>Transaction ID:</strong> <code>${paymentReference || "n/a"}</code></p>
         <p><strong>Total:</strong> $${(total ?? 0).toFixed(2)} ${currency}</p>
         <ul>${items.map((i) => `<li>${i.quantity}× ${i.name} — $${(i.price * i.quantity).toFixed(2)}</li>`).join("")}</ul>`,
     });

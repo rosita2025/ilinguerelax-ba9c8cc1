@@ -221,6 +221,11 @@ const AdminProductEdit = () => {
           </div>
 
           <h1 className="text-2xl font-bold">{isNew ? "Nuevo producto" : `Editar: ${product.name}`}</h1>
+          {isNew && (
+            <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs">
+              ⚡ <b>Política estándar aplicada automáticamente</b>: Hotmart para LATAM (excepto 🇨🇺🇻🇪🇳🇮), Tienda propia para el resto del mundo + 🇵🇪. Pega el enlace de Hotmart abajo y el precio PEN se sugerirá desde el USD (×3.75).
+            </div>
+          )}
 
           <Card className="p-6 space-y-4">
             <h2 className="font-semibold">1. Información básica</h2>

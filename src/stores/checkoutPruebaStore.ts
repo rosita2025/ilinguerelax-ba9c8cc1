@@ -104,6 +104,23 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
         }
       },
 
+      syncItem: (patch) => {
+        const { quantity: _q, ...rest } = patch;
+        set({
+          items: get().items.map((i) =>
+            i.id === patch.id
+              ? {
+                  ...i,
+                  ...rest,
+                  // Explicitly clear regionPrices if the new patch omits it,
+                  // so switching a product from region-priced to flat works.
+                  regionPrices: patch.regionPrices ?? undefined,
+                }
+              : i,
+          ),
+        });
+      },
+
       removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
 
       updateQuantity: (id, qty) => {

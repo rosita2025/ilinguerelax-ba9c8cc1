@@ -169,7 +169,7 @@ const AdminProductEdit = () => {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <Button variant="ghost" asChild><Link to="/admin/productos"><ArrowLeft className="w-4 h-4 mr-1" /> Volver</Link></Button>
-            <Button onClick={save} disabled={saving}>
+            <Button onClick={() => save()} disabled={saving}>
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
               Guardar
             </Button>
@@ -512,7 +512,7 @@ const AdminProductEdit = () => {
           </Card>
 
           <div className="flex justify-end">
-            <Button onClick={save} disabled={saving} size="lg">
+            <Button onClick={() => save()} disabled={saving} size="lg">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
               Guardar producto
             </Button>

@@ -186,6 +186,16 @@ const AdminProductEdit = () => {
         },
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
+      // Broadcast catalog change so open product/checkout tabs refetch instantly.
+      try {
+        const stamp = Date.now();
+        localStorage.setItem("ilr-catalog-updated", String(stamp));
+        if ("BroadcastChannel" in window) {
+          const bc = new BroadcastChannel("ilr-catalog");
+          bc.postMessage({ type: "product-updated", sku: product.sku, at: stamp });
+          bc.close();
+        }
+      } catch { /* ignore */ }
       toast({ title: "✅ Guardado" });
       navigate("/admin/productos");
     } catch (e) {

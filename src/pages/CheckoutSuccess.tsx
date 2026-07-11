@@ -273,6 +273,90 @@ export default function CheckoutSuccess() {
           </ul>
         </section>
 
+        {/* Digital delivery — download links from admin/products */}
+        {(deliveryLoading || delivery.length > 0) && (
+          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Download className="w-5 h-5 text-primary" />
+              <h2 className="font-semibold text-base">Descarga tu material digital</h2>
+            </div>
+            {deliveryLoading && (
+              <p className="text-sm text-muted-foreground">Cargando enlaces…</p>
+            )}
+            <div className="space-y-3">
+              {delivery.map((d) => {
+                const bonusList: BonusEntry[] = [
+                  ...(d.bonus_drive_url ? [{ name: d.bonus_name || "Bonus", drive_url: d.bonus_drive_url, access_key: d.bonus_access_key || "" }] : []),
+                  ...((d.bonuses ?? []).filter((b) => b?.drive_url)),
+                ];
+                return (
+                  <div key={d.sku} className="rounded-lg border bg-card p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      {d.cover_image_url && (
+                        <img src={d.cover_image_url} alt={d.name} className="w-12 h-12 rounded object-cover" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{d.name}</div>
+                      </div>
+                    </div>
+                    {d.drive_url ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button asChild size="sm" className="gap-1.5">
+                          <a href={d.drive_url} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-4 h-4" /> Descargar / Ver en Drive
+                          </a>
+                        </Button>
+                        {d.access_key && (
+                          <button
+                            type="button"
+                            onClick={() => copyKey(d.access_key!)}
+                            className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md border bg-background hover:bg-muted"
+                            title="Copiar clave"
+                          >
+                            <Copy className="w-3.5 h-3.5" /> Clave: <code className="font-mono">{d.access_key}</code>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Te enviaremos el enlace de descarga a <strong>{buyer.email}</strong> en unos minutos.
+                      </p>
+                    )}
+                    {bonusList.length > 0 && (
+                      <div className="pt-2 border-t space-y-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                          <Gift className="w-3.5 h-3.5" /> Bonos incluidos
+                        </div>
+                        {bonusList.map((b, idx) => (
+                          <div key={idx} className="flex flex-wrap items-center gap-2 text-xs">
+                            <span className="font-medium">{b.name || `Bonus ${idx + 1}`}:</span>
+                            <a href={b.drive_url} target="_blank" rel="noopener noreferrer" className="text-primary underline inline-flex items-center gap-1">
+                              <Download className="w-3 h-3" /> Descargar
+                            </a>
+                            {b.access_key && (
+                              <button
+                                type="button"
+                                onClick={() => copyKey(b.access_key!)}
+                                className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                              >
+                                <Copy className="w-3 h-3" /> <code className="font-mono">{b.access_key}</code>
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Guarda esta página o revisa tu correo <strong>{buyer.email}</strong> — también te enviamos los enlaces por email.
+            </p>
+          </section>
+        )}
+
+
         {/* Order summary */}
         {items.length > 0 && (
           <section className="rounded-xl border bg-card p-5 space-y-4">

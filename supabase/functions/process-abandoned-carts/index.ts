@@ -8,15 +8,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Email intervals: after how many seconds from cart creation each email should be sent
+// Simplified schedule: Day 1, Day 7, Day 15, Day 30 from cart creation.
+// delayMs = time to wait *after the previous email* before sending the next.
+const DAY = 24 * 60 * 60 * 1000;
 const EMAIL_SCHEDULE = [
-  { index: 0, delayMs: 0 },                          // Email 1: immediate (already scheduled at 1h)
-  { index: 1, delayMs: 24 * 60 * 60 * 1000 },        // Email 2: +1 day
-  { index: 2, delayMs: 3 * 24 * 60 * 60 * 1000 },    // Email 3: +3 days (4 days total)
-  { index: 3, delayMs: 3 * 24 * 60 * 60 * 1000 },    // Email 4: +3 days (7 days total)
-  { index: 4, delayMs: 8 * 24 * 60 * 60 * 1000 },    // Email 5: +8 days (15 days total)
-  { index: 5, delayMs: 15 * 24 * 60 * 60 * 1000 },   // Email 6: +15 days (30 days total)
+  { index: 0, delayMs: 0 },        // Email 1: Day 1  (scheduled at cart creation +1d)
+  { index: 1, delayMs: 6 * DAY },  // Email 2: Day 7  (+6d after email 1)
+  { index: 2, delayMs: 8 * DAY },  // Email 3: Day 15 (+8d after email 2)
+  { index: 3, delayMs: 15 * DAY }, // Email 4: Day 30 (+15d after email 3)
 ];
+const MAX_EMAILS = EMAIL_SCHEDULE.length;
 
 const SITE_URL = "https://ilinguerelax.com";
 const COUPON_CODE = "NEW10";

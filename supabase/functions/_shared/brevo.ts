@@ -1,78 +1,66 @@
-// Shared Brevo email sender using Lovable Connector Gateway.
-// Drop-in replacement for `resend.emails.send({ from, to, subject, html })`.
-
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
+// Email sender — uses Resend directly.
+// Brevo gateway currently returns 404 on all routes (API key rejected), so we
+// route through the working Resend key while keeping the `resend.emails.send`
+// shape so existing callers don't have to change.
 
 interface SendArgs {
-  from?: string; // e.g. "iLingue Relax <hola@ilinguerelax.com>"; optional when using templateId (Brevo template sender wins)
+  from?: string;
   to: string | string[];
   subject?: string;
   html?: string;
   replyTo?: string;
-  templateId?: number;         // Brevo template ID (Marketing → Templates)
-  params?: Record<string, unknown>; // Variables for {{ params.xxx }} in the template
+  /** Ignored (kept for Brevo API compatibility). */
+  templateId?: number;
+  params?: Record<string, unknown>;
 }
 
 interface SendResult {
-  data?: { messageId?: string };
+  data?: { messageId?: string; id?: string };
   error?: { message: string; status?: number; body?: string };
 }
 
-function parseAddress(input: string): { email: string; name?: string } {
-  const m = input.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
-  if (m) return { name: m[1] || undefined, email: m[2] };
-  return { email: input.trim() };
-}
+const DEFAULT_FROM = "iLingue Relax <hola@ilinguerelax.com>";
 
-export async function sendBrevoEmail(args: SendArgs): Promise<SendResult> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
-  if (!LOVABLE_API_KEY || !BREVO_API_KEY) {
-    return { error: { message: "Missing LOVABLE_API_KEY or BREVO_API_KEY" } };
+export async function sendEmail(args: SendArgs): Promise<SendResult> {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) {
+    return { error: { message: "Missing RESEND_API_KEY" } };
   }
 
-  const toList = Array.isArray(args.to) ? args.to : [args.to];
-  const to = toList.map((t) => parseAddress(t));
+  const to = Array.isArray(args.to) ? args.to : [args.to];
+  const body: Record<string, unknown> = {
+    from: args.from ?? DEFAULT_FROM,
+    to,
+    subject: args.subject ?? "",
+    html: args.html ?? "",
+  };
+  if (args.replyTo) body.reply_to = args.replyTo;
 
-  const body: Record<string, unknown> = { to };
-  if (args.templateId) {
-    body.templateId = args.templateId;
-    if (args.params) body.params = args.params;
-    if (args.from) body.sender = parseAddress(args.from);
-    if (args.subject) body.subject = args.subject;
-  } else {
-    body.sender = parseAddress(args.from ?? "iLingue Relax <hola@ilinguerelax.com>");
-    body.subject = args.subject;
-    body.htmlContent = args.html;
-  }
-  if (args.replyTo) body.replyTo = parseAddress(args.replyTo);
-
-  const res = await fetch(`${GATEWAY_URL}/v3/smtp/email`, {
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "X-Connection-Api-Key": BREVO_API_KEY,
+      Authorization: `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify(body),
   });
 
   const text = await res.text();
   if (!res.ok) {
-    console.error(`Brevo send failed [${res.status}]: ${text}`);
-    return { error: { message: "Brevo send failed", status: res.status, body: text } };
+    console.error(`Resend send failed [${res.status}]: ${text}`);
+    return { error: { message: "Resend send failed", status: res.status, body: text } };
   }
   try {
     const parsed = JSON.parse(text);
-    return { data: { messageId: parsed.messageId } };
+    return { data: { messageId: parsed.id, id: parsed.id } };
   } catch {
     return { data: {} };
   }
 }
 
-// Resend-compatible shim so existing code `resend.emails.send({...})` keeps working.
+// Backwards-compatible shim: existing code uses `resend.emails.send({...})`.
 export const resend = {
   emails: {
-    send: (args: SendArgs) => sendBrevoEmail(args),
+    send: (args: SendArgs) => sendEmail(args),
   },
 };

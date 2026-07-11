@@ -54,6 +54,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminReviews = lazy(() => import("./pages/AdminReviews"));
 const AdminFunnel = lazy(() => import("./pages/AdminFunnel"));
 const AdminSEO = lazy(() => import("./pages/AdminSEO"));
+const AdminBots = lazy(() => import("./pages/AdminBots"));
 
 const AdminHome = lazy(() => import("./pages/AdminHome"));
 const AdminLive = lazy(() => import("./pages/AdminLive"));

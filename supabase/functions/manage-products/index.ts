@@ -24,6 +24,7 @@ interface ProductIn {
   learner_language?: string;
   target_language?: string;
   price_usd: number;
+  price_usd_latam?: number | null;
   price_pen?: number | null;
   drive_url?: string | null;
   access_key?: string | null;
@@ -92,7 +93,8 @@ Deno.serve(async (req) => {
         learner_language: p.learner_language || "es",
         target_language: p.target_language || "en",
         price_usd: Number(p.price_usd),
-        price_pen: p.price_pen == null || p.price_pen === "" ? null : Number(p.price_pen),
+        price_usd_latam: p.price_usd_latam == null || (p.price_usd_latam as unknown as string) === "" ? null : Number(p.price_usd_latam),
+        price_pen: p.price_pen == null || (p.price_pen as unknown as string) === "" ? null : Number(p.price_pen),
         drive_url: p.drive_url ?? null,
         access_key: p.access_key ?? null,
         cover_image_url: p.cover_image_url ?? null,

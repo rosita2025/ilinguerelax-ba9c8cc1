@@ -22,6 +22,7 @@ interface Product {
   learner_language: string;
   target_language: string;
   price_usd: number;
+  price_usd_latam: number | null;
   price_pen: number | null;
   drive_url: string | null;
   access_key: string | null;
@@ -57,7 +58,7 @@ const LANGS = [
 
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
-  price_usd: 0, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
+  price_usd: 0, price_usd_latam: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
   is_upsell: false, active: true, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
@@ -307,41 +308,51 @@ const AdminProductEdit = () => {
           </Card>
 
           <Card className="p-6 space-y-4">
-            <h2 className="font-semibold">3. Precios</h2>
+            <h2 className="font-semibold">3. Precios por región</h2>
 
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
-              <div className="font-semibold">💡 Rangos sugeridos por región</div>
-              <div>🌎 <b>LATAM</b> (Hotmart / conversión alta): <b>$8 – $15 USD</b></div>
-              <div>🇺🇸🇪🇺🇦🇺 <b>USA, Europa, Anglo, Asia</b> (tienda propia): <b>$17 – $20 USD</b></div>
-              <div className="text-[11px] text-amber-800/80">El precio USD se cobra en la tienda propia. Hotmart maneja su propio precio en su panel.</div>
+            <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-xs text-sky-900 space-y-1">
+              <div className="font-semibold">🌐 Dos precios USD distintos según el país del comprador</div>
+              <div>🌎 <b>Latinoamérica</b> (tienda propia, sin Hotmart): sugerido <b>$8 – $15 USD</b></div>
+              <div>🇺🇸🇨🇦🇪🇺🇬🇧🇦🇺🇯🇵 <b>USA, Canadá, Europa, UK, Australia, Asia</b> (resto del mundo): sugerido <b>$17 – $20 USD</b></div>
+              <div className="text-[11px] text-sky-800/80">Si LATAM va por Hotmart, Hotmart usa su propio precio y este campo se ignora en esos países.</div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <Label>Precio USD (tienda global)</Label>
-                <Input type="number" step="0.01" value={product.price_usd} onChange={(e) => update("price_usd", Number(e.target.value))} />
-                {product.price_usd > 0 && (
-                  <p className={`text-xs mt-1 ${
-                    product.price_usd >= 17 && product.price_usd <= 20
-                      ? "text-emerald-600"
-                      : product.price_usd >= 8 && product.price_usd <= 15
-                      ? "text-amber-600"
-                      : "text-red-600"
-                  }`}>
-                    {product.price_usd >= 17 && product.price_usd <= 20
-                      ? "✓ Ideal para USA/Europa/Asia"
-                      : product.price_usd >= 8 && product.price_usd <= 15
-                      ? "⚠️ Rango LATAM — bajo para mercados premium"
-                      : product.price_usd < 8
-                      ? "❌ Muy bajo — sube a $8+ mínimo"
-                      : "❌ Muy alto — máximo sugerido $20"}
-                  </p>
-                )}
+                <Label>Precio USD — Resto del mundo</Label>
+                <Input
+                  type="number" step="0.01"
+                  value={product.price_usd}
+                  onChange={(e) => update("price_usd", Number(e.target.value))}
+                  placeholder="17.00"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  🇺🇸🇨🇦🇪🇺🇬🇧🇦🇺🇯🇵 USA, Canadá, Europa, UK, Australia, Asia
+                </p>
               </div>
               <div>
-                <Label>Precio PEN (Perú, opcional)</Label>
-                <Input type="number" step="0.01" value={product.price_pen ?? ""} onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))} placeholder="S/ 29.90" />
-                <p className="text-xs text-muted-foreground mt-1">Sugerido: S/ {Math.round((product.price_usd || 0) * 3.75 * 10) / 10}</p>
+                <Label>Precio USD — Latinoamérica</Label>
+                <Input
+                  type="number" step="0.01"
+                  value={product.price_usd_latam ?? ""}
+                  onChange={(e) => update("price_usd_latam", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="10.00"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  🌎 MX, AR, CL, CO, PE… Si lo dejas vacío, se usa el precio del resto del mundo.
+                </p>
+              </div>
+              <div>
+                <Label>Precio PEN (Perú)</Label>
+                <Input
+                  type="number" step="0.01"
+                  value={product.price_pen ?? ""}
+                  onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="S/ 29.90"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Sugerido: S/ {Math.round((product.price_usd_latam ?? product.price_usd ?? 0) * 3.75 * 10) / 10}
+                </p>
               </div>
             </div>
           </Card>

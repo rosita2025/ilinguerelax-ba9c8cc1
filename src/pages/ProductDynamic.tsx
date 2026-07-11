@@ -8,6 +8,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 interface DBProduct {
   id: string;
@@ -17,6 +18,7 @@ interface DBProduct {
   learner_language: string;
   target_language: string;
   price_usd: number;
+  price_usd_latam: number | null;
   price_pen: number | null;
   cover_image_url: string | null;
   is_upsell: boolean;
@@ -61,7 +63,7 @@ const ProductDynamic = () => {
     const load = async () => {
       const { data, error } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+        .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
         .eq("sku", slug)
         .eq("active", true)
         .maybeSingle();
@@ -78,7 +80,14 @@ const ProductDynamic = () => {
     };
   }, [slug]);
 
-  const local = useLocalCurrency(product ? Number(product.price_usd) : 0);
+  // Pick the correct USD price based on visitor region (LATAM vs. rest of the world).
+  const region = useRegionTier();
+  const effectiveUsd = product
+    ? (region.tier === "latam" && product.price_usd_latam != null
+        ? Number(product.price_usd_latam)
+        : Number(product.price_usd))
+    : 0;
+  const local = useLocalCurrency(effectiveUsd);
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
@@ -134,10 +143,10 @@ const ProductDynamic = () => {
               <div className="flex items-baseline gap-3 mb-5">
                 <span className="text-4xl font-bold text-primary">{displayFormatted}</span>
                 {!isPEN && !local.isUsd && (
-                  <span className="text-sm text-muted-foreground">≈ ${Number(product.price_usd).toFixed(2)} USD</span>
+                  <span className="text-sm text-muted-foreground">≈ ${effectiveUsd.toFixed(2)} USD</span>
                 )}
                 {isPEN && (
-                  <span className="text-sm text-muted-foreground">≈ ${Number(product.price_usd).toFixed(2)} USD</span>
+                  <span className="text-sm text-muted-foreground">≈ ${effectiveUsd.toFixed(2)} USD</span>
                 )}
               </div>
 

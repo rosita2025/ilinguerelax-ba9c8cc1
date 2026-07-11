@@ -1,0 +1,3 @@
+ALTER TABLE public.digital_products ADD COLUMN IF NOT EXISTS price_usd_latam NUMERIC;
+COMMENT ON COLUMN public.digital_products.price_usd IS 'Precio USD para el resto del mundo: USA, Canadá, Europa, Reino Unido, Australia, Asia (canal tienda propia).';
+COMMENT ON COLUMN public.digital_products.price_usd_latam IS 'Precio USD específico para Latinoamérica cuando se vende por tienda propia (no Hotmart). Si es NULL, se usa price_usd.';

@@ -42,7 +42,7 @@ export default function CheckoutPrueba1() {
       const cb = Date.now();
       const { data, error } = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, price_pen, cover_image_url, updated_at")
+        .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
         .eq("sku", slug)
         .eq("active", true)
         .gt("price_usd", -1 - (cb % 7) * 0.0000001) // varies request signature to bust caches
@@ -89,16 +89,18 @@ export default function CheckoutPrueba1() {
       }
       if (cancelled) return;
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
+      const priceGlobal = Number(data.price_usd);
+      const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
       setDbItem({
         id: data.sku,
         name: data.name,
-        price: Number(data.price_usd),
+        price: priceGlobal,
         image: (data.cover_image_url || "/placeholder.svg") + imgBust,
         description: data.description || undefined,
         productPath: `/products/${data.sku}`,
         upsells,
-        ...(data.price_pen != null && {
-          regionPrices: { latam: Number(data.price_pen), global: Number(data.price_usd) },
+        ...(priceLatam != null && {
+          regionPrices: { latam: priceLatam, global: priceGlobal },
         }),
       } as CatalogItem);
       setDbMissing(false);

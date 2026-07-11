@@ -6,7 +6,13 @@ const corsHeaders = {
 };
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
-const SITE_URL = "sc-domain:ilinguerelax.com";
+// Try domain property first, then URL-prefix variants. The connector picks
+// whichever the account actually owns in Search Console.
+const SITE_CANDIDATES = [
+  "sc-domain:ilinguerelax.com",
+  "https://ilinguerelax.com/",
+  "https://www.ilinguerelax.com/",
+];
 
 async function querySearchAnalytics(dimension: "query" | "page", days: number, limit: number) {
   const lovableKey = Deno.env.get("LOVABLE_API_KEY");
@@ -18,35 +24,43 @@ async function querySearchAnalytics(dimension: "query" | "page", days: number, l
   start.setUTCDate(start.getUTCDate() - days);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
 
-  const url = `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(SITE_URL)}/searchAnalytics/query`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": gscKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      startDate: iso(start),
-      endDate: iso(end),
-      dimensions: [dimension],
-      rowLimit: limit,
-      dataState: "all",
-    }),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`GSC ${dimension} ${res.status}: ${body}`);
+  let lastErr = "";
+  let usedSite = "";
+  for (const site of SITE_CANDIDATES) {
+    const url = `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": gscKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        startDate: iso(start),
+        endDate: iso(end),
+        dimensions: [dimension],
+        rowLimit: limit,
+        dataState: "all",
+      }),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      usedSite = site;
+      return {
+        site: usedSite,
+        rows: (json.rows ?? []).map((r: { keys?: string[]; clicks?: number; impressions?: number; ctr?: number; position?: number }) => ({
+          key: r.keys?.[0] ?? "",
+          clicks: r.clicks ?? 0,
+          impressions: r.impressions ?? 0,
+          ctr: r.ctr ?? 0,
+          position: r.position ?? 0,
+        })),
+      };
+    }
+    lastErr = `${site} → ${res.status}: ${await res.text()}`;
+    console.warn("GSC probe failed:", lastErr);
   }
-  const json = await res.json();
-  return (json.rows ?? []).map((r: any) => ({
-    key: r.keys?.[0] ?? "",
-    clicks: r.clicks ?? 0,
-    impressions: r.impressions ?? 0,
-    ctr: r.ctr ?? 0,
-    position: r.position ?? 0,
-  }));
+  throw new Error(`GSC ${dimension} — no property matched. Last: ${lastErr}`);
 }
 
 serve(async (req) => {

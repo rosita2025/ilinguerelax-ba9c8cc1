@@ -1,13 +1,18 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Lock, Loader2 } from "lucide-react";
+import { Lock, Loader2, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "ilr_admin_key";
+const ATTEMPTS_KEY = "ilr_admin_attempts";
+const LOCK_KEY = "ilr_admin_lock_until";
+const MAX_ATTEMPTS = 5;
+const LOCK_MS = 5 * 60 * 1000; // 5 min
 
 type Ctx = { adminKey: string; logout: () => void };
 const AdminCtx = createContext<Ctx | null>(null);

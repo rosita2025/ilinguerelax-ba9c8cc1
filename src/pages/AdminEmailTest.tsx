@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminNav from "@/components/admin/AdminNav";
+import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";

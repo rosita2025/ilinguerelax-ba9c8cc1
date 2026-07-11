@@ -15,7 +15,10 @@ export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
   upsells?: UpsellItem[];
   /** Ruta de la página del producto para el enlace "Volver al producto". */
   productPath?: string;
+  /** SKU real en admin/products (digital_products.sku) cuando difiere del slug del checkout. */
+  adminSku?: string;
 }
+
 
 
 /**

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Eye, EyeOff, Pencil, Package, Search, ExternalLink, ArrowUpDown } from "lucide-react";
+import { Plus, Eye, EyeOff, Pencil, Package, Search, ExternalLink, ArrowUpDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";

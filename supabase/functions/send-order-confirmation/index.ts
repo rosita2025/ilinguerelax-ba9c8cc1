@@ -43,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body: OrderRequest = await req.json();
-    const { customerEmail, customerName, orderId, total, currency = "USD", paymentProvider, items } = body;
+    const { customerEmail, customerName, orderId, paymentReference, total, currency = "USD", paymentProvider, items } = body;
 
     if (!customerEmail || !items?.length) {
       return new Response(JSON.stringify({ error: "customerEmail and items are required" }), {
@@ -53,7 +53,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     const name = customerName?.trim() || "there";
     const firstName = name.split(" ")[0];
-    const orderRef = orderId ? `#${String(orderId).slice(-8).toUpperCase()}` : "";
+    // Use the friendly order number as-is when provided (e.g. ILR-ST-A1B2C3);
+    // fall back to a short tail only if we don't have one.
+    const orderRef = orderId
+      ? (orderId.startsWith("ILR-") ? orderId : `#${String(orderId).slice(-8).toUpperCase()}`)
+      : "";
+    const providerLabel = paymentProvider
+      ? paymentProvider.charAt(0).toUpperCase() + paymentProvider.slice(1)
+      : "";
 
     const itemsHtml = items.map((i) => {
       const link = ACCESS_LINKS[i.id] ?? DEFAULT_ACCESS;

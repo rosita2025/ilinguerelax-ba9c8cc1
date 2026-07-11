@@ -225,11 +225,11 @@ const App = () => (
                   <Route path="/admin/email-test" element={<Navigate to="/admin/orders" replace />} />
                   <Route path="/admin/email-templates" element={<AdminGate><AdminEmailTemplates /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
-                  <Route path="/checkouts" element={<Navigate to="/products" replace />} />
+                  <Route path="/checkouts" element={<NotFound />} />
                   <Route path="/checkouts/:slug" element={<Checkout />} />
-                  <Route path="/checkout" element={<Navigate to="/products" replace />} />
+                  <Route path="/checkout" element={<NotFound />} />
                   <Route path="/checkout/:slug" element={<CheckoutSlugRedirect />} />
-                  <Route path="/checkouts/prueba-1" element={<Navigate to="/products" replace />} />
+                  <Route path="/checkouts/prueba-1" element={<NotFound />} />
                   <Route path="/checkouts/return" element={<CheckoutReturn />} />
                   <Route path="/checkouts/success" element={<CheckoutSuccess />} />
                   <Route path="/checkouts/failure" element={<CheckoutFailure />} />

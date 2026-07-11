@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft } from "lucide-react";
@@ -12,8 +12,9 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
-import { getCatalogItem, CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
+import { getCatalogItem, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function CheckoutPrueba1() {
   const { slug } = useParams<{ slug?: string }>();

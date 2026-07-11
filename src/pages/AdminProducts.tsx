@@ -131,6 +131,7 @@ const AdminProducts = () => {
                   <th className="text-left px-4 py-3">Producto</th>
                   <th className="text-left px-4 py-3">Categoría</th>
                   <th className="text-right px-4 py-3">Precio</th>
+                  <th className="text-center px-4 py-3">Preset</th>
                   <th className="text-center px-4 py-3">Drive</th>
                   <th className="text-center px-4 py-3">Tipo</th>
                   <th className="text-center px-4 py-3">Estado</th>
@@ -139,7 +140,7 @@ const AdminProducts = () => {
               </thead>
               <tbody>
                 {filtered.length === 0 && (
-                  <tr><td colSpan={7} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
+                  <tr><td colSpan={8} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
                 )}
                 {filtered.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">

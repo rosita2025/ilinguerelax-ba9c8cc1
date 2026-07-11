@@ -18,6 +18,8 @@ interface OrderRequest {
   customerEmail: string;
   customerName?: string;
   orderId?: string;
+  /** Underlying provider transaction id (PaymentIntent, PayPal order, MP payment). */
+  paymentReference?: string;
   total?: number;
   currency?: string;
   paymentProvider?: string;
@@ -41,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body: OrderRequest = await req.json();
-    const { customerEmail, customerName, orderId, total, currency = "USD", paymentProvider, items } = body;
+    const { customerEmail, customerName, orderId, paymentReference, total, currency = "USD", paymentProvider, items } = body;
 
     if (!customerEmail || !items?.length) {
       return new Response(JSON.stringify({ error: "customerEmail and items are required" }), {
@@ -51,7 +53,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     const name = customerName?.trim() || "there";
     const firstName = name.split(" ")[0];
-    const orderRef = orderId ? `#${String(orderId).slice(-8).toUpperCase()}` : "";
+    // Use the friendly order number as-is when provided (e.g. ILR-ST-A1B2C3);
+    // fall back to a short tail only if we don't have one.
+    const orderRef = orderId
+      ? (orderId.startsWith("ILR-") ? orderId : `#${String(orderId).slice(-8).toUpperCase()}`)
+      : "";
+    const providerLabel = paymentProvider
+      ? paymentProvider.charAt(0).toUpperCase() + paymentProvider.slice(1)
+      : "";
 
     const itemsHtml = items.map((i) => {
       const link = ACCESS_LINKS[i.id] ?? DEFAULT_ACCESS;
@@ -85,6 +94,14 @@ const handler = async (req: Request): Promise<Response> => {
       <div style="display:flex;justify-content:space-between;padding:16px 0;margin-top:8px;font-size:16px;font-weight:700;color:#111827;">
         <span>Total paid</span><span>$${total.toFixed(2)} ${currency}</span>
       </div>` : ""}
+
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px 18px;margin:8px 0 4px;font-size:13px;color:#374151;">
+        <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Transaction details</div>
+        ${orderRef ? `<div style="margin:2px 0;"><strong style="color:#111827;">Order number:</strong> <span style="font-family:monospace;">${orderRef}</span></div>` : ""}
+        ${providerLabel ? `<div style="margin:2px 0;"><strong style="color:#111827;">Payment method:</strong> ${providerLabel}</div>` : ""}
+        ${paymentReference ? `<div style="margin:2px 0;word-break:break-all;"><strong style="color:#111827;">Transaction ID:</strong> <span style="font-family:monospace;font-size:12px;color:#4b5563;">${paymentReference}</span></div>` : ""}
+        <div style="margin-top:8px;font-size:12px;color:#6b7280;">Keep this reference in case you need to contact support.</div>
+      </div>
 
       <div style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;padding:20px;margin:28px 0;">
         <h3 style="margin:0 0 12px;color:#065f46;font-size:15px;">🚀 Steps to get started</h3>
@@ -125,7 +142,8 @@ const handler = async (req: Request): Promise<Response> => {
       html: `<h2>New order</h2>
         <p><strong>Customer:</strong> ${name} &lt;${customerEmail}&gt;</p>
         <p><strong>Provider:</strong> ${paymentProvider || "n/a"}</p>
-        <p><strong>Order:</strong> ${orderId || "n/a"}</p>
+        <p><strong>Order number:</strong> ${orderId || "n/a"}</p>
+        <p><strong>Transaction ID:</strong> <code>${paymentReference || "n/a"}</code></p>
         <p><strong>Total:</strong> $${(total ?? 0).toFixed(2)} ${currency}</p>
         <ul>${items.map((i) => `<li>${i.quantity}× ${i.name} — $${(i.price * i.quantity).toFixed(2)}</li>`).join("")}</ul>`,
     });

@@ -114,9 +114,30 @@ const AdminProductEdit = () => {
 
   const update = <K extends keyof Product>(k: K, v: Product[K]) => setProduct((p) => ({ ...p, [k]: v }));
 
-  const save = async () => {
+  // Países sin ningún canal disponible: ni Tienda (activa y no excluye) ni Hotmart (con enlace y no excluye)
+  const orphanCountries = useMemo(() => {
+    const storeOn = product.store_enabled;
+    const hotmartOn = !!product.hotmart_url?.trim();
+    if (!storeOn && !hotmartOn) return Object.keys(COUNTRY_INFO);
+    const storeExc = new Set(product.store_excluded_countries ?? []);
+    const hotExc = new Set(product.hotmart_excluded_countries ?? []);
+    return Object.keys(COUNTRY_INFO).filter((c) => {
+      const storeCovers = storeOn && !storeExc.has(c);
+      const hotCovers = hotmartOn && !hotExc.has(c);
+      return !storeCovers && !hotCovers;
+    });
+  }, [product.store_enabled, product.hotmart_url, product.store_excluded_countries, product.hotmart_excluded_countries]);
+
+  const save = async (opts: { force?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });
+    if (!opts.force && orphanCountries.length > 0) {
+      const list = orphanCountries.map((c) => `${COUNTRY_INFO[c]?.flag ?? ""} ${c}`).join(", ");
+      const ok = window.confirm(
+        `⚠️ ${orphanCountries.length} país(es) no verán NINGÚN botón de compra:\n\n${list}\n\n¿Guardar de todas formas?`,
+      );
+      if (!ok) return;
+    }
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("manage-products", {
@@ -135,6 +156,7 @@ const AdminProductEdit = () => {
       setSaving(false);
     }
   };
+
 
   if (loading) return (
     <><AdminNav /><div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div></>

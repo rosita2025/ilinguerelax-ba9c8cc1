@@ -27,10 +27,20 @@ const resolveCountry = async (ip: string | null, fallback: string | null): Promi
   return fallback;
 };
 
+const BOT_UA = /(bot|crawler|spider|crawling|slurp|bingpreview|facebookexternalhit|whatsapp|telegrambot|discordbot|pinterest|semrush|ahrefs|mj12|dotbot|petalbot|yandex|baiduspider|duckduckbot|applebot|headlesschrome|phantomjs|puppeteer|playwright|lighthouse|gtmetrix|pagespeed|screaming|monitor|uptime|pingdom|curl|wget|python-requests|axios|httpclient|go-http-client|okhttp|scrapy)/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const ua = req.headers.get("user-agent") || "";
+    if (BOT_UA.test(ua)) {
+      // Silently drop bot/crawler hits — keep humans-only in funnel_events
+      return new Response(JSON.stringify({ ok: true, skipped: "bot" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json().catch(() => ({}));
     const event_name = String(body.event_name || "");
     if (!ALLOWED.has(event_name)) {

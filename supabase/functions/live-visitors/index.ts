@@ -195,7 +195,13 @@ serve(async (req) => {
     ]);
     if (error) throw error;
 
-    const rows = (data || []).filter((row) => !isAdminPath((row.page_path as string) || null));
+    const BOT_REF = /(bot|crawler|spider|semrush|ahrefs|mj12|petalbot|yandex|baiduspider|pingdom|uptime|gtmetrix|pagespeed|lighthouse)/i;
+    const rows = (data || []).filter((row) => {
+      if (isAdminPath((row.page_path as string) || null)) return false;
+      const ref = (row.referrer as string) || "";
+      if (BOT_REF.test(ref)) return false;
+      return true;
+    });
 
     // Group by session — one entry per live visitor with their latest activity
     const bySession = new Map<string, {

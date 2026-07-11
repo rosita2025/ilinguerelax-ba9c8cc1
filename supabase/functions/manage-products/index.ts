@@ -24,6 +24,7 @@ interface ProductIn {
   learner_language?: string;
   target_language?: string;
   price_usd: number;
+  price_usd_latam?: number | null;
   price_pen?: number | null;
   drive_url?: string | null;
   access_key?: string | null;

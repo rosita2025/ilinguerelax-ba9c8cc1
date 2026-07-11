@@ -332,7 +332,7 @@ const ProductSpanish3000VerbsBook = () => {
                 size="xl"
                 className="w-full mb-3 text-lg py-6 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black border-0 shadow-lg shadow-cyan-500/30"
                 onClick={handleAddToCart}
-                disabled={cartLoading || !shopifyVariantId}
+                disabled={false}
               >
                 {cartLoading ? (
                   <Loader2 className="w-6 h-6 animate-spin mr-2" />
@@ -565,7 +565,7 @@ const ProductSpanish3000VerbsBook = () => {
                 size="xl"
                 className="text-base px-8 py-5 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black border-0 shadow-lg shadow-cyan-500/30"
                 onClick={handleAddToCart}
-                disabled={cartLoading || !shopifyVariantId}
+                disabled={false}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Add the Verb Mastery to my collection
@@ -647,7 +647,7 @@ const ProductSpanish3000VerbsBook = () => {
         ctaText={`PRE-ORDER NOW — $${PREORDER_PRICE}`}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
-        disabled={!shopifyVariantId}
+        disabled={false}
         isPhysical={true}
       />
     </main>

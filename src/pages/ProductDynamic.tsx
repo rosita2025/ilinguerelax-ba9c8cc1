@@ -57,7 +57,7 @@ const ProductDynamic = () => {
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
-    (async () => {
+    const load = async () => {
       const { data, error } = await supabase
         .from("digital_products")
         .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
@@ -66,10 +66,13 @@ const ProductDynamic = () => {
         .maybeSingle();
       if (cancelled) return;
       if (error || !data) setNotFound(true);
-      else setProduct(data as unknown as DBProduct);
+      else { setProduct(data as unknown as DBProduct); setNotFound(false); }
       setLoading(false);
-    })();
-    return () => { cancelled = true; };
+    };
+    load();
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { cancelled = true; document.removeEventListener("visibilitychange", onVis); };
   }, [slug]);
 
   const local = useLocalCurrency(product ? Number(product.price_usd) : 0);

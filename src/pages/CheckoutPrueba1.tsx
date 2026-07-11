@@ -30,12 +30,13 @@ export default function CheckoutPrueba1() {
   const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
 
-  // If slug not in static catalog, try to load from digital_products table
+  // If slug not in static catalog, try to load from digital_products table.
+  // Also refetches when the tab regains focus so admin edits (price / upsells) show up fast.
   useEffect(() => {
     if (!slug || staticItem) return;
     let cancelled = false;
-    setLoadingDb(true);
-    (async () => {
+    const load = async () => {
+      setLoadingDb(true);
       const { data, error } = await supabase
         .from("digital_products")
         .select("sku, name, description, price_usd, price_pen, cover_image_url")
@@ -45,22 +46,62 @@ export default function CheckoutPrueba1() {
       if (cancelled) return;
       if (error || !data) {
         setDbMissing(true);
-      } else {
-        setDbItem({
-          id: data.sku,
-          name: data.name,
-          price: Number(data.price_usd),
-          image: data.cover_image_url || "/placeholder.svg",
-          description: data.description || undefined,
-          productPath: `/products/${data.sku}`,
-          ...(data.price_pen != null && {
-            regionPrices: { latam: Number(data.price_pen), global: Number(data.price_usd) },
-          }),
-        } as CatalogItem);
+        setLoadingDb(false);
+        return;
       }
+      // Fetch configured upsells for this product from admin.
+      const { data: upRows } = await supabase
+        .from("product_upsells")
+        .select("upsell_sku, discount_pct, sort_order")
+        .eq("product_sku", slug)
+        .order("sort_order", { ascending: true });
+      let upsells: CatalogItem["upsells"] = undefined;
+      if (upRows && upRows.length) {
+        const skus = upRows.map((u) => u.upsell_sku);
+        const { data: upProducts } = await supabase
+          .from("digital_products")
+          .select("sku, name, description, price_usd, cover_image_url")
+          .in("sku", skus)
+          .eq("active", true);
+        const bySku = new Map((upProducts ?? []).map((p) => [p.sku, p]));
+        upsells = upRows
+          .map((u) => {
+            const p = bySku.get(u.upsell_sku);
+            if (!p) return null;
+            const original = Number(p.price_usd);
+            const price = Math.round(original * (1 - (Number(u.discount_pct) || 0) / 100) * 100) / 100;
+            return {
+              id: p.sku,
+              name: p.name,
+              price,
+              originalPrice: u.discount_pct ? original : undefined,
+              image: p.cover_image_url || "/placeholder.svg",
+              description: p.description || undefined,
+              badge: u.discount_pct ? `-${u.discount_pct}%` : undefined,
+            };
+          })
+          .filter(Boolean) as CatalogItem["upsells"];
+      }
+      if (cancelled) return;
+      setDbItem({
+        id: data.sku,
+        name: data.name,
+        price: Number(data.price_usd),
+        image: data.cover_image_url || "/placeholder.svg",
+        description: data.description || undefined,
+        productPath: `/products/${data.sku}`,
+        upsells,
+        ...(data.price_pen != null && {
+          regionPrices: { latam: Number(data.price_pen), global: Number(data.price_usd) },
+        }),
+      } as CatalogItem);
+      setDbMissing(false);
       setLoadingDb(false);
-    })();
-    return () => { cancelled = true; };
+    };
+    load();
+    const onFocus = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onFocus);
+    return () => { cancelled = true; document.removeEventListener("visibilitychange", onFocus); };
   }, [slug, staticItem]);
 
   const catalogItem = staticItem ?? dbItem;

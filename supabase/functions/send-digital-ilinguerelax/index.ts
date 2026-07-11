@@ -42,7 +42,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { customerEmail, customerName, orderId, skus, idempotencyKey, force }: Body = await req.json();
+    const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey, force }: Body = await req.json();
     if (!customerEmail || !Array.isArray(skus) || skus.length === 0) {
       return new Response(JSON.stringify({ error: "customerEmail and skus required" }), {
         status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },

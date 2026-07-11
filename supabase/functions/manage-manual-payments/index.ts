@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -147,6 +148,19 @@ Deno.serve(async (req) => {
         customerName: order.buyer_name,
         orderNumber: order.order_number,
         materials,
+      });
+
+      await upsertBrevoContact({
+        email: order.buyer_email,
+        name: order.buyer_name,
+        phone: order.buyer_phone,
+        country: order.buyer_country,
+        productName: productNames,
+        skus: items.map((i: any) => i?.sku).filter(Boolean),
+        amount: Number(order.amount_local ?? order.amount_usd),
+        currency: order.currency_local || "USD",
+        orderNumber: order.order_number,
+        provider: "yape_plin",
       });
 
       return new Response(JSON.stringify({ success: true, materialsSent: materials.length }), {

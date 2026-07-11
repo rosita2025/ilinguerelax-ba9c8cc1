@@ -2,6 +2,7 @@
 // and mercadopago-webhook. Sends via Lovable's built-in email infrastructure
 // (send-transactional-email → queued → process-email-queue).
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { upsertBrevoContact } from "./brevoContact.ts";
 
 interface Args {
   customerEmail: string;
@@ -69,5 +70,16 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
   await Promise.all([
     invokeTemplate("thank-you", a.customerEmail, data, `thank-you-${key}`),
     invokeTemplate("admin-sale", undefined, data, `admin-sale-${key}`),
+    upsertBrevoContact({
+      email: a.customerEmail,
+      name: a.customerName,
+      phone: a.customerPhone,
+      country: a.customerCountry,
+      productName: a.productName,
+      amount: a.amount,
+      currency: a.currency,
+      orderNumber,
+      provider: a.provider,
+    }),
   ]);
 }

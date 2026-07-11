@@ -528,6 +528,7 @@ export type Database = {
           id: string
           product_sku: string
           sort_order: number
+          updated_at: string
           upsell_sku: string
         }
         Insert: {
@@ -536,6 +537,7 @@ export type Database = {
           id?: string
           product_sku: string
           sort_order?: number
+          updated_at?: string
           upsell_sku: string
         }
         Update: {
@@ -544,6 +546,7 @@ export type Database = {
           id?: string
           product_sku?: string
           sort_order?: number
+          updated_at?: string
           upsell_sku?: string
         }
         Relationships: [

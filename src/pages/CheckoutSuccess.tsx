@@ -82,7 +82,35 @@ export default function CheckoutSuccess() {
   // confirmation email doesn't flip the screen to "private confirmation".
   const [isVerifiedBuyer] = useState(initialVerified);
 
-  // Send confirmation email once, then clear the cart
+  const [resending, setResending] = useState(false);
+
+  const sendDigitalEmail = async () => {
+    const skus = items.map((i) => i.id);
+    if (!buyer.email || skus.length === 0) return { skipped: true };
+    return supabase.functions.invoke("send-digital-ilinguerelax", {
+      body: {
+        customerEmail: buyer.email,
+        customerName: buyer.fullName,
+        orderId: orderNumber,
+        skus,
+      },
+    });
+  };
+
+  const resendDigital = async () => {
+    setResending(true);
+    try {
+      const res = await sendDigitalEmail();
+      if ((res as any)?.error) throw (res as any).error;
+      toast({ title: "Email reenviado", description: `Enviado a ${buyer.email}` });
+    } catch (e: any) {
+      toast({ title: "No se pudo reenviar", description: e?.message || "Intenta más tarde", variant: "destructive" });
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // Send confirmation email once, then send the digital-delivery email, then clear the cart
   useEffect(() => {
     if (sentRef.current) return;
     if (!isVerifiedBuyer) return;
@@ -94,29 +122,36 @@ export default function CheckoutSuccess() {
     sentRef.current = true;
     sessionStorage.setItem(key, "1");
 
-    supabase.functions
-      .invoke("send-order-confirmation", {
-        body: {
-          customerEmail: buyer.email,
-          customerName: buyer.fullName,
-          orderId: orderNumber,
-          paymentReference: paymentId || externalRef || undefined,
-          total,
-          currency: "USD",
-          paymentProvider: provider,
-          items: items.map((i) => ({
-            id: i.id,
-            name: i.name,
-            quantity: i.quantity,
-            price: itemPrice(i, region.tier),
-            image: i.image,
-          })),
-        },
-      })
-      .catch((e) => console.error("send-order-confirmation failed", e))
-      .finally(() => {
-        setTimeout(() => clear(), 800);
-      });
+    (async () => {
+      try {
+        await supabase.functions.invoke("send-order-confirmation", {
+          body: {
+            customerEmail: buyer.email,
+            customerName: buyer.fullName,
+            orderId: orderNumber,
+            paymentReference: paymentId || externalRef || undefined,
+            total,
+            currency: "USD",
+            paymentProvider: provider,
+            items: items.map((i) => ({
+              id: i.id,
+              name: i.name,
+              quantity: i.quantity,
+              price: itemPrice(i, region.tier),
+              image: i.image,
+            })),
+          },
+        });
+      } catch (e) {
+        console.error("send-order-confirmation failed", e);
+      }
+      try {
+        await sendDigitalEmail();
+      } catch (e) {
+        console.error("send-digital-ilinguerelax failed", e);
+      }
+      setTimeout(() => clear(), 800);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -350,9 +385,14 @@ export default function CheckoutSuccess() {
                 );
               })}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Guarda esta página o revisa tu correo <strong>{buyer.email}</strong> — también te enviamos los enlaces por email.
-            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Button size="sm" variant="outline" onClick={resendDigital} disabled={resending} className="gap-1.5">
+                <Mail className="w-4 h-4" /> {resending ? "Reenviando…" : "Reenviar enlaces a mi correo"}
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                También te lo enviamos automáticamente a <strong>{buyer.email}</strong>.
+              </span>
+            </div>
           </section>
         )}
 

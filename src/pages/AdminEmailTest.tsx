@@ -127,6 +127,7 @@ const AdminEmailTest = () => {
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
       setCounts(perSource);
+    } catch (e) {
       toast.error((e as Error).message);
     } finally {
       setLoading(false);

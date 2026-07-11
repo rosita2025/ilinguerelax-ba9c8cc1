@@ -1,10 +1,11 @@
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf",
 };
 
 const FUNNEL_EVENTS = ["PageView", "ViewContent", "Lead", "AddToCart", "InitiateCheckout", "Purchase"];
@@ -83,6 +84,9 @@ async function ga4Realtime(propertyId: string, token: string) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const csrfBlock = assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
 
   try {
     const { adminKey, days = 7, startDate, endDate } = await req.json().catch(() => ({}));

@@ -1,8 +1,9 @@
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf",
 };
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
@@ -65,6 +66,9 @@ async function querySearchAnalytics(dimension: "query" | "page", days: number, l
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const csrfBlock = assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
 
   try {
     const { adminKey, days = 28, limit = 25 } = await req.json().catch(() => ({}));

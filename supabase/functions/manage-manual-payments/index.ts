@@ -1,10 +1,11 @@
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 import { markAbandonedCartConverted } from "../_shared/thankYouEmail.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Resuelve materiales digitales leyendo la tabla `digital_products`.
@@ -77,6 +78,9 @@ async function sendTemplate(admin: ReturnType<typeof createClient>, templateName
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const csrfBlock = assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
 
   try {
     const { action, orderId, adminKey, notes } = await req.json();

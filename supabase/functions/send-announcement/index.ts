@@ -1,9 +1,10 @@
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { resend } from "../_shared/brevo.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf",
 };
 
 const buildAnnouncementHtml = (productName: string, productUrl: string, imageUrl: string): string => {
@@ -66,6 +67,9 @@ const buildAnnouncementHtml = (productName: string, productUrl: string, imageUrl
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
+
+  const csrfBlock = assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
     return new Response(null, { headers: corsHeaders });
   }
 

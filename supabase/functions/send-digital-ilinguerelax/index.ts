@@ -167,9 +167,11 @@ serve(async (req) => {
     const r = await resend.emails.send({
       from: "iLingue Relax <hola@ilinguerelax.com>",
       to: [customerEmail],
-      subject: `🎉 Gracias por su compra ${orderRef ? `— ${orderRef}` : ""} · enlaces de descarga${hasMultiple ? " (incluye producto adicional)" : ""}`,
+      reply_to: "hola@ilinguerelax.com",
+      subject: `Gracias por su compra${orderRef ? ` — ${orderRef}` : ""} · enlaces de descarga${hasMultiple ? " (incluye producto adicional)" : ""}`,
       html,
     });
+
 
     if (r.error) {
       console.error("send-digital-ilinguerelax failed", r.error);

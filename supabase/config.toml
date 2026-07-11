@@ -3,8 +3,6 @@ project_id = "opyitzdvvurdyyyzkwwv"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
-  [functions.brevo-webhook]
-    verify_jwt = false
   [functions.create-checkout-prueba]
     verify_jwt = false
   [functions.create-mercadopago-preference]

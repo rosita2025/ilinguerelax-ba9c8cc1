@@ -87,32 +87,14 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                     <p className="text-xs text-muted-foreground truncate">{item.description}</p>
                   )}
                   {!locked && (
-                    <div className="flex items-center gap-1 mt-1.5">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      >
-                        <Minus className="w-3 h-3" />
-                      </Button>
-                      <span className="text-xs w-6 text-center">{item.quantity}</span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="w-3 h-3" />
-                      </Button>
+                    <div className="flex items-center justify-end mt-1.5">
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 ml-auto text-muted-foreground hover:text-destructive"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive"
                         onClick={() => removeItem(item.id)}
+                        aria-label="Quitar"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>

@@ -361,27 +361,11 @@ export const CartDrawer = () => {
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-5 w-5"
-                          onClick={() => updateInternalQty(it.id, it.quantity - 1)}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-5 text-center text-xs">{it.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-5 w-5"
-                          onClick={() => updateInternalQty(it.id, it.quantity + 1)}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                        <Button
                           variant="ghost"
                           size="icon"
                           className="h-5 w-5"
                           onClick={() => removeInternal(it.id)}
+                          aria-label="Quitar"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>

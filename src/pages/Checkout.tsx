@@ -114,12 +114,13 @@ export default function Checkout() {
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
       setDbItem({
-        id: data.sku,
+        id: staticItem?.id ?? data.sku,
         name: data.name,
         price: priceGlobal,
         image: (data.cover_image_url || "/placeholder.svg") + imgBust,
         description: data.description || undefined,
-        productPath: `/products/${data.sku}`,
+        productPath: staticItem?.productPath ?? `/products/${data.sku}`,
+        adminSku: data.sku,
         upsells: upsells ?? undefined,
         ...(priceLatam != null && {
           regionPrices: { latam: priceLatam, global: priceGlobal },
@@ -130,7 +131,8 @@ export default function Checkout() {
     };
 
     load();
-    const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load });
+    const unsubscribe = subscribeCatalogUpdates({ sku: adminSku, onUpdate: load });
+
     return () => {
       cancelled = true;
       unsubscribe();

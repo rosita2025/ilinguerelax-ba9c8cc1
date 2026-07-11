@@ -13,6 +13,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
 import { COUNTRY_INFO } from "@/lib/countryInfo";
+import { publishCatalogUpdate } from "@/lib/catalogSync";
 
 interface Product {
   sku: string;

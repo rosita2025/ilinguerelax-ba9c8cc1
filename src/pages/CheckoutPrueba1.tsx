@@ -15,6 +15,7 @@ import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { getCatalogItem, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { supabase } from "@/integrations/supabase/client";
+import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 
 export default function CheckoutPrueba1() {
   const { slug } = useParams<{ slug?: string }>();

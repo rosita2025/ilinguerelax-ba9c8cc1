@@ -2,6 +2,7 @@
 // and mercadopago-webhook. Sends via Lovable's built-in email infrastructure
 // (send-transactional-email → queued → process-email-queue).
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { upsertBrevoContact } from "./brevoContact.ts";
 
 interface Args {
   customerEmail: string;

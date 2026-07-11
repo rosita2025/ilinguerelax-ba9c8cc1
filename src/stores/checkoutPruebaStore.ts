@@ -32,6 +32,8 @@ interface PruebaStore {
   buyer: BuyerInfo;
   setBuyer: (patch: Partial<BuyerInfo>) => void;
   addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
+  /** Update price/name/image/regionPrices of items already in cart (keeps quantity). */
+  syncItem: (patch: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, qty: number) => void;
   clear: () => void;
@@ -100,6 +102,23 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
         } else {
           set({ items: [...get().items, { ...item, quantity: item.quantity ?? 1 }] });
         }
+      },
+
+      syncItem: (patch) => {
+        const { quantity: _q, ...rest } = patch;
+        set({
+          items: get().items.map((i) =>
+            i.id === patch.id
+              ? {
+                  ...i,
+                  ...rest,
+                  // Explicitly clear regionPrices if the new patch omits it,
+                  // so switching a product from region-priced to flat works.
+                  regionPrices: patch.regionPrices ?? undefined,
+                }
+              : i,
+          ),
+        });
       },
 
       removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id) }),

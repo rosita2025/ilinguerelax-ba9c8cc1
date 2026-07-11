@@ -28,23 +28,15 @@ interface DBProduct {
   hotmart_excluded_countries: string[] | null;
 }
 
+import { COUNTRY_INFO } from "@/lib/countryInfo";
+
 const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [
   { code: "auto", label: "🌐 Auto (detectar por IP)" },
-  { code: "PE", label: "🇵🇪 Perú" },
-  { code: "MX", label: "🇲🇽 México" },
-  { code: "CO", label: "🇨🇴 Colombia" },
-  { code: "AR", label: "🇦🇷 Argentina" },
-  { code: "CL", label: "🇨🇱 Chile" },
-  { code: "BR", label: "🇧🇷 Brasil" },
-  { code: "US", label: "🇺🇸 Estados Unidos" },
-  { code: "CA", label: "🇨🇦 Canadá" },
-  { code: "GB", label: "🇬🇧 Reino Unido" },
-  { code: "ES", label: "🇪🇸 España" },
-  { code: "FR", label: "🇫🇷 Francia" },
-  { code: "DE", label: "🇩🇪 Alemania" },
-  { code: "JP", label: "🇯🇵 Japón" },
-  { code: "KR", label: "🇰🇷 Corea" },
+  ...Object.entries(COUNTRY_INFO)
+    .map(([code, info]) => ({ code, label: `${info.flag} ${info.name}` }))
+    .sort((a, b) => a.label.localeCompare(b.label)),
 ];
+
 
 const FLAG: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",

@@ -32,6 +32,8 @@ interface PruebaStore {
   buyer: BuyerInfo;
   setBuyer: (patch: Partial<BuyerInfo>) => void;
   addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
+  /** Update price/name/image/regionPrices of items already in cart (keeps quantity). */
+  syncItem: (patch: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, qty: number) => void;
   clear: () => void;

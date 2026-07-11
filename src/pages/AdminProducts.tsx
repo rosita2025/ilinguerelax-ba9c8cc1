@@ -131,7 +131,7 @@ const AdminProducts = () => {
                   <th className="text-left px-4 py-3">Producto</th>
                   <th className="text-left px-4 py-3">Categoría</th>
                   <th className="text-right px-4 py-3">Precio</th>
-                  <th className="text-center px-4 py-3">Preset</th>
+                  
                   <th className="text-center px-4 py-3">Drive</th>
                   <th className="text-center px-4 py-3">Tipo</th>
                   <th className="text-center px-4 py-3">Estado</th>

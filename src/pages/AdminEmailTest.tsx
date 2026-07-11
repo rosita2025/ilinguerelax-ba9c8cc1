@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
-type Source = "manual" | "shopify" | "hotmart" | "digital";
+type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
 
 interface OrderRow {
   id: string;
@@ -39,16 +39,26 @@ const fmt = (iso: string | null) => {
 
 const sourceLabel: Record<Source, string> = {
   manual: "Yape/Plin",
-  shopify: "Shopify",
-  hotmart: "Hotmart",
-  digital: "Digital (email)",
+  stripe: "Stripe",
+  paypal: "PayPal",
+  mercadopago: "Mercado Pago",
+  digital: "Digital",
 };
 
 const sourceColor: Record<Source, string> = {
   manual: "bg-amber-100 text-amber-800",
-  shopify: "bg-emerald-100 text-emerald-800",
-  hotmart: "bg-orange-100 text-orange-800",
+  stripe: "bg-indigo-100 text-indigo-800",
+  paypal: "bg-sky-100 text-sky-800",
+  mercadopago: "bg-cyan-100 text-cyan-800",
   digital: "bg-blue-100 text-blue-800",
+};
+
+const providerToSource = (p?: string | null): Source => {
+  const v = (p || "").toLowerCase();
+  if (v.includes("stripe")) return "stripe";
+  if (v.includes("paypal")) return "paypal";
+  if (v.includes("mercado") || v === "mp") return "mercadopago";
+  return "digital";
 };
 
 const AdminEmailTest = () => {

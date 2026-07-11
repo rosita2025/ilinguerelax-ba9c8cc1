@@ -8,6 +8,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 interface DBProduct {
   id: string;

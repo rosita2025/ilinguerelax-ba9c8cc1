@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
+import { detectPolicyPreset, POLICY_META } from "@/lib/productPolicy";
 
 interface Product {
   id: string;
@@ -21,6 +22,10 @@ interface Product {
   active: boolean;
   sort_order: number;
   cover_image_url: string | null;
+  hotmart_url: string | null;
+  store_enabled: boolean;
+  store_excluded_countries: string[] | null;
+  hotmart_excluded_countries: string[] | null;
 }
 
 const FLAGS: Record<string, string> = {

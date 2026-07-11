@@ -1,5 +1,5 @@
 // Translations for the /checkouts/prueba-1 checkout page UI.
-// Consumed by CheckoutPrueba1, BuyerInfoForm, PaymentMethodsGroup, OrderSummary.
+// Consumed by Checkout, BuyerInfoForm, PaymentMethodsGroup, OrderSummary.
 import type { Language } from "./index";
 
 export interface CheckoutUIStrings {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { toast } from "@/hooks/use-toast";
 
 export function AddProductForm() {

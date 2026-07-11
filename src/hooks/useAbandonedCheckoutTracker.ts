@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useI18n } from "@/i18n/I18nContext";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

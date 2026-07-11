@@ -68,7 +68,7 @@ import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
 const CheckoutTest = lazy(() => import("./pages/CheckoutTest"));
-const CheckoutPrueba1 = lazy(() => import("./pages/CheckoutPrueba1"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
 const CheckoutFailure = lazy(() => import("./pages/CheckoutFailure"));
@@ -218,8 +218,8 @@ const App = () => (
                   <Route path="/admin/productos" element={<AdminGate><AdminProducts /></AdminGate>} />
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
-                  <Route path="/checkouts" element={<CheckoutPrueba1 />} />
-                  <Route path="/checkouts/:slug" element={<CheckoutPrueba1 />} />
+                  <Route path="/checkouts" element={<Checkout />} />
+                  <Route path="/checkouts/:slug" element={<Checkout />} />
                   <Route path="/checkout" element={<Navigate to="/checkouts" replace />} />
                   <Route path="/checkout/:slug" element={<CheckoutSlugRedirect />} />
                   <Route path="/checkouts/prueba-1" element={<Navigate to="/checkouts" replace />} />

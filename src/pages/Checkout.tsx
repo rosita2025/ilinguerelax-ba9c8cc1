@@ -8,7 +8,7 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
-import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
@@ -17,7 +17,7 @@ import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 
-export default function CheckoutPrueba1() {
+export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);

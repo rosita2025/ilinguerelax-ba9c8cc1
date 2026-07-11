@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -59,6 +59,13 @@ const panels = [
     title: "Productos digitales",
     desc: "Catálogo tipo Shopify: crea productos, precios, enlaces de Drive y upsells sin tocar código. Se sincroniza con checkout y correos.",
     color: "text-teal-600",
+  },
+  {
+    to: "/admin/email-test",
+    icon: Mail,
+    title: "Prueba de correo",
+    desc: "Envía un email transaccional real asociado a una orden y ve en vivo cómo el webhook de Brevo marca delivered / opened / bounced.",
+    color: "text-sky-600",
   },
 ];
 

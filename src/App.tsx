@@ -62,6 +62,7 @@ const AdminCheckoutMethods = lazy(() => import("./pages/AdminCheckoutMethods"));
 const AdminManualPayments = lazy(() => import("./pages/AdminManualPayments"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
+const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
 
 import { AdminGate } from "@/components/admin/AdminGate";
@@ -217,6 +218,7 @@ const App = () => (
                   <Route path="/admin/manual-payments" element={<AdminGate><AdminManualPayments /></AdminGate>} />
                   <Route path="/admin/productos" element={<AdminGate><AdminProducts /></AdminGate>} />
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
+                  <Route path="/admin/email-test" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
                   <Route path="/checkouts" element={<Checkout />} />
                   <Route path="/checkouts/:slug" element={<Checkout />} />

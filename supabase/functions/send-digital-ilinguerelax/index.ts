@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { resend } from "../_shared/brevo.ts";
 import { BRAND, escapeHtml, renderBrandedEmail } from "../_shared/emailBrand.ts";
+import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,11 +12,17 @@ const corsHeaders = {
 interface Body {
   customerEmail: string;
   customerName?: string;
+  customerPhone?: string;
+  customerCountry?: string;
   orderId?: string;
   skus: string[];
+  amount?: number;
+  currency?: string;
+  provider?: string;
   idempotencyKey?: string;
   force?: boolean;
 }
+
 
 interface Bonus { name?: string | null; drive_url?: string | null; access_key?: string | null }
 interface Product {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Eye, EyeOff, Pencil, Package, Search, ExternalLink, ArrowUpDown } from "lucide-react";
+import { Plus, Eye, EyeOff, Pencil, Package, Search, ExternalLink, ArrowUpDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,6 +68,20 @@ const AdminProducts = () => {
       load();
     } catch {
       toast({ title: "Error", variant: "destructive" });
+    }
+  };
+
+  const remove = async (sku: string, name: string) => {
+    if (!confirm(`¿Eliminar "${name}" (${sku}) definitivamente? Esta acción no se puede deshacer.`)) return;
+    try {
+      const { error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "delete", sku, adminKey },
+      });
+      if (error) throw error;
+      toast({ title: "Producto eliminado" });
+      load();
+    } catch (e: any) {
+      toast({ title: "Error al eliminar", description: e?.message, variant: "destructive" });
     }
   };
 
@@ -179,6 +193,9 @@ const AdminProducts = () => {
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => toggle(p.sku, p.active)} title={p.active ? "Ocultar" : "Publicar"}>
                           {p.active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => remove(p.sku, p.name)} title="Eliminar" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>

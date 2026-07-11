@@ -43,6 +43,14 @@ export default function CheckoutSuccess() {
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
 
+  // Build a friendly order number: ILR-<PROVIDER>-<6 chars>
+  // Deterministic from the payment reference so the same payment always maps
+  // to the same order number across refreshes and the confirmation email.
+  const providerCode = provider === "stripe" ? "ST" : provider === "paypal" ? "PP" : provider === "mercadopago" ? "MP" : "OR";
+  const rawRef = String(paymentId || externalRef || paypalToken || "").replace(/[^a-zA-Z0-9]/g, "");
+  const refTail = rawRef ? rawRef.slice(-6).toUpperCase().padStart(6, "0") : Math.random().toString(36).slice(2, 8).toUpperCase();
+  const orderNumber = `ILR-${providerCode}-${refTail}`;
+
   // Gate: only real buyers from Stripe or PayPal should see the confirmation.
   // A visitor without a valid payment reference OR without buyer info in the
   // session store is treated as public/unknown and gets a neutral screen.
@@ -74,7 +82,8 @@ export default function CheckoutSuccess() {
         body: {
           customerEmail: buyer.email,
           customerName: buyer.fullName,
-          orderId: paymentId || externalRef || undefined,
+          orderId: orderNumber,
+          paymentReference: paymentId || externalRef || undefined,
           total,
           currency: "USD",
           paymentProvider: provider,
@@ -175,7 +184,7 @@ export default function CheckoutSuccess() {
             <CheckCircle2 className="w-11 h-11 text-green-600 dark:text-green-400" />
           </div>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
-            {paymentId ? `${t.orderNumber} #${String(paymentId).slice(-8).toUpperCase()}` : t.orderConfirmed}
+            {t.orderNumber} <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
           </p>
           <h1 className="text-3xl md:text-4xl font-bold">
             {t.thanks(buyer.fullName ? buyer.fullName.split(" ")[0] : undefined)}

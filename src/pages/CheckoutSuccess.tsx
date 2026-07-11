@@ -84,7 +84,9 @@ export default function CheckoutSuccess() {
 
   const [resending, setResending] = useState(false);
 
-  const sendDigitalEmail = async () => {
+  const idemKey = `digital:${(orderNumber || paymentId || externalRef || buyer.email || "").toLowerCase()}`;
+
+  const sendDigitalEmail = async (opts?: { force?: boolean }) => {
     const skus = items.map((i) => i.id);
     if (!buyer.email || skus.length === 0) return { skipped: true };
     return supabase.functions.invoke("send-digital-ilinguerelax", {
@@ -93,6 +95,8 @@ export default function CheckoutSuccess() {
         customerName: buyer.fullName,
         orderId: orderNumber,
         skus,
+        idempotencyKey: idemKey,
+        force: opts?.force === true,
       },
     });
   };
@@ -100,7 +104,8 @@ export default function CheckoutSuccess() {
   const resendDigital = async () => {
     setResending(true);
     try {
-      const res = await sendDigitalEmail();
+      // Manual resend: bypass idempotency
+      const res = await sendDigitalEmail({ force: true });
       if ((res as any)?.error) throw (res as any).error;
       toast({ title: "Email reenviado", description: `Enviado a ${buyer.email}` });
     } catch (e: any) {
@@ -110,7 +115,7 @@ export default function CheckoutSuccess() {
     }
   };
 
-  // Send confirmation email once, then send the digital-delivery email, then clear the cart
+  // Send confirmation email once, then ~90s later send the digital-delivery email
   useEffect(() => {
     if (sentRef.current) return;
     if (!isVerifiedBuyer) return;
@@ -121,6 +126,8 @@ export default function CheckoutSuccess() {
     }
     sentRef.current = true;
     sessionStorage.setItem(key, "1");
+
+    let digitalTimer: ReturnType<typeof setTimeout> | null = null;
 
     (async () => {
       try {
@@ -145,13 +152,22 @@ export default function CheckoutSuccess() {
       } catch (e) {
         console.error("send-order-confirmation failed", e);
       }
-      try {
-        await sendDigitalEmail();
-      } catch (e) {
-        console.error("send-digital-ilinguerelax failed", e);
-      }
+      // Wait ~90s before sending the digital delivery email so it arrives as a
+      // clearly separate second message (better deliverability, less "spammy").
+      // Idempotency on the server side prevents duplicates if the user refreshes.
+      digitalTimer = setTimeout(async () => {
+        try {
+          await sendDigitalEmail();
+        } catch (e) {
+          console.error("send-digital-ilinguerelax failed", e);
+        }
+      }, 90_000);
       setTimeout(() => clear(), 800);
     })();
+
+    return () => {
+      if (digitalTimer) clearTimeout(digitalTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

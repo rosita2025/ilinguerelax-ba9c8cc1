@@ -134,6 +134,33 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_email_sends: {
+        Row: {
+          created_at: string
+          customer_email: string
+          id: string
+          idempotency_key: string
+          order_id: string | null
+          skus: string[]
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          id?: string
+          idempotency_key: string
+          order_id?: string | null
+          skus?: string[]
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          id?: string
+          idempotency_key?: string
+          order_id?: string | null
+          skus?: string[]
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           access_key: string | null

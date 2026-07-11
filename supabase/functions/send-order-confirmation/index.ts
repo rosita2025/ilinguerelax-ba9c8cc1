@@ -95,6 +95,14 @@ const handler = async (req: Request): Promise<Response> => {
         <span>Total paid</span><span>$${total.toFixed(2)} ${currency}</span>
       </div>` : ""}
 
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px 18px;margin:8px 0 4px;font-size:13px;color:#374151;">
+        <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Transaction details</div>
+        ${orderRef ? `<div style="margin:2px 0;"><strong style="color:#111827;">Order number:</strong> <span style="font-family:monospace;">${orderRef}</span></div>` : ""}
+        ${providerLabel ? `<div style="margin:2px 0;"><strong style="color:#111827;">Payment method:</strong> ${providerLabel}</div>` : ""}
+        ${paymentReference ? `<div style="margin:2px 0;word-break:break-all;"><strong style="color:#111827;">Transaction ID:</strong> <span style="font-family:monospace;font-size:12px;color:#4b5563;">${paymentReference}</span></div>` : ""}
+        <div style="margin-top:8px;font-size:12px;color:#6b7280;">Keep this reference in case you need to contact support.</div>
+      </div>
+
       <div style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;padding:20px;margin:28px 0;">
         <h3 style="margin:0 0 12px;color:#065f46;font-size:15px;">🚀 Steps to get started</h3>
         <ol style="margin:0;padding-left:20px;color:#065f46;font-size:14px;line-height:1.8;">

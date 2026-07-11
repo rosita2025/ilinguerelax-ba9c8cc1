@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft } from "lucide-react";
@@ -12,8 +12,9 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutPruebaStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
-import { getCatalogItem, CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
+import { getCatalogItem, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function CheckoutPrueba1() {
   const { slug } = useParams<{ slug?: string }>();
@@ -24,8 +25,46 @@ export default function CheckoutPrueba1() {
   const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
 
-  const catalogItem = getCatalogItem(slug);
-  const slugUnknown = !!slug && !catalogItem;
+  const staticItem = getCatalogItem(slug);
+  const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
+  const [loadingDb, setLoadingDb] = useState(!staticItem && !!slug);
+  const [dbMissing, setDbMissing] = useState(false);
+
+  // If slug not in static catalog, try to load from digital_products table
+  useEffect(() => {
+    if (!slug || staticItem) return;
+    let cancelled = false;
+    setLoadingDb(true);
+    (async () => {
+      const { data, error } = await supabase
+        .from("digital_products")
+        .select("sku, name, description, price_usd, price_pen, cover_image_url")
+        .eq("sku", slug)
+        .eq("active", true)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error || !data) {
+        setDbMissing(true);
+      } else {
+        setDbItem({
+          id: data.sku,
+          name: data.name,
+          price: Number(data.price_usd),
+          image: data.cover_image_url || "/placeholder.svg",
+          description: data.description || undefined,
+          productPath: `/products/${data.sku}`,
+          ...(data.price_pen != null && {
+            regionPrices: { latam: Number(data.price_pen), global: Number(data.price_usd) },
+          }),
+        } as CatalogItem);
+      }
+      setLoadingDb(false);
+    })();
+    return () => { cancelled = true; };
+  }, [slug, staticItem]);
+
+  const catalogItem = staticItem ?? dbItem;
+  const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
 
   // Auto-load product from URL slug (Shopify-style)
   useEffect(() => {
@@ -34,11 +73,19 @@ export default function CheckoutPrueba1() {
       addItem(catalogItem);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [catalogItem?.id]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.
   useAbandonedCheckoutTracker(slug, catalogItem?.name);
+
+  if (loadingDb) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-muted-foreground">Cargando checkout…</div>
+      </div>
+    );
+  }
 
   if (slugUnknown) {
     return (

@@ -52,43 +52,61 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Resolve SKU dynamically from Hotmart payload. Fall back to the digital
+    // catalog default if the webhook does not include a product identifier.
+    const rawSku = String(
+      body.data?.product?.slug ||
+      body.data?.product?.sku ||
+      body.data?.product?.id ||
+      body.product?.slug ||
+      body.product?.sku ||
+      body.sku ||
+      ""
+    ).trim().toLowerCase();
+
+    let productSku = rawSku;
+    if (!productSku) {
+      const { data: firstProduct } = await supabase
+        .from("digital_products")
+        .select("sku")
+        .eq("is_active", true)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      productSku = (firstProduct as { sku?: string } | null)?.sku ||
+        "5-000-spanish-words-with-english-pronunciation-digital";
+    }
+
     // Check if this email already has an active abandoned cart sequence
     const { data: existing } = await supabase
       .from("abandoned_carts")
       .select("id, is_completed, converted")
       .eq("customer_email", buyerEmail.toLowerCase())
       .eq("is_completed", false)
-      .single();
+      .maybeSingle();
 
     if (existing) {
-      // Reset the existing sequence
       await supabase
         .from("abandoned_carts")
         .update({
           emails_sent: 0,
-          next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour
+          next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
           last_email_sent_at: null,
           customer_name: buyerName,
+          product_type: productSku,
         })
         .eq("id", existing.id);
-
-      console.log("Reset existing abandoned cart sequence for:", buyerEmail);
+      console.log("Reset abandoned cart:", buyerEmail, productSku);
     } else {
-      // Create new abandoned cart entry
       const { error } = await supabase.from("abandoned_carts").insert({
         customer_name: buyerName,
         customer_email: buyerEmail.toLowerCase(),
-        product_type: "english",
+        product_type: productSku,
         language,
-        next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
+        next_email_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
       });
-
-      if (error) {
-        console.error("Error inserting abandoned cart:", error);
-        throw error;
-      }
-
-      console.log("Created abandoned cart entry for:", buyerEmail);
+      if (error) throw error;
+      console.log("Created abandoned cart:", buyerEmail, productSku);
     }
 
     // Save to central email contacts
@@ -98,7 +116,7 @@ serve(async (req) => {
         name: buyerName,
         source: "abandoned_cart",
         language,
-        product_type: "english",
+        product_type: productSku,
       });
     } catch (e) {
       console.log("Contact already saved:", e);

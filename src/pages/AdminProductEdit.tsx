@@ -321,6 +321,64 @@ const AdminProductEdit = () => {
               </Button>
             </div>
 
+
+            {/* Resumen visual de política activa y canales habilitados */}
+            {(() => {
+              const storeOn = product.store_enabled;
+              const hotOn = !!product.hotmart_url?.trim();
+              const badge =
+                policyStatus === "standard"
+                  ? { label: "⚡ Política estándar", cls: "bg-primary/15 text-primary border-primary/40" }
+                  : policyStatus === "worldwide"
+                  ? { label: "🌍 Tienda mundial (sin exclusiones)", cls: "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/40" }
+                  : { label: "🛠️ Configuración personalizada", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40" };
+              return (
+                <div className="p-3 border rounded-lg bg-muted/30 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold">Política activa</span>
+                    <span className={`text-xs px-2 py-1 rounded-full border ${badge.cls}`}>{badge.label}</span>
+                  </div>
+                  {policyStatus === "standard" && (
+                    <div className="text-xs text-muted-foreground">
+                      Hotmart <b>solo LATAM</b> (excepto 🇨🇺 🇻🇪 🇳🇮) · Tienda <b>mundial excepto LATAM</b> (con 🇵🇪 incluido).
+                    </div>
+                  )}
+
+                  <div className="grid sm:grid-cols-2 gap-2 pt-1">
+                    {/* Tienda */}
+                    <div className={`p-2 rounded border text-xs ${storeOn ? "border-green-500/40 bg-green-500/10" : "border-border bg-muted/40 opacity-60"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">🛒 Tienda ILINGUE RELAX</span>
+                        <span className={storeOn ? "text-green-700 dark:text-green-400" : "text-muted-foreground"}>
+                          {storeOn ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
+                      {storeOn && (
+                        <div className="mt-1 text-muted-foreground truncate">
+                          Enlace: <a href={`/checkouts/${product.sku}`} target="_blank" rel="noreferrer" className="text-primary underline">/checkouts/{product.sku}</a>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Hotmart */}
+                    <div className={`p-2 rounded border text-xs ${hotOn ? "border-[#EF4E23]/40 bg-[#EF4E23]/10" : "border-border bg-muted/40 opacity-60"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">🔥 Hotmart</span>
+                        <span className={hotOn ? "text-[#EF4E23]" : "text-muted-foreground"}>
+                          {hotOn ? "Activo" : "Sin enlace"}
+                        </span>
+                      </div>
+                      {hotOn && (
+                        <div className="mt-1 text-muted-foreground truncate">
+                          Enlace: <a href={product.hotmart_url!} target="_blank" rel="noreferrer" className="text-primary underline">{product.hotmart_url}</a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Resumen de cobertura */}
             {orphanCountries.length > 0 ? (
               <div className="text-xs p-3 rounded border border-destructive/40 bg-destructive/10 text-destructive space-y-1">

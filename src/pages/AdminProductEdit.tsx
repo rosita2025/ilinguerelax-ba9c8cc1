@@ -97,6 +97,24 @@ const AdminProductEdit = () => {
             .filter((u: { product_sku: string }) => u.product_sku === sku)
             .map((u: UpsellRow) => ({ upsell_sku: u.upsell_sku, discount_pct: u.discount_pct, sort_order: u.sort_order }));
           setUpsells(ups);
+        } else {
+          // Nuevo producto: aplicar política estándar automáticamente
+          const LATAM = REGIONS.latam.codes;
+          const HOTMART_BLOCKED = ["CU", "VE", "NI"];
+          const allCodes = Object.keys(COUNTRY_INFO);
+          const storeExcl = LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c));
+          const hotExcl = Array.from(new Set([
+            ...allCodes.filter((c) => !LATAM.includes(c)),
+            ...HOTMART_BLOCKED,
+          ]));
+          const maxOrder = list.reduce((m, p) => Math.max(m, p.sort_order ?? 0), 0);
+          setProduct((p) => ({
+            ...p,
+            store_enabled: true,
+            store_excluded_countries: storeExcl,
+            hotmart_excluded_countries: hotExcl,
+            sort_order: maxOrder + 1,
+          }));
         }
       } catch {
         toast({ title: "Error al cargar", variant: "destructive" });
@@ -106,6 +124,16 @@ const AdminProductEdit = () => {
     })();
     // eslint-disable-next-line
   }, [sku, adminKey]);
+
+  // Auto-sugerir precio PEN desde USD (solo si está vacío) al crear
+  useEffect(() => {
+    if (!isNew) return;
+    if (product.price_usd > 0 && (product.price_pen == null || product.price_pen === 0)) {
+      const suggested = Math.round(product.price_usd * 3.75 * 10) / 10; // ~S/ 3.75 por USD
+      setProduct((p) => ({ ...p, price_pen: suggested }));
+    }
+    // eslint-disable-next-line
+  }, [product.price_usd]);
 
   const availableUpsells = useMemo(
     () => allProducts.filter((p) => p.sku !== product.sku && !upsells.find((u) => u.upsell_sku === p.sku)),
@@ -193,6 +221,11 @@ const AdminProductEdit = () => {
           </div>
 
           <h1 className="text-2xl font-bold">{isNew ? "Nuevo producto" : `Editar: ${product.name}`}</h1>
+          {isNew && (
+            <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs">
+              ⚡ <b>Política estándar aplicada automáticamente</b>: Hotmart para LATAM (excepto 🇨🇺🇻🇪🇳🇮), Tienda propia para el resto del mundo + 🇵🇪. Pega el enlace de Hotmart abajo y el precio PEN se sugerirá desde el USD (×3.75).
+            </div>
+          )}
 
           <Card className="p-6 space-y-4">
             <h2 className="font-semibold">1. Información básica</h2>

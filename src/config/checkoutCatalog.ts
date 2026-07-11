@@ -95,6 +95,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
     productPath: "/products/5-000-spanish-words-with-english-pronunciation-digital",
+    adminSku: "5-000-spanish-words-with-english-pronunciation-digital",
   },
   "500-preguntas": {
     id: "500-preguntas-ingles",
@@ -103,7 +104,9 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-spanish-500-questions.png",
     description: "500 essential Spanish questions with English pronunciation",
     productPath: "/products/spanish-relax-500-questions-in-spanish-with-english-pronunciation-guide",
+    adminSku: "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
   },
+
   "8000-palabras": {
     id: "8000-palabras-ingles",
     name: "Inglés Relax · 8,000 Palabras Esenciales (Digital PDF)",

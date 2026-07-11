@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Smartphone, Building2, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { toast } from "@/hooks/use-toast";
 

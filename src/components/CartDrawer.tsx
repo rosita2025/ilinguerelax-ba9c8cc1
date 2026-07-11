@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X, Check, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
-import { useCheckoutPruebaStore, itemPrice } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore, itemPrice } from "@/stores/checkoutStore";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useNavigate } from "react-router-dom";

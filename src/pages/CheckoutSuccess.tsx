@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutPruebaStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";

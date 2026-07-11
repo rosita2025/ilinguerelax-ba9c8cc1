@@ -1,4 +1,4 @@
-import type { PruebaItem } from "@/stores/checkoutPruebaStore";
+import type { PruebaItem } from "@/stores/checkoutStore";
 
 export interface UpsellItem {
   id: string;

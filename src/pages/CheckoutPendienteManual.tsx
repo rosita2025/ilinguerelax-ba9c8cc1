@@ -80,7 +80,7 @@ export default function CheckoutPendienteManual() {
         </div>
 
         <div className="flex gap-2 justify-center pt-2">
-          <Button asChild variant="outline"><Link to="/checkouts/prueba-1">Back to checkout</Link></Button>
+          <Button asChild variant="outline"><Link to="/checkouts">Back to checkout</Link></Button>
           <Button asChild><Link to="/">Go to home</Link></Button>
         </div>
       </div>

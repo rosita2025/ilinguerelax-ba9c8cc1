@@ -98,21 +98,14 @@ const AdminProductEdit = () => {
             .map((u: UpsellRow) => ({ upsell_sku: u.upsell_sku, discount_pct: u.discount_pct, sort_order: u.sort_order }));
           setUpsells(ups);
         } else {
-          // Nuevo producto: aplicar política estándar automáticamente
-          const LATAM = REGIONS.latam.codes;
-          const HOTMART_BLOCKED = ["CU", "VE", "NI"];
-          const allCodes = Object.keys(COUNTRY_INFO);
-          const storeExcl = LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c));
-          const hotExcl = Array.from(new Set([
-            ...allCodes.filter((c) => !LATAM.includes(c)),
-            ...HOTMART_BLOCKED,
-          ]));
+          // Nuevo producto: por defecto TIENDA MUNDIAL (sin exclusiones, sin Hotmart).
+          // Si luego pegas un enlace de Hotmart, un botón te sugiere la política estándar (LATAM→Hotmart).
           const maxOrder = list.reduce((m, p) => Math.max(m, p.sort_order ?? 0), 0);
           setProduct((p) => ({
             ...p,
             store_enabled: true,
-            store_excluded_countries: storeExcl,
-            hotmart_excluded_countries: hotExcl,
+            store_excluded_countries: [],
+            hotmart_excluded_countries: [],
             sort_order: maxOrder + 1,
           }));
         }
@@ -222,8 +215,9 @@ const AdminProductEdit = () => {
 
           <h1 className="text-2xl font-bold">{isNew ? "Nuevo producto" : `Editar: ${product.name}`}</h1>
           {isNew && (
-            <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs">
-              ⚡ <b>Política estándar aplicada automáticamente</b>: Hotmart para LATAM (excepto 🇨🇺🇻🇪🇳🇮), Tienda propia para el resto del mundo + 🇵🇪. Pega el enlace de Hotmart abajo y el precio PEN se sugerirá desde el USD (×3.75).
+            <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs space-y-1">
+              <div>🌍 <b>Por defecto: Tienda mundial</b> (todos los países, sin Hotmart). Ideal para productos en español dirigidos a angloparlantes u otros idiomas.</div>
+              <div>⚡ Si tienes enlace de Hotmart (típico para productos que enseñan inglés/coreano/etc. a hispanos), pégalo abajo y toca <b>«Aplicar política estándar»</b> para enrutar LATAM → Hotmart.</div>
             </div>
           )}
 
@@ -325,33 +319,56 @@ const AdminProductEdit = () => {
               />
             </div>
 
-            {/* Preset rápido: política estándar */}
-            <div className="p-3 border-2 border-primary/40 rounded-lg bg-primary/5 space-y-2">
-              <div className="text-sm font-semibold">⚡ Política estándar (1 clic)</div>
-              <p className="text-xs text-muted-foreground">
-                <b>Hotmart</b>: solo LATAM (excepto 🇨🇺 Cuba, 🇻🇪 Venezuela y 🇳🇮 Nicaragua, donde Hotmart no opera bien).<br />
-                <b>Tienda propia</b>: todo el mundo, incluyendo 🇵🇪 Perú, 🇺🇸 USA, 🇨🇦 Canadá — oculta en el resto de LATAM (los que ya compran por Hotmart).
-              </p>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => {
-                  const LATAM = REGIONS.latam.codes; // MX, GT, HN, SV, NI, CR, PA, CU, DO, PR, CO, VE, EC, PE, BO, BR, PY, UY, AR, CL
-                  const HOTMART_BLOCKED = ["CU", "VE", "NI"];
-                  // Tienda: excluye LATAM salvo Perú y los bloqueados en Hotmart (para que igual tengan un canal)
-                  const storeExcl = LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c));
-                  // Hotmart: excluye todo el mundo salvo LATAM; y además bloquea CU/VE/NI
-                  const allCodes = Object.keys(COUNTRY_INFO);
-                  const hotExcl = Array.from(new Set([
-                    ...allCodes.filter((c) => !LATAM.includes(c)),
-                    ...HOTMART_BLOCKED,
-                  ]));
-                  update("store_excluded_countries", storeExcl);
-                  update("hotmart_excluded_countries", hotExcl);
-                }}
-              >
-                Aplicar política estándar
-              </Button>
+            {/* Presets rápidos: 2 políticas comunes */}
+            <div className="grid md:grid-cols-2 gap-3">
+              <div className="p-3 border-2 border-primary/40 rounded-lg bg-primary/5 space-y-2">
+                <div className="text-sm font-semibold">⚡ Política estándar</div>
+                <p className="text-xs text-muted-foreground">
+                  Para productos que enseñan <b>inglés/coreano/etc. a hispanos</b>.<br />
+                  <b>Hotmart</b>: solo LATAM (excepto 🇨🇺🇻🇪🇳🇮).<br />
+                  <b>Tienda</b>: mundo + 🇵🇪, oculta en el resto de LATAM.
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => {
+                    const LATAM = REGIONS.latam.codes;
+                    const HOTMART_BLOCKED = ["CU", "VE", "NI"];
+                    const storeExcl = LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c));
+                    const allCodes = Object.keys(COUNTRY_INFO);
+                    const hotExcl = Array.from(new Set([
+                      ...allCodes.filter((c) => !LATAM.includes(c)),
+                      ...HOTMART_BLOCKED,
+                    ]));
+                    update("store_excluded_countries", storeExcl);
+                    update("hotmart_excluded_countries", hotExcl);
+                    update("store_enabled", true);
+                  }}
+                >
+                  Aplicar estándar
+                </Button>
+              </div>
+
+              <div className="p-3 border-2 border-emerald-400/60 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 space-y-2">
+                <div className="text-sm font-semibold">🌍 Tienda mundial (sin Hotmart)</div>
+                <p className="text-xs text-muted-foreground">
+                  Para productos que enseñan <b>español a angloparlantes</b> u otros idiomas — o cuando <b>no tienes enlace de Hotmart</b>.<br />
+                  Se muestra la Tienda ILINGUE RELAX en <b>todos los países</b>.
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    update("store_excluded_countries", []);
+                    update("hotmart_excluded_countries", []);
+                    update("store_enabled", true);
+                    update("hotmart_url", "");
+                  }}
+                >
+                  Aplicar tienda mundial
+                </Button>
+              </div>
             </div>
 
 

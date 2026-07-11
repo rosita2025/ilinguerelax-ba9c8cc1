@@ -82,7 +82,8 @@ export default function CheckoutSuccess() {
         body: {
           customerEmail: buyer.email,
           customerName: buyer.fullName,
-          orderId: paymentId || externalRef || undefined,
+          orderId: orderNumber,
+          paymentReference: paymentId || externalRef || undefined,
           total,
           currency: "USD",
           paymentProvider: provider,

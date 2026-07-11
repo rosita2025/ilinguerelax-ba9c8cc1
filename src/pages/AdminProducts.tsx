@@ -71,6 +71,20 @@ const AdminProducts = () => {
     }
   };
 
+  const remove = async (sku: string, name: string) => {
+    if (!confirm(`¿Eliminar "${name}" (${sku}) definitivamente? Esta acción no se puede deshacer.`)) return;
+    try {
+      const { error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "delete", sku, adminKey },
+      });
+      if (error) throw error;
+      toast({ title: "Producto eliminado" });
+      load();
+    } catch (e: any) {
+      toast({ title: "Error al eliminar", description: e?.message, variant: "destructive" });
+    }
+  };
+
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of products) set.add(`${p.learner_language}-${p.target_language}`);

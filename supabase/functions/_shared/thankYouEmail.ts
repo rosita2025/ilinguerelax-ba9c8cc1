@@ -49,6 +49,21 @@ async function invokeTemplate(
   if (error) console.error(`[thankyou-email] ${templateName} failed:`, error);
 }
 
+export async function markAbandonedCartConverted(email?: string): Promise<void> {
+  if (!email) return;
+  try {
+    const supabase = getClient();
+    const { error } = await supabase
+      .from("abandoned_carts")
+      .update({ converted: true, is_completed: true, updated_at: new Date().toISOString() })
+      .eq("customer_email", email.trim().toLowerCase())
+      .eq("converted", false);
+    if (error) console.error("[abandoned-cart] mark converted failed:", error);
+  } catch (e) {
+    console.error("[abandoned-cart] mark converted exception:", e);
+  }
+}
+
 export async function sendThankYouEmail(a: Args): Promise<void> {
   if (!a.customerEmail) return;
   const key = a.idempotencyKey || `${a.provider}-${a.customerEmail}-${Date.now()}`;
@@ -81,5 +96,6 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
       orderNumber,
       provider: a.provider,
     }),
+    markAbandonedCartConverted(a.customerEmail),
   ]);
 }

@@ -161,11 +161,14 @@ export default function Checkout() {
     if (!catalogItem) return;
     const existing = items.find((i) => i.id === catalogItem.id);
     if (!existing) {
-      clear();
-      addItem(catalogItem);
+      // Add the new product WITHOUT clearing previous items — user keeps
+      // whatever they already had in the cart across product pages.
+      addItem({ ...catalogItem, quantity: 1 });
     } else {
-      // Same product already in cart → just update mutable fields (price, image, regionPrices…).
+      // Same product already in cart → refresh mutable fields, force qty=1
+      // (digital products are single-unit).
       syncItem(catalogItem);
+      if (existing.quantity !== 1) updateQty(catalogItem.id, 1);
     }
     // Fingerprint intentionally includes price + region prices + upsell prices so
     // any admin edit refreshes the cart line immediately.

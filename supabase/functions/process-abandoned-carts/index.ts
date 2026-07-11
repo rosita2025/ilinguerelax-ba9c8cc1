@@ -91,9 +91,8 @@ serve(async (req) => {
     for (const cart of pendingCarts) {
       try {
         const emailIndex = cart.emails_sent;
-        
-        if (emailIndex >= 6) {
-          // Max emails reached, mark as completed
+
+        if (emailIndex >= MAX_EMAILS) {
           await supabase
             .from("abandoned_carts")
             .update({ is_completed: true })
@@ -101,9 +100,20 @@ serve(async (req) => {
           continue;
         }
 
+        // Safety: re-check conversion right before sending to avoid a race where
+        // the customer paid between the query and the send.
+        const { data: fresh } = await supabase
+          .from("abandoned_carts")
+          .select("converted, is_completed")
+          .eq("id", cart.id)
+          .maybeSingle();
+        if (fresh?.converted || fresh?.is_completed) {
+          continue;
+        }
+
         const productUrl = getProductUrl(cart.product_type);
         const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, productUrl, cart.product_type);
-        
+
         const emailResponse = await resend.emails.send({
           from: "iLingue Relax <hola@ilinguerelax.com>",
           to: [cart.customer_email],
@@ -111,11 +121,10 @@ serve(async (req) => {
           html: emailContent.html,
         });
 
-        console.log(`Email ${emailIndex + 1}/6 sent to ${cart.customer_email} (product: ${cart.product_type}):`, emailResponse);
+        console.log(`Email ${emailIndex + 1}/${MAX_EMAILS} sent to ${cart.customer_email} (product: ${cart.product_type}):`, emailResponse);
 
-        // Calculate next email time
         const nextEmailIndex = emailIndex + 1;
-        const isLastEmail = nextEmailIndex >= 6;
+        const isLastEmail = nextEmailIndex >= MAX_EMAILS;
 
         const updateData: Record<string, unknown> = {
           emails_sent: nextEmailIndex,

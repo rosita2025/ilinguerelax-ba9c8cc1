@@ -40,6 +40,9 @@ export default function Checkout() {
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
+    // Use adminSku alias when the checkout slug doesn't match the admin SKU
+    // (e.g. /checkouts/1000-verbos → digital_products.sku = "1-000-verbos-...").
+    const adminSku = staticItem?.adminSku ?? slug;
 
     const load = async () => {
       setLoadingDb(true);
@@ -49,7 +52,7 @@ export default function Checkout() {
       const { data, error } = await supabase
         .from("digital_products")
         .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
-        .eq("sku", slug)
+        .eq("sku", adminSku)
         .eq("active", true)
         .gt("price_usd", -1 - (cb % 7) * 0.0000001)
         .maybeSingle();
@@ -61,8 +64,9 @@ export default function Checkout() {
       const { data: upRows } = await supabase
         .from("product_upsells")
         .select("upsell_sku, discount_pct, sort_order")
-        .eq("product_sku", slug)
+        .eq("product_sku", adminSku)
         .order("sort_order", { ascending: true });
+
 
       let upsells: CatalogItem["upsells"] | null = null;
       if (upRows && upRows.length) {

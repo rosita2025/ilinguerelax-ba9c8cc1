@@ -28,11 +28,13 @@ const COUPON_CODE = "NEW10";
 
 // Legacy product_type → SKU fallback map (older carts stored a type, newer ones store the actual SKU)
 const PRODUCT_TYPE_TO_SKU: Record<string, string> = {
-  english: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
-  english_8000: "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  english: "5-000-spanish-words-with-english-pronunciation-digital",
+  english_5000: "5-000-spanish-words-with-english-pronunciation-digital",
+  spanish: "5-000-spanish-words-with-english-pronunciation-digital",
   verbs: "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
   questions: "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
-  spanish: "5-000-spanish-words-with-english-pronunciation",
+  coreano: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
+  patrones: "patrones-especiales",
 };
 
 interface DbProduct {
@@ -42,14 +44,27 @@ interface DbProduct {
   cover_image_url: string | null;
 }
 
+// Resolve product dynamically for ANY sku stored in abandoned_carts.
+// Order: exact sku → legacy alias → fuzzy ilike fallback.
 async function fetchProduct(supabase: ReturnType<typeof createClient>, productType: string): Promise<DbProduct | null> {
-  const sku = PRODUCT_TYPE_TO_SKU[productType] ?? productType;
-  const { data } = await supabase
+  const candidates = Array.from(new Set(
+    [productType, PRODUCT_TYPE_TO_SKU[productType]].filter(Boolean) as string[]
+  ));
+  for (const sku of candidates) {
+    const { data } = await supabase
+      .from("digital_products")
+      .select("sku,name,price_usd,cover_image_url")
+      .eq("sku", sku)
+      .maybeSingle();
+    if (data) return data as DbProduct;
+  }
+  const { data: fuzzy } = await supabase
     .from("digital_products")
     .select("sku,name,price_usd,cover_image_url")
-    .eq("sku", sku)
+    .ilike("sku", `%${productType}%`)
+    .limit(1)
     .maybeSingle();
-  return (data as DbProduct | null) ?? null;
+  return (fuzzy as DbProduct | null) ?? null;
 }
 
 serve(async (req) => {

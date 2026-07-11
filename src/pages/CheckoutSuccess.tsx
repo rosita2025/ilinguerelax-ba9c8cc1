@@ -128,6 +128,8 @@ export default function CheckoutSuccess() {
     sessionStorage.setItem(key, "1");
 
     let digitalTimer: ReturnType<typeof setTimeout> | null = null;
+    void digitalTimer;
+
 
     (async () => {
       // Client-side fallback for the "Gracias por su compra" + admin "New order"

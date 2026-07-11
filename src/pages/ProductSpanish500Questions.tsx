@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCartStore } from "@/stores/cartStore";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -11,7 +12,6 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 
 const productImage = "/images/product-spanish-500-questions.png";
-const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/43120267132989";
 const PRICE = "12.00";
 
 const features = [
@@ -26,35 +26,16 @@ const features = [
 ];
 
 const ProductSpanish500Questions = () => {
-  const addItem = useCartStore((s) => s.addItem);
+  const navigate = useNavigate();
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const campaign = useCampaignPrice(12, 40);
 
-  const handleBuyNow = async () => {
-    const shopifyProduct = {
-      node: {
-        id: "gid://shopify/Product/7842828615741",
-        title: "Spanish Relax - 500 Questions in Spanish",
-        description: "",
-        handle: "spanish-relax-500-questions-in-spanish-with-english-pronunciation-guide",
-        priceRange: { minVariantPrice: { amount: PRICE, currencyCode: "USD" } },
-        images: { edges: [{ node: { url: productImage, altText: "500 Questions in Spanish" } }] },
-        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: PRICE, currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
-        options: [{ name: "Title", values: ["Default Title"] }],
-      },
-    };
-
-    await addItem({
-      product: shopifyProduct,
-      variantId: SHOPIFY_VARIANT_ID,
-      variantTitle: "Default Title",
-      price: { amount: PRICE, currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }],
-    });
-
-    setDrawerOpen(true);
+  // Route directly to internal checkout — Shopify is intentionally bypassed.
+  const handleBuyNow = () => {
+    setDrawerOpen(false);
+    navigate("/checkouts/500-preguntas");
   };
+
 
   return (
     <main className="min-h-screen bg-background">

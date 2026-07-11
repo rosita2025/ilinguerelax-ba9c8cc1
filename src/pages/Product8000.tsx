@@ -168,36 +168,12 @@ const Product8000 = () => {
   };
 
   const handleAddToCart = async () => {
-    await addItem({
-      product: {
-        node: {
-          id: "gid://shopify/Product/7837769039933",
-          title: "Inglés Relax - 8,000 Palabras en Inglés Digital",
-          description: "8,000 palabras esenciales del inglés con pronunciación en español y fonética UK/USA.",
-          handle: "ingles-relax-8-000-palabras-en-ingles-digital",
-          priceRange: { minVariantPrice: { amount: "20.00", currencyCode: "USD" } },
-          images: { edges: [{ node: { url: "/images/product-8000.webp", altText: "8,000 Palabras Digital" } }] },
-          variants: {
-            edges: [{
-              node: {
-                id: "gid://shopify/ProductVariant/43094791454781",
-                title: "Default Title",
-                price: { amount: "20.00", currencyCode: "USD" },
-                availableForSale: true,
-                selectedOptions: [{ name: "Title", value: "Default Title" }],
-              },
-            }],
-          },
-          options: [{ name: "Title", values: ["Default Title"] }],
-        },
-      },
-      variantId: "gid://shopify/ProductVariant/43094791454781",
-      variantTitle: "Default Title",
-      price: { amount: "20.00", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }],
-    });
+    // Shopify removed — route directly to the internal checkout for the 8,000 digital.
+    if (typeof window !== "undefined") {
+      window.location.assign("/checkouts/8000-palabras");
+    }
   };
+
 
   return (
     <main className="min-h-screen bg-background">

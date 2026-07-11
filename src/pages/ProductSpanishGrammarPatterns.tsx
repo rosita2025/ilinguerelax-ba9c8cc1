@@ -92,21 +92,14 @@ const ProductSpanishGrammarPatterns = () => {
     loadProduct();
   }, []);
 
+  const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
   const handleAddToCart = async () => {
-    if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Product is loading. Please try again in a moment.");
-      return;
+    // Physical book — Shopify removed. Send buyers to Amazon.
+    if (typeof window !== "undefined") {
+      window.open(AMAZON_URL_GRAMMAR, "_blank", "noopener,noreferrer");
     }
-    const variant = shopifyProduct.node.variants.edges[0]?.node;
-    await addItem({
-      product: shopifyProduct,
-      variantId: shopifyVariantId,
-      variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: String(PRICE), currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: variant?.selectedOptions || [],
-    });
   };
+
 
   const pixelParams = useMemo(
     () => ({
@@ -316,7 +309,7 @@ const ProductSpanishGrammarPatterns = () => {
                 size="xl"
                 className="w-full mb-2 text-lg py-6 bg-gradient-to-r from-[#d4af37] to-[#f4d782] hover:from-[#f4d782] hover:to-[#d4af37] text-[#1a1233] font-black border-0 shadow-lg shadow-[#d4af37]/30"
                 onClick={handleAddToCart}
-                disabled={cartLoading || !shopifyVariantId}
+                disabled={false}
               >
                 {cartLoading ? (
                   <Loader2 className="w-6 h-6 animate-spin mr-2" />
@@ -540,7 +533,7 @@ const ProductSpanishGrammarPatterns = () => {
                 size="xl"
                 className="text-base px-8 py-5 bg-gradient-to-r from-[#d4af37] to-[#f4d782] hover:from-[#f4d782] hover:to-[#d4af37] text-[#1a1233] font-black border-0 shadow-lg shadow-[#d4af37]/30"
                 onClick={handleAddToCart}
-                disabled={cartLoading || !shopifyVariantId}
+                disabled={false}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Add to Cart — ${PRICE}.00
@@ -620,7 +613,7 @@ const ProductSpanishGrammarPatterns = () => {
         ctaText={`ADD TO CART — $${PRICE}.00`}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
-        disabled={!shopifyVariantId}
+        disabled={false}
         isPhysical={true}
       />
     </main>

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "
 import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense, useEffect } from "react";
 import { useCartSync } from "@/hooks/useCartSync";
+import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
@@ -81,6 +82,7 @@ const queryClient = new QueryClient();
 
 const CartSyncWrapper = ({ children }: { children: React.ReactNode }) => {
   useCartSync();
+  useCartCatalogValidator();
   return <>{children}</>;
 };
 

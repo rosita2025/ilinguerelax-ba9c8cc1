@@ -40,6 +40,8 @@ interface PruebaStore {
   applyCoupon: (code: string) => boolean;
   removeCoupon: () => void;
   resetToDefaults: () => void;
+  /** Remove any cart line whose id is NOT in the provided allow-list of valid IDs. */
+  pruneUnknown: (validIds: Set<string>) => number;
 }
 
 // Carrito arranca VACÍO. Los productos se agregan solo cuando el usuario
@@ -132,6 +134,14 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       removeCoupon: () => set({ coupon: null, couponPercent: 0 }),
 
       resetToDefaults: () => set({ items: DEFAULT_ITEMS, coupon: null, couponPercent: 0 }),
+
+      pruneUnknown: (validIds) => {
+        const before = get().items;
+        const kept = before.filter((i) => validIds.has(i.id));
+        const removed = before.length - kept.length;
+        if (removed > 0) set({ items: kept });
+        return removed;
+      },
     }),
     {
       name: "checkout-prueba-1",

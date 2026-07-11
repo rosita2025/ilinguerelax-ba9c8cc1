@@ -228,6 +228,59 @@ Deno.serve(async (req) => {
             external_reference: payment.external_reference,
           },
         };
+
+        // Send pending-payment emails for transferencia/efectivo/ticket/atm
+        // so the customer keeps a receipt if the tab/battery dies.
+        const isPending = payment.status === "pending" || payment.status === "in_process";
+        const payerEmail = payment.payer?.email;
+        if (isPending && payerEmail) {
+          const orderNumber = payment.external_reference || `MP-${payment.id}`;
+          const method = payment.payment_type_id === "ticket"
+            ? "Efectivo / Ticket (Mercado Pago)"
+            : payment.payment_type_id === "bank_transfer"
+              ? "Transferencia (Mercado Pago)"
+              : payment.payment_type_id === "atm"
+                ? "Cajero / ATM (Mercado Pago)"
+                : `Mercado Pago (${payment.payment_method_id || payment.payment_type_id || "pendiente"})`;
+          const customerName = [payment.payer?.first_name, payment.payer?.last_name]
+            .filter(Boolean).join(" ") || payerEmail.split("@")[0];
+          const templateData = {
+            orderNumber,
+            customerName,
+            productName: payment.description || "Producto ILINGUE RELAX",
+            amount: payment.transaction_amount ?? null,
+            currency: payment.currency_id || "PEN",
+            method,
+            orderDate: payment.date_created || new Date().toISOString(),
+          };
+          const idemBase = `mp-pending-${payment.id}`;
+          // Fire both emails in parallel, best-effort
+          await Promise.allSettled([
+            supabase.functions.invoke("send-transactional-email", {
+              body: {
+                templateName: "customer-manual-pending",
+                recipientEmail: payerEmail,
+                idempotencyKey: `${idemBase}-customer`,
+                templateData,
+              },
+            }),
+            supabase.functions.invoke("send-transactional-email", {
+              body: {
+                templateName: "admin-manual-pending",
+                recipientEmail: "hola@ilinguerelax.com",
+                idempotencyKey: `${idemBase}-admin`,
+                templateData: {
+                  ...templateData,
+                  customerEmail: payerEmail,
+                  customerWhatsapp: payment.payer?.phone
+                    ? `${payment.payer.phone.area_code || ""}${payment.payer.phone.number || ""}`
+                    : "",
+                  country: payment.payer?.address?.country_id || "",
+                },
+              },
+            }),
+          ]).catch((e) => console.error("MP pending emails failed:", e));
+        }
         break;
       }
       case "plan": {

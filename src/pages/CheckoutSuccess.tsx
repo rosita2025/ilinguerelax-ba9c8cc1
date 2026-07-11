@@ -1,13 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package } from "lucide-react";
+import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package, Download, Gift, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
+import { useToast } from "@/hooks/use-toast";
+
+interface BonusEntry { name?: string; drive_url?: string; access_key?: string }
+interface DeliveryItem {
+  sku: string;
+  name: string;
+  drive_url: string | null;
+  access_key: string | null;
+  bonus_name: string | null;
+  bonus_drive_url: string | null;
+  bonus_access_key: string | null;
+  bonuses: BonusEntry[] | null;
+  cover_image_url: string | null;
+}
 
 export default function CheckoutSuccess() {
   const [sp] = useSearchParams();

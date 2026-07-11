@@ -136,15 +136,31 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
     {
       name: "checkout-prueba-1",
       storage: createJSONStorage(() => localStorage),
-      version: 3,
-      merge: (persisted, current) => ({
-        ...current,
-        ...(persisted as object),
-        buyer: {
-          ...current.buyer,
-          ...((persisted as { buyer?: BuyerInfo })?.buyer ?? {}),
-        },
-      }),
+      // Bump de versión para purgar caches con productos demo antiguos.
+      version: 4,
+      migrate: (persisted: any, _fromVersion) => {
+        if (persisted && Array.isArray(persisted.items)) {
+          persisted.items = persisted.items.filter(
+            (i: PruebaItem) => !PHANTOM_IDS.has(i.id),
+          );
+        }
+        return persisted;
+      },
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<PruebaStore>;
+        const cleanItems = Array.isArray(p.items)
+          ? p.items.filter((i) => !PHANTOM_IDS.has(i.id))
+          : current.items;
+        return {
+          ...current,
+          ...p,
+          items: cleanItems,
+          buyer: {
+            ...current.buyer,
+            ...((p as { buyer?: BuyerInfo })?.buyer ?? {}),
+          },
+        };
+      },
     },
   ),
 );

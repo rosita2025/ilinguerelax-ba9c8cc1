@@ -93,12 +93,18 @@ export default function CheckoutSuccess() {
       body: {
         customerEmail: buyer.email,
         customerName: buyer.fullName,
+        customerPhone: buyer.phone,
+        customerCountry: (buyer as any).country || region.country || undefined,
         orderId: orderNumber,
         skus,
+        amount: total,
+        currency: "USD",
+        provider,
         idempotencyKey: idemKey,
         force: opts?.force === true,
       },
     });
+
   };
 
   const resendDigital = async () => {

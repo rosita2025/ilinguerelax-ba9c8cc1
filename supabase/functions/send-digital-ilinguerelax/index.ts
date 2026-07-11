@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { resend } from "../_shared/brevo.ts";
 import { BRAND, escapeHtml, renderBrandedEmail } from "../_shared/emailBrand.ts";
+import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,11 +12,17 @@ const corsHeaders = {
 interface Body {
   customerEmail: string;
   customerName?: string;
+  customerPhone?: string;
+  customerCountry?: string;
   orderId?: string;
   skus: string[];
+  amount?: number;
+  currency?: string;
+  provider?: string;
   idempotencyKey?: string;
   force?: boolean;
 }
+
 
 interface Bonus { name?: string | null; drive_url?: string | null; access_key?: string | null }
 interface Product {
@@ -35,7 +42,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { customerEmail, customerName, orderId, skus, idempotencyKey, force }: Body = await req.json();
+    const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey, force }: Body = await req.json();
     if (!customerEmail || !Array.isArray(skus) || skus.length === 0) {
       return new Response(JSON.stringify({ error: "customerEmail and skus required" }), {
         status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -175,6 +182,26 @@ serve(async (req) => {
         last_event: "sent",
         last_event_at: new Date().toISOString(),
       }, { onConflict: "idempotency_key" });
+
+    // Sync buyer to Brevo "Clientes iLingue Relax" list. Runs after the email
+    // to avoid blocking delivery if Brevo is slow; failures only log.
+    try {
+      await upsertBrevoContact({
+        email: customerEmail,
+        name: customerName,
+        phone: customerPhone,
+        country: customerCountry,
+        productName: products.map((p) => p.name).filter(Boolean).join(" + "),
+        skus,
+        amount,
+        currency,
+        orderNumber: orderId,
+        provider,
+      });
+    } catch (e) {
+      console.error("[send-digital-ilinguerelax] brevo upsert failed", e);
+    }
+
 
     return new Response(JSON.stringify({ success: true, sent: products.length, result: r }), {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },

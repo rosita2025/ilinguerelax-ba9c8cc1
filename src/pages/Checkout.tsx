@@ -40,9 +40,16 @@ export default function Checkout() {
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
-    // Use adminSku alias when the checkout slug doesn't match the admin SKU
-    // (e.g. /checkouts/1000-verbos → digital_products.sku = "1-000-verbos-...").
-    const adminSku = staticItem?.adminSku ?? slug;
+    // Resolve the admin SKU automatically for every product:
+    // 1) explicit `adminSku` in the static catalog,
+    // 2) otherwise derive it from `productPath` (/products/<sku>),
+    // 3) otherwise fall back to the URL slug itself.
+    // This keeps /checkouts/:slug in sync with /admin/products/:sku for every
+    // product (price, image, upsells, with or without upsell) with zero manual
+    // wiring per SKU.
+    const derivedFromPath = staticItem?.productPath?.replace(/^\/products\//, "") || null;
+    const adminSku = staticItem?.adminSku ?? derivedFromPath ?? slug;
+
 
     const load = async () => {
       setLoadingDb(true);

@@ -2,91 +2,145 @@ import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import { BRAND, escapeHtml, renderBrandedEmail, formatLocalFromUsd } from '../_shared/emailBrand.ts'
 
-// ------- Abandoned cart preview (mirrors process-abandoned-carts) -------
-const COUPON_CODE = 'NEW10'
-
-function buildEmail(p: { name: string; headline: string; body: string; ctaText: string; ctaUrl: string; footer: string; color: string }) {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;background-color:#f4f4f5;">
-<div style="max-width:600px;margin:0 auto;padding:40px 20px;">
-  <div style="background:linear-gradient(135deg,${p.color} 0%,${p.color}dd 100%);border-radius:16px 16px 0 0;padding:40px;text-align:center;">
-    <h1 style="color:white;margin:0;font-size:26px;">${p.headline}</h1>
-  </div>
-  <div style="background:white;padding:40px;border-radius:0 0 16px 16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-    <p style="font-size:18px;color:#1f2937;margin-bottom:24px;">Hola ${p.name}!</p>
-    <div style="font-size:16px;color:#4b5563;line-height:1.6;">${p.body}</div>
-    <div style="text-align:center;margin:32px 0;">
-      <a href="${p.ctaUrl}" style="display:inline-block;background:linear-gradient(135deg,${p.color} 0%,${p.color}dd 100%);color:white;text-decoration:none;padding:16px 40px;border-radius:12px;font-size:18px;font-weight:bold;box-shadow:0 4px 14px ${p.color}66;">${p.ctaText}</a>
-    </div>
-    <p style="font-size:14px;color:#9ca3af;text-align:center;margin-top:24px;">${p.footer}</p>
-  </div>
-  <div style="text-align:center;padding:24px;color:#9ca3af;font-size:12px;">
-    <p style="margin:0;">© ${new Date().getFullYear()} iLingue Relax · ilinguerelax.com</p>
-    <p style="margin:8px 0 0 0;">Si no deseas recibir más correos, simplemente ignora este mensaje.</p>
-  </div>
-</div></body></html>`
+// -------- Sample data (mirrors production) --------
+const SAMPLE_PRODUCT = {
+  name: '5,000 Palabras en Inglés con Pronunciación',
+  sku: '5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa',
+  price_usd: 22,
+  cover: 'https://ilinguerelax.com/placeholder.svg',
 }
 
-function cupon() {
-  return `<div style="background:linear-gradient(135deg,#f3e8ff,#ede9fe);border:2px dashed #8b5cf6;border-radius:12px;padding:16px 24px;margin:24px 0;text-align:center;">
-    <p style="margin:0 0 8px 0;color:#6b7280;font-size:14px;">Usa este cupón al pagar y obtén un 10% de descuento extra:</p>
-    <p style="margin:0;font-size:28px;font-weight:900;letter-spacing:4px;color:#7c3aed;">${COUPON_CODE}</p>
+// -------- Digital delivery preview (mirrors send-digital-ilinguerelax) --------
+function buildDigitalPreview() {
+  const firstName = 'María'
+  const orderRef = 'ILR-ST-20260710-ABC123'
+  const products = [
+    {
+      name: SAMPLE_PRODUCT.name,
+      price_usd: 22,
+      drive_url: 'https://drive.google.com/file/d/EXAMPLE/view',
+      access_key: '123A',
+      cover: SAMPLE_PRODUCT.cover,
+      bonuses: [
+        { name: 'Bonus 1 — Guía de pronunciación UK/USA', drive_url: 'https://drive.google.com/example-bonus-1', access_key: 'B1X' },
+        { name: 'Bonus 2 — Diccionario básico PDF', drive_url: 'https://drive.google.com/example-bonus-2', access_key: null },
+      ],
+    },
+    {
+      name: '500 Preguntas en Inglés (adicional)',
+      price_usd: 7,
+      drive_url: 'https://drive.google.com/file/d/EXAMPLE2/view',
+      access_key: '456B',
+      cover: SAMPLE_PRODUCT.cover,
+      bonuses: [],
+    },
+  ]
+  const hasMultiple = products.length > 1
+  const blocks = products.map((p) => {
+    const bonusHtml = p.bonuses.length
+      ? `<div style="margin-top:14px;padding-top:14px;border-top:1px dashed ${BRAND.border};">
+          <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">🎁 Bonos incluidos</div>
+          ${p.bonuses.map((b, i) => `<div style="margin:6px 0;font-size:13px;color:#374151;"><strong>${escapeHtml(b.name || `Bonus ${i + 1}`)}:</strong> <a href="${escapeHtml(b.drive_url)}" style="color:${BRAND.primary};text-decoration:underline;">Descargar</a>${b.access_key ? ` · Clave: <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code>` : ''}</div>`).join('')}
+        </div>`
+      : `<div style="margin-top:12px;font-size:12px;color:${BRAND.muted};font-style:italic;">Sin bonos adicionales para este producto.</div>`
+    return `<div style="border:1px solid ${BRAND.border};border-radius:12px;padding:20px;margin:14px 0;background:${BRAND.bg};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+        <td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>
+        <td valign="top"><div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name)}</div><div style="font-size:12px;color:${BRAND.muted};margin-top:2px;">USD ${p.price_usd.toFixed(2)}</div></td>
+      </tr></table>
+      <div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">⬇ Descargar / Ver en Drive</a></div>
+      <div style="margin-top:10px;font-size:13px;color:#374151;"><strong>Clave de acceso:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>
+      ${bonusHtml}
+    </div>`
+  }).join('')
+  const stepsHtml = `<div style="background:#eff6ff;border-left:4px solid #0ea5e9;border-radius:8px;padding:14px 18px;margin:0 0 18px;font-size:13px;color:#1e40af;line-height:1.6;">📖 <strong>Cómo descargar cada producto:</strong><ol style="margin:8px 0 0;padding-left:20px;"><li>Haz clic en "Descargar / Ver en Drive" de cada producto.</li><li>Se abrirá Google Drive → pulsa ⬇ para guardar el PDF.</li><li>Si pide clave de acceso, cópiala del email.</li><li>Repite con el producto adicional (upsell).</li></ol></div>`
+  const tipHtml = `<div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:8px;padding:14px 18px;margin:20px 0;font-size:13px;color:#78350f;">💡 <strong>Consejo:</strong> guarda los PDFs en tu teléfono o computadora.</div>`
+  return {
+    subject: `Gracias por tu compra — ${orderRef} · enlaces de descarga (incluye producto adicional)`,
+    html: renderBrandedEmail({
+      preheader: `Enlaces de descarga de tu compra ${orderRef}`,
+      headline: `¡Gracias por tu compra, ${firstName}! 🎉`,
+      orderNumber: orderRef,
+      intro: `Tu compra incluye <strong>${products.length} productos</strong> (principal + adicional). Abajo tienes el enlace de descarga y la clave de cada uno.`,
+      bodyHtml: `${stepsHtml}${blocks}${tipHtml}`,
+      lang: 'es',
+    }),
+  }
+}
+
+// -------- Abandoned cart preview (mirrors process-abandoned-carts) --------
+const COUPON_CODE = 'NEW10'
+
+function couponBlock(): string {
+  return `<div style="background:#fff7ed;border:2px dashed ${BRAND.accent};border-radius:12px;padding:16px 20px;margin:20px 0;text-align:center;">
+    <div style="font-size:13px;color:#9a3412;margin-bottom:6px;">Usa este cupón al pagar y obtén un 10% de descuento extra:</div>
+    <div style="font-size:26px;font-weight:900;letter-spacing:4px;color:${BRAND.accent};">${COUPON_CODE}</div>
   </div>`
 }
 
-const productUrl = 'https://ilinguerelax.com/products/ingles-relax-5000-palabras'
-const productName = '5,000 Palabras'
-const name = 'María'
+function productCard(): string {
+  const local = formatLocalFromUsd(SAMPLE_PRODUCT.price_usd, { language: 'es' })
+  return `<div style="border:1px solid ${BRAND.border};border-radius:12px;padding:16px;margin:16px 0;background:${BRAND.soft};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(SAMPLE_PRODUCT.cover)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>
+      <td valign="top"><div style="font-size:15px;font-weight:bold;color:${BRAND.text};line-height:1.35;">${escapeHtml(SAMPLE_PRODUCT.name)}</div><div style="margin-top:6px;font-size:14px;color:${BRAND.primary};font-weight:bold;">Precio: ${local}</div></td>
+    </tr></table>
+  </div>`
+}
 
-const abandonedEmails = [
-  {
-    day: 'Día 1',
-    subject: `Tu carrito está esperando - iLingue Relax ${productName} 🛒`,
-    html: buildEmail({
-      name, headline: '¡Tu libro te está esperando!',
-      body: `<p>Notamos que estabas a punto de conseguir <strong>"Inglés Relax - 5,000 Palabras"</strong> pero no completaste la compra.</p>
-      <p>¡No te preocupes! Tu selección sigue disponible al <strong>precio especial de $12</strong> (antes $54).</p>${cupon()}`,
-      ctaText: 'Completar mi compra →', ctaUrl: productUrl,
-      footer: 'Este precio especial podría no estar disponible por mucho tiempo.', color: '#8b5cf6',
+function buildAbandonedPreview(index: number) {
+  const firstName = 'María'
+  const productUrl = `${BRAND.siteUrl}/products/${SAMPLE_PRODUCT.sku}`
+  const local = formatLocalFromUsd(SAMPLE_PRODUCT.price_usd, { language: 'es' })
+  const priceInline = ` (${local})`
+  const card = productCard()
+  const templates = [
+    {
+      subject: `Tu carrito te espera — ${SAMPLE_PRODUCT.name}`,
+      headline: '¡Tu material te está esperando!',
+      intro: `Hola ${firstName}, notamos que estabas por llevar <strong>${escapeHtml(SAMPLE_PRODUCT.name)}</strong>${priceInline} y no completaste la compra.`,
+      body: `${card}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Tu selección sigue disponible. Aprende a tu ritmo, con descarga inmediata en PDF.</p>${couponBlock()}`,
+      note: 'Este cupón puede caducar pronto.',
+    },
+    {
+      subject: `${firstName}, sigue pendiente tu ${SAMPLE_PRODUCT.name}`,
+      headline: 'Por qué miles ya aprenden con nosotros',
+      intro: `Ayer viste <strong>${escapeHtml(SAMPLE_PRODUCT.name)}</strong>${priceInline}. Aquí lo que incluye:`,
+      body: `<ul style="color:#4b5563;line-height:1.9;font-size:14px;padding-left:20px;"><li>✅ Contenido con pronunciación adaptada</li><li>✅ Bonos gratis incluidos</li><li>✅ Descarga inmediata en PDF</li><li>✅ Actualizaciones de por vida</li></ul>${card}${couponBlock()}`,
+      note: 'Más de 1,200 estudiantes ya confían en el método Relax.',
+    },
+    {
+      subject: `⏰ Última semana con descuento — ${SAMPLE_PRODUCT.name}`,
+      headline: 'El tiempo corre',
+      intro: `Han pasado varios días desde que viste <strong>${escapeHtml(SAMPLE_PRODUCT.name)}</strong>${priceInline}. El descuento es por tiempo limitado.`,
+      body: `${card}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Solo necesitas 10-15 minutos al día para avanzar. Sin estrés, a tu ritmo.</p>${couponBlock()}`,
+      note: 'Recuerda: incluye bonos gratis.',
+    },
+    {
+      subject: `Un último recordatorio — ${SAMPLE_PRODUCT.name}`,
+      headline: 'Un último mensaje para ti',
+      intro: `Ha pasado un mes desde que viste <strong>${escapeHtml(SAMPLE_PRODUCT.name)}</strong>. Este será nuestro último correo — te dejamos un cupón por si algún día decides dar el paso.`,
+      body: `${card}${couponBlock()}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Cuando estés listo, estaremos aquí para ayudarte. 💜</p>`,
+      note: 'Este es nuestro último correo sobre este pedido.',
+    },
+  ]
+  const t = templates[Math.max(0, Math.min(3, index))]
+  return {
+    subject: t.subject,
+    html: renderBrandedEmail({
+      preheader: t.intro.replace(/<[^>]+>/g, '').slice(0, 140),
+      headline: t.headline,
+      intro: t.intro,
+      bodyHtml: t.body,
+      ctaText: 'Completar mi compra →',
+      ctaUrl: productUrl,
+      secondaryNote: t.note,
+      lang: 'es',
     }),
-  },
-  {
-    day: 'Día 7',
-    subject: `Tu carrito está esperando - iLingue Relax ${productName} 🧠`,
-    html: buildEmail({
-      name, headline: '¿Por qué miles ya aprenden con nosotros?',
-      body: `<p>Hace unos días estuviste viendo <strong>"Inglés Relax - 5,000 Palabras"</strong>. Estos son los beneficios:</p>
-      <ul style="color:#4b5563;line-height:2;"><li>✅ 5,000 palabras con pronunciación en español</li><li>✅ Fonética UK y USA</li><li>✅ 52 capítulos temáticos</li><li>✅ 4 Bonus GRATIS</li><li>✅ Descarga inmediata</li></ul>
-      <p>Todo por solo <strong>$12</strong> en lugar de $54. ¡78% de descuento!</p>${cupon()}`,
-      ctaText: '¡Quiero mi libro ahora! 📚', ctaUrl: productUrl,
-      footer: 'Más de 1,200 personas ya confían en el método Relax.', color: '#6366f1',
-    }),
-  },
-  {
-    day: 'Día 15',
-    subject: `⏰ Tu carrito está esperando - iLingue Relax ${productName}`,
-    html: buildEmail({
-      name, headline: '¡Última oportunidad!',
-      body: `<p>Han pasado 15 días desde que visitaste <strong>"Inglés Relax - 5,000 Palabras"</strong>.</p>
-      <p>El precio especial de <strong>$12</strong> (ahorro del 78%) es por tiempo limitado.</p>${cupon()}`,
-      ctaText: 'Aprovechar el descuento →', ctaUrl: productUrl,
-      footer: 'Esta podría ser tu última oportunidad a este precio.', color: '#ef4444',
-    }),
-  },
-  {
-    day: 'Día 30',
-    subject: `Tu carrito está esperando - iLingue Relax ${productName} 🎁`,
-    html: buildEmail({
-      name, headline: 'Un último mensaje',
-      body: `<p>Ha pasado un mes desde que visitaste nuestra página. Este será nuestro último correo sobre <strong>"Inglés Relax - 5,000 Palabras"</strong>.</p>
-      <p>Antes de despedirnos, aquí tienes un cupón especial del 10% por si algún día decides dar el paso:</p>${cupon()}
-      <p>Aprender inglés no tiene que ser difícil. Cuando estés lista, aquí estaremos. 💜</p>`,
-      ctaText: 'Guardar mi enlace de compra →', ctaUrl: productUrl,
-      footer: '¡Te deseamos lo mejor! Este es nuestro último correo.', color: '#8b5cf6',
-    }),
-  },
-]
+  }
+}
 
 async function renderTemplate(name: string): Promise<{ subject: string; html: string }> {
   const entry = TEMPLATES[name]
@@ -107,11 +161,9 @@ Deno.serve(async (req) => {
     let subject = ''
     let html = ''
     if (kind === 'order') ({ subject, html } = await renderTemplate('thank-you'))
-    else if (kind === 'digital') ({ subject, html } = await renderTemplate('material-delivery'))
-    else if (kind === 'abandoned') {
-      const e = abandonedEmails[Math.max(0, Math.min(3, idx))]
-      subject = e.subject; html = e.html
-    } else throw new Error(`Unknown kind: ${kind}`)
+    else if (kind === 'digital') ({ subject, html } = buildDigitalPreview())
+    else if (kind === 'abandoned') ({ subject, html } = buildAbandonedPreview(idx))
+    else throw new Error(`Unknown kind: ${kind}`)
 
     if (url.searchParams.get('format') === 'json') {
       return new Response(JSON.stringify({ subject, html }), {

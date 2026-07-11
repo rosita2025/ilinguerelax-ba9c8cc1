@@ -79,7 +79,14 @@ const ProductDynamic = () => {
     };
   }, [slug]);
 
-  const local = useLocalCurrency(product ? Number(product.price_usd) : 0);
+  // Pick the correct USD price based on visitor region (LATAM vs. rest of the world).
+  const region = useRegionTier();
+  const effectiveUsd = product
+    ? (region.tier === "latam" && product.price_usd_latam != null
+        ? Number(product.price_usd_latam)
+        : Number(product.price_usd))
+    : 0;
+  const local = useLocalCurrency(effectiveUsd);
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
@@ -135,10 +142,10 @@ const ProductDynamic = () => {
               <div className="flex items-baseline gap-3 mb-5">
                 <span className="text-4xl font-bold text-primary">{displayFormatted}</span>
                 {!isPEN && !local.isUsd && (
-                  <span className="text-sm text-muted-foreground">≈ ${Number(product.price_usd).toFixed(2)} USD</span>
+                  <span className="text-sm text-muted-foreground">≈ ${effectiveUsd.toFixed(2)} USD</span>
                 )}
                 {isPEN && (
-                  <span className="text-sm text-muted-foreground">≈ ${Number(product.price_usd).toFixed(2)} USD</span>
+                  <span className="text-sm text-muted-foreground">≈ ${effectiveUsd.toFixed(2)} USD</span>
                 )}
               </div>
 

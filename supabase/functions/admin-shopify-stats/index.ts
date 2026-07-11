@@ -1,3 +1,4 @@
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 // Aggregates OWN funnel_events data (Purchase / InitiateCheckout / ViewContent)
 // into a Shopify/Power BI style KPI report. No Shopify Admin token required.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -32,6 +33,9 @@ const PAGE_LABEL = (p: string | null): string => {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const csrfBlock = assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
 
   const url = new URL(req.url);
   const adminKey = req.headers.get("x-admin-key") || url.searchParams.get("key");

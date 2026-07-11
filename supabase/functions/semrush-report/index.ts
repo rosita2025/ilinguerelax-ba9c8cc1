@@ -1,3 +1,4 @@
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const corsHeaders = {
@@ -32,6 +33,9 @@ function rowsToObjects(data: any): any[] {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const csrfBlock = assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
   try {
     const { adminKey, database = "us", limit = 25 } = await req.json().catch(() => ({}));
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");

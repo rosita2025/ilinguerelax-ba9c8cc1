@@ -130,31 +130,14 @@ export default function CheckoutSuccess() {
     let digitalTimer: ReturnType<typeof setTimeout> | null = null;
 
     (async () => {
-      try {
-        await supabase.functions.invoke("send-order-confirmation", {
-          body: {
-            customerEmail: buyer.email,
-            customerName: buyer.fullName,
-            orderId: orderNumber,
-            paymentReference: paymentId || externalRef || undefined,
-            total,
-            currency: "USD",
-            paymentProvider: provider,
-            items: items.map((i) => ({
-              id: i.id,
-              name: i.name,
-              quantity: i.quantity,
-              price: itemPrice(i, region.tier),
-              image: i.image,
-            })),
-          },
-        });
-      } catch (e) {
-        console.error("send-order-confirmation failed", e);
-      }
-      // Wait ~90s before sending the digital delivery email so it arrives as a
-      // clearly separate second message (better deliverability, less "spammy").
-      // Idempotency on the server side prevents duplicates if the user refreshes.
+      // NOTE: The "Thanks for your purchase" email + admin "New order" notification
+      // are sent server-side from stripe-webhook / paypal-webhook / mercadopago-webhook
+      // via sendThankYouEmail(). We no longer call send-order-confirmation from the
+      // client — that caused duplicate emails to both the customer and the admin,
+      // each with a different order number (ILR-ST-XXXXXX vs #XXXXXXXX).
+      //
+      // From the client we only trigger the second "digital delivery" email
+      // ~90 seconds later so it arrives as a clearly separate message.
       digitalTimer = setTimeout(async () => {
         try {
           await sendDigitalEmail();
@@ -167,6 +150,7 @@ export default function CheckoutSuccess() {
 
     return () => {
       if (digitalTimer) clearTimeout(digitalTimer);
+
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

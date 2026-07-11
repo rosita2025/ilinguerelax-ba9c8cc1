@@ -152,6 +152,23 @@ Deno.serve(async (req) => {
       return json({ success: true, sku: p.sku });
     }
 
+    if (action === "rename") {
+      const oldSku = (body.oldSku as string || "").trim();
+      const newSku = (body.newSku as string || "").trim().toLowerCase();
+      if (!oldSku || !newSku) return json({ error: "oldSku y newSku requeridos" }, 400);
+      if (oldSku === newSku) return json({ success: true, sku: newSku });
+      if (!SKU_RE.test(newSku)) return json({ error: "SKU nuevo inválido (usa minúsculas, números y guiones)" }, 400);
+
+      const { data: existing } = await admin.from("digital_products").select("sku").eq("sku", newSku).maybeSingle();
+      if (existing) return json({ error: "Ya existe un producto con ese SKU" }, 400);
+
+      const { error: e1 } = await admin.from("digital_products").update({ sku: newSku }).eq("sku", oldSku);
+      if (e1) throw e1;
+      await admin.from("product_upsells").update({ product_sku: newSku }).eq("product_sku", oldSku);
+      await admin.from("product_upsells").update({ upsell_sku: newSku }).eq("upsell_sku", oldSku);
+      return json({ success: true, sku: newSku });
+    }
+
     if (action === "delete") {
       const sku = body.sku as string;
       if (!sku) return json({ error: "SKU requerido" }, 400);

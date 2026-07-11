@@ -110,21 +110,14 @@ const ProductSpanish3000VerbsBook = () => {
     loadProduct();
   }, []);
 
+  const AMAZON_URL_3000 = "https://www.amazon.com/s?k=Spanish+Relax+3000+Verbs";
   const handleAddToCart = async () => {
-    if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Pre-order product is not available yet. Please try again in a moment.");
-      return;
+    // Physical book — Shopify removed. Send buyers to Amazon.
+    if (typeof window !== "undefined") {
+      window.open(AMAZON_URL_3000, "_blank", "noopener,noreferrer");
     }
-    const variant = shopifyProduct.node.variants.edges[0]?.node;
-    await addItem({
-      product: shopifyProduct,
-      variantId: shopifyVariantId,
-      variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: "17.00", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: variant?.selectedOptions || [],
-    });
   };
+
 
   const pixelParams = useMemo(
     () => ({

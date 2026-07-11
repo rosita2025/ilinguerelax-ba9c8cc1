@@ -34,7 +34,7 @@ function rowsToObjects(data: any): any[] {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const csrfBlock = assertAdminCsrf(req);
+  const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;
   try {
     const { adminKey, database = "us", limit = 25 } = await req.json().catch(() => ({}));

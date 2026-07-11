@@ -275,6 +275,35 @@ const AdminProductEdit = () => {
               />
             </div>
 
+            {/* Preset rápido: política estándar */}
+            <div className="p-3 border-2 border-primary/40 rounded-lg bg-primary/5 space-y-2">
+              <div className="text-sm font-semibold">⚡ Política estándar (1 clic)</div>
+              <p className="text-xs text-muted-foreground">
+                <b>Hotmart</b>: solo LATAM (excepto 🇨🇺 Cuba, 🇻🇪 Venezuela y 🇳🇮 Nicaragua, donde Hotmart no opera bien).<br />
+                <b>Tienda propia</b>: todo el mundo, incluyendo 🇵🇪 Perú, 🇺🇸 USA, 🇨🇦 Canadá — oculta en el resto de LATAM (los que ya compran por Hotmart).
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => {
+                  const LATAM = REGIONS.latam.codes; // MX, GT, HN, SV, NI, CR, PA, CU, DO, PR, CO, VE, EC, PE, BO, BR, PY, UY, AR, CL
+                  const HOTMART_BLOCKED = ["CU", "VE", "NI"];
+                  // Tienda: excluye LATAM salvo Perú y los bloqueados en Hotmart (para que igual tengan un canal)
+                  const storeExcl = LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c));
+                  // Hotmart: excluye todo el mundo salvo LATAM; y además bloquea CU/VE/NI
+                  const allCodes = Object.keys(COUNTRY_INFO);
+                  const hotExcl = Array.from(new Set([
+                    ...allCodes.filter((c) => !LATAM.includes(c)),
+                    ...HOTMART_BLOCKED,
+                  ]));
+                  update("store_excluded_countries", storeExcl);
+                  update("hotmart_excluded_countries", hotExcl);
+                }}
+              >
+                Aplicar política estándar
+              </Button>
+            </div>
+
             {/* Países excluidos POR CANAL */}
             {(["store_excluded_countries", "hotmart_excluded_countries"] as const).map((field) => {
               const isStore = field === "store_excluded_countries";

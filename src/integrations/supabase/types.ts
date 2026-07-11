@@ -917,14 +917,14 @@ export type Database = {
         }
         Insert: {
           country?: string | null
-          customer_name?: string | null
+          customer_name?: never
           order_created_at?: string | null
           product_key?: string | null
           product_name?: string | null
         }
         Update: {
           country?: string | null
-          customer_name?: string | null
+          customer_name?: never
           order_created_at?: string | null
           product_key?: string | null
           product_name?: string | null

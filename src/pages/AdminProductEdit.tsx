@@ -319,6 +319,8 @@ const AdminProductEdit = () => {
               <div><b>Preset típico "Hotmart solo LATAM":</b> en <i>Excluir de la Tienda</i> toca 🌎 LATAM; en <i>Excluir de Hotmart</i> toca 🇺🇸 Angloparlantes + 🇪🇺 Europa + 🌏 Asia.</div>
               <div><b>Tienda mundial:</b> deja Hotmart vacío y ambas listas vacías.</div>
             </div>
+          </Card>
+
 
 
 

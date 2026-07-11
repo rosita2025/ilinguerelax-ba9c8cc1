@@ -3,6 +3,7 @@
 // Validates x-signature header (HMAC SHA256) and logs payment events.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 
 const encoder = new TextEncoder();
 

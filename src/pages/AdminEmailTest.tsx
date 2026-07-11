@@ -61,14 +61,28 @@ const providerToSource = (p?: string | null): Source => {
   return "digital";
 };
 
+const CACHE_KEY = "admin-orders-cache-v1";
+
 const AdminEmailTest = () => {
   const { adminKey } = useAdminKey();
-  const [rows, setRows] = useState<OrderRow[]>([]);
+  const [rows, setRows] = useState<OrderRow[]>(() => {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (raw) return JSON.parse(raw).rows || [];
+    } catch {}
+    return [];
+  });
   const [loading, setLoading] = useState(false);
-  const [counts, setCounts] = useState<Record<Source, number>>({ manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 });
+  const [counts, setCounts] = useState<Record<Source, number>>(() => {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (raw) return JSON.parse(raw).counts || { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
+    } catch {}
+    return { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
+  });
 
-  const load = async () => {
-    setLoading(true);
+  const load = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("list-admin-orders", {
         body: { adminKey },
@@ -103,7 +117,6 @@ const AdminEmailTest = () => {
         perSource.manual++;
       });
 
-      // Digital sends from Stripe / PayPal / Mercado Pago
       const matchedEmails = new Set(merged.map((m) => m.email.toLowerCase()));
       (digitalRes.data ?? []).forEach((r: any) => {
         const e = (r.customer_email || "").toLowerCase();
@@ -127,17 +140,19 @@ const AdminEmailTest = () => {
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
       setCounts(perSource);
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: merged, counts: perSource })); } catch {}
     } catch (e) {
-      toast.error((e as Error).message);
+      if (!silent) toast.error((e as Error).message);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!adminKey) return;
-    load();
-    const t = setInterval(load, 30000);
+    // Silent background refresh so cached data shows instantly
+    load(rows.length > 0);
+    const t = setInterval(() => load(true), 30000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);

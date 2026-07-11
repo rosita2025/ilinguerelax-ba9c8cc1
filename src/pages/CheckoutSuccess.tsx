@@ -43,6 +43,14 @@ export default function CheckoutSuccess() {
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
 
+  // Build a friendly order number: ILR-<PROVIDER>-<6 chars>
+  // Deterministic from the payment reference so the same payment always maps
+  // to the same order number across refreshes and the confirmation email.
+  const providerCode = provider === "stripe" ? "ST" : provider === "paypal" ? "PP" : provider === "mercadopago" ? "MP" : "OR";
+  const rawRef = String(paymentId || externalRef || paypalToken || "").replace(/[^a-zA-Z0-9]/g, "");
+  const refTail = rawRef ? rawRef.slice(-6).toUpperCase().padStart(6, "0") : Math.random().toString(36).slice(2, 8).toUpperCase();
+  const orderNumber = `ILR-${providerCode}-${refTail}`;
+
   // Gate: only real buyers from Stripe or PayPal should see the confirmation.
   // A visitor without a valid payment reference OR without buyer info in the
   // session store is treated as public/unknown and gets a neutral screen.

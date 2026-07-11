@@ -179,7 +179,7 @@ const AdminEmailTest = () => {
                 Vista unificada: Yape/Plin, Stripe, PayPal y Mercado Pago. Actualiza cada 30s.
               </p>
             </div>
-            <Button variant="outline" onClick={load} disabled={loading}>
+            <Button variant="outline" onClick={() => load(false)} disabled={loading}>
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refrescar
             </Button>
           </header>

@@ -30,38 +30,41 @@ export default function Checkout() {
 
   const staticItem = getCatalogItem(slug);
   const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
+  const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
   const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
 
-  // If slug not in static catalog, try to load from digital_products table.
-  // Also refetches when the tab regains focus so admin edits (price / upsells) show up fast.
+  // Always live-load product + upsells from admin (`digital_products` +
+  // `product_upsells`) so /checkouts/:slug mirrors /admin/products/:sku
+  // exactly, con o sin upsell. Static catalog only serves as a fallback shell.
   useEffect(() => {
-    if (!slug || staticItem) return;
+    if (!slug) return;
     let cancelled = false;
+
     const load = async () => {
       setLoadingDb(true);
-      // Cache-buster: unique filter forces PostgREST to bypass any intermediary cache.
       const cb = Date.now();
+
+      // 1) Product row (skip if we already have static fallback and it exists)
       const { data, error } = await supabase
         .from("digital_products")
         .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
         .eq("sku", slug)
         .eq("active", true)
-        .gt("price_usd", -1 - (cb % 7) * 0.0000001) // varies request signature to bust caches
+        .gt("price_usd", -1 - (cb % 7) * 0.0000001)
         .maybeSingle();
+
       if (cancelled) return;
-      if (error || !data) {
-        setDbMissing(true);
-        setLoadingDb(false);
-        return;
-      }
-      // Fetch configured upsells for this product from admin.
+
+      // 2) Admin-configured upsells for this SKU — always fetched so removing
+      //    all upsells in admin also removes them from the checkout.
       const { data: upRows } = await supabase
         .from("product_upsells")
         .select("upsell_sku, discount_pct, sort_order")
         .eq("product_sku", slug)
         .order("sort_order", { ascending: true });
-      let upsells: CatalogItem["upsells"] = undefined;
+
+      let upsells: CatalogItem["upsells"] | null = null;
       if (upRows && upRows.length) {
         const skus = upRows.map((u) => u.upsell_sku);
         const { data: upProducts } = await supabase
@@ -88,8 +91,21 @@ export default function Checkout() {
             };
           })
           .filter(Boolean) as CatalogItem["upsells"];
+      } else {
+        // Empty array = "admin cleared all upsells for this SKU"
+        upsells = [];
       }
+
       if (cancelled) return;
+      setAdminUpsells(upsells);
+
+      if (error || !data) {
+        // No DB row → rely on static catalog if any, otherwise mark missing.
+        setDbMissing(!staticItem);
+        setLoadingDb(false);
+        return;
+      }
+
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
@@ -100,7 +116,7 @@ export default function Checkout() {
         image: (data.cover_image_url || "/placeholder.svg") + imgBust,
         description: data.description || undefined,
         productPath: `/products/${data.sku}`,
-        upsells,
+        upsells: upsells ?? undefined,
         ...(priceLatam != null && {
           regionPrices: { latam: priceLatam, global: priceGlobal },
         }),
@@ -108,8 +124,8 @@ export default function Checkout() {
       setDbMissing(false);
       setLoadingDb(false);
     };
-    load();
 
+    load();
     const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load });
     return () => {
       cancelled = true;
@@ -117,8 +133,14 @@ export default function Checkout() {
     };
   }, [slug, staticItem]);
 
-  const catalogItem = staticItem ?? dbItem;
+  // Merge: DB takes precedence for price/image/name; admin upsells always win
+  // over static ones once they've been fetched (including the "empty" state).
+  const mergedFromStatic: CatalogItem | null = staticItem
+    ? { ...staticItem, ...(adminUpsells !== null ? { upsells: adminUpsells.length ? adminUpsells : undefined } : {}) }
+    : null;
+  const catalogItem = dbItem ?? mergedFromStatic;
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
+
 
   // Auto-load product from URL slug (Shopify-style). Also live-syncs price/image/upsells
   // when the admin edits the catalog and pushes an update — without dropping items or state.

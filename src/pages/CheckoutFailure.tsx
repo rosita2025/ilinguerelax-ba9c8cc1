@@ -62,7 +62,7 @@ export default function CheckoutFailure() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           {(mapped?.retryable ?? true) && (
             <Button asChild size="lg" className="gap-2">
-              <Link to="/checkouts/prueba-1"><RefreshCcw className="w-4 h-4" /> {t.tryAgain}</Link>
+              <Link to="/checkouts"><RefreshCcw className="w-4 h-4" /> {t.tryAgain}</Link>
             </Button>
           )}
           <Button asChild variant="outline" size="lg" className="gap-2">

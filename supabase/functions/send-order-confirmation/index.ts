@@ -18,6 +18,8 @@ interface OrderRequest {
   customerEmail: string;
   customerName?: string;
   orderId?: string;
+  /** Underlying provider transaction id (PaymentIntent, PayPal order, MP payment). */
+  paymentReference?: string;
   total?: number;
   currency?: string;
   paymentProvider?: string;

@@ -12,6 +12,8 @@ interface Body {
   customerName?: string;
   orderId?: string;
   skus: string[];
+  idempotencyKey?: string;
+  force?: boolean;
 }
 
 interface Bonus { name?: string | null; drive_url?: string | null; access_key?: string | null }

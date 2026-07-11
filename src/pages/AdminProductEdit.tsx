@@ -98,21 +98,14 @@ const AdminProductEdit = () => {
             .map((u: UpsellRow) => ({ upsell_sku: u.upsell_sku, discount_pct: u.discount_pct, sort_order: u.sort_order }));
           setUpsells(ups);
         } else {
-          // Nuevo producto: aplicar política estándar automáticamente
-          const LATAM = REGIONS.latam.codes;
-          const HOTMART_BLOCKED = ["CU", "VE", "NI"];
-          const allCodes = Object.keys(COUNTRY_INFO);
-          const storeExcl = LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c));
-          const hotExcl = Array.from(new Set([
-            ...allCodes.filter((c) => !LATAM.includes(c)),
-            ...HOTMART_BLOCKED,
-          ]));
+          // Nuevo producto: por defecto TIENDA MUNDIAL (sin exclusiones, sin Hotmart).
+          // Si luego pegas un enlace de Hotmart, un botón te sugiere la política estándar (LATAM→Hotmart).
           const maxOrder = list.reduce((m, p) => Math.max(m, p.sort_order ?? 0), 0);
           setProduct((p) => ({
             ...p,
             store_enabled: true,
-            store_excluded_countries: storeExcl,
-            hotmart_excluded_countries: hotExcl,
+            store_excluded_countries: [],
+            hotmart_excluded_countries: [],
             sort_order: maxOrder + 1,
           }));
         }

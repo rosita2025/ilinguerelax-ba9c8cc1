@@ -4,7 +4,7 @@ import { resend } from "../_shared/brevo.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf",
 };
 
 const buildAnnouncementHtml = (productName: string, productUrl: string, imageUrl: string): string => {

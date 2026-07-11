@@ -130,14 +130,56 @@ export default function CheckoutSuccess() {
     let digitalTimer: ReturnType<typeof setTimeout> | null = null;
 
     (async () => {
-      // NOTE: The "Thanks for your purchase" email + admin "New order" notification
-      // are sent server-side from stripe-webhook / paypal-webhook / mercadopago-webhook
-      // via sendThankYouEmail(). We no longer call send-order-confirmation from the
-      // client — that caused duplicate emails to both the customer and the admin,
-      // each with a different order number (ILR-ST-XXXXXX vs #XXXXXXXX).
-      //
-      // From the client we only trigger the second "digital delivery" email
-      // ~90 seconds later so it arrives as a clearly separate message.
+      // Client-side fallback for the "Gracias por su compra" + admin "New order"
+      // emails. Primary path is the provider webhook (stripe/paypal/mercadopago
+      // → sendThankYouEmail). If the webhook doesn't fire (missing endpoint,
+      // bad signing secret, network hiccup), the customer would never get the
+      // email. Using the SAME idempotencyKey the webhook uses means:
+      //   - if the webhook already ran, send-transactional-email dedupes and
+      //     this is a no-op (no duplicate email);
+      //   - if the webhook didn't run, this call actually delivers the email.
+      try {
+        const providerKey = String(paymentId || externalRef || paypalToken || orderNumber);
+        const payloadItems = items.map((i) => ({
+          name: i.name,
+          qty: i.quantity,
+          price: itemPrice(i, region.tier),
+        }));
+        const templateData = {
+          orderNumber,
+          customerName: buyer.fullName,
+          customerEmail: buyer.email,
+          customerPhone: buyer.phone,
+          productName: items[0]?.name,
+          items: payloadItems,
+          amount: total,
+          currency: "USD",
+          provider,
+          orderDate: new Date().toISOString(),
+        };
+        await Promise.all([
+          supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "thank-you",
+              recipientEmail: buyer.email,
+              templateData,
+              idempotencyKey: `thank-you-${providerKey}`,
+              purpose: "transactional",
+            },
+          }),
+          supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "admin-sale",
+              templateData,
+              idempotencyKey: `admin-sale-${providerKey}`,
+              purpose: "transactional",
+            },
+          }),
+        ]);
+      } catch (e) {
+        console.error("thank-you fallback failed", e);
+      }
+
       digitalTimer = setTimeout(async () => {
         try {
           await sendDigitalEmail();

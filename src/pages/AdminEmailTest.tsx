@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
-type Source = "manual" | "shopify" | "hotmart" | "digital";
+type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
 
 interface OrderRow {
   id: string;
@@ -39,23 +39,33 @@ const fmt = (iso: string | null) => {
 
 const sourceLabel: Record<Source, string> = {
   manual: "Yape/Plin",
-  shopify: "Shopify",
-  hotmart: "Hotmart",
-  digital: "Digital (email)",
+  stripe: "Stripe",
+  paypal: "PayPal",
+  mercadopago: "Mercado Pago",
+  digital: "Digital",
 };
 
 const sourceColor: Record<Source, string> = {
   manual: "bg-amber-100 text-amber-800",
-  shopify: "bg-emerald-100 text-emerald-800",
-  hotmart: "bg-orange-100 text-orange-800",
+  stripe: "bg-indigo-100 text-indigo-800",
+  paypal: "bg-sky-100 text-sky-800",
+  mercadopago: "bg-cyan-100 text-cyan-800",
   digital: "bg-blue-100 text-blue-800",
+};
+
+const providerToSource = (p?: string | null): Source => {
+  const v = (p || "").toLowerCase();
+  if (v.includes("stripe")) return "stripe";
+  if (v.includes("paypal")) return "paypal";
+  if (v.includes("mercado") || v === "mp") return "mercadopago";
+  return "digital";
 };
 
 const AdminEmailTest = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(false);
-  const [counts, setCounts] = useState({ manual: 0, shopify: 0, hotmart: 0, digital: 0 });
+  const [counts, setCounts] = useState<Record<Source, number>>({ manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 });
 
   const load = async () => {
     setLoading(true);
@@ -65,8 +75,6 @@ const AdminEmailTest = () => {
       });
       if (error) throw error;
       const manualRes = { data: (data as any)?.manual ?? [] };
-      const shopifyRes = { data: (data as any)?.shopify ?? [] };
-      const hotmartRes = { data: (data as any)?.hotmart ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
 
       const digitalByEmail = new Map<string, any>();
@@ -76,6 +84,7 @@ const AdminEmailTest = () => {
       });
 
       const merged: OrderRow[] = [];
+      const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
 
       (manualRes.data ?? []).forEach((r: any) => {
         const d = digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
@@ -91,46 +100,18 @@ const AdminEmailTest = () => {
           status: r.status || "pending",
           delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
         });
+        perSource.manual++;
       });
 
-      (shopifyRes.data ?? []).forEach((r: any) => {
-        merged.push({
-          id: `s-${r.id}`,
-          source: "shopify",
-          created_at: r.created_at,
-          order_ref: r.shopify_order_id || "—",
-          customer: r.customer_name || "—",
-          email: "—",
-          products: r.product_name || "—",
-          amount: "—",
-          status: "paid",
-        });
-      });
-
-      (hotmartRes.data ?? []).forEach((r: any) => {
-        const d = digitalByEmail.get((r.email || "").toLowerCase()) || null;
-        merged.push({
-          id: `h-${r.id}`,
-          source: "hotmart",
-          created_at: r.created_at,
-          order_ref: r.transaction_code || "—",
-          customer: "—",
-          email: r.email,
-          products: r.product_id || r.product_code || "—",
-          amount: "—",
-          status: r.status || "—",
-          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
-        });
-      });
-
-      // Digital sends not matched to any order (Stripe/PayPal direct sends)
+      // Digital sends from Stripe / PayPal / Mercado Pago
       const matchedEmails = new Set(merged.map((m) => m.email.toLowerCase()));
       (digitalRes.data ?? []).forEach((r: any) => {
         const e = (r.customer_email || "").toLowerCase();
         if (matchedEmails.has(e)) return;
+        const src = providerToSource(r.provider);
         merged.push({
           id: `d-${r.id}`,
-          source: "digital",
+          source: src,
           created_at: r.created_at,
           order_ref: r.order_id || "—",
           customer: "—",
@@ -140,16 +121,12 @@ const AdminEmailTest = () => {
           status: r.status || "—",
           delivery: { status: r.status, last_event: r.last_event, last_event_at: r.last_event_at, message_id: r.message_id },
         });
+        perSource[src]++;
       });
 
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
-      setCounts({
-        manual: manualRes.data?.length ?? 0,
-        shopify: shopifyRes.data?.length ?? 0,
-        hotmart: hotmartRes.data?.length ?? 0,
-        digital: digitalRes.data?.length ?? 0,
-      });
+      setCounts(perSource);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -184,7 +161,7 @@ const AdminEmailTest = () => {
                 <ShoppingBag className="w-7 h-7 text-primary" /> Pedidos de clientes
               </h1>
               <p className="text-muted-foreground text-sm mt-1">
-                Vista unificada: Yape/Plin, Shopify, Hotmart y entregas digitales (Stripe/PayPal). Actualiza cada 30s.
+                Vista unificada: Yape/Plin, Stripe, PayPal y Mercado Pago. Actualiza cada 30s.
               </p>
             </div>
             <Button variant="outline" onClick={load} disabled={loading}>
@@ -192,8 +169,8 @@ const AdminEmailTest = () => {
             </Button>
           </header>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {(["manual", "shopify", "hotmart", "digital"] as Source[]).map((s) => (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card key={s} className="p-4">
                 <div className="text-xs text-muted-foreground">{sourceLabel[s]}</div>
                 <div className="text-2xl font-bold mt-1">{counts[s]}</div>

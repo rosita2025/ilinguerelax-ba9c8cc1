@@ -138,26 +138,47 @@ export type Database = {
         Row: {
           created_at: string
           customer_email: string
+          event_count: number
+          events: Json
           id: string
           idempotency_key: string
+          last_event: string | null
+          last_event_at: string | null
+          message_id: string | null
           order_id: string | null
+          provider: string | null
           skus: string[]
+          status: string | null
         }
         Insert: {
           created_at?: string
           customer_email: string
+          event_count?: number
+          events?: Json
           id?: string
           idempotency_key: string
+          last_event?: string | null
+          last_event_at?: string | null
+          message_id?: string | null
           order_id?: string | null
+          provider?: string | null
           skus?: string[]
+          status?: string | null
         }
         Update: {
           created_at?: string
           customer_email?: string
+          event_count?: number
+          events?: Json
           id?: string
           idempotency_key?: string
+          last_event?: string | null
+          last_event_at?: string | null
+          message_id?: string | null
           order_id?: string | null
+          provider?: string | null
           skus?: string[]
+          status?: string | null
         }
         Relationships: []
       }
@@ -290,6 +311,45 @@ export type Database = {
           product_type?: string | null
           source?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      email_delivery_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          message_id: string | null
+          occurred_at: string | null
+          order_id: string | null
+          provider: string
+          raw: Json
+          reason: string | null
+          recipient_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          message_id?: string | null
+          occurred_at?: string | null
+          order_id?: string | null
+          provider?: string
+          raw?: Json
+          reason?: string | null
+          recipient_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          message_id?: string | null
+          occurred_at?: string | null
+          order_id?: string | null
+          provider?: string
+          raw?: Json
+          reason?: string | null
+          recipient_email?: string | null
         }
         Relationships: []
       }

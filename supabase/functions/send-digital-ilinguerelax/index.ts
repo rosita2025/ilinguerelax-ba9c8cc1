@@ -186,6 +186,11 @@ serve(async (req) => {
         order_id: orderId || null,
         customer_email: customerEmail,
         skus,
+        message_id: r.data?.messageId || r.data?.id || null,
+        provider: r.data?.provider || null,
+        status: "sent",
+        last_event: "sent",
+        last_event_at: new Date().toISOString(),
       }, { onConflict: "idempotency_key" });
 
     return new Response(JSON.stringify({ success: true, sent: products.length, result: r }), {

@@ -61,7 +61,7 @@ const panels = [
     color: "text-teal-600",
   },
   {
-    to: "/admin/email-test",
+    to: "/admin/orders",
     icon: Mail,
     title: "Prueba de correo",
     desc: "Envía un email transaccional real asociado a una orden y ve en vivo cómo el webhook de Brevo marca delivered / opened / bounced.",

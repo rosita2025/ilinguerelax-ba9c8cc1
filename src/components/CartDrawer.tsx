@@ -22,6 +22,12 @@ const HOTMART_CHECKOUT_MAP: Record<string, string> = {
   "gid://shopify/ProductVariant/43062338191421": "https://pay.hotmart.com/T102978081M?bid=1775682831595", // 1,000 Verbos Digital
 };
 
+// Variants that must NEVER appear in the Shopify cart (phantom / deprecated Shopify listings
+// that now sell exclusively through the internal /checkouts flow).
+const BLOCKED_VARIANTS = new Set<string>([
+  "gid://shopify/ProductVariant/43120267100221", // Spanish Relax - 1,000 Verbs in Spanish
+]);
+
 const CART_IMAGE_FALLBACKS: Record<string, { url: string; alt: string }> = {
   "gid://shopify/ProductVariant/42931924795453": {
     url: productSpanish5000Image,

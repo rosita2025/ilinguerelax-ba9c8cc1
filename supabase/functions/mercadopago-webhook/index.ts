@@ -282,6 +282,27 @@ Deno.serve(async (req) => {
             }),
           ]).catch((e) => console.error("MP pending emails failed:", e));
         }
+
+        // Approved payment → send customer thank-you + admin-sale notification
+        if (payment.status === "approved" && payerEmail) {
+          const customerName = [payment.payer?.first_name, payment.payer?.last_name]
+            .filter(Boolean).join(" ") || payerEmail.split("@")[0];
+          try {
+            await sendThankYouEmail({
+              customerEmail: payerEmail,
+              customerName,
+              customerCountry: payment.payer?.address?.country_id || undefined,
+              productName: payment.description || "Producto ILINGUE RELAX",
+              amount: payment.transaction_amount ?? undefined,
+              currency: payment.currency_id || "PEN",
+              provider: "mercadopago",
+              orderNumber: payment.external_reference || `ILR-MP-${payment.id}`,
+              idempotencyKey: `mp-approved-${payment.id}`,
+            });
+          } catch (e) {
+            console.error("MP approved emails failed:", e);
+          }
+        }
         break;
       }
       case "plan": {

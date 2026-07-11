@@ -104,6 +104,36 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_filters: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          kind: string
+          note: string | null
+          pattern: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          kind?: string
+          note?: string | null
+          pattern: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          kind?: string
+          note?: string | null
+          pattern?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           access_key: string | null

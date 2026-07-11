@@ -169,6 +169,7 @@ const AdminProducts = () => {
                           </span>
                         );
                       })()}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       {p.drive_url ? (
                         <a href={p.drive_url} target="_blank" rel="noreferrer" className="text-primary inline-flex items-center gap-1">

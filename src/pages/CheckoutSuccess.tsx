@@ -127,8 +127,8 @@ export default function CheckoutSuccess() {
     sentRef.current = true;
     sessionStorage.setItem(key, "1");
 
-    let digitalTimer: ReturnType<typeof setTimeout> | null = null;
-    void digitalTimer;
+
+
 
 
     (async () => {

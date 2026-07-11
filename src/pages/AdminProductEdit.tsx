@@ -338,10 +338,30 @@ const AdminProductEdit = () => {
               );
             })}
 
+            {orphanCountries.length > 0 ? (
+              <div className="text-xs p-3 rounded border border-destructive/40 bg-destructive/10 text-destructive space-y-1">
+                <div className="font-semibold">⚠️ {orphanCountries.length} país(es) sin ningún botón de compra:</div>
+                <div className="flex flex-wrap gap-1">
+                  {orphanCountries.slice(0, 40).map((c) => (
+                    <span key={c} className="px-1.5 py-0.5 bg-background/60 rounded">
+                      {COUNTRY_INFO[c]?.flag} {c}
+                    </span>
+                  ))}
+                  {orphanCountries.length > 40 && <span>+{orphanCountries.length - 40} más</span>}
+                </div>
+                <div className="text-[11px] opacity-80">Quítalos de las exclusiones o activa el otro canal para cubrirlos.</div>
+              </div>
+            ) : (
+              <div className="text-xs p-2 rounded border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400">
+                ✅ Todos los países del catálogo tienen al menos un canal de compra disponible.
+              </div>
+            )}
+
             <div className="text-xs bg-muted/40 p-2 rounded space-y-1">
-              <div><b>Preset típico "Hotmart solo LATAM":</b> en <i>Excluir de la Tienda</i> toca 🌎 LATAM; en <i>Excluir de Hotmart</i> toca 🇺🇸 Angloparlantes + 🇪🇺 Europa + 🌏 Asia.</div>
+              <div><b>Preset típico "Hotmart solo LATAM":</b> en <i>Excluir de la Tienda</i> toca 🌎 LATAM; en <i>Excluir de Hotmart</i> toca 🇺🇸 Angloparlantes + 🇪🇺 Europa + 🌏 Asia + 🇵🇪 Solo Perú.</div>
               <div><b>Tienda mundial:</b> deja Hotmart vacío y ambas listas vacías.</div>
             </div>
+
           </Card>
 
 

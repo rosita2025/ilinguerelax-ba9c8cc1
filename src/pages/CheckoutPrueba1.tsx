@@ -42,7 +42,7 @@ export default function CheckoutPrueba1() {
       const cb = Date.now();
       const { data, error } = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, price_pen, cover_image_url, updated_at")
+        .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
         .eq("sku", slug)
         .eq("active", true)
         .gt("price_usd", -1 - (cb % 7) * 0.0000001) // varies request signature to bust caches

@@ -128,6 +128,23 @@ const AdminProductEdit = () => {
     });
   }, [product.store_enabled, product.hotmart_url, product.store_excluded_countries, product.hotmart_excluded_countries]);
 
+  // Detecta si las exclusiones coinciden con la "política estándar"
+  const policyStatus = useMemo(() => {
+    const LATAM = REGIONS.latam.codes;
+    const HOTMART_BLOCKED = ["CU", "VE", "NI"];
+    const expectedStore = new Set(LATAM.filter((c) => c !== "PE" && !HOTMART_BLOCKED.includes(c)));
+    const expectedHot = new Set([
+      ...Object.keys(COUNTRY_INFO).filter((c) => !LATAM.includes(c)),
+      ...HOTMART_BLOCKED,
+    ]);
+    const store = new Set(product.store_excluded_countries ?? []);
+    const hot = new Set(product.hotmart_excluded_countries ?? []);
+    const eq = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((x) => b.has(x));
+    if (eq(store, expectedStore) && eq(hot, expectedHot)) return "standard" as const;
+    if (store.size === 0 && hot.size === 0) return "worldwide" as const;
+    return "custom" as const;
+  }, [product.store_excluded_countries, product.hotmart_excluded_countries]);
+
   const save = async (opts: { force?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });
@@ -303,6 +320,64 @@ const AdminProductEdit = () => {
                 Aplicar política estándar
               </Button>
             </div>
+
+
+            {/* Resumen visual de política activa y canales habilitados */}
+            {(() => {
+              const storeOn = product.store_enabled;
+              const hotOn = !!product.hotmart_url?.trim();
+              const badge =
+                policyStatus === "standard"
+                  ? { label: "⚡ Política estándar", cls: "bg-primary/15 text-primary border-primary/40" }
+                  : policyStatus === "worldwide"
+                  ? { label: "🌍 Tienda mundial (sin exclusiones)", cls: "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/40" }
+                  : { label: "🛠️ Configuración personalizada", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40" };
+              return (
+                <div className="p-3 border rounded-lg bg-muted/30 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold">Política activa</span>
+                    <span className={`text-xs px-2 py-1 rounded-full border ${badge.cls}`}>{badge.label}</span>
+                  </div>
+                  {policyStatus === "standard" && (
+                    <div className="text-xs text-muted-foreground">
+                      Hotmart <b>solo LATAM</b> (excepto 🇨🇺 🇻🇪 🇳🇮) · Tienda <b>mundial excepto LATAM</b> (con 🇵🇪 incluido).
+                    </div>
+                  )}
+
+                  <div className="grid sm:grid-cols-2 gap-2 pt-1">
+                    {/* Tienda */}
+                    <div className={`p-2 rounded border text-xs ${storeOn ? "border-green-500/40 bg-green-500/10" : "border-border bg-muted/40 opacity-60"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">🛒 Tienda ILINGUE RELAX</span>
+                        <span className={storeOn ? "text-green-700 dark:text-green-400" : "text-muted-foreground"}>
+                          {storeOn ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
+                      {storeOn && (
+                        <div className="mt-1 text-muted-foreground truncate">
+                          Enlace: <a href={`/checkouts/${product.sku}`} target="_blank" rel="noreferrer" className="text-primary underline">/checkouts/{product.sku}</a>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Hotmart */}
+                    <div className={`p-2 rounded border text-xs ${hotOn ? "border-[#EF4E23]/40 bg-[#EF4E23]/10" : "border-border bg-muted/40 opacity-60"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">🔥 Hotmart</span>
+                        <span className={hotOn ? "text-[#EF4E23]" : "text-muted-foreground"}>
+                          {hotOn ? "Activo" : "Sin enlace"}
+                        </span>
+                      </div>
+                      {hotOn && (
+                        <div className="mt-1 text-muted-foreground truncate">
+                          Enlace: <a href={product.hotmart_url!} target="_blank" rel="noreferrer" className="text-primary underline">{product.hotmart_url}</a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Resumen de cobertura */}
             {orphanCountries.length > 0 ? (

@@ -52,13 +52,14 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   const phone = normalizePhone(a.phone);
 
   const attributes: Record<string, unknown> = {};
-  if (first) attributes.FIRSTNAME = first;
-  if (last) attributes.LASTNAME = last;
+  // Brevo uses NOMBRE/APELLIDOS (aliased to firstname/lastname) and COUNTRY_CODE in this account.
+  if (first) attributes.NOMBRE = first;
+  if (last) attributes.APELLIDOS = last;
   if (phone) {
     attributes.SMS = phone;
     attributes.WHATSAPP = phone;
   }
-  if (a.country) attributes.COUNTRY = a.country.toUpperCase();
+  if (a.country) attributes.COUNTRY_CODE = a.country.toUpperCase();
   if (a.orderNumber) attributes.LAST_ORDER = a.orderNumber;
   if (typeof a.amount === "number") attributes.LAST_ORDER_AMOUNT = a.amount;
   if (a.currency) attributes.LAST_ORDER_CURRENCY = a.currency.toUpperCase();

@@ -1,66 +1,66 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { resend } from "../_shared/brevo.ts";
-
+import {
+  BRAND,
+  escapeHtml,
+  formatLocalFromUsd,
+  renderBrandedEmail,
+} from "../_shared/emailBrand.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Simplified schedule: Day 1, Day 7, Day 15, Day 30 from cart creation.
-// delayMs = time to wait *after the previous email* before sending the next.
+// Day 1, Day 7, Day 15, Day 30
 const DAY = 24 * 60 * 60 * 1000;
 const EMAIL_SCHEDULE = [
-  { index: 0, delayMs: 0 },        // Email 1: Day 1  (scheduled at cart creation +1d)
-  { index: 1, delayMs: 6 * DAY },  // Email 2: Day 7  (+6d after email 1)
-  { index: 2, delayMs: 8 * DAY },  // Email 3: Day 15 (+8d after email 2)
-  { index: 3, delayMs: 15 * DAY }, // Email 4: Day 30 (+15d after email 3)
+  { index: 0, delayMs: 0 },
+  { index: 1, delayMs: 6 * DAY },
+  { index: 2, delayMs: 8 * DAY },
+  { index: 3, delayMs: 15 * DAY },
 ];
 const MAX_EMAILS = EMAIL_SCHEDULE.length;
 
-const SITE_URL = "https://ilinguerelax.com";
+const SITE_URL = BRAND.siteUrl;
 const COUPON_CODE = "NEW10";
 
-// Product display names for email subjects
-const PRODUCT_NAMES: Record<string, { es: string; en: string }> = {
-  english:      { es: "5,000 Palabras en Inglés", en: "5,000 English Words" },
-  english_8000: { es: "8,000 Palabras en Inglés", en: "8,000 English Words" },
-  verbs:        { es: "1,000 Verbos en Inglés",   en: "1,000 English Verbs" },
-  questions:    { es: "500 Preguntas en Inglés",   en: "500 English Questions" },
-  spanish:      { es: "5,000 Palabras en Español", en: "5,000 Spanish Words" },
+// Legacy product_type → SKU fallback map (older carts stored a type, newer ones store the actual SKU)
+const PRODUCT_TYPE_TO_SKU: Record<string, string> = {
+  english: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  english_8000: "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  verbs: "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+  questions: "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
+  spanish: "5-000-spanish-words-with-english-pronunciation",
 };
 
-function getProductName(productType: string, lang: string): string {
-  const names = PRODUCT_NAMES[productType] ?? PRODUCT_NAMES["english"];
-  return lang === "es" ? names.es : names.en;
+interface DbProduct {
+  sku: string;
+  name: string;
+  price_usd: number | null;
+  cover_image_url: string | null;
 }
 
-// Product page URLs on the website (not direct Hotmart checkout)
-const PRODUCT_URLS: Record<string, string> = {
-  english:      `${SITE_URL}/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa`,
-  english_8000: `${SITE_URL}/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa`,
-  verbs:        `${SITE_URL}/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion`,
-  questions:    `${SITE_URL}/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes`,
-  spanish:      `${SITE_URL}/products/5-000-spanish-words-with-english-pronunciation`,
-};
-
-function getProductUrl(productType: string): string {
-  return PRODUCT_URLS[productType] ?? PRODUCT_URLS["english"];
+async function fetchProduct(supabase: ReturnType<typeof createClient>, productType: string): Promise<DbProduct | null> {
+  const sku = PRODUCT_TYPE_TO_SKU[productType] ?? productType;
+  const { data } = await supabase
+    .from("digital_products")
+    .select("sku,name,price_usd,cover_image_url")
+    .eq("sku", sku)
+    .maybeSingle();
+  return (data as DbProduct | null) ?? null;
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Get all carts that need an email sent now
     const now = new Date().toISOString();
     const { data: pendingCarts, error } = await supabase
       .from("abandoned_carts")
@@ -71,19 +71,12 @@ serve(async (req) => {
       .order("next_email_at", { ascending: true })
       .limit(50);
 
-    if (error) {
-      console.error("Error fetching pending carts:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     if (!pendingCarts || pendingCarts.length === 0) {
-      console.log("No pending abandoned cart emails to send");
       return new Response(JSON.stringify({ processed: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    console.log(`Processing ${pendingCarts.length} abandoned cart emails`);
 
     let processed = 0;
     let errors = 0;
@@ -91,366 +84,195 @@ serve(async (req) => {
     for (const cart of pendingCarts) {
       try {
         const emailIndex = cart.emails_sent;
-
         if (emailIndex >= MAX_EMAILS) {
-          await supabase
-            .from("abandoned_carts")
-            .update({ is_completed: true })
-            .eq("id", cart.id);
+          await supabase.from("abandoned_carts").update({ is_completed: true }).eq("id", cart.id);
           continue;
         }
-
-        // Safety: re-check conversion right before sending to avoid a race where
-        // the customer paid between the query and the send.
         const { data: fresh } = await supabase
           .from("abandoned_carts")
           .select("converted, is_completed")
           .eq("id", cart.id)
           .maybeSingle();
-        if (fresh?.converted || fresh?.is_completed) {
-          continue;
-        }
+        if (fresh?.converted || fresh?.is_completed) continue;
 
-        const productUrl = getProductUrl(cart.product_type);
-        const emailContent = getEmailContent(emailIndex, cart.customer_name, cart.language, productUrl, cart.product_type);
+        const product = await fetchProduct(supabase, cart.product_type);
+        const sku = product?.sku ?? PRODUCT_TYPE_TO_SKU[cart.product_type] ?? cart.product_type;
+        const productUrl = `${SITE_URL}/products/${sku}`;
+        const productName = product?.name ?? "tu curso iLingue Relax";
+        const priceUsd = Number(product?.price_usd ?? 0);
+        const localPrice = priceUsd > 0
+          ? formatLocalFromUsd(priceUsd, { language: cart.language })
+          : "";
 
-        const emailResponse = await resend.emails.send({
-          from: "iLingue Relax <hola@ilinguerelax.com>",
-          to: [cart.customer_email],
-          subject: emailContent.subject,
-          html: emailContent.html,
+        const content = buildContent({
+          index: emailIndex,
+          firstName: (cart.customer_name || "").split(" ")[0] || "Hola",
+          lang: cart.language || "es",
+          productName,
+          productUrl,
+          coverImage: product?.cover_image_url ?? null,
+          localPrice,
         });
 
-        console.log(`Email ${emailIndex + 1}/${MAX_EMAILS} sent to ${cart.customer_email} (product: ${cart.product_type}):`, emailResponse);
+        const emailResponse = await resend.emails.send({
+          from: `iLingue Relax <${BRAND.supportEmail}>`,
+          to: [cart.customer_email],
+          subject: content.subject,
+          html: content.html,
+        });
+        console.log(`Cart email ${emailIndex + 1}/${MAX_EMAILS} → ${cart.customer_email}`, emailResponse);
 
         const nextEmailIndex = emailIndex + 1;
         const isLastEmail = nextEmailIndex >= MAX_EMAILS;
-
         const updateData: Record<string, unknown> = {
           emails_sent: nextEmailIndex,
           last_email_sent_at: now,
           is_completed: isLastEmail,
         };
-
         if (!isLastEmail) {
-          const nextDelay = EMAIL_SCHEDULE[nextEmailIndex]?.delayMs || 0;
-          updateData.next_email_at = new Date(Date.now() + nextDelay).toISOString();
+          updateData.next_email_at = new Date(Date.now() + (EMAIL_SCHEDULE[nextEmailIndex]?.delayMs || 0)).toISOString();
         }
-
-        await supabase
-          .from("abandoned_carts")
-          .update(updateData)
-          .eq("id", cart.id);
-
+        await supabase.from("abandoned_carts").update(updateData).eq("id", cart.id);
         processed++;
-      } catch (emailError) {
-        console.error(`Error processing cart ${cart.id}:`, emailError);
+      } catch (e) {
+        console.error(`Cart ${cart.id} error`, e);
         errors++;
       }
     }
 
-    console.log(`Processed: ${processed}, Errors: ${errors}`);
-
-    return new Response(
-      JSON.stringify({ processed, errors, total: pendingCarts.length }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ processed, errors, total: pendingCarts.length }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("Process error:", msg);
     return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
 
-function getEmailContent(index: number, name: string, lang: string, productUrl: string, productType: string) {
-  const isSpanish = lang === "es";
-  const firstName = name.split(" ")[0];
-  const productName = getProductName(productType, lang);
-  const templates = isSpanish ? getSpanishTemplates(firstName, productUrl, productName) : getEnglishTemplates(firstName, productUrl, productName);
-  return templates[index] || templates[0];
+interface ContentArgs {
+  index: number;
+  firstName: string;
+  lang: string;
+  productName: string;
+  productUrl: string;
+  coverImage: string | null;
+  localPrice: string;
 }
 
-function couponBox(isSpanish: boolean) {
-  const label = isSpanish ? "Usa este cupón al pagar y obtén un 10% de descuento extra:" : "Use this coupon at checkout for an extra 10% off:";
-  return `
-    <div style="background: linear-gradient(135deg, #f3e8ff, #ede9fe); border: 2px dashed #8b5cf6; border-radius: 12px; padding: 16px 24px; margin: 24px 0; text-align: center;">
-      <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">${label}</p>
-      <p style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: 4px; color: #7c3aed;">${COUPON_CODE}</p>
-    </div>`;
+function couponBlock(lang: string): string {
+  const label = lang === "en"
+    ? "Use this coupon at checkout for an extra 10% off:"
+    : "Usa este cupón al pagar y obtén un 10% de descuento extra:";
+  return `<div style="background:#fff7ed;border:2px dashed ${BRAND.accent};border-radius:12px;padding:16px 20px;margin:20px 0;text-align:center;">
+    <div style="font-size:13px;color:#9a3412;margin-bottom:6px;">${label}</div>
+    <div style="font-size:26px;font-weight:900;letter-spacing:4px;color:${BRAND.accent};">${COUPON_CODE}</div>
+  </div>`;
 }
 
-function getSpanishTemplates(name: string, productUrl: string, productName: string) {
-  const cupon = couponBox(true);
-  return [
-    // Email 1: 1 hora - Recordatorio suave
+function productCard(name: string, cover: string | null, localPrice: string, lang: string): string {
+  const priceLabel = lang === "en" ? "Price" : "Precio";
+  return `<div style="border:1px solid ${BRAND.border};border-radius:12px;padding:16px;margin:16px 0;background:${BRAND.soft};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      ${cover ? `<td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(cover)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>` : ""}
+      <td valign="top">
+        <div style="font-size:15px;font-weight:bold;color:${BRAND.text};line-height:1.35;">${escapeHtml(name)}</div>
+        ${localPrice ? `<div style="margin-top:6px;font-size:14px;color:${BRAND.primary};font-weight:bold;">${priceLabel}: ${localPrice}</div>` : ""}
+      </td>
+    </tr></table>
+  </div>`;
+}
+
+function buildContent(a: ContentArgs): { subject: string; html: string } {
+  const isEs = a.lang !== "en";
+  const priceInline = a.localPrice ? ` (${a.localPrice})` : "";
+  const card = productCard(a.productName, a.coverImage, a.localPrice, a.lang);
+  const cta = isEs ? "Completar mi compra →" : "Complete my purchase →";
+
+  const templates = isEs ? [
     {
-      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🛒`,
-      html: buildEmail({
-        name,
-        headline: "¡Tu libro te está esperando!",
-        body: `<p>Notamos que estabas a punto de conseguir <strong>"Inglés Relax - 5,000 Palabras"</strong> pero no completaste la compra.</p>
-        <p>¡No te preocupes! Tu selección sigue disponible al <strong>precio especial de $12</strong> (antes $54).</p>
-        <p>Con este libro podrás aprender 5,000 palabras en inglés de forma relajada y sin estrés, con pronunciación adaptada para hispanohablantes.</p>
-        ${cupon}`,
-        ctaText: "Completar mi compra →",
-        ctaUrl: productUrl,
-        footer: "Este precio especial podría no estar disponible por mucho tiempo.",
-        color: "#8b5cf6",
-      }),
+      subject: `Tu carrito te espera — ${a.productName}`,
+      headline: "¡Tu material te está esperando!",
+      intro: `Hola ${escapeHtml(a.firstName)}, notamos que estabas por llevar <strong>${escapeHtml(a.productName)}</strong>${priceInline} y no completaste la compra.`,
+      body: `${card}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Tu selección sigue disponible. Aprende a tu ritmo, con descarga inmediata en PDF.</p>${couponBlock(a.lang)}`,
+      footerNote: "Este cupón puede caducar pronto.",
     },
-    // Email 2: 1 día - Beneficios
     {
-      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🧠`,
-      html: buildEmail({
-        name,
-        headline: "¿Por qué miles ya aprenden con nosotros?",
-        body: `<p>Ayer estuviste viendo nuestro libro <strong>"Inglés Relax - 5,000 Palabras"</strong> y queremos contarte por qué es diferente:</p>
-        <ul style="color: #4b5563; line-height: 2;">
-          <li>✅ <strong>5,000 palabras</strong> con pronunciación en español</li>
-          <li>✅ <strong>Fonética UK y USA</strong> para que elijas tu acento</li>
-          <li>✅ <strong>52 capítulos temáticos</strong> organizados por situaciones reales</li>
-          <li>✅ <strong>4 Bonus GRATIS</strong> incluidos con tu compra</li>
-          <li>✅ <strong>Descarga inmediata</strong> - empieza hoy mismo</li>
-        </ul>
-        <p>Y todo esto por solo <strong>$12</strong> en lugar de $54. ¡Un 78% de descuento!</p>
-        ${cupon}`,
-        ctaText: "¡Quiero mi libro ahora! 📚",
-        ctaUrl: productUrl,
-        footer: "Más de 1,200 personas ya confían en el método Relax.",
-        color: "#6366f1",
-      }),
+      subject: `${escapeHtml(a.firstName)}, sigue pendiente tu ${a.productName}`,
+      headline: "Por qué miles ya aprenden con nosotros",
+      intro: `Ayer viste <strong>${escapeHtml(a.productName)}</strong>${priceInline}. Aquí lo que incluye:`,
+      body: `<ul style="color:#4b5563;line-height:1.9;font-size:14px;padding-left:20px;">
+        <li>✅ Contenido con pronunciación adaptada</li>
+        <li>✅ Bonos gratis incluidos</li>
+        <li>✅ Descarga inmediata en PDF</li>
+        <li>✅ Actualizaciones de por vida</li>
+      </ul>${card}${couponBlock(a.lang)}`,
+      footerNote: "Más de 1,200 estudiantes ya confían en el método Relax.",
     },
-    // Email 3: 4 días - Urgencia
     {
-      subject: `⏰ Tu carrito está esperando - iLingue Relax ${productName}`,
-      html: buildEmail({
-        name,
-        headline: "El tiempo corre...",
-        body: `<p>Han pasado unos días desde que visitaste <strong>"Inglés Relax - 5,000 Palabras"</strong>.</p>
-        <p>Queremos recordarte que el precio especial de <strong>$12</strong> (un ahorro del 78%) es por tiempo limitado.</p>
-        <p>Imagina poder dominar 5,000 palabras en inglés aprendiendo solo <strong>10-15 palabras al día</strong>, sin estrés y a tu propio ritmo.</p>
-        <p>No dejes pasar esta oportunidad. ¡Tu futuro bilingüe te espera!</p>
-        ${cupon}`,
-        ctaText: "Aprovechar el descuento →",
-        ctaUrl: productUrl,
-        footer: "Recuerda: incluye 4 bonus gratis valorados en más de $40.",
-        color: "#ec4899",
-      }),
+      subject: `⏰ Última semana con descuento — ${a.productName}`,
+      headline: "El tiempo corre",
+      intro: `Han pasado varios días desde que viste <strong>${escapeHtml(a.productName)}</strong>${priceInline}. El descuento es por tiempo limitado.`,
+      body: `${card}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Solo necesitas 10-15 minutos al día para avanzar. Sin estrés, a tu ritmo.</p>${couponBlock(a.lang)}`,
+      footerNote: "Recuerda: incluye bonos gratis.",
     },
-    // Email 4: 1 semana - Testimonio social
     {
-      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🌟`,
-      html: buildEmail({
-        name,
-        headline: "Lo que dicen nuestros estudiantes",
-        body: `<p>Hace una semana estuviste interesado en <strong>"Inglés Relax - 5,000 Palabras"</strong>. Mira lo que dicen quienes ya lo tienen:</p>
-        <div style="background: #f3f4f6; border-left: 4px solid #8b5cf6; padding: 16px; border-radius: 8px; margin: 16px 0;">
-          <p style="font-style: italic; color: #4b5563;">"Nunca pensé que aprender inglés pudiera ser tan fácil. La pronunciación en español me ayudó muchísimo."</p>
-          <p style="color: #6b7280; font-size: 14px;">⭐⭐⭐⭐⭐ - María G.</p>
-        </div>
-        <div style="background: #f3f4f6; border-left: 4px solid #6366f1; padding: 16px; border-radius: 8px; margin: 16px 0;">
-          <p style="font-style: italic; color: #4b5563;">"Lo mejor es que puedo aprender a mi ritmo, sin presión. Ya llevo 500 palabras en 2 semanas."</p>
-          <p style="color: #6b7280; font-size: 14px;">⭐⭐⭐⭐⭐ - Carlos R.</p>
-        </div>
-        <p>Únete a más de <strong>1,200 estudiantes</strong> que ya están aprendiendo con el método Relax.</p>
-        ${cupon}`,
-        ctaText: "Unirme ahora por solo $12 →",
-        ctaUrl: productUrl,
-        footer: "Satisfacción garantizada con nuestro método.",
-        color: "#8b5cf6",
-      }),
+      subject: `Un último recordatorio — ${a.productName}`,
+      headline: "Un último mensaje para ti",
+      intro: `Ha pasado un mes desde que viste <strong>${escapeHtml(a.productName)}</strong>. Este será nuestro último correo — te dejamos un cupón por si algún día decides dar el paso.`,
+      body: `${card}${couponBlock(a.lang)}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Cuando estés listo, estaremos aquí para ayudarte. 💜</p>`,
+      footerNote: "Este es nuestro último correo sobre este pedido.",
     },
-    // Email 5: 15 días - Última oportunidad
+  ] : [
     {
-      subject: `🚨 Tu carrito está esperando - iLingue Relax ${productName}`,
-      html: buildEmail({
-        name,
-        headline: "¡Última oportunidad!",
-        body: `<p>Hace 15 días mostraste interés en aprender inglés con nuestro método Relax.</p>
-        <p>Este es un recordatorio amistoso de que el <strong>descuento del 78%</strong> sigue activo, pero no por mucho tiempo más.</p>
-        <p><strong>Lo que recibes:</strong></p>
-        <ul style="color: #4b5563; line-height: 2;">
-          <li>📖 5,000 palabras con pronunciación</li>
-          <li>🎁 4 Bonus gratis (diccionario, estructura, artículos, y más)</li>
-          <li>📱 Descarga inmediata en PDF</li>
-          <li>🔄 Actualizaciones gratuitas de por vida</li>
-        </ul>
-        <p>Todo por solo <strong>$12</strong> en vez de $54.</p>
-        ${cupon}`,
-        ctaText: "¡SÍ, QUIERO MI LIBRO! 🎉",
-        ctaUrl: productUrl,
-        footer: "Esta podría ser tu última oportunidad a este precio.",
-        color: "#ef4444",
-      }),
+      subject: `Your cart is waiting — ${a.productName}`,
+      headline: "Your material is waiting!",
+      intro: `Hi ${escapeHtml(a.firstName)}, you were about to get <strong>${escapeHtml(a.productName)}</strong>${priceInline} but didn't finish.`,
+      body: `${card}<p style="font-size:14px;color:#4b5563;line-height:1.6;">Learn at your own pace, instant PDF download.</p>${couponBlock(a.lang)}`,
+      footerNote: "This coupon may expire soon.",
     },
-    // Email 6: 30 días - Despedida
     {
-      subject: `Tu carrito está esperando - iLingue Relax ${productName} 🎁`,
-      html: buildEmail({
-        name,
-        headline: "Un último mensaje para ti",
-        body: `<p>Ha pasado un mes desde que visitaste nuestra página y este será nuestro último correo sobre <strong>"Inglés Relax - 5,000 Palabras"</strong>.</p>
-        <p>Entendemos que quizás no era el momento adecuado, y lo respetamos completamente.</p>
-        <p>Pero antes de despedirnos, te dejamos un cupón especial de 10% extra por si en algún momento decides dar el paso:</p>
-        ${cupon}
-        <p>Aprender inglés no tiene que ser difícil ni estresante. Cuando estés listo, estaremos aquí para ayudarte. 💜</p>`,
-        ctaText: "Guardar mi enlace de compra →",
-        ctaUrl: productUrl,
-        footer: "¡Te deseamos mucho éxito en tu aprendizaje! Este es nuestro último correo.",
-        color: "#8b5cf6",
-      }),
+      subject: `${escapeHtml(a.firstName)}, ${a.productName} is still waiting`,
+      headline: "Why thousands already learn with us",
+      intro: `Yesterday you checked out <strong>${escapeHtml(a.productName)}</strong>${priceInline}. Here's what's included:`,
+      body: `<ul style="color:#4b5563;line-height:1.9;font-size:14px;padding-left:20px;">
+        <li>✅ Adapted pronunciation</li>
+        <li>✅ Free bonuses included</li>
+        <li>✅ Instant PDF download</li>
+        <li>✅ Lifetime updates</li>
+      </ul>${card}${couponBlock(a.lang)}`,
+      footerNote: "Over 1,200 students trust the Relax method.",
+    },
+    {
+      subject: `⏰ Last chance — ${a.productName}`,
+      headline: "Time is running out",
+      intro: `It's been a few days since you saw <strong>${escapeHtml(a.productName)}</strong>${priceInline}. The discount is limited.`,
+      body: `${card}${couponBlock(a.lang)}`,
+      footerNote: "Includes free bonuses.",
+    },
+    {
+      subject: `One last reminder — ${a.productName}`,
+      headline: "One last message",
+      intro: `It's been a month since you saw <strong>${escapeHtml(a.productName)}</strong>. This is our last email — here's a coupon in case you decide to take the step.`,
+      body: `${card}${couponBlock(a.lang)}`,
+      footerNote: "This is our final email about this order.",
     },
   ];
-}
 
-function getEnglishTemplates(name: string, productUrl: string, productName: string) {
-  const cupon = couponBox(false);
-  return [
-    {
-      subject: `Your cart is waiting - iLingue Relax ${productName} 🛒`,
-      html: buildEmail({
-        name,
-        headline: "Your book is waiting!",
-        body: `<p>We noticed you were about to get <strong>"Inglés Relax - 5,000 Words"</strong> but didn't complete your purchase.</p>
-        <p>No worries! Your selection is still available at the <strong>special price of $12</strong> (was $54).</p>
-        <p>Learn 5,000 English words in a relaxed, stress-free way with pronunciation adapted for Spanish speakers.</p>
-        ${cupon}`,
-        ctaText: "Complete my purchase →",
-        ctaUrl: productUrl,
-        footer: "This special price may not last much longer.",
-        color: "#8b5cf6",
-      }),
-    },
-    {
-      subject: `Your cart is waiting - iLingue Relax ${productName} 🧠`,
-      html: buildEmail({
-        name,
-        headline: "Why thousands already learn with us",
-        body: `<p>Yesterday you were checking out <strong>"Inglés Relax - 5,000 Words"</strong>. Here's why it's different:</p>
-        <ul style="color: #4b5563; line-height: 2;">
-          <li>✅ <strong>5,000 words</strong> with Spanish pronunciation guide</li>
-          <li>✅ <strong>UK & USA phonetics</strong></li>
-          <li>✅ <strong>52 thematic chapters</strong></li>
-          <li>✅ <strong>4 FREE bonuses</strong> included</li>
-          <li>✅ <strong>Instant download</strong></li>
-        </ul>
-        <p>All for just <strong>$12</strong> instead of $54. That's 78% off!</p>
-        ${cupon}`,
-        ctaText: "Get my book now! 📚",
-        ctaUrl: productUrl,
-        footer: "Over 1,200 people trust the Relax method.",
-        color: "#6366f1",
-      }),
-    },
-    {
-      subject: `⏰ Your cart is waiting - iLingue Relax ${productName}`,
-      html: buildEmail({
-        name,
-        headline: "Time is running out...",
-        body: `<p>It's been a few days since you visited <strong>"Inglés Relax - 5,000 Words"</strong>.</p>
-        <p>The special price of <strong>$12</strong> (78% savings) is limited time only.</p>
-        <p>Imagine mastering 5,000 English words by learning just <strong>10-15 words per day</strong>, stress-free and at your own pace.</p>
-        ${cupon}`,
-        ctaText: "Claim my discount →",
-        ctaUrl: productUrl,
-        footer: "Remember: includes 4 free bonuses worth over $40.",
-        color: "#ec4899",
-      }),
-    },
-    {
-      subject: `Your cart is waiting - iLingue Relax ${productName} 🌟`,
-      html: buildEmail({
-        name,
-        headline: "What our students say",
-        body: `<p>A week ago you showed interest in our book. Here's what others say:</p>
-        <div style="background: #f3f4f6; border-left: 4px solid #8b5cf6; padding: 16px; border-radius: 8px; margin: 16px 0;">
-          <p style="font-style: italic; color: #4b5563;">"I never thought learning English could be this easy. The Spanish pronunciation guide helped me so much."</p>
-          <p style="color: #6b7280; font-size: 14px;">⭐⭐⭐⭐⭐ - María G.</p>
-        </div>
-        <p>Join <strong>1,200+ students</strong> learning with the Relax method.</p>
-        ${cupon}`,
-        ctaText: "Join now for only $12 →",
-        ctaUrl: productUrl,
-        footer: "Satisfaction guaranteed.",
-        color: "#8b5cf6",
-      }),
-    },
-    {
-      subject: `🚨 Your cart is waiting - iLingue Relax ${productName}`,
-      html: buildEmail({
-        name,
-        headline: "Last chance!",
-        body: `<p>15 days ago you showed interest in learning English with our Relax method.</p>
-        <p>The <strong>78% discount</strong> is still active but not for much longer.</p>
-        <p><strong>What you get:</strong></p>
-        <ul style="color: #4b5563; line-height: 2;">
-          <li>📖 5,000 words with pronunciation</li>
-          <li>🎁 4 Free bonuses</li>
-          <li>📱 Instant PDF download</li>
-          <li>🔄 Free lifetime updates</li>
-        </ul>
-        <p>All for just <strong>$12</strong> instead of $54.</p>
-        ${cupon}`,
-        ctaText: "YES, I WANT MY BOOK! 🎉",
-        ctaUrl: productUrl,
-        footer: "This might be your last chance at this price.",
-        color: "#ef4444",
-      }),
-    },
-    {
-      subject: `Your cart is waiting - iLingue Relax ${productName} 🎁`,
-      html: buildEmail({
-        name,
-        headline: "One last message",
-        body: `<p>It's been a month since you visited our page. This will be our last email about <strong>"Inglés Relax - 5,000 Words"</strong>.</p>
-        <p>We understand it might not have been the right time, and we respect that.</p>
-        <p>But before we say goodbye, here's a special 10% coupon in case you ever decide to take the step:</p>
-        ${cupon}
-        <p>Learning English doesn't have to be hard or stressful. When you're ready, we'll be here. 💜</p>`,
-        ctaText: "Save my purchase link →",
-        ctaUrl: productUrl,
-        footer: "Wishing you the best! This is our final email.",
-        color: "#8b5cf6",
-      }),
-    },
-  ];
-}
-
-function buildEmail(params: {
-  name: string;
-  headline: string;
-  body: string;
-  ctaText: string;
-  ctaUrl: string;
-  footer: string;
-  color: string;
-}) {
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f5;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-    <div style="background: linear-gradient(135deg, ${params.color} 0%, ${params.color}dd 100%); border-radius: 16px 16px 0 0; padding: 40px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 26px;">${params.headline}</h1>
-    </div>
-    <div style="background: white; padding: 40px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      <p style="font-size: 18px; color: #1f2937; margin-bottom: 24px;">Hola ${params.name}!</p>
-      <div style="font-size: 16px; color: #4b5563; line-height: 1.6;">${params.body}</div>
-      <div style="text-align: center; margin: 32px 0;">
-        <a href="${params.ctaUrl}" style="display: inline-block; background: linear-gradient(135deg, ${params.color} 0%, ${params.color}dd 100%); color: white; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 14px ${params.color}66;">
-          ${params.ctaText}
-        </a>
-      </div>
-      <p style="font-size: 14px; color: #9ca3af; text-align: center; margin-top: 24px;">${params.footer}</p>
-    </div>
-    <div style="text-align: center; padding: 24px; color: #9ca3af; font-size: 12px;">
-      <p style="margin: 0;">© 2025 iLingue Relax. All rights reserved.</p>
-      <p style="margin: 8px 0 0 0;">Si no deseas recibir más correos, simplemente ignora este mensaje.</p>
-    </div>
-  </div>
-</body>
-</html>`;
+  const t = templates[a.index] ?? templates[0];
+  return {
+    subject: t.subject,
+    html: renderBrandedEmail({
+      preheader: t.intro.replace(/<[^>]+>/g, "").slice(0, 140),
+      headline: t.headline,
+      intro: t.intro,
+      bodyHtml: t.body,
+      ctaText: cta,
+      ctaUrl: a.productUrl,
+      secondaryNote: t.footerNote,
+      lang: a.lang,
+    }),
+  };
 }

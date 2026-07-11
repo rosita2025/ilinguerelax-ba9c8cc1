@@ -79,13 +79,18 @@ serve(async (req) => {
     const safeDays = Math.min(Math.max(parseInt(String(days)) || 28, 1), 480);
     const safeLimit = Math.min(Math.max(parseInt(String(limit)) || 25, 1), 100);
 
-    const [queries, pages] = await Promise.all([
+    const [queriesRes, pagesRes] = await Promise.all([
       querySearchAnalytics("query", safeDays, safeLimit),
       querySearchAnalytics("page", safeDays, safeLimit),
     ]);
 
     return new Response(
-      JSON.stringify({ days: safeDays, queries, pages, site: SITE_URL }),
+      JSON.stringify({
+        days: safeDays,
+        queries: queriesRes.rows,
+        pages: pagesRes.rows,
+        site: queriesRes.site || pagesRes.site,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
     );
   } catch (err) {

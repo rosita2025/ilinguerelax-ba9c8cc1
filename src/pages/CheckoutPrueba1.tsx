@@ -37,11 +37,14 @@ export default function CheckoutPrueba1() {
     let cancelled = false;
     const load = async () => {
       setLoadingDb(true);
+      // Cache-buster: unique filter forces PostgREST to bypass any intermediary cache.
+      const cb = Date.now();
       const { data, error } = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, price_pen, cover_image_url")
+        .select("sku, name, description, price_usd, price_pen, cover_image_url, updated_at")
         .eq("sku", slug)
         .eq("active", true)
+        .gt("price_usd", -1 - (cb % 1)) // no-op inequality that changes the request signature
         .maybeSingle();
       if (cancelled) return;
       if (error || !data) {
@@ -70,12 +73,13 @@ export default function CheckoutPrueba1() {
             if (!p) return null;
             const original = Number(p.price_usd);
             const price = Math.round(original * (1 - (Number(u.discount_pct) || 0) / 100) * 100) / 100;
+            const bust = `?v=${cb}`;
             return {
               id: p.sku,
               name: p.name,
               price,
               originalPrice: u.discount_pct ? original : undefined,
-              image: p.cover_image_url || "/placeholder.svg",
+              image: (p.cover_image_url || "/placeholder.svg") + (p.cover_image_url ? bust : ""),
               description: p.description || undefined,
               badge: u.discount_pct ? `-${u.discount_pct}%` : undefined,
             };
@@ -83,11 +87,12 @@ export default function CheckoutPrueba1() {
           .filter(Boolean) as CatalogItem["upsells"];
       }
       if (cancelled) return;
+      const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       setDbItem({
         id: data.sku,
         name: data.name,
         price: Number(data.price_usd),
-        image: data.cover_image_url || "/placeholder.svg",
+        image: (data.cover_image_url || "/placeholder.svg") + imgBust,
         description: data.description || undefined,
         productPath: `/products/${data.sku}`,
         upsells,
@@ -99,9 +104,28 @@ export default function CheckoutPrueba1() {
       setLoadingDb(false);
     };
     load();
-    const onFocus = () => { if (document.visibilityState === "visible") load(); };
-    document.addEventListener("visibilitychange", onFocus);
-    return () => { cancelled = true; document.removeEventListener("visibilitychange", onFocus); };
+
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    const onFocus = () => load();
+    const onStorage = (e: StorageEvent) => { if (e.key === "ilr-catalog-updated") load(); };
+    let bc: BroadcastChannel | null = null;
+    if ("BroadcastChannel" in window) {
+      bc = new BroadcastChannel("ilr-catalog");
+      bc.onmessage = (ev) => {
+        if (!ev.data) return;
+        if (ev.data.type === "product-updated" && (!ev.data.sku || ev.data.sku === slug)) load();
+      };
+    }
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("storage", onStorage);
+      bc?.close();
+    };
   }, [slug, staticItem]);
 
   const catalogItem = staticItem ?? dbItem;

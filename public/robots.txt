@@ -43,7 +43,12 @@ Sitemap: https://ilinguerelax.com/sitemap.xml
 
 # Disallow admin, private and download paths
 Disallow: /api/
+Disallow: /admin
 Disallow: /admin/
+Disallow: /admin/*
+Disallow: /descarga
+Disallow: /descarga/
+Disallow: /descarga-patrones
 Disallow: /_next/
 Disallow: /private/
 Disallow: /descarga/

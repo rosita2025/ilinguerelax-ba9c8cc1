@@ -89,16 +89,18 @@ export default function CheckoutPrueba1() {
       }
       if (cancelled) return;
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
+      const priceGlobal = Number(data.price_usd);
+      const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
       setDbItem({
         id: data.sku,
         name: data.name,
-        price: Number(data.price_usd),
+        price: priceGlobal,
         image: (data.cover_image_url || "/placeholder.svg") + imgBust,
         description: data.description || undefined,
         productPath: `/products/${data.sku}`,
         upsells,
-        ...(data.price_pen != null && {
-          regionPrices: { latam: Number(data.price_pen), global: Number(data.price_usd) },
+        ...(priceLatam != null && {
+          regionPrices: { latam: priceLatam, global: priceGlobal },
         }),
       } as CatalogItem);
       setDbMissing(false);

@@ -178,6 +178,16 @@ serve(async (req) => {
       });
     }
 
+    // Record send for idempotency (upsert so force=true still deduplicates future retries)
+    await supabase
+      .from("digital_email_sends")
+      .upsert({
+        idempotency_key: idemKey,
+        order_id: orderId || null,
+        customer_email: customerEmail,
+        skus,
+      }, { onConflict: "idempotency_key" });
+
     return new Response(JSON.stringify({ success: true, sent: products.length, result: r }), {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
     });

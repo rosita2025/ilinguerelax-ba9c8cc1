@@ -52,20 +52,21 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   const phone = normalizePhone(a.phone);
 
   const attributes: Record<string, unknown> = {};
-  if (first) attributes.FIRSTNAME = first;
-  if (last) attributes.LASTNAME = last;
+  // Brevo uses NOMBRE/APELLIDOS (aliased to firstname/lastname) and COUNTRY_CODE in this account.
+  if (first) attributes.NOMBRE = first;
+  if (last) attributes.APELLIDOS = last;
   if (phone) {
     attributes.SMS = phone;
     attributes.WHATSAPP = phone;
   }
-  if (a.country) attributes.COUNTRY = a.country.toUpperCase();
+  if (a.country) attributes.COUNTRY_CODE = a.country.toUpperCase();
   if (a.orderNumber) attributes.LAST_ORDER = a.orderNumber;
   if (typeof a.amount === "number") attributes.LAST_ORDER_AMOUNT = a.amount;
   if (a.currency) attributes.LAST_ORDER_CURRENCY = a.currency.toUpperCase();
   if (a.productName) attributes.LAST_PRODUCT = a.productName;
   if (a.skus && a.skus.length) attributes.LAST_SKUS = a.skus.join(", ");
   if (a.provider) attributes.LAST_PROVIDER = a.provider;
-  attributes.LAST_ORDER_DATE = new Date().toISOString();
+  attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
 
   const listIdsRaw = Deno.env.get("BREVO_CUSTOMERS_LIST_ID");
   const listIds = listIdsRaw

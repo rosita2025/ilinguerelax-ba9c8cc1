@@ -74,19 +74,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // ---- Auth: shared token in query string or header ----
-    const secret = Deno.env.get("BREVO_WEBHOOK_SECRET");
-    if (secret) {
-      const url = new URL(req.url);
-      const token = url.searchParams.get("token")
-        || req.headers.get("x-webhook-token")
-        || "";
-      if (token !== secret) {
-        return new Response(JSON.stringify({ error: "unauthorized" }), {
-          status: 401, headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-    }
+    // No token required — Brevo webhook is open (event log only, no sensitive ops).
 
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "method not allowed" }), {

@@ -42,33 +42,17 @@ interface PruebaStore {
   resetToDefaults: () => void;
 }
 
-const DEFAULT_ITEMS: PruebaItem[] = [
-  {
-    id: "prueba-1",
-    name: "Prueba 1 · Producto Digital",
-    price: 22,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&h=200&fit=crop",
-    description: "Producto de prueba principal",
-  },
-  {
-    id: "prueba-patrones-es",
-    name: "Patrones en Español · Precio por región",
-    price: 15, // fallback (global)
-    regionPrices: { latam: 10, global: 15 }, // 🌎 $10 LatAm · 🌍 $15 resto
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=200&h=200&fit=crop",
-    description: "Demo: precio se ajusta según tu país (IP)",
-  },
-  {
-    id: "prueba-3",
-    name: "Prueba 3 · Bonus",
-    price: 10,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200&h=200&fit=crop",
-    description: "Bono adicional",
-  },
-];
+// Carrito arranca VACÍO. Los productos se agregan solo cuando el usuario
+// hace clic en "Agregar al carrito" desde una página de producto.
+const DEFAULT_ITEMS: PruebaItem[] = [];
+
+// IDs de productos demo/prueba antiguos que deben purgarse del localStorage
+// existente para evitar que aparezcan sin acción del usuario.
+const PHANTOM_IDS = new Set([
+  "prueba-1",
+  "prueba-patrones-es",
+  "prueba-3",
+]);
 
 const VALID_COUPONS: Record<string, number> = {
   NEW10: 10,

@@ -118,21 +118,12 @@ const Product5000Book = () => {
   }, []);
 
   const handleAddToShopifyCart = async () => {
-    if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Producto no disponible en la tienda en línea");
-      return;
+    // Physical book — Shopify removed. Send buyers to Amazon.
+    if (typeof window !== "undefined") {
+      window.open(AMAZON_URL, "_blank", "noopener,noreferrer");
     }
-    const variant = shopifyProduct.node.variants.edges[0]?.node;
-    await addItem({
-      product: shopifyProduct,
-      variantId: shopifyVariantId,
-      variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: "19.99", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: variant?.selectedOptions || [],
-    });
-    
   };
+
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 5,000 Palabras Libro Físico",

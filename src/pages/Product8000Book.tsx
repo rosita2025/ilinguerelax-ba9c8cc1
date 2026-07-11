@@ -122,23 +122,14 @@ const Product8000Book = () => {
     loadProduct();
   }, []);
 
+  const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
   const handleAddToShopifyCart = async () => {
-    if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Producto no disponible en la tienda en línea");
-      return;
+    // Physical book — Shopify removed. Send buyers to Amazon.
+    if (typeof window !== "undefined") {
+      window.open(AMAZON_URL_8000, "_blank", "noopener,noreferrer");
     }
-    const variant = shopifyProduct.node.variants.edges[0]?.node;
-    // AddToCart se dispara automáticamente desde cartStore.addItem
-    await addItem({
-      product: shopifyProduct,
-      variantId: shopifyVariantId,
-      variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: "25.00", currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: variant?.selectedOptions || [],
-    });
-    
   };
+
 
 
   // Meta Pixel ViewContent event

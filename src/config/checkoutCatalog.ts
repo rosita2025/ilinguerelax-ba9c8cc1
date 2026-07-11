@@ -89,6 +89,22 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     description: "5,000 vocabulary words in Spanish with English pronunciation",
     productPath: "/products/5-000-spanish-words-with-english-pronunciation-digital",
   },
+  "500-preguntas": {
+    id: "500-preguntas-ingles",
+    name: "Spanish Relax · 500 Questions in Spanish (Digital PDF)",
+    price: 12,
+    image: "/images/product-spanish-500-questions.png",
+    description: "500 essential Spanish questions with English pronunciation",
+    productPath: "/products/spanish-relax-500-questions-in-spanish-with-english-pronunciation-guide",
+  },
+  "8000-palabras": {
+    id: "8000-palabras-ingles",
+    name: "Inglés Relax · 8,000 Palabras Esenciales (Digital PDF)",
+    price: 20,
+    image: "/images/product-8000.webp",
+    description: "8,000 palabras del inglés con pronunciación en español y fonética UK/USA",
+    productPath: "/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  },
   "patrones-espanol": {
     id: "prueba-patrones-es",
     name: "Patrones en Español · Precio por región",
@@ -98,6 +114,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     description: "Precio ajustado por IP: LatAm $10 · Resto $15",
   },
 };
+
 
 export function getCatalogItem(slug: string | undefined): CatalogItem | null {
   if (!slug) return null;

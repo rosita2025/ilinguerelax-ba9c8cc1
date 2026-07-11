@@ -45,6 +45,11 @@ export const useAdminKey = () => {
 };
 
 export const AdminGate = ({ children }: { children: ReactNode }) => {
+  // Ensure the CSRF header is attached to every functions call even before login,
+  // so the login check itself is protected.
+  installAdminCsrfInterceptor();
+  getAdminCsrfToken();
+
   const [adminKey, setAdminKey] = useState<string>(() => {
     try { return sessionStorage.getItem(STORAGE_KEY) || ""; } catch { return ""; }
   });
@@ -55,6 +60,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+    resetAdminCsrfToken();
     setAdminKey("");
     navigate("/admin", { replace: true });
   };

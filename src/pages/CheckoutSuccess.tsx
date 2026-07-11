@@ -1,13 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package } from "lucide-react";
+import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package, Download, Gift, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
+import { useToast } from "@/hooks/use-toast";
+
+interface BonusEntry { name?: string; drive_url?: string; access_key?: string }
+interface DeliveryItem {
+  sku: string;
+  name: string;
+  drive_url: string | null;
+  access_key: string | null;
+  bonus_name: string | null;
+  bonus_drive_url: string | null;
+  bonus_access_key: string | null;
+  bonuses: BonusEntry[] | null;
+  cover_image_url: string | null;
+}
 
 export default function CheckoutSuccess() {
   const [sp] = useSearchParams();
@@ -42,6 +56,9 @@ export default function CheckoutSuccess() {
   const sentRef = useRef(false);
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
+  const { toast } = useToast();
+  const [delivery, setDelivery] = useState<DeliveryItem[]>([]);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
 
   // Build a friendly order number: ILR-<PROVIDER>-<6 chars>
   // Deterministic from the payment reference so the same payment always maps
@@ -102,6 +119,30 @@ export default function CheckoutSuccess() {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fetch delivery info (drive links + bonuses) for purchased SKUs
+  useEffect(() => {
+    if (!isVerifiedBuyer) return;
+    const skus = items.map((i) => i.id);
+    if (!skus.length) return;
+    setDeliveryLoading(true);
+    supabase.functions
+      .invoke("manage-products", { body: { action: "get_delivery", skus } })
+      .then(({ data, error }) => {
+        if (error) throw error;
+        setDelivery((data?.items ?? []) as DeliveryItem[]);
+      })
+      .catch((e) => console.error("get_delivery failed", e))
+      .finally(() => setDeliveryLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const copyKey = (val: string) => {
+    navigator.clipboard.writeText(val).then(
+      () => toast({ title: "Clave copiada", description: val }),
+      () => {},
+    );
+  };
 
   // Localized copy for the public / unverified screen (IP-based via useI18n)
   const publicCopy = {
@@ -231,6 +272,90 @@ export default function CheckoutSuccess() {
             </li>
           </ul>
         </section>
+
+        {/* Digital delivery — download links from admin/products */}
+        {(deliveryLoading || delivery.length > 0) && (
+          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Download className="w-5 h-5 text-primary" />
+              <h2 className="font-semibold text-base">Descarga tu material digital</h2>
+            </div>
+            {deliveryLoading && (
+              <p className="text-sm text-muted-foreground">Cargando enlaces…</p>
+            )}
+            <div className="space-y-3">
+              {delivery.map((d) => {
+                const bonusList: BonusEntry[] = [
+                  ...(d.bonus_drive_url ? [{ name: d.bonus_name || "Bonus", drive_url: d.bonus_drive_url, access_key: d.bonus_access_key || "" }] : []),
+                  ...((d.bonuses ?? []).filter((b) => b?.drive_url)),
+                ];
+                return (
+                  <div key={d.sku} className="rounded-lg border bg-card p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      {d.cover_image_url && (
+                        <img src={d.cover_image_url} alt={d.name} className="w-12 h-12 rounded object-cover" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{d.name}</div>
+                      </div>
+                    </div>
+                    {d.drive_url ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button asChild size="sm" className="gap-1.5">
+                          <a href={d.drive_url} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-4 h-4" /> Descargar / Ver en Drive
+                          </a>
+                        </Button>
+                        {d.access_key && (
+                          <button
+                            type="button"
+                            onClick={() => copyKey(d.access_key!)}
+                            className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md border bg-background hover:bg-muted"
+                            title="Copiar clave"
+                          >
+                            <Copy className="w-3.5 h-3.5" /> Clave: <code className="font-mono">{d.access_key}</code>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Te enviaremos el enlace de descarga a <strong>{buyer.email}</strong> en unos minutos.
+                      </p>
+                    )}
+                    {bonusList.length > 0 && (
+                      <div className="pt-2 border-t space-y-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                          <Gift className="w-3.5 h-3.5" /> Bonos incluidos
+                        </div>
+                        {bonusList.map((b, idx) => (
+                          <div key={idx} className="flex flex-wrap items-center gap-2 text-xs">
+                            <span className="font-medium">{b.name || `Bonus ${idx + 1}`}:</span>
+                            <a href={b.drive_url} target="_blank" rel="noopener noreferrer" className="text-primary underline inline-flex items-center gap-1">
+                              <Download className="w-3 h-3" /> Descargar
+                            </a>
+                            {b.access_key && (
+                              <button
+                                type="button"
+                                onClick={() => copyKey(b.access_key!)}
+                                className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                              >
+                                <Copy className="w-3 h-3" /> <code className="font-mono">{b.access_key}</code>
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Guarda esta página o revisa tu correo <strong>{buyer.email}</strong> — también te enviamos los enlaces por email.
+            </p>
+          </section>
+        )}
+
 
         {/* Order summary */}
         {items.length > 0 && (

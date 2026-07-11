@@ -15,7 +15,10 @@ export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
   upsells?: UpsellItem[];
   /** Ruta de la página del producto para el enlace "Volver al producto". */
   productPath?: string;
+  /** SKU real en admin/products (digital_products.sku) cuando difiere del slug del checkout. */
+  adminSku?: string;
 }
+
 
 
 /**
@@ -31,6 +34,8 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-patrones-especiales.webp",
     description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
     productPath: "/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles",
+    adminSku: "patrones-especiales",
+
 
     upsells: [
       {
@@ -60,6 +65,8 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-1000-verbos.webp",
     description: "1,000 verbos en presente, pasado y futuro con pronunciación",
     productPath: "/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+    adminSku: "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+
     upsells: [
       {
         id: "upsell-patrones-ingles",
@@ -88,6 +95,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
     productPath: "/products/5-000-spanish-words-with-english-pronunciation-digital",
+    adminSku: "5-000-spanish-words-with-english-pronunciation-digital",
   },
   "500-preguntas": {
     id: "500-preguntas-ingles",
@@ -96,7 +104,9 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-spanish-500-questions.png",
     description: "500 essential Spanish questions with English pronunciation",
     productPath: "/products/spanish-relax-500-questions-in-spanish-with-english-pronunciation-guide",
+    adminSku: "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
   },
+
   "8000-palabras": {
     id: "8000-palabras-ingles",
     name: "Inglés Relax · 8,000 Palabras Esenciales (Digital PDF)",

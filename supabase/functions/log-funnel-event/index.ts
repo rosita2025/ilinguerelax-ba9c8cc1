@@ -87,14 +87,7 @@ serve(async (req) => {
       });
     }
 
-    const xff = req.headers.get("x-forwarded-for") || "";
-    const ip = xff.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
     const country = await resolveCountry(ip, body.country || null);
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
 
     const { error } = await supabase.from("funnel_events").insert({
       event_name,

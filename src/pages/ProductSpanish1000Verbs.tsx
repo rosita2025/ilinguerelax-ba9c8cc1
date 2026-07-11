@@ -1,17 +1,16 @@
-import { useMemo } from "react";
 import { useCartStore } from "@/stores/cartStore";
+import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Sparkles, ShoppingCart, Star, Check, Shield, Download, Zap } from "lucide-react";
+import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 
 const productImage = "/images/product-spanish-1000-verbs.png";
-const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/43120267100221";
 const PRICE = "12.00";
 
 const features = [
@@ -26,34 +25,15 @@ const features = [
 ];
 
 const ProductSpanish1000Verbs = () => {
-  const addItem = useCartStore((s) => s.addItem);
+  const navigate = useNavigate();
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const campaign = useCampaignPrice(12, 54);
 
-  const handleBuyNow = async () => {
-    const shopifyProduct = {
-      node: {
-        id: "gid://shopify/Product/7842828582973",
-        title: "Spanish Relax - 1,000 Verbs in Spanish",
-        description: "",
-        handle: "spanish-relax-1-000-verbs-in-spanish-past-present-and-future-with-english-pronunciation",
-        priceRange: { minVariantPrice: { amount: PRICE, currencyCode: "USD" } },
-        images: { edges: [{ node: { url: productImage, altText: "1,000 Verbs in Spanish" } }] },
-        variants: { edges: [{ node: { id: SHOPIFY_VARIANT_ID, title: "Default Title", price: { amount: PRICE, currencyCode: "USD" }, availableForSale: true, selectedOptions: [{ name: "Title", value: "Default Title" }] } }] },
-        options: [{ name: "Title", values: ["Default Title"] }],
-      },
-    };
-
-    await addItem({
-      product: shopifyProduct,
-      variantId: SHOPIFY_VARIANT_ID,
-      variantTitle: "Default Title",
-      price: { amount: PRICE, currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: [{ name: "Title", value: "Default Title" }],
-    });
-
-    setDrawerOpen(true);
+  const handleBuyNow = () => {
+    // Route directly to internal checkout — Shopify is intentionally bypassed here
+    // to avoid the phantom "Spanish Relax - 1,000 Verbs in Spanish" line item.
+    setDrawerOpen(false);
+    navigate("/checkouts/1000-verbos");
   };
 
   return (

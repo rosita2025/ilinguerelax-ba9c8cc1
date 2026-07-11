@@ -67,10 +67,12 @@ const isPhysicalPreorderItem = (title: string) => {
 export const CartDrawer = () => {
   const { currency, formatPrice } = useI18n();
   const { 
-    items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
+    items: rawItems, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
     applyDiscount, removeDiscount, syncError, retrySync
   } = useCartStore();
+  // Filter out phantom/deprecated Shopify variants immediately so they never render.
+  const items = rawItems.filter((i) => !BLOCKED_VARIANTS.has(i.variantId));
 
   const navigate = useNavigate();
   const { tier } = useRegionTier();

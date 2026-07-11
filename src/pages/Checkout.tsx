@@ -22,6 +22,7 @@ export default function Checkout() {
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
+  const updateQty = useCheckoutPruebaStore((s) => s.updateQuantity);
   const items = useCheckoutPruebaStore((s) => s.items);
   const region = useRegionTier();
   const { language } = useI18n();

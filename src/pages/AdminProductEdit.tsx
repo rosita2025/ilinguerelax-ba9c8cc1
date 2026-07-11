@@ -355,6 +355,8 @@ const AdminProductEdit = () => {
                 </p>
               </div>
             </div>
+
+            <PricingPreview product={product} />
           </Card>
 
           <Card className="p-6 space-y-4">

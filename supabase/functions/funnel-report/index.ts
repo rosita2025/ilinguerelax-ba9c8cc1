@@ -202,11 +202,15 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
-    const since = new Date(Date.now() - safeDays * 86400000).toISOString();
+    const since = new Date(sinceMs).toISOString();
+    const untilIso = startDate && endDate && isoDate.test(endDate)
+      ? new Date(`${endDate}T23:59:59Z`).toISOString()
+      : new Date().toISOString();
     const { data: convData } = await supabase
       .from("funnel_events")
       .select("event_name, value, product_id")
       .gte("created_at", since)
+      .lte("created_at", untilIso)
       .in("event_name", FUNNEL_EVENTS)
       .limit(50000);
 

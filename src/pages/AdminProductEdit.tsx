@@ -215,8 +215,9 @@ const AdminProductEdit = () => {
 
           <h1 className="text-2xl font-bold">{isNew ? "Nuevo producto" : `Editar: ${product.name}`}</h1>
           {isNew && (
-            <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs">
-              ⚡ <b>Política estándar aplicada automáticamente</b>: Hotmart para LATAM (excepto 🇨🇺🇻🇪🇳🇮), Tienda propia para el resto del mundo + 🇵🇪. Pega el enlace de Hotmart abajo y el precio PEN se sugerirá desde el USD (×3.75).
+            <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs space-y-1">
+              <div>🌍 <b>Por defecto: Tienda mundial</b> (todos los países, sin Hotmart). Ideal para productos en español dirigidos a angloparlantes u otros idiomas.</div>
+              <div>⚡ Si tienes enlace de Hotmart (típico para productos que enseñan inglés/coreano/etc. a hispanos), pégalo abajo y toca <b>«Aplicar política estándar»</b> para enrutar LATAM → Hotmart.</div>
             </div>
           )}
 

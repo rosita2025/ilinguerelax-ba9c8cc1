@@ -169,8 +169,8 @@ const AdminEmailTest = () => {
             </Button>
           </header>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {(["manual", "shopify", "hotmart", "digital"] as Source[]).map((s) => (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card key={s} className="p-4">
                 <div className="text-xs text-muted-foreground">{sourceLabel[s]}</div>
                 <div className="text-2xl font-bold mt-1">{counts[s]}</div>

@@ -27,16 +27,54 @@ const resolveCountry = async (ip: string | null, fallback: string | null): Promi
   return fallback;
 };
 
-const BOT_UA = /(bot|crawler|spider|crawling|slurp|bingpreview|facebookexternalhit|whatsapp|telegrambot|discordbot|pinterest|semrush|ahrefs|mj12|dotbot|petalbot|yandex|baiduspider|duckduckbot|applebot|headlesschrome|phantomjs|puppeteer|playwright|lighthouse|gtmetrix|pagespeed|screaming|monitor|uptime|pingdom|curl|wget|python-requests|axios|httpclient|go-http-client|okhttp|scrapy)/i;
+// Cached bot filter patterns loaded from public.bot_filters (refreshed every 60s).
+type FilterRow = { pattern: string; kind: string; enabled: boolean };
+let filtersCache: { ua: RegExp | null; referrer: RegExp | null; ips: Set<string>; expires: number } = {
+  ua: null, referrer: null, ips: new Set(), expires: 0,
+};
+
+const buildRegex = (patterns: string[]): RegExp | null => {
+  if (patterns.length === 0) return null;
+  const escaped = patterns.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(`(${escaped.join("|")})`, "i");
+};
+
+const loadFilters = async (supabase: ReturnType<typeof createClient>) => {
+  const now = Date.now();
+  if (now < filtersCache.expires) return filtersCache;
+  const { data } = await supabase.from("bot_filters").select("pattern,kind,enabled").eq("enabled", true);
+  const rows = (data ?? []) as FilterRow[];
+  filtersCache = {
+    ua: buildRegex(rows.filter((r) => r.kind === "user_agent").map((r) => r.pattern)),
+    referrer: buildRegex(rows.filter((r) => r.kind === "referrer").map((r) => r.pattern)),
+    ips: new Set(rows.filter((r) => r.kind === "ip").map((r) => r.pattern.trim())),
+    expires: now + 60000,
+  };
+  return filtersCache;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
     const ua = req.headers.get("user-agent") || "";
-    if (BOT_UA.test(ua)) {
-      // Silently drop bot/crawler hits — keep humans-only in funnel_events
-      return new Response(JSON.stringify({ ok: true, skipped: "bot" }), {
+    const referer = req.headers.get("referer") || req.headers.get("referrer") || "";
+    const xff = req.headers.get("x-forwarded-for") || "";
+    const ip = xff.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
+
+    const filters = await loadFilters(supabase);
+    const skipReason =
+      (filters.ua && filters.ua.test(ua)) ? "bot_ua" :
+      (filters.referrer && filters.referrer.test(referer)) ? "bot_referrer" :
+      (ip && filters.ips.has(ip)) ? "bot_ip" : null;
+
+    if (skipReason) {
+      return new Response(JSON.stringify({ ok: true, skipped: skipReason }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

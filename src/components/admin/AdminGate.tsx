@@ -4,21 +4,28 @@ import { Helmet } from "react-helmet-async";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Lock, Loader2, ShieldAlert } from "lucide-react";
+import { Lock, Loader2, ShieldAlert, MailCheck, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getAdminCsrfToken, resetAdminCsrfToken } from "@/lib/adminInvoke";
+import {
+  getAdminCsrfToken,
+  resetAdminCsrfToken,
+  getAdmin2FAToken,
+  setAdmin2FAToken,
+  resetAdmin2FAToken,
+} from "@/lib/adminInvoke";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "ilr_admin_key";
 const ATTEMPTS_KEY = "ilr_admin_attempts";
 const LOCK_KEY = "ilr_admin_lock_until";
+const OTP_ATTEMPTS_KEY = "ilr_admin_otp_attempts";
 const MAX_ATTEMPTS = 5;
-const LOCK_MS = 5 * 60 * 1000; // 5 min
+const MAX_OTP_ATTEMPTS = 5;
+const LOCK_MS = 5 * 60 * 1000;
 
-// Install once: any call to a Supabase Edge Function gets the admin CSRF header.
-// Server (`_shared/adminCsrf.ts`) validates the token + Origin allowlist.
+// Install once: any call to /functions/v1/* gets CSRF + 2FA headers.
 let fetchPatched = false;
-function installAdminCsrfInterceptor() {
+function installAdminHeaderInterceptor() {
   if (fetchPatched || typeof window === "undefined") return;
   fetchPatched = true;
   const orig = window.fetch.bind(window);
@@ -28,6 +35,8 @@ function installAdminCsrfInterceptor() {
       if (url && url.includes("/functions/v1/")) {
         const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
         if (!headers.has("x-admin-csrf")) headers.set("x-admin-csrf", getAdminCsrfToken());
+        const twofa = getAdmin2FAToken();
+        if (twofa && !headers.has("x-admin-2fa")) headers.set("x-admin-2fa", twofa);
         return orig(input, { ...init, headers });
       }
     } catch { /* noop */ }
@@ -44,16 +53,25 @@ export const useAdminKey = () => {
   return ctx;
 };
 
+type Stage = "password" | "otp";
+
 export const AdminGate = ({ children }: { children: ReactNode }) => {
-  // Ensure the CSRF header is attached to every functions call even before login,
-  // so the login check itself is protected.
-  installAdminCsrfInterceptor();
+  installAdminHeaderInterceptor();
   getAdminCsrfToken();
 
   const [adminKey, setAdminKey] = useState<string>(() => {
-    try { return sessionStorage.getItem(STORAGE_KEY) || ""; } catch { return ""; }
+    try {
+      const key = sessionStorage.getItem(STORAGE_KEY) || "";
+      // Only consider logged-in if we also have a valid 2FA token.
+      return key && getAdmin2FAToken() ? key : "";
+    } catch { return ""; }
   });
+  const [stage, setStage] = useState<Stage>("password");
+  const [pendingKey, setPendingKey] = useState("");
+  const [challengeId, setChallengeId] = useState("");
+  const [sentTo, setSentTo] = useState("");
   const [input, setInput] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,11 +79,15 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
     resetAdminCsrfToken();
+    resetAdmin2FAToken();
     setAdminKey("");
+    setStage("password");
+    setPendingKey("");
+    setChallengeId("");
     navigate("/admin", { replace: true });
   };
 
-  // Validate stored key on mount (in case it was rotated)
+  // Validate stored session on mount — if 2FA expired or key rotated, boot back.
   useEffect(() => {
     if (!adminKey) return;
     let cancelled = false;
@@ -74,9 +96,14 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         body: { action: "list", adminKey },
       });
       if (cancelled) return;
-      if (error || (data as { error?: string } | null)?.error) {
+      const err = (data as { error?: string; code?: string } | null);
+      if (error || err?.error) {
         try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+        resetAdmin2FAToken();
         setAdminKey("");
+        if (err?.code === "TWO_FA_REQUIRED") {
+          toast.info("Sesión 2FA expirada. Verifica de nuevo.");
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -90,7 +117,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     } catch { return 0; }
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submitPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input) return;
     const remaining = getLockRemaining();
@@ -100,10 +127,12 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("manage-reviews", {
-        body: { action: "list", adminKey: input },
+      // admin-2fa "request" both validates the admin key and emails the OTP.
+      const { data, error } = await supabase.functions.invoke("admin-2fa", {
+        body: { action: "request", adminKey: input },
       });
-      if (error || (data as { error?: string } | null)?.error) {
+      const payload = data as { challengeId?: string; sentTo?: string; error?: string } | null;
+      if (error || payload?.error || !payload?.challengeId) {
         let attempts = 0;
         try { attempts = Number(localStorage.getItem(ATTEMPTS_KEY) || 0) + 1; } catch { /* noop */ }
         try { localStorage.setItem(ATTEMPTS_KEY, String(attempts)); } catch { /* noop */ }
@@ -113,22 +142,85 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
             localStorage.setItem(ATTEMPTS_KEY, "0");
           } catch { /* noop */ }
           toast.error("Demasiados intentos. Bloqueado 5 minutos.");
+        } else if (payload?.error === "email_failed") {
+          toast.error("No se pudo enviar el código. Revisa la config de correo.");
         } else {
           toast.error(`Clave incorrecta (${MAX_ATTEMPTS - attempts} intentos restantes)`);
         }
         return;
       }
-      try {
-        localStorage.removeItem(ATTEMPTS_KEY);
-        localStorage.removeItem(LOCK_KEY);
-        sessionStorage.setItem(STORAGE_KEY, input);
-      } catch { /* noop */ }
-      setAdminKey(input);
+      try { localStorage.removeItem(ATTEMPTS_KEY); localStorage.removeItem(LOCK_KEY); } catch { /* noop */ }
+      setPendingKey(input);
+      setChallengeId(payload.challengeId);
+      setSentTo(payload.sentTo || "");
       setInput("");
-      toast.success("Acceso concedido");
-      if (location.pathname === "/admin") return; // stay on hub
+      setOtp("");
+      setStage("otp");
+      try { sessionStorage.setItem(OTP_ATTEMPTS_KEY, "0"); } catch { /* noop */ }
+      toast.success(`Código enviado a ${payload.sentTo || "tu correo"}`);
     } catch {
       toast.error("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(otp)) {
+      toast.error("Ingresa el código de 6 dígitos");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-2fa", {
+        body: { action: "verify", challengeId, code: otp },
+      });
+      const payload = data as { token?: string; expiresAt?: number; error?: string } | null;
+      if (error || payload?.error || !payload?.token || !payload?.expiresAt) {
+        let attempts = 0;
+        try { attempts = Number(sessionStorage.getItem(OTP_ATTEMPTS_KEY) || 0) + 1; } catch { /* noop */ }
+        try { sessionStorage.setItem(OTP_ATTEMPTS_KEY, String(attempts)); } catch { /* noop */ }
+        if (attempts >= MAX_OTP_ATTEMPTS || payload?.error === "challenge_expired") {
+          toast.error("Código inválido o expirado. Vuelve a iniciar sesión.");
+          setStage("password");
+          setChallengeId("");
+          setPendingKey("");
+        } else {
+          toast.error(`Código inválido (${MAX_OTP_ATTEMPTS - attempts} intentos restantes)`);
+        }
+        return;
+      }
+      setAdmin2FAToken(payload.token, payload.expiresAt);
+      try { sessionStorage.setItem(STORAGE_KEY, pendingKey); } catch { /* noop */ }
+      setAdminKey(pendingKey);
+      setPendingKey("");
+      setChallengeId("");
+      setOtp("");
+      toast.success("Acceso concedido");
+      if (location.pathname === "/admin") return;
+    } catch {
+      toast.error("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendOtp = async () => {
+    if (!pendingKey || loading) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-2fa", {
+        body: { action: "request", adminKey: pendingKey },
+      });
+      const payload = data as { challengeId?: string; sentTo?: string; error?: string } | null;
+      if (error || payload?.error || !payload?.challengeId) {
+        toast.error("No se pudo reenviar el código");
+        return;
+      }
+      setChallengeId(payload.challengeId);
+      setSentTo(payload.sentTo || sentTo);
+      toast.success("Código reenviado");
     } finally {
       setLoading(false);
     }
@@ -152,33 +244,84 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         <div className="min-h-dvh flex items-center justify-center bg-background p-4">
           <Card className="p-8 max-w-sm w-full space-y-4">
             <div className="text-center">
-              <Lock className="w-10 h-10 text-primary mx-auto mb-3" />
-              <h1 className="text-xl font-bold">Panel privado</h1>
+              {stage === "password" ? (
+                <Lock className="w-10 h-10 text-primary mx-auto mb-3" />
+              ) : (
+                <MailCheck className="w-10 h-10 text-primary mx-auto mb-3" />
+              )}
+              <h1 className="text-xl font-bold">
+                {stage === "password" ? "Panel privado" : "Verificación 2FA"}
+              </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Acceso restringido. Solo personal autorizado.
+                {stage === "password"
+                  ? "Acceso restringido. Solo personal autorizado."
+                  : `Enviamos un código de 6 dígitos a ${sentTo || "tu correo"}. Vence en 5 min.`}
               </p>
             </div>
-            {lockRemaining > 0 && (
+
+            {stage === "password" && lockRemaining > 0 && (
               <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
                 <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>Acceso bloqueado por seguridad. Intenta de nuevo en {Math.ceil(lockRemaining / 60)} min.</span>
               </div>
             )}
-            <form onSubmit={submit} className="space-y-3" autoComplete="off">
-              <Input
-                type="password"
-                autoFocus
-                placeholder="Clave admin"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                autoComplete="off"
-                spellCheck={false}
-                disabled={lockRemaining > 0}
-              />
-              <Button type="submit" className="w-full" disabled={loading || !input || lockRemaining > 0}>
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Entrar"}
-              </Button>
-            </form>
+
+            {stage === "password" ? (
+              <form onSubmit={submitPassword} className="space-y-3" autoComplete="off">
+                <Input
+                  type="password"
+                  autoFocus
+                  placeholder="Clave admin"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                  disabled={lockRemaining > 0}
+                />
+                <Button type="submit" className="w-full" disabled={loading || !input || lockRemaining > 0}>
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Continuar"}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={submitOtp} className="space-y-3" autoComplete="off">
+                <div className="relative">
+                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    autoFocus
+                    placeholder="Código de 6 dígitos"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    className="pl-9 tracking-[0.5em] text-center font-mono"
+                    autoComplete="one-time-code"
+                    spellCheck={false}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading || otp.length !== 6}>
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verificar y entrar"}
+                </Button>
+                <div className="flex items-center justify-between text-xs">
+                  <button
+                    type="button"
+                    onClick={() => { setStage("password"); setOtp(""); setChallengeId(""); setPendingKey(""); }}
+                    className="text-muted-foreground hover:text-foreground underline underline-offset-2"
+                  >
+                    ← Volver
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resendOtp}
+                    disabled={loading}
+                    className="text-primary hover:underline underline-offset-2 disabled:opacity-50"
+                  >
+                    Reenviar código
+                  </button>
+                </div>
+              </form>
+            )}
           </Card>
         </div>
       </>

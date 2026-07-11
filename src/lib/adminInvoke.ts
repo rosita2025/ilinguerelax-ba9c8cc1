@@ -1,13 +1,14 @@
-// Client-side helper that attaches an `x-admin-csrf` token to every admin
-// edge-function call. Paired with `_shared/adminCsrf.ts` on the server, this
-// prevents cross-site request forgery attempts against the admin panel:
-// - The token is generated per browser session, stored in sessionStorage
-//   (never in a cookie, so no automatic cross-site attachment).
-// - The custom header forces a CORS preflight, which the server rejects for
-//   any non-allowlisted origin.
+// Client-side helpers for the admin panel:
+// - `x-admin-csrf`: per-session random token, forces CORS preflight, paired
+//   with the server-side Origin allowlist in `_shared/adminCsrf.ts`.
+// - `x-admin-2fa`: HMAC-signed 12h session token issued by `admin-2fa` after
+//   the operator completes an email OTP challenge. Required on every admin
+//   call (server enforces this).
 import { supabase } from "@/integrations/supabase/client";
 
 const CSRF_KEY = "ilr_admin_csrf";
+const TWOFA_TOKEN_KEY = "ilr_admin_2fa";
+const TWOFA_EXP_KEY = "ilr_admin_2fa_exp";
 
 export function getAdminCsrfToken(): string {
   try {
@@ -26,6 +27,31 @@ export function resetAdminCsrfToken() {
   try { sessionStorage.removeItem(CSRF_KEY); } catch { /* noop */ }
 }
 
+export function getAdmin2FAToken(): string | null {
+  try {
+    const token = sessionStorage.getItem(TWOFA_TOKEN_KEY);
+    const exp = Number(sessionStorage.getItem(TWOFA_EXP_KEY) || 0);
+    if (!token || !exp || exp < Date.now()) return null;
+    return token;
+  } catch {
+    return null;
+  }
+}
+
+export function setAdmin2FAToken(token: string, expiresAt: number) {
+  try {
+    sessionStorage.setItem(TWOFA_TOKEN_KEY, token);
+    sessionStorage.setItem(TWOFA_EXP_KEY, String(expiresAt));
+  } catch { /* noop */ }
+}
+
+export function resetAdmin2FAToken() {
+  try {
+    sessionStorage.removeItem(TWOFA_TOKEN_KEY);
+    sessionStorage.removeItem(TWOFA_EXP_KEY);
+  } catch { /* noop */ }
+}
+
 function generateToken(): string {
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
@@ -36,14 +62,12 @@ type InvokeOptions = Parameters<typeof supabase.functions.invoke>[1] & {
   headers?: Record<string, string>;
 };
 
-/**
- * Drop-in replacement for `supabase.functions.invoke` that attaches the admin
- * CSRF header. Use this for every admin panel call.
- */
 export function adminInvoke<T = unknown>(fn: string, options: InvokeOptions = {}) {
-  const headers = {
+  const twofa = getAdmin2FAToken();
+  const headers: Record<string, string> = {
     ...(options.headers || {}),
     "x-admin-csrf": getAdminCsrfToken(),
   };
+  if (twofa) headers["x-admin-2fa"] = twofa;
   return supabase.functions.invoke<T>(fn, { ...options, headers });
 }

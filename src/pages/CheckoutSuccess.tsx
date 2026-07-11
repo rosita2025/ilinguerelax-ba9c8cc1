@@ -184,7 +184,7 @@ export default function CheckoutSuccess() {
             <CheckCircle2 className="w-11 h-11 text-green-600 dark:text-green-400" />
           </div>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
-            {paymentId ? `${t.orderNumber} #${String(paymentId).slice(-8).toUpperCase()}` : t.orderConfirmed}
+            {t.orderNumber} <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
           </p>
           <h1 className="text-3xl md:text-4xl font-bold">
             {t.thanks(buyer.fullName ? buyer.fullName.split(" ")[0] : undefined)}

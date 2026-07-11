@@ -184,12 +184,15 @@ serve(async (req) => {
     const since = new Date(Date.now() - winSec * 1000).toISOString();
     const win = winSec / 60;
 
-    const { data, error } = await supabase
-      .from("funnel_events")
-      .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at")
-      .gte("created_at", since)
-      .order("created_at", { ascending: false })
-      .limit(5000);
+    const [{ data, error }, ga4] = await Promise.all([
+      supabase
+        .from("funnel_events")
+        .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at")
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(5000),
+      fetchGa4Live(),
+    ]);
     if (error) throw error;
 
     const rows = (data || []).filter((row) => !isAdminPath((row.page_path as string) || null));

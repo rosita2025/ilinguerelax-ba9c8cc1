@@ -341,6 +341,26 @@ export function PaymentMethodsGroup() {
       console.warn("[manual_payments] insert failed", e);
     }
 
+    // Notificar a Rosa (hola@ilinguerelax.com) con botón directo a WhatsApp del cliente
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-manual-pending",
+        idempotencyKey: `manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim(),
+          customerEmail: s.buyer.email.trim().toLowerCase(),
+          customerPhone: s.buyer.phone ?? "",
+          customerCountry: (region.country || "").toUpperCase(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "USD",
+          method: "Yape/Plin",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[admin-manual-pending] notify failed", err));
+
     supabase.from("email_contacts").upsert({
       email: s.buyer.email.trim().toLowerCase(),
       name: s.buyer.fullName.trim(),

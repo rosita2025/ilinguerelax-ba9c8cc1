@@ -92,21 +92,14 @@ const ProductSpanishGrammarPatterns = () => {
     loadProduct();
   }, []);
 
+  const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
   const handleAddToCart = async () => {
-    if (!shopifyVariantId || !shopifyProduct) {
-      toast.error("Product is loading. Please try again in a moment.");
-      return;
+    // Physical book — Shopify removed. Send buyers to Amazon.
+    if (typeof window !== "undefined") {
+      window.open(AMAZON_URL_GRAMMAR, "_blank", "noopener,noreferrer");
     }
-    const variant = shopifyProduct.node.variants.edges[0]?.node;
-    await addItem({
-      product: shopifyProduct,
-      variantId: shopifyVariantId,
-      variantTitle: variant?.title || "Default",
-      price: variant?.price || { amount: String(PRICE), currencyCode: "USD" },
-      quantity: 1,
-      selectedOptions: variant?.selectedOptions || [],
-    });
   };
+
 
   const pixelParams = useMemo(
     () => ({

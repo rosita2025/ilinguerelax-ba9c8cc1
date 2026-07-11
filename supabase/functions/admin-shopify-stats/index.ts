@@ -34,7 +34,7 @@ const PAGE_LABEL = (p: string | null): string => {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const csrfBlock = assertAdminCsrf(req);
+  const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;
 
   const url = new URL(req.url);

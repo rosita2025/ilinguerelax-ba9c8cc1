@@ -68,7 +68,7 @@ const buildAnnouncementHtml = (productName: string, productUrl: string, imageUrl
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
 
-  const csrfBlock = assertAdminCsrf(req);
+  const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;
     return new Response(null, { headers: corsHeaders });
   }

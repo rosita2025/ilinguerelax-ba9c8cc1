@@ -135,7 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Internal notification
-    await resend.emails.send({
+    const internalRes = await resend.emails.send({
       from: "iLingue Relax <hola@ilinguerelax.com>",
       to: ["hola@ilinguerelax.com"],
       subject: `🛒 New order ${orderRef} — ${customerEmail}`,
@@ -148,7 +148,15 @@ const handler = async (req: Request): Promise<Response> => {
         <ul>${items.map((i) => `<li>${i.quantity}× ${i.name} — $${(i.price * i.quantity).toFixed(2)}</li>`).join("")}</ul>`,
     });
 
-    return new Response(JSON.stringify({ success: true, customerRes }), {
+    if (customerRes.error) {
+      console.error("Customer email failed", customerRes.error);
+      return new Response(
+        JSON.stringify({ success: false, error: customerRes.error, internalRes }),
+        { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+
+    return new Response(JSON.stringify({ success: true, customerRes, internalRes }), {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error) {

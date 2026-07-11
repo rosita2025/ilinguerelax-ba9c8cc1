@@ -164,6 +164,8 @@ Deno.serve(async (req) => {
         provider: "yape_plin",
       });
 
+      await markAbandonedCartConverted(order.buyer_email);
+
       return new Response(JSON.stringify({ success: true, materialsSent: materials.length }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

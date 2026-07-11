@@ -140,7 +140,7 @@ const AdminProducts = () => {
               </thead>
               <tbody>
                 {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
+                  <tr><td colSpan={7} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
                 )}
                 {filtered.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">

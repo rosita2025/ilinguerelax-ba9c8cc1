@@ -27,7 +27,7 @@ export default function CheckoutPrueba1() {
 
   const staticItem = getCatalogItem(slug);
   const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
-  const [loadingDb, setLoadingDb] = useState(!staticItem && !!slug);
+  const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
 
   // If slug not in static catalog, try to load from digital_products table
@@ -79,13 +79,10 @@ export default function CheckoutPrueba1() {
   // fill name+email but leave without completing card payment.
   useAbandonedCheckoutTracker(slug, catalogItem?.name);
 
-  if (loadingDb) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Cargando checkout…</div>
-      </div>
-    );
+  if (loadingDb && !catalogItem && !slugUnknown) {
+    // Silent background fetch — don't block UI with a loader
   }
+
 
   if (slugUnknown) {
     return (

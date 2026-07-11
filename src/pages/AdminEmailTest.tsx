@@ -52,6 +52,7 @@ const sourceColor: Record<Source, string> = {
 };
 
 const AdminEmailTest = () => {
+  const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [counts, setCounts] = useState({ manual: 0, shopify: 0, hotmart: 0, digital: 0 });
@@ -59,12 +60,14 @@ const AdminEmailTest = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const [manualRes, shopifyRes, hotmartRes, digitalRes] = await Promise.all([
-        supabase.from("manual_payments").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("shopify_sales").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("hotmart_purchases").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("digital_email_sends").select("*").order("created_at", { ascending: false }).limit(100),
-      ]);
+      const { data, error } = await supabase.functions.invoke("list-admin-orders", {
+        body: { adminKey },
+      });
+      if (error) throw error;
+      const manualRes = { data: (data as any)?.manual ?? [] };
+      const shopifyRes = { data: (data as any)?.shopify ?? [] };
+      const hotmartRes = { data: (data as any)?.hotmart ?? [] };
+      const digitalRes = { data: (data as any)?.digital ?? [] };
 
       const digitalByEmail = new Map<string, any>();
       (digitalRes.data ?? []).forEach((d: any) => {

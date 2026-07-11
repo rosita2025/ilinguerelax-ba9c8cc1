@@ -21,6 +21,8 @@ export default function CheckoutPrueba1() {
   const { slug } = useParams<{ slug?: string }>();
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
+  const items = useCheckoutPruebaStore((s) => s.items);
   const region = useRegionTier();
   const { language } = useI18n();
   const t = getCheckoutUI(language);

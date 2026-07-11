@@ -63,6 +63,7 @@ const AdminManualPayments = lazy(() => import("./pages/AdminManualPayments"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
 const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
+const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
 
 import { AdminGate } from "@/components/admin/AdminGate";

@@ -60,6 +60,13 @@ const panels = [
     desc: "Catálogo tipo Shopify: crea productos, precios, enlaces de Drive y upsells sin tocar código. Se sincroniza con checkout y correos.",
     color: "text-teal-600",
   },
+  {
+    to: "/admin/email-test",
+    icon: Mail,
+    title: "Prueba de correo",
+    desc: "Envía un email transaccional real asociado a una orden y ve en vivo cómo el webhook de Brevo marca delivered / opened / bounced.",
+    color: "text-sky-600",
+  },
 ];
 
 const AdminHome = () => {

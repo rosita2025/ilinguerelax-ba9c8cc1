@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { Check, ArrowLeft, Download, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -70,25 +71,10 @@ const ProductDynamic = () => {
       setLoading(false);
     };
     load();
-    const onVis = () => { if (document.visibilityState === "visible") load(); };
-    const onFocus = () => load();
-    const onStorage = (e: StorageEvent) => { if (e.key === "ilr-catalog-updated") load(); };
-    let bc: BroadcastChannel | null = null;
-    if ("BroadcastChannel" in window) {
-      bc = new BroadcastChannel("ilr-catalog");
-      bc.onmessage = (ev) => {
-        if (ev.data?.type === "product-updated" && (!ev.data.sku || ev.data.sku === slug)) load();
-      };
-    }
-    document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("focus", onFocus);
-    window.addEventListener("storage", onStorage);
+    const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load });
     return () => {
       cancelled = true;
-      document.removeEventListener("visibilitychange", onVis);
-      window.removeEventListener("focus", onFocus);
-      window.removeEventListener("storage", onStorage);
-      bc?.close();
+      unsubscribe();
     };
   }, [slug]);
 

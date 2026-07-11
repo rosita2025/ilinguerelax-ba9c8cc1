@@ -13,6 +13,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
 import { COUNTRY_INFO } from "@/lib/countryInfo";
+import { publishCatalogUpdate } from "@/lib/catalogSync";
 
 interface Product {
   sku: string;
@@ -196,14 +197,7 @@ const AdminProductEdit = () => {
           .maybeSingle();
         if (fresh?.updated_at) version = new Date(fresh.updated_at).getTime();
       } catch { /* ignore */ }
-      try {
-        localStorage.setItem("ilr-catalog-updated", `${product.sku}:${version}`);
-        if ("BroadcastChannel" in window) {
-          const bc = new BroadcastChannel("ilr-catalog");
-          bc.postMessage({ type: "product-updated", sku: product.sku, at: version });
-          bc.close();
-        }
-      } catch { /* ignore */ }
+      publishCatalogUpdate(product.sku, version);
       toast({ title: "✅ Guardado" });
       navigate("/admin/productos");
     } catch (e) {

@@ -4,12 +4,22 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { upsertBrevoContact } from "./brevoContact.ts";
 
+interface Item {
+  name: string;
+  qty?: number;
+  price?: number;
+  kind?: "main" | "upsell" | "bonus";
+}
+
 interface Args {
   customerEmail: string;
   customerName?: string;
   customerPhone?: string;
   customerCountry?: string;
+  customerAddress?: string;
   productName?: string;
+  items?: Item[];
+  bonuses?: string[];
   amount?: number;
   currency?: string;
   provider: "stripe" | "paypal" | "mercadopago";
@@ -75,7 +85,10 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
     customerEmail: a.customerEmail,
     customerPhone: a.customerPhone,
     customerCountry: a.customerCountry,
+    customerAddress: a.customerAddress,
     productName: a.productName,
+    items: a.items,
+    bonuses: a.bonuses,
     amount: a.amount,
     currency: a.currency,
     provider: a.provider,

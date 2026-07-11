@@ -355,6 +355,8 @@ const AdminProductEdit = () => {
                 </p>
               </div>
             </div>
+
+            <PricingPreview product={product} />
           </Card>
 
           <Card className="p-6 space-y-4">
@@ -708,5 +710,134 @@ const AdminProductEdit = () => {
     </>
   );
 };
+
+// LATAM set — debe coincidir con src/hooks/useRegionTier.ts
+const LATAM_TIER = new Set([
+  "AR","BO","BR","CL","CO","CR","CU","DO","EC","SV",
+  "GT","HN","MX","NI","PA","PY","PE","PR","UY","VE",
+]);
+
+const PREVIEW_PRESETS: { code: string; label: string }[] = [
+  { code: "PE", label: "🇵🇪 Perú" },
+  { code: "MX", label: "🇲🇽 México" },
+  { code: "CO", label: "🇨🇴 Colombia" },
+  { code: "AR", label: "🇦🇷 Argentina" },
+  { code: "CL", label: "🇨🇱 Chile" },
+  { code: "BR", label: "🇧🇷 Brasil" },
+  { code: "US", label: "🇺🇸 USA" },
+  { code: "CA", label: "🇨🇦 Canadá" },
+  { code: "ES", label: "🇪🇸 España" },
+  { code: "GB", label: "🇬🇧 UK" },
+  { code: "DE", label: "🇩🇪 Alemania" },
+  { code: "FR", label: "🇫🇷 Francia" },
+  { code: "AU", label: "🇦🇺 Australia" },
+  { code: "JP", label: "🇯🇵 Japón" },
+  { code: "KR", label: "🇰🇷 Corea" },
+];
+
+function PricingPreview({ product }: { product: Product }) {
+  const [country, setCountry] = useState<string>("PE");
+
+  const info = COUNTRY_INFO[country];
+  const isLatam = LATAM_TIER.has(country);
+  const tierLabel = isLatam ? "🌎 LATAM" : "🌐 Resto del mundo";
+
+  const usdPrice = isLatam && product.price_usd_latam != null
+    ? Number(product.price_usd_latam)
+    : Number(product.price_usd || 0);
+  const usdSource = isLatam && product.price_usd_latam != null
+    ? "price_usd_latam"
+    : "price_usd";
+
+  const showPen = country === "PE" && product.price_pen != null;
+  const storeExc = new Set(product.store_excluded_countries ?? []);
+  const hotExc = new Set(product.hotmart_excluded_countries ?? []);
+  const storeAvail = product.store_enabled && !storeExc.has(country);
+  const hotAvail = !!product.hotmart_url?.trim() && !hotExc.has(country);
+
+  return (
+    <div className="rounded-lg border-2 border-dashed border-primary/40 bg-primary/5 p-3 space-y-3">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="text-sm font-semibold">👁️ Previsualización del checkout</div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs whitespace-nowrap">País del comprador</Label>
+          <select
+            className="h-8 text-xs border border-input rounded-md px-2 bg-background"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+          >
+            {PREVIEW_PRESETS.map((p) => (
+              <option key={p.code} value={p.code}>{p.label}</option>
+            ))}
+            <optgroup label="── Todos los países ──">
+              {Object.entries(COUNTRY_INFO)
+                .sort((a, b) => a[1].name.localeCompare(b[1].name))
+                .map(([code, i]) => (
+                  <option key={code} value={code}>{i.flag} {i.name} ({code})</option>
+                ))}
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-2 text-xs">
+        <div className="p-2 rounded border bg-background/60">
+          <div className="text-muted-foreground">Región detectada</div>
+          <div className="font-semibold">{info?.flag} {info?.name ?? country} · {tierLabel}</div>
+        </div>
+        <div className="p-2 rounded border bg-background/60">
+          <div className="text-muted-foreground">Precio que verá</div>
+          <div className="font-semibold text-base text-primary">
+            {showPen ? `S/ ${product.price_pen}` : `$${usdPrice.toFixed(2)} USD`}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">
+            {showPen ? "campo: price_pen" : `campo: ${usdSource}`}
+            {!isLatam && product.price_usd_latam != null && " · (precio LATAM ignorado)"}
+            {isLatam && product.price_usd_latam == null && " · (sin precio LATAM → usa global)"}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-2 text-xs">
+        <div className={`p-2 rounded border ${storeAvail ? "border-green-500/40 bg-green-500/10" : "border-border bg-muted/40 opacity-60"}`}>
+          <div className="flex items-center justify-between">
+            <span className="font-medium">🛒 Tienda ILINGUE RELAX</span>
+            <span className={storeAvail ? "text-green-700 dark:text-green-400" : "text-muted-foreground"}>
+              {storeAvail ? "Se muestra" : "Oculto"}
+            </span>
+          </div>
+          {!storeAvail && (
+            <div className="text-[10px] text-muted-foreground mt-0.5">
+              {!product.store_enabled ? "Tienda desactivada" : `Excluido en ${country}`}
+            </div>
+          )}
+        </div>
+        <div className={`p-2 rounded border ${hotAvail ? "border-[#EF4E23]/40 bg-[#EF4E23]/10" : "border-border bg-muted/40 opacity-60"}`}>
+          <div className="flex items-center justify-between">
+            <span className="font-medium">🔥 Hotmart</span>
+            <span className={hotAvail ? "text-[#EF4E23]" : "text-muted-foreground"}>
+              {hotAvail ? "Se muestra" : "Oculto"}
+            </span>
+          </div>
+          {!hotAvail && (
+            <div className="text-[10px] text-muted-foreground mt-0.5">
+              {!product.hotmart_url?.trim() ? "Sin enlace de Hotmart" : `Excluido en ${country}`}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {!storeAvail && !hotAvail && (
+        <div className="text-[11px] p-2 rounded border border-destructive/40 bg-destructive/10 text-destructive">
+          ⚠️ Este país no vería <b>ningún</b> botón de compra con la configuración actual.
+        </div>
+      )}
+
+      <div className="text-[10px] text-muted-foreground">
+        Simulación local — no cambia lo que verán los compradores reales. Guarda los cambios para publicarlos.
+      </div>
+    </div>
+  );
+}
 
 export default AdminProductEdit;

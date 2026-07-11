@@ -310,23 +310,44 @@ serve(async (req) => {
       if (ev === "Purchase") recordPurchase(row as Record<string, unknown>);
     }
 
+    // ---- Merge GA4 realtime into the live snapshot ----
+    const mergedByCountry = { ...byCountry };
+    const mergedByPageLabel = { ...byPageLabel };
+    const mergedByEvent = { ...byEvent };
+    if (ga4) {
+      for (const [c, n] of Object.entries(ga4.byCountry)) {
+        mergedByCountry[c] = Math.max(mergedByCountry[c] || 0, n);
+      }
+      for (const [p, n] of Object.entries(ga4.byPage)) {
+        mergedByPageLabel[p] = Math.max(mergedByPageLabel[p] || 0, n);
+      }
+      for (const [e, n] of Object.entries(ga4.byEvent)) {
+        mergedByEvent[e] = Math.max(mergedByEvent[e] || 0, n);
+      }
+    }
+    const ga4Active = ga4?.activeUsers || 0;
+    const activeNow = Math.max(activeFive.size, ga4Active);
+    const totalOut = Math.max(visitors.length, ga4Active);
+
     return new Response(JSON.stringify({
       windowMinutes: win,
-      total: visitors.length,
-      activeNow: activeFive.size,
-      productViews: byEvent.ViewContent || 0,
-      checkouts: byEvent.InitiateCheckout || 0,
+      total: totalOut,
+      activeNow,
+      ga4ActiveUsers: ga4Active,
+      ga4Available: !!ga4,
+      productViews: mergedByEvent.ViewContent || mergedByEvent.view_item || 0,
+      checkouts: byEvent.InitiateCheckout || mergedByEvent.begin_checkout || 0,
       checkoutSessions: checkoutSessions.size,
       purchases: purchaseSessions.size,
       purchaseSessions: purchaseSessions.size,
       revenue,
-      byCountry,
+      byCountry: mergedByCountry,
       byPage,
-      byPageLabel,
+      byPageLabel: mergedByPageLabel,
       byProduct,
       bySource,
       byChannel,
-      byEvent,
+      byEvent: mergedByEvent,
       revenueByCountry,
       visitors: visitors.slice(0, 200),
       recentEvents,

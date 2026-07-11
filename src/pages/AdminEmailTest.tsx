@@ -161,7 +161,7 @@ const AdminEmailTest = () => {
                 <ShoppingBag className="w-7 h-7 text-primary" /> Pedidos de clientes
               </h1>
               <p className="text-muted-foreground text-sm mt-1">
-                Vista unificada: Yape/Plin, Shopify, Hotmart y entregas digitales (Stripe/PayPal). Actualiza cada 30s.
+                Vista unificada: Yape/Plin, Stripe, PayPal y Mercado Pago. Actualiza cada 30s.
               </p>
             </div>
             <Button variant="outline" onClick={load} disabled={loading}>

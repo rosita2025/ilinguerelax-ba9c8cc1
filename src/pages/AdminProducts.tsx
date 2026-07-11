@@ -188,7 +188,18 @@ const AdminProducts = () => {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex gap-1">
-                        <Button size="sm" variant="ghost" asChild>
+                        <Button size="sm" variant="ghost" asChild title="Ver página pública">
+                          <a href={`/products/${p.sku}`} target="_blank" rel="noreferrer"><ExternalLink className="w-4 h-4" /></a>
+                        </Button>
+                        <Button size="sm" variant="ghost" asChild title="Ver checkout interno">
+                          <a href={`/checkouts/${p.sku}`} target="_blank" rel="noreferrer">🛒</a>
+                        </Button>
+                        {p.hotmart_url && (
+                          <Button size="sm" variant="ghost" asChild title="Abrir Hotmart">
+                            <a href={p.hotmart_url} target="_blank" rel="noreferrer" className="text-[#EF4E23]">H</a>
+                          </Button>
+                        )}
+                        <Button size="sm" variant="ghost" asChild title="Editar">
                           <Link to={`/admin/productos/${p.sku}`}><Pencil className="w-4 h-4" /></Link>
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => toggle(p.sku, p.active)} title={p.active ? "Ocultar" : "Publicar"}>

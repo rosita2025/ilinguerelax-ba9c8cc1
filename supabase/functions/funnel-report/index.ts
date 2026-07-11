@@ -85,7 +85,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { adminKey, days = 7 } = await req.json().catch(() => ({}));
+    const { adminKey, days = 7, startDate, endDate } = await req.json().catch(() => ({}));
 
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expectedKey || adminKey !== expectedKey) {
@@ -95,12 +95,31 @@ serve(async (req) => {
       });
     }
 
-    const safeDays = Math.min(Math.max(parseInt(String(days)) || 7, 1), 90);
     const propertyId = Deno.env.get("GA4_PROPERTY_ID");
     if (!propertyId) throw new Error("GA4_PROPERTY_ID not set");
 
     const token = await getGa4AccessToken();
-    const dateRange = { startDate: `${safeDays}daysAgo`, endDate: "today" };
+
+    // Resolve date range: custom start/end (YYYY-MM-DD) takes priority; otherwise fall back to `days`.
+    const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+    let ga4Start: string;
+    let ga4End: string;
+    let safeDays: number;
+    let sinceMs: number;
+    if (startDate && endDate && isoDate.test(startDate) && isoDate.test(endDate)) {
+      ga4Start = startDate;
+      ga4End = endDate;
+      const s = new Date(`${startDate}T00:00:00Z`).getTime();
+      const e = new Date(`${endDate}T23:59:59Z`).getTime();
+      safeDays = Math.max(1, Math.round((e - s) / 86400000));
+      sinceMs = s;
+    } else {
+      safeDays = Math.min(Math.max(parseInt(String(days)) || 7, 1), 365);
+      ga4Start = `${safeDays - 1}daysAgo`;
+      ga4End = "today";
+      sinceMs = Date.now() - safeDays * 86400000;
+    }
+    const dateRange = { startDate: ga4Start, endDate: ga4End };
 
     // Parallel GA4 queries
     const [totalsRes, countryRes, sourceRes, pageRes, liveVisitors] = await Promise.all([
@@ -183,11 +202,15 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
-    const since = new Date(Date.now() - safeDays * 86400000).toISOString();
+    const since = new Date(sinceMs).toISOString();
+    const untilIso = startDate && endDate && isoDate.test(endDate)
+      ? new Date(`${endDate}T23:59:59Z`).toISOString()
+      : new Date().toISOString();
     const { data: convData } = await supabase
       .from("funnel_events")
       .select("event_name, value, product_id")
       .gte("created_at", since)
+      .lte("created_at", untilIso)
       .in("event_name", FUNNEL_EVENTS)
       .limit(50000);
 
@@ -214,6 +237,7 @@ serve(async (req) => {
       JSON.stringify({
         source: "ga4",
         days: safeDays,
+        range: { startDate: ga4Start, endDate: ga4End },
         propertyId,
         totals,
         engagementRate,

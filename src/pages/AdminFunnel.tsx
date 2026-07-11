@@ -49,17 +49,38 @@ const STEP_LABELS: Record<string, string> = {
 const fmt = (n: number) => n.toLocaleString();
 const fmtSec = (s: number) => `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
 
+type Preset = "today" | "yesterday" | "7d" | "30d" | "90d" | "custom";
+
+const toIso = (d: Date) => d.toISOString().slice(0, 10);
+const todayIso = () => toIso(new Date());
+const daysAgoIso = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return toIso(d);
+};
+
 const AdminFunnel = () => {
   const { adminKey } = useAdminKey();
-  const [days, setDays] = useState(7);
+  const [preset, setPreset] = useState<Preset>("7d");
+  const [startDate, setStartDate] = useState<string>(daysAgoIso(6));
+  const [endDate, setEndDate] = useState<string>(todayIso());
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<Ga4Report | null>(null);
+
+  const applyPreset = (p: Preset) => {
+    setPreset(p);
+    if (p === "today") { setStartDate(todayIso()); setEndDate(todayIso()); }
+    else if (p === "yesterday") { setStartDate(daysAgoIso(1)); setEndDate(daysAgoIso(1)); }
+    else if (p === "7d") { setStartDate(daysAgoIso(6)); setEndDate(todayIso()); }
+    else if (p === "30d") { setStartDate(daysAgoIso(29)); setEndDate(todayIso()); }
+    else if (p === "90d") { setStartDate(daysAgoIso(89)); setEndDate(todayIso()); }
+  };
 
   const loadReport = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("funnel-report", {
-        body: { adminKey, days },
+        body: { adminKey, startDate, endDate },
       });
       if (error) throw error;
       if ((data as { error?: string })?.error) {
@@ -75,14 +96,14 @@ const AdminFunnel = () => {
     }
   };
 
-  useEffect(() => { void loadReport(); }, [adminKey, days]);
+  useEffect(() => { void loadReport(); }, [adminKey, startDate, endDate]);
 
   useEffect(() => {
     if (!report) return;
     const id = setInterval(() => { void loadReport(); }, 30000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [report, adminKey, days]);
+  }, [report, adminKey, startDate, endDate]);
 
   if (!report) {
     return (
@@ -101,6 +122,15 @@ const AdminFunnel = () => {
     1,
   );
 
+  const PRESETS: { id: Preset; label: string }[] = [
+    { id: "today", label: "Hoy" },
+    { id: "yesterday", label: "Ayer" },
+    { id: "7d", label: "7 días" },
+    { id: "30d", label: "30 días" },
+    { id: "90d", label: "90 días" },
+    { id: "custom", label: "Personalizado" },
+  ];
+
   return (
     <>
       <AdminNav />
@@ -110,7 +140,7 @@ const AdminFunnel = () => {
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">Tráfico real (GA4)</h1>
               <p className="text-sm text-muted-foreground">
-                Property {report.propertyId} · Últimos {report.days} días
+                Property {report.propertyId} · {startDate} → {endDate} ({report.days} {report.days === 1 ? "día" : "días"})
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -123,19 +153,47 @@ const AdminFunnel = () => {
                 <span className="text-sm font-semibold tabular-nums">{report.liveVisitors}</span>
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
-              <Input
-                type="number"
-                min={1}
-                max={90}
-                value={days}
-                onChange={(e) => setDays(parseInt(e.target.value) || 7)}
-                className="w-24"
-              />
               <Button onClick={loadReport} disabled={loading} variant="outline">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Recargar"}
               </Button>
             </div>
           </div>
+
+          {/* Date range controls */}
+          <Card className="p-4 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {PRESETS.map((p) => (
+                <Button
+                  key={p.id}
+                  size="sm"
+                  variant={preset === p.id ? "default" : "outline"}
+                  onClick={() => applyPreset(p.id)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="text-xs text-muted-foreground">Desde</label>
+              <Input
+                type="date"
+                value={startDate}
+                max={endDate}
+                onChange={(e) => { setPreset("custom"); setStartDate(e.target.value); }}
+                className="w-40"
+              />
+              <label className="text-xs text-muted-foreground">Hasta</label>
+              <Input
+                type="date"
+                value={endDate}
+                min={startDate}
+                max={todayIso()}
+                onChange={(e) => { setPreset("custom"); setEndDate(e.target.value); }}
+                className="w-40"
+              />
+            </div>
+          </Card>
+
 
           {/* Top KPIs from GA4 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

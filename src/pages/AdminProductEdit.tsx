@@ -225,9 +225,34 @@ const AdminProductEdit = () => {
             <h2 className="font-semibold">1. Información básica</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label>SKU (identificador único)</Label>
-                <Input value={product.sku} onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))} disabled={!isNew} placeholder="ej: patrones-especiales" />
-                <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. No se puede cambiar después.</p>
+                <Label>SKU (identificador único · también es la URL pública /products/{product.sku || "…"})</Label>
+                <div className="flex gap-2">
+                  <Input value={product.sku} onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))} placeholder="ej: coreano-100-mapas" />
+                  {!isNew && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={async () => {
+                        const newSku = product.sku.trim();
+                        if (!newSku || newSku === sku) return toast({ title: "Cambia el SKU antes de renombrar", variant: "destructive" });
+                        if (!confirm(`¿Renombrar "${sku}" → "${newSku}"?\n\nLa URL pública cambiará a /products/${newSku}. Actualiza enlaces externos (Hotmart, redes, emails) después.`)) return;
+                        try {
+                          const { error } = await supabase.functions.invoke("manage-products", {
+                            body: { action: "rename", oldSku: sku, newSku, adminKey },
+                          });
+                          if (error) throw error;
+                          toast({ title: "SKU renombrado" });
+                          navigate(`/admin/productos/${newSku}`, { replace: true });
+                        } catch (e) {
+                          toast({ title: "Error al renombrar", description: (e as Error).message, variant: "destructive" });
+                        }
+                      }}
+                    >
+                      Renombrar
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Al renombrar cambia también la URL pública del producto.</p>
               </div>
               <div>
                 <Label>Orden</Label>

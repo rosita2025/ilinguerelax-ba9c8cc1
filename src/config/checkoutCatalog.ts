@@ -63,6 +63,8 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     image: "/images/product-1000-verbos.webp",
     description: "1,000 verbos en presente, pasado y futuro con pronunciación",
     productPath: "/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+    adminSku: "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+
     upsells: [
       {
         id: "upsell-patrones-ingles",

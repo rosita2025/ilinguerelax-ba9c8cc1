@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lock, Loader2, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getAdminCsrfToken, resetAdminCsrfToken } from "@/lib/adminInvoke";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "ilr_admin_key";
@@ -13,6 +14,26 @@ const ATTEMPTS_KEY = "ilr_admin_attempts";
 const LOCK_KEY = "ilr_admin_lock_until";
 const MAX_ATTEMPTS = 5;
 const LOCK_MS = 5 * 60 * 1000; // 5 min
+
+// Install once: any call to a Supabase Edge Function gets the admin CSRF header.
+// Server (`_shared/adminCsrf.ts`) validates the token + Origin allowlist.
+let fetchPatched = false;
+function installAdminCsrfInterceptor() {
+  if (fetchPatched || typeof window === "undefined") return;
+  fetchPatched = true;
+  const orig = window.fetch.bind(window);
+  window.fetch = (input: RequestInfo | URL, init: RequestInit = {}) => {
+    try {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      if (url && url.includes("/functions/v1/")) {
+        const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
+        if (!headers.has("x-admin-csrf")) headers.set("x-admin-csrf", getAdminCsrfToken());
+        return orig(input, { ...init, headers });
+      }
+    } catch { /* noop */ }
+    return orig(input, init);
+  };
+}
 
 type Ctx = { adminKey: string; logout: () => void };
 const AdminCtx = createContext<Ctx | null>(null);

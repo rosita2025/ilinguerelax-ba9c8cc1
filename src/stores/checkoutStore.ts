@@ -40,6 +40,8 @@ interface PruebaStore {
   applyCoupon: (code: string) => boolean;
   removeCoupon: () => void;
   resetToDefaults: () => void;
+  /** Remove any cart line whose id is NOT in the provided allow-list of valid IDs. */
+  pruneUnknown: (validIds: Set<string>) => number;
 }
 
 // Carrito arranca VACÍO. Los productos se agregan solo cuando el usuario

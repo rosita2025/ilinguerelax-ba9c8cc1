@@ -120,6 +120,30 @@ export default function CheckoutSuccess() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fetch delivery info (drive links + bonuses) for purchased SKUs
+  useEffect(() => {
+    if (!isVerifiedBuyer) return;
+    const skus = items.map((i) => i.id);
+    if (!skus.length) return;
+    setDeliveryLoading(true);
+    supabase.functions
+      .invoke("manage-products", { body: { action: "get_delivery", skus } })
+      .then(({ data, error }) => {
+        if (error) throw error;
+        setDelivery((data?.items ?? []) as DeliveryItem[]);
+      })
+      .catch((e) => console.error("get_delivery failed", e))
+      .finally(() => setDeliveryLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const copyKey = (val: string) => {
+    navigator.clipboard.writeText(val).then(
+      () => toast({ title: "Clave copiada", description: val }),
+      () => {},
+    );
+  };
+
   // Localized copy for the public / unverified screen (IP-based via useI18n)
   const publicCopy = {
     es: {

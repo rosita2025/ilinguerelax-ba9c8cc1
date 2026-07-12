@@ -207,11 +207,6 @@ const ProductCoreanoRelax = () => {
                 <p className="text-sm font-semibold text-foreground mb-1">
                   {displayFlag} Precio para {isPeru ? "Perú" : region.tier === "latam" ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
                 </p>
-                <div className="text-xs text-muted-foreground space-y-0.5 mb-2">
-                  <div>🌍 Global: ${PRICE_GLOBAL_USD} USD</div>
-                  <div>🌎 Latinoamérica: ${PRICE_LATAM_USD} USD</div>
-                  <div>🇵🇪 Perú: S/ {PRICE_PEN.toFixed(2)} PEN</div>
-                </div>
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 

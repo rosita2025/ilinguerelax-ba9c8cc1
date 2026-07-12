@@ -12,4 +12,32 @@
     <loc>https://ilinguerelax.com/sitemaps/sitemap-blog.xml</loc>
     <lastmod>2026-03-25</lastmod>
   </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-us.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-ca.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-pe.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-mx.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-es.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-fr.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://ilinguerelax.com/sitemaps/sitemap-br.xml</loc>
+    <lastmod>2026-07-12</lastmod>
+  </sitemap>
 </sitemapindex>

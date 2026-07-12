@@ -76,6 +76,7 @@ const Products = () => {
   const isLatam = LATAM.has(detectedCurrency);
   const priceFor = (p: typeof products[number]) =>
     p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
+  const cardPrice = useCardPrice();
 
   // Collect available learner/target language codes from the merged catalog.
   const { learners, targets } = useMemo(() => {

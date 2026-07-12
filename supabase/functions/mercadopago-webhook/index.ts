@@ -197,9 +197,12 @@ Deno.serve(async (req) => {
 
     const ok = await verifySignature(req, dataId);
     if (!ok) {
+      // Firma inválida = bots/scanners golpeando la URL pública. NO es un hackeo
+      // ni una compra real: MP nunca movió dinero. Solo log silencioso (warn, sin
+      // correo) para evitar spam en la bandeja del admin de madrugada.
       await raiseAlert({
-        reason: "Firma HMAC inválida",
-        severity: "critical",
+        reason: "Firma HMAC inválida (probable bot/scanner)",
+        severity: "warn",
         data_id: dataId,
         event_type: type,
         http_status: 401,

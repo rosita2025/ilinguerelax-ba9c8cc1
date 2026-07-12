@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { pushAbandonedCartToBrevo } from "../_shared/brevoAbandonedCart.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

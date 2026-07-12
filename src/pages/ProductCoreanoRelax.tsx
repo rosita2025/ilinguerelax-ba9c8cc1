@@ -391,12 +391,12 @@ const ProductCoreanoRelax = () => {
 
       {/* Sticky Buy Bar — dos botones: Tienda iLingue + Hotmart */}
       <StickyBuyBar
-        price={showLocal ? `${localPrice.price} ${localPrice.currency}` : "$10"}
+        price={displayPrice}
         originalPrice="$54"
-        currencyCode={localPrice.currency}
-        flag={flag}
+        currencyCode={currencyLabel}
+        flag={displayFlag}
         productName="Coreano · +100 Mapas Mentales"
-        ctaText="TIENDA ILINGUE · $10"
+        ctaText={`TIENDA ILINGUE · ${displayPrice}`}
         onBuyClick={handleBuyStore}
         secondaryCtaText="HOTMART"
         onSecondaryClick={handleBuyHotmart}

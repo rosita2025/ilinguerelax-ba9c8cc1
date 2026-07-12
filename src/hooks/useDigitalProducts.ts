@@ -49,6 +49,8 @@ function toProduct(p: DBProduct): Product {
     features: [],
     isPhysical: false,
     formats: ["digital"],
+    learnerLanguage: p.learner_language as Product["learnerLanguage"],
+    targetLanguage: p.target_language as Product["targetLanguage"],
     // Route DB products to their dynamic product page (Shopify-style /products/:sku).
     externalUrl: `/products/${p.sku}`,
   };

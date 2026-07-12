@@ -198,6 +198,7 @@ export type Database = {
           hotmart_excluded_countries: string[]
           hotmart_url: string | null
           id: string
+          is_physical: boolean
           is_upsell: boolean
           learner_language: string
           mp_preference_template: Json | null
@@ -229,6 +230,7 @@ export type Database = {
           hotmart_excluded_countries?: string[]
           hotmart_url?: string | null
           id?: string
+          is_physical?: boolean
           is_upsell?: boolean
           learner_language?: string
           mp_preference_template?: Json | null
@@ -260,6 +262,7 @@ export type Database = {
           hotmart_excluded_countries?: string[]
           hotmart_url?: string | null
           id?: string
+          is_physical?: boolean
           is_upsell?: boolean
           learner_language?: string
           mp_preference_template?: Json | null

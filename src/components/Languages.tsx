@@ -365,16 +365,14 @@ export const Languages = () => {
                     <span className="text-2xl font-bold text-primary">
                       {product.price === 0
                         ? "GRATIS"
-                        : product.isPhysical
-                          ? formatPrice(product.price)
-                          : cardPrice.format(product.slug, product.price)}
+                        : cardPrice.format(product.slug, product.price)}
                     </span>
                     {product.originalPrice && (
                       <span className="text-sm text-muted-foreground line-through">
                         {formatPrice(product.originalPrice)}
                       </span>
                     )}
-                    {!product.isPhysical && product.price > 0 && (
+                    {product.price > 0 && (
                       <>
                         <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(product.slug)}</span>
                         <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>

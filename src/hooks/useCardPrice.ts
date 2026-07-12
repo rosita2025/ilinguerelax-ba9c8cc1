@@ -41,11 +41,15 @@ async function loadAll(): Promise<Record<string, Row>> {
   return inflight;
 }
 
+export type RegionLabel = "PE" | "LATAM" | "Global";
+
 export interface CardPriceFormatter {
   /** Formatted primary label (e.g. `$15.00`, `S/ 55.00`, `18,50 €`). */
   format: (sku: string | null | undefined, fallbackUsd: number) => string;
-  /** Currency badge to display next to the price (e.g. `USD`, `PEN`, `EUR`). */
+  /** Currency badge (e.g. `USD`, `PEN`, `EUR`). */
   currencyLabel: (sku: string | null | undefined) => string;
+  /** Region tier badge: `PE`, `LATAM` or `Global`. */
+  regionLabel: RegionLabel;
   ready: boolean;
 }
 
@@ -66,6 +70,7 @@ export function useCardPrice(): CardPriceFormatter {
 
   const isPeru = country.toUpperCase() === "PE";
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
+  const regionLabel: RegionLabel = isPeru ? "PE" : tier === "latam" ? "LATAM" : "Global";
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {
     const row = sku && rows ? rows[sku] : undefined;
@@ -77,7 +82,7 @@ export function useCardPrice(): CardPriceFormatter {
       return formatPrice(fallbackUsd, "PEN");
     }
 
-    // LATAM (non-PE) → local currency (MXN, ARS, CLP, COP, BRL…) converted from USD LATAM tier
+    // LATAM (non-PE) → local currency (MXN, ARS, COP, BRL…) converted from USD LATAM tier
     if (tier === "latam") {
       const usd = row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd;
       return formatPrice(Number(usd), displayCurrency as any);
@@ -96,6 +101,7 @@ export function useCardPrice(): CardPriceFormatter {
   return {
     format,
     currencyLabel,
+    regionLabel,
     ready: !loading && rows !== null,
   };
 }

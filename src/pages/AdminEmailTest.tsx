@@ -4,7 +4,7 @@ import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle } from "lucide-react";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
@@ -17,6 +17,7 @@ interface OrderRow {
   customer: string;
   email: string;
   products: string;
+  productLines: ProductLine[];
   amount: string;
   status: string;
   delivery?: {
@@ -25,6 +26,21 @@ interface OrderRow {
     last_event_at: string | null;
     message_id: string | null;
   } | null;
+}
+
+interface ProductLine {
+  sku?: string;
+  name: string;
+  role: "principal" | "upsell" | "producto";
+  bonusCount?: number;
+  hasBonus?: boolean;
+}
+
+interface ProductMeta {
+  sku: string;
+  name: string;
+  bonusCount: number;
+  hasBonus: boolean;
 }
 
 const fmt = (iso: string | null) => {
@@ -61,6 +77,33 @@ const providerToSource = (p?: string | null): Source => {
   return "digital";
 };
 
+const splitSkuText = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value.map((v) => String(v)).filter(Boolean);
+  if (typeof value !== "string") return [];
+  return value.split(",").map((s) => s.trim()).filter(Boolean);
+};
+
+const bonusCountFrom = (p: any) => {
+  const listCount = Array.isArray(p?.bonuses) ? p.bonuses.filter((b: any) => b?.drive_url || b?.name).length : 0;
+  return listCount + (p?.bonus_drive_url || p?.bonus_name ? 1 : 0);
+};
+
+const buildProductLines = (skus: string[], fallback: string, productMap: Map<string, ProductMeta>): ProductLine[] => {
+  if (skus.length > 0) {
+    return skus.map((sku, index) => {
+      const meta = productMap.get(String(sku));
+      return {
+        sku: String(sku),
+        name: meta?.name || String(sku),
+        role: index === 0 ? "principal" : "upsell",
+        bonusCount: meta?.bonusCount ?? 0,
+        hasBonus: meta?.hasBonus ?? false,
+      };
+    });
+  }
+  return fallback && fallback !== "—" ? [{ name: fallback, role: "producto" }] : [];
+};
+
 const CACHE_KEY = "admin-orders-cache-v1";
 
 const AdminEmailTest = () => {
@@ -91,6 +134,18 @@ const AdminEmailTest = () => {
       const manualRes = { data: (data as any)?.manual ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
       const funnelRes = { data: (data as any)?.funnel ?? [] };
+      const productMap = new Map<string, ProductMeta>();
+      ((data as any)?.products ?? []).forEach((p: any) => {
+        const bonusCount = bonusCountFrom(p);
+        if (p?.sku) {
+          productMap.set(String(p.sku), {
+            sku: String(p.sku),
+            name: p.name || String(p.sku),
+            bonusCount,
+            hasBonus: bonusCount > 0,
+          });
+        }
+      });
 
       const digitalByEmail = new Map<string, any>();
       const digitalByOrder = new Map<string, any>();
@@ -106,6 +161,8 @@ const AdminEmailTest = () => {
 
       (manualRes.data ?? []).forEach((r: any) => {
         const d = digitalByOrder.get((r.order_number || "").toLowerCase()) || digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
+        const skus = Array.isArray(r.items) ? r.items.map((i: any) => i?.sku || i?.id).filter(Boolean) : [];
+        const products = (Array.isArray(r.items) ? r.items.map((i: any) => i?.name).filter(Boolean).join(", ") : "") || "—";
         merged.push({
           id: `m-${r.id}`,
           source: "manual",
@@ -113,7 +170,8 @@ const AdminEmailTest = () => {
           order_ref: r.order_number,
           customer: r.buyer_name || "—",
           email: r.buyer_email,
-          products: (Array.isArray(r.items) ? r.items.map((i: any) => i?.name).filter(Boolean).join(", ") : "") || "—",
+          products,
+          productLines: buildProductLines(skus, products, productMap),
           amount: `${r.currency_local || "USD"} ${Number(r.amount_local ?? r.amount_usd ?? 0).toFixed(2)}`,
           status: r.status || "pending",
           delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
@@ -133,6 +191,8 @@ const AdminEmailTest = () => {
         const email = (meta.payer_email || meta.customer_email || "").toLowerCase();
         const d = digitalByOrder.get(String(orderRef).toLowerCase()) || (email ? digitalByEmail.get(email) : null) || null;
         const status = r.event_name === "purchase" || r.event_name === "Purchase" ? "approved" : String(meta.status || r.event_name || "pending").replace(/^mp_/, "");
+        const skus = splitSkuText(meta.skus || d?.skus);
+        const products = meta.items_summary || r.product_id || "—";
         merged.push({
           id: `f-${r.id}`,
           source: src,
@@ -140,7 +200,8 @@ const AdminEmailTest = () => {
           order_ref: String(orderRef || "—"),
           customer: meta.customer_name || "—",
           email: email || "—",
-          products: r.product_id || meta.items_summary || "—",
+          products,
+          productLines: buildProductLines(skus, products, productMap),
           amount: `${r.currency || ""} ${Number(r.value ?? 0).toFixed(2)}`.trim(),
           status,
           delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
@@ -158,6 +219,8 @@ const AdminEmailTest = () => {
         const orderKey = (r.order_id || "").toLowerCase();
         if (orderKey && matchedDigitalOrders.has(orderKey)) return;
         const src = providerToSource(r.provider);
+        const skus = Array.isArray(r.skus) ? r.skus : [];
+        const products = skus.join(", ") || "—";
         merged.push({
           id: `d-${r.id}`,
           source: src,
@@ -165,7 +228,8 @@ const AdminEmailTest = () => {
           order_ref: r.order_id || "—",
           customer: "—",
           email: r.customer_email,
-          products: (r.skus || []).join(", ") || "—",
+          products,
+          productLines: buildProductLines(skus, products, productMap),
           amount: "—",
           status: r.status || "—",
           delivery: { status: r.status, last_event: r.last_event, last_event_at: r.last_event_at, message_id: r.message_id },
@@ -201,6 +265,31 @@ const AdminEmailTest = () => {
     return "bg-muted text-muted-foreground";
   };
 
+  const renderProducts = (r: OrderRow) => {
+    if (!r.productLines.length) return <span className="text-muted-foreground">{r.products || "—"}</span>;
+    return (
+      <div className="space-y-2 min-w-[320px]">
+        {r.productLines.map((p, index) => (
+          <div key={`${r.id}-${p.sku || p.name}-${index}`} className="rounded-md border bg-card p-2">
+            <div className="flex items-start gap-2">
+              <PackageCheck className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold leading-snug">{p.name}</div>
+                {p.sku && <div className="font-mono text-[11px] text-muted-foreground break-all mt-0.5">SKU: {p.sku}</div>}
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  <span className="px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium capitalize">{p.role}</span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium">
+                    <Gift className="w-3 h-3" /> {p.hasBonus ? `Bono incluido (${p.bonusCount})` : "Sin bono extra"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
       <AdminNav />
@@ -234,49 +323,52 @@ const AdminEmailTest = () => {
               <table className="w-full text-sm">
                 <thead className="text-xs uppercase text-muted-foreground border-b">
                   <tr>
-                    <th className="text-left py-2 pr-3">Fecha</th>
+                    <th className="text-left py-2 pr-4">Orden</th>
+                    <th className="text-left py-2 pr-4">Producto / SKU / Upsell</th>
+                    <th className="text-left py-2 pr-3">Entrega digital</th>
+                    <th className="text-left py-2 pr-3">Estado pago</th>
                     <th className="text-left py-2 pr-3">Origen</th>
-                    <th className="text-left py-2 pr-3">Orden</th>
                     <th className="text-left py-2 pr-3">Cliente</th>
                     <th className="text-left py-2 pr-3">Email</th>
-                    <th className="text-left py-2 pr-3">Productos</th>
                     <th className="text-left py-2 pr-3">Monto</th>
-                    <th className="text-left py-2 pr-3">Estado</th>
-                    <th className="text-left py-2">Correo entrega</th>
+                    <th className="text-left py-2">Fecha</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.id} className="border-b last:border-0 align-top">
-                      <td className="py-2 pr-3 whitespace-nowrap text-xs">{fmt(r.created_at)}</td>
-                      <td className="py-2 pr-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sourceColor[r.source]}`}>
-                          {sourceLabel[r.source]}
-                        </span>
+                      <td className="py-3 pr-4 font-mono text-sm font-bold whitespace-nowrap">{r.order_ref}</td>
+                      <td className="py-3 pr-4 text-xs">{renderProducts(r)}</td>
+                      <td className="py-3 pr-3 text-xs">
+                        {r.delivery ? (
+                          <div className="space-y-1">
+                            <span className="inline-flex items-center gap-1">
+                              <Mail className="w-3 h-3 text-primary" />
+                              <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${statusColor(r.delivery.status || "")}`}>
+                                {r.delivery.last_event || r.delivery.status || "—"}
+                              </span>
+                              {r.delivery.message_id ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <XCircle className="w-3 h-3 text-muted-foreground" />}
+                            </span>
+                            <div className="text-[11px] text-muted-foreground">{fmt(r.delivery.last_event_at)}</div>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">pendiente / sin envío</span>
+                        )}
                       </td>
-                      <td className="py-2 pr-3 font-mono text-xs">{r.order_ref}</td>
-                      <td className="py-2 pr-3">{r.customer}</td>
-                      <td className="py-2 pr-3 text-xs">{r.email}</td>
-                      <td className="py-2 pr-3 text-xs max-w-[240px]">{r.products}</td>
-                      <td className="py-2 pr-3 text-xs whitespace-nowrap">{r.amount}</td>
-                      <td className="py-2 pr-3">
+                      <td className="py-3 pr-3">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(r.status)}`}>
                           {r.status}
                         </span>
                       </td>
-                      <td className="py-2 text-xs">
-                        {r.delivery ? (
-                          <span className="inline-flex items-center gap-1">
-                            <Mail className="w-3 h-3 text-primary" />
-                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${statusColor(r.delivery.status || "")}`}>
-                              {r.delivery.last_event || r.delivery.status || "—"}
-                            </span>
-                            {r.delivery.message_id ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <XCircle className="w-3 h-3 text-muted-foreground" />}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">sin envío</span>
-                        )}
+                      <td className="py-3 pr-3">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sourceColor[r.source]}`}>
+                          {sourceLabel[r.source]}
+                        </span>
                       </td>
+                      <td className="py-3 pr-3">{r.customer}</td>
+                      <td className="py-3 pr-3 text-xs">{r.email}</td>
+                      <td className="py-3 pr-3 text-xs whitespace-nowrap">{r.amount}</td>
+                      <td className="py-3 whitespace-nowrap text-xs">{fmt(r.created_at)}</td>
                     </tr>
                   ))}
                   {rows.length === 0 && (

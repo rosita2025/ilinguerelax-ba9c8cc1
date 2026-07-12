@@ -155,7 +155,16 @@ serve(async (req) => {
           session_id: session.client_reference_id || session.id,
           page_path: "/payment-success",
           country: session.customer_details?.address?.country || null,
-          referrer: "stripe-webhook",
+          referrer: JSON.stringify({
+            provider: "stripe",
+            session_id: session.id,
+            external_reference: session.id ? `ILR-ST-${String(session.id).slice(-8).toUpperCase()}` : session.id,
+            customer_email: customerEmail,
+            customer_name: customerName,
+            items_summary: session.metadata?.items_summary || purchase.content_name,
+            skus: session.metadata?.skus || "",
+            status: "approved",
+          }).slice(0, 2000),
         });
       } catch (trackingError) {
         console.error("purchase tracking error:", trackingError);

@@ -234,8 +234,13 @@ Deno.serve(async (req) => {
             payment_method: payment.payment_method_id,
             payment_type: payment.payment_type_id,
             payer_email: payment.payer?.email || payment.metadata?.customer_email,
+            customer_email: payment.payer?.email || payment.metadata?.customer_email,
+            customer_name: payment.metadata?.customer_name,
+            customer_phone: payment.metadata?.customer_phone,
             preference_id: payment.metadata?.preference_id,
             external_reference: payment.external_reference,
+            items_summary: payment.metadata?.items_summary || payment.description,
+            skus: payment.metadata?.skus || getPaymentSkus(payment).join(","),
           },
         };
 

@@ -70,13 +70,6 @@ Crawl-delay: 2
 
 # Sitemap location
 Sitemap: https://ilinguerelax.com/sitemap.xml
-Sitemap: https://us.ilinguerelax.com/sitemap.xml
-Sitemap: https://ca.ilinguerelax.com/sitemap.xml
-Sitemap: https://pe.ilinguerelax.com/sitemap.xml
-Sitemap: https://mx.ilinguerelax.com/sitemap.xml
-Sitemap: https://es.ilinguerelax.com/sitemap.xml
-Sitemap: https://fr.ilinguerelax.com/sitemap.xml
-Sitemap: https://br.ilinguerelax.com/sitemap.xml
 
 # IndexNow verification key (Bing / Yandex / Seznam auto-discovery)
 # Key file: https://ilinguerelax.com/ilinguerelax-indexnow-key.txt

@@ -38,9 +38,19 @@ interface SitemapEntry {
 // Static routes (curated from src/App.tsx — excludes /admin, /checkouts,
 // /descarga, /payment-success, /hotmart-*, /amazon, /dejar-resena, /*)
 // --------------------------------------------------------------------------
+const LEARN_PAIR_SLUGS = [
+  "es-en", "es-ko", "es-fr", "es-de", "es-it", "es-pt", "es-nl", "en-es",
+];
+
 const staticEntries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/products", changefreq: "weekly", priority: "0.95" },
+  { path: "/aprender", changefreq: "weekly", priority: "0.9" },
+  ...LEARN_PAIR_SLUGS.map((s) => ({
+    path: `/aprender/${s}`,
+    changefreq: "weekly" as const,
+    priority: "0.9",
+  })),
   { path: "/sobre-nosotros", changefreq: "monthly", priority: "0.7" },
   { path: "/contacto", changefreq: "monthly", priority: "0.6" },
   { path: "/faq", changefreq: "monthly", priority: "0.6" },

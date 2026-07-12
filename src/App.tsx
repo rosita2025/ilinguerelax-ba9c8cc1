@@ -66,6 +66,7 @@ const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
 const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
+const LearnCategory = lazy(() => import("./pages/LearnCategory"));
 
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
@@ -172,6 +173,10 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/products" element={<Products />} />
+                  <Route path="/aprender" element={<LearnCategory />} />
+                  <Route path="/aprender/:pair" element={<LearnCategory />} />
+                  <Route path="/learn" element={<Navigate to="/aprender" replace />} />
+                  <Route path="/learn/:pair" element={<LearnCategory />} />
                   <Route path="/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product5000 />} />
                   <Route path="/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa" element={<Product8000 />} />
                   <Route path="/products/5-000-palabras-libro-fisico" element={<Product5000Book />} />

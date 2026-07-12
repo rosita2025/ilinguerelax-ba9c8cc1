@@ -346,12 +346,9 @@ export const SEO = ({
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
-      {/* hreflang — each regional subdomain (us., ca., pe., mx., es., fr., br.)
-          gets its own alternate URL so Google, Baidu, Naver, Yandex, etc.
-          serve the right localized store per country. Path is preserved from
-          the current canonical so /products/foo → us.ilinguerelax.com/products/foo. */}
+      {/* hreflang — single canonical domain (www.ilinguerelax.com) for all
+          languages. Kept flat to avoid splitting SEO equity across subdomains. */}
       {canonicalUrl && (() => {
-        // Derive path from canonicalUrl (strip host, keep path+search).
         let path = "/";
         try {
           const u = new URL(canonicalUrl);
@@ -359,33 +356,12 @@ export const SEO = ({
         } catch {
           path = canonicalUrl.startsWith("/") ? canonicalUrl : "/";
         }
-        const build = (sub: string) =>
-          sub ? `https://${sub}.ilinguerelax.com${path}` : `https://www.ilinguerelax.com${path}`;
-        const alts: Array<{ lang: string; sub: string }> = [
-          { lang: "x-default", sub: "" },
-          { lang: "es", sub: "" },
-          { lang: "es-ES", sub: "es" },
-          { lang: "es-MX", sub: "mx" },
-          { lang: "es-PE", sub: "pe" },
-          { lang: "es-AR", sub: "" },
-          { lang: "es-CO", sub: "" },
-          { lang: "es-CL", sub: "" },
-          { lang: "en", sub: "us" },
-          { lang: "en-US", sub: "us" },
-          { lang: "en-CA", sub: "ca" },
-          { lang: "en-GB", sub: "us" },
-          { lang: "en-AU", sub: "us" },
-          { lang: "fr", sub: "fr" },
-          { lang: "fr-FR", sub: "fr" },
-          { lang: "fr-CA", sub: "ca" },
-          { lang: "pt", sub: "br" },
-          { lang: "pt-BR", sub: "br" },
-          { lang: "pt-PT", sub: "br" },
-        ];
+        const href = `https://www.ilinguerelax.com${path}`;
+        const langs = ["x-default", "es", "es-ES", "es-MX", "es-PE", "en", "en-US", "fr", "fr-FR", "pt", "pt-BR"];
         return (
           <>
-            {alts.map((a) => (
-              <link key={a.lang} rel="alternate" hrefLang={a.lang} href={build(a.sub)} />
+            {langs.map((l) => (
+              <link key={l} rel="alternate" hrefLang={l} href={href} />
             ))}
           </>
         );

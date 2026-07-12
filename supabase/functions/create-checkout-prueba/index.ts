@@ -110,6 +110,7 @@ Deno.serve(async (req) => {
         coupon_percent: String(body.couponPercent),
         items_count: String(body.items.length),
         items_summary: productSummary,
+        skus: body.items.map((i) => i.id).join(",").slice(0, 490),
       },
     });
 

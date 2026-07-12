@@ -157,6 +157,7 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
                     {product.originalPrice}
                   </span>
                   <span className="text-sm text-primary font-semibold">{cardPrice.currencyLabel(product.sku)}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
                 </div>
 
                 {/* CTA Button */}

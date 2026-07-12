@@ -41,6 +41,9 @@ Crawl-delay: 2
 # Sitemap location
 Sitemap: https://ilinguerelax.com/sitemap.xml
 
+# IndexNow verification key (Bing / Yandex / Seznam auto-discovery)
+# Key file: https://ilinguerelax.com/ilinguerelax-indexnow-key.txt
+
 # Disallow admin, private and download paths
 Disallow: /api/
 Disallow: /admin

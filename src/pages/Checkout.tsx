@@ -21,6 +21,7 @@ export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
   const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
   const updateQty = useCheckoutPruebaStore((s) => s.updateQuantity);
   const items = useCheckoutPruebaStore((s) => s.items);
@@ -160,10 +161,20 @@ export default function Checkout() {
   // when the admin edits the catalog and pushes an update — without dropping items or state.
   useEffect(() => {
     if (!catalogItem) return;
+    // Prune the cart to items that actually belong to THIS checkout URL
+    // (main product + declared upsells). Prevents leftovers from a previous
+    // /checkouts/:slug visit (e.g. Patrones) sneaking into a new purchase
+    // (e.g. 1,000 Verbos) and getting delivered by mistake.
+    const allowed = new Set<string>([
+      catalogItem.id,
+      ...((catalogItem.upsells ?? []).map((u) => u.id)),
+    ]);
+    for (const it of items) {
+      if (!allowed.has(it.id)) removeItem(it.id);
+    }
+
     const existing = items.find((i) => i.id === catalogItem.id);
     if (!existing) {
-      // Add the new product WITHOUT clearing previous items — user keeps
-      // whatever they already had in the cart across product pages.
       addItem({ ...catalogItem, quantity: 1 });
     } else {
       // Same product already in cart → refresh mutable fields, force qty=1

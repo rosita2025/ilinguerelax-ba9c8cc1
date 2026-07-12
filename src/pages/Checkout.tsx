@@ -21,6 +21,7 @@ export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
   const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
   const updateQty = useCheckoutPruebaStore((s) => s.updateQuantity);
   const items = useCheckoutPruebaStore((s) => s.items);

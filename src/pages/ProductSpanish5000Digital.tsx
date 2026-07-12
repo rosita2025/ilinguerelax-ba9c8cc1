@@ -208,7 +208,7 @@ const ProductSpanish5000Digital = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
         image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
-        price={String(PRICE)}
+        price={String(currentPrice)}
         originalPrice={String(ORIGINAL_PRICE)}
         rating="4.8"
         reviewCount="500"

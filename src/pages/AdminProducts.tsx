@@ -13,6 +13,7 @@ interface Product {
   id: string;
   sku: string;
   name: string;
+  description?: string | null;
   learner_language: string;
   target_language: string;
   price_usd: number;

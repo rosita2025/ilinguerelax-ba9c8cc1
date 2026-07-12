@@ -88,7 +88,7 @@ const Product1000Verbos = () => {
       toast.success("Producto agregado al carrito");
       navigate("/checkouts/1000-verbos");
     } else {
-      window.location.href = HOTMART_URL;
+      window.location.href = pricing.hotmartUrl || HOTMART_URL;
     }
   };
 

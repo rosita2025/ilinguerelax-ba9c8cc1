@@ -1,0 +1,1 @@
+UPDATE public.digital_products SET price_usd_tienda = 7 WHERE sku = 'patrones-especiales-alfabeto-combinaciones-secretas-ingles';

@@ -31,11 +31,13 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
   const penMode = penTotals !== null;
-  const useLocal = penMode || (!localTotal.isUsd && !localTotal.loading);
-  const fmtMoney = (usd: number, local: { formatted: string }, penAmount?: number) =>
+  // Regla estricta: solo PE muestra soles nativos. Todo lo demás (VE/CU/NI, LATAM, Global) se muestra en USD.
+  const useLocal = false;
+  const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
-      : useLocal ? local.formatted : `$${usd.toFixed(2)}`;
+      : `$${usd.toFixed(2)}`;
+  void localSubtotal; void localDiscount; void localTotal; void useLocal;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
 
@@ -108,9 +110,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                 <div className="text-sm font-semibold shrink-0 text-right">
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen * item.quantity)
-                    : useLocal
-                      ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
-                      : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                    : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
                 </div>
               </div>
             ))}
@@ -180,7 +180,8 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : useLocal ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : `USD $${total.toFixed(2)}`}</div>
+
             </div>
           </div>
 

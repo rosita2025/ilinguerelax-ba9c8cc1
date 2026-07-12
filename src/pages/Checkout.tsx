@@ -140,8 +140,12 @@ export default function Checkout() {
         adminSku: data.sku,
         upsells: upsells ?? undefined,
         ...(pricePen != null && { pricePen }),
-        ...(priceLatam != null && {
-          regionPrices: { latam: priceLatam, global: priceGlobal, ...(priceTienda != null && { tienda: priceTienda }) },
+        ...((priceLatam != null || priceTienda != null || staticItem?.regionPrices) && {
+          regionPrices: {
+            latam: priceLatam ?? staticItem?.regionPrices?.latam ?? priceGlobal,
+            global: priceGlobal,
+            tienda: priceTienda ?? staticItem?.regionPrices?.tienda,
+          },
         }),
       } as CatalogItem);
       setDbMissing(false);

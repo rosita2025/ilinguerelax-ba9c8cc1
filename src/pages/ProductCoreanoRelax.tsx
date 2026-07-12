@@ -110,7 +110,7 @@ const ProductCoreanoRelax = () => {
   const handleBuyHotmart = () => {
     if (!pricingReady) return;
     trackInitiate();
-    window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
+    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank", "noopener,noreferrer");
   };
 
   const handleBuyStore = () => {

@@ -113,7 +113,7 @@ const ProductPatronesEspeciales = () => {
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
   const priceLabel = regional.isIntl ? regional.price! : formatPrice(PRICE_USD);
   const originalLabel = regional.isIntl ? regional.original! : formatPrice(ORIGINAL_USD);
-  const HOTMART_URL = regional.url;
+  const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",

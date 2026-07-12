@@ -63,7 +63,7 @@ const Product500Preguntas = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(HOTMART_URL, "_blank");
+    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank");
   };
 
   return (
@@ -270,7 +270,7 @@ const Product500Preguntas = () => {
         rating={4.7}
         reviewCount={280}
         showReviews={true}
-        buyUrl={HOTMART_URL}
+        buyUrl={pricing.hotmartUrl || HOTMART_URL}
         onBuyClick={handleBuy}
       />
 

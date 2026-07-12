@@ -65,7 +65,7 @@ export function useCardPrice(): CardPriceFormatter {
   }, [rows]);
 
   const isPeru = country.toUpperCase() === "PE";
-  const displayCurrency = isPeru ? "PEN" : tier === "latam" ? "USD" : detectCurrency(country || "US");
+  const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {
     const row = sku && rows ? rows[sku] : undefined;
@@ -77,10 +77,10 @@ export function useCardPrice(): CardPriceFormatter {
       return formatPrice(fallbackUsd, "PEN");
     }
 
-    // LATAM (non-PE) → USD (Hotmart tier)
+    // LATAM (non-PE) → local currency (MXN, ARS, CLP, COP, BRL…) converted from USD LATAM tier
     if (tier === "latam") {
       const usd = row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd;
-      return `$${Number(usd).toFixed(2)}`;
+      return formatPrice(Number(usd), displayCurrency as any);
     }
 
     // Global → local currency converted from USD
@@ -89,11 +89,7 @@ export function useCardPrice(): CardPriceFormatter {
   };
 
   const currencyLabel = (sku: string | null | undefined): string => {
-    if (isPeru) {
-      const row = sku && rows ? rows[sku] : undefined;
-      return row?.price_pen && row.price_pen > 0 ? "PEN" : "PEN";
-    }
-    if (tier === "latam") return "USD";
+    if (isPeru) return "PEN";
     return displayCurrency;
   };
 

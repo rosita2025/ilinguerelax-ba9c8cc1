@@ -77,9 +77,16 @@ const ProductCoreanoRelax = () => {
   const navigate = useNavigate();
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const localPrice = useCampaignPrice(10, 54);
-  const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
-  const showLocal = localPrice.currency !== "USD";
+  const region = useRegionTier();
+  // Three pricing tiers (mirrors digital_products.price_usd / _latam / _pen)
+  const PRICE_GLOBAL_USD = 15;
+  const PRICE_LATAM_USD = 10;
+  const PRICE_PEN = 29.9;
+  const isPeru = region.country === "PE";
+  const usdPrice = region.tier === "latam" ? PRICE_LATAM_USD : PRICE_GLOBAL_USD;
+  const displayPrice = isPeru ? `S/ ${PRICE_PEN.toFixed(2)}` : `$${usdPrice}`;
+  const displayFlag = isPeru ? "🇵🇪" : region.tier === "latam" ? "🌎" : "🌍";
+  const currencyLabel = isPeru ? "PEN" : "USD";
 
   const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
@@ -87,7 +94,7 @@ const ProductCoreanoRelax = () => {
       content_category: "Digital Book",
       content_ids: ["product-coreano-100-mapas"],
       content_type: "product",
-      value: 10,
+      value: usdPrice,
       currency: "USD",
       num_items: 1,
     });
@@ -103,7 +110,8 @@ const ProductCoreanoRelax = () => {
     addItem({
       id: "coreano-100-mapas",
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
-      price: 10,
+      price: usdPrice,
+      regionPrices: { latam: PRICE_LATAM_USD, global: PRICE_GLOBAL_USD },
       image: "/images/product-coreano-100-mapas.webp",
       description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
       quantity: 1,

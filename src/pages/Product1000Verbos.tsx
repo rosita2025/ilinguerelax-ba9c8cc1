@@ -110,10 +110,10 @@ const Product1000Verbos = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="1,000 Verbos en Inglés PDF con Pronunciación"
-        description="1,000 verbos esenciales en inglés en presente, pasado y futuro con pronunciación en español. PDF descargable al instante. Desde $10 USD."
+        title={pricing.name ?? "1,000 Verbos en Inglés PDF con Pronunciación"}
+        description={pricing.description ?? "1,000 verbos esenciales en inglés en presente, pasado y futuro con pronunciación en español. PDF descargable al instante. Desde $10 USD."}
         canonicalUrl="https://ilinguerelax.com/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion"
-        image="https://ilinguerelax.com/og-image.png"
+        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/og-image.png"}
         type="product"
         price="10"
         originalPrice="54"

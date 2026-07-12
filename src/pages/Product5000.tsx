@@ -325,10 +325,10 @@ const Product5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Inglés PDF con Pronunciación"
-        description="Libro digital con 5,000 palabras en inglés, pronunciación en español y fonética UK/USA. 52 capítulos, nivel A1–C1. PDF descargable al instante."
+        title={pricing5000.name ?? "5,000 Palabras en Inglés PDF con Pronunciación"}
+        description={pricing5000.description ?? "Libro digital con 5,000 palabras en inglés, pronunciación en español y fonética UK/USA. 52 capítulos, nivel A1–C1. PDF descargable al instante."}
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
-        image="https://ilinguerelax.com/images/product-5000.webp"
+        image={pricing5000.coverImageUrl ?? "https://ilinguerelax.com/images/product-5000.webp"}
         type="product"
         price="14.30"
         originalPrice="54"

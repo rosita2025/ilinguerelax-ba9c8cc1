@@ -157,10 +157,10 @@ const ProductCoreanoRelax = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Aprender Coreano PDF · +100 Mapas Mentales"
-        description="Aprende coreano desde cero con +100 mapas mentales visuales, alfabeto hangul y vocabulario K-pop y K-dramas. PDF descargable, nivel A1–A2."
+        title={pricing.name ?? "Aprender Coreano PDF · +100 Mapas Mentales"}
+        description={pricing.description ?? "Aprende coreano desde cero con +100 mapas mentales visuales, alfabeto hangul y vocabulario K-pop y K-dramas. PDF descargable, nivel A1–A2."}
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
-        image={`https://ilinguerelax.com${coverAsset.url}`}
+        image={pricing.coverImageUrl ?? `https://ilinguerelax.com${coverAsset.url}`}
         type="product"
         price="10"
         originalPrice="54"

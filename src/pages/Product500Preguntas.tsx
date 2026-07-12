@@ -69,10 +69,10 @@ const Product500Preguntas = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="500 Preguntas en Inglés PDF con Pronunciación"
-        description="500 preguntas reales en inglés con pronunciación en español para conversar sin miedo en el trabajo, viajes y día a día. PDF descargable al instante."
+        title={pricing.name ?? "500 Preguntas en Inglés PDF con Pronunciación"}
+        description={pricing.description ?? "500 preguntas reales en inglés con pronunciación en español para conversar sin miedo en el trabajo, viajes y día a día. PDF descargable al instante."}
         canonicalUrl="https://ilinguerelax.com/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes"
-        image="https://ilinguerelax.com/og-image.png"
+        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/og-image.png"}
         type="product"
         price="10"
         originalPrice="54"

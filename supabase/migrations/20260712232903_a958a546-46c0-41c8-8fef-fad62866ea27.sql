@@ -1,0 +1,1 @@
+ALTER TABLE public.digital_products ADD COLUMN IF NOT EXISTS price_usd_tienda numeric;

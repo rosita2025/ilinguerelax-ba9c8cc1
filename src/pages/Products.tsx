@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
 import { products as staticProducts, getProductLink, type Product } from "@/data/products";
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
+import { useCardPrice } from "@/hooks/useCardPrice";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
@@ -75,6 +76,7 @@ const Products = () => {
   const isLatam = LATAM.has(detectedCurrency);
   const priceFor = (p: typeof products[number]) =>
     p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
+  const cardPrice = useCardPrice();
 
   // Collect available learner/target language codes from the merged catalog.
   const { learners, targets } = useMemo(() => {
@@ -462,11 +464,11 @@ const Products = () => {
                               <span className="text-[11px] text-muted-foreground">{sub}</span>
                             </div>
                             <div className="flex items-baseline gap-1.5">
-                              <span className="text-lg font-black text-foreground">${priceFor(p)}</span>
+                              <span className="text-lg font-black text-foreground">{cardPrice.format(p.id, priceFor(p))}</span>
                               {p.originalPrice && p.originalPrice > p.price && (
                                 <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>
                               )}
-                              <span className="text-[10px] text-accent font-semibold">USD</span>
+                              <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(p.id)}</span>
                             </div>
                           </div>
                           <ArrowRight className="w-4 h-4 text-muted-foreground group-hover/opt:text-primary group-hover/opt:translate-x-0.5 transition-all" />
@@ -481,7 +483,7 @@ const Products = () => {
                       {/* Price */}
                       <div className="flex items-baseline gap-2 mb-6">
                         <span className="text-3xl font-bold text-foreground">
-                          ${priceFor(product)}
+                          {cardPrice.format(product.id, priceFor(product))}
                         </span>
                         {product.isPhysical && (
                           <span className="text-sm text-muted-foreground">
@@ -493,7 +495,7 @@ const Products = () => {
                             ${product.originalPrice}
                           </span>
                         )}
-                        <span className="text-sm text-accent font-medium">USD</span>
+                        <span className="text-sm text-accent font-medium">{cardPrice.currencyLabel(product.id)}</span>
                       </div>
 
                       {/* CTA */}

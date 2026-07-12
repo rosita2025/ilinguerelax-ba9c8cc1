@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, Star, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCardPrice } from "@/hooks/useCardPrice";
 
 // Product images
 const product8000Image = "/images/product-8000.webp";
@@ -17,7 +18,8 @@ const products = {
     image: product5000Image,
     title: "5,000 Palabras en Inglés",
     subtitle: "con Pronunciación Español",
-    price: "$10",
+    sku: "5000",
+    priceUsd: 10,
     originalPrice: "$54",
     discount: "81%",
     url: "/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
@@ -28,7 +30,8 @@ const products = {
     image: product8000Image,
     title: "8,000 Palabras en Inglés",
     subtitle: "con Pronunciación Español",
-    price: "$20",
+    sku: "8000",
+    priceUsd: 20,
     originalPrice: "$54",
     discount: "63%",
     url: "/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
@@ -38,9 +41,9 @@ const products = {
 };
 
 export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSellProps) => {
-  // Show the OTHER product
   const otherProduct = currentProduct === "5000" ? "8000" : "5000";
   const product = products[otherProduct];
+  const cardPrice = useCardPrice();
 
   const text = lang === "en" ? {
     heading: "Would you like another option?",
@@ -148,12 +151,12 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-4">
                   <span className="text-3xl font-black text-foreground">
-                    {product.price}
+                    {cardPrice.format(product.sku, product.priceUsd)}
                   </span>
                   <span className="text-lg text-muted-foreground line-through">
                     {product.originalPrice}
                   </span>
-                  <span className="text-sm text-primary font-semibold">USD</span>
+                  <span className="text-sm text-primary font-semibold">{cardPrice.currencyLabel(product.sku)}</span>
                 </div>
 
                 {/* CTA Button */}

@@ -14,6 +14,7 @@ import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { useI18n } from "@/i18n/I18nContext";
+import { detectCurrency, formatPrice as formatPriceIntl } from "@/i18n";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.png";
 import { BLOCKED_VARIANTS, isBlockedVariant } from "@/config/blockedVariants";
 
@@ -70,7 +71,7 @@ export const CartDrawer = () => {
   const items = rawItems.filter((i) => !BLOCKED_VARIANTS.has(i.variantId));
 
   const navigate = useNavigate();
-  const { tier } = useRegionTier();
+  const { tier, country } = useRegionTier();
   const internalItems = useCheckoutPruebaStore((s) => s.items);
   const removeInternal = useCheckoutPruebaStore((s) => s.removeItem);
   const updateInternalQty = useCheckoutPruebaStore((s) => s.updateQuantity);
@@ -88,23 +89,32 @@ export const CartDrawer = () => {
   // Default seeded items without a slug shouldn't clutter the site-wide drawer.
   const visibleInternalItems = internalItems.filter((i) => slugByInternalId[i.id]);
   const internalCount = visibleInternalItems.reduce((s, i) => s + i.quantity, 0);
-  // If the buyer's currency is PEN and every visible internal item has a native
-  // pricePen configured in admin, render prices natively in Soles (matches the
-  // product page + checkout, avoids USD→PEN fx drift).
+
+  // Display currency for the cart drawer: derive from the visitor's IP country
+  // (source of truth for pricing region) so LATAM / Europe / Anglosphere users
+  // see their local currency automatically. Falls back to the manual currency
+  // selector if country is not yet detected.
+  const displayCurrency = country ? detectCurrency(country) : currency;
+
+  // Peru: if every item has a native pricePen from admin, render Soles natively
+  // (matches product page + checkout, avoids USD→PEN fx drift). Uses country
+  // (IP) as source of truth so it works even if the currency selector is USD.
+  const isPeru = (country || "").toUpperCase() === "PE";
   const showNativePen =
-    currency === "PEN" &&
+    isPeru &&
     visibleInternalItems.length > 0 &&
     visibleInternalItems.every((i) => typeof i.pricePen === "number" && (i.pricePen as number) > 0);
+
   const formatInternalUnit = (it: typeof visibleInternalItems[number]) =>
     showNativePen
       ? `S/ ${(it.pricePen as number).toFixed(2)} PEN`
-      : `${formatPrice(itemPrice(it, tier))} ${currency}`;
+      : `${formatPriceIntl(itemPrice(it, tier), displayCurrency)} ${displayCurrency}`;
   const internalSubtotal = showNativePen
     ? visibleInternalItems.reduce((s, i) => s + (i.pricePen as number) * i.quantity, 0)
     : visibleInternalItems.reduce((s, i) => s + itemPrice(i, tier) * i.quantity, 0);
   const internalSubtotalLabel = showNativePen
     ? `S/ ${internalSubtotal.toFixed(2)} PEN`
-    : `${formatPrice(internalSubtotal)} ${currency}`;
+    : `${formatPriceIntl(internalSubtotal, displayCurrency)} ${displayCurrency}`;
 
   const [couponInput, setCouponInput] = useState("");
   const [isApplying, setIsApplying] = useState(false);

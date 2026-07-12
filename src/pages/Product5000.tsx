@@ -20,6 +20,7 @@ const SalesNotification = lazy(() => import("@/components/SalesNotification"));
 
 const CustomerReviewsCarousel = lazy(() => import("@/components/CustomerReviewsCarousel").then(m => ({ default: m.CustomerReviewsCarousel })));
 import { useCampaignPrice, readInitialCampaignCurrency } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {

@@ -270,7 +270,7 @@ const Product500Preguntas = () => {
         rating={4.7}
         reviewCount={280}
         showReviews={true}
-        buyUrl={HOTMART_URL}
+        buyUrl={pricing.hotmartUrl || HOTMART_URL}
         onBuyClick={handleBuy}
       />
 

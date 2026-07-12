@@ -10,10 +10,29 @@ import { products as staticProducts, getProductLink, type Product } from "@/data
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useI18n } from "@/i18n/I18nContext";
+import type { LangCode } from "@/data/products";
+
+const LANG_META: Record<LangCode, { flag: string; label: string }> = {
+  es: { flag: "🇪🇸", label: "Español" },
+  en: { flag: "🇬🇧", label: "English" },
+  fr: { flag: "🇫🇷", label: "Français" },
+  pt: { flag: "🇵🇹", label: "Português" },
+  ko: { flag: "🇰🇷", label: "한국어" },
+  de: { flag: "🇩🇪", label: "Deutsch" },
+  it: { flag: "🇮🇹", label: "Italiano" },
+  ja: { flag: "🇯🇵", label: "日本語" },
+  nl: { flag: "🇳🇱", label: "Nederlands" },
+  zh: { flag: "🇨🇳", label: "中文" },
+};
 
 const Products = () => {
+  const { language: uiLang } = useI18n();
+  // "Hablo" auto-defaults to the visitor's detected UI language (IP/subdomain-based).
+  const defaultLearner: LangCode = (["es","en","fr","pt"].includes(uiLang) ? uiLang : "es") as LangCode;
   const [type, setType] = useState<"all" | "digital" | "physical">("all");
-  const [language, setLanguage] = useState<string>("all");
+  const [learnerLang, setLearnerLang] = useState<LangCode | "all">(defaultLearner);
+  const [targetLang, setTargetLang] = useState<LangCode | "all">("all");
   const [search, setSearch] = useState("");
 
   // Merge static catalog with products managed from /admin/productos.
@@ -57,12 +76,15 @@ const Products = () => {
   const priceFor = (p: typeof products[number]) =>
     p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
 
-  const languages = useMemo(() => {
-    const map = new Map<string, { flag: string; label: string }>();
+  // Collect available learner/target language codes from the merged catalog.
+  const { learners, targets } = useMemo(() => {
+    const l = new Set<LangCode>();
+    const t = new Set<LangCode>();
     for (const p of products) {
-      if (!map.has(p.flag)) map.set(p.flag, { flag: p.flag, label: p.country });
+      if (p.learnerLanguage) l.add(p.learnerLanguage);
+      if (p.targetLanguage) t.add(p.targetLanguage);
     }
-    return Array.from(map.values());
+    return { learners: Array.from(l), targets: Array.from(t) };
   }, [products]);
 
   const filtered = useMemo(() => {
@@ -71,7 +93,8 @@ const Products = () => {
       const formats = p.formats ?? (p.isPhysical ? ['physical'] : ['digital']);
       if (type === "digital" && !formats.includes('digital')) return false;
       if (type === "physical" && !formats.includes('physical')) return false;
-      if (language !== "all" && p.flag !== language) return false;
+      if (learnerLang !== "all" && p.learnerLanguage && p.learnerLanguage !== learnerLang) return false;
+      if (targetLang !== "all" && p.targetLanguage && p.targetLanguage !== targetLang) return false;
       if (
         q &&
         !p.title.toLowerCase().includes(q) &&
@@ -82,7 +105,7 @@ const Products = () => {
         return false;
       return true;
     });
-  }, [type, language, search, products]);
+  }, [type, learnerLang, targetLang, search, products]);
 
   // Group products that share a groupId so digital + physical appear in a single card
   type Group = {
@@ -212,40 +235,33 @@ const Products = () => {
             })}
           </div>
 
-          {/* Step 2: Language */}
+          {/* Step 2: Hablo (native language) */}
           <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">
-            2. Elige el idioma
+            2. Yo hablo / I speak
           </p>
           <div className="-mx-3 px-3 mb-4 md:mx-0 md:px-0">
             <div className="flex md:flex-wrap md:justify-center gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
               <button
-                onClick={() => setLanguage("all")}
-                aria-pressed={language === "all"}
+                onClick={() => setLearnerLang("all")}
+                aria-pressed={learnerLang === "all"}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
-                  language === "all"
+                  learnerLang === "all"
                     ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
                     : "bg-card text-foreground border-border hover:border-foreground/40"
                 )}
               >
                 <span className="text-base">🌐</span>
                 <span>Todos</span>
-                <span
-                  className={cn(
-                    "text-xs px-1.5 py-0.5 rounded-full",
-                    language === "all" ? "bg-white/25" : "bg-muted text-muted-foreground"
-                  )}
-                >
-                  {langCounts.all || 0}
-                </span>
               </button>
-              {languages.map((l) => {
-                const isActive = language === l.flag;
-                const count = langCounts[l.flag] || 0;
+              {learners.map((code) => {
+                const meta = LANG_META[code];
+                if (!meta) return null;
+                const isActive = learnerLang === code;
                 return (
                   <button
-                    key={l.flag}
-                    onClick={() => setLanguage(l.flag)}
+                    key={code}
+                    onClick={() => setLearnerLang(code)}
                     aria-pressed={isActive}
                     className={cn(
                       "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
@@ -254,21 +270,57 @@ const Products = () => {
                         : "bg-card text-foreground border-border hover:border-foreground/40"
                     )}
                   >
-                    <span className="text-base font-bold">{l.flag}</span>
-                    <span>{l.label}</span>
-                    <span
-                      className={cn(
-                        "text-xs px-1.5 py-0.5 rounded-full",
-                        isActive ? "bg-white/25" : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {count}
-                    </span>
+                    <span className="text-base font-bold">{meta.flag}</span>
+                    <span>{meta.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
+
+          {/* Step 3: Quiero aprender (target language) */}
+          <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">
+            3. Quiero aprender / I want to learn
+          </p>
+          <div className="-mx-3 px-3 mb-4 md:mx-0 md:px-0">
+            <div className="flex md:flex-wrap md:justify-center gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+              <button
+                onClick={() => setTargetLang("all")}
+                aria-pressed={targetLang === "all"}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
+                  targetLang === "all"
+                    ? "bg-accent text-accent-foreground border-accent shadow-md scale-105"
+                    : "bg-card text-foreground border-border hover:border-foreground/40"
+                )}
+              >
+                <span className="text-base">🌐</span>
+                <span>Todos</span>
+              </button>
+              {targets.map((code) => {
+                const meta = LANG_META[code];
+                if (!meta) return null;
+                const isActive = targetLang === code;
+                return (
+                  <button
+                    key={code}
+                    onClick={() => setTargetLang(code)}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
+                      isActive
+                        ? "bg-accent text-accent-foreground border-accent shadow-md scale-105"
+                        : "bg-card text-foreground border-border hover:border-foreground/40"
+                    )}
+                  >
+                    <span className="text-base font-bold">{meta.flag}</span>
+                    <span>{meta.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           {/* Search */}
           <div className="relative max-w-md mx-auto">

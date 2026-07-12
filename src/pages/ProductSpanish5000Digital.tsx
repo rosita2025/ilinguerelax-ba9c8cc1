@@ -549,8 +549,9 @@ const ProductSpanish5000Digital = () => {
         originalPrice={localizedOriginal}
         currencyCode={currency}
         flag={flag}
+        buyUrl={useTiendaOnly ? TIENDA_PATH_SP5K : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
         onBuyClick={handleBuyNow}
-        ctaText={`GET IT NOW — ${localizedPrice}`}
+        ctaText={useTiendaOnly ? `GET IT NOW — ${localizedPrice}` : `BUY ON HOTMART — ${localizedPrice}`}
         lang="en"
         rating={4.8}
         reviewCount={500}

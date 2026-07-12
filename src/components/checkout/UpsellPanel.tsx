@@ -122,6 +122,7 @@ export function UpsellPanel({ upsells }: Props) {
                     id: u.id,
                     name: u.name,
                     price: u.price,
+                    pricePen: u.pricePen,
                     image: u.image,
                     description: u.description,
                     quantity: 1,

@@ -12,11 +12,44 @@ export interface PruebaItem {
   description?: string;
   /** Optional per-region prices in USD. If set, overrides `price` based on IP tier. */
   regionPrices?: { latam: number; global: number };
+  /** Optional Peru local price (PEN). When set + country=PE, shown natively (no conversion). */
+  pricePen?: number;
 }
 
 /** Returns the effective USD unit price for an item, given the visitor's IP region tier. */
 export function itemPrice(item: PruebaItem, tier: RegionTier): number {
   return item.regionPrices?.[tier] ?? item.price;
+}
+
+/**
+ * If country is Peru AND every item has a native pricePen set, returns totals in PEN.
+ * Otherwise returns null (caller falls back to USD-based conversion).
+ */
+export function calcTotalsPen(
+  items: PruebaItem[],
+  couponPercent: number,
+  country: string,
+): { subtotal: number; discount: number; total: number } | null {
+  if ((country || "").toUpperCase() !== "PE") return null;
+  if (items.length === 0) return null;
+  if (!items.every((i) => typeof i.pricePen === "number" && (i.pricePen as number) > 0)) return null;
+  const subtotal = items.reduce((s, i) => s + (i.pricePen as number) * i.quantity, 0);
+  const discount = (subtotal * couponPercent) / 100;
+  const total = Math.max(0, subtotal - discount);
+  return {
+    subtotal: Math.round(subtotal * 100) / 100,
+    discount: Math.round(discount * 100) / 100,
+    total: Math.round(total * 100) / 100,
+  };
+}
+
+/** Formats a PEN amount as "S/ 29.90" using es-PE locale. */
+export function formatPen(amount: number): string {
+  try {
+    return new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(amount);
+  } catch {
+    return `S/ ${amount.toFixed(2)}`;
+  }
 }
 
 export interface BuyerInfo {
@@ -101,6 +134,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
                   // Explicitly clear regionPrices if the new patch omits it,
                   // so switching a product from region-priced to flat works.
                   regionPrices: patch.regionPrices ?? undefined,
+                  pricePen: patch.pricePen ?? undefined,
                 }
               : i,
           ),

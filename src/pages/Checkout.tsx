@@ -82,7 +82,7 @@ export default function Checkout() {
         const skus = upRows.map((u) => u.upsell_sku);
         const { data: upProducts } = await supabase
           .from("digital_products")
-          .select("sku, name, description, price_usd, cover_image_url")
+          .select("sku, name, description, price_usd, price_pen, cover_image_url")
           .in("sku", skus)
           .eq("active", true);
         const bySku = new Map((upProducts ?? []).map((p) => [p.sku, p]));
@@ -91,12 +91,18 @@ export default function Checkout() {
             const p = bySku.get(u.upsell_sku);
             if (!p) return null;
             const original = Number(p.price_usd);
-            const price = Math.round(original * (1 - (Number(u.discount_pct) || 0) / 100) * 100) / 100;
+            const discountPct = Number(u.discount_pct) || 0;
+            const price = Math.round(original * (1 - discountPct / 100) * 100) / 100;
+            const rawPen = p.price_pen != null ? Number(p.price_pen) : null;
+            const pricePen = rawPen != null && rawPen > 0
+              ? Math.round(rawPen * (1 - discountPct / 100) * 100) / 100
+              : undefined;
             const bust = `?v=${cb}`;
             return {
               id: p.sku,
               name: p.name,
               price,
+              pricePen,
               originalPrice: u.discount_pct ? original : undefined,
               image: (p.cover_image_url || "/placeholder.svg") + (p.cover_image_url ? bust : ""),
               description: p.description || undefined,
@@ -122,6 +128,7 @@ export default function Checkout() {
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
+      const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
       setDbItem({
         id: staticItem?.id ?? data.sku,
         name: data.name,
@@ -131,6 +138,7 @@ export default function Checkout() {
         productPath: staticItem?.productPath ?? `/products/${data.sku}`,
         adminSku: data.sku,
         upsells: upsells ?? undefined,
+        ...(pricePen != null && { pricePen }),
         ...(priceLatam != null && {
           regionPrices: { latam: priceLatam, global: priceGlobal },
         }),
@@ -188,11 +196,12 @@ export default function Checkout() {
   }, [
     catalogItem?.id,
     catalogItem?.price,
+    catalogItem?.pricePen,
     catalogItem?.regionPrices?.latam,
     catalogItem?.regionPrices?.global,
     catalogItem?.image,
     catalogItem?.name,
-    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.originalPrice]) ?? []),
+    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []),
   ]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they

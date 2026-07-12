@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency, formatLocalAmount } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
@@ -26,12 +26,16 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
   const localTotal = useLocalCurrency(total);
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
-  const useLocal = !localTotal.isUsd && !localTotal.loading;
-  const fmtMoney = (usd: number, local: { formatted: string }) =>
-    useLocal ? local.formatted : `$${usd.toFixed(2)}`;
+  const penMode = penTotals !== null;
+  const useLocal = penMode || (!localTotal.isUsd && !localTotal.loading);
+  const fmtMoney = (usd: number, local: { formatted: string }, penAmount?: number) =>
+    penMode && penAmount != null
+      ? formatPen(penAmount)
+      : useLocal ? local.formatted : `$${usd.toFixed(2)}`;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
 
@@ -53,7 +57,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             {expanded ? t.hideSummary : t.showSummary}
           </span>
-          <span className="text-lg font-bold">{fmtMoney(total, localTotal)}</span>
+          <span className="text-lg font-bold">{fmtMoney(total, localTotal, penTotals?.total)}</span>
         </button>
       )}
 
@@ -102,9 +106,11 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                   )}
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
-                  {useLocal
-                    ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
-                    : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                  {penMode && item.pricePen != null
+                    ? formatPen(item.pricePen * item.quantity)
+                    : useLocal
+                      ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
+                      : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
                 </div>
               </div>
             ))}
@@ -159,12 +165,12 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>{fmtMoney(subtotal, localSubtotal)}</span>
+            <span>{fmtMoney(subtotal, localSubtotal, penTotals?.subtotal)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-{fmtMoney(discount, localDiscount)}</span>
+              <span>-{fmtMoney(discount, localDiscount, penTotals?.discount)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
@@ -174,7 +180,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{useLocal ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : useLocal ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
             </div>
           </div>
 

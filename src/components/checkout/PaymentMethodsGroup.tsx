@@ -4,7 +4,7 @@ import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
-import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 
@@ -73,10 +73,12 @@ export function PaymentMethodsGroup() {
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const { total } = calcTotals(items, couponPercent, region.tier);
+  const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
+  const penBadge = penTotals ? formatPen(penTotals.total) : null;
   // Badge principal: SIEMPRE en moneda local del país (USD, CAD, EUR, MXN, ARS, PEN, etc.)
-  const priceBadge = local.loading ? `USD $${totalUsd}` : local.formatted;
+  const priceBadge = penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted);
   const localBadge = "";
 
 
@@ -310,7 +312,7 @@ export function PaymentMethodsGroup() {
   const handleManualPaid = async () => {
     const s = useCheckoutPruebaStore.getState();
     const orderNumber = `ILR-YP-${Math.floor(1000 + Math.random() * 9000)}`;
-    const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
+    const amountText = penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted);
     const productList = s.items.map((i) => `• ${i.name} x${i.quantity}`).join("\n");
     const msg =
       `Hola! 👋 Acabo de pagar por Yape/Plin.\n\n` +
@@ -331,8 +333,8 @@ export function PaymentMethodsGroup() {
         buyer_phone: s.buyer.phone ?? null,
         buyer_country: (region.country || "").toUpperCase() || null,
         amount_usd: Number(totalUsd),
-        amount_local: local.loading ? null : Number(local.amount ?? totalUsd),
-        currency_local: local.currency || "USD",
+        amount_local: penTotals ? penTotals.total : (local.loading ? null : Number(local.amount ?? totalUsd)),
+        currency_local: penTotals ? "PEN" : (local.currency || "USD"),
         method: "yape_plin",
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
@@ -353,8 +355,8 @@ export function PaymentMethodsGroup() {
           customerPhone: s.buyer.phone ?? "",
           customerCountry: (region.country || "").toUpperCase(),
           productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "USD",
+          amount: penTotals ? penTotals.total : (local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd)),
+          currency: penTotals ? "PEN" : (local.currency || "USD"),
           method: "Yape/Plin",
           orderDate: new Date().toISOString(),
         },
@@ -371,8 +373,8 @@ export function PaymentMethodsGroup() {
           orderNumber,
           customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
           productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "USD",
+          amount: penTotals ? penTotals.total : (local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd)),
+          currency: penTotals ? "PEN" : (local.currency || "USD"),
           method: "Yape/Plin",
           orderDate: new Date().toISOString(),
         },
@@ -763,13 +765,13 @@ export function PaymentMethodsGroup() {
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
                   <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{local.loading ? `USD $${totalUsd}` : local.formatted}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
                   <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
                 </div>
 
                 <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
                   <li>{t.yapeStep1}</li>
-                  <li>{t.yapeStep2(local.loading ? `USD $${totalUsd}` : local.formatted, YAPE_PHONE, YAPE_NAME)}</li>
+                  <li>{t.yapeStep2(penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted), YAPE_PHONE, YAPE_NAME)}</li>
                   <li>{t.yapeStep3}</li>
                   <li>{t.yapeStep4}</li>
                 </ol>

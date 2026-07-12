@@ -196,11 +196,12 @@ export default function Checkout() {
   }, [
     catalogItem?.id,
     catalogItem?.price,
+    catalogItem?.pricePen,
     catalogItem?.regionPrices?.latam,
     catalogItem?.regionPrices?.global,
     catalogItem?.image,
     catalogItem?.name,
-    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.originalPrice]) ?? []),
+    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []),
   ]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they

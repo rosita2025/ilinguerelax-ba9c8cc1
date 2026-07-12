@@ -145,6 +145,10 @@ serve(async (req) => {
         language,
         source: "hotmart",
       });
+    } catch (e) {
+      console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
+    }
+
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

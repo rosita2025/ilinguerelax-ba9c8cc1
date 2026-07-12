@@ -481,7 +481,7 @@ const ProductSpanish5000Digital = () => {
             className="h-14 px-8 text-base font-black shadow-hero"
           >
             <ShoppingCart className="w-5 h-5 mr-2" />
-            {isRedirecting ? "Redirecting…" : `GET IT NOW — $${PRICE}`}
+            {isRedirecting ? "Redirecting…" : `GET IT NOW — $${currentPrice}`}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1">

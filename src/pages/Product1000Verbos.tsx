@@ -26,13 +26,14 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
+const ADMIN_SKU_1000_VERBOS = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
-const CART_ITEM = {
+const CART_ITEM_BASE = {
   id: "1000-verbos-ingles",
   name: "Inglés Relax · 1,000 Verbos Esenciales (Digital PDF)",
-  price: 10,
   image: product1000VerbosImage,
   description: "1,000 verbos en presente, pasado y futuro con pronunciación",
 };
@@ -49,21 +50,24 @@ const features = [
 ];
 
 const Product1000Verbos = () => {
-  const campaign = useCampaignPrice(10, 54);
+  const pricing = useAdminPricing(ADMIN_SKU_1000_VERBOS, { global: 10 });
+  const currentPrice = pricing.priceGlobalUsd;
+  const campaign = useCampaignPrice(currentPrice, 54);
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const { country } = useRegionTier();
   const isPeru = country === "PE";
+  const cartItem = { ...CART_ITEM_BASE, price: currentPrice, pricePen: pricing.pricePen ?? undefined };
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",
     content_category: "Digital Book",
     content_ids: ["product-1000-verbos"],
     content_type: "product",
-    value: 10,
+    value: currentPrice,
     currency: "USD",
-  }), []);
+  }), [currentPrice]);
   useHotmartPixel(pixelParams);
 
   const handleBuy = () => {
@@ -72,13 +76,13 @@ const Product1000Verbos = () => {
       content_category: "Digital Book",
       content_ids: ["product-1000-verbos"],
       content_type: "product",
-      value: 10,
+      value: currentPrice,
       currency: "USD",
       num_items: 1,
     });
     if (isPeru) {
       clear();
-      addItem({ ...CART_ITEM, quantity: 1 });
+      addItem({ ...cartItem, quantity: 1 });
       toast.success("Producto agregado al carrito");
       navigate("/checkouts/1000-verbos");
     } else {
@@ -87,7 +91,7 @@ const Product1000Verbos = () => {
   };
 
   const handleAddToCart = () => {
-    addItem({ ...CART_ITEM, quantity: 1 });
+    addItem({ ...cartItem, quantity: 1 });
     toast.success("Producto agregado al carrito", {
       description: "Puedes seguir explorando o ir al checkout.",
       action: {
@@ -96,6 +100,7 @@ const Product1000Verbos = () => {
       },
     });
   };
+
 
 
 
@@ -182,7 +187,7 @@ const Product1000Verbos = () => {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">${currentPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}

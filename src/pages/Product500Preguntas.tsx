@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { LiveViewers } from "@/components/LiveViewers";
@@ -37,15 +38,17 @@ const features = [
 ];
 
 const Product500Preguntas = () => {
-  const campaign = useCampaignPrice(10, 54);
+  const pricing = useAdminPricing("500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes", { global: 10 });
+  const currentPrice = pricing.priceGlobalUsd;
+  const campaign = useCampaignPrice(currentPrice, 54);
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 500 Preguntas en Inglés",
     content_category: "Digital Book",
     content_ids: ["product-500-preguntas"],
     content_type: "product",
-    value: 10,
+    value: currentPrice,
     currency: "USD",
-  }), []);
+  }), [currentPrice]);
   useHotmartPixel(pixelParams);
 
   const handleBuy = () => {
@@ -54,7 +57,7 @@ const Product500Preguntas = () => {
       content_category: "Digital Book",
       content_ids: ["product-500-preguntas"],
       content_type: "product",
-      value: 10,
+      value: currentPrice,
       currency: "USD",
       num_items: 1,
     });
@@ -153,7 +156,7 @@ const Product500Preguntas = () => {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">${currentPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}

@@ -27,6 +27,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
@@ -126,7 +127,9 @@ const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
-  const localizedPrice = formatPrice(PRICE);
+  const pricing = useAdminPricing("5-000-spanish-words-with-english-pronunciation-digital", { global: PRICE });
+  const currentPrice = pricing.priceGlobalUsd;
+  const localizedPrice = formatPrice(currentPrice);
   const localizedOriginal = formatPrice(ORIGINAL_PRICE);
   const flag = countryToFlag(countryCode);
 
@@ -135,14 +138,14 @@ const ProductSpanish5000Digital = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000-digital"],
     content_type: "product",
-    value: PRICE,
+    value: currentPrice,
     currency: "USD",
-  }), []);
+  }), [currentPrice]);
   useHotmartPixel(pixelParams);
   useTrackProductView({
     productId: "product-spanish-5000-digital",
     productName: "Spanish Relax - 5,000 Words (Digital)",
-    price: PRICE,
+    price: currentPrice,
     currency: "USD",
     category: "Digital Book",
   });
@@ -160,14 +163,14 @@ const ProductSpanish5000Digital = () => {
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000-digital"],
       content_type: "product",
-      value: PRICE,
+      value: currentPrice,
       currency: "USD",
       num_items: 1,
     });
     addItem({
       id: "5000-spanish-words",
       name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: PRICE,
+      price: currentPrice,
       image: "/images/product-5000-spanish.webp",
       description: "5,000 vocabulary words in Spanish with English pronunciation",
       quantity: 1,
@@ -179,7 +182,7 @@ const ProductSpanish5000Digital = () => {
     addItem({
       id: "5000-spanish-words",
       name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: PRICE,
+      price: currentPrice,
       image: "/images/product-5000-spanish.webp",
       description: "5,000 vocabulary words in Spanish with English pronunciation",
       quantity: 1,
@@ -193,6 +196,7 @@ const ProductSpanish5000Digital = () => {
     });
   };
 
+
   return (
     <main className="min-h-screen bg-background">
       <Helmet>
@@ -204,7 +208,7 @@ const ProductSpanish5000Digital = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
         image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
-        price={String(PRICE)}
+        price={String(currentPrice)}
         originalPrice={String(ORIGINAL_PRICE)}
         rating="4.8"
         reviewCount="500"
@@ -272,7 +276,7 @@ const ProductSpanish5000Digital = () => {
               {/* Price block */}
               <div className="p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-3 flex-wrap">
-                  <span className="text-4xl md:text-5xl font-black text-foreground">${PRICE}</span>
+                  <span className="text-4xl md:text-5xl font-black text-foreground">${currentPrice}</span>
                   <span className="text-xl text-muted-foreground line-through mb-1">${ORIGINAL_PRICE}</span>
                   <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">
                     SAVE {DISCOUNT_PCT}%
@@ -288,7 +292,7 @@ const ProductSpanish5000Digital = () => {
                   className="mt-4 w-full h-14 text-base font-black shadow-hero"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${PRICE}`}
+                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${currentPrice}`}
                 </Button>
                 <Button
                   onClick={handleAddToCart}
@@ -466,7 +470,7 @@ const ProductSpanish5000Digital = () => {
             5,000 essential Spanish words · English pronunciation · 3 free bonuses.
           </p>
           <div className="flex items-baseline justify-center gap-3 mb-4">
-            <span className="text-5xl font-black">${PRICE}</span>
+            <span className="text-5xl font-black">${currentPrice}</span>
             <span className="text-xl line-through text-muted-foreground">${ORIGINAL_PRICE}</span>
             <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">-{DISCOUNT_PCT}%</span>
           </div>
@@ -477,7 +481,7 @@ const ProductSpanish5000Digital = () => {
             className="h-14 px-8 text-base font-black shadow-hero"
           >
             <ShoppingCart className="w-5 h-5 mr-2" />
-            {isRedirecting ? "Redirecting…" : `GET IT NOW — $${PRICE}`}
+            {isRedirecting ? "Redirecting…" : `GET IT NOW — $${currentPrice}`}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1">

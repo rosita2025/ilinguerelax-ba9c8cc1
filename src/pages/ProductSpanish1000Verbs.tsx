@@ -9,9 +9,10 @@ import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const productImage = "/images/product-spanish-1000-verbs.png";
-const PRICE = "12.00";
+const PRICE_FALLBACK = 12;
 
 const features = [
   "1,000 essential Spanish verbs",
@@ -27,7 +28,9 @@ const features = [
 const ProductSpanish1000Verbs = () => {
   const navigate = useNavigate();
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
-  const campaign = useCampaignPrice(12, 54);
+  const pricing = useAdminPricing("1-000-verbs-in-spanish-past-present-future-with-english-pronunciation", { global: PRICE_FALLBACK });
+  const currentPrice = pricing.priceGlobalUsd;
+  const campaign = useCampaignPrice(currentPrice, 54);
 
   const handleBuyNow = () => {
     // Route directly to internal checkout — Shopify is intentionally bypassed here
@@ -44,7 +47,7 @@ const ProductSpanish1000Verbs = () => {
         canonicalUrl="https://ilinguerelax.com/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation"
         image="https://ilinguerelax.com/images/product-spanish-1000-verbs.png"
         type="product"
-        price={PRICE}
+        price={currentPrice.toFixed(2)}
         originalPrice="54"
         rating="4.8"
         reviewCount="0"

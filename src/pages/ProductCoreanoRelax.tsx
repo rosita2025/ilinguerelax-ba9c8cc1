@@ -75,11 +75,14 @@ const ProductCoreanoRelax = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const clearCart = useCheckoutPruebaStore((s) => s.clear);
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const localPrice = useCampaignPrice(10, 54);
   const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
   const showLocal = localPrice.currency !== "USD";
 
-  const handleBuy = () => {
+  const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Coreano Sin Complicaciones - 100 Mapas Mentales",
       content_category: "Digital Book",
@@ -89,7 +92,25 @@ const ProductCoreanoRelax = () => {
       currency: "USD",
       num_items: 1,
     });
+
+  const handleBuyHotmart = () => {
+    trackInitiate();
     window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
+  };
+
+  const handleBuyStore = () => {
+    trackInitiate();
+    clearCart();
+    addItem({
+      id: "coreano-100-mapas",
+      name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
+      price: 10,
+      image: "/images/product-coreano-100-mapas.webp",
+      description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
+      quantity: 1,
+    });
+    sonnerToast.success("Producto agregado al carrito");
+    navigate("/checkouts/coreano-100-mapas");
   };
 
 

@@ -21,17 +21,6 @@ import { config as loadEnv } from "dotenv";
 loadEnv();
 
 const BASE_URL = "https://ilinguerelax.com";
-// Regional subdomains — each gets its own sitemap segment so we can submit
-// per-property in Google Search Console. Keep in sync with src/lib/subdomainRegion.ts.
-const REGIONAL_HOSTS = [
-  "https://us.ilinguerelax.com",
-  "https://ca.ilinguerelax.com",
-  "https://pe.ilinguerelax.com",
-  "https://mx.ilinguerelax.com",
-  "https://es.ilinguerelax.com",
-  "https://fr.ilinguerelax.com",
-  "https://br.ilinguerelax.com",
-];
 const TODAY = new Date().toISOString().slice(0, 10);
 const URLS_PER_SITEMAP = 5000; // Google allows up to 50,000; keep files small.
 

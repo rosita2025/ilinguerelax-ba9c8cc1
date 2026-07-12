@@ -737,7 +737,7 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         price={priceLabel}
         originalPrice={originalLabel}
-        currencyCode={currency}
+        currencyCode={cardPrice.ready ? cardPrice.currencyLabel("patrones-especiales") : currency}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={6}

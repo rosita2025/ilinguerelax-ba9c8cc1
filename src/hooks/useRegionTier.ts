@@ -69,40 +69,12 @@ export interface RegionInfo {
  * Cached 24h. This is source-of-truth for regional pricing — the user cannot
  * change it manually (the header currency selector only affects display).
  */
-// Subdominios activos → país ISO
-// us → US, pe → PE, mx → MX, uk → GB (Reino Unido), eu → ES (Europa/EUR)
-// Cualquier otro subdominio (o dominio raíz ilinguerelax.com) usa detección por IP.
-const SUBDOMAIN_MAP: Record<string, string> = {
-  US: "US",
-  PE: "PE",
-  MX: "MX",
-  UK: "GB",
-  EU: "ES",
-  // Reservados por si se agregan más subdominios:
-  CA: "CA", AU: "AU", BR: "BR", CO: "CO", AR: "AR", CL: "CL",
-  ES: "ES", FR: "FR", DE: "DE", IT: "IT", PT: "PT",
-  JP: "JP", KR: "KR", CN: "CN", IN: "IN",
-};
-
-function detectFromSubdomain(): string {
-  if (typeof window === "undefined") return "";
-  const host = window.location.hostname.toLowerCase();
-  const parts = host.split(".");
-  if (parts.length < 3) return "";
-  const sub = parts[0].toUpperCase();
-  if (sub.length !== 2) return "";
-  return SUBDOMAIN_MAP[sub] || "";
-}
+// Subdominios regionales desactivados — usamos solo ilinguerelax.com y detección por IP.
 
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
     if (typeof window !== "undefined") {
-      // Prioridad 1: subdominio (us.ilinguerelax.com, pe.ilinguerelax.com…)
-      const fromSub = detectFromSubdomain();
-      if (fromSub) {
-        try { localStorage.setItem("ilr_country", fromSub); } catch { /* ignore */ }
-        return { tier: classify(fromSub), country: fromSub, loading: false };
-      }
+
       // Prioridad 2: ?country=XX manual (pruebas)
       const params = new URLSearchParams(window.location.search);
       const urlOverride = params.get("country")?.toUpperCase();

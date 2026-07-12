@@ -57,24 +57,23 @@ export default function Checkout() {
       setLoadingDb(true);
       const cb = Date.now();
 
-      // 1) Product row (skip if we already have static fallback and it exists)
-      const { data, error } = await supabase
-        .from("digital_products")
-        .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
-        .eq("sku", adminSku)
-        .eq("active", true)
-        .gt("price_usd", -1 - (cb % 7) * 0.0000001)
-        .maybeSingle();
+      // Run product + upsells queries in parallel to shave ~50% off the wait.
+      const [{ data, error }, { data: upRows }] = await Promise.all([
+        supabase
+          .from("digital_products")
+          .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
+          .eq("sku", adminSku)
+          .eq("active", true)
+          .maybeSingle(),
+        supabase
+          .from("product_upsells")
+          .select("upsell_sku, discount_pct, sort_order")
+          .eq("product_sku", adminSku)
+          .order("sort_order", { ascending: true }),
+      ]);
 
       if (cancelled) return;
 
-      // 2) Admin-configured upsells for this SKU — always fetched so removing
-      //    all upsells in admin also removes them from the checkout.
-      const { data: upRows } = await supabase
-        .from("product_upsells")
-        .select("upsell_sku, discount_pct, sort_order")
-        .eq("product_sku", adminSku)
-        .order("sort_order", { ascending: true });
 
 
       let upsells: CatalogItem["upsells"] | null = null;

@@ -179,7 +179,7 @@ serve(async (req) => {
         customer_email: customerEmail,
         skus: normalizedSkus,
         message_id: r.data?.messageId || r.data?.id || null,
-        provider: r.data?.provider || null,
+        provider: provider || r.data?.provider || null,
         status: "sent",
         last_event: "sent",
         last_event_at: new Date().toISOString(),

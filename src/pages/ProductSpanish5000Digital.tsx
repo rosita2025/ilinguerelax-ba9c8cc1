@@ -353,11 +353,15 @@ const ProductSpanish5000Digital = () => {
             <p className="text-muted-foreground mt-2">Real sample pages from the PDF.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[previewSpanishIndex, previewSpanishVocab, previewSpanishPhrases].map((src, i) => (
+            {[
+              { src: previewSpanishIndex, alt: "5,000 Spanish Words PDF — Table of contents sample page (Spanish for English speakers)" },
+              { src: previewSpanishVocab, alt: "5,000 Spanish Words PDF — Vocabulary sample page with English pronunciation" },
+              { src: previewSpanishPhrases, alt: "5,000 Spanish Words PDF — Real-life phrases sample page with English pronunciation" },
+            ].map((p, i) => (
               <img
                 key={i}
-                src={src}
-                alt={`Sample page ${i + 1}`}
+                src={p.src}
+                alt={p.alt}
                 className="w-full h-auto rounded-xl border border-border shadow-md"
                 loading="lazy"
                 decoding="async"

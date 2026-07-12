@@ -35,9 +35,10 @@ export const CoreanoLaunchBanner = () => {
               <p className="text-muted-foreground text-pretty">
                 Método visual y natural conectado con k-dramas, K-pop y cultura coreana. Desde cero (A1) hasta nivel avanzado.
               </p>
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center gap-3 pt-2 flex-wrap">
                 <span className="text-3xl font-bold text-primary">{cardPrice.format(COREANO_SKU, 10)}</span>
                 <span className="text-sm text-muted-foreground">{cardPrice.currencyLabel(COREANO_SKU)} · pago único</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
               </div>
               <div className="inline-flex items-center gap-2 text-primary font-semibold pt-2 group-hover:gap-3 transition-all">
                 Ver el producto <ArrowRight className="w-4 h-4" />

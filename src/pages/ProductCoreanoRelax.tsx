@@ -200,11 +200,11 @@ const ProductCoreanoRelax = () => {
                   <span className="text-5xl md:text-6xl font-black text-foreground">{displayPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
-                    {isPeru ? "-72%" : region.tier === "latam" ? "-81%" : "-72%"}
+                    {isPeru ? "-72%" : useHotmartLatam ? "-81%" : "-72%"}
                   </motion.span>
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
-                  {displayFlag} Precio para {isPeru ? "Perú" : region.tier === "latam" ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
+                  {displayFlag} Precio para {isPeru ? "Perú" : useHotmartLatam ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
                 </p>
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>

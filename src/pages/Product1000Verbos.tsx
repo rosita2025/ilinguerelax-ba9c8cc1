@@ -317,7 +317,7 @@ const Product1000Verbos = () => {
         rating={4.8}
         reviewCount={350}
         showReviews={true}
-        buyUrl={isPeru ? "/checkouts/1000-verbos" : HOTMART_URL}
+        buyUrl={isPeru ? "/checkouts/1000-verbos" : (pricing.hotmartUrl || HOTMART_URL)}
         onBuyClick={handleBuy}
       />
 

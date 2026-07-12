@@ -115,7 +115,7 @@ const ProductPatronesEspeciales = () => {
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
   // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
   const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD);
-  const originalLabel = formatPrice(ORIGINAL_USD);
+  const originalLabel = cardPrice.ready ? cardPrice.format(null, ORIGINAL_USD) : formatPrice(ORIGINAL_USD);
   const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({

@@ -335,49 +335,19 @@ const ProductPatronesEspeciales = () => {
                 </p>
               </motion.div>
 
-              {usePaypalStripe ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              {useTiendaOnly ? (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="hero"
                     size="xl"
-                    className="w-full text-base py-6 shadow-2xl"
-                    onClick={() => {
-                      trackHotmartEvent("InitiateCheckout", {
-                        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-                        content_category: "Digital Book",
-                        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-                        content_type: "product",
-                        value: PRICE_USD,
-                        currency: "USD",
-                        num_items: 1,
-                      });
-                      window.open(PAYPAL_URL, "_blank");
-                    }}
+                    className="w-full mb-4 text-lg py-6 shadow-2xl"
+                    onClick={handleBuy}
                   >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Pagar con PayPal
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    Comprar en tienda online
+                    <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="xl"
-                    className="w-full text-base py-6"
-                    onClick={() => {
-                      trackHotmartEvent("InitiateCheckout", {
-                        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-                        content_category: "Digital Book",
-                        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-                        content_type: "product",
-                        value: PRICE_USD,
-                        currency: "USD",
-                        num_items: 1,
-                      });
-                      window.open(STRIPE_URL, "_blank");
-                    }}
-                  >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Pagar con Stripe
-                  </Button>
-                </div>
+                </motion.div>
               ) : (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button

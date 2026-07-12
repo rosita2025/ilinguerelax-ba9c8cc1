@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
+import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency, formatLocalAmount } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";

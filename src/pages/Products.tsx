@@ -483,7 +483,7 @@ const Products = () => {
                       {/* Price */}
                       <div className="flex items-baseline gap-2 mb-6">
                         <span className="text-3xl font-bold text-foreground">
-                          ${priceFor(product)}
+                          {cardPrice.format(product.id, priceFor(product))}
                         </span>
                         {product.isPhysical && (
                           <span className="text-sm text-muted-foreground">
@@ -495,7 +495,7 @@ const Products = () => {
                             ${product.originalPrice}
                           </span>
                         )}
-                        <span className="text-sm text-accent font-medium">USD</span>
+                        <span className="text-sm text-accent font-medium">{cardPrice.currencyLabel(product.id)}</span>
                       </div>
 
                       {/* CTA */}

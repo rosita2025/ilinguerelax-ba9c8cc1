@@ -236,6 +236,40 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     </Helmet>
   );
 
+  // Restrict admin to the canonical domain only. Regional subdomains
+  // (us., pe., mx., ca., es., fr., br.) must NOT expose the admin panel.
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname.toLowerCase();
+    const isCanonical =
+      host === "ilinguerelax.com" ||
+      host === "www.ilinguerelax.com" ||
+      host === "localhost" ||
+      host.endsWith(".lovable.app") ||
+      host.endsWith(".lovable.dev");
+    if (!isCanonical) {
+      return (
+        <>
+          <NoIndex />
+          <div className="min-h-dvh flex items-center justify-center bg-background p-4">
+            <Card className="p-8 max-w-md w-full text-center space-y-3">
+              <ShieldAlert className="w-10 h-10 text-destructive mx-auto" />
+              <h1 className="text-xl font-bold">Panel no disponible aquí</h1>
+              <p className="text-sm text-muted-foreground">
+                El panel de administración solo está accesible desde el dominio principal.
+              </p>
+              <a
+                href={`https://www.ilinguerelax.com${location.pathname}`}
+                className="inline-block text-primary underline underline-offset-2 text-sm"
+              >
+                Ir a www.ilinguerelax.com
+              </a>
+            </Card>
+          </div>
+        </>
+      );
+    }
+  }
+
   if (!adminKey) {
     const lockRemaining = getLockRemaining();
     return (

@@ -1,0 +1,69 @@
+/**
+ * IndexNow ping helper.
+ *
+ * IndexNow is a lightweight open protocol supported by Bing, Yandex, Seznam
+ * and Naver. Google doesn't consume the protocol directly but discovers new
+ * URLs faster once they're announced to the shared index.
+ *
+ * Setup:
+ *  - A key file lives at https://ilinguerelax.com/ilinguerelax-indexnow-key.txt
+ *  - The file contents (a 32-char token) match INDEXNOW_KEY below.
+ *  - Any change to that file requires updating the constant.
+ *
+ * Usage (from an edge function):
+ *   await pingIndexNow(["https://ilinguerelax.com/products/foo"]);
+ *
+ * Failures are swallowed — SEO pings must never block the caller.
+ */
+
+const INDEXNOW_KEY = "ilr7k3n9x2q8w5m4v6b1p0d3s7z4h2y8";
+const HOST = "ilinguerelax.com";
+const KEY_LOCATION = `https://${HOST}/ilinguerelax-indexnow-key.txt`;
+const ENDPOINT = "https://api.indexnow.org/indexnow";
+
+export async function pingIndexNow(urls: string[]): Promise<void> {
+  const clean = Array.from(new Set(urls.filter(Boolean)));
+  if (clean.length === 0) return;
+
+  try {
+    const res = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        host: HOST,
+        key: INDEXNOW_KEY,
+        keyLocation: KEY_LOCATION,
+        urlList: clean.slice(0, 10_000), // hard cap per IndexNow spec
+      }),
+    });
+    // 200, 202 = accepted. Anything else we log but never throw.
+    if (!(res.status === 200 || res.status === 202)) {
+      console.warn("[indexnow] non-success:", res.status, await res.text().catch(() => ""));
+    }
+  } catch (err) {
+    console.warn("[indexnow] fetch failed:", (err as Error).message);
+  }
+}
+
+export function productUrl(sku: string): string {
+  return `https://${HOST}/products/${sku}`;
+}
+
+/**
+ * Also asks Google to re-fetch the sitemap. Uses the public sitemap ping
+ * endpoint (no auth). Google deprecated it in 2023 for pure discovery but
+ * still accepts pings — treat it as a best-effort hint.
+ */
+export async function pingSitemap(): Promise<void> {
+  const sitemap = encodeURIComponent(`https://${HOST}/sitemap.xml`);
+  try {
+    await fetch(`https://www.google.com/ping?sitemap=${sitemap}`, { method: "GET" });
+  } catch {
+    /* ignore */
+  }
+  try {
+    await fetch(`https://www.bing.com/ping?sitemap=${sitemap}`, { method: "GET" });
+  } catch {
+    /* ignore */
+  }
+}

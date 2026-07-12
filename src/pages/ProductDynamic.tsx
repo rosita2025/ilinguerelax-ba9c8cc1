@@ -131,7 +131,13 @@ const ProductDynamic = () => {
 
           <div className="grid md:grid-cols-2 gap-8 items-start">
             <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-              <img src={cover} alt={product.name} className="w-full aspect-square object-cover" loading="eager" />
+              <img
+                src={cover}
+                alt={`${product.name} — portada del PDF · ${LANG[product.target_language] ?? product.target_language} para hablantes de ${LANG[product.learner_language] ?? product.learner_language} · iLingue Relax`}
+                title={product.name}
+                className="w-full aspect-square object-cover"
+                loading="eager"
+              />
             </div>
 
             <div>

@@ -296,6 +296,42 @@ const AdminEmailTest = () => {
     );
   };
 
+  const principalSkuOf = (r: OrderRow) => r.productLines.find((p) => p.role === "principal")?.sku || "";
+  const upsellSkusOf = (r: OrderRow) =>
+    r.productLines.filter((p) => p.role === "upsell").map((p) => p.sku || p.name).join(", ");
+
+  const toggleSort = (key: typeof sortKey) => {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir(key === "date" ? "desc" : "asc"); }
+  };
+
+  const visibleRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = rows.filter((r) => {
+      if (sourceFilter !== "all" && r.source !== sourceFilter) return false;
+      if (!q) return true;
+      return (
+        r.order_ref.toLowerCase().includes(q) ||
+        principalSkuOf(r).toLowerCase().includes(q) ||
+        upsellSkusOf(r).toLowerCase().includes(q) ||
+        r.productLines.some((p) => (p.sku || "").toLowerCase().includes(q) || p.name.toLowerCase().includes(q)) ||
+        r.email.toLowerCase().includes(q) ||
+        r.customer.toLowerCase().includes(q)
+      );
+    });
+    const dir = sortDir === "asc" ? 1 : -1;
+    list = [...list].sort((a, b) => {
+      let av = "", bv = "";
+      if (sortKey === "date") return (a.created_at < b.created_at ? 1 : -1) * dir;
+      if (sortKey === "order_ref") { av = a.order_ref; bv = b.order_ref; }
+      if (sortKey === "principal_sku") { av = principalSkuOf(a); bv = principalSkuOf(b); }
+      if (sortKey === "upsell_sku") { av = upsellSkusOf(a); bv = upsellSkusOf(b); }
+      return av.localeCompare(bv) * dir;
+    });
+    return list;
+  }, [rows, query, sourceFilter, sortKey, sortDir]);
+
+
   return (
     <>
       <AdminNav />

@@ -74,22 +74,19 @@ export interface RegionInfo {
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
     if (typeof window !== "undefined") {
+      // Limpia overrides antiguos que quedaban persistidos para siempre y
+      // hacían que la IP nunca ganara (ej. un ?country=ES de un test viejo).
+      try { localStorage.removeItem("ilr_country_override"); } catch { /* ignore */ }
 
-      // Prioridad 2: ?country=XX manual (pruebas)
+      // ?country=XX sigue funcionando pero SÓLO en esta carga (no se persiste).
       const params = new URLSearchParams(window.location.search);
       const urlOverride = params.get("country")?.toUpperCase();
       if (urlOverride) {
-        try { localStorage.setItem("ilr_country_override", urlOverride); } catch { /* ignore */ }
-      }
-      const override = urlOverride || (() => {
-        try { return localStorage.getItem("ilr_country_override")?.toUpperCase() || ""; } catch { return ""; }
-      })();
-      if (override) {
-        try { localStorage.setItem("ilr_country", override); } catch { /* ignore */ }
-        return { tier: classify(override), country: override, loading: false };
+        try { localStorage.setItem("ilr_country", urlOverride); } catch { /* ignore */ }
+        return { tier: classify(urlOverride), country: urlOverride, loading: false };
       }
     }
-    // Prioridad 3: cache de detección por IP
+    // Prioridad: cache de detección por IP
     const cached = readCache();
     if (cached) return { tier: cached.tier, country: cached.country, loading: false };
     return { tier: "global", country: "", loading: true };

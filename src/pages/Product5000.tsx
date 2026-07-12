@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -19,8 +19,9 @@ const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })
 const SalesNotification = lazy(() => import("@/components/SalesNotification"));
 
 const CustomerReviewsCarousel = lazy(() => import("@/components/CustomerReviewsCarousel").then(m => ({ default: m.CustomerReviewsCarousel })));
-import { useCampaignPrice, readInitialCampaignCurrency } from "@/hooks/useCampaignPrice";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useRegionTier } from "@/hooks/useRegionTier";
+import { detectCurrency, formatPrice } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -201,71 +202,28 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  // Regional pricing: Latam (MXN/ARS/PEN/COP/CLP/BRL/...) paga 13.99 USD,
-  // resto del mundo (USA / España / Europa / UK / CA / AU) paga 28 USD (~24.06 €).
-  const LATAM_CURRENCIES = useMemo(
-    () => new Set([
-      "MXN", "ARS", "PEN", "COP", "CLP", "BRL",
-      "UYU", "BOB", "PYG", "GTQ", "DOP", "CRC", "HNL", "NIO", "VES",
-    ]),
-    [],
-  );
-  const [detectedCurrency, setDetectedCurrency] = useState<string>(readInitialCampaignCurrency);
-  useEffect(() => {
-    const sync = () => setDetectedCurrency(readInitialCampaignCurrency());
-    sync();
-    const id = window.setInterval(sync, 1500);
-    window.addEventListener("campaign-currency-change", sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.clearInterval(id);
-      window.removeEventListener("campaign-currency-change", sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, []);
   const pricing5000 = useAdminPricing("5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa");
-  const isLatam = LATAM_CURRENCIES.has(detectedCurrency);
-  const priceUSD = (isLatam ? pricing5000.priceLatamUsd : pricing5000.priceGlobalUsd) ?? 0;
-  const pricing5000Ready = pricing5000.loaded && priceUSD > 0;
+  const region = useRegionTier();
+  const country = region.country.toUpperCase();
+  const isPeru = country === "PE";
+  const isLatam = region.tier === "latam" && !isPeru;
+  const priceUSD = isLatam
+    ? (pricing5000.priceLatamUsd ?? pricing5000.priceGlobalUsd ?? 0)
+    : (pricing5000.priceGlobalUsd ?? 0);
+  const pricePen = pricing5000.pricePen ?? null;
+  const pricing5000Ready = pricing5000.loaded && (isPeru ? !!pricePen : priceUSD > 0);
+  const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
+  const displayPrice = isPeru && pricePen
+    ? `S/${pricePen.toFixed(2)}`
+    : formatPrice(priceUSD, displayCurrency);
+  const displayOriginalPrice = isPeru && pricePen
+    ? `S/${Math.round(pricePen * 2.4 * 100) / 100}`
+    : formatPrice(Math.max(priceUSD * 2.4, priceUSD + 1), displayCurrency);
+  const regionLabel = isPeru ? "PE" : isLatam ? "LATAM" : "Global";
   const buyUrl = pricing5000.hotmartUrl || (isLatam
     ? "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153"
     : "https://pay.hotmart.com/C106016400K?off=oa7xq3rf&checkoutMode=10&bid=1780550589206");
-  const campaign = useCampaignPrice(priceUSD, 54);
-  const campaignFull = useCampaignPrice(priceUSD, 107);
-  const bonusValue = useCampaignPrice(priceUSD, 62);
-
-  // Override de precios LOCALES exactos SOLO para esta página (Inglés 5000).
-  // No afecta a otros productos. Charge sigue siendo en USD vía Hotmart.
-  const PRICE_OVERRIDES_5000: Record<string, string> = {
-    MXN: "$199",
-    COP: "$41.000",
-    CLP: "$10.200",
-    ARS: "$16.400",
-    BRL: "R$59",
-    BOB: "Bs 80",
-    UYU: "$469",
-    PYG: "₲70.000",
-    CRC: "₡5.300",
-    HNL: "L 305.17",
-    GTQ: "Q 89.34",
-  };
-  // USD se comparte entre varios países (US, EC, PR, PA, SV). Para EC y PR
-  // queremos mostrar $11 USD aunque otros países USD vean el precio normal.
-  const USD_COUNTRY_OVERRIDE: Record<string, string> = {
-    EC: "$11",
-    PR: "$11",
-  };
-  const overridden =
-    PRICE_OVERRIDES_5000[campaign.currency] ||
-    (campaign.currency === "USD" ? USD_COUNTRY_OVERRIDE[campaign.countryCode] : undefined);
-  if (overridden) {
-    campaign.price = overridden;
-    campaign.priceWithCurrency = `${overridden} ${campaign.currency}`;
-    campaignFull.price = overridden;
-    campaignFull.priceWithCurrency = `${overridden} ${campaignFull.currency}`;
-    bonusValue.price = overridden;
-    bonusValue.priceWithCurrency = `${overridden} ${bonusValue.currency}`;
-  }
+  const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";
 
   const heroImages = [productoPrincipalInglesRelax];
   const heroThumbs = [productoPrincipalInglesRelax];
@@ -564,11 +522,18 @@ const Product5000 = () => {
                           : 'text-4xl sm:text-5xl md:text-6xl'
                     }`}
                   >
-                    {campaignFull.price}
+                    {safePriceLabel}
                   </span>
-                  <span className="text-sm md:text-base text-muted-foreground line-through tabular-nums">
-                    {campaignFull.originalPrice}
-                  </span>
+                  {pricing5000Ready && (
+                    <span className="text-sm md:text-base text-muted-foreground line-through tabular-nums">
+                      {displayOriginalPrice}
+                    </span>
+                  )}
+                  {pricing5000Ready && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      {displayCurrency} · {regionLabel}
+                    </span>
+                  )}
                 </div>
 
                 {/* Métodos de pago */}
@@ -723,7 +688,7 @@ const Product5000 = () => {
               </p>
               <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent/40 bg-accent/10 shadow-sm">
                 <span className="text-[11px] md:text-xs font-semibold text-muted-foreground line-through tabular-nums">
-                  {bonusValue.originalPrice}
+                  {pricing5000Ready ? displayOriginalPrice : "—"}
                 </span>
                 <span className="text-[11px] md:text-xs font-black uppercase tracking-wide text-accent">
                   GRATIS hoy
@@ -775,8 +740,8 @@ const Product5000 = () => {
       <CompactBuyCard
         title="Inglés Relax 5,000"
         subtitle="Top-Rated Curso Digital con Pronunciación ES"
-        price={campaignFull.price}
-        originalPrice={campaignFull.originalPrice}
+        price={safePriceLabel}
+        originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
         discountLabel="AHORRA 89%"
         rating={4.8}
         reviewsCount="800+"
@@ -786,7 +751,7 @@ const Product5000 = () => {
           "Descarga inmediata",
           "4 Bonus GRATIS",
         ]}
-        ctaText={`COMPRAR AHORA | ${campaignFull.price}`}
+        ctaText={`COMPRAR AHORA | ${safePriceLabel}`}
         onBuy={handleBuy}
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
@@ -919,9 +884,10 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        price={campaign.price}
-        originalPrice={campaign.originalPrice}
-        currencyCode={campaign.currency}
+        price={safePriceLabel}
+        originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
+        currencyCode={displayCurrency}
+        flag={isPeru ? "🇵🇪" : undefined}
         productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)"
         rating={4.8}
         reviewCount={800}

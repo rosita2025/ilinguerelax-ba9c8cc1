@@ -111,13 +111,15 @@ serve(async (req) => {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
     if (!sig) {
-      await raiseStripeAlert("Missing stripe-signature header", "warn", { http_status: 400 });
+      // Bot/scanner golpeando la URL pública sin header. Sin correo, sin alerta.
+      console.log("Stripe webhook rejected: missing stripe-signature (probable bot/scanner)");
       return new Response("Missing signature", { status: 400 });
     }
 
     const verified = await verifyStripeSignature(body, sig);
     if (!verified.ok) {
-      await raiseStripeAlert(`Firma inválida: ${verified.reason}`, "critical", { http_status: 401 });
+      // Firma inválida = bot/scanner. Stripe nunca movió dinero. Silencio total.
+      console.log("Stripe webhook rejected: invalid signature (probable bot/scanner)", { reason: verified.reason });
       return new Response("Invalid signature", { status: 401 });
     }
 

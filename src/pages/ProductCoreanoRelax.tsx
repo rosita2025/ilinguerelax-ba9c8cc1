@@ -16,8 +16,8 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { useRegionTier } from "@/hooks/useRegionTier";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
@@ -37,25 +37,9 @@ import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCore
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
-const HOTMART_URL = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
-
-const COUNTRY_FLAG: Record<string, string> = {
-  US: "🇺🇸", PE: "🇵🇪", MX: "🇲🇽", CO: "🇨🇴", AR: "🇦🇷", CL: "🇨🇱", BR: "🇧🇷",
-  UY: "🇺🇾", BO: "🇧🇴", PY: "🇵🇾", GT: "🇬🇹", DO: "🇩🇴", CR: "🇨🇷", HN: "🇭🇳",
-  NI: "🇳🇮", VE: "🇻🇪", PA: "🇵🇦", EC: "🇪🇨", SV: "🇸🇻", ES: "🇪🇸", FR: "🇫🇷",
-  DE: "🇩🇪", IT: "🇮🇹", PT: "🇵🇹", GB: "🇬🇧", CA: "🇨🇦", AU: "🇦🇺", NZ: "🇳🇿",
-  JP: "🇯🇵", KR: "🇰🇷", SG: "🇸🇬", HK: "🇭🇰", TW: "🇹🇼", CH: "🇨🇭",
-  SE: "🇸🇪", NO: "🇳🇴", DK: "🇩🇰",
-};
-
-const CURRENCY_FLAG: Record<string, string> = {
-  USD: "🇺🇸", CAD: "🇨🇦", EUR: "🇪🇸", GBP: "🇬🇧", AUD: "🇦🇺", NZD: "🇳🇿",
-  MXN: "🇲🇽", COP: "🇨🇴", ARS: "🇦🇷", PEN: "🇵🇪", CLP: "🇨🇱", BRL: "🇧🇷",
-  UYU: "🇺🇾", BOB: "🇧🇴", PYG: "🇵🇾", GTQ: "🇬🇹", DOP: "🇩🇴", CRC: "🇨🇷",
-  HNL: "🇭🇳", NIO: "🇳🇮", VES: "🇻🇪",
-};
-
-
+const HOTMART_URL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
+const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
+const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",
@@ -78,23 +62,25 @@ const ProductCoreanoRelax = () => {
   const navigate = useNavigate();
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const region = useRegionTier();
-  // Precios se obtienen automáticamente del admin (digital_products). Sin fallbacks hardcodeados.
-  const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
   const pricing = useAdminPricing(ADMIN_SKU);
-  const PRICE_GLOBAL_USD = pricing.priceGlobalUsd ?? 0;
-  const PRICE_LATAM_USD = pricing.priceLatamUsd ?? 0;
-  const PRICE_PEN = pricing.pricePen ?? 0;
-  const isPeru = region.country === "PE";
-  const usdPrice = region.tier === "latam" ? PRICE_LATAM_USD : PRICE_GLOBAL_USD;
-  const pricingReady = pricing.loaded && usdPrice > 0 && (!isPeru || PRICE_PEN > 0);
-  const displayPrice = !pricingReady
-    ? "…"
-    : isPeru
-      ? `S/ ${PRICE_PEN.toFixed(2)}`
-      : `$${usdPrice}`;
-  const displayFlag = isPeru ? "🇵🇪" : region.tier === "latam" ? "🌎" : "🌍";
-  const currencyLabel = isPeru ? "PEN" : "USD";
+  const tier = useCountryTierRouting(ADMIN_SKU, {
+    tiendaPath: TIENDA_CHECKOUT_PATH,
+    fallbackHotmartUrl: HOTMART_URL_LATAM,
+  });
+  const {
+    isPeru,
+    useTiendaOnly,
+    useHotmartLatam,
+    priceUsd,
+    priceGlobalUsd,
+    priceLatamUsd,
+    priceTiendaUsd,
+    pricePen,
+    priceLabel: displayPrice,
+    currencyCode: currencyLabel,
+    loaded: pricingReady,
+  } = tier;
+  const displayFlag = isPeru ? "🇵🇪" : useHotmartLatam ? "🌎" : "🌍";
 
   const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
@@ -102,7 +88,7 @@ const ProductCoreanoRelax = () => {
       content_category: "Digital Book",
       content_ids: ["product-coreano-100-mapas"],
       content_type: "product",
-      value: usdPrice,
+      value: priceUsd,
       currency: "USD",
       num_items: 1,
     });
@@ -110,7 +96,7 @@ const ProductCoreanoRelax = () => {
   const handleBuyHotmart = () => {
     if (!pricingReady) return;
     trackInitiate();
-    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank", "noopener,noreferrer");
+    window.open(tier.hotmartUrl || HOTMART_URL_LATAM, "_blank", "noopener,noreferrer");
   };
 
   const handleBuyStore = () => {
@@ -120,16 +106,18 @@ const ProductCoreanoRelax = () => {
     addItem({
       id: "coreano-100-mapas",
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
-      price: usdPrice,
-      regionPrices: { latam: PRICE_LATAM_USD, global: PRICE_GLOBAL_USD },
-      pricePen: PRICE_PEN > 0 ? PRICE_PEN : undefined,
+      price: priceUsd,
+      regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+      pricePen: pricePen ?? undefined,
       image: "/images/product-coreano-100-mapas.webp",
       description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
       quantity: 1,
     });
     sonnerToast.success("Producto agregado al carrito");
-    navigate("/checkouts/coreano-100-mapas");
+    navigate(TIENDA_CHECKOUT_PATH);
   };
+
+  const handleBuy = () => (useTiendaOnly ? handleBuyStore() : handleBuyHotmart());
 
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -212,25 +200,27 @@ const ProductCoreanoRelax = () => {
                   <span className="text-5xl md:text-6xl font-black text-foreground">{displayPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
-                    {isPeru ? "-72%" : region.tier === "latam" ? "-81%" : "-72%"}
+                    {isPeru ? "-72%" : useHotmartLatam ? "-81%" : "-72%"}
                   </motion.span>
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
-                  {displayFlag} Precio para {isPeru ? "Perú" : region.tier === "latam" ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
+                  {displayFlag} Precio para {isPeru ? "Perú" : useHotmartLatam ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
                 </p>
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className={useTiendaOnly ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-3"}>
                   <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <Store className="w-5 h-5 mr-2" />
                     Tienda iLingue · {displayPrice}
                   </Button>
-                  <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Hotmart · ${usdPrice}
-                  </Button>
+                  {useHotmartLatam && (
+                    <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Hotmart · ${priceLatamUsd.toFixed(2)}
+                    </Button>
+                  )}
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
               </motion.div>
@@ -395,17 +385,17 @@ const ProductCoreanoRelax = () => {
       <WhatsAppButton url="https://wa.link/ghi4rw" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
 
-      {/* Sticky Buy Bar — dos botones: Tienda iLingue + Hotmart */}
+      {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
       <StickyBuyBar
         price={displayPrice}
-        originalPrice="$54"
+        originalPrice={tier.originalLabel}
         currencyCode={currencyLabel}
         flag={displayFlag}
         productName="Coreano · +100 Mapas Mentales"
-        ctaText={`TIENDA ILINGUE · ${displayPrice}`}
-        onBuyClick={handleBuyStore}
-        secondaryCtaText="HOTMART"
-        onSecondaryClick={handleBuyHotmart}
+        ctaText={useTiendaOnly ? `TIENDA ILINGUE · ${displayPrice}` : `COMPRAR EN HOTMART · ${displayPrice}`}
+        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : (tier.hotmartUrl || HOTMART_URL_LATAM)}
+        onBuyClick={handleBuy}
+        {...(useHotmartLatam ? { secondaryCtaText: "TIENDA", onSecondaryClick: handleBuyStore } : {})}
         rating={4.9}
         reviewCount={120}
         lang="es"

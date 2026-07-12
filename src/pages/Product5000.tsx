@@ -20,7 +20,10 @@ const SalesNotification = lazy(() => import("@/components/SalesNotification"));
 
 const CustomerReviewsCarousel = lazy(() => import("@/components/CustomerReviewsCarousel").then(m => ({ default: m.CustomerReviewsCarousel })));
 import { useAdminPricing } from "@/hooks/useAdminPricing";
-import { useRegionTier } from "@/hooks/useRegionTier";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
+import { useNavigate } from "react-router-dom";
+import { toast as sonnerToast } from "sonner";
 import { detectCurrency, formatPrice } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -202,16 +205,20 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
-  const pricing5000 = useAdminPricing("5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa");
-  const region = useRegionTier();
-  const country = region.country.toUpperCase();
-  const isPeru = country === "PE";
-  const isLatam = region.tier === "latam" && !isPeru;
-  const priceUSD = isLatam
-    ? (pricing5000.priceLatamUsd ?? pricing5000.priceGlobalUsd ?? 0)
-    : (pricing5000.priceGlobalUsd ?? 0);
-  const pricePen = pricing5000.pricePen ?? null;
-  const pricing5000Ready = pricing5000.loaded && (isPeru ? !!pricePen : priceUSD > 0);
+  const ADMIN_SKU_5000 = "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa";
+  const TIENDA_CHECKOUT_5000 = "/checkouts/5000-palabras";
+  const HOTMART_5000_LATAM = "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153";
+  const pricing5000 = useAdminPricing(ADMIN_SKU_5000);
+  const tier = useCountryTierRouting(ADMIN_SKU_5000, {
+    tiendaPath: TIENDA_CHECKOUT_5000,
+    fallbackHotmartUrl: HOTMART_5000_LATAM,
+  });
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const clearCart = useCheckoutPruebaStore((s) => s.clear);
+  const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
+  const isLatam = useHotmartLatam;
+  const pricing5000Ready = tier.loaded;
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   const displayPrice = isPeru && pricePen
     ? `S/${pricePen.toFixed(2)}`
@@ -220,9 +227,7 @@ const Product5000 = () => {
     ? `S/${Math.round(pricePen * 2.4 * 100) / 100}`
     : formatPrice(Math.max(priceUSD * 2.4, priceUSD + 1), displayCurrency);
   const regionLabel = isPeru ? "PE" : isLatam ? "LATAM" : "Global";
-  const buyUrl = pricing5000.hotmartUrl || (isLatam
-    ? "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153"
-    : "https://pay.hotmart.com/C106016400K?off=oa7xq3rf&checkoutMode=10&bid=1780550589206");
+  const buyUrl = useTiendaOnly ? TIENDA_CHECKOUT_5000 : (tier.hotmartUrl || HOTMART_5000_LATAM);
   const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";
 
   const heroImages = [productoPrincipalInglesRelax];
@@ -276,9 +281,26 @@ const Product5000 = () => {
   };
 
   const handleBuy = async () => {
+    if (!pricing5000Ready) return;
     handleBuyClick();
+    if (useTiendaOnly) {
+      clearCart();
+      addItem({
+        id: "5000-palabras-ingles",
+        name: "Inglés Relax · 5,000 Palabras (Digital PDF)",
+        price: priceUSD,
+        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+        pricePen: pricePen ?? undefined,
+        image: "/images/product-5000-book.webp",
+        description: "5,000 palabras del inglés con pronunciación en español y fonética UK/USA",
+        quantity: 1,
+      });
+      sonnerToast.success("Producto agregado al carrito");
+      navigate(TIENDA_CHECKOUT_5000);
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 400));
-    window.open(buyUrl, "_blank");
+    window.open(buyUrl, "_blank", "noopener,noreferrer");
   };
   return (
     <main className="min-h-screen bg-background">
@@ -892,7 +914,7 @@ const Product5000 = () => {
         rating={4.8}
         reviewCount={800}
         showReviews={true}
-        ctaText="DESCARGAR AHORA - PAGO SEGURO"
+        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${safePriceLabel}` : `COMPRAR EN HOTMART · ${safePriceLabel}`}
         buyUrl={buyUrl}
         onBuyClick={handleBuy}
       />

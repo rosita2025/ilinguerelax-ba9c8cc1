@@ -28,6 +28,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
 import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
@@ -127,10 +128,18 @@ const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
-  const pricing = useAdminPricing("5-000-spanish-words-with-english-pronunciation-digital");
-  const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const pricingReady = pricing.loaded && currentPrice > 0;
-  const localizedPrice = formatPrice(currentPrice);
+  const ADMIN_SKU_SP5K = "5-000-spanish-words-with-english-pronunciation-digital";
+  const TIENDA_PATH_SP5K = "/checkouts/5000-spanish-words";
+  const HOTMART_SP5K_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
+  const pricing = useAdminPricing(ADMIN_SKU_SP5K);
+  const tier = useCountryTierRouting(ADMIN_SKU_SP5K, {
+    tiendaPath: TIENDA_PATH_SP5K,
+    fallbackHotmartUrl: HOTMART_SP5K_LATAM,
+  });
+  const currentPrice = tier.priceUsd;
+  const pricingReady = tier.loaded;
+  const { useTiendaOnly, useHotmartLatam, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
+  const localizedPrice = tier.isPeru && pricePen ? `S/${pricePen.toFixed(2)}` : formatPrice(currentPrice);
   const localizedOriginal = formatPrice(ORIGINAL_PRICE);
   const flag = countryToFlag(countryCode);
 
@@ -155,6 +164,17 @@ const ProductSpanish5000Digital = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
+  const buildCartItem = () => ({
+    id: "5000-spanish-words",
+    name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
+    price: currentPrice,
+    pricePen: pricePen ?? undefined,
+    regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+    image: "/images/product-5000-spanish.webp",
+    description: "5,000 vocabulary words in Spanish with English pronunciation",
+    quantity: 1,
+  });
+
   const handleBuyNow = () => {
     if (!pricingReady) return;
     if (lockRef.current) return;
@@ -169,34 +189,24 @@ const ProductSpanish5000Digital = () => {
       currency: "USD",
       num_items: 1,
     });
-    addItem({
-      id: "5000-spanish-words",
-      name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: currentPrice,
-      pricePen: pricing.pricePen ?? undefined,
-      image: "/images/product-5000-spanish.webp",
-      description: "5,000 vocabulary words in Spanish with English pronunciation",
-      quantity: 1,
-    });
-    navigate("/checkouts/5000-spanish-words");
+    if (useTiendaOnly) {
+      addItem(buildCartItem());
+      navigate(TIENDA_PATH_SP5K);
+    } else {
+      window.open(tier.hotmartUrl || HOTMART_SP5K_LATAM, "_blank", "noopener,noreferrer");
+      lockRef.current = false;
+      setIsRedirecting(false);
+    }
   };
 
   const handleAddToCart = () => {
     if (!pricingReady) return;
-    addItem({
-      id: "5000-spanish-words",
-      name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: currentPrice,
-      pricePen: pricing.pricePen ?? undefined,
-      image: "/images/product-5000-spanish.webp",
-      description: "5,000 vocabulary words in Spanish with English pronunciation",
-      quantity: 1,
-    });
+    addItem(buildCartItem());
     toast.success("Product added to cart", {
       description: "Keep browsing or go to checkout.",
       action: {
         label: "Go to checkout",
-        onClick: () => navigate("/checkouts/5000-spanish-words"),
+        onClick: () => navigate(TIENDA_PATH_SP5K),
       },
     });
   };
@@ -539,8 +549,9 @@ const ProductSpanish5000Digital = () => {
         originalPrice={localizedOriginal}
         currencyCode={currency}
         flag={flag}
+        buyUrl={useTiendaOnly ? TIENDA_PATH_SP5K : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
         onBuyClick={handleBuyNow}
-        ctaText={`GET IT NOW — ${localizedPrice}`}
+        ctaText={useTiendaOnly ? `GET IT NOW — ${localizedPrice}` : `BUY ON HOTMART — ${localizedPrice}`}
         lang="en"
         rating={4.8}
         reviewCount={500}

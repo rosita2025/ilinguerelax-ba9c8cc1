@@ -240,13 +240,13 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
   // (us., pe., mx., ca., es., fr., br.) must NOT expose the admin panel.
   if (typeof window !== "undefined") {
     const host = window.location.hostname.toLowerCase();
-    const isCanonical =
-      host === "ilinguerelax.com" ||
-      host === "www.ilinguerelax.com" ||
-      host === "localhost" ||
-      host.endsWith(".lovable.app") ||
-      host.endsWith(".lovable.dev");
-    if (!isCanonical) {
+    // Only block the known regional subdomains of ilinguerelax.com.
+    // Everything else (main domain, preview, localhost, custom hosts) is allowed.
+    const REGIONAL = ["us", "ca", "pe", "mx", "es", "fr", "br"];
+    const isBlockedRegional = REGIONAL.some(
+      (r) => host === `${r}.ilinguerelax.com`
+    );
+    if (isBlockedRegional) {
       return (
         <>
           <NoIndex />

@@ -40,7 +40,7 @@ const AdminManualPayments = () => {
         body: { action: "list", adminKey },
       });
       if (error) throw error;
-      setOrders(data?.orders ?? []);
+      setOrders(((data as { orders?: ManualPayment[] } | null)?.orders) ?? []);
     } catch {
       toast({ title: "Error al cargar órdenes", variant: "destructive" });
     } finally {

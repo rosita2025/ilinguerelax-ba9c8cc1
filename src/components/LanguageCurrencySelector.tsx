@@ -77,19 +77,42 @@ const COUNTRY_STORAGE = "manual_country_v1";
 function readInitialCountry(): string {
   if (typeof window === "undefined") return "US";
   try {
-    const saved = localStorage.getItem(COUNTRY_STORAGE);
-    if (saved && COUNTRIES.some((c) => c.code === saved)) return saved;
+    // Prefer IP-detected campaign cache over the manual override so a stale
+    // manual pick from a previous session does not shadow the real location.
     const cached = localStorage.getItem(CAMPAIGN_STORAGE);
     if (cached) {
       const parsed = JSON.parse(cached);
       const match = COUNTRIES.find((c) => c.code === parsed.countryCode);
       if (match) return match.code;
     }
+    const saved = localStorage.getItem(COUNTRY_STORAGE);
+    if (saved && COUNTRIES.some((c) => c.code === saved)) return saved;
   } catch { /* ignore */ }
   return "US";
 }
 
 const I18N_SUPPORTED: Currency[] = ["USD", "EUR", "BRL", "MXN", "COP", "ARS", "GBP", "CAD", "AUD", "PEN"];
+
+// Detect country via IP so the header selector reflects the visitor's real
+// location even on pages that don't call useCampaignPrice (e.g. /admin, /blog).
+let inflightIpDetection: Promise<string | null> | null = null;
+async function detectCountryByIp(): Promise<string | null> {
+  if (inflightIpDetection) return inflightIpDetection;
+  inflightIpDetection = (async () => {
+    for (const url of ["https://ipapi.co/json/", "https://ipwho.is/"]) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (data?.error || data?.success === false) continue;
+        const country = (data.country_code || data.country || "").toString().toUpperCase();
+        if (country && COUNTRIES.some((c) => c.code === country)) return country;
+      } catch { /* try next */ }
+    }
+    return null;
+  })();
+  return inflightIpDetection;
+}
 
 export const LanguageCurrencySelector = () => {
   const { language, setLanguage, setCurrency, languageNames, languageFlags } = useI18n();
@@ -108,11 +131,37 @@ export const LanguageCurrencySelector = () => {
     };
     window.addEventListener("campaign-currency-change", sync);
     window.addEventListener("storage", sync);
+
+    // Force IP detection on mount so the selector reflects the real country.
+    // The manual override (COUNTRY_STORAGE) is only respected if it matches
+    // the IP-detected country — otherwise IP wins.
+    let cancelled = false;
+    detectCountryByIp().then((detected) => {
+      if (cancelled || !detected) return;
+      const match = COUNTRIES.find((c) => c.code === detected);
+      if (!match) return;
+      try {
+        const payload = { currency: match.currency, countryCode: detected, timestamp: Date.now() };
+        localStorage.setItem(CAMPAIGN_STORAGE, JSON.stringify(payload));
+        // Clear stale manual pick so it can't shadow IP on the next visit.
+        localStorage.removeItem(COUNTRY_STORAGE);
+      } catch { /* ignore */ }
+      if (detected !== countryCode) {
+        setCountryCode(detected);
+        if ((I18N_SUPPORTED as string[]).includes(match.currency)) {
+          setCurrency(match.currency as Currency);
+        }
+        window.dispatchEvent(new CustomEvent("campaign-currency-change", { detail: match.currency }));
+      }
+    });
+
     return () => {
+      cancelled = true;
       window.removeEventListener("campaign-currency-change", sync);
       window.removeEventListener("storage", sync);
     };
-  }, [countryCode]);
+  }, [countryCode, setCurrency]);
+
 
   const current = COUNTRIES.find((c) => c.code === countryCode) ?? COUNTRIES[0];
 

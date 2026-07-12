@@ -470,7 +470,7 @@ const ProductSpanish5000Digital = () => {
             5,000 essential Spanish words · English pronunciation · 3 free bonuses.
           </p>
           <div className="flex items-baseline justify-center gap-3 mb-4">
-            <span className="text-5xl font-black">${PRICE}</span>
+            <span className="text-5xl font-black">${currentPrice}</span>
             <span className="text-xl line-through text-muted-foreground">${ORIGINAL_PRICE}</span>
             <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">-{DISCOUNT_PCT}%</span>
           </div>

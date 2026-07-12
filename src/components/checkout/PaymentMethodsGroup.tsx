@@ -73,10 +73,12 @@ export function PaymentMethodsGroup() {
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const { total } = calcTotals(items, couponPercent, region.tier);
+  const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
+  const penBadge = penTotals ? formatPen(penTotals.total) : null;
   // Badge principal: SIEMPRE en moneda local del país (USD, CAD, EUR, MXN, ARS, PEN, etc.)
-  const priceBadge = local.loading ? `USD $${totalUsd}` : local.formatted;
+  const priceBadge = penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted);
   const localBadge = "";
 
 

@@ -82,7 +82,7 @@ export default function Checkout() {
         const skus = upRows.map((u) => u.upsell_sku);
         const { data: upProducts } = await supabase
           .from("digital_products")
-          .select("sku, name, description, price_usd, cover_image_url")
+          .select("sku, name, description, price_usd, price_pen, cover_image_url")
           .in("sku", skus)
           .eq("active", true);
         const bySku = new Map((upProducts ?? []).map((p) => [p.sku, p]));

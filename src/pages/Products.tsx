@@ -235,40 +235,33 @@ const Products = () => {
             })}
           </div>
 
-          {/* Step 2: Language */}
+          {/* Step 2: Hablo (native language) */}
           <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">
-            2. Elige el idioma
+            2. Yo hablo / I speak
           </p>
           <div className="-mx-3 px-3 mb-4 md:mx-0 md:px-0">
             <div className="flex md:flex-wrap md:justify-center gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
               <button
-                onClick={() => setLanguage("all")}
-                aria-pressed={language === "all"}
+                onClick={() => setLearnerLang("all")}
+                aria-pressed={learnerLang === "all"}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
-                  language === "all"
+                  learnerLang === "all"
                     ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
                     : "bg-card text-foreground border-border hover:border-foreground/40"
                 )}
               >
                 <span className="text-base">🌐</span>
                 <span>Todos</span>
-                <span
-                  className={cn(
-                    "text-xs px-1.5 py-0.5 rounded-full",
-                    language === "all" ? "bg-white/25" : "bg-muted text-muted-foreground"
-                  )}
-                >
-                  {langCounts.all || 0}
-                </span>
               </button>
-              {languages.map((l) => {
-                const isActive = language === l.flag;
-                const count = langCounts[l.flag] || 0;
+              {learners.map((code) => {
+                const meta = LANG_META[code];
+                if (!meta) return null;
+                const isActive = learnerLang === code;
                 return (
                   <button
-                    key={l.flag}
-                    onClick={() => setLanguage(l.flag)}
+                    key={code}
+                    onClick={() => setLearnerLang(code)}
                     aria-pressed={isActive}
                     className={cn(
                       "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
@@ -277,21 +270,57 @@ const Products = () => {
                         : "bg-card text-foreground border-border hover:border-foreground/40"
                     )}
                   >
-                    <span className="text-base font-bold">{l.flag}</span>
-                    <span>{l.label}</span>
-                    <span
-                      className={cn(
-                        "text-xs px-1.5 py-0.5 rounded-full",
-                        isActive ? "bg-white/25" : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {count}
-                    </span>
+                    <span className="text-base font-bold">{meta.flag}</span>
+                    <span>{meta.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
+
+          {/* Step 3: Quiero aprender (target language) */}
+          <p className="text-center text-xs md:text-sm font-semibold text-muted-foreground mb-3">
+            3. Quiero aprender / I want to learn
+          </p>
+          <div className="-mx-3 px-3 mb-4 md:mx-0 md:px-0">
+            <div className="flex md:flex-wrap md:justify-center gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+              <button
+                onClick={() => setTargetLang("all")}
+                aria-pressed={targetLang === "all"}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
+                  targetLang === "all"
+                    ? "bg-accent text-accent-foreground border-accent shadow-md scale-105"
+                    : "bg-card text-foreground border-border hover:border-foreground/40"
+                )}
+              >
+                <span className="text-base">🌐</span>
+                <span>Todos</span>
+              </button>
+              {targets.map((code) => {
+                const meta = LANG_META[code];
+                if (!meta) return null;
+                const isActive = targetLang === code;
+                return (
+                  <button
+                    key={code}
+                    onClick={() => setTargetLang(code)}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all shrink-0 snap-start min-h-[44px] active:scale-95",
+                      isActive
+                        ? "bg-accent text-accent-foreground border-accent shadow-md scale-105"
+                        : "bg-card text-foreground border-border hover:border-foreground/40"
+                    )}
+                  >
+                    <span className="text-base font-bold">{meta.flag}</span>
+                    <span>{meta.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           {/* Search */}
           <div className="relative max-w-md mx-auto">

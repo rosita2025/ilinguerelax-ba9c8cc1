@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Eye, EyeOff, Pencil, Package, Search, ExternalLink, ArrowUpDown, Trash2 } from "lucide-react";
+import { Plus, Eye, EyeOff, Pencil, Package, Search, ExternalLink, ArrowUpDown, Trash2, LayoutGrid, List, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ interface Product {
   id: string;
   sku: string;
   name: string;
+  description?: string | null;
   learner_language: string;
   target_language: string;
   price_usd: number;
@@ -40,6 +41,10 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState<string>("all");
+  const [view, setView] = useState<"grid" | "table">(() => (localStorage.getItem("adminProductsView") as "grid" | "table") || "grid");
+
+  useEffect(() => { localStorage.setItem("adminProductsView", view); }, [view]);
+
 
   const load = async () => {
     setLoading(true);
@@ -136,8 +141,107 @@ const AdminProducts = () => {
             <Button variant="ghost" size="sm" onClick={load} disabled={loading}>
               {loading ? "…" : "↻"}
             </Button>
+            <div className="ml-auto inline-flex rounded-lg border border-border overflow-hidden">
+              <button
+                onClick={() => setView("grid")}
+                className={`px-3 py-1.5 text-xs inline-flex items-center gap-1 ${view === "grid" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"}`}
+                title="Vista de tarjetas"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" /> Tarjetas
+              </button>
+              <button
+                onClick={() => setView("table")}
+                className={`px-3 py-1.5 text-xs inline-flex items-center gap-1 border-l border-border ${view === "table" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"}`}
+                title="Vista de tabla"
+              >
+                <List className="w-3.5 h-3.5" /> Tabla
+              </button>
+            </div>
           </div>
 
+          {view === "grid" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filtered.length === 0 && (
+                <div className="col-span-full text-center py-10 text-muted-foreground bg-card border border-border rounded-xl">
+                  No hay productos.
+                </div>
+              )}
+              {filtered.map((p) => (
+                <div key={p.id} className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+                  <Link to={`/admin/productos/${p.sku}`} className="relative aspect-[4/3] bg-muted overflow-hidden block">
+                    {p.cover_image_url ? (
+                      <img
+                        src={p.cover_image_url}
+                        alt={p.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        <Package className="w-10 h-10 opacity-40" />
+                      </div>
+                    )}
+                    <div className="absolute top-2 left-2 flex flex-col gap-1">
+                      {p.active ? (
+                        <span className="text-[10px] bg-green-500/90 text-white px-2 py-0.5 rounded-full font-semibold">Activo</span>
+                      ) : (
+                        <span className="text-[10px] bg-gray-600/90 text-white px-2 py-0.5 rounded-full font-semibold">Borrador</span>
+                      )}
+                      {p.is_upsell && (
+                        <span className="text-[10px] bg-fuchsia-500/90 text-white px-2 py-0.5 rounded-full font-semibold">Upsell</span>
+                      )}
+                    </div>
+                    <div className="absolute top-2 right-2 text-lg bg-background/80 backdrop-blur px-1.5 py-0.5 rounded">
+                      {FLAGS[p.learner_language] ?? p.learner_language} → {FLAGS[p.target_language] ?? p.target_language}
+                    </div>
+                  </Link>
+
+                  <div className="p-3 flex flex-col flex-1">
+                    <div className="font-semibold text-sm line-clamp-2 mb-1">{p.name}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono truncate mb-2">{p.sku}</div>
+                    {p.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{p.description}</p>
+                    )}
+                    <div className="flex items-baseline gap-2 mb-3">
+                      <span className="text-lg font-bold text-primary">${Number(p.price_usd).toFixed(2)}</span>
+                      {p.price_pen != null && (
+                        <span className="text-xs text-muted-foreground">S/ {Number(p.price_pen).toFixed(2)}</span>
+                      )}
+                      {!p.drive_url && (
+                        <span className="ml-auto text-[10px] text-red-500">Sin Drive</span>
+                      )}
+                    </div>
+
+                    <div className="mt-auto flex flex-wrap gap-1">
+                      <Button size="sm" variant="outline" className="h-8 text-xs flex-1" asChild>
+                        <a href={`/products/${p.sku}`} target="_blank" rel="noreferrer">
+                          <ExternalLink className="w-3 h-3 mr-1" /> Ver
+                        </a>
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-8 text-xs flex-1" asChild>
+                        <a href={`/checkouts/${p.sku}`} target="_blank" rel="noreferrer">
+                          <ShoppingCart className="w-3 h-3 mr-1" /> Checkout
+                        </a>
+                      </Button>
+                      <Button size="sm" variant="default" className="h-8 text-xs flex-1" asChild>
+                        <Link to={`/admin/productos/${p.sku}`}>
+                          <Pencil className="w-3 h-3 mr-1" /> Editar
+                        </Link>
+                      </Button>
+                    </div>
+                    <div className="flex gap-1 mt-1">
+                      <Button size="sm" variant="ghost" className="h-7 text-xs flex-1" onClick={() => toggle(p.sku, p.active)}>
+                        {p.active ? <><EyeOff className="w-3 h-3 mr-1" /> Ocultar</> : <><Eye className="w-3 h-3 mr-1" /> Publicar</>}
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => remove(p.sku, p.name)}>
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="bg-card border border-border rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
@@ -215,6 +319,8 @@ const AdminProducts = () => {
               </tbody>
             </table>
           </div>
+          )}
+
 
           <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
             <ArrowUpDown className="w-3 h-3" /> El orden se ajusta desde el formulario de cada producto (campo "Orden").

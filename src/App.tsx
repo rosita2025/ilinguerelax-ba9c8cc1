@@ -170,7 +170,7 @@ const App = () => (
               <AutoTranslate />
               <BrevoChatToggle />
               <CookieConsent />
-              <RegionSuggestionBanner />
+              
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />

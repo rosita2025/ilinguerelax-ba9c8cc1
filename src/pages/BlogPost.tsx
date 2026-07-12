@@ -302,13 +302,14 @@ const BlogPost = () => {
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-lg font-bold text-primary">
-                              €{product.price.toFixed(2)}
+                              {cardPrice.format(product.id, product.price)}
                             </span>
                             {product.originalPrice && (
                               <span className="text-sm text-muted-foreground line-through">
-                                €{product.originalPrice.toFixed(2)}
+                                {cardPrice.format(product.id, product.originalPrice)}
                               </span>
                             )}
+                            <span className="text-xs text-primary/70 font-semibold">{cardPrice.currencyLabel(product.id)}</span>
                           </div>
                         </div>
                         <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />

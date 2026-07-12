@@ -134,6 +134,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
                   // Explicitly clear regionPrices if the new patch omits it,
                   // so switching a product from region-priced to flat works.
                   regionPrices: patch.regionPrices ?? undefined,
+                  pricePen: patch.pricePen ?? undefined,
                 }
               : i,
           ),

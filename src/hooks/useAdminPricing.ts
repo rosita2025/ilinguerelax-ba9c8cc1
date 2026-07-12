@@ -8,54 +8,78 @@ export interface AdminPricing {
   priceLatamUsd: number | null;
   /** Native PEN price for Peru buyers. `null` when not configured. */
   pricePen: number | null;
+  /** Product display name from admin. `null` until loaded. */
+  name: string | null;
+  /** Product description from admin. `null` until loaded. */
+  description: string | null;
+  /** Hotmart checkout URL from admin. `null` if not configured. */
+  hotmartUrl: string | null;
+  /** Whether the internal store checkout is enabled. */
+  storeEnabled: boolean;
+  /** Cover image URL from admin. `null` until loaded. */
+  coverImageUrl: string | null;
   /** `true` once the query has resolved (successfully or not). */
   loaded: boolean;
   /** `true` if the SKU has no active row in `digital_products`. */
   missing: boolean;
 }
 
+const INITIAL: AdminPricing = {
+  priceGlobalUsd: null,
+  priceLatamUsd: null,
+  pricePen: null,
+  name: null,
+  description: null,
+  hotmartUrl: null,
+  storeEnabled: true,
+  coverImageUrl: null,
+  loaded: false,
+  missing: false,
+};
+
 /**
- * Single source of truth for product pricing.
+ * Single source of truth for product data.
  *
- * Reads `price_usd`, `price_usd_latam`, and `price_pen` from
+ * Reads pricing, title, description, hotmart URL and store toggle from
  * `digital_products` (managed via `/admin/products/:sku`) for the given SKU.
- *
- * No hardcoded fallbacks: consumers must handle the `loaded === false` state
- * (skeleton, disabled buttons) and the `missing === true` state (SKU not
- * configured in admin).
  */
 export function useAdminPricing(sku: string): AdminPricing {
-  const [state, setState] = useState<AdminPricing>({
-    priceGlobalUsd: null,
-    priceLatamUsd: null,
-    pricePen: null,
-    loaded: false,
-    missing: false,
-  });
+  const [state, setState] = useState<AdminPricing>(INITIAL);
 
   useEffect(() => {
     if (!sku) {
-      setState({ priceGlobalUsd: null, priceLatamUsd: null, pricePen: null, loaded: true, missing: true });
+      setState({ ...INITIAL, loaded: true, missing: true });
       return;
     }
     let cancelled = false;
     setState((s) => ({ ...s, loaded: false, missing: false }));
     supabase
       .from("digital_products")
-      .select("price_usd, price_usd_latam, price_pen")
+      .select("price_usd, price_usd_latam, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
       .eq("sku", sku)
       .eq("active", true)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
         if (!data) {
-          setState({ priceGlobalUsd: null, priceLatamUsd: null, pricePen: null, loaded: true, missing: true });
+          setState({ ...INITIAL, loaded: true, missing: true });
           return;
         }
         const global = data.price_usd != null ? Number(data.price_usd) : null;
         const latam = data.price_usd_latam != null ? Number(data.price_usd_latam) : global;
         const pen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : null;
-        setState({ priceGlobalUsd: global, priceLatamUsd: latam, pricePen: pen, loaded: true, missing: false });
+        setState({
+          priceGlobalUsd: global,
+          priceLatamUsd: latam,
+          pricePen: pen,
+          name: (data as any).name ?? null,
+          description: (data as any).description ?? null,
+          hotmartUrl: (data as any).hotmart_url ?? null,
+          storeEnabled: (data as any).store_enabled !== false,
+          coverImageUrl: (data as any).cover_image_url ?? null,
+          loaded: true,
+          missing: false,
+        });
       });
     return () => {
       cancelled = true;

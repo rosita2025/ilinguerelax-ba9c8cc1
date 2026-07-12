@@ -16,8 +16,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
-import { CountryFlagSelector } from "@/components/CountryFlagSelector";
+import { useRegionTier } from "@/hooks/useRegionTier";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
@@ -78,9 +77,16 @@ const ProductCoreanoRelax = () => {
   const navigate = useNavigate();
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const localPrice = useCampaignPrice(10, 54);
-  const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
-  const showLocal = localPrice.currency !== "USD";
+  const region = useRegionTier();
+  // Three pricing tiers (mirrors digital_products.price_usd / _latam / _pen)
+  const PRICE_GLOBAL_USD = 15;
+  const PRICE_LATAM_USD = 10;
+  const PRICE_PEN = 29.9;
+  const isPeru = region.country === "PE";
+  const usdPrice = region.tier === "latam" ? PRICE_LATAM_USD : PRICE_GLOBAL_USD;
+  const displayPrice = isPeru ? `S/ ${PRICE_PEN.toFixed(2)}` : `$${usdPrice}`;
+  const displayFlag = isPeru ? "🇵🇪" : region.tier === "latam" ? "🌎" : "🌍";
+  const currencyLabel = isPeru ? "PEN" : "USD";
 
   const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
@@ -88,7 +94,7 @@ const ProductCoreanoRelax = () => {
       content_category: "Digital Book",
       content_ids: ["product-coreano-100-mapas"],
       content_type: "product",
-      value: 10,
+      value: usdPrice,
       currency: "USD",
       num_items: 1,
     });
@@ -104,7 +110,8 @@ const ProductCoreanoRelax = () => {
     addItem({
       id: "coreano-100-mapas",
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
-      price: 10,
+      price: usdPrice,
+      regionPrices: { latam: PRICE_LATAM_USD, global: PRICE_GLOBAL_USD },
       image: "/images/product-coreano-100-mapas.webp",
       description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
       quantity: 1,
@@ -191,18 +198,20 @@ const ProductCoreanoRelax = () => {
                   <span className="text-amber-600 font-semibold text-xs uppercase">Precio de Lanzamiento</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">{displayPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
-                    -81%
+                    {isPeru ? "-72%" : region.tier === "latam" ? "-81%" : "-72%"}
                   </motion.span>
                 </div>
-                {showLocal && (
-                  <p className="text-sm font-semibold text-foreground mb-1">
-                    {flag} ≈ <span className="text-primary">{localPrice.price} {localPrice.currency}</span>
-                  </p>
-                )}
-                <CountryFlagSelector campaign={localPrice} className="mb-2" />
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  {displayFlag} Precio para {isPeru ? "Perú" : region.tier === "latam" ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
+                </p>
+                <div className="text-xs text-muted-foreground space-y-0.5 mb-2">
+                  <div>🌍 Global: ${PRICE_GLOBAL_USD} USD</div>
+                  <div>🌎 Latinoamérica: ${PRICE_LATAM_USD} USD</div>
+                  <div>🇵🇪 Perú: S/ {PRICE_PEN.toFixed(2)} PEN</div>
+                </div>
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 
@@ -210,11 +219,11 @@ const ProductCoreanoRelax = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <Store className="w-5 h-5 mr-2" />
-                    Tienda iLingue · $10
+                    Tienda iLingue · {displayPrice}
                   </Button>
                   <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
                     <ShoppingCart className="w-5 h-5 mr-2" />
-                    Hotmart · $10
+                    Hotmart · ${usdPrice}
                   </Button>
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
@@ -382,12 +391,12 @@ const ProductCoreanoRelax = () => {
 
       {/* Sticky Buy Bar — dos botones: Tienda iLingue + Hotmart */}
       <StickyBuyBar
-        price={showLocal ? `${localPrice.price} ${localPrice.currency}` : "$10"}
+        price={displayPrice}
         originalPrice="$54"
-        currencyCode={localPrice.currency}
-        flag={flag}
+        currencyCode={currencyLabel}
+        flag={displayFlag}
         productName="Coreano · +100 Mapas Mentales"
-        ctaText="TIENDA ILINGUE · $10"
+        ctaText={`TIENDA ILINGUE · ${displayPrice}`}
         onBuyClick={handleBuyStore}
         secondaryCtaText="HOTMART"
         onSecondaryClick={handleBuyHotmart}

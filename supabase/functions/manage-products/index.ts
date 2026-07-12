@@ -205,6 +205,9 @@ Deno.serve(async (req) => {
       if (!sku) return json({ error: "SKU requerido" }, 400);
       const { error } = await admin.from("digital_products").delete().eq("sku", sku);
       if (error) throw error;
+      // Product removed — tell IndexNow so it drops the URL from indexes.
+      await pingIndexNow([productUrl(sku)]);
+      pingSitemap().catch(() => {});
       return json({ success: true });
     }
 
@@ -214,7 +217,7 @@ Deno.serve(async (req) => {
       if (!sku) return json({ error: "SKU requerido" }, 400);
       const { error } = await admin.from("digital_products").update({ active }).eq("sku", sku);
       if (error) throw error;
-      // Product removed — tell IndexNow so it drops the URL from indexes.
+      // Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
       await pingIndexNow([productUrl(sku)]);
       pingSitemap().catch(() => {});
       return json({ success: true });

@@ -205,41 +205,18 @@ export const LanguageCurrencySelector = () => {
         </SelectContent>
       </Select>
 
-      {/* Country + Currency */}
-      <Select value={current.code} onValueChange={handleCountryChange}>
-        <SelectTrigger
-          aria-label="Cambiar país y moneda"
-          className="w-auto gap-1.5 border-none bg-transparent hover:bg-muted/50 focus:ring-0 px-2"
-        >
-          <SelectValue>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="text-base leading-none">{current.flag}</span>
-              <span className="hidden sm:inline text-xs font-medium">{current.label}</span>
-              <span className="text-[10px] font-semibold text-primary/80">{current.currency}</span>
-            </span>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent className="max-h-96">
-          {(Object.keys(grouped) as Array<keyof typeof grouped>).map((region) => (
-            <SelectGroup key={region}>
-              <SelectLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {region}
-              </SelectLabel>
-              {grouped[region].map((c) => (
-                <SelectItem key={c.code} value={c.code} className="text-xs">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="text-base leading-none">{c.flag}</span>
-                    <span>{c.label}</span>
-                    <span className="ml-1 text-[10px] font-semibold text-muted-foreground">
-                      {c.currency}
-                    </span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </SelectContent>
-      </Select>
+      {/* País + moneda: sólo lectura, detectado por IP.
+          Evita que un visitante de USA cambie a MX/PE y compre al precio local
+          reducido (arbitraje). Para pruebas internas: ?country=XX en la URL. */}
+      <div
+        aria-label={`País detectado: ${current.label} (${current.currency})`}
+        title="País y moneda detectados por tu ubicación"
+        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/40 select-none cursor-default"
+      >
+        <span className="text-base leading-none">{current.flag}</span>
+        <span className="hidden sm:inline text-xs font-medium">{current.label}</span>
+        <span className="text-[10px] font-semibold text-primary/80">{current.currency}</span>
+      </div>
     </div>
   );
 };

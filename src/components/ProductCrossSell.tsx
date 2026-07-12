@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, Star, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCardPrice } from "@/hooks/useCardPrice";
 
 // Product images
 const product8000Image = "/images/product-8000.webp";

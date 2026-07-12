@@ -88,10 +88,23 @@ export const CartDrawer = () => {
   // Default seeded items without a slug shouldn't clutter the site-wide drawer.
   const visibleInternalItems = internalItems.filter((i) => slugByInternalId[i.id]);
   const internalCount = visibleInternalItems.reduce((s, i) => s + i.quantity, 0);
-  const internalSubtotal = visibleInternalItems.reduce(
-    (s, i) => s + itemPrice(i, tier) * i.quantity,
-    0,
-  );
+  // If the buyer's currency is PEN and every visible internal item has a native
+  // pricePen configured in admin, render prices natively in Soles (matches the
+  // product page + checkout, avoids USD→PEN fx drift).
+  const showNativePen =
+    currency === "PEN" &&
+    visibleInternalItems.length > 0 &&
+    visibleInternalItems.every((i) => typeof i.pricePen === "number" && (i.pricePen as number) > 0);
+  const formatInternalUnit = (it: typeof visibleInternalItems[number]) =>
+    showNativePen
+      ? `S/ ${(it.pricePen as number).toFixed(2)} PEN`
+      : `${formatPrice(itemPrice(it, tier))} ${currency}`;
+  const internalSubtotal = showNativePen
+    ? visibleInternalItems.reduce((s, i) => s + (i.pricePen as number) * i.quantity, 0)
+    : visibleInternalItems.reduce((s, i) => s + itemPrice(i, tier) * i.quantity, 0);
+  const internalSubtotalLabel = showNativePen
+    ? `S/ ${internalSubtotal.toFixed(2)} PEN`
+    : `${formatPrice(internalSubtotal)} ${currency}`;
 
   const [couponInput, setCouponInput] = useState("");
   const [isApplying, setIsApplying] = useState(false);
@@ -347,7 +360,6 @@ export const CartDrawer = () => {
               </div>
               <div className="space-y-2">
                 {visibleInternalItems.map((it) => {
-                  const unit = itemPrice(it, tier);
                   return (
                     <div key={it.id} className="flex gap-2.5 items-center">
                       <div className="w-10 h-10 rounded-md overflow-hidden bg-secondary/20 flex-shrink-0">
@@ -356,7 +368,7 @@ export const CartDrawer = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold leading-tight truncate">{it.name}</p>
                         <p className="text-[11px] text-primary font-bold">
-                          {formatPrice(unit)} {currency}
+                          {formatInternalUnit(it)}
                         </p>
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
@@ -377,7 +389,7 @@ export const CartDrawer = () => {
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-primary/20">
                 <span className="text-xs font-semibold">Subtotal</span>
                 <span className="text-sm font-bold text-primary">
-                  {formatPrice(internalSubtotal)} {currency}
+                  {internalSubtotalLabel}
                 </span>
               </div>
               <Button

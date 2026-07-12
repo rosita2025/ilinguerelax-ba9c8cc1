@@ -346,38 +346,50 @@ export const SEO = ({
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
-      {/* hreflang — tells Google, Baidu, Naver, Yandex which locales/countries
-          this page serves. Applies to all pages so language auto-detection by
-          country is respected in SERPs. x-default falls back to the canonical. */}
-      {canonicalUrl && (
-        <>
-          <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es-ES" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es-MX" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es-AR" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es-CO" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es-PE" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="es-CL" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="en" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="en-US" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="en-GB" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="en-CA" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="en-AU" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="fr" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="fr-FR" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="fr-CA" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="pt" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="pt-BR" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="pt-PT" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="de" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="it" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="nl" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="ko" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="ja" href={canonicalUrl} />
-          <link rel="alternate" hrefLang="zh" href={canonicalUrl} />
-        </>
-      )}
+      {/* hreflang — each regional subdomain (us., ca., pe., mx., es., fr., br.)
+          gets its own alternate URL so Google, Baidu, Naver, Yandex, etc.
+          serve the right localized store per country. Path is preserved from
+          the current canonical so /products/foo → us.ilinguerelax.com/products/foo. */}
+      {canonicalUrl && (() => {
+        // Derive path from canonicalUrl (strip host, keep path+search).
+        let path = "/";
+        try {
+          const u = new URL(canonicalUrl);
+          path = u.pathname + u.search;
+        } catch {
+          path = canonicalUrl.startsWith("/") ? canonicalUrl : "/";
+        }
+        const build = (sub: string) =>
+          sub ? `https://${sub}.ilinguerelax.com${path}` : `https://www.ilinguerelax.com${path}`;
+        const alts: Array<{ lang: string; sub: string }> = [
+          { lang: "x-default", sub: "" },
+          { lang: "es", sub: "" },
+          { lang: "es-ES", sub: "es" },
+          { lang: "es-MX", sub: "mx" },
+          { lang: "es-PE", sub: "pe" },
+          { lang: "es-AR", sub: "" },
+          { lang: "es-CO", sub: "" },
+          { lang: "es-CL", sub: "" },
+          { lang: "en", sub: "us" },
+          { lang: "en-US", sub: "us" },
+          { lang: "en-CA", sub: "ca" },
+          { lang: "en-GB", sub: "us" },
+          { lang: "en-AU", sub: "us" },
+          { lang: "fr", sub: "fr" },
+          { lang: "fr-FR", sub: "fr" },
+          { lang: "fr-CA", sub: "ca" },
+          { lang: "pt", sub: "br" },
+          { lang: "pt-BR", sub: "br" },
+          { lang: "pt-PT", sub: "br" },
+        ];
+        return (
+          <>
+            {alts.map((a) => (
+              <link key={a.lang} rel="alternate" hrefLang={a.lang} href={build(a.sub)} />
+            ))}
+          </>
+        );
+      })()}
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />

@@ -310,6 +310,7 @@ const BlogPost = () => {
                               </span>
                             )}
                             <span className="text-xs text-primary/70 font-semibold">{cardPrice.currencyLabel(product.id)}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
                           </div>
                         </div>
                         <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />

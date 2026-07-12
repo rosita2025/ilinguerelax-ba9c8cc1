@@ -4,7 +4,12 @@ import { fr } from "./translations/fr";
 import { pt } from "./translations/pt";
 
 export type Language = "es" | "en" | "fr" | "pt";
-export type Currency = "USD" | "EUR" | "BRL" | "MXN" | "COP" | "ARS" | "GBP" | "CAD" | "AUD" | "PEN";
+export type Currency =
+  | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
+  | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
+  | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "PYG" | "UYU" | "HTG"
+  | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
+  | "JPY" | "KRW" | "CNY" | "INR";
 
 export const translations = {
   es,

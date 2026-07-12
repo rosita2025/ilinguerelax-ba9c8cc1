@@ -1,4 +1,5 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -170,6 +171,12 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Fire-and-forget SEO propagation: announces the new/updated URL to
+      // Bing/Yandex/Seznam (IndexNow) and pings sitemap for Google.
+      if (p.active !== false) {
+        await pingIndexNow([productUrl(p.sku)]);
+        pingSitemap().catch(() => {});
+      }
       return json({ success: true, sku: p.sku });
     }
 
@@ -187,6 +194,9 @@ Deno.serve(async (req) => {
       if (e1) throw e1;
       await admin.from("product_upsells").update({ product_sku: newSku }).eq("product_sku", oldSku);
       await admin.from("product_upsells").update({ upsell_sku: newSku }).eq("upsell_sku", oldSku);
+      // Announce both old (now 404) and new URLs so search engines refresh.
+      await pingIndexNow([productUrl(oldSku), productUrl(newSku)]);
+      pingSitemap().catch(() => {});
       return json({ success: true, sku: newSku });
     }
 
@@ -195,6 +205,9 @@ Deno.serve(async (req) => {
       if (!sku) return json({ error: "SKU requerido" }, 400);
       const { error } = await admin.from("digital_products").delete().eq("sku", sku);
       if (error) throw error;
+      // Product removed — tell IndexNow so it drops the URL from indexes.
+      await pingIndexNow([productUrl(sku)]);
+      pingSitemap().catch(() => {});
       return json({ success: true });
     }
 
@@ -204,6 +217,9 @@ Deno.serve(async (req) => {
       if (!sku) return json({ error: "SKU requerido" }, 400);
       const { error } = await admin.from("digital_products").update({ active }).eq("sku", sku);
       if (error) throw error;
+      // Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
+      await pingIndexNow([productUrl(sku)]);
+      pingSitemap().catch(() => {});
       return json({ success: true });
     }
 

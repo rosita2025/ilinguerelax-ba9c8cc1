@@ -125,6 +125,11 @@ const AdminEmailTest = () => {
     return { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
   });
 
+  const [query, setQuery] = useState("");
+  const [sourceFilter, setSourceFilter] = useState<Source | "all">("all");
+  const [sortKey, setSortKey] = useState<"date" | "order_ref" | "principal_sku" | "upsell_sku">("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
     try {

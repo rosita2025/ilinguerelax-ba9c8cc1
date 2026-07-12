@@ -50,8 +50,9 @@ const features = [
 ];
 
 const Product1000Verbos = () => {
-  const pricing = useAdminPricing(ADMIN_SKU_1000_VERBOS, { global: 10 });
-  const currentPrice = pricing.priceGlobalUsd;
+  const pricing = useAdminPricing(ADMIN_SKU_1000_VERBOS);
+  const currentPrice = pricing.priceGlobalUsd ?? 0;
+  const pricingReady = pricing.loaded && currentPrice > 0;
   const campaign = useCampaignPrice(currentPrice, 54);
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
@@ -71,6 +72,7 @@ const Product1000Verbos = () => {
   useHotmartPixel(pixelParams);
 
   const handleBuy = () => {
+    if (!pricingReady) return;
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 1,000 Verbos Esenciales",
       content_category: "Digital Book",
@@ -91,6 +93,7 @@ const Product1000Verbos = () => {
   };
 
   const handleAddToCart = () => {
+    if (!pricingReady) return;
     addItem({ ...cartItem, quantity: 1 });
     toast.success("Producto agregado al carrito", {
       description: "Puedes seguir explorando o ir al checkout.",

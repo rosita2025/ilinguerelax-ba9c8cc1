@@ -105,8 +105,9 @@ const ProductPatronesEspeciales = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
-  const pricingAdmin = useAdminPricing("patrones-especiales", { global: 8 });
-  const PRICE_USD = pricingAdmin.priceGlobalUsd; // Precio dinámico desde /admin/products
+  const pricingAdmin = useAdminPricing("patrones-especiales");
+  const PRICE_USD = pricingAdmin.priceGlobalUsd ?? 0; // Precio dinámico desde /admin/products
+  const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
   const ORIGINAL_USD = 19.99;
   const regional = getRegionalPricing(countryCode);
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
@@ -121,10 +122,11 @@ const ProductPatronesEspeciales = () => {
     content_type: "product",
     value: PRICE_USD,
     currency: "USD",
-  }), []);
+  }), [PRICE_USD]);
   useHotmartPixel(pixelParams);
 
   const handleBuy = () => {
+    if (!pricingReady) return;
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
       content_category: "Digital Book",
@@ -139,10 +141,12 @@ const ProductPatronesEspeciales = () => {
   };
 
   const handleAddToCart = () => {
+    if (!pricingReady) return;
     addItem({
       id: "patrones-especiales-ingles",
       name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
       price: PRICE_USD,
+      pricePen: pricingAdmin.pricePen ?? undefined,
       image: "/images/product-patrones-especiales.webp",
       description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
       quantity: 1,

@@ -127,8 +127,9 @@ const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
-  const pricing = useAdminPricing("5-000-spanish-words-with-english-pronunciation-digital", { global: PRICE });
-  const currentPrice = pricing.priceGlobalUsd;
+  const pricing = useAdminPricing("5-000-spanish-words-with-english-pronunciation-digital");
+  const currentPrice = pricing.priceGlobalUsd ?? 0;
+  const pricingReady = pricing.loaded && currentPrice > 0;
   const localizedPrice = formatPrice(currentPrice);
   const localizedOriginal = formatPrice(ORIGINAL_PRICE);
   const flag = countryToFlag(countryCode);
@@ -155,6 +156,7 @@ const ProductSpanish5000Digital = () => {
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
   const handleBuyNow = () => {
+    if (!pricingReady) return;
     if (lockRef.current) return;
     lockRef.current = true;
     setIsRedirecting(true);
@@ -171,6 +173,7 @@ const ProductSpanish5000Digital = () => {
       id: "5000-spanish-words",
       name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
       price: currentPrice,
+      pricePen: pricing.pricePen ?? undefined,
       image: "/images/product-5000-spanish.webp",
       description: "5,000 vocabulary words in Spanish with English pronunciation",
       quantity: 1,
@@ -179,10 +182,12 @@ const ProductSpanish5000Digital = () => {
   };
 
   const handleAddToCart = () => {
+    if (!pricingReady) return;
     addItem({
       id: "5000-spanish-words",
       name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
       price: currentPrice,
+      pricePen: pricing.pricePen ?? undefined,
       image: "/images/product-5000-spanish.webp",
       description: "5,000 vocabulary words in Spanish with English pronunciation",
       quantity: 1,

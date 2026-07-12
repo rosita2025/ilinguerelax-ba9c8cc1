@@ -38,8 +38,9 @@ const features = [
 ];
 
 const Product500Preguntas = () => {
-  const pricing = useAdminPricing("500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes", { global: 10 });
-  const currentPrice = pricing.priceGlobalUsd;
+  const pricing = useAdminPricing("500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes");
+  const currentPrice = pricing.priceGlobalUsd ?? 0;
+  const pricingReady = pricing.loaded && currentPrice > 0;
   const campaign = useCampaignPrice(currentPrice, 54);
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 500 Preguntas en Inglés",
@@ -52,6 +53,7 @@ const Product500Preguntas = () => {
   useHotmartPixel(pixelParams);
 
   const handleBuy = () => {
+    if (!pricingReady) return;
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 500 Preguntas en Inglés",
       content_category: "Digital Book",

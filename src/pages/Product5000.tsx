@@ -223,9 +223,10 @@ const Product5000 = () => {
       window.removeEventListener("storage", sync);
     };
   }, []);
-  const pricing5000 = useAdminPricing("5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa", { global: 28, latam: 13.99 });
+  const pricing5000 = useAdminPricing("5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa");
   const isLatam = LATAM_CURRENCIES.has(detectedCurrency);
-  const priceUSD = isLatam ? pricing5000.priceLatamUsd : pricing5000.priceGlobalUsd;
+  const priceUSD = (isLatam ? pricing5000.priceLatamUsd : pricing5000.priceGlobalUsd) ?? 0;
+  const pricing5000Ready = pricing5000.loaded && priceUSD > 0;
   const buyUrl = isLatam
     ? "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153"
     : "https://pay.hotmart.com/C106016400K?off=oa7xq3rf&checkoutMode=10&bid=1780550589206";

@@ -8,7 +8,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
  */
 export const LATAM_HOTMART_COUNTRIES = new Set([
   "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV",
-  "GT", "HN", "HT", "MX", "PA", "PY", "UY",
+  "GT", "HN", "MX", "PA", "PY", "PR", "UY",
 ]);
 
 export const TIENDA_USD_COUNTRIES = new Set(["VE", "CU", "NI"]);

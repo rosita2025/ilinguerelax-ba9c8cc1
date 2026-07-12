@@ -106,7 +106,7 @@ const ProductPatronesEspeciales = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
-  const pricingAdmin = useAdminPricing("patrones-especiales");
+  const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
   const cardPrice = useCardPrice();
   const PRICE_USD = pricingAdmin.priceGlobalUsd ?? 0; // Precio dinámico desde /admin/products
   const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
@@ -114,14 +114,14 @@ const ProductPatronesEspeciales = () => {
   const regional = getRegionalPricing(countryCode);
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
   // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
-  const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales", PRICE_USD) : formatPrice(PRICE_USD);
+  const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD);
   const originalLabel = formatPrice(ORIGINAL_USD);
   const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
     content_category: "Digital Book",
-    content_ids: ["patrones-especiales"],
+    content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
     content_type: "product",
     value: PRICE_USD,
     currency: "USD",
@@ -133,7 +133,7 @@ const ProductPatronesEspeciales = () => {
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
       content_category: "Digital Book",
-      content_ids: ["patrones-especiales"],
+      content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
       content_type: "product",
       value: PRICE_USD,
       currency: "USD",
@@ -336,7 +336,7 @@ const ProductPatronesEspeciales = () => {
                       trackHotmartEvent("InitiateCheckout", {
                         content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
                         content_category: "Digital Book",
-                        content_ids: ["patrones-especiales"],
+                        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
                         content_type: "product",
                         value: PRICE_USD,
                         currency: "USD",
@@ -356,7 +356,7 @@ const ProductPatronesEspeciales = () => {
                       trackHotmartEvent("InitiateCheckout", {
                         content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
                         content_category: "Digital Book",
-                        content_ids: ["patrones-especiales"],
+                        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
                         content_type: "product",
                         value: PRICE_USD,
                         currency: "USD",
@@ -737,7 +737,7 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         price={priceLabel}
         originalPrice={originalLabel}
-        currencyCode={cardPrice.ready ? cardPrice.currencyLabel("patrones-especiales") : currency}
+        currencyCode={cardPrice.ready ? cardPrice.currencyLabel("patrones-especiales-alfabeto-combinaciones-secretas-ingles") : currency}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={6}

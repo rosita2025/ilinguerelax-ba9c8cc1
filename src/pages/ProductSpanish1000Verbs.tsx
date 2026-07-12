@@ -30,10 +30,11 @@ const ProductSpanish1000Verbs = () => {
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const pricing = useAdminPricing("1-000-verbs-in-spanish-past-present-future-with-english-pronunciation");
   const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const currentPrice = pricing.priceGlobalUsd;
+  const pricingReady = pricing.loaded && currentPrice > 0;
   const campaign = useCampaignPrice(currentPrice, 54);
 
   const handleBuyNow = () => {
+    if (!pricingReady) return;
     // Route directly to internal checkout — Shopify is intentionally bypassed here
     // to avoid the phantom "Spanish Relax - 1,000 Verbs in Spanish" line item.
     setDrawerOpen(false);

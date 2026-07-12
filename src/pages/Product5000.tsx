@@ -515,9 +515,9 @@ const Product5000 = () => {
                 <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0 mb-2">
                   <span
                     className={`font-black text-foreground leading-none tracking-tight tabular-nums ${
-                      campaignFull.price.length > 9
+                      safePriceLabel.length > 9
                         ? 'text-2xl sm:text-3xl md:text-4xl'
-                        : campaignFull.price.length > 6
+                        : safePriceLabel.length > 6
                           ? 'text-3xl sm:text-4xl md:text-5xl'
                           : 'text-4xl sm:text-5xl md:text-6xl'
                     }`}

@@ -128,10 +128,18 @@ const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
-  const pricing = useAdminPricing("5-000-spanish-words-with-english-pronunciation-digital");
-  const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const pricingReady = pricing.loaded && currentPrice > 0;
-  const localizedPrice = formatPrice(currentPrice);
+  const ADMIN_SKU_SP5K = "5-000-spanish-words-with-english-pronunciation-digital";
+  const TIENDA_PATH_SP5K = "/checkouts/5000-spanish-words";
+  const HOTMART_SP5K_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
+  const pricing = useAdminPricing(ADMIN_SKU_SP5K);
+  const tier = useCountryTierRouting(ADMIN_SKU_SP5K, {
+    tiendaPath: TIENDA_PATH_SP5K,
+    fallbackHotmartUrl: HOTMART_SP5K_LATAM,
+  });
+  const currentPrice = tier.priceUsd;
+  const pricingReady = tier.loaded;
+  const { useTiendaOnly, useHotmartLatam, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
+  const localizedPrice = tier.isPeru && pricePen ? `S/${pricePen.toFixed(2)}` : formatPrice(currentPrice);
   const localizedOriginal = formatPrice(ORIGINAL_PRICE);
   const flag = countryToFlag(countryCode);
 

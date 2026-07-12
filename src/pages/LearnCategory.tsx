@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Star, Download, BookOpen } from "lucide-react";
 import { products as staticProducts, getProductLink, type Product } from "@/data/products";
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
+import { useCardPrice } from "@/hooks/useCardPrice";
 import { useI18n } from "@/i18n/I18nContext";
 import { LANG_LABEL, LEARN_PAIRS, defaultPairFor, parsePairSlug } from "@/lib/learnPairs";
 
@@ -21,6 +22,7 @@ const LearnCategory = () => {
   const { pair: pairSlug } = useParams();
   const { language: uiLang } = useI18n();
   const { items: dbProducts } = useDigitalProducts();
+  const cardPrice = useCardPrice();
 
   // /aprender (no slug) → redirect to detected pair.
   if (!pairSlug) {
@@ -184,12 +186,13 @@ const LearnCategory = () => {
                     </div>
                     <h2 className="text-xl font-bold text-foreground mb-1">{product.title}</h2>
                     <p className="text-sm text-muted-foreground mb-4">{product.subtitle}</p>
-                    <div className="flex items-baseline gap-2 mb-6">
-                      <span className="text-3xl font-bold text-foreground">${product.price}</span>
+                    <div className="flex items-baseline gap-2 mb-6 flex-wrap">
+                      <span className="text-3xl font-bold text-foreground">{cardPrice.format(product.slug, product.price)}</span>
                       {product.originalPrice && product.originalPrice > product.price && (
                         <span className="text-lg text-muted-foreground line-through">${product.originalPrice}</span>
                       )}
-                      <span className="text-sm text-accent font-medium">USD</span>
+                      <span className="text-sm text-accent font-medium">{cardPrice.currencyLabel(product.slug)}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
                     </div>
                     <Link to={getProductLink(product)}>
                       <Button variant="hero" size="lg" className="w-full">

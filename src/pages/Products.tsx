@@ -464,11 +464,11 @@ const Products = () => {
                               <span className="text-[11px] text-muted-foreground">{sub}</span>
                             </div>
                             <div className="flex items-baseline gap-1.5">
-                              <span className="text-lg font-black text-foreground">${priceFor(p)}</span>
+                              <span className="text-lg font-black text-foreground">{cardPrice.format(p.id, priceFor(p))}</span>
                               {p.originalPrice && p.originalPrice > p.price && (
                                 <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>
                               )}
-                              <span className="text-[10px] text-accent font-semibold">USD</span>
+                              <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(p.id)}</span>
                             </div>
                           </div>
                           <ArrowRight className="w-4 h-4 text-muted-foreground group-hover/opt:text-primary group-hover/opt:translate-x-0.5 transition-all" />

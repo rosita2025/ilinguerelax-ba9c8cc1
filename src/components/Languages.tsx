@@ -361,14 +361,24 @@ export const Languages = () => {
 
                 {/* Pricing & Buy Button */}
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-2xl font-bold text-primary">
-                      {product.price === 0 ? "GRATIS" : formatPrice(product.price)}
+                      {product.price === 0
+                        ? "GRATIS"
+                        : product.isPhysical
+                          ? formatPrice(product.price)
+                          : cardPrice.format(product.id, product.price)}
                     </span>
                     {product.originalPrice && (
                       <span className="text-sm text-muted-foreground line-through">
                         {formatPrice(product.originalPrice)}
                       </span>
+                    )}
+                    {!product.isPhysical && product.price > 0 && (
+                      <>
+                        <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(product.id)}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
+                      </>
                     )}
                   </div>
                   <Button size="sm" className="gap-2" asChild>

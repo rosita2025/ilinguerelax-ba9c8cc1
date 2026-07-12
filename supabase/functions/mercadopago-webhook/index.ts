@@ -183,12 +183,9 @@ Deno.serve(async (req) => {
     console.log("MP webhook received:", { type, dataId, action: body?.action });
 
     if (!dataId) {
-      await raiseAlert({
-        reason: "Webhook sin data.id",
-        severity: "warn",
-        event_type: type,
-        payload: body,
-      });
+      // Bot/scanner golpeando la URL pública sin payload real. Ignorar en silencio
+      // (sin log en DB, sin correo) para no llenar la bandeja de alertas falsas.
+      console.log("MP webhook ignored: no data.id (probable bot/scanner)");
       return new Response(JSON.stringify({ received: true, ignored: "no data.id" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -197,17 +194,9 @@ Deno.serve(async (req) => {
 
     const ok = await verifySignature(req, dataId);
     if (!ok) {
-      // Firma inválida = bots/scanners golpeando la URL pública. NO es un hackeo
-      // ni una compra real: MP nunca movió dinero. Solo log silencioso (warn, sin
-      // correo) para evitar spam en la bandeja del admin de madrugada.
-      await raiseAlert({
-        reason: "Firma HMAC inválida (probable bot/scanner)",
-        severity: "warn",
-        data_id: dataId,
-        event_type: type,
-        http_status: 401,
-        payload: body,
-      });
+      // Firma inválida = bot/scanner. MP nunca movió dinero. Silencio total:
+      // sin correo y sin insertar en webhook_alerts (evita spam y ruido).
+      console.log("MP webhook rejected: invalid HMAC (probable bot/scanner)", { dataId, type });
       return new Response("Invalid signature", { status: 401, headers: corsHeaders });
     }
 

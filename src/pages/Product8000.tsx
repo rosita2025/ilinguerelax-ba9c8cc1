@@ -312,7 +312,7 @@ const Product8000 = () => {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
                     <CreditCard className="w-6 h-6 mr-2" />
-                    ¡COMPRAR AHORA EN HOTMART!
+                    {useTiendaOnly ? "¡COMPRAR AHORA EN TIENDA!" : "¡COMPRAR AHORA EN HOTMART!"}
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>

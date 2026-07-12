@@ -10,10 +10,29 @@ import { products as staticProducts, getProductLink, type Product } from "@/data
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useI18n } from "@/i18n/I18nContext";
+import type { LangCode } from "@/data/products";
+
+const LANG_META: Record<LangCode, { flag: string; label: string }> = {
+  es: { flag: "🇪🇸", label: "Español" },
+  en: { flag: "🇬🇧", label: "English" },
+  fr: { flag: "🇫🇷", label: "Français" },
+  pt: { flag: "🇵🇹", label: "Português" },
+  ko: { flag: "🇰🇷", label: "한국어" },
+  de: { flag: "🇩🇪", label: "Deutsch" },
+  it: { flag: "🇮🇹", label: "Italiano" },
+  ja: { flag: "🇯🇵", label: "日本語" },
+  nl: { flag: "🇳🇱", label: "Nederlands" },
+  zh: { flag: "🇨🇳", label: "中文" },
+};
 
 const Products = () => {
+  const { language: uiLang } = useI18n();
+  // "Hablo" auto-defaults to the visitor's detected UI language (IP/subdomain-based).
+  const defaultLearner: LangCode = (["es","en","fr","pt"].includes(uiLang) ? uiLang : "es") as LangCode;
   const [type, setType] = useState<"all" | "digital" | "physical">("all");
-  const [language, setLanguage] = useState<string>("all");
+  const [learnerLang, setLearnerLang] = useState<LangCode | "all">(defaultLearner);
+  const [targetLang, setTargetLang] = useState<LangCode | "all">("all");
   const [search, setSearch] = useState("");
 
   // Merge static catalog with products managed from /admin/productos.

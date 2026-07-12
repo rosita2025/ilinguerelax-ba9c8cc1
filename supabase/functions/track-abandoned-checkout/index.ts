@@ -84,6 +84,32 @@ Deno.serve(async (req) => {
       });
     } catch (_) { /* dedupe conflict ignored */ }
 
+    // Push to Brevo — the Brevo Automation workflow sends Day 1/7/15/30 emails.
+    try {
+      const { data: product } = await supabase
+        .from("digital_products")
+        .select("name, price_usd, slug")
+        .eq("sku", productType)
+        .maybeSingle();
+      const site = "https://ilinguerelax.com";
+      const url = product?.slug
+        ? `${site}/checkouts/${product.slug}`
+        : `${site}/products/${productType}`;
+      await pushAbandonedCartToBrevo({
+        email,
+        name,
+        productSku: productType,
+        productName: (product as { name?: string } | null)?.name,
+        productUrl: url,
+        priceUsd: (product as { price_usd?: number } | null)?.price_usd ?? undefined,
+        couponCode: "NEW10",
+        language,
+        source: "checkout",
+      });
+    } catch (e) {
+      console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
+    }
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

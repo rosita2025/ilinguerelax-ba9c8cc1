@@ -1,114 +1,86 @@
-## Panel `/admin/productos` — Gestión tipo Shopify
+# Subdominios regionales para iLingue Relax (Opción A)
 
-Crear un panel completo para gestionar productos digitales sin tocar código.
+Todos los subdominios apuntan al **mismo proyecto** Lovable. El código detecta el subdominio en el navegador y fuerza país, idioma, moneda, pasarela de pago y SEO.
 
-### 1. Base de datos
+## Alcance
 
-Nueva tabla `digital_products` en Lovable Cloud:
+Subdominios de la fase 1:
 
-| Campo | Tipo | Ejemplo |
-|---|---|---|
-| `sku` | text (único) | `patrones-especiales` |
-| `name` | text | "Patrones Especiales de Inglés" |
-| `description` | text | Descripción larga |
-| `learner_language` | text | `es`, `en`, `fr`, `pt`, `ko` |
-| `target_language` | text | `en`, `es`, `ko`, `fr` |
-| `price_usd` | numeric | 8.00 |
-| `price_pen` | numeric | 29.90 |
-| `drive_url` | text | Enlace de Google Drive |
-| `access_key` | text (opcional) | Solo si algún PDF la usa |
-| `cover_image_url` | text | URL de la portada |
-| `is_upsell` | boolean | Si puede aparecer como upsell |
-| `stripe_price_id` | text (auto) | Se crea al guardar |
-| `mp_preference_template` | jsonb (auto) | Configuración Mercado Pago |
-| `active` | boolean | Publicado / borrador |
-| `sort_order` | integer | Orden en la tienda |
+| Subdominio | País | Idioma | Moneda | Pasarela |
+|---|---|---|---|---|
+| `www.ilinguerelax.com` | Global (default) | ES | USD | Stripe |
+| `us.ilinguerelax.com` | USA | EN | USD | Stripe |
+| `ca.ilinguerelax.com` | Canadá | EN | CAD | Stripe |
+| `pe.ilinguerelax.com` | Perú | ES | PEN | Yape/Plin + Stripe |
+| `mx.ilinguerelax.com` | México | ES | MXN | Mercado Pago |
+| `es.ilinguerelax.com` | España | ES | EUR | Stripe |
+| `fr.ilinguerelax.com` | Francia | FR | EUR | Stripe |
+| `br.ilinguerelax.com` | Brasil | PT | BRL | Mercado Pago |
 
-Tabla auxiliar `product_upsells` (relaciones N:N):
+## Pasos que hago yo (código)
 
-| Campo | Descripción |
-|---|---|
-| `product_sku` | Producto principal |
-| `upsell_sku` | Producto sugerido |
-| `discount_pct` | Descuento al agregarlo (ej: 30%) |
+1. **Nuevo módulo `src/lib/subdomainRegion.ts`**
+   - Función `getSubdomainRegion()` que lee `window.location.hostname` y devuelve `{ country, language, currency, paymentGateway, tier }`.
+   - Si el subdominio no coincide con la tabla → fallback a detección por IP actual (`ipapi.co`).
 
-Así cada producto tiene **sus propios upsells** (ej: Patrones sugiere Coreano; Coreano sugiere Verbos).
+2. **Hook `useSubdomainRegion()`**
+   - Envuelve la lógica y expone la región activa a toda la app.
+   - Se integra con el `useRegionTier()` existente: el subdominio **sobrescribe** la detección por IP.
 
-### 2. Categorías por par de idiomas
+3. **Ajustes en componentes existentes**
+   - `Checkout.tsx`: usar la moneda/gateway del subdominio en vez de IP.
+   - `CountryFlagSelector.tsx`: mostrar la bandera del subdominio como "actual" y ofrecer enlaces para cambiar a otro subdominio (`us.` ↔ `pe.` ↔ `mx.`…).
+   - `i18n` inicial: forzar el idioma del subdominio al cargar.
 
-El sistema filtra automáticamente por combinación **idioma nativo → idioma a estudiar**:
+4. **SEO por subdominio**
+   - `SEO.tsx`: emitir `hreflang` con las URLs de cada subdominio (`us.ilinguerelax.com/…` `hreflang="en-US"`, etc.).
+   - `canonical` = URL del subdominio actual (no forzar a `www.`).
+   - `scripts/generate-sitemap.ts`: generar un sitemap por subdominio (`sitemap-us.xml`, `sitemap-pe.xml`…) y un índice `sitemap.xml` que los liste.
+   - `robots.txt`: agregar todos los `Sitemap:` de cada subdominio.
 
-- 🇪🇸 → 🇬🇧 Español aprende Inglés (Patrones, 1000 Verbos, 500 Preguntas)
-- 🇬🇧 → 🇪🇸 Inglés aprende Español (5000 Spanish Words)
-- 🇪🇸 → 🇰🇷 Español aprende Coreano (100 Mapas Coreano)
-- 🇫🇷 → 🇬🇧 Francés aprende Inglés
-- etc.
+5. **Banner de "sugerencia de región"**
+   - Si el visitante llega a `www.` pero su IP dice México → banner sutil: *"¿Prefieres visitar mx.ilinguerelax.com?"*
+   - Se puede descartar; se recuerda con cookie.
 
-El admin muestra tabs por categoría; el frontend usa geolocalización IP para sugerir la categoría correcta.
+6. **Admin**
+   - En `/admin/productos` mostrar en qué subdominios está publicado cada producto (todos por defecto; opcional excluir alguno).
 
-### 3. Panel `/admin/productos`
+## Pasos que haces tú (DNS + Lovable)
 
-Interfaz tipo Shopify:
+1. **En tu registrador DNS** (donde tengas `ilinguerelax.com`) creas un registro **A** por cada subdominio:
+   ```
+   Tipo: A   Nombre: us    Valor: 185.158.133.1
+   Tipo: A   Nombre: pe    Valor: 185.158.133.1
+   Tipo: A   Nombre: ca    Valor: 185.158.133.1
+   Tipo: A   Nombre: mx    Valor: 185.158.133.1
+   Tipo: A   Nombre: es    Valor: 185.158.133.1
+   Tipo: A   Nombre: fr    Valor: 185.158.133.1
+   Tipo: A   Nombre: br    Valor: 185.158.133.1
+   ```
+   (Si usas Cloudflare, activa "proxy" solo si vas a marcar la casilla correspondiente en Lovable.)
 
-- **Lista de productos** — tabla con thumbnail, nombre, categoría (banderas), precio USD/PEN, estado (activo/borrador), botones editar/duplicar/desactivar.
-- **Filtros** — por categoría (par de idiomas), estado, tipo (principal/upsell).
-- **Botón "Nuevo producto"** — formulario paso a paso:
-  1. Info básica (nombre, SKU, descripción, portada)
-  2. Idiomas (nativo → estudia)
-  3. Precios (USD, PEN)
-  4. Entrega digital (enlace Drive, clave opcional)
-  5. Upsells (seleccionar productos sugeridos con descuento)
-  6. Publicar (activo/borrador)
-- **Al guardar** — llama edge function `sync-product-payment` que:
-  - Crea el producto en Stripe automáticamente (via `payments--create_product` en runtime)
-  - Genera plantilla de Mercado Pago
-  - Guarda los IDs en la tabla
+2. **En Lovable → Project Settings → Domains → Connect Domain** agregas cada subdominio uno por uno. Lovable verificará el DNS y emitirá SSL automático (5-30 min).
 
-### 4. Integración con el resto del sistema
+3. **En Google Search Console**: agregar cada subdominio como propiedad separada (te ayudo a generar los meta-tags de verificación después).
 
-- **Checkout** (`checkoutCatalog.ts`) — se convierte en hook `useCheckoutCatalog()` que lee de la tabla.
-- **Upsells en carrito** (`UpsellPanel.tsx`) — lee `product_upsells` según el producto en carrito.
-- **Email de entrega** (`manage-manual-payments`, `send-transactional-email`) — consulta la tabla por SKU en vez de mapa hardcoded.
-- **Páginas de producto** — opcional en fase 2: se puede migrar cada `ProductXxx.tsx` a leer de la tabla.
+## Detalles técnicos
 
-### 5. Migración de datos actuales
+- La detección se hace **client-side** con `window.location.hostname`, por lo que no se rompe el SSR/preview.
+- Durante desarrollo (`localhost`, `*.lovable.app`) → cae al modo IP actual, sin cambios.
+- El catálogo de productos sigue siendo **único** en Supabase; solo cambian precio mostrado y pasarela.
+- Los emails transaccionales incluirán el subdominio de origen del pedido para tracking.
+- Ningún cambio destructivo en pagos existentes: si Stripe ya está configurado en modo live, sigue funcionando; solo se selecciona la moneda correcta según subdominio.
 
-Poblar la tabla con los productos existentes:
-- Patrones Especiales ($8 / S/29.90, ES→EN)
-- Coreano 100 Mapas ($27, ES→KO)
-- 1000 Verbos Inglés ($9, ES→EN)
-- 500 Preguntas Inglés ($9, ES→EN)
-- 5000 Spanish Words ($22, EN→ES)
+## Fuera de este plan (posibles fases 2/3)
 
-Necesitaré que pegues los **enlaces de Google Drive** de cada uno para completarlos (o los dejo vacíos y los editas después en el panel).
+- Traducciones completas de páginas de producto por idioma nativo (hoy solo IU tiene i18n).
+- Métodos de pago locales adicionales (PIX en `br.`, Bizum en `es.`).
+- CDN geolocalizado.
 
-### 6. Seguridad
+## Fase 1 primero — confirmación
 
-- Tabla protegida con RLS: solo lectura pública de productos `active=true`; escritura solo vía edge function con `ADMIN_REVIEW_KEY`.
-- El panel `/admin/productos` reutiliza la misma protección de `/admin/manual-payments`.
-- `/descarga/*` se agrega a `robots.txt` con `Disallow` + meta `noindex` (aunque migremos a Drive, para limpiar rastros SEO).
+Antes de que empiece a escribir código, confírmame:
 
-### Detalles técnicos
-
-**Archivos nuevos:**
-- `supabase/migrations/xxx_digital_products.sql`
-- `supabase/functions/manage-products/index.ts` (CRUD + sync a Stripe)
-- `src/pages/AdminProducts.tsx` (lista)
-- `src/pages/AdminProductEdit.tsx` (formulario)
-- `src/components/admin/UpsellSelector.tsx`
-- `src/hooks/useDigitalProducts.ts`
-
-**Archivos modificados:**
-- `src/App.tsx` — rutas `/admin/productos` y `/admin/productos/:sku`
-- `src/pages/AdminHome.tsx` — nueva tarjeta "Productos"
-- `src/stores/checkoutPruebaStore.ts` — leer de la tabla
-- `supabase/functions/manage-manual-payments/index.ts` — leer materiales de la tabla
-- `supabase/functions/_shared/transactional-email-templates/material-delivery.tsx` — recibir array de materiales
-- `public/robots.txt` — bloquear `/descarga/*`
-
-### Fase de entrega
-
-**Fase 1 (esta iteración):** Tabla + panel admin + migración de datos + integración con checkout y emails.
-**Fase 2 (después):** Migrar páginas de producto individuales para leer de la tabla (opcional; hoy funcionan hardcoded).
-
-¿Procedo con la Fase 1?
+1. ¿La tabla de mapeo país→moneda→pasarela está OK, o quieres cambiar algo (por ejemplo `ca.` en francés en vez de inglés)?
+2. ¿Empezamos con los 7 subdominios de la tabla, o solo con los 3 primeros (`us`, `pe`, `ca`) para probar?
+3. ¿Quieres el banner de "cambiar a tu región" activado desde el inicio, o lo dejamos para después?

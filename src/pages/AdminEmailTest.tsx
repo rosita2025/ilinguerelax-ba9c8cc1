@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck } from "lucide-react";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
@@ -123,6 +124,11 @@ const AdminEmailTest = () => {
     } catch {}
     return { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
   });
+
+  const [query, setQuery] = useState("");
+  const [sourceFilter, setSourceFilter] = useState<Source | "all">("all");
+  const [sortKey, setSortKey] = useState<"date" | "order_ref" | "principal_sku" | "upsell_sku">("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -290,6 +296,42 @@ const AdminEmailTest = () => {
     );
   };
 
+  const principalSkuOf = (r: OrderRow) => r.productLines.find((p) => p.role === "principal")?.sku || "";
+  const upsellSkusOf = (r: OrderRow) =>
+    r.productLines.filter((p) => p.role === "upsell").map((p) => p.sku || p.name).join(", ");
+
+  const toggleSort = (key: typeof sortKey) => {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir(key === "date" ? "desc" : "asc"); }
+  };
+
+  const visibleRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = rows.filter((r) => {
+      if (sourceFilter !== "all" && r.source !== sourceFilter) return false;
+      if (!q) return true;
+      return (
+        r.order_ref.toLowerCase().includes(q) ||
+        principalSkuOf(r).toLowerCase().includes(q) ||
+        upsellSkusOf(r).toLowerCase().includes(q) ||
+        r.productLines.some((p) => (p.sku || "").toLowerCase().includes(q) || p.name.toLowerCase().includes(q)) ||
+        r.email.toLowerCase().includes(q) ||
+        r.customer.toLowerCase().includes(q)
+      );
+    });
+    const dir = sortDir === "asc" ? 1 : -1;
+    list = [...list].sort((a, b) => {
+      let av = "", bv = "";
+      if (sortKey === "date") return (a.created_at < b.created_at ? 1 : -1) * dir;
+      if (sortKey === "order_ref") { av = a.order_ref; bv = b.order_ref; }
+      if (sortKey === "principal_sku") { av = principalSkuOf(a); bv = principalSkuOf(b); }
+      if (sortKey === "upsell_sku") { av = upsellSkusOf(a); bv = upsellSkusOf(b); }
+      return av.localeCompare(bv) * dir;
+    });
+    return list;
+  }, [rows, query, sourceFilter, sortKey, sortDir]);
+
+
   return (
     <>
       <AdminNav />
@@ -311,33 +353,95 @@ const AdminEmailTest = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
-              <Card key={s} className="p-4">
+              <Card
+                key={s}
+                className={`p-4 cursor-pointer transition ${sourceFilter === s ? "ring-2 ring-primary" : ""}`}
+                onClick={() => setSourceFilter(sourceFilter === s ? "all" : s)}
+              >
                 <div className="text-xs text-muted-foreground">{sourceLabel[s]}</div>
                 <div className="text-2xl font-bold mt-1">{counts[s]}</div>
               </Card>
             ))}
           </div>
 
+          <Card className="p-4 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[240px]">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por orden, SKU principal, SKU upsell, cliente o correo…"
+                className="pl-9"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(["all", "manual", "stripe", "paypal", "mercadopago", "digital"] as const).map((s) => (
+                <Button
+                  key={s}
+                  size="sm"
+                  variant={sourceFilter === s ? "default" : "outline"}
+                  onClick={() => setSourceFilter(s)}
+                >
+                  {s === "all" ? "Todos" : sourceLabel[s as Source]}
+                </Button>
+              ))}
+            </div>
+            <div className="text-xs text-muted-foreground ml-auto">
+              {visibleRows.length} de {rows.length} pedidos
+            </div>
+          </Card>
+
           <Card className="p-6">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-xs uppercase text-muted-foreground border-b">
                   <tr>
-                    <th className="text-left py-2 pr-4">Orden</th>
-                    <th className="text-left py-2 pr-4">Producto / SKU / Upsell</th>
+                    <th className="text-left py-2 pr-4">
+                      <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("order_ref")}>
+                        Orden <ArrowUpDown className="w-3 h-3" />
+                        {sortKey === "order_ref" && <span className="text-[10px]">{sortDir}</span>}
+                      </button>
+                    </th>
+                    <th className="text-left py-2 pr-4">
+                      <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("principal_sku")}>
+                        SKU principal <ArrowUpDown className="w-3 h-3" />
+                        {sortKey === "principal_sku" && <span className="text-[10px]">{sortDir}</span>}
+                      </button>
+                    </th>
+                    <th className="text-left py-2 pr-4">
+                      <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("upsell_sku")}>
+                        SKU upsell / bono <ArrowUpDown className="w-3 h-3" />
+                        {sortKey === "upsell_sku" && <span className="text-[10px]">{sortDir}</span>}
+                      </button>
+                    </th>
+                    <th className="text-left py-2 pr-4">Detalle producto</th>
                     <th className="text-left py-2 pr-3">Entrega digital</th>
                     <th className="text-left py-2 pr-3">Estado pago</th>
                     <th className="text-left py-2 pr-3">Origen</th>
                     <th className="text-left py-2 pr-3">Cliente</th>
                     <th className="text-left py-2 pr-3">Email</th>
                     <th className="text-left py-2 pr-3">Monto</th>
-                    <th className="text-left py-2">Fecha</th>
+                    <th className="text-left py-2">
+                      <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("date")}>
+                        Fecha <ArrowUpDown className="w-3 h-3" />
+                        {sortKey === "date" && <span className="text-[10px]">{sortDir}</span>}
+                      </button>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((r) => (
+                  {visibleRows.map((r) => {
+                    const pSku = principalSkuOf(r);
+                    const uSku = upsellSkusOf(r);
+                    return (
                     <tr key={r.id} className="border-b last:border-0 align-top">
                       <td className="py-3 pr-4 font-mono text-sm font-bold whitespace-nowrap">{r.order_ref}</td>
+                      <td className="py-3 pr-4 font-mono text-xs whitespace-nowrap">
+                        {pSku ? <span className="px-2 py-0.5 rounded bg-primary/10 text-primary">{pSku}</span> : <span className="text-muted-foreground">—</span>}
+                      </td>
+                      <td className="py-3 pr-4 font-mono text-xs">
+                        {uSku ? <span className="px-2 py-0.5 rounded bg-accent/10 text-accent-foreground">{uSku}</span> : <span className="text-muted-foreground">sin upsell</span>}
+                      </td>
                       <td className="py-3 pr-4 text-xs">{renderProducts(r)}</td>
                       <td className="py-3 pr-3 text-xs">
                         {r.delivery ? (
@@ -370,12 +474,14 @@ const AdminEmailTest = () => {
                       <td className="py-3 pr-3 text-xs whitespace-nowrap">{r.amount}</td>
                       <td className="py-3 whitespace-nowrap text-xs">{fmt(r.created_at)}</td>
                     </tr>
-                  ))}
-                  {rows.length === 0 && (
+                    );
+                  })}
+                  {visibleRows.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="py-10 text-center text-muted-foreground">
-                        {loading ? "Cargando pedidos…" : "Aún no hay pedidos registrados en ninguna fuente."}
+                      <td colSpan={11} className="py-10 text-center text-muted-foreground">
+                        {loading ? "Cargando pedidos…" : rows.length === 0 ? "Aún no hay pedidos registrados en ninguna fuente." : "Sin resultados para el filtro actual."}
                       </td>
+
                     </tr>
                   )}
                 </tbody>

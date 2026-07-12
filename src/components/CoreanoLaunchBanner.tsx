@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
+import { useCardPrice } from "@/hooks/useCardPrice";
+
+const COREANO_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
 
 export const CoreanoLaunchBanner = () => {
+  const cardPrice = useCardPrice();
   return (
     <section className="py-10 md:py-14 bg-gradient-to-br from-primary/5 via-background to-accent/10">
       <div className="container mx-auto px-4">

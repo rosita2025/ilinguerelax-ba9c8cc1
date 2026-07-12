@@ -3,7 +3,6 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -85,24 +84,28 @@ const AdminEmailTest = () => {
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("list-admin-orders", {
+      const { data, error } = await adminInvoke("list-admin-orders", {
         body: { adminKey },
       });
       if (error) throw error;
       const manualRes = { data: (data as any)?.manual ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
+      const funnelRes = { data: (data as any)?.funnel ?? [] };
 
       const digitalByEmail = new Map<string, any>();
+      const digitalByOrder = new Map<string, any>();
       (digitalRes.data ?? []).forEach((d: any) => {
         const k = (d.customer_email || "").toLowerCase();
         if (!digitalByEmail.has(k)) digitalByEmail.set(k, d);
+        const orderKey = (d.order_id || "").toLowerCase();
+        if (orderKey && !digitalByOrder.has(orderKey)) digitalByOrder.set(orderKey, d);
       });
 
       const merged: OrderRow[] = [];
       const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
 
       (manualRes.data ?? []).forEach((r: any) => {
-        const d = digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
+        const d = digitalByOrder.get((r.order_number || "").toLowerCase()) || digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
         merged.push({
           id: `m-${r.id}`,
           source: "manual",
@@ -116,6 +119,33 @@ const AdminEmailTest = () => {
           delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
         });
         perSource.manual++;
+      });
+
+      const matchedOrderRefs = new Set(merged.map((m) => m.order_ref.toLowerCase()).filter(Boolean));
+
+      (funnelRes.data ?? []).forEach((r: any) => {
+        let meta: any = {};
+        try { meta = r.referrer ? JSON.parse(r.referrer) : {}; } catch { meta = {}; }
+        const src = providerToSource(meta.provider || r.referrer || "");
+        if (src !== "stripe" && src !== "mercadopago" && src !== "paypal") return;
+        const orderRef = meta.external_reference || meta.payment_id || r.session_id || r.id;
+        if (matchedOrderRefs.has(String(orderRef).toLowerCase())) return;
+        const email = (meta.payer_email || meta.customer_email || "").toLowerCase();
+        const d = digitalByOrder.get(String(orderRef).toLowerCase()) || (email ? digitalByEmail.get(email) : null) || null;
+        const status = r.event_name === "purchase" || r.event_name === "Purchase" ? "approved" : String(meta.status || r.event_name || "pending").replace(/^mp_/, "");
+        merged.push({
+          id: `f-${r.id}`,
+          source: src,
+          created_at: r.created_at,
+          order_ref: String(orderRef || "—"),
+          customer: meta.customer_name || "—",
+          email: email || "—",
+          products: r.product_id || meta.items_summary || "—",
+          amount: `${r.currency || ""} ${Number(r.value ?? 0).toFixed(2)}`.trim(),
+          status,
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+        });
+        perSource[src]++;
       });
 
       const matchedEmails = new Set(merged.map((m) => m.email.toLowerCase()));

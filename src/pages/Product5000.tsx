@@ -281,9 +281,26 @@ const Product5000 = () => {
   };
 
   const handleBuy = async () => {
+    if (!pricing5000Ready) return;
     handleBuyClick();
+    if (useTiendaOnly) {
+      clearCart();
+      addItem({
+        id: "5000-palabras-ingles",
+        name: "Inglés Relax · 5,000 Palabras (Digital PDF)",
+        price: priceUSD,
+        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+        pricePen: pricePen ?? undefined,
+        image: "/images/product-5000-book.webp",
+        description: "5,000 palabras del inglés con pronunciación en español y fonética UK/USA",
+        quantity: 1,
+      });
+      sonnerToast.success("Producto agregado al carrito");
+      navigate(TIENDA_CHECKOUT_5000);
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 400));
-    window.open(buyUrl, "_blank");
+    window.open(buyUrl, "_blank", "noopener,noreferrer");
   };
   return (
     <main className="min-h-screen bg-background">

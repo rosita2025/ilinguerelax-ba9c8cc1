@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast as sonnerToast } from "sonner";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,12 +8,14 @@ import { FAQ } from "@/components/FAQ";
 import { ProductReviews } from "@/components/ProductReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart } from "lucide-react";
+import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart, Store } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { CountryFlagSelector } from "@/components/CountryFlagSelector";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
@@ -71,11 +75,14 @@ const ProductCoreanoRelax = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const clearCart = useCheckoutPruebaStore((s) => s.clear);
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const localPrice = useCampaignPrice(10, 54);
   const flag = CURRENCY_FLAG[localPrice.currency] || COUNTRY_FLAG[localPrice.countryCode] || "🌎";
   const showLocal = localPrice.currency !== "USD";
 
-  const handleBuy = () => {
+  const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Coreano Sin Complicaciones - 100 Mapas Mentales",
       content_category: "Digital Book",
@@ -85,7 +92,25 @@ const ProductCoreanoRelax = () => {
       currency: "USD",
       num_items: 1,
     });
+
+  const handleBuyHotmart = () => {
+    trackInitiate();
     window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
+  };
+
+  const handleBuyStore = () => {
+    trackInitiate();
+    clearCart();
+    addItem({
+      id: "coreano-100-mapas",
+      name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
+      price: 10,
+      image: "/images/product-coreano-100-mapas.webp",
+      description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
+      quantity: 1,
+    });
+    sonnerToast.success("Producto agregado al carrito");
+    navigate("/checkouts/coreano-100-mapas");
   };
 
 
@@ -182,13 +207,17 @@ const ProductCoreanoRelax = () => {
               </motion.div>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
-                <div className="block">
-                  <Button onClick={handleBuy} size="lg" className="w-full text-lg py-7 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
+                    <Store className="w-5 h-5 mr-2" />
+                    Tienda iLingue · $10
+                  </Button>
+                  <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
                     <ShoppingCart className="w-5 h-5 mr-2" />
-                    Comprar $10
+                    Hotmart · $10
                   </Button>
                 </div>
-                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática</p>
+                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
               </motion.div>
 
             </div>
@@ -351,33 +380,23 @@ const ProductCoreanoRelax = () => {
       <WhatsAppButton url="https://wa.link/ghi4rw" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
 
-      {/* Sticky Buy Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t border-border shadow-2xl">
-        <div className="container px-3 py-2 flex flex-col items-stretch gap-1.5">
-          <div className="flex items-baseline justify-center gap-2 leading-none flex-wrap">
-            <span className="text-xl font-black text-foreground">$10 USD</span>
-            {showLocal && (
-              <span className="text-xs font-bold text-primary">{flag} ≈ {localPrice.price}</span>
-            )}
-            <span className="text-xs text-muted-foreground line-through">$54</span>
-          </div>
-
-          <a
-            href={HOTMART_URL}
-            onClick={(event) => {
-              event.preventDefault();
-              handleBuy();
-            }}
-            className="w-full"
-          >
-            <Button size="lg" className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-black shadow-hero text-sm sm:text-base h-11">
-              <ShoppingCart className="w-4 h-4 mr-1.5 flex-shrink-0" />
-              <span className="truncate">COMPRAR AHORA</span>
-            </Button>
-          </a>
-        </div>
-      </div>
+      {/* Sticky Buy Bar — dos botones: Tienda iLingue + Hotmart */}
+      <StickyBuyBar
+        price={showLocal ? `${localPrice.price} ${localPrice.currency}` : "$10"}
+        originalPrice="$54"
+        currencyCode={localPrice.currency}
+        flag={flag}
+        productName="Coreano · +100 Mapas Mentales"
+        ctaText="TIENDA ILINGUE · $10"
+        onBuyClick={handleBuyStore}
+        secondaryCtaText="HOTMART"
+        onSecondaryClick={handleBuyHotmart}
+        rating={4.9}
+        reviewCount={120}
+        lang="es"
+      />
       <div className="h-28 md:h-24" aria-hidden />
+
 
       {/* Floating WhatsApp help button */}
 

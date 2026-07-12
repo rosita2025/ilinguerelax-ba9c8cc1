@@ -41,6 +41,10 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState<string>("all");
+  const [view, setView] = useState<"grid" | "table">(() => (localStorage.getItem("adminProductsView") as "grid" | "table") || "grid");
+
+  useEffect(() => { localStorage.setItem("adminProductsView", view); }, [view]);
+
 
   const load = async () => {
     setLoading(true);

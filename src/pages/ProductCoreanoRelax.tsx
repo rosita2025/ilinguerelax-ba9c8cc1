@@ -380,33 +380,23 @@ const ProductCoreanoRelax = () => {
       <WhatsAppButton url="https://wa.link/ghi4rw" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
 
-      {/* Sticky Buy Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t border-border shadow-2xl">
-        <div className="container px-3 py-2 flex flex-col items-stretch gap-1.5">
-          <div className="flex items-baseline justify-center gap-2 leading-none flex-wrap">
-            <span className="text-xl font-black text-foreground">$10 USD</span>
-            {showLocal && (
-              <span className="text-xs font-bold text-primary">{flag} ≈ {localPrice.price}</span>
-            )}
-            <span className="text-xs text-muted-foreground line-through">$54</span>
-          </div>
-
-          <a
-            href={HOTMART_URL}
-            onClick={(event) => {
-              event.preventDefault();
-              handleBuy();
-            }}
-            className="w-full"
-          >
-            <Button size="lg" className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-black shadow-hero text-sm sm:text-base h-11">
-              <ShoppingCart className="w-4 h-4 mr-1.5 flex-shrink-0" />
-              <span className="truncate">COMPRAR AHORA</span>
-            </Button>
-          </a>
-        </div>
-      </div>
+      {/* Sticky Buy Bar — dos botones: Tienda iLingue + Hotmart */}
+      <StickyBuyBar
+        price={showLocal ? `${localPrice.price} ${localPrice.currency}` : "$10"}
+        originalPrice="$54"
+        currencyCode={localPrice.currency}
+        flag={flag}
+        productName="Coreano · +100 Mapas Mentales"
+        ctaText="TIENDA ILINGUE · $10"
+        onBuyClick={handleBuyStore}
+        secondaryCtaText="HOTMART"
+        onSecondaryClick={handleBuyHotmart}
+        rating={4.9}
+        reviewCount={120}
+        lang="es"
+      />
       <div className="h-28 md:h-24" aria-hidden />
+
 
       {/* Floating WhatsApp help button */}
 

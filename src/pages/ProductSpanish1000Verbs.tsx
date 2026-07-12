@@ -9,9 +9,10 @@ import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const productImage = "/images/product-spanish-1000-verbs.png";
-const PRICE = "12.00";
+const PRICE_FALLBACK = 12;
 
 const features = [
   "1,000 essential Spanish verbs",

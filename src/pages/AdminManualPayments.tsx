@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
@@ -36,11 +36,11 @@ const AdminManualPayments = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("manage-manual-payments", {
+      const { data, error } = await adminInvoke("manage-manual-payments", {
         body: { action: "list", adminKey },
       });
       if (error) throw error;
-      setOrders(data?.orders ?? []);
+      setOrders(((data as { orders?: ManualPayment[] } | null)?.orders) ?? []);
     } catch {
       toast({ title: "Error al cargar órdenes", variant: "destructive" });
     } finally {
@@ -52,7 +52,7 @@ const AdminManualPayments = () => {
 
   const runAction = async (action: "verify" | "reject" | "reset", orderId: string) => {
     try {
-      const { error } = await supabase.functions.invoke("manage-manual-payments", {
+      const { error } = await adminInvoke("manage-manual-payments", {
         body: { action, orderId, adminKey },
       });
       if (error) throw error;

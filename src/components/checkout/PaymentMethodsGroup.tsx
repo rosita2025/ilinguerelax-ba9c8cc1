@@ -334,7 +334,7 @@ export function PaymentMethodsGroup() {
         amount_local: local.loading ? null : Number(local.amount ?? totalUsd),
         currency_local: local.currency || "USD",
         method: "yape_plin",
-        items: s.items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+        items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
       });
     } catch (e) {

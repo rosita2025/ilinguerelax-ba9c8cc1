@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
+import { normalizeSkus } from "../_shared/digitalSku.ts";
 
 const ItemSchema = z.object({
   id: z.string().min(1).max(64),
@@ -82,6 +83,11 @@ Deno.serve(async (req) => {
       currency_id: "USD",
       unit_price: Number((item.price * discountMultiplier).toFixed(2)),
     }));
+    const productSummary = body.items
+      .map((i) => `${i.quantity}x ${i.name}`)
+      .join(" · ")
+      .slice(0, 300);
+    const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
 
     // Webhook URL — Mercado Pago llamará aquí en cada cambio de estado del pago.
     // Sin esto el webhook nunca se dispara (fue el bug encontrado en el test live).
@@ -109,6 +115,11 @@ Deno.serve(async (req) => {
         coupon_percent: body.couponPercent,
         total_usd: calculatedTotalUsd,
         item_count: body.items.reduce((sum, item) => sum + item.quantity, 0),
+        items_summary: productSummary,
+        skus: deliverySkus,
+        customer_email: body.payerEmail ?? "",
+        customer_name: body.payerName ?? "",
+        customer_phone: body.payerPhone ?? "",
       },
       // Filtrar tipos según selección del cliente
       payment_methods: {

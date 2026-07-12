@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
+import { normalizeSkus } from "../_shared/digitalSku.ts";
 
 const ItemSchema = z.object({
   id: z.string().min(1).max(64),
@@ -89,6 +90,7 @@ Deno.serve(async (req) => {
       .map((i) => `${i.quantity}x ${i.name}`)
       .join(" · ")
       .slice(0, 300);
+    const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
 
     const session = await stripe.checkout.sessions.create({
       line_items,
@@ -110,7 +112,7 @@ Deno.serve(async (req) => {
         coupon_percent: String(body.couponPercent),
         items_count: String(body.items.length),
         items_summary: productSummary,
-        skus: body.items.map((i) => i.id).join(",").slice(0, 490),
+        skus: deliverySkus,
       },
     });
 

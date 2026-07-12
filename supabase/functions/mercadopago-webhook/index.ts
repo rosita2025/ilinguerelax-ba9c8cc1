@@ -4,6 +4,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
+import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 
 const encoder = new TextEncoder();
 
@@ -78,6 +79,14 @@ const fetchPlan = (id: string) => mpGet(`/preapproval_plan/${id}`);
 const fetchSubscription = (id: string) => mpGet(`/preapproval/${id}`);
 const fetchInvoice = (id: string) => mpGet(`/authorized_payments/${id}`);
 const fetchMerchantOrder = (id: string) => mpGet(`/merchant_orders/${id}`);
+
+function getPaymentSkus(payment: any): string[] {
+  return normalizeSkus([
+    ...splitSkuList(payment.metadata?.skus),
+    ...splitSkuList(payment.metadata?.sku),
+    ...((payment.additional_info?.items ?? []).map((item: any) => item?.id || item?.title) as string[]),
+  ]);
+}
 
 const ALERT_TO = "hola@ilinguerelax.com";
 const ALERT_FROM = "Alertas ILINGUE <hola@ilinguerelax.com>";
@@ -224,7 +233,7 @@ Deno.serve(async (req) => {
             status_detail: payment.status_detail,
             payment_method: payment.payment_method_id,
             payment_type: payment.payment_type_id,
-            payer_email: payment.payer?.email,
+            payer_email: payment.payer?.email || payment.metadata?.customer_email,
             preference_id: payment.metadata?.preference_id,
             external_reference: payment.external_reference,
           },
@@ -233,7 +242,7 @@ Deno.serve(async (req) => {
         // Send pending-payment emails for transferencia/efectivo/ticket/atm
         // so the customer keeps a receipt if the tab/battery dies.
         const isPending = payment.status === "pending" || payment.status === "in_process";
-        const payerEmail = payment.payer?.email;
+        const payerEmail = payment.payer?.email || payment.metadata?.customer_email;
         if (isPending && payerEmail) {
           const orderNumber = payment.external_reference || `MP-${payment.id}`;
           const method = payment.payment_type_id === "ticket"
@@ -244,11 +253,11 @@ Deno.serve(async (req) => {
                 ? "Cajero / ATM (Mercado Pago)"
                 : `Mercado Pago (${payment.payment_method_id || payment.payment_type_id || "pendiente"})`;
           const customerName = [payment.payer?.first_name, payment.payer?.last_name]
-            .filter(Boolean).join(" ") || payerEmail.split("@")[0];
+            .filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail.split("@")[0];
           const templateData = {
             orderNumber,
             customerName,
-            productName: payment.description || "Producto ILINGUE RELAX",
+            productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
             amount: payment.transaction_amount ?? null,
             currency: payment.currency_id || "PEN",
             method,
@@ -286,21 +295,47 @@ Deno.serve(async (req) => {
         // Approved payment → send customer thank-you + admin-sale notification
         if (payment.status === "approved" && payerEmail) {
           const customerName = [payment.payer?.first_name, payment.payer?.last_name]
-            .filter(Boolean).join(" ") || payerEmail.split("@")[0];
+            .filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail.split("@")[0];
+          const orderNumber = payment.external_reference || `ILR-MP-${payment.id}`;
           try {
             await sendThankYouEmail({
               customerEmail: payerEmail,
               customerName,
+              customerPhone: payment.metadata?.customer_phone || undefined,
               customerCountry: payment.payer?.address?.country_id || undefined,
-              productName: payment.description || "Producto ILINGUE RELAX",
+              productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
               amount: payment.transaction_amount ?? undefined,
               currency: payment.currency_id || "PEN",
               provider: "mercadopago",
-              orderNumber: payment.external_reference || `ILR-MP-${payment.id}`,
+              orderNumber,
               idempotencyKey: `mp-approved-${payment.id}`,
             });
           } catch (e) {
             console.error("MP approved emails failed:", e);
+          }
+          try {
+            const skus = getPaymentSkus(payment);
+            if (skus.length > 0) {
+              const { error: digitalErr } = await supabase.functions.invoke("send-digital-ilinguerelax", {
+                body: {
+                  customerEmail: payerEmail,
+                  customerName,
+                  customerPhone: payment.metadata?.customer_phone || undefined,
+                  customerCountry: payment.payer?.address?.country_id || undefined,
+                  orderId: orderNumber,
+                  skus,
+                  amount: payment.transaction_amount ?? undefined,
+                  currency: payment.currency_id || "PEN",
+                  provider: "mercadopago",
+                  idempotencyKey: `digital:mp:${payment.id}`,
+                },
+              });
+              if (digitalErr) console.error("MP digital delivery failed:", digitalErr);
+            } else {
+              console.warn("MP approved payment has no delivery SKUs", { payment_id: payment.id, external_reference: payment.external_reference });
+            }
+          } catch (e) {
+            console.error("MP digital delivery exception:", e);
           }
         }
         break;

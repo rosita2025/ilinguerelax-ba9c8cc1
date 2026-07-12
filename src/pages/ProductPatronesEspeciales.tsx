@@ -25,7 +25,6 @@ import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
-const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
 // Perú → tienda interna PEN. VE/CU/NI → tienda interna USD. Global → tienda interna USD.
@@ -35,32 +34,6 @@ const LATAM_HOTMART_COUNTRIES = new Set([
   "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PR", "UY",
 ]);
 
-const EUROPE_CODES = new Set([
-  "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",
-  "LU","CZ","HU","RO","BG","HR","SI","SK","EE","LV","LT","MT","CY","IS","LI","AD",
-  "MC","SM","VA","GB","UA","RS","BA","MK","AL","ME","MD","BY","XK",
-]);
-const ASIA_CODES = new Set([
-  "JP","KR","CN","HK","TW","SG","MY","TH","VN","ID","PH","IN","PK","BD","LK","NP",
-  "MM","KH","LA","BN","MN","MO","AE","SA","IL","QA","KW","BH","OM","JO","LB","IQ",
-  "IR","YE","SY","TR","KZ","UZ","TM","KG","TJ","AF","AZ","AM","GE",
-]);
-
-function getRegionalPricing(countryCode: string) {
-  if (countryCode === "CA") {
-    return { url: HOTMART_URL_INTL, price: "CA$ 25.20", original: "CA$ 62.00", isIntl: true };
-  }
-  if (countryCode === "US") {
-    return { url: HOTMART_URL_INTL, price: "$15.00 USD", original: "$37.00 USD", isIntl: true };
-  }
-  if (EUROPE_CODES.has(countryCode)) {
-    return { url: HOTMART_URL_INTL, price: "14,56 €", original: "36,00 €", isIntl: true };
-  }
-  if (ASIA_CODES.has(countryCode)) {
-    return { url: HOTMART_URL_INTL, price: "$15.00 USD", original: "$37.00 USD", isIntl: true };
-  }
-  return { url: HOTMART_URL_LATAM, price: null, original: null, isIntl: false };
-}
 const productImage = "/images/product-patrones-especiales.webp";
 
 import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
@@ -107,13 +80,11 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
-  const { countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
   const region = useRegionTier();
-  const visitorCountry = (region.country || countryCode || "").toUpperCase();
+  const visitorCountry = (region.country || "").toUpperCase();
   const isPeru = visitorCountry === "PE";
   const isTiendaUsdCountry = TIENDA_USD_COUNTRIES.has(visitorCountry);
   const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(visitorCountry);
@@ -125,8 +96,7 @@ const ProductPatronesEspeciales = () => {
   const PRICE_USD = isTiendaUsdCountry ? TIENDA_USD : useHotmartLatam ? LATAM_USD : GLOBAL_USD;
   const pricingReady = pricingAdmin.loaded && (isPeru ? (pricingAdmin.pricePen ?? 0) > 0 : PRICE_USD > 0);
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
-  const regional = getRegionalPricing(countryCode);
-  // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
+  // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
   const priceLabel = isPeru && pricingAdmin.pricePen
     ? `S/ ${pricingAdmin.pricePen.toFixed(2)}`
     : (useTiendaOnly ? `$${PRICE_USD.toFixed(2)} USD` : `$${PRICE_USD.toFixed(2)} USD`);

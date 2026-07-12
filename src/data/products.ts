@@ -410,6 +410,37 @@ export const products: Product[] = [
   },
 ];
 
+// Attach learner/target language metadata. Keeps the product blocks above untouched
+// while enabling the "Hablo → Quiero aprender" filter on /products.
+const LEARNER_TARGET: Record<string, [LangCode, LangCode]> = {
+  "coreano-relax": ["es", "ko"],
+  "patrones-especiales": ["es", "en"],
+  "5000": ["es", "en"],
+  "8000": ["es", "en"],
+  "5000-book": ["es", "en"],
+  "8000-book": ["es", "en"],
+  "spanish-5000": ["en", "es"],
+  "spanish-5000-digital": ["en", "es"],
+  "spanish-1000-verbs": ["en", "es"],
+  "spanish-3000-verbs-book": ["en", "es"],
+  "spanish-grammar-patterns": ["en", "es"],
+  "spanish-500-questions": ["en", "es"],
+  "1000-verbos": ["es", "en"],
+  "500-preguntas": ["es", "en"],
+  "german-5000": ["es", "de"],
+  "portuguese-5000": ["es", "pt"],
+  "italian-5000": ["es", "it"],
+  "dutch-5000": ["es", "nl"],
+  "french-5000": ["es", "fr"],
+};
+for (const p of products) {
+  const lt = LEARNER_TARGET[p.id];
+  if (lt) {
+    p.learnerLanguage = lt[0];
+    p.targetLanguage = lt[1];
+  }
+}
+
 export const comingSoonLanguages = [
   { name: "Japonés", flag: "🇯🇵" },
   { name: "Chino", flag: "🇨🇳" },

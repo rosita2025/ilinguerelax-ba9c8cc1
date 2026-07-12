@@ -114,15 +114,15 @@ const ProductCoreanoRelax = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Coreano Sin Complicaciones · +100 Mapas Mentales para Aprender Coreano de Forma Natural"
-        description="Aprende coreano de manera visual, sencilla y entretenida con +100 mapas mentales. Conecta el idioma con los k-dramas, el K-pop y la cultura coreana moderna. Ideal para principiantes (A1–A2)."
+        title="Aprender Coreano PDF · +100 Mapas Mentales"
+        description="Aprende coreano desde cero con +100 mapas mentales visuales, alfabeto hangul y vocabulario K-pop y K-dramas. PDF descargable, nivel A1–A2."
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
         image={`https://ilinguerelax.com${coverAsset.url}`}
         type="product"
         price="10"
         originalPrice="54"
         sku="ILINGUE-COREANO-100MM"
-        keywords="coreano sin complicaciones, aprender coreano, mapas mentales coreano, alfabeto hangul, kpop, kdramas, coreano para hispanohablantes"
+        keywords="aprender coreano desde cero, coreano para hispanohablantes, mapas mentales coreano, alfabeto hangul pdf, curso de coreano pdf, vocabulario coreano, coreano kpop, coreano kdramas, libro para aprender coreano, coreano A1 A2, ebook coreano"
       />
       <Navbar />
 

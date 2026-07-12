@@ -161,14 +161,14 @@ const ProductSpanish3000VerbsBook = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Pre-Order: 3,000 Spanish Verbs Mastery — Past, Present & Future Physical Book"
-        description="Pre-order the 3,000 Spanish Verbs Mastery physical book at $17 USD (regular $39). Past, Present & Future with English pronunciation. Professional, Aggressive & Social verbs. Ships June 2026."
+        title="Pre-Order: 3,000 Spanish Verbs Physical Book"
+        description="Pre-order 3,000 Spanish Verbs Mastery at $17 (reg. $39). Past, present & future with English pronunciation. Professional, social & aggressive verbs. Ships 2026."
         canonicalUrl="https://ilinguerelax.com/products/3-000-spanish-verbs-mastery-physical-book-preorder"
         image={`https://ilinguerelax.com${COVER_IMAGE_PUBLIC}`}
         type="product"
         price={String(PREORDER_PRICE)}
         sku="ILINGUE-SPANISH-3000-VERBS-BOOK"
-        keywords="3000 Spanish verbs, Spanish verbs book, past present future Spanish, Spanish verbs English pronunciation, pre-order Spanish verbs, Spanish Relax verbs"
+        keywords="3000 Spanish verbs, Spanish verbs book, Spanish verbs mastery, learn Spanish verbs fast, Spanish verb conjugation book, Spanish verbs with English pronunciation, Spanish for English speakers, pre-order Spanish book, Spanish Relax verbs, physical Spanish book"
         availability="PreOrder"
         isPhysical={true}
       />

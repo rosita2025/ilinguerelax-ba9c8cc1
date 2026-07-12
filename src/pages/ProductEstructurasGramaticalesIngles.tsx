@@ -139,8 +139,8 @@ const ProductEstructurasGramaticalesIngles = () => {
   return (
     <main className="min-h-screen bg-[#04102a] text-white">
       <SEO
-        title="Estructuras Gramaticales de Inglés Desde Cero Hasta Avanzado | iLingue Relax®"
-        description="Aprende gramática inglesa desde cero hasta avanzado con más de 150 estructuras esenciales. Método práctico para hispanohablantes. Acceso inmediato."
+        title="Gramática Inglesa PDF · Estructuras A1 a C1"
+        description="150+ estructuras gramaticales del inglés explicadas paso a paso, del nivel A1 al C1. Método práctico para hispanohablantes. PDF con acceso inmediato."
         canonicalUrl="https://ilinguerelax.com/products/estructuras-gramaticales-ingles-a1-c1"
         type="product"
         price="12.00"
@@ -148,7 +148,7 @@ const ProductEstructurasGramaticalesIngles = () => {
         rating="4.9"
         reviewCount="320"
         sku="ILR-GRAMMAR-A1C1"
-        keywords="gramática inglesa, aprender inglés desde cero, estructuras gramaticales en inglés, curso de gramática inglesa, inglés para hispanohablantes, ebook de inglés, inglés avanzado, inglés básico, iLingue Relax"
+        keywords="gramática inglesa, gramática inglesa pdf, estructuras gramaticales en inglés, curso de gramática inglesa, aprender gramática inglés desde cero, tiempos verbales en inglés, inglés A1 A2 B1 B2 C1, inglés para hispanohablantes, ebook gramática inglés, gramática inglesa fácil"
       />
 
       <Navbar />

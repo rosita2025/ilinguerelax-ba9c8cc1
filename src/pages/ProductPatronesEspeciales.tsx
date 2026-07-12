@@ -199,8 +199,8 @@ const ProductPatronesEspeciales = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title={`Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés | ${priceLabel}`}
-        description="Domina la pronunciación en inglés con patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Método fácil para hispanohablantes paso a paso. Ebook digital Inglés Relax."
+        title={`Patrones y Pronunciación en Inglés PDF · ${priceLabel}`}
+        description="Domina la pronunciación en inglés: patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Ebook PDF para hispanohablantes."
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image="https://ilinguerelax.com/images/product-patrones-especiales.webp"
         type="product"
@@ -209,7 +209,7 @@ const ProductPatronesEspeciales = () => {
         rating="4.9"
         reviewCount="6"
         sku="ILINGUE-PATRONES-ESP"
-        keywords="patrones especiales inglés, combinaciones secretas inglés, pronunciación inglés para hispanohablantes, letras mudas inglés, ebook aprender inglés, inglés relax, pronunciación fácil inglés"
+        keywords="pronunciación en inglés, patrones de pronunciación inglés, letras mudas en inglés, combinaciones de letras inglés, alfabeto en inglés con pronunciación, cómo pronunciar en inglés, mejorar pronunciación inglés, fonética inglés para hispanohablantes, ebook pronunciación inglés pdf, contracciones en inglés"
         reviews={productReviews}
         faqItems={[
           { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },

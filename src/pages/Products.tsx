@@ -140,10 +140,10 @@ const Products = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Libros Digitales de Inglés con Pronunciación - Catálogo"
-        description="Libros digitales para aprender inglés: 5,000 y 8,000 palabras con pronunciación adaptada para hispanohablantes. Fonética UK/USA. Descarga inmediata desde $10."
+        title="Catálogo iLingue Relax · Libros de Idiomas PDF"
+        description="Libros y ebooks para aprender inglés, coreano, francés, alemán, italiano, portugués y neerlandés con pronunciación en español. Descarga inmediata desde $10."
         canonicalUrl="https://ilinguerelax.com/products"
-        keywords="comprar libros inglés digital, vocabulario inglés 5000 8000 palabras, libros pronunciación inglés español, diccionario inglés fonética UK USA, aprender inglés hispanohablantes"
+        keywords="libros para aprender idiomas, aprender inglés pdf, aprender coreano pdf, aprender francés pdf, aprender alemán pdf, aprender italiano pdf, aprender portugués pdf, aprender neerlandés pdf, ebooks de idiomas, libros con pronunciación en español, catálogo iLingue Relax, cursos de idiomas para hispanohablantes"
         productList={products.map((product) => ({
           name: product.title,
           description: product.description,

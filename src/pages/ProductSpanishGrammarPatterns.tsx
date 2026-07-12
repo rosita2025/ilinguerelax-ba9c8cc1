@@ -143,14 +143,14 @@ const ProductSpanishGrammarPatterns = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Grammar Patterns A1-C1 Mastery — Spanish Sentence Builder Book"
-        description="Grammar Patterns A1-C1 Mastery — $45 USD. 1,500+ Spanish grammar patterns from A1 to C1. Lego-style sentence building. Available now, ships worldwide."
+        title="Spanish Grammar Patterns Book · A1 to C1"
+        description="1,500+ Spanish grammar patterns from A1 to C1 in one Lego-style sentence builder book. For English speakers. $45 USD, ships worldwide."
         canonicalUrl="https://ilinguerelax.com/products/spanish-grammar-patterns-a1-c1-mastery-preorder"
         image={`https://ilinguerelax.com${COVER_IMAGE_PUBLIC}`}
         type="product"
         price={String(PRICE)}
         sku="ILINGUE-SPANISH-GRAMMAR-PATTERNS"
-        keywords="Spanish grammar patterns, A1 C1 Spanish, Spanish sentence builder, Spanish grammar book, Spanish Relax grammar"
+        keywords="Spanish grammar book, Spanish grammar patterns, Spanish sentence builder, learn Spanish grammar, Spanish grammar A1 to C1, Spanish for English speakers, Spanish grammar exercises, best Spanish grammar book, Spanish Relax grammar, Spanish structure book"
         availability="InStock"
         isPhysical={true}
       />

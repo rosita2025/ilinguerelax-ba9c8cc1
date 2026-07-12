@@ -64,8 +64,8 @@ const Product500Preguntas = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="500 Preguntas en Inglés con Pronunciación para Hispanohablantes"
-        description="Aprende 500 preguntas esenciales en inglés con pronunciación adaptada para hispanohablantes. Habla sin miedo en situaciones reales. Descarga inmediata."
+        title="500 Preguntas en Inglés PDF con Pronunciación"
+        description="500 preguntas reales en inglés con pronunciación en español para conversar sin miedo en el trabajo, viajes y día a día. PDF descargable al instante."
         canonicalUrl="https://ilinguerelax.com/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
@@ -74,7 +74,7 @@ const Product500Preguntas = () => {
         rating="4.7"
         reviewCount="280"
         sku="ILINGUE-500-PREGUNTAS"
-        keywords="preguntas en inglés, aprender preguntas inglés, pronunciación inglés hispanohablantes, conversación inglés"
+        keywords="preguntas en inglés, 500 preguntas en inglés, preguntas comunes en inglés, preguntas y respuestas en inglés, conversaciones en inglés, hablar inglés desde cero, inglés para viajar, inglés para entrevistas de trabajo, preguntas en inglés con pronunciación, ebook inglés conversacional"
       />
 
       <Navbar />

@@ -199,8 +199,8 @@ const ProductSpanish5000Digital = () => {
         <link rel="preload" as="image" href={productDigitalImage} />
       </Helmet>
       <SEO
-        title="Spanish Relax — 5,000 Spanish Words (Digital PDF) · $22"
-        description="Digital-only PDF: 5,000 essential Spanish words with English pronunciation. 3 free bonuses included. Special launch price $22 (was $35). Instant download."
+        title="5,000 Spanish Words PDF · English Pronunciation"
+        description="Digital PDF with 5,000 essential Spanish words and English pronunciation. 3 free bonuses. Launch price $22 (was $35). Instant download."
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
         image="https://ilinguerelax.com/product-spanish-5000.png"
         type="product"
@@ -209,7 +209,7 @@ const ProductSpanish5000Digital = () => {
         rating="4.8"
         reviewCount="500"
         sku="SPANISH-5000-DIGITAL"
-        keywords="Spanish Relax digital, 5000 Spanish words PDF, learn Spanish, Spanish for English speakers, Spanish pronunciation PDF"
+        keywords="5000 Spanish words pdf, learn Spanish vocabulary, Spanish for English speakers, Spanish pronunciation guide, best Spanish ebook, Spanish A1 to C1, Spanish Relax digital, Spanish vocabulary book pdf, download Spanish book, Spanish for beginners"
       />
       <Navbar />
 

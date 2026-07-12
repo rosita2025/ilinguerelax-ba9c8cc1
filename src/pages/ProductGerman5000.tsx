@@ -79,15 +79,15 @@ const ProductGerman5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Alemán con Pronunciación para Hispanohablantes y Fonética Alemana"
-        description="Aprende 5,000 palabras en alemán con pronunciación adaptada para hispanohablantes y fonética alemana (IPA). Muy pronto disponible."
+        title="5,000 Palabras en Alemán PDF con Pronunciación"
+        description="Aprende 5,000 palabras en alemán con pronunciación en español y fonética alemana (IPA). Nivel A1–C1. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
         price="12"
         originalPrice="54"
         sku="ILINGUE-GERMAN-5000"
-        keywords="palabras en alemán, aprender alemán, pronunciación alemán hispanohablantes, fonética alemana, alemán para hispanohablantes"
+        keywords="aprender alemán desde cero, 5000 palabras en alemán, vocabulario en alemán pdf, alemán para hispanohablantes, pronunciación alemán en español, libro de alemán pdf, ebook alemán, curso de alemán online, alemán A1 A2 B1, fonética alemana IPA"
       />
 
       <Navbar />

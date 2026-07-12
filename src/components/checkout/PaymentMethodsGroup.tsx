@@ -203,7 +203,7 @@ export function PaymentMethodsGroup() {
 
       const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
         body: {
-          orderId: `ilr-prueba-${Date.now()}`,
+          orderId: `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
           items: s.items.map((i) => {
             const abs = i.image && /^https?:\/\//i.test(i.image)
               ? i.image

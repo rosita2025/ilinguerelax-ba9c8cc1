@@ -36,7 +36,7 @@ export function MercadoPagoButton() {
 
     const latestCart = useCheckoutPruebaStore.getState();
     const latestTotals = calcTotals(latestCart.items, latestCart.couponPercent, region.tier);
-    const orderId = `ilr-prueba-${Date.now()}`;
+    const orderId = `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
     if (latestCart.items.length === 0) {
       toast({ title: "Carrito vacío", variant: "destructive" });

@@ -127,7 +127,8 @@ export default function Checkout() {
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
-      const priceTienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0 ? Number((data as any).price_usd_tienda) : null;
+      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null };
+      const priceTienda = rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0 ? Number(rowWithTienda.price_usd_tienda) : null;
       const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
       setDbItem({
         id: staticItem?.id ?? data.sku,
@@ -163,6 +164,7 @@ export default function Checkout() {
     : null;
   const catalogItem = dbItem ?? mergedFromStatic;
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
+  const upsellsFingerprint = JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []);
 
 
   // Auto-load product from URL slug (Shopify-style). Also live-syncs price/image/upsells
@@ -202,7 +204,7 @@ export default function Checkout() {
     catalogItem?.regionPrices?.tienda,
     catalogItem?.image,
     catalogItem?.name,
-    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []),
+    upsellsFingerprint,
   ]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they

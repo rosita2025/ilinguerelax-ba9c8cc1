@@ -106,6 +106,10 @@ const VALID_COUPONS: Record<string, number> = {
   PRUEBA1: 90,
 };
 
+interface PersistedCheckoutState {
+  items?: PruebaItem[];
+}
+
 export const useCheckoutPruebaStore = create<PruebaStore>()(
   persist(
     (set, get) => ({
@@ -189,13 +193,14 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       storage: createJSONStorage(() => localStorage),
       // Bump de versión para purgar caches con productos demo antiguos.
       version: 4,
-      migrate: (persisted: any, _fromVersion) => {
-        if (persisted && Array.isArray(persisted.items)) {
-          persisted.items = persisted.items.filter(
+      migrate: (persisted: unknown, _fromVersion) => {
+        const state = persisted as PersistedCheckoutState | null;
+        if (state && Array.isArray(state.items)) {
+          state.items = state.items.filter(
             (i: PruebaItem) => !PHANTOM_IDS.has(i.id),
           );
         }
-        return persisted;
+        return state;
       },
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<PruebaStore>;

@@ -4,7 +4,12 @@ import { fr } from "./translations/fr";
 import { pt } from "./translations/pt";
 
 export type Language = "es" | "en" | "fr" | "pt";
-export type Currency = "USD" | "EUR" | "BRL" | "MXN" | "COP" | "ARS" | "GBP" | "CAD" | "AUD" | "PEN";
+export type Currency =
+  | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
+  | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
+  | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "PYG" | "UYU" | "HTG"
+  | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
+  | "JPY" | "KRW" | "CNY" | "INR";
 
 export const translations = {
   es,
@@ -103,49 +108,29 @@ export const detectLanguageFromCountry = (countryCode: string): Language => {
 // Country to currency mapping
 const countryToCurrency: Record<string, Currency> = {
   // USD countries
-  US: "USD",
-  EC: "USD", // Ecuador uses USD
-  SV: "USD", // El Salvador uses USD
-  PA: "USD", // Panama uses USD
-  
-  // EUR countries
-  ES: "EUR",
-  FR: "EUR",
-  DE: "EUR",
-  IT: "EUR",
-  PT: "EUR",
-  NL: "EUR",
-  BE: "EUR",
-  AT: "EUR",
-  IE: "EUR",
-  FI: "EUR",
-  GR: "EUR",
-  
+  US: "USD", EC: "USD", SV: "USD", PA: "USD", PR: "USD",
+
+  // EUR
+  ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR", NL: "EUR",
+  BE: "EUR", AT: "EUR", IE: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
+
   // GBP
-  GB: "GBP",
-  UK: "GBP",
-  
-  // BRL
-  BR: "BRL",
-  
-  // MXN
-  MX: "MXN",
-  
-  // COP
-  CO: "COP",
-  
-  // ARS
-  AR: "ARS",
-  
-  // CAD
-  CA: "CAD",
+  GB: "GBP", UK: "GBP",
 
-  // AUD
-  AU: "AUD",
-  NZ: "AUD",
+  // Otras principales
+  BR: "BRL", MX: "MXN", CO: "COP", AR: "ARS", CA: "CAD",
+  AU: "AUD", NZ: "AUD", PE: "PEN",
 
-  // PEN
-  PE: "PEN",
+  // LATAM Hotmart (moneda local)
+  CL: "CLP", BO: "BOB", CR: "CRC", DO: "DOP",
+  GT: "GTQ", HN: "HNL", PY: "PYG", UY: "UYU", HT: "HTG",
+
+  // Europa fuera Eurozona
+  CH: "CHF", SE: "SEK", NO: "NOK", DK: "DKK",
+  PL: "PLN", CZ: "CZK",
+
+  // Asia principal
+  JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR",
 };
 
 // Currency symbols and formatting
@@ -160,6 +145,25 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   CAD: { symbol: "$", position: "before", decimals: 2 },
   AUD: { symbol: "A$", position: "before", decimals: 2 },
   PEN: { symbol: "S/", position: "before", decimals: 2 },
+  CLP: { symbol: "$", position: "before", decimals: 0 },
+  BOB: { symbol: "Bs ", position: "before", decimals: 2 },
+  CRC: { symbol: "₡", position: "before", decimals: 0 },
+  DOP: { symbol: "RD$", position: "before", decimals: 2 },
+  GTQ: { symbol: "Q", position: "before", decimals: 2 },
+  HNL: { symbol: "L", position: "before", decimals: 2 },
+  PYG: { symbol: "₲", position: "before", decimals: 0 },
+  UYU: { symbol: "$U", position: "before", decimals: 2 },
+  HTG: { symbol: "G ", position: "before", decimals: 2 },
+  CHF: { symbol: "CHF ", position: "before", decimals: 2 },
+  SEK: { symbol: " kr", position: "after", decimals: 2 },
+  NOK: { symbol: " kr", position: "after", decimals: 2 },
+  DKK: { symbol: " kr", position: "after", decimals: 2 },
+  PLN: { symbol: " zł", position: "after", decimals: 2 },
+  CZK: { symbol: " Kč", position: "after", decimals: 2 },
+  JPY: { symbol: "¥", position: "before", decimals: 0 },
+  KRW: { symbol: "₩", position: "before", decimals: 0 },
+  CNY: { symbol: "¥", position: "before", decimals: 2 },
+  INR: { symbol: "₹", position: "before", decimals: 0 },
 };
 
 // Exchange rates from USD (updated May 2026 — approximate)
@@ -174,6 +178,25 @@ export const exchangeRates: Record<Currency, number> = {
   CAD: 1.38,
   AUD: 1.55,
   PEN: 3.70,
+  CLP: 950,
+  BOB: 6.9,
+  CRC: 510,
+  DOP: 60,
+  GTQ: 7.8,
+  HNL: 24.8,
+  PYG: 7300,
+  UYU: 40,
+  HTG: 132,
+  CHF: 0.85,
+  SEK: 10.5,
+  NOK: 10.8,
+  DKK: 6.9,
+  PLN: 4.0,
+  CZK: 23,
+  JPY: 155,
+  KRW: 1350,
+  CNY: 7.2,
+  INR: 84,
 };
 
 // Detect currency from country

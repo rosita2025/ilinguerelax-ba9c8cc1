@@ -63,7 +63,7 @@ const Product500Preguntas = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(HOTMART_URL, "_blank");
+    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank");
   };
 
   return (

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";

@@ -107,13 +107,15 @@ const ProductPatronesEspeciales = () => {
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const pricingAdmin = useAdminPricing("patrones-especiales");
+  const cardPrice = useCardPrice();
   const PRICE_USD = pricingAdmin.priceGlobalUsd ?? 0; // Precio dinámico desde /admin/products
   const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
-  const ORIGINAL_USD = 19.99;
+  const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
   const regional = getRegionalPricing(countryCode);
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
-  const priceLabel = regional.isIntl ? regional.price! : formatPrice(PRICE_USD);
-  const originalLabel = regional.isIntl ? regional.original! : formatPrice(ORIGINAL_USD);
+  // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
+  const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales", PRICE_USD) : formatPrice(PRICE_USD);
+  const originalLabel = formatPrice(ORIGINAL_USD);
   const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({

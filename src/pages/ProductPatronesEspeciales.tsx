@@ -105,7 +105,8 @@ const ProductPatronesEspeciales = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
-  const PRICE_USD = 8; // ≈ S/29.90 PEN — Stripe/Mercado Pago convierten automáticamente
+  const pricingAdmin = useAdminPricing("patrones-especiales", { global: 8 });
+  const PRICE_USD = pricingAdmin.priceGlobalUsd; // Precio dinámico desde /admin/products
   const ORIGINAL_USD = 19.99;
   const regional = getRegionalPricing(countryCode);
   const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);

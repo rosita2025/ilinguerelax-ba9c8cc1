@@ -319,6 +319,8 @@ const AdminProducts = () => {
               </tbody>
             </table>
           </div>
+          )}
+
 
           <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
             <ArrowUpDown className="w-3 h-3" /> El orden se ajusta desde el formulario de cada producto (campo "Orden").

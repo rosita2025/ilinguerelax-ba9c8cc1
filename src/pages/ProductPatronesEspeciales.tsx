@@ -199,7 +199,7 @@ const ProductPatronesEspeciales = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title={`Patrones y Pronunciación en Inglés PDF · ${priceLabel}`}
+        title="Patrones y Pronunciación en Inglés PDF · A1 a C1"
         description="Domina la pronunciación en inglés: patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Ebook PDF para hispanohablantes."
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image="https://ilinguerelax.com/images/product-patrones-especiales.webp"

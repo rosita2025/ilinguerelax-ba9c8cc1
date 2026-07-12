@@ -132,8 +132,10 @@ const ProductPatronesEspeciales = () => {
   const priceLabel = isPeru && pricingAdmin.pricePen
     ? `S/ ${pricingAdmin.pricePen.toFixed(2)}`
     : (useTiendaOnly ? `$${PRICE_USD.toFixed(2)} USD` : `$${PRICE_USD.toFixed(2)} USD`);
-  const originalLabel = cardPrice.ready ? cardPrice.format(null, ORIGINAL_USD) : formatPrice(ORIGINAL_USD);
-  const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
+  const originalLabel = isPeru && pricingAdmin.pricePen
+    ? `S/ ${(pricingAdmin.pricePen * 2.5).toFixed(2)}`
+    : `$${ORIGINAL_USD.toFixed(2)} USD`;
+  const HOTMART_URL = useHotmartLatam ? (pricingAdmin.hotmartUrl || HOTMART_URL_LATAM) : regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",

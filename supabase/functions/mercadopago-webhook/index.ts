@@ -233,7 +233,7 @@ Deno.serve(async (req) => {
             status_detail: payment.status_detail,
             payment_method: payment.payment_method_id,
             payment_type: payment.payment_type_id,
-            payer_email: payment.payer?.email,
+            payer_email: payment.payer?.email || payment.metadata?.customer_email,
             preference_id: payment.metadata?.preference_id,
             external_reference: payment.external_reference,
           },
@@ -242,7 +242,7 @@ Deno.serve(async (req) => {
         // Send pending-payment emails for transferencia/efectivo/ticket/atm
         // so the customer keeps a receipt if the tab/battery dies.
         const isPending = payment.status === "pending" || payment.status === "in_process";
-        const payerEmail = payment.payer?.email;
+        const payerEmail = payment.payer?.email || payment.metadata?.customer_email;
         if (isPending && payerEmail) {
           const orderNumber = payment.external_reference || `MP-${payment.id}`;
           const method = payment.payment_type_id === "ticket"
@@ -253,11 +253,11 @@ Deno.serve(async (req) => {
                 ? "Cajero / ATM (Mercado Pago)"
                 : `Mercado Pago (${payment.payment_method_id || payment.payment_type_id || "pendiente"})`;
           const customerName = [payment.payer?.first_name, payment.payer?.last_name]
-            .filter(Boolean).join(" ") || payerEmail.split("@")[0];
+            .filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail.split("@")[0];
           const templateData = {
             orderNumber,
             customerName,
-            productName: payment.description || "Producto ILINGUE RELAX",
+            productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
             amount: payment.transaction_amount ?? null,
             currency: payment.currency_id || "PEN",
             method,
@@ -303,7 +303,7 @@ Deno.serve(async (req) => {
               customerName,
               customerPhone: payment.metadata?.customer_phone || undefined,
               customerCountry: payment.payer?.address?.country_id || undefined,
-              productName: payment.description || "Producto ILINGUE RELAX",
+              productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
               amount: payment.transaction_amount ?? undefined,
               currency: payment.currency_id || "PEN",
               provider: "mercadopago",

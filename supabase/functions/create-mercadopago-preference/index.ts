@@ -117,6 +117,7 @@ Deno.serve(async (req) => {
         item_count: body.items.reduce((sum, item) => sum + item.quantity, 0),
         items_summary: productSummary,
         skus: deliverySkus,
+        customer_email: body.payerEmail ?? "",
         customer_name: body.payerName ?? "",
         customer_phone: body.payerPhone ?? "",
       },

@@ -164,6 +164,17 @@ const ProductSpanish5000Digital = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
+  const buildCartItem = () => ({
+    id: "5000-spanish-words",
+    name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
+    price: currentPrice,
+    pricePen: pricePen ?? undefined,
+    regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+    image: "/images/product-5000-spanish.webp",
+    description: "5,000 vocabulary words in Spanish with English pronunciation",
+    quantity: 1,
+  });
+
   const handleBuyNow = () => {
     if (!pricingReady) return;
     if (lockRef.current) return;
@@ -178,34 +189,24 @@ const ProductSpanish5000Digital = () => {
       currency: "USD",
       num_items: 1,
     });
-    addItem({
-      id: "5000-spanish-words",
-      name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: currentPrice,
-      pricePen: pricing.pricePen ?? undefined,
-      image: "/images/product-5000-spanish.webp",
-      description: "5,000 vocabulary words in Spanish with English pronunciation",
-      quantity: 1,
-    });
-    navigate("/checkouts/5000-spanish-words");
+    if (useTiendaOnly) {
+      addItem(buildCartItem());
+      navigate(TIENDA_PATH_SP5K);
+    } else {
+      window.open(tier.hotmartUrl || HOTMART_SP5K_LATAM, "_blank", "noopener,noreferrer");
+      lockRef.current = false;
+      setIsRedirecting(false);
+    }
   };
 
   const handleAddToCart = () => {
     if (!pricingReady) return;
-    addItem({
-      id: "5000-spanish-words",
-      name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: currentPrice,
-      pricePen: pricing.pricePen ?? undefined,
-      image: "/images/product-5000-spanish.webp",
-      description: "5,000 vocabulary words in Spanish with English pronunciation",
-      quantity: 1,
-    });
+    addItem(buildCartItem());
     toast.success("Product added to cart", {
       description: "Keep browsing or go to checkout.",
       action: {
         label: "Go to checkout",
-        onClick: () => navigate("/checkouts/5000-spanish-words"),
+        onClick: () => navigate(TIENDA_PATH_SP5K),
       },
     });
   };

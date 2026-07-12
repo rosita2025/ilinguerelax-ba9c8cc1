@@ -50,20 +50,29 @@ export function productUrl(sku: string): string {
 }
 
 /**
- * Also asks Google to re-fetch the sitemap. Uses the public sitemap ping
- * endpoint (no auth). Google deprecated it in 2023 for pure discovery but
- * still accepts pings — treat it as a best-effort hint.
+ * Best-effort sitemap discovery ping across every major search engine
+ * that still accepts unauthenticated pings:
+ *   - Google (deprecated but tolerated)
+ *   - Bing (also covered by IndexNow)
+ *   - Yandex (RU + IndexNow)
+ *   - Baidu (CN) — the only way to nudge Baiduspider without an
+ *     authenticated Zhanzhang push account.
+ *   - Naver (KR) — Seznam / Yeti fallback discovery.
+ *
+ * All calls swallow errors; SEO pings must never block the caller.
  */
 export async function pingSitemap(): Promise<void> {
-  const sitemap = encodeURIComponent(`https://${HOST}/sitemap.xml`);
-  try {
-    await fetch(`https://www.google.com/ping?sitemap=${sitemap}`, { method: "GET" });
-  } catch {
-    /* ignore */
-  }
-  try {
-    await fetch(`https://www.bing.com/ping?sitemap=${sitemap}`, { method: "GET" });
-  } catch {
-    /* ignore */
-  }
+  const sitemap = `https://${HOST}/sitemap.xml`;
+  const encoded = encodeURIComponent(sitemap);
+  const endpoints = [
+    `https://www.google.com/ping?sitemap=${encoded}`,
+    `https://www.bing.com/ping?sitemap=${encoded}`,
+    `https://blogsearch.google.com/ping/RPC2?name=iLingueRelax&url=${encoded}`,
+    `https://ping.blogs.yandex.ru/RPC2?sitemap=${encoded}`,
+    `http://ping.baidu.com/ping/RPC2?sitemap=${encoded}`,
+    `https://searchadvisor.naver.com/indexnow?url=${encoded}&keyLocation=${encodeURIComponent(KEY_LOCATION)}&key=${INDEXNOW_KEY}`,
+  ];
+  await Promise.allSettled(
+    endpoints.map((url) => fetch(url, { method: "GET" }).catch(() => null))
+  );
 }

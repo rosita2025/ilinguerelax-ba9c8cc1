@@ -34,6 +34,36 @@ Allow: /
 User-agent: Yandex
 Allow: /
 
+User-agent: YandexBot
+Allow: /
+
+# Baidu (China)
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider-image
+Allow: /
+
+# Naver (South Korea)
+User-agent: Yeti
+Allow: /
+
+User-agent: NaverBot
+Allow: /
+
+# Seznam (Czech Republic)
+User-agent: SeznamBot
+Allow: /
+
+# Sogou (China)
+User-agent: Sogou web spider
+Allow: /
+
+# Applebot (Siri / Spotlight)
+User-agent: Applebot
+Allow: /
+
 User-agent: *
 Allow: /
 Crawl-delay: 2

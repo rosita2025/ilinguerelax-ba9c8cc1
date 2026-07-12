@@ -63,6 +63,7 @@ const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabA
 
 export const Languages = () => {
   const { language, formatPrice } = useI18n();
+  const cardPrice = useCardPrice();
   const [activeFormat, setActiveFormat] = useState<FormatKey>("digital");
   const [activeTab, setActiveTab] = useState<LangKey>("english");
 

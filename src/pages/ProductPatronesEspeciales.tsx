@@ -251,11 +251,11 @@ const ProductPatronesEspeciales = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés
+                {pricingAdmin.name ?? "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"}
               </h1>
 
               <p className="text-base text-muted-foreground mb-4">
-                Domina la pronunciación en inglés con patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Método fácil para hispanohablantes paso a paso.
+                {pricingAdmin.description ?? "Domina la pronunciación en inglés con patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Método fácil para hispanohablantes paso a paso."}
               </p>
 
               <div className="flex items-center gap-3 mb-4">

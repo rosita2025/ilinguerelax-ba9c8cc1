@@ -267,15 +267,15 @@ const ProductSpanish5000Digital = () => {
               <PurchaseCounter />
 
               <h1 className="text-3xl md:text-5xl font-black leading-tight">
-                Learn 5,000 Spanish Words —{" "}
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  with English Pronunciation
-                </span>
+                {pricing.name ?? (<>Learn 5,000 Spanish Words —{" "}
+                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    with English Pronunciation
+                  </span></>)}
               </h1>
 
               <p className="text-base md:text-lg text-muted-foreground">
-                Digital-only PDF designed for English speakers. Every word written the way it{" "}
-                <em>actually sounds</em>. No dictionaries, no stress — start speaking Spanish today.
+                {pricing.description ?? (<>Digital-only PDF designed for English speakers. Every word written the way it{" "}
+                <em>actually sounds</em>. No dictionaries, no stress — start speaking Spanish today.</>)}
               </p>
 
               {/* Price block */}

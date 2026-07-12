@@ -16,8 +16,8 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { useRegionTier } from "@/hooks/useRegionTier";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
@@ -37,25 +37,9 @@ import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCore
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
-const HOTMART_URL = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
-
-const COUNTRY_FLAG: Record<string, string> = {
-  US: "🇺🇸", PE: "🇵🇪", MX: "🇲🇽", CO: "🇨🇴", AR: "🇦🇷", CL: "🇨🇱", BR: "🇧🇷",
-  UY: "🇺🇾", BO: "🇧🇴", PY: "🇵🇾", GT: "🇬🇹", DO: "🇩🇴", CR: "🇨🇷", HN: "🇭🇳",
-  NI: "🇳🇮", VE: "🇻🇪", PA: "🇵🇦", EC: "🇪🇨", SV: "🇸🇻", ES: "🇪🇸", FR: "🇫🇷",
-  DE: "🇩🇪", IT: "🇮🇹", PT: "🇵🇹", GB: "🇬🇧", CA: "🇨🇦", AU: "🇦🇺", NZ: "🇳🇿",
-  JP: "🇯🇵", KR: "🇰🇷", SG: "🇸🇬", HK: "🇭🇰", TW: "🇹🇼", CH: "🇨🇭",
-  SE: "🇸🇪", NO: "🇳🇴", DK: "🇩🇰",
-};
-
-const CURRENCY_FLAG: Record<string, string> = {
-  USD: "🇺🇸", CAD: "🇨🇦", EUR: "🇪🇸", GBP: "🇬🇧", AUD: "🇦🇺", NZD: "🇳🇿",
-  MXN: "🇲🇽", COP: "🇨🇴", ARS: "🇦🇷", PEN: "🇵🇪", CLP: "🇨🇱", BRL: "🇧🇷",
-  UYU: "🇺🇾", BOB: "🇧🇴", PYG: "🇵🇾", GTQ: "🇬🇹", DOP: "🇩🇴", CRC: "🇨🇷",
-  HNL: "🇭🇳", NIO: "🇳🇮", VES: "🇻🇪",
-};
-
-
+const HOTMART_URL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
+const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
+const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
 
 const features = [
   "Más de 100 mapas mentales organizados por temas",
@@ -78,23 +62,25 @@ const ProductCoreanoRelax = () => {
   const navigate = useNavigate();
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const region = useRegionTier();
-  // Precios se obtienen automáticamente del admin (digital_products). Sin fallbacks hardcodeados.
-  const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
   const pricing = useAdminPricing(ADMIN_SKU);
-  const PRICE_GLOBAL_USD = pricing.priceGlobalUsd ?? 0;
-  const PRICE_LATAM_USD = pricing.priceLatamUsd ?? 0;
-  const PRICE_PEN = pricing.pricePen ?? 0;
-  const isPeru = region.country === "PE";
-  const usdPrice = region.tier === "latam" ? PRICE_LATAM_USD : PRICE_GLOBAL_USD;
-  const pricingReady = pricing.loaded && usdPrice > 0 && (!isPeru || PRICE_PEN > 0);
-  const displayPrice = !pricingReady
-    ? "…"
-    : isPeru
-      ? `S/ ${PRICE_PEN.toFixed(2)}`
-      : `$${usdPrice}`;
-  const displayFlag = isPeru ? "🇵🇪" : region.tier === "latam" ? "🌎" : "🌍";
-  const currencyLabel = isPeru ? "PEN" : "USD";
+  const tier = useCountryTierRouting(ADMIN_SKU, {
+    tiendaPath: TIENDA_CHECKOUT_PATH,
+    fallbackHotmartUrl: HOTMART_URL_LATAM,
+  });
+  const {
+    isPeru,
+    useTiendaOnly,
+    useHotmartLatam,
+    priceUsd,
+    priceGlobalUsd,
+    priceLatamUsd,
+    priceTiendaUsd,
+    pricePen,
+    priceLabel: displayPrice,
+    currencyCode: currencyLabel,
+    loaded: pricingReady,
+  } = tier;
+  const displayFlag = isPeru ? "🇵🇪" : useHotmartLatam ? "🌎" : "🌍";
 
   const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
@@ -102,7 +88,7 @@ const ProductCoreanoRelax = () => {
       content_category: "Digital Book",
       content_ids: ["product-coreano-100-mapas"],
       content_type: "product",
-      value: usdPrice,
+      value: priceUsd,
       currency: "USD",
       num_items: 1,
     });
@@ -110,7 +96,7 @@ const ProductCoreanoRelax = () => {
   const handleBuyHotmart = () => {
     if (!pricingReady) return;
     trackInitiate();
-    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank", "noopener,noreferrer");
+    window.open(tier.hotmartUrl || HOTMART_URL_LATAM, "_blank", "noopener,noreferrer");
   };
 
   const handleBuyStore = () => {
@@ -120,16 +106,18 @@ const ProductCoreanoRelax = () => {
     addItem({
       id: "coreano-100-mapas",
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
-      price: usdPrice,
-      regionPrices: { latam: PRICE_LATAM_USD, global: PRICE_GLOBAL_USD },
-      pricePen: PRICE_PEN > 0 ? PRICE_PEN : undefined,
+      price: priceUsd,
+      regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+      pricePen: pricePen ?? undefined,
       image: "/images/product-coreano-100-mapas.webp",
       description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
       quantity: 1,
     });
     sonnerToast.success("Producto agregado al carrito");
-    navigate("/checkouts/coreano-100-mapas");
+    navigate(TIENDA_CHECKOUT_PATH);
   };
+
+  const handleBuy = () => (useTiendaOnly ? handleBuyStore() : handleBuyHotmart());
 
 
   const handleSubscribe = async (e: React.FormEvent) => {

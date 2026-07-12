@@ -79,31 +79,20 @@ const ProductCoreanoRelax = () => {
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const region = useRegionTier();
-  // Precios se obtienen automáticamente del admin (digital_products).
-  // Los constantes solo son fallback inicial mientras carga la DB.
+  // Precios se obtienen automáticamente del admin (digital_products). Sin fallbacks hardcodeados.
   const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
-  const [PRICE_GLOBAL_USD, setPriceGlobal] = useState(15);
-  const [PRICE_LATAM_USD, setPriceLatam] = useState(10);
-  const [PRICE_PEN, setPricePen] = useState(29.9);
-  useEffect(() => {
-    let cancelled = false;
-    supabase
-      .from("digital_products")
-      .select("price_usd, price_usd_latam, price_pen")
-      .eq("sku", ADMIN_SKU)
-      .eq("active", true)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled || !data) return;
-        if (data.price_usd != null) setPriceGlobal(Number(data.price_usd));
-        if (data.price_usd_latam != null) setPriceLatam(Number(data.price_usd_latam));
-        if (data.price_pen != null && Number(data.price_pen) > 0) setPricePen(Number(data.price_pen));
-      });
-    return () => { cancelled = true; };
-  }, []);
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const PRICE_GLOBAL_USD = pricing.priceGlobalUsd ?? 0;
+  const PRICE_LATAM_USD = pricing.priceLatamUsd ?? 0;
+  const PRICE_PEN = pricing.pricePen ?? 0;
   const isPeru = region.country === "PE";
   const usdPrice = region.tier === "latam" ? PRICE_LATAM_USD : PRICE_GLOBAL_USD;
-  const displayPrice = isPeru ? `S/ ${PRICE_PEN.toFixed(2)}` : `$${usdPrice}`;
+  const pricingReady = pricing.loaded && usdPrice > 0 && (!isPeru || PRICE_PEN > 0);
+  const displayPrice = !pricingReady
+    ? "…"
+    : isPeru
+      ? `S/ ${PRICE_PEN.toFixed(2)}`
+      : `$${usdPrice}`;
   const displayFlag = isPeru ? "🇵🇪" : region.tier === "latam" ? "🌎" : "🌍";
   const currencyLabel = isPeru ? "PEN" : "USD";
 
@@ -119,11 +108,13 @@ const ProductCoreanoRelax = () => {
     });
 
   const handleBuyHotmart = () => {
+    if (!pricingReady) return;
     trackInitiate();
     window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
   };
 
   const handleBuyStore = () => {
+    if (!pricingReady) return;
     trackInitiate();
     clearCart();
     addItem({
@@ -131,7 +122,7 @@ const ProductCoreanoRelax = () => {
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
       price: usdPrice,
       regionPrices: { latam: PRICE_LATAM_USD, global: PRICE_GLOBAL_USD },
-      pricePen: PRICE_PEN,
+      pricePen: PRICE_PEN > 0 ? PRICE_PEN : undefined,
       image: "/images/product-coreano-100-mapas.webp",
       description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
       quantity: 1,

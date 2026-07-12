@@ -57,7 +57,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             {expanded ? t.hideSummary : t.showSummary}
           </span>
-          <span className="text-lg font-bold">{fmtMoney(total, localTotal)}</span>
+          <span className="text-lg font-bold">{fmtMoney(total, localTotal, penTotals?.total)}</span>
         </button>
       )}
 

@@ -44,10 +44,10 @@ const ProductSpanish1000Verbs = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="1,000 Spanish Verbs PDF · English Pronunciation"
-        description="Master 1,000 essential Spanish verbs in past, present and future with English pronunciation. Instant PDF download for English speakers."
+        title={pricing.name ?? "1,000 Spanish Verbs PDF · English Pronunciation"}
+        description={pricing.description ?? "Master 1,000 essential Spanish verbs in past, present and future with English pronunciation. Instant PDF download for English speakers."}
         canonicalUrl="https://ilinguerelax.com/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation"
-        image="https://ilinguerelax.com/images/product-spanish-1000-verbs.png"
+        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/images/product-spanish-1000-verbs.png"}
         type="product"
         price={currentPrice.toFixed(2)}
         originalPrice="54"

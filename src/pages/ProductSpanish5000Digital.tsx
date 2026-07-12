@@ -208,10 +208,10 @@ const ProductSpanish5000Digital = () => {
         <link rel="preload" as="image" href={productDigitalImage} />
       </Helmet>
       <SEO
-        title="5,000 Spanish Words PDF · English Pronunciation"
-        description="Digital PDF with 5,000 essential Spanish words and English pronunciation. 3 free bonuses. Launch price $22 (was $35). Instant download."
+        title={pricing.name ?? "5,000 Spanish Words PDF · English Pronunciation"}
+        description={pricing.description ?? "Digital PDF with 5,000 essential Spanish words and English pronunciation. 3 free bonuses. Launch price $22 (was $35). Instant download."}
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
-        image="https://ilinguerelax.com/product-spanish-5000.png"
+        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/product-spanish-5000.png"}
         type="product"
         price={String(currentPrice)}
         originalPrice={String(ORIGINAL_PRICE)}

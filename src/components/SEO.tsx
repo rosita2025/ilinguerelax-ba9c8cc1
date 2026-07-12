@@ -34,6 +34,8 @@ interface SEOProps {
   }>;
   availability?: "InStock" | "PreOrder" | "OutOfStock";
   isPhysical?: boolean;
+  /** Custom breadcrumb trail. Overrides the default URL-based inference. */
+  breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
 export const SEO = ({
@@ -54,6 +56,7 @@ export const SEO = ({
   faqItems,
   availability = "InStock",
   isPhysical = false,
+  breadcrumbs,
 }: SEOProps) => {
   // Keep combined title under 60 chars to avoid SERP truncation.
   const SUFFIX = " | iLingue Relax";
@@ -245,7 +248,16 @@ export const SEO = ({
   } : null;
 
   // Breadcrumb structured data
-  const breadcrumbData = canonicalUrl ? {
+  const breadcrumbData = breadcrumbs && breadcrumbs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((b, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": b.name,
+      "item": b.url,
+    })),
+  } : canonicalUrl ? {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [

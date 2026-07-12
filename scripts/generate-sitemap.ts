@@ -144,11 +144,11 @@ async function getDbProductSlugs(): Promise<string[]> {
 // --------------------------------------------------------------------------
 // XML builders
 // --------------------------------------------------------------------------
-function urlsetXml(entries: SitemapEntry[]): string {
+function urlsetXml(entries: SitemapEntry[], hostBase: string = BASE_URL): string {
   const urls = entries.map((e) =>
     [
       "  <url>",
-      `    <loc>${BASE_URL}${e.path}</loc>`,
+      `    <loc>${hostBase}${e.path}</loc>`,
       e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
       e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
       e.priority ? `    <priority>${e.priority}</priority>` : null,

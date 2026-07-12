@@ -339,33 +339,10 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
         </div>
       </div>
 
-      {/* SEO: JSON-LD for DB reviews */}
-      {dbReviews.length > 0 && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Product",
-              "name": reviewSchema.name,
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": (dbReviews.reduce((sum, r) => sum + r.rating, 0) / dbReviews.length).toFixed(1),
-                "reviewCount": dbReviews.length + testimonials.length + textReviews.length,
-                "bestRating": "5",
-                "worstRating": "1"
-              },
-              "review": dbReviews.map(r => ({
-                "@type": "Review",
-                "reviewRating": { "@type": "Rating", "ratingValue": String(r.rating), "bestRating": "5" },
-                "author": { "@type": "Person", "name": r.customer_name },
-                "datePublished": r.created_at.split("T")[0],
-                "reviewBody": r.review_text,
-              }))
-            })
-          }}
-        />
-      )}
+      {/* JSON-LD intentionally omitted: <SEO /> owns the per-page Product
+          schema (aggregateRating + reviews) to avoid duplicate "brand" and
+          duplicate Product entities flagged by Google Search Console. */}
+
     </section>
   );
 };

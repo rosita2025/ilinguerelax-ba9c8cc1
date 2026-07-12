@@ -22,6 +22,7 @@ const LearnCategory = () => {
   const { pair: pairSlug } = useParams();
   const { language: uiLang } = useI18n();
   const { items: dbProducts } = useDigitalProducts();
+  const cardPrice = useCardPrice();
 
   // /aprender (no slug) → redirect to detected pair.
   if (!pairSlug) {

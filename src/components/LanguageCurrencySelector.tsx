@@ -165,25 +165,12 @@ export const LanguageCurrencySelector = () => {
 
   const current = COUNTRIES.find((c) => c.code === countryCode) ?? COUNTRIES[0];
 
-  const handleCountryChange = (code: string) => {
-    const next = COUNTRIES.find((c) => c.code === code);
-    if (!next) return;
-    setCountryCode(code);
-    try {
-      localStorage.setItem(COUNTRY_STORAGE, code);
-      const payload = { currency: next.currency, countryCode: code, timestamp: Date.now() };
-      localStorage.setItem(CAMPAIGN_STORAGE, JSON.stringify(payload));
-      window.dispatchEvent(new CustomEvent("campaign-currency-change", { detail: next.currency }));
-    } catch { /* ignore */ }
-    if ((I18N_SUPPORTED as string[]).includes(next.currency)) {
-      setCurrency(next.currency as Currency);
-    }
-  };
+  // Nota: cambio manual de país deshabilitado a propósito para evitar arbitraje
+  // (visitante de USA cambiando a MX/PE para comprar al precio local reducido).
+  // La moneda y el tramo de precio se derivan solo del IP.
+  void setCurrency;
 
-  const grouped = COUNTRIES.reduce<Record<string, CountryOption[]>>((acc, c) => {
-    (acc[c.region] ||= []).push(c);
-    return acc;
-  }, {});
+
 
   return (
     <div className="flex items-center gap-2">

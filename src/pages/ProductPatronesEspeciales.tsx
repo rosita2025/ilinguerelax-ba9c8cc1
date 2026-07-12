@@ -27,8 +27,8 @@ import { useCardPrice } from "@/hooks/useCardPrice";
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
-// Países donde Hotmart no permite comprar → usar tienda online interna
-const TIENDA_ONLY_COUNTRIES = new Set(["VE","NI","CU","KR","CN","SG","TR","HN"]);
+// Países donde Hotmart NO permite comprar (ni LATAM ni Global) → usar tienda online interna
+const TIENDA_ONLY_COUNTRIES = new Set(["VE","CU","NI"]);
 
 const EUROPE_CODES = new Set([
   "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",

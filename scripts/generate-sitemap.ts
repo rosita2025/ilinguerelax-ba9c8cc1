@@ -232,21 +232,8 @@ async function main() {
     children.push({ file: "sitemap-blog.xml", lastmod: latest });
   }
 
-  // Regional subdomain segments — one <urlset> per regional host containing
-  // the same pages + products, but URLs prefixed with that subdomain. Each
-  // file is discoverable at /sitemaps/sitemap-<region>.xml on every host and
-  // is submitted per-property in Google Search Console.
-  const regionalAllEntries: SitemapEntry[] = [
-    ...staticEntries,
-    ...productEntries,
-    ...blogEntries,
-  ];
-  for (const host of REGIONAL_HOSTS) {
-    const region = host.replace("https://", "").split(".")[0]; // us, ca, pe, mx…
-    const file = `sitemap-${region}.xml`;
-    writeFileSync(join(SITEMAPS_DIR, file), urlsetXml(regionalAllEntries, host));
-    children.push({ file, lastmod: TODAY });
-  }
+  // Regional subdomains disabled — single canonical domain only.
+
 
   // Root index
   writeFileSync(join(PUBLIC_DIR, "sitemap.xml"), indexXml(children));

@@ -469,6 +469,7 @@ const Products = () => {
                                 <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>
                               )}
                               <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(p.id)}</span>
+                              <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
                             </div>
                           </div>
                           <ArrowRight className="w-4 h-4 text-muted-foreground group-hover/opt:text-primary group-hover/opt:translate-x-0.5 transition-all" />

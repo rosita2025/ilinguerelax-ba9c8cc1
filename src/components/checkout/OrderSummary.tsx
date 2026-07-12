@@ -180,7 +180,8 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : useLocal ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : `USD $${total.toFixed(2)}`}</div>
+
             </div>
           </div>
 

@@ -76,12 +76,15 @@ const Products = () => {
   const priceFor = (p: typeof products[number]) =>
     p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
 
-  const languages = useMemo(() => {
-    const map = new Map<string, { flag: string; label: string }>();
+  // Collect available learner/target language codes from the merged catalog.
+  const { learners, targets } = useMemo(() => {
+    const l = new Set<LangCode>();
+    const t = new Set<LangCode>();
     for (const p of products) {
-      if (!map.has(p.flag)) map.set(p.flag, { flag: p.flag, label: p.country });
+      if (p.learnerLanguage) l.add(p.learnerLanguage);
+      if (p.targetLanguage) t.add(p.targetLanguage);
     }
-    return Array.from(map.values());
+    return { learners: Array.from(l), targets: Array.from(t) };
   }, [products]);
 
   const filtered = useMemo(() => {
@@ -90,7 +93,8 @@ const Products = () => {
       const formats = p.formats ?? (p.isPhysical ? ['physical'] : ['digital']);
       if (type === "digital" && !formats.includes('digital')) return false;
       if (type === "physical" && !formats.includes('physical')) return false;
-      if (language !== "all" && p.flag !== language) return false;
+      if (learnerLang !== "all" && p.learnerLanguage && p.learnerLanguage !== learnerLang) return false;
+      if (targetLang !== "all" && p.targetLanguage && p.targetLanguage !== targetLang) return false;
       if (
         q &&
         !p.title.toLowerCase().includes(q) &&
@@ -101,7 +105,7 @@ const Products = () => {
         return false;
       return true;
     });
-  }, [type, language, search, products]);
+  }, [type, learnerLang, targetLang, search, products]);
 
   // Group products that share a groupId so digital + physical appear in a single card
   type Group = {

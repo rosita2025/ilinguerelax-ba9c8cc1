@@ -148,10 +148,15 @@ const AdminEmailTest = () => {
         perSource[src]++;
       });
 
-      const matchedEmails = new Set(merged.map((m) => m.email.toLowerCase()));
+      const matchedDigitalOrders = new Set(
+        merged
+          .filter((m) => !!m.delivery?.message_id)
+          .map((m) => m.order_ref.toLowerCase()),
+      );
       (digitalRes.data ?? []).forEach((r: any) => {
         const e = (r.customer_email || "").toLowerCase();
-        if (matchedEmails.has(e)) return;
+        const orderKey = (r.order_id || "").toLowerCase();
+        if (orderKey && matchedDigitalOrders.has(orderKey)) return;
         const src = providerToSource(r.provider);
         merged.push({
           id: `d-${r.id}`,

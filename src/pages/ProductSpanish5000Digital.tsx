@@ -127,7 +127,9 @@ const ProductSpanish5000Digital = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
-  const localizedPrice = formatPrice(PRICE);
+  const pricing = useAdminPricing("5-000-spanish-words-with-english-pronunciation-digital", { global: PRICE });
+  const currentPrice = pricing.priceGlobalUsd;
+  const localizedPrice = formatPrice(currentPrice);
   const localizedOriginal = formatPrice(ORIGINAL_PRICE);
   const flag = countryToFlag(countryCode);
 
@@ -136,14 +138,14 @@ const ProductSpanish5000Digital = () => {
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000-digital"],
     content_type: "product",
-    value: PRICE,
+    value: currentPrice,
     currency: "USD",
-  }), []);
+  }), [currentPrice]);
   useHotmartPixel(pixelParams);
   useTrackProductView({
     productId: "product-spanish-5000-digital",
     productName: "Spanish Relax - 5,000 Words (Digital)",
-    price: PRICE,
+    price: currentPrice,
     currency: "USD",
     category: "Digital Book",
   });
@@ -161,14 +163,14 @@ const ProductSpanish5000Digital = () => {
       content_category: "Digital Book",
       content_ids: ["product-spanish-5000-digital"],
       content_type: "product",
-      value: PRICE,
+      value: currentPrice,
       currency: "USD",
       num_items: 1,
     });
     addItem({
       id: "5000-spanish-words",
       name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: PRICE,
+      price: currentPrice,
       image: "/images/product-5000-spanish.webp",
       description: "5,000 vocabulary words in Spanish with English pronunciation",
       quantity: 1,
@@ -180,7 +182,7 @@ const ProductSpanish5000Digital = () => {
     addItem({
       id: "5000-spanish-words",
       name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
-      price: PRICE,
+      price: currentPrice,
       image: "/images/product-5000-spanish.webp",
       description: "5,000 vocabulary words in Spanish with English pronunciation",
       quantity: 1,
@@ -193,6 +195,7 @@ const ProductSpanish5000Digital = () => {
       },
     });
   };
+
 
   return (
     <main className="min-h-screen bg-background">

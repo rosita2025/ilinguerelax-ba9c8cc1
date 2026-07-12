@@ -210,15 +210,17 @@ const ProductCoreanoRelax = () => {
               </motion.div>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className={useTiendaOnly ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-3"}>
                   <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <Store className="w-5 h-5 mr-2" />
                     Tienda iLingue · {displayPrice}
                   </Button>
-                  <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Hotmart · ${usdPrice}
-                  </Button>
+                  {useHotmartLatam && (
+                    <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Hotmart · ${priceLatamUsd.toFixed(2)}
+                    </Button>
+                  )}
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
               </motion.div>

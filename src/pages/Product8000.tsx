@@ -135,10 +135,19 @@ const benefits = [
 }];
 
 
+const ADMIN_SKU_8000 = "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa";
+const TIENDA_PATH_8000 = "/checkouts/8000-palabras";
+const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10";
+
 const Product8000 = () => {
   const campaign = useCampaignPrice(20, 54);
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
+  const tier = useCountryTierRouting(ADMIN_SKU_8000, {
+    tiendaPath: TIENDA_PATH_8000,
+    fallbackHotmartUrl: HOTMART_8000_LATAM,
+  });
+  const { useTiendaOnly, priceUsd } = tier;
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -147,31 +156,34 @@ const Product8000 = () => {
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 20,
+      value: priceUsd || 20,
       currency: "USD"
     }),
-    []
+    [priceUsd]
   );
   useHotmartPixel(pixelParams);
 
-  // Handle Buy Now with Hotmart pixel tracking
+  // Handle Buy Now — 4-tier routing (Perú/VE-CU-NI/Global → tienda interna · LATAM → Hotmart)
   const handleBuyNow = () => {
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 8,000 Palabras Digital",
       content_category: "Digital Book",
       content_ids: ["product-8000"],
       content_type: "product",
-      value: 20,
+      value: priceUsd || 20,
       currency: "USD",
       num_items: 1
     });
-    window.open("https://pay.hotmart.com/U103990323W?checkoutMode=10", "_blank");
+    if (useTiendaOnly) {
+      if (typeof window !== "undefined") window.location.assign(TIENDA_PATH_8000);
+      return;
+    }
+    window.open(tier.hotmartUrl || HOTMART_8000_LATAM, "_blank", "noopener,noreferrer");
   };
 
   const handleAddToCart = async () => {
-    // Shopify removed — route directly to the internal checkout for the 8,000 digital.
     if (typeof window !== "undefined") {
-      window.location.assign("/checkouts/8000-palabras");
+      window.location.assign(TIENDA_PATH_8000);
     }
   };
 

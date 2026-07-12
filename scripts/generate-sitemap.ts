@@ -1,16 +1,20 @@
 /**
  * Runs before `vite dev` and `vite build` (predev/prebuild hooks).
- * Writes public/sitemap.xml with:
- *  - Static indexable routes (from App.tsx, excluding admin/checkout/utility)
- *  - All blog posts (from src/data/blogPosts.ts)
- *  - All active products (from Supabase digital_products table)
  *
- * Never fails the build: if Supabase is unreachable, we keep the static routes
- * plus the previously generated sitemap's product URLs (best-effort).
+ * Writes a sitemap INDEX at public/sitemap.xml that references segmented
+ * child sitemaps under public/sitemaps/:
+ *   - sitemap-pages.xml       (static institutional + catalog routes)
+ *   - sitemap-products-N.xml  (product URLs, auto-chunked at 5,000 each)
+ *   - sitemap-blog.xml        (blog posts)
+ *
+ * Each child sitemap stays well under Google's 50,000-URL / 50 MB limit,
+ * and the index scales as the catalog grows.
+ *
+ * Never fails the build: on error we fall back to a minimal index + pages.
  */
 
-import { writeFileSync, readFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from "fs";
+import { resolve, join } from "path";
 import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 
@@ -18,6 +22,10 @@ loadEnv();
 
 const BASE_URL = "https://ilinguerelax.com";
 const TODAY = new Date().toISOString().slice(0, 10);
+const URLS_PER_SITEMAP = 5000; // Google allows up to 50,000; keep files small.
+
+const PUBLIC_DIR = resolve("public");
+const SITEMAPS_DIR = resolve("public/sitemaps");
 
 interface SitemapEntry {
   path: string;
@@ -43,8 +51,6 @@ const staticEntries: SitemapEntry[] = [
   { path: "/vista-previa/coreano-100-mapas-mentales", changefreq: "monthly", priority: "0.6" },
 ];
 
-// Product routes hard-coded in App.tsx (typed pages). Dynamic products from the
-// DB are appended after this list.
 const hardcodedProductSlugs: string[] = [
   "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
   "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
@@ -115,9 +121,9 @@ async function getDbProductSlugs(): Promise<string[]> {
 }
 
 // --------------------------------------------------------------------------
-// XML build + write
+// XML builders
 // --------------------------------------------------------------------------
-function toXml(entries: SitemapEntry[]): string {
+function urlsetXml(entries: SitemapEntry[]): string {
   const urls = entries.map((e) =>
     [
       "  <url>",
@@ -139,11 +145,40 @@ function toXml(entries: SitemapEntry[]): string {
   ].join("\n");
 }
 
-async function main() {
-  const blogEntries = await getBlogEntries();
-  const dbSlugs = await getDbProductSlugs();
+function indexXml(children: Array<{ file: string; lastmod: string }>): string {
+  const items = children.map(
+    (c) =>
+      `  <sitemap>\n    <loc>${BASE_URL}/sitemaps/${c.file}</loc>\n    <lastmod>${c.lastmod}</lastmod>\n  </sitemap>`,
+  );
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...items,
+    "</sitemapindex>",
+    "",
+  ].join("\n");
+}
 
-  // Merge hardcoded + DB product slugs, dedupe, preserve order (hardcoded first).
+function chunk<T>(arr: T[], size: number): T[][] {
+  if (arr.length === 0) return [];
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+// --------------------------------------------------------------------------
+// Main
+// --------------------------------------------------------------------------
+async function main() {
+  if (!existsSync(SITEMAPS_DIR)) mkdirSync(SITEMAPS_DIR, { recursive: true });
+
+  // Wipe stale sitemap-*.xml segments so removed chunks don't linger.
+  for (const f of readdirSync(SITEMAPS_DIR)) {
+    if (/^sitemap-.*\.xml$/.test(f)) unlinkSync(join(SITEMAPS_DIR, f));
+  }
+
+  const [blogEntries, dbSlugs] = await Promise.all([getBlogEntries(), getDbProductSlugs()]);
+
   const productSlugs = Array.from(new Set([...hardcodedProductSlugs, ...dbSlugs]));
   const productEntries: SitemapEntry[] = productSlugs.map((slug) => ({
     path: `/products/${slug}`,
@@ -152,19 +187,53 @@ async function main() {
     priority: "0.85",
   }));
 
-  const all: SitemapEntry[] = [...staticEntries, ...productEntries, ...blogEntries];
-  const outPath = resolve("public/sitemap.xml");
-  writeFileSync(outPath, toXml(all));
+  const children: Array<{ file: string; lastmod: string }> = [];
+
+  // Pages
+  writeFileSync(join(SITEMAPS_DIR, "sitemap-pages.xml"), urlsetXml(staticEntries));
+  children.push({ file: "sitemap-pages.xml", lastmod: TODAY });
+
+  // Products (chunked)
+  const productChunks = chunk(productEntries, URLS_PER_SITEMAP);
+  productChunks.forEach((entries, i) => {
+    const file = `sitemap-products-${i + 1}.xml`;
+    writeFileSync(join(SITEMAPS_DIR, file), urlsetXml(entries));
+    children.push({ file, lastmod: TODAY });
+  });
+
+  // Blog
+  if (blogEntries.length > 0) {
+    writeFileSync(join(SITEMAPS_DIR, "sitemap-blog.xml"), urlsetXml(blogEntries));
+    const latest = blogEntries
+      .map((e) => e.lastmod ?? TODAY)
+      .sort()
+      .pop()!;
+    children.push({ file: "sitemap-blog.xml", lastmod: latest });
+  }
+
+  // Root index
+  writeFileSync(join(PUBLIC_DIR, "sitemap.xml"), indexXml(children));
+
   console.log(
-    `[sitemap] Wrote ${all.length} entries (${staticEntries.length} static, ${productEntries.length} products [${dbSlugs.length} from DB], ${blogEntries.length} blog) → public/sitemap.xml`,
+    `[sitemap] Index written with ${children.length} child sitemaps ` +
+      `(${staticEntries.length} pages, ${productEntries.length} products in ${productChunks.length} file(s) ` +
+      `[${dbSlugs.length} from DB], ${blogEntries.length} blog).`,
   );
 }
 
 main().catch((err) => {
   console.error("[sitemap] generation failed:", err);
-  // Don't fail the build — a stale sitemap is better than none.
-  if (!existsSync(resolve("public/sitemap.xml"))) {
-    writeFileSync(resolve("public/sitemap.xml"), toXml(staticEntries));
+  // Fallback: minimal index pointing at a pages-only child, so /sitemap.xml
+  // remains a valid index even if the DB / blog imports break.
+  try {
+    if (!existsSync(SITEMAPS_DIR)) mkdirSync(SITEMAPS_DIR, { recursive: true });
+    writeFileSync(join(SITEMAPS_DIR, "sitemap-pages.xml"), urlsetXml(staticEntries));
+    writeFileSync(
+      join(PUBLIC_DIR, "sitemap.xml"),
+      indexXml([{ file: "sitemap-pages.xml", lastmod: TODAY }]),
+    );
+  } catch {
+    /* keep previous file */
   }
   process.exit(0);
 });

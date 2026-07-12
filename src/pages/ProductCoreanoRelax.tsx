@@ -385,17 +385,17 @@ const ProductCoreanoRelax = () => {
       <WhatsAppButton url="https://wa.link/ghi4rw" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
 
-      {/* Sticky Buy Bar — dos botones: Tienda iLingue + Hotmart */}
+      {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
       <StickyBuyBar
         price={displayPrice}
-        originalPrice="$54"
+        originalPrice={tier.originalLabel}
         currencyCode={currencyLabel}
         flag={displayFlag}
         productName="Coreano · +100 Mapas Mentales"
-        ctaText={`TIENDA ILINGUE · ${displayPrice}`}
-        onBuyClick={handleBuyStore}
-        secondaryCtaText="HOTMART"
-        onSecondaryClick={handleBuyHotmart}
+        ctaText={useTiendaOnly ? `TIENDA ILINGUE · ${displayPrice}` : `COMPRAR EN HOTMART · ${displayPrice}`}
+        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : (tier.hotmartUrl || HOTMART_URL_LATAM)}
+        onBuyClick={handleBuy}
+        {...(useHotmartLatam ? { secondaryCtaText: "TIENDA", onSecondaryClick: handleBuyStore } : {})}
         rating={4.9}
         reviewCount={120}
         lang="es"

@@ -26,13 +26,14 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
+const ADMIN_SKU_1000_VERBOS = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
-const CART_ITEM = {
+const CART_ITEM_BASE = {
   id: "1000-verbos-ingles",
   name: "Inglés Relax · 1,000 Verbos Esenciales (Digital PDF)",
-  price: 10,
   image: product1000VerbosImage,
   description: "1,000 verbos en presente, pasado y futuro con pronunciación",
 };

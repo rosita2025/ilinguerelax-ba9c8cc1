@@ -91,12 +91,18 @@ export default function Checkout() {
             const p = bySku.get(u.upsell_sku);
             if (!p) return null;
             const original = Number(p.price_usd);
-            const price = Math.round(original * (1 - (Number(u.discount_pct) || 0) / 100) * 100) / 100;
+            const discountPct = Number(u.discount_pct) || 0;
+            const price = Math.round(original * (1 - discountPct / 100) * 100) / 100;
+            const rawPen = p.price_pen != null ? Number(p.price_pen) : null;
+            const pricePen = rawPen != null && rawPen > 0
+              ? Math.round(rawPen * (1 - discountPct / 100) * 100) / 100
+              : undefined;
             const bust = `?v=${cb}`;
             return {
               id: p.sku,
               name: p.name,
               price,
+              pricePen,
               originalPrice: u.discount_pct ? original : undefined,
               image: (p.cover_image_url || "/placeholder.svg") + (p.cover_image_url ? bust : ""),
               description: p.description || undefined,

@@ -1,0 +1,1 @@
+ALTER TABLE public.digital_products ADD COLUMN IF NOT EXISTS is_physical BOOLEAN NOT NULL DEFAULT false;

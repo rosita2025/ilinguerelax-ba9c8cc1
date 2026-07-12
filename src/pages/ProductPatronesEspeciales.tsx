@@ -22,6 +22,7 @@ import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCardPrice } from "@/hooks/useCardPrice";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";

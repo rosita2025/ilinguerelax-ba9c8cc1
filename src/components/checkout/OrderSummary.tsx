@@ -110,9 +110,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                 <div className="text-sm font-semibold shrink-0 text-right">
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen * item.quantity)
-                    : useLocal
-                      ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
-                      : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                    : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
                 </div>
               </div>
             ))}

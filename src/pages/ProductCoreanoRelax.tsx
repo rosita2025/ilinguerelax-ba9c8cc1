@@ -112,6 +112,7 @@ const ProductCoreanoRelax = () => {
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
       price: usdPrice,
       regionPrices: { latam: PRICE_LATAM_USD, global: PRICE_GLOBAL_USD },
+      pricePen: PRICE_PEN,
       image: "/images/product-coreano-100-mapas.webp",
       description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
       quantity: 1,

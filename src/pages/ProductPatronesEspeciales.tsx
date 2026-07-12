@@ -112,7 +112,7 @@ const ProductPatronesEspeciales = () => {
   const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
   const regional = getRegionalPricing(countryCode);
-  const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
+  const useTiendaOnly = TIENDA_ONLY_COUNTRIES.has(countryCode);
   // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
   const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD);
   const originalLabel = cardPrice.ready ? cardPrice.format(null, ORIGINAL_USD) : formatPrice(ORIGINAL_USD);
@@ -128,6 +128,12 @@ const ProductPatronesEspeciales = () => {
   }), [PRICE_USD]);
   useHotmartPixel(pixelParams);
 
+  const goToTienda = () => {
+    if (!pricingReady) return;
+    handleAddToCart();
+    navigate(TIENDA_CHECKOUT_PATH);
+  };
+
   const handleBuy = () => {
     if (!pricingReady) return;
     trackHotmartEvent("InitiateCheckout", {
@@ -139,8 +145,11 @@ const ProductPatronesEspeciales = () => {
       currency: "USD",
       num_items: 1,
     });
-    const url = usePaypalStripe ? PAYPAL_URL : HOTMART_URL;
-    window.open(url, "_blank", "noopener,noreferrer");
+    if (useTiendaOnly) {
+      goToTienda();
+      return;
+    }
+    window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
   };
 
   const handleAddToCart = () => {

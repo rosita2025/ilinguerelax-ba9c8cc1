@@ -160,6 +160,8 @@ serve(async (req) => {
         console.error("purchase tracking error:", trackingError);
       }
 
+      const orderNumber = session.id ? `ILR-ST-${String(session.id).slice(-8).toUpperCase()}` : undefined;
+
       await sendThankYouEmail({
         customerEmail,
         customerName,
@@ -169,9 +171,42 @@ serve(async (req) => {
         amount: purchase.value,
         currency: purchase.currency,
         provider: "stripe",
-        orderNumber: session.id ? `ILR-ST-${String(session.id).slice(-8).toUpperCase()}` : undefined,
+        orderNumber,
         idempotencyKey: session.id,
       });
+
+      // Digital delivery — always trigger server-side so it goes out even if
+      // the buyer closes the tab before landing on /checkout/success.
+      try {
+        const skusRaw = (session.metadata?.skus || "") as string;
+        const skus = skusRaw.split(",").map((s) => s.trim()).filter(Boolean);
+        if (skus.length > 0) {
+          const digitalClient = createClient(
+            Deno.env.get("SUPABASE_URL")!,
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+          );
+          const { error: digitalErr } = await digitalClient.functions.invoke("send-digital-ilinguerelax", {
+            body: {
+              customerEmail,
+              customerName,
+              customerPhone: session.customer_details?.phone || undefined,
+              customerCountry: session.customer_details?.address?.country || undefined,
+              orderId: orderNumber,
+              skus,
+              amount: purchase.value,
+              currency: purchase.currency,
+              provider: "stripe",
+              idempotencyKey: `digital:${session.id}`,
+            },
+          });
+          if (digitalErr) console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);
+        } else {
+          console.log("[stripe-webhook] no skus in metadata; skipping digital delivery");
+        }
+      } catch (digitalException) {
+        console.error("digital delivery exception:", digitalException);
+      }
+
 
       return new Response(
         JSON.stringify({ received: true, emailsSent: true }),

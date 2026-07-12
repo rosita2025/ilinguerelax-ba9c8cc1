@@ -198,18 +198,20 @@ const ProductCoreanoRelax = () => {
                   <span className="text-amber-600 font-semibold text-xs uppercase">Precio de Lanzamiento</span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">{displayPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
-                    -81%
+                    {isPeru ? "-72%" : region.tier === "latam" ? "-81%" : "-72%"}
                   </motion.span>
                 </div>
-                {showLocal && (
-                  <p className="text-sm font-semibold text-foreground mb-1">
-                    {flag} ≈ <span className="text-primary">{localPrice.price} {localPrice.currency}</span>
-                  </p>
-                )}
-                <CountryFlagSelector campaign={localPrice} className="mb-2" />
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  {displayFlag} Precio para {isPeru ? "Perú" : region.tier === "latam" ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
+                </p>
+                <div className="text-xs text-muted-foreground space-y-0.5 mb-2">
+                  <div>🌍 Global: ${PRICE_GLOBAL_USD} USD</div>
+                  <div>🌎 Latinoamérica: ${PRICE_LATAM_USD} USD</div>
+                  <div>🇵🇪 Perú: S/ {PRICE_PEN.toFixed(2)} PEN</div>
+                </div>
                 <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
               </motion.div>
 
@@ -217,11 +219,11 @@ const ProductCoreanoRelax = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
                     <Store className="w-5 h-5 mr-2" />
-                    Tienda iLingue · $10
+                    Tienda iLingue · {displayPrice}
                   </Button>
                   <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
                     <ShoppingCart className="w-5 h-5 mr-2" />
-                    Hotmart · $10
+                    Hotmart · ${usdPrice}
                   </Button>
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>

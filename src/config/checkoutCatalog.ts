@@ -4,6 +4,8 @@ export interface UpsellItem {
   id: string;
   name: string;
   price: number;
+  /** Optional native PEN price for Peru display. */
+  pricePen?: number;
   /** Precio original (tachado) para mostrar el ahorro. Si no se define, no se muestra descuento. */
   originalPrice?: number;
   image: string;

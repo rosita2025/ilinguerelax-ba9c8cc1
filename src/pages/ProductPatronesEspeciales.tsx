@@ -22,7 +22,6 @@ import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
-import { useCardPrice } from "@/hooks/useCardPrice";
 import { useRegionTier } from "@/hooks/useRegionTier";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
@@ -108,12 +107,11 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
-  const { formatPrice, currency, countryCode } = useI18n();
+  const { countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
-  const cardPrice = useCardPrice();
   const region = useRegionTier();
   const visitorCountry = (region.country || countryCode || "").toUpperCase();
   const isPeru = visitorCountry === "PE";
@@ -135,7 +133,7 @@ const ProductPatronesEspeciales = () => {
   const originalLabel = isPeru && pricingAdmin.pricePen
     ? `S/ ${(pricingAdmin.pricePen * 2.5).toFixed(2)}`
     : `$${ORIGINAL_USD.toFixed(2)} USD`;
-  const HOTMART_URL = useHotmartLatam ? (pricingAdmin.hotmartUrl || HOTMART_URL_LATAM) : regional.url;
+  const HOTMART_URL = pricingAdmin.hotmartUrl || HOTMART_URL_LATAM;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
@@ -736,7 +734,7 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         price={priceLabel}
         originalPrice={originalLabel}
-        currencyCode={cardPrice.ready ? cardPrice.currencyLabel("patrones-especiales-alfabeto-combinaciones-secretas-ingles") : currency}
+        currencyCode={isPeru ? "PEN" : "USD"}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={6}

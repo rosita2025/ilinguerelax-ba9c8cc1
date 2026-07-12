@@ -24,6 +24,7 @@ interface Product {
   target_language: string;
   price_usd: number;
   price_usd_latam: number | null;
+  price_usd_tienda: number | null;
   price_pen: number | null;
   drive_url: string | null;
   access_key: string | null;
@@ -59,7 +60,7 @@ const LANGS = [
 
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
-  price_usd: 0, price_usd_latam: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
+  price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
   is_upsell: false, active: true, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
@@ -316,17 +317,17 @@ const AdminProductEdit = () => {
             <h2 className="font-semibold">3. Precios por región</h2>
 
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <Label>Precio USD — Resto del mundo</Label>
+                <Label>Precio USD — Global</Label>
                 <Input
                   type="number" step="0.01"
                   value={product.price_usd}
                   onChange={(e) => update("price_usd", Number(e.target.value))}
-                  placeholder="17.00"
+                  placeholder="15.00"
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  🇺🇸🇨🇦🇪🇺🇬🇧🇦🇺🇯🇵 USA, Canadá, Europa, UK, Australia, Asia
+                  🇺🇸🇨🇦🇪🇺🇬🇧🇦🇺🇯🇵 USA, Canadá, Europa, UK, Asia
                 </p>
               </div>
               <div>
@@ -338,7 +339,7 @@ const AdminProductEdit = () => {
                   placeholder="10.00"
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  🌎 MX, AR, CL, CO, PE… Si lo dejas vacío, se usa el precio del resto del mundo.
+                  🌎 MX, AR, CL, CO… Si lo dejas vacío, se usa el precio Global.
                 </p>
               </div>
               <div>
@@ -347,13 +348,28 @@ const AdminProductEdit = () => {
                   type="number" step="0.01"
                   value={product.price_pen ?? ""}
                   onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))}
-                  placeholder="S/ 29.90"
+                  placeholder="S/ 25.00"
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Sugerido: S/ {Math.round((product.price_usd_latam ?? product.price_usd ?? 0) * 3.75 * 10) / 10}
+                  🇵🇪 Perú. Sugerido: S/ {Math.round((product.price_usd_latam ?? product.price_usd ?? 0) * 3.75 * 10) / 10}
+                </p>
+              </div>
+              <div>
+                <Label>Precio USD — Tienda online</Label>
+                <Input
+                  type="number" step="0.01"
+                  value={product.price_usd_tienda ?? ""}
+                  onChange={(e) => update("price_usd_tienda", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="7.00"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  🇻🇪🇨🇺🇳🇮 Venezuela, Cuba, Nicaragua (donde Hotmart no vende). Si vacío, se usa el precio LATAM.
                 </p>
               </div>
             </div>
+
+            
+
 
             
           </Card>

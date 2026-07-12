@@ -108,13 +108,17 @@ const ProductPatronesEspeciales = () => {
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
   const cardPrice = useCardPrice();
-  const PRICE_USD = pricingAdmin.priceGlobalUsd ?? 0; // Precio dinámico desde /admin/products
+  const useTiendaOnly = TIENDA_ONLY_COUNTRIES.has(countryCode);
+  // 4 tiers dinámicos desde /admin/productos: Global / LATAM / Perú / Tienda (VE/CU/NI)
+  const TIENDA_USD = pricingAdmin.priceTiendaUsd ?? pricingAdmin.priceLatamUsd ?? pricingAdmin.priceGlobalUsd ?? 0;
+  const PRICE_USD = useTiendaOnly ? TIENDA_USD : (pricingAdmin.priceGlobalUsd ?? 0);
   const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
   const regional = getRegionalPricing(countryCode);
-  const useTiendaOnly = TIENDA_ONLY_COUNTRIES.has(countryCode);
   // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
-  const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD);
+  const priceLabel = useTiendaOnly
+    ? `$${TIENDA_USD.toFixed(2)} USD`
+    : (cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD));
   const originalLabel = cardPrice.ready ? cardPrice.format(null, ORIGINAL_USD) : formatPrice(ORIGINAL_USD);
   const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
   const hasLongPriceLabel = priceLabel.length > 9;

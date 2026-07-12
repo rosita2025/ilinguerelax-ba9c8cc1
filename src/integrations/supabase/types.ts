@@ -206,6 +206,7 @@ export type Database = {
           price_pen: number | null
           price_usd: number
           price_usd_latam: number | null
+          price_usd_tienda: number | null
           sku: string
           sort_order: number
           store_enabled: boolean
@@ -238,6 +239,7 @@ export type Database = {
           price_pen?: number | null
           price_usd?: number
           price_usd_latam?: number | null
+          price_usd_tienda?: number | null
           sku: string
           sort_order?: number
           store_enabled?: boolean
@@ -270,6 +272,7 @@ export type Database = {
           price_pen?: number | null
           price_usd?: number
           price_usd_latam?: number | null
+          price_usd_tienda?: number | null
           sku?: string
           sort_order?: number
           store_enabled?: boolean

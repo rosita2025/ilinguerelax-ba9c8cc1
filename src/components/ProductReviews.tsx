@@ -151,53 +151,15 @@ export const ProductReviews = ({ productType = "english", showProductSelector = 
   const testimonials = getTestimonials();
   const textReviews = getTextReviews();
 
-  // Schema.org structured data for reviews
-  const reviewSchema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": activeProduct === "english8000" || activeProduct === "english-book"
-      ? "Inglés Relax - 8,000 Palabras"
-      : activeProduct === "english" 
-        ? "Inglés Relax - 5,000 Palabras" 
-        : "Spanish Relax - 5,000 Words",
-    "brand": {
-      "@type": "Brand",
-      "name": "iLingue Relax"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": testimonials.length + textReviews.length,
-      "bestRating": "5",
-      "worstRating": "1"
-    },
-    "review": textReviews.map((review, index) => ({
-      "@type": "Review",
-      "reviewRating": {
-        "@type": "Rating",
-        "ratingValue": "5",
-        "bestRating": "5"
-      },
-      "author": {
-        "@type": "Person",
-        "name": `Cliente Verificado #${index + 1}`
-      },
-      "datePublished": review.date,
-      "reviewBody": review.text,
-      "publisher": {
-        "@type": "Organization",
-        "name": "iLingue Relax"
-      }
-    }))
-  };
+  // NOTE: Product/Review JSON-LD is emitted centrally by <SEO /> on each
+  // product page (with brand, aggregateRating, and reviews). Emitting a
+  // second Product block here caused Google Search Console to flag the
+  // "brand" field as duplicated, invalidating the rich result. Keep this
+  // component purely presentational.
 
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-secondary/30 to-background overflow-hidden">
-      {/* Schema.org JSON-LD for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
-      />
+
 
       <div className="container px-4 md:px-6">
         {/* Header */}

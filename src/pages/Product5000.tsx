@@ -322,8 +322,8 @@ const Product5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5.000 Palabras en Inglés con Pronunciación ES"
-        description="Libro digital con 5.000 palabras en inglés, pronunciación adaptada al español y fonética UK/USA. 52 capítulos y descarga inmediata."
+        title="5,000 Palabras en Inglés PDF con Pronunciación"
+        description="Libro digital con 5,000 palabras en inglés, pronunciación en español y fonética UK/USA. 52 capítulos, nivel A1–C1. PDF descargable al instante."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/images/product-5000.webp"
         type="product"
@@ -333,7 +333,7 @@ const Product5000 = () => {
         reviewCount="800"
         sku="ILINGUE-5000"
         availability="InStock"
-        keywords="aprender inglés, 5000 palabras inglés, vocabulario inglés con pronunciación, pronunciación inglés para hispanohablantes, fonética UK USA, inglés A1 C1, estructuras gramaticales inglés, libro digital inglés, PDF inglés descargable, inglés relax, aprender inglés en 6 meses, inglés Latinoamérica"
+        keywords="5000 palabras en inglés, vocabulario en inglés con pronunciación, libro de inglés pdf, aprender inglés desde cero, inglés para hispanohablantes, pronunciación inglés adaptada al español, fonética inglés UK USA, inglés A1 A2 B1 B2 C1, ebook de inglés, descargar libro de inglés, aprender inglés en Perú, aprender inglés en México"
       />
       {/* Lightbox Dialog */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>

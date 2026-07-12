@@ -102,8 +102,8 @@ const Product1000Verbos = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="1,000 Verbos Esenciales en Inglés: Presente, Pasado y Futuro con Pronunciación"
-        description="Aprende 1,000 verbos esenciales en inglés con pronunciación adaptada para hispanohablantes. Presente, pasado y futuro. Descarga inmediata."
+        title="1,000 Verbos en Inglés PDF con Pronunciación"
+        description="1,000 verbos esenciales en inglés en presente, pasado y futuro con pronunciación en español. PDF descargable al instante. Desde $10 USD."
         canonicalUrl="https://ilinguerelax.com/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
@@ -112,7 +112,7 @@ const Product1000Verbos = () => {
         rating="4.8"
         reviewCount="350"
         sku="ILINGUE-1000-VERBOS"
-        keywords="verbos en inglés, aprender verbos inglés, pronunciación inglés hispanohablantes, presente pasado futuro inglés"
+        keywords="1000 verbos en inglés, verbos en inglés pdf, lista de verbos en inglés con pronunciación, verbos irregulares en inglés, verbos regulares en inglés, verbos en inglés presente pasado futuro, aprender verbos en inglés para hispanohablantes, conjugación de verbos en inglés, verbos en inglés más usados, ebook verbos inglés"
       />
 
       <Navbar />

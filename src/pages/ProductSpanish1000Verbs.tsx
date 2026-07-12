@@ -39,8 +39,8 @@ const ProductSpanish1000Verbs = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="1,000 Verbs in Spanish: Past, Present & Future with English Pronunciation"
-        description="Master the 1,000 most-used Spanish verbs in past, present and future with English pronunciation. Instant PDF download."
+        title="1,000 Spanish Verbs PDF · English Pronunciation"
+        description="Master 1,000 essential Spanish verbs in past, present and future with English pronunciation. Instant PDF download for English speakers."
         canonicalUrl="https://ilinguerelax.com/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation"
         image="https://ilinguerelax.com/images/product-spanish-1000-verbs.png"
         type="product"
@@ -49,6 +49,7 @@ const ProductSpanish1000Verbs = () => {
         rating="4.8"
         reviewCount="0"
         sku="SPANISH-1000-VERBS"
+        keywords="1000 Spanish verbs, Spanish verbs pdf, Spanish verb conjugation, learn Spanish verbs, most common Spanish verbs, Spanish verbs with English pronunciation, Spanish for English speakers, Spanish past present future, Spanish verbs ebook, Spanish Relax verbs"
       />
       <Navbar />
 

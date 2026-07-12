@@ -79,15 +79,15 @@ const ProductPortuguese5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Portugués con Pronunciación"
-        description="Aprende 5,000 palabras en portugués con pronunciación adaptada para hispanohablantes y fonética en portugués real. Muy pronto disponible."
+        title="5,000 Palabras en Portugués PDF con Pronunciación"
+        description="Aprende 5,000 palabras en portugués (Brasil) con pronunciación en español y fonética portuguesa real. Nivel A1–C1. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
         price="12"
         originalPrice="54"
         sku="ILINGUE-PORTUGUESE-5000"
-        keywords="palabras en portugués, aprender portugués, pronunciación portugués hispanohablantes, fonética portugués, portugués para hispanohablantes"
+        keywords="aprender portugués desde cero, 5000 palabras en portugués, vocabulario en portugués pdf, portugués brasileño para hispanohablantes, pronunciación portugués en español, libro de portugués pdf, ebook portugués, curso de portugués online, portugués A1 A2 B1, fonética portuguesa"
       />
 
       <Navbar />

@@ -57,15 +57,15 @@ const ProductDutch5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Neerlandés con Pronunciación para Hispanohablantes y Fonética Neerlandesa"
-        description="Aprende 5,000 palabras en neerlandés con pronunciación adaptada para hispanohablantes y fonética neerlandesa. Muy pronto disponible."
+        title="5,000 Palabras en Neerlandés (Holandés) PDF"
+        description="Aprende 5,000 palabras en neerlandés (holandés) con pronunciación en español y fonética neerlandesa. Nivel A1–C1. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
         price="12"
         originalPrice="54"
         sku="ILINGUE-DUTCH-5000"
-        keywords="palabras en neerlandés, aprender neerlandés, pronunciación neerlandés hispanohablantes, fonética neerlandesa, neerlandés para hispanohablantes, holandés"
+        keywords="aprender neerlandés, aprender holandés desde cero, 5000 palabras en neerlandés, vocabulario holandés pdf, neerlandés para hispanohablantes, pronunciación neerlandés en español, libro de holandés pdf, ebook neerlandés, curso de neerlandés, holandés A1 A2 B1"
       />
       <Navbar />
 

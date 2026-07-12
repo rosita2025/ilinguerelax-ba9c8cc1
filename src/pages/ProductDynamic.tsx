@@ -113,10 +113,14 @@ const ProductDynamic = () => {
   return (
     <>
       <SEO
-        title={`${product.name} | ILINGUE RELAX`}
-        description={product.description || `${product.name} — descarga digital inmediata.`}
+        title={product.name}
+        description={product.description || `${product.name} en PDF con pronunciación. Descarga digital inmediata en iLingue Relax.`}
         canonicalUrl={canonical}
         image={cover}
+        type="product"
+        price={product.price_usd ? String(product.price_usd) : undefined}
+        sku={product.sku}
+        keywords={`${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
       />
       <Navbar />
       <main className="min-h-dvh bg-background pt-4 pb-16">

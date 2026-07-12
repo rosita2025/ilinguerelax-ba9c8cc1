@@ -178,8 +178,8 @@ const Product8000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="8.000 Palabras en Inglés con Pronunciación ES"
-        description="Domina 8.000 palabras en inglés con pronunciación para hispanohablantes y fonética UK/USA. Método paso a paso, sin diccionarios."
+        title="8,000 Palabras en Inglés PDF Nivel Avanzado"
+        description="8,000 palabras en inglés con pronunciación en español y fonética UK/USA. Nivel A1 a C1, sin diccionarios. PDF descargable al instante."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image="https://ilinguerelax.com/product-8000.png"
         type="product"
@@ -188,7 +188,7 @@ const Product8000 = () => {
         rating="4.9"
         reviewCount="892"
         sku="ILINGUE-8000"
-        keywords="aprender inglés, vocabulario inglés 8000 palabras, pronunciación inglés hispanohablantes, libro digital inglés avanzado" />
+        keywords="8000 palabras en inglés, vocabulario avanzado inglés, libro de inglés avanzado pdf, inglés nivel C1, aprender inglés fluido, inglés para hispanohablantes, pronunciación inglés adaptada al español, fonética UK USA, ebook inglés avanzado, descargar libro inglés" />
       
       <Navbar />
 

@@ -59,15 +59,15 @@ const ProductItalian5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Italiano con Pronunciación"
-        description="Aprende 5,000 palabras en italiano con pronunciación adaptada para hispanohablantes y fonética italiana. Muy pronto disponible."
+        title="5,000 Palabras en Italiano PDF con Pronunciación"
+        description="Aprende 5,000 palabras en italiano con pronunciación en español y fonética italiana. Nivel A1–C1. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
         price="12"
         originalPrice="54"
         sku="ILINGUE-ITALIAN-5000"
-        keywords="palabras en italiano, aprender italiano, pronunciación italiano hispanohablantes, fonética italiana, italiano para hispanohablantes"
+        keywords="aprender italiano desde cero, 5000 palabras en italiano, vocabulario en italiano pdf, italiano para hispanohablantes, pronunciación italiano en español, libro de italiano pdf, ebook italiano, curso de italiano online, italiano A1 A2 B1, fonética italiana"
       />
       <Navbar />
 

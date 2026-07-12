@@ -59,15 +59,15 @@ const ProductFrench5000 = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="5,000 Palabras en Francés con Pronunciación"
-        description="Aprende 5,000 palabras en francés con pronunciación adaptada para hispanohablantes y fonética francesa. Muy pronto disponible."
+        title="5,000 Palabras en Francés PDF con Pronunciación"
+        description="Aprende 5,000 palabras en francés con pronunciación en español y fonética francesa (IPA). Nivel A1–C1. Muy pronto disponible."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes"
         image="https://ilinguerelax.com/og-image.png"
         type="product"
         price="12"
         originalPrice="54"
         sku="ILINGUE-FRENCH-5000"
-        keywords="palabras en francés, aprender francés, pronunciación francés hispanohablantes, fonética francesa, francés para hispanohablantes"
+        keywords="aprender francés desde cero, 5000 palabras en francés, vocabulario en francés pdf, francés para hispanohablantes, pronunciación francés en español, libro de francés pdf, ebook francés, curso de francés online, francés A1 A2 B1, fonética francesa"
       />
       <Navbar />
 

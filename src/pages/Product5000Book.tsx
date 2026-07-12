@@ -154,8 +154,8 @@ const Product5000Book = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Libro Físico: 5,000 Palabras en Inglés con Pronunciación | Comprar en Amazon"
-        description="Compra el libro físico de 5,000 palabras en inglés con pronunciación para hispanohablantes. Tapa blanda premium disponible en Amazon. Método iLingue Relax."
+        title="Libro Físico: 5,000 Palabras en Inglés"
+        description="Libro físico con 5,000 palabras en inglés y pronunciación en español. Tapa blanda premium, envío mundial. Método iLingue Relax."
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/images/product-5000-book.webp"
         type="product"
@@ -163,7 +163,7 @@ const Product5000Book = () => {
         rating=""
         reviewCount=""
         sku="ILINGUE-5000-BOOK"
-        keywords="libro físico inglés, 5000 palabras inglés, pronunciación inglés hispanohablantes, libro inglés impreso, Amazon"
+        keywords="libro de inglés físico, libro para aprender inglés, 5000 palabras en inglés libro, libro de vocabulario en inglés, libro de inglés con pronunciación en español, mejor libro para aprender inglés, libro de inglés para hispanohablantes, comprar libro de inglés Amazon, libro de inglés tapa blanda, iLingue Relax libro"
         availability="InStock"
         isPhysical={true}
       />

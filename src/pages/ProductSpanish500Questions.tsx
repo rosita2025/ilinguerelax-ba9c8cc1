@@ -40,8 +40,8 @@ const ProductSpanish500Questions = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="500 Questions in Spanish with English Pronunciation Guide"
-        description="Your essential guide to mastering 500 questions in Spanish with English pronunciation. Instant PDF download."
+        title="500 Spanish Questions PDF · English Pronunciation"
+        description="Master 500 real Spanish questions with English pronunciation. Talk confidently at work, travel and daily life. Instant PDF download for English speakers."
         canonicalUrl="https://ilinguerelax.com/products/500-questions-in-spanish-with-english-pronunciation"
         image="https://ilinguerelax.com/images/product-spanish-500-questions.png"
         type="product"
@@ -50,6 +50,7 @@ const ProductSpanish500Questions = () => {
         rating="4.8"
         reviewCount="0"
         sku="SPANISH-500-QUESTIONS"
+        keywords="500 Spanish questions, common Spanish questions, Spanish questions and answers, Spanish conversation questions, learn to speak Spanish, Spanish for travel, Spanish for English speakers, Spanish pronunciation guide, Spanish ebook pdf, Spanish Relax"
       />
       <Navbar />
 

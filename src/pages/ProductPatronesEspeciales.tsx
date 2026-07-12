@@ -26,9 +26,9 @@ import { useCardPrice } from "@/hooks/useCardPrice";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
-const PAYPAL_URL = "https://www.paypal.com/ncp/payment/D884C48J9VTMG";
-const STRIPE_URL = "https://buy.stripe.com/aFaeVcahadlze5i59X8IU0c";
-const PAYPAL_STRIPE_COUNTRIES = new Set(["VE","NI","CU","KR","CN","SG","TR","HN"]);
+const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
+// Países donde Hotmart no permite comprar → usar tienda online interna
+const TIENDA_ONLY_COUNTRIES = new Set(["VE","NI","CU","KR","CN","SG","TR","HN"]);
 
 const EUROPE_CODES = new Set([
   "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",
@@ -112,7 +112,7 @@ const ProductPatronesEspeciales = () => {
   const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
   const regional = getRegionalPricing(countryCode);
-  const usePaypalStripe = PAYPAL_STRIPE_COUNTRIES.has(countryCode);
+  const useTiendaOnly = TIENDA_ONLY_COUNTRIES.has(countryCode);
   // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
   const priceLabel = cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD);
   const originalLabel = cardPrice.ready ? cardPrice.format(null, ORIGINAL_USD) : formatPrice(ORIGINAL_USD);
@@ -128,6 +128,12 @@ const ProductPatronesEspeciales = () => {
   }), [PRICE_USD]);
   useHotmartPixel(pixelParams);
 
+  const goToTienda = () => {
+    if (!pricingReady) return;
+    handleAddToCart();
+    navigate(TIENDA_CHECKOUT_PATH);
+  };
+
   const handleBuy = () => {
     if (!pricingReady) return;
     trackHotmartEvent("InitiateCheckout", {
@@ -139,8 +145,11 @@ const ProductPatronesEspeciales = () => {
       currency: "USD",
       num_items: 1,
     });
-    const url = usePaypalStripe ? PAYPAL_URL : HOTMART_URL;
-    window.open(url, "_blank", "noopener,noreferrer");
+    if (useTiendaOnly) {
+      goToTienda();
+      return;
+    }
+    window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
   };
 
   const handleAddToCart = () => {
@@ -326,49 +335,19 @@ const ProductPatronesEspeciales = () => {
                 </p>
               </motion.div>
 
-              {usePaypalStripe ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              {useTiendaOnly ? (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="hero"
                     size="xl"
-                    className="w-full text-base py-6 shadow-2xl"
-                    onClick={() => {
-                      trackHotmartEvent("InitiateCheckout", {
-                        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-                        content_category: "Digital Book",
-                        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-                        content_type: "product",
-                        value: PRICE_USD,
-                        currency: "USD",
-                        num_items: 1,
-                      });
-                      window.open(PAYPAL_URL, "_blank");
-                    }}
+                    className="w-full mb-4 text-lg py-6 shadow-2xl"
+                    onClick={handleBuy}
                   >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Pagar con PayPal
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    Comprar en tienda online
+                    <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="xl"
-                    className="w-full text-base py-6"
-                    onClick={() => {
-                      trackHotmartEvent("InitiateCheckout", {
-                        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-                        content_category: "Digital Book",
-                        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-                        content_type: "product",
-                        value: PRICE_USD,
-                        currency: "USD",
-                        num_items: 1,
-                      });
-                      window.open(STRIPE_URL, "_blank");
-                    }}
-                  >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Pagar con Stripe
-                  </Button>
-                </div>
+                </motion.div>
               ) : (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
@@ -742,39 +721,9 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl={usePaypalStripe ? PAYPAL_URL : HOTMART_URL}
-        onBuyClick={
-          usePaypalStripe
-            ? () => {
-                trackHotmartEvent("InitiateCheckout", {
-                  content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-                  content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-                  content_type: "product",
-                  value: PRICE_USD,
-                  currency: "USD",
-                  num_items: 1,
-                });
-                window.open(PAYPAL_URL, "_blank", "noopener,noreferrer");
-              }
-            : handleBuy
-        }
-        ctaText={usePaypalStripe ? "Pagar con PayPal" : "COMPRAR AHORA"}
-        secondaryCtaText={usePaypalStripe ? "Pagar con Stripe" : undefined}
-        onSecondaryClick={
-          usePaypalStripe
-            ? () => {
-                trackHotmartEvent("InitiateCheckout", {
-                  content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-                  content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-                  content_type: "product",
-                  value: PRICE_USD,
-                  currency: "USD",
-                  num_items: 1,
-                });
-                window.open(STRIPE_URL, "_blank", "noopener,noreferrer");
-              }
-            : undefined
-        }
+        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
+        onBuyClick={handleBuy}
+        ctaText={useTiendaOnly ? "Comprar en tienda online" : "COMPRAR AHORA"}
       />
 
       <div className="h-20 md:h-16" />

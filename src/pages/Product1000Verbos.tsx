@@ -156,8 +156,11 @@ const Product1000Verbos = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                1,000 Verbos Esenciales en Inglés: Presente, Pasado y Futuro con Pronunciación
+                {pricing.name ?? "1,000 Verbos Esenciales en Inglés: Presente, Pasado y Futuro con Pronunciación"}
               </h1>
+              {pricing.description && (
+                <p className="text-base text-muted-foreground mb-4">{pricing.description}</p>
+              )}
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">

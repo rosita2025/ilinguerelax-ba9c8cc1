@@ -70,12 +70,12 @@ const ProductSpanish1000Verbs = () => {
 
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Spanish Relax - 1,000 Verbs in Spanish
-                <br />
-                <span className="text-blue-600">Past, Present & Future</span>
+                {pricing.name ?? (<>Spanish Relax - 1,000 Verbs in Spanish
+                  <br />
+                  <span className="text-blue-600">Past, Present & Future</span></>)}
               </h1>
               <p className="text-lg text-muted-foreground mb-4">
-                The complete stress-free guide to master Spanish verbs. With English pronunciation. Digital PDF — download instantly!
+                {pricing.description ?? "The complete stress-free guide to master Spanish verbs. With English pronunciation. Digital PDF — download instantly!"}
               </p>
 
               <div className="flex items-center gap-3 mb-4">

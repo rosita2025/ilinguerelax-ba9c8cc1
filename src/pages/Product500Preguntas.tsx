@@ -124,8 +124,11 @@ const Product500Preguntas = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                500 Preguntas en Inglés con Pronunciación para Hispanohablantes
+                {pricing.name ?? "500 Preguntas en Inglés con Pronunciación para Hispanohablantes"}
               </h1>
+              {pricing.description && (
+                <p className="text-base text-muted-foreground mb-4">{pricing.description}</p>
+              )}
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">

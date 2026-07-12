@@ -499,12 +499,12 @@ const Product5000 = () => {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Inglés Relax - 5,000 Palabras con Pronunciación Español y Fonética UK/USA
+                {pricing5000.name ?? "Inglés Relax - 5,000 Palabras con Pronunciación Español y Fonética UK/USA"}
               </h1>
               <p className="text-base text-muted-foreground mb-4">
-                📚 Incluye estructura gramatical completa desde{" "}
+                {pricing5000.description ?? (<>📚 Incluye estructura gramatical completa desde{" "}
                 <span className="font-bold text-foreground">Nivel Cero hasta Avanzado C1</span>. Perfecto para
-                principiantes y estudiantes avanzados.
+                principiantes y estudiantes avanzados.</>)}
               </p>
 
               {/* Reviews - More Prominent */}

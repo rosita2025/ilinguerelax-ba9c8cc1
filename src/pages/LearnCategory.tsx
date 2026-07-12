@@ -74,6 +74,11 @@ const LearnCategory = () => {
           rating: p.rating,
           reviewCount: p.reviews,
         }))}
+        breadcrumbs={[
+          { name: inEnglish ? "Home" : "Inicio", url: "https://ilinguerelax.com" },
+          { name: inEnglish ? "Learn" : "Aprender", url: "https://ilinguerelax.com/aprender" },
+          { name: `${fromMeta.native} → ${toMeta.native}`, url: `https://ilinguerelax.com/aprender/${from}-${to}` },
+        ]}
       />
       <Navbar />
 

@@ -29,6 +29,7 @@ export interface AdminPricing {
 const INITIAL: AdminPricing = {
   priceGlobalUsd: null,
   priceLatamUsd: null,
+  priceTiendaUsd: null,
   pricePen: null,
   name: null,
   description: null,

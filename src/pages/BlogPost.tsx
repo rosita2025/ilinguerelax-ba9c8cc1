@@ -10,8 +10,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useCardPrice } from "@/hooks/useCardPrice";
 
 const BlogPost = () => {
+  const cardPrice = useCardPrice();
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? getBlogPostBySlug(slug) : null;
   

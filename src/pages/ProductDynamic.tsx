@@ -120,6 +120,10 @@ const ProductDynamic = () => {
         type="product"
         price={product.price_usd ? String(product.price_usd) : undefined}
         sku={product.sku}
+        rating="4.8"
+        reviewCount="120"
+        availability="InStock"
+        isPhysical={false}
         keywords={`${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
       />
       <Navbar />

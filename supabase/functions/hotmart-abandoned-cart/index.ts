@@ -123,6 +123,29 @@ serve(async (req) => {
       console.log("Contact already saved:", e);
     }
 
+    // Push to Brevo — workflow handles the drip.
+    try {
+      const { data: product } = await supabase
+        .from("digital_products")
+        .select("name, price_usd, slug")
+        .eq("sku", productSku)
+        .maybeSingle();
+      const site = "https://ilinguerelax.com";
+      const url = (product as { slug?: string } | null)?.slug
+        ? `${site}/checkouts/${(product as { slug?: string }).slug}`
+        : `${site}/products/${productSku}`;
+      await pushAbandonedCartToBrevo({
+        email: buyerEmail.toLowerCase(),
+        name: buyerName,
+        productSku,
+        productName: (product as { name?: string } | null)?.name,
+        productUrl: url,
+        priceUsd: (product as { price_usd?: number } | null)?.price_usd ?? undefined,
+        couponCode: "NEW10",
+        language,
+        source: "hotmart",
+      });
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

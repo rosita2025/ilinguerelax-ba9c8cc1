@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Star, Download, BookOpen } from "lucide-react";
 import { products as staticProducts, getProductLink, type Product } from "@/data/products";
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
+import { useCardPrice } from "@/hooks/useCardPrice";
 import { useI18n } from "@/i18n/I18nContext";
 import { LANG_LABEL, LEARN_PAIRS, defaultPairFor, parsePairSlug } from "@/lib/learnPairs";
 

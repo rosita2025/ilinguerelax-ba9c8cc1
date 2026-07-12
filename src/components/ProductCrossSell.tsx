@@ -41,9 +41,9 @@ const products = {
 };
 
 export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSellProps) => {
-  // Show the OTHER product
   const otherProduct = currentProduct === "5000" ? "8000" : "5000";
   const product = products[otherProduct];
+  const cardPrice = useCardPrice();
 
   const text = lang === "en" ? {
     heading: "Would you like another option?",

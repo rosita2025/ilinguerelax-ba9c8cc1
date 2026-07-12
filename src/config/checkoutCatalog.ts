@@ -97,6 +97,15 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     productPath: "/products/5-000-spanish-words-with-english-pronunciation-digital",
     adminSku: "5-000-spanish-words-with-english-pronunciation-digital",
   },
+  "coreano-100-mapas": {
+    id: "coreano-100-mapas",
+    name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
+    price: 10,
+    image: "/images/product-coreano-100-mapas.webp",
+    description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
+    productPath: "/products/100-mapas-mentales-para-aprender-coreano-hangul-c1",
+    adminSku: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
+  },
   "500-preguntas": {
     id: "500-preguntas-ingles",
     name: "Spanish Relax · 500 Questions in Spanish (Digital PDF)",

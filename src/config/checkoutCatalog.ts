@@ -32,11 +32,13 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "patrones-ingles": {
     id: "patrones-especiales-ingles",
     name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
-    price: 8,
+    price: 15,
+    pricePen: 25,
+    regionPrices: { latam: 10, global: 15, tienda: 7 },
     image: "/images/product-patrones-especiales.webp",
     description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
     productPath: "/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles",
-    adminSku: "patrones-especiales",
+    adminSku: "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
 
 
     upsells: [

@@ -15,48 +15,24 @@ import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb,
 import { motion } from "framer-motion";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { useI18n } from "@/i18n/I18nContext";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
-import { useCardPrice } from "@/hooks/useCardPrice";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
-const HOTMART_URL_INTL = "https://pay.hotmart.com/Y106596408X?checkoutMode=10&bid=1783105751202";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
-// Países que SIEMPRE usan la tienda interna (Yape / Plin / Mercado Pago), no Hotmart
-// Perú va a la tienda interna con soles (PEN). VE/CU/NI usan tienda en USD.
-const TIENDA_ONLY_COUNTRIES = new Set(["PE","VE","CU","NI"]);
-
-const EUROPE_CODES = new Set([
-  "ES","FR","DE","IT","PT","NL","BE","AT","IE","GR","PL","SE","NO","DK","FI","CH",
-  "LU","CZ","HU","RO","BG","HR","SI","SK","EE","LV","LT","MT","CY","IS","LI","AD",
-  "MC","SM","VA","GB","UA","RS","BA","MK","AL","ME","MD","BY","XK",
-]);
-const ASIA_CODES = new Set([
-  "JP","KR","CN","HK","TW","SG","MY","TH","VN","ID","PH","IN","PK","BD","LK","NP",
-  "MM","KH","LA","BN","MN","MO","AE","SA","IL","QA","KW","BH","OM","JO","LB","IQ",
-  "IR","YE","SY","TR","KZ","UZ","TM","KG","TJ","AF","AZ","AM","GE",
+// ÚNICA regla final para Patrones:
+// Perú → tienda interna PEN. VE/CU/NI → tienda interna USD. Global → tienda interna USD.
+// Solo LATAM permitido (sin PE/VE/CU/NI) usa Hotmart LATAM.
+const TIENDA_USD_COUNTRIES = new Set(["VE", "CU", "NI"]);
+const LATAM_HOTMART_COUNTRIES = new Set([
+  "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PR", "UY",
 ]);
 
-function getRegionalPricing(countryCode: string) {
-  if (countryCode === "CA") {
-    return { url: HOTMART_URL_INTL, price: "CA$ 25.20", original: "CA$ 62.00", isIntl: true };
-  }
-  if (countryCode === "US") {
-    return { url: HOTMART_URL_INTL, price: "$15.00 USD", original: "$37.00 USD", isIntl: true };
-  }
-  if (EUROPE_CODES.has(countryCode)) {
-    return { url: HOTMART_URL_INTL, price: "14,56 €", original: "36,00 €", isIntl: true };
-  }
-  if (ASIA_CODES.has(countryCode)) {
-    return { url: HOTMART_URL_INTL, price: "$15.00 USD", original: "$37.00 USD", isIntl: true };
-  }
-  return { url: HOTMART_URL_LATAM, price: null, original: null, isIntl: false };
-}
 const productImage = "/images/product-patrones-especiales.webp";
 
 import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
@@ -103,25 +79,30 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
-  const { formatPrice, currency, countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
-  const cardPrice = useCardPrice();
-  const useTiendaOnly = TIENDA_ONLY_COUNTRIES.has(countryCode);
+  const region = useRegionTier();
+  const visitorCountry = (region.country || "").toUpperCase();
+  const isPeru = visitorCountry === "PE";
+  const isTiendaUsdCountry = TIENDA_USD_COUNTRIES.has(visitorCountry);
+  const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(visitorCountry);
+  const useTiendaOnly = !useHotmartLatam;
   // 4 tiers dinámicos desde /admin/productos: Global / LATAM / Perú / Tienda (VE/CU/NI)
   const TIENDA_USD = pricingAdmin.priceTiendaUsd ?? pricingAdmin.priceLatamUsd ?? pricingAdmin.priceGlobalUsd ?? 0;
-  const PRICE_USD = useTiendaOnly ? TIENDA_USD : (pricingAdmin.priceGlobalUsd ?? 0);
-  const pricingReady = pricingAdmin.loaded && PRICE_USD > 0;
+  const LATAM_USD = pricingAdmin.priceLatamUsd ?? pricingAdmin.priceGlobalUsd ?? 0;
+  const GLOBAL_USD = pricingAdmin.priceGlobalUsd ?? 0;
+  const PRICE_USD = isTiendaUsdCountry ? TIENDA_USD : useHotmartLatam ? LATAM_USD : GLOBAL_USD;
+  const pricingReady = pricingAdmin.loaded && (isPeru ? (pricingAdmin.pricePen ?? 0) > 0 : PRICE_USD > 0);
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
-  const regional = getRegionalPricing(countryCode);
-  // Sticky bar y botones siempre reflejan el precio del admin vía useCardPrice (3-tier: PE / LATAM / Global)
-  const priceLabel = useTiendaOnly
-    ? `$${TIENDA_USD.toFixed(2)} USD`
-    : (cardPrice.ready ? cardPrice.format("patrones-especiales-alfabeto-combinaciones-secretas-ingles", PRICE_USD) : formatPrice(PRICE_USD));
-  const originalLabel = cardPrice.ready ? cardPrice.format(null, ORIGINAL_USD) : formatPrice(ORIGINAL_USD);
-  const HOTMART_URL = pricingAdmin.hotmartUrl || regional.url;
+  // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
+  const priceLabel = isPeru && pricingAdmin.pricePen
+    ? `S/ ${pricingAdmin.pricePen.toFixed(2)}`
+    : (useTiendaOnly ? `$${PRICE_USD.toFixed(2)} USD` : `$${PRICE_USD.toFixed(2)} USD`);
+  const originalLabel = isPeru && pricingAdmin.pricePen
+    ? `S/ ${(pricingAdmin.pricePen * 2.5).toFixed(2)}`
+    : `$${ORIGINAL_USD.toFixed(2)} USD`;
+  const HOTMART_URL = pricingAdmin.hotmartUrl || HOTMART_URL_LATAM;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
@@ -164,6 +145,7 @@ const ProductPatronesEspeciales = () => {
       name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
       price: PRICE_USD,
       pricePen: pricingAdmin.pricePen ?? undefined,
+      regionPrices: { latam: LATAM_USD, global: GLOBAL_USD, tienda: TIENDA_USD },
       image: "/images/product-patrones-especiales.webp",
       description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
       quantity: 1,
@@ -238,7 +220,7 @@ const ProductPatronesEspeciales = () => {
           { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
-          { question: "¿Cómo realizo el pago?", answer: "Pago seguro mediante Hotmart: tarjeta de crédito/débito, PayPal y otros métodos según tu país." },
+          { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de ILINGUE RELAX o Hotmart LATAM." },
         ]}
       />
 
@@ -710,7 +692,7 @@ const ProductPatronesEspeciales = () => {
           { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba.", icon: Lightbulb },
           { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas.", icon: BookOpen },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo.", icon: Smartphone },
-          { question: "¿Cómo realizo el pago?", answer: "Pago seguro mediante Hotmart: tarjeta de crédito/débito, PayPal y otros métodos según tu país.", icon: CreditCard },
+          { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de ILINGUE RELAX o Hotmart LATAM.", icon: CreditCard },
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"
@@ -721,14 +703,14 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         price={priceLabel}
         originalPrice={originalLabel}
-        currencyCode={cardPrice.ready ? cardPrice.currencyLabel("patrones-especiales-alfabeto-combinaciones-secretas-ingles") : currency}
+        currencyCode={isPeru ? "PEN" : "USD"}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={6}
         showReviews={true}
         buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
         onBuyClick={handleBuy}
-        ctaText={useTiendaOnly ? "Comprar en tienda online" : "COMPRAR AHORA"}
+        ctaText={useTiendaOnly ? "Comprar en tienda online" : "Comprar en Hotmart LATAM"}
       />
 
       <div className="h-20 md:h-16" />

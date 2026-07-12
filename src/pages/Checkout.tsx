@@ -61,7 +61,7 @@ export default function Checkout() {
       const [{ data, error }, { data: upRows }] = await Promise.all([
         supabase
           .from("digital_products")
-          .select("sku, name, description, price_usd, price_usd_latam, price_pen, cover_image_url, updated_at")
+          .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
           .eq("sku", adminSku)
           .eq("active", true)
           .maybeSingle(),
@@ -127,6 +127,8 @@ export default function Checkout() {
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
+      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null };
+      const priceTienda = rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0 ? Number(rowWithTienda.price_usd_tienda) : null;
       const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
       setDbItem({
         id: staticItem?.id ?? data.sku,
@@ -139,7 +141,7 @@ export default function Checkout() {
         upsells: upsells ?? undefined,
         ...(pricePen != null && { pricePen }),
         ...(priceLatam != null && {
-          regionPrices: { latam: priceLatam, global: priceGlobal },
+          regionPrices: { latam: priceLatam, global: priceGlobal, ...(priceTienda != null && { tienda: priceTienda }) },
         }),
       } as CatalogItem);
       setDbMissing(false);
@@ -162,6 +164,7 @@ export default function Checkout() {
     : null;
   const catalogItem = dbItem ?? mergedFromStatic;
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
+  const upsellsFingerprint = JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []);
 
 
   // Auto-load product from URL slug (Shopify-style). Also live-syncs price/image/upsells
@@ -198,9 +201,10 @@ export default function Checkout() {
     catalogItem?.pricePen,
     catalogItem?.regionPrices?.latam,
     catalogItem?.regionPrices?.global,
+    catalogItem?.regionPrices?.tienda,
     catalogItem?.image,
     catalogItem?.name,
-    JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []),
+    upsellsFingerprint,
   ]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they

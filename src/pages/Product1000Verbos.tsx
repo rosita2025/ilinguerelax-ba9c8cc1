@@ -187,7 +187,7 @@ const Product1000Verbos = () => {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$10</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">${currentPrice}</span>
                   <span className="text-2xl text-muted-foreground line-through">$54</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}

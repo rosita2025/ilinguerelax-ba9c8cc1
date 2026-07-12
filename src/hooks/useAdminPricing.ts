@@ -6,6 +6,8 @@ export interface AdminPricing {
   priceGlobalUsd: number | null;
   /** USD price for LATAM regions. `null` until the DB responds. */
   priceLatamUsd: number | null;
+  /** USD price for the internal store tier (VE/CU/NI). `null` when not configured. */
+  priceTiendaUsd: number | null;
   /** Native PEN price for Peru buyers. `null` when not configured. */
   pricePen: number | null;
   /** Product display name from admin. `null` until loaded. */

@@ -108,49 +108,29 @@ export const detectLanguageFromCountry = (countryCode: string): Language => {
 // Country to currency mapping
 const countryToCurrency: Record<string, Currency> = {
   // USD countries
-  US: "USD",
-  EC: "USD", // Ecuador uses USD
-  SV: "USD", // El Salvador uses USD
-  PA: "USD", // Panama uses USD
-  
-  // EUR countries
-  ES: "EUR",
-  FR: "EUR",
-  DE: "EUR",
-  IT: "EUR",
-  PT: "EUR",
-  NL: "EUR",
-  BE: "EUR",
-  AT: "EUR",
-  IE: "EUR",
-  FI: "EUR",
-  GR: "EUR",
-  
+  US: "USD", EC: "USD", SV: "USD", PA: "USD", PR: "USD",
+
+  // EUR
+  ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR", NL: "EUR",
+  BE: "EUR", AT: "EUR", IE: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
+
   // GBP
-  GB: "GBP",
-  UK: "GBP",
-  
-  // BRL
-  BR: "BRL",
-  
-  // MXN
-  MX: "MXN",
-  
-  // COP
-  CO: "COP",
-  
-  // ARS
-  AR: "ARS",
-  
-  // CAD
-  CA: "CAD",
+  GB: "GBP", UK: "GBP",
 
-  // AUD
-  AU: "AUD",
-  NZ: "AUD",
+  // Otras principales
+  BR: "BRL", MX: "MXN", CO: "COP", AR: "ARS", CA: "CAD",
+  AU: "AUD", NZ: "AUD", PE: "PEN",
 
-  // PEN
-  PE: "PEN",
+  // LATAM Hotmart (moneda local)
+  CL: "CLP", BO: "BOB", CR: "CRC", DO: "DOP",
+  GT: "GTQ", HN: "HNL", PY: "PYG", UY: "UYU", HT: "HTG",
+
+  // Europa fuera Eurozona
+  CH: "CHF", SE: "SEK", NO: "NOK", DK: "DKK",
+  PL: "PLN", CZ: "CZK",
+
+  // Asia principal
+  JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR",
 };
 
 // Currency symbols and formatting

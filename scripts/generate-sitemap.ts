@@ -21,17 +21,6 @@ import { config as loadEnv } from "dotenv";
 loadEnv();
 
 const BASE_URL = "https://ilinguerelax.com";
-// Regional subdomains — each gets its own sitemap segment so we can submit
-// per-property in Google Search Console. Keep in sync with src/lib/subdomainRegion.ts.
-const REGIONAL_HOSTS = [
-  "https://us.ilinguerelax.com",
-  "https://ca.ilinguerelax.com",
-  "https://pe.ilinguerelax.com",
-  "https://mx.ilinguerelax.com",
-  "https://es.ilinguerelax.com",
-  "https://fr.ilinguerelax.com",
-  "https://br.ilinguerelax.com",
-];
 const TODAY = new Date().toISOString().slice(0, 10);
 const URLS_PER_SITEMAP = 5000; // Google allows up to 50,000; keep files small.
 
@@ -232,21 +221,8 @@ async function main() {
     children.push({ file: "sitemap-blog.xml", lastmod: latest });
   }
 
-  // Regional subdomain segments — one <urlset> per regional host containing
-  // the same pages + products, but URLs prefixed with that subdomain. Each
-  // file is discoverable at /sitemaps/sitemap-<region>.xml on every host and
-  // is submitted per-property in Google Search Console.
-  const regionalAllEntries: SitemapEntry[] = [
-    ...staticEntries,
-    ...productEntries,
-    ...blogEntries,
-  ];
-  for (const host of REGIONAL_HOSTS) {
-    const region = host.replace("https://", "").split(".")[0]; // us, ca, pe, mx…
-    const file = `sitemap-${region}.xml`;
-    writeFileSync(join(SITEMAPS_DIR, file), urlsetXml(regionalAllEntries, host));
-    children.push({ file, lastmod: TODAY });
-  }
+  // Regional subdomains disabled — single canonical domain only.
+
 
   // Root index
   writeFileSync(join(PUBLIC_DIR, "sitemap.xml"), indexXml(children));

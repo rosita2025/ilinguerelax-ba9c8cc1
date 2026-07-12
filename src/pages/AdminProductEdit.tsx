@@ -281,8 +281,12 @@ const AdminProductEdit = () => {
               <Textarea rows={3} value={product.description ?? ""} onChange={(e) => update("description", e.target.value)} />
             </div>
             <div>
-              <Label>URL de portada (imagen)</Label>
-              <Input value={product.cover_image_url ?? ""} onChange={(e) => update("cover_image_url", e.target.value)} placeholder="https://…" />
+              <Label>Portada del producto</Label>
+              <ProductImageUploader
+                value={product.cover_image_url ?? ""}
+                onChange={(url) => update("cover_image_url", url)}
+                sku={product.sku}
+              />
             </div>
           </Card>
 

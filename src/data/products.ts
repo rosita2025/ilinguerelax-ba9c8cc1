@@ -1,3 +1,5 @@
+export type LangCode = "es" | "en" | "fr" | "pt" | "ko" | "de" | "it" | "ja" | "nl" | "zh";
+
 export interface Product {
   id: string;
   slug: string;
@@ -22,6 +24,10 @@ export interface Product {
   groupId?: string;
   /** Optional explicit format tags shown on product cards. Defaults to ['physical'] or ['digital'] based on isPhysical. */
   formats?: ('digital' | 'physical')[];
+  /** Idioma nativo del comprador objetivo (para filtro "Hablo"). */
+  learnerLanguage?: LangCode;
+  /** Idioma que enseña el producto (para filtro "Quiero aprender"). */
+  targetLanguage?: LangCode;
 }
 
 export const products: Product[] = [

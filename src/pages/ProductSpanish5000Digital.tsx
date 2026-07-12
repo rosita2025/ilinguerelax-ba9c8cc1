@@ -292,7 +292,7 @@ const ProductSpanish5000Digital = () => {
                   className="mt-4 w-full h-14 text-base font-black shadow-hero"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${PRICE}`}
+                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${currentPrice}`}
                 </Button>
                 <Button
                   onClick={handleAddToCart}

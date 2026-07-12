@@ -14,6 +14,7 @@ import { useAdminKey } from "@/components/admin/AdminGate";
 import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
 import { COUNTRY_INFO } from "@/lib/countryInfo";
 import { publishCatalogUpdate } from "@/lib/catalogSync";
+import ProductImageUploader from "@/components/admin/ProductImageUploader";
 
 interface Product {
   sku: string;
@@ -281,8 +282,12 @@ const AdminProductEdit = () => {
               <Textarea rows={3} value={product.description ?? ""} onChange={(e) => update("description", e.target.value)} />
             </div>
             <div>
-              <Label>URL de portada (imagen)</Label>
-              <Input value={product.cover_image_url ?? ""} onChange={(e) => update("cover_image_url", e.target.value)} placeholder="https://…" />
+              <Label>Portada del producto</Label>
+              <ProductImageUploader
+                value={product.cover_image_url ?? ""}
+                onChange={(url) => update("cover_image_url", url)}
+                sku={product.sku}
+              />
             </div>
           </Card>
 

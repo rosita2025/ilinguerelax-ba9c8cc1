@@ -58,7 +58,7 @@ export function useAdminPricing(sku: string): AdminPricing {
     setState((s) => ({ ...s, loaded: false, missing: false }));
     supabase
       .from("digital_products")
-      .select("price_usd, price_usd_latam, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
+      .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
       .eq("sku", sku)
       .eq("active", true)
       .maybeSingle()
@@ -70,10 +70,14 @@ export function useAdminPricing(sku: string): AdminPricing {
         }
         const global = data.price_usd != null ? Number(data.price_usd) : null;
         const latam = data.price_usd_latam != null ? Number(data.price_usd_latam) : global;
+        const tienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0
+          ? Number((data as any).price_usd_tienda)
+          : null;
         const pen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : null;
         setState({
           priceGlobalUsd: global,
           priceLatamUsd: latam,
+          priceTiendaUsd: tienda,
           pricePen: pen,
           name: (data as any).name ?? null,
           description: (data as any).description ?? null,

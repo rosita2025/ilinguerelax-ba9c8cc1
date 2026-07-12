@@ -128,6 +128,7 @@ export default function Checkout() {
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
+      const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
       setDbItem({
         id: staticItem?.id ?? data.sku,
         name: data.name,
@@ -137,6 +138,7 @@ export default function Checkout() {
         productPath: staticItem?.productPath ?? `/products/${data.sku}`,
         adminSku: data.sku,
         upsells: upsells ?? undefined,
+        ...(pricePen != null && { pricePen }),
         ...(priceLatam != null && {
           regionPrices: { latam: priceLatam, global: priceGlobal },
         }),

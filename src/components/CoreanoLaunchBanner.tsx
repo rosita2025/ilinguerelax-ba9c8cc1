@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
+import { useCardPrice } from "@/hooks/useCardPrice";
+
+const COREANO_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
 
 export const CoreanoLaunchBanner = () => {
+  const cardPrice = useCardPrice();
   return (
     <section className="py-10 md:py-14 bg-gradient-to-br from-primary/5 via-background to-accent/10">
       <div className="container mx-auto px-4">
@@ -32,8 +36,8 @@ export const CoreanoLaunchBanner = () => {
                 Método visual y natural conectado con k-dramas, K-pop y cultura coreana. Desde cero (A1) hasta nivel avanzado.
               </p>
               <div className="flex items-center gap-3 pt-2">
-                <span className="text-3xl font-bold text-primary">$10</span>
-                <span className="text-sm text-muted-foreground">USD · pago único</span>
+                <span className="text-3xl font-bold text-primary">{cardPrice.format(COREANO_SKU, 10)}</span>
+                <span className="text-sm text-muted-foreground">{cardPrice.currencyLabel(COREANO_SKU)} · pago único</span>
               </div>
               <div className="inline-flex items-center gap-2 text-primary font-semibold pt-2 group-hover:gap-3 transition-all">
                 Ver el producto <ArrowRight className="w-4 h-4" />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast as sonnerToast } from "sonner";
 import { SEO } from "@/components/SEO";
@@ -78,10 +78,28 @@ const ProductCoreanoRelax = () => {
   const clearCart = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const region = useRegionTier();
-  // Three pricing tiers (mirrors digital_products.price_usd / _latam / _pen)
-  const PRICE_GLOBAL_USD = 15;
-  const PRICE_LATAM_USD = 10;
-  const PRICE_PEN = 29.9;
+  // Precios se obtienen automáticamente del admin (digital_products).
+  // Los constantes solo son fallback inicial mientras carga la DB.
+  const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
+  const [PRICE_GLOBAL_USD, setPriceGlobal] = useState(15);
+  const [PRICE_LATAM_USD, setPriceLatam] = useState(10);
+  const [PRICE_PEN, setPricePen] = useState(29.9);
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("digital_products")
+      .select("price_usd, price_usd_latam, price_pen")
+      .eq("sku", ADMIN_SKU)
+      .eq("active", true)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        if (data.price_usd != null) setPriceGlobal(Number(data.price_usd));
+        if (data.price_usd_latam != null) setPriceLatam(Number(data.price_usd_latam));
+        if (data.price_pen != null && Number(data.price_pen) > 0) setPricePen(Number(data.price_pen));
+      });
+    return () => { cancelled = true; };
+  }, []);
   const isPeru = region.country === "PE";
   const usdPrice = region.tier === "latam" ? PRICE_LATAM_USD : PRICE_GLOBAL_USD;
   const displayPrice = isPeru ? `S/ ${PRICE_PEN.toFixed(2)}` : `$${usdPrice}`;

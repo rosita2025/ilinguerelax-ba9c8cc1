@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { resend } from "../_shared/brevo.ts";
 import { BRAND, escapeHtml, renderBrandedEmail } from "../_shared/emailBrand.ts";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
+import { normalizeSkus } from "../_shared/digitalSku.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,7 +44,8 @@ serve(async (req) => {
 
   try {
     const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey, force }: Body = await req.json();
-    if (!customerEmail || !Array.isArray(skus) || skus.length === 0) {
+    const normalizedSkus = normalizeSkus(Array.isArray(skus) ? skus : []);
+    if (!customerEmail || normalizedSkus.length === 0) {
       return new Response(JSON.stringify({ error: "customerEmail and skus required" }), {
         status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },
       });
@@ -55,7 +57,7 @@ serve(async (req) => {
     );
 
     const idemKey = idempotencyKey
-      || `digital:${(orderId || customerEmail).toLowerCase()}:${[...skus].sort().join(",")}`;
+      || `digital:${(orderId || customerEmail).toLowerCase()}:${[...normalizedSkus].sort().join(",")}`;
 
     if (!force) {
       const { data: existing } = await supabase
@@ -73,7 +75,7 @@ serve(async (req) => {
     const { data, error } = await supabase
       .from("digital_products")
       .select("sku,name,price_usd,drive_url,access_key,bonus_name,bonus_drive_url,bonus_access_key,bonuses,cover_image_url")
-      .in("sku", skus);
+      .in("sku", normalizedSkus);
     if (error) throw error;
 
     const products = (data ?? []) as Product[];
@@ -175,7 +177,7 @@ serve(async (req) => {
         idempotency_key: idemKey,
         order_id: orderId || null,
         customer_email: customerEmail,
-        skus,
+        skus: normalizedSkus,
         message_id: r.data?.messageId || r.data?.id || null,
         provider: r.data?.provider || null,
         status: "sent",
@@ -192,7 +194,7 @@ serve(async (req) => {
         phone: customerPhone,
         country: customerCountry,
         productName: products.map((p) => p.name).filter(Boolean).join(" + "),
-        skus,
+        skus: normalizedSkus,
         amount,
         currency,
         orderNumber: orderId,

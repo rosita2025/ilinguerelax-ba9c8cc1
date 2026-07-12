@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { resend } from "../_shared/brevo.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 
 // NOTE: We do NOT instantiate the Stripe SDK here. There is no STRIPE_SECRET_KEY
 // in this project; API keys are opaque gateway connection IDs. Webhook signature
@@ -178,8 +179,7 @@ serve(async (req) => {
       // Digital delivery — always trigger server-side so it goes out even if
       // the buyer closes the tab before landing on /checkout/success.
       try {
-        const skusRaw = (session.metadata?.skus || "") as string;
-        const skus = skusRaw.split(",").map((s) => s.trim()).filter(Boolean);
+        const skus = normalizeSkus(splitSkuList(session.metadata?.skus));
         if (skus.length > 0) {
           const digitalClient = createClient(
             Deno.env.get("SUPABASE_URL")!,

@@ -4,6 +4,7 @@ import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 

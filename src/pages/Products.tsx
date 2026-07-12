@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowRight, Star, Gift, Search, Download, BookOpen } from "lucide-react";
 import { products as staticProducts, getProductLink, type Product } from "@/data/products";
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
+import { useCardPrice } from "@/hooks/useCardPrice";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";

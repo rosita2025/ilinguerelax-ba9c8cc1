@@ -31,6 +31,18 @@ export default function Checkout() {
   const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
 
+  // Prewarm: cargar stripe.js y despertar el edge function `create-checkout-prueba`
+  // en cuanto se abre /checkouts, para que al mostrar el iframe ya esté caliente
+  // (evita el cold start de 1-3 s en la primera compra del día).
+  useEffect(() => {
+    try { getStripe(); } catch { /* sandbox no configurado */ }
+    // OPTIONS preflight = warm-up gratis, sin efectos secundarios.
+    try {
+      const url = `https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/create-checkout-prueba`;
+      fetch(url, { method: "OPTIONS", mode: "cors" }).catch(() => {});
+    } catch { /* ignore */ }
+  }, []);
+
   const staticItem = getCatalogItem(slug);
   const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
   const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);

@@ -7,8 +7,10 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 interface DBProduct {
   id: string;

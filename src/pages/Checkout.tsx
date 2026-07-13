@@ -359,6 +359,7 @@ export default function Checkout() {
         <div className="space-y-6">
           <BuyerInfoForm />
           {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />}
+          <MoreProductsPanel excludeIds={[catalogItem?.id, catalogItem?.adminSku, ...(catalogItem?.upsells?.map((u) => u.id) ?? [])].filter(Boolean) as string[]} />
           <PaymentMethodsGroup />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

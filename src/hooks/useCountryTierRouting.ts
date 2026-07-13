@@ -41,6 +41,10 @@ interface Options {
   fallbackHotmartUrl?: string;
   /** Multiplicador para el precio "antes" tachado (default 2.5x). */
   originalMultiplier?: number;
+  fallbackPriceGlobalUsd?: number;
+  fallbackPriceLatamUsd?: number;
+  fallbackPriceTiendaUsd?: number;
+  fallbackPricePen?: number;
 }
 
 export function useCountryTierRouting(adminSku: string, opts: Options = {}): CountryTierRouting {
@@ -52,10 +56,10 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(country);
   const useTiendaOnly = !useHotmartLatam;
 
-  const priceGlobalUsd = pricing.priceGlobalUsd ?? 0;
+  const priceGlobalUsd = pricing.priceGlobalUsd ?? opts.fallbackPriceGlobalUsd ?? 0;
   const priceLatamUsd = pricing.priceLatamUsd ?? priceGlobalUsd;
-  const priceTiendaUsd = pricing.priceTiendaUsd ?? priceLatamUsd;
-  const pricePen = pricing.pricePen ?? null;
+  const priceTiendaUsd = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? priceLatamUsd;
+  const pricePen = pricing.pricePen ?? opts.fallbackPricePen ?? null;
 
   const priceUsd = isTiendaUsd
     ? priceTiendaUsd
@@ -71,7 +75,8 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     ? `S/ ${(pricePen * mult).toFixed(2)}`
     : `$${(priceGlobalUsd * mult).toFixed(2)} USD`;
 
-  const loaded = pricing.loaded && (isPeru ? (pricePen ?? 0) > 0 : priceUsd > 0);
+  const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;
+  const loaded = (pricing.loaded || hasFallback) && (isPeru ? (pricePen ?? 0) > 0 : priceUsd > 0);
 
   return {
     loaded,

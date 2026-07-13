@@ -657,11 +657,11 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar — 4-tier routing */}
       <StickyBuyBar
-        price={campaign.price}
-        originalPrice={campaign.originalPrice}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
         rating={4.9}
         reviewCount={10000}
-        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${campaign.price}` : `COMPRAR EN HOTMART · ${campaign.price}`}
+        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${tier.priceLabel}` : `COMPRAR EN HOTMART · ${tier.priceLabel}`}
         buyUrl={useTiendaOnly ? TIENDA_PATH_8000 : (tier.hotmartUrl || HOTMART_8000_LATAM)}
         onBuyClick={handleBuyNow} />
       

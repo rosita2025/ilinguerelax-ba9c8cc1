@@ -157,6 +157,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Si vous préférez ne pas demander de remboursement, vous pouvez échanger votre achat contre un autre produit numérique de valeur égale ou inférieure, sans frais supplémentaires. Si le nouveau produit est plus cher, vous ne payez que la différence. Cette option s'applique tant que la commande respecte les conditions de la plateforme d'achat concernée.",
       },
+      {
+        icon: ShieldOff,
+        title: "Ce qui se passe avec le téléchargement et l'accès",
+        content:
+          "Lorsqu'un remboursement ou un échange est approuvé, l'accès au produit numérique précédent est révoqué : les liens de téléchargement cessent de fonctionner, l'accès sur la plateforme est annulé et vous vous engagez à supprimer les copies déjà téléchargées ou imprimées. En cas d'échange, nous activons le nouveau produit dès la désactivation confirmée du précédent. Demandez votre échange ou remboursement via WhatsApp +1 251 272 4704 pour accélérer le processus.",
+      },
     ],
     amazonTitle: "Demandez votre retour sur Amazon",
     amazonText:

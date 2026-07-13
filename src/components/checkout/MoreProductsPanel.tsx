@@ -76,6 +76,51 @@ export function MoreProductsPanel({ parentSku }: Props) {
     return () => { cancelled = true; };
   }, [parentSku]);
 
+  // Auto-apply upsell discount to matching items already in cart
+  useEffect(() => {
+    if (upsells.length === 0 || items.length === 0) return;
+    const country = (region.country || "").toUpperCase();
+    const isPE = country === "PE";
+    const isTienda = ["VE", "CU", "NI"].includes(country);
+    upsells.forEach((r) => {
+      const factor = 1 - Math.max(0, Math.min(95, r.discount_pct)) / 100;
+      if (factor >= 1) return;
+      const equivIds = new Set<string>([r.sku]);
+      Object.values(CHECKOUT_CATALOG).forEach((c) => { if (c.adminSku === r.sku) equivIds.add(c.id); });
+      const existing = items.find((i) => equivIds.has(i.id));
+      if (!existing) return;
+      const regUsd = isTienda && r.price_usd_tienda && Number(r.price_usd_tienda) > 0
+        ? Number(r.price_usd_tienda)
+        : region.tier === "latam" && r.price_usd_latam && Number(r.price_usd_latam) > 0
+          ? Number(r.price_usd_latam)
+          : Number(r.price_usd) || 0;
+      const expectedDisplayUsd = Math.round(regUsd * factor * 100) / 100;
+      const expectedPen = r.price_pen && Number(r.price_pen) > 0
+        ? Math.round(Number(r.price_pen) * factor * 100) / 100 : undefined;
+      // Detect if already discounted (avoid infinite loop)
+      const currentUsd = existing.regionPrices?.[region.tier === "latam" ? "latam" : (isTienda ? "tienda" : "global")] ?? existing.price;
+      const currentPen = existing.pricePen;
+      const usdMatches = Math.abs((currentUsd ?? 0) - expectedDisplayUsd) < 0.01;
+      const penMatches = isPE ? Math.abs((currentPen ?? 0) - (expectedPen ?? 0)) < 0.01 : true;
+      if (usdMatches && penMatches) return;
+      const globalPrice = Math.round((Number(r.price_usd) || 0) * factor * 100) / 100;
+      const latamPrice = r.price_usd_latam && Number(r.price_usd_latam) > 0
+        ? Math.round(Number(r.price_usd_latam) * factor * 100) / 100 : globalPrice;
+      const tiendaPrice = r.price_usd_tienda && Number(r.price_usd_tienda) > 0
+        ? Math.round(Number(r.price_usd_tienda) * factor * 100) / 100 : undefined;
+      syncItem({
+        id: existing.id,
+        name: existing.name,
+        image: existing.image,
+        description: existing.description,
+        price: globalPrice,
+        pricePen: expectedPen,
+        regionPrices: { latam: latamPrice, global: globalPrice, ...(tiendaPrice != null ? { tienda: tiendaPrice } : {}) },
+      });
+    });
+  }, [upsells, items, region.country, region.tier, syncItem]);
+
+
   // equivalence: match catalog ids that reference same admin sku
   const equivalentIdsFor = (sku: string): string[] => {
     const ids = new Set<string>([sku]);

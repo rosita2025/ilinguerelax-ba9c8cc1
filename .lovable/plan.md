@@ -1,86 +1,30 @@
-# Subdominios regionales para iLingue Relax (Opción A)
+Objetivo: hacer que el producto “5,000 Spanish Words Digital” y el checkout nunca queden en blanco aunque falle/bloquee la detección de IP en USA/VPN o algún servicio externo.
 
-Todos los subdominios apuntan al **mismo proyecto** Lovable. El código detecta el subdominio en el navegador y fuerza país, idioma, moneda, pasarela de pago y SEO.
+Plan:
+1. Blindar geolocalización
+   - Crear un helper único para detectar país por IP con timeout, fallback por timezone y fallback final seguro a `US`.
+   - Reemplazar llamadas duplicadas a `ipwho.is` por proveedores alternos reales y manejar bloqueos/rate limits sin romper la UI.
+   - Hacer que `useRegionTier`, `useCampaignPrice` y `LanguageCurrencySelector` usen el mismo comportamiento tolerante a fallos.
 
-## Alcance
+2. Evitar pantalla blanca por errores de render
+   - Añadir una barrera de error global alrededor de las rutas principales para mostrar una pantalla de recuperación en vez de blanco.
+   - Si ocurre un error de chunk/import viejo, mantener el auto-reload existente.
+   - Si ocurre un error normal de producto/checkout/geolocalización, mostrar un mensaje simple con botón “Recargar” y enlace a WhatsApp, sin tumbar toda la app.
 
-Subdominios de la fase 1:
+3. Reforzar el producto Spanish 5,000 Digital
+   - Asegurar que si la IP no se detecta o viene vacía, el producto cargue como Global/USA con precio global y botón interno de tienda.
+   - Mantener Perú con PEN, LATAM Hotmart y USA/Canadá/Europa/Asia por tienda interna según la lógica actual.
+   - Evitar que `pricingReady` bloquee para siempre si la base de datos tarda o falla: usar fallback del catálogo estático mientras llega el admin.
 
-| Subdominio | País | Idioma | Moneda | Pasarela |
-|---|---|---|---|---|
-| `www.ilinguerelax.com` | Global (default) | ES | USD | Stripe |
-| `us.ilinguerelax.com` | USA | EN | USD | Stripe |
-| `ca.ilinguerelax.com` | Canadá | EN | CAD | Stripe |
-| `pe.ilinguerelax.com` | Perú | ES | PEN | Yape/Plin + Stripe |
-| `mx.ilinguerelax.com` | México | ES | MXN | Mercado Pago |
-| `es.ilinguerelax.com` | España | ES | EUR | Stripe |
-| `fr.ilinguerelax.com` | Francia | FR | EUR | Stripe |
-| `br.ilinguerelax.com` | Brasil | PT | BRL | Mercado Pago |
+4. Reforzar checkout `/checkouts/5000-spanish-words`
+   - Mantener el producto visible aunque la consulta del admin tarde/falle, usando el catálogo estático como respaldo.
+   - Si geolocalización falla, cobrar/mostrar precio global USD en lugar de dejar estado incompleto.
 
-## Pasos que hago yo (código)
+5. Verificación
+   - Probar localmente la ruta del producto y el checkout simulando:
+     - USA/global
+     - Perú
+     - fallo total de `ipwho.is`
+   - Confirmar que no aparece pantalla blanca y que siempre hay contenido o pantalla de recuperación.
 
-1. **Nuevo módulo `src/lib/subdomainRegion.ts`**
-   - Función `getSubdomainRegion()` que lee `window.location.hostname` y devuelve `{ country, language, currency, paymentGateway, tier }`.
-   - Si el subdominio no coincide con la tabla → fallback a detección por IP actual (`ipapi.co`).
-
-2. **Hook `useSubdomainRegion()`**
-   - Envuelve la lógica y expone la región activa a toda la app.
-   - Se integra con el `useRegionTier()` existente: el subdominio **sobrescribe** la detección por IP.
-
-3. **Ajustes en componentes existentes**
-   - `Checkout.tsx`: usar la moneda/gateway del subdominio en vez de IP.
-   - `CountryFlagSelector.tsx`: mostrar la bandera del subdominio como "actual" y ofrecer enlaces para cambiar a otro subdominio (`us.` ↔ `pe.` ↔ `mx.`…).
-   - `i18n` inicial: forzar el idioma del subdominio al cargar.
-
-4. **SEO por subdominio**
-   - `SEO.tsx`: emitir `hreflang` con las URLs de cada subdominio (`us.ilinguerelax.com/…` `hreflang="en-US"`, etc.).
-   - `canonical` = URL del subdominio actual (no forzar a `www.`).
-   - `scripts/generate-sitemap.ts`: generar un sitemap por subdominio (`sitemap-us.xml`, `sitemap-pe.xml`…) y un índice `sitemap.xml` que los liste.
-   - `robots.txt`: agregar todos los `Sitemap:` de cada subdominio.
-
-5. **Banner de "sugerencia de región"**
-   - Si el visitante llega a `www.` pero su IP dice México → banner sutil: *"¿Prefieres visitar mx.ilinguerelax.com?"*
-   - Se puede descartar; se recuerda con cookie.
-
-6. **Admin**
-   - En `/admin/productos` mostrar en qué subdominios está publicado cada producto (todos por defecto; opcional excluir alguno).
-
-## Pasos que haces tú (DNS + Lovable)
-
-1. **En tu registrador DNS** (donde tengas `ilinguerelax.com`) creas un registro **A** por cada subdominio:
-   ```
-   Tipo: A   Nombre: us    Valor: 185.158.133.1
-   Tipo: A   Nombre: pe    Valor: 185.158.133.1
-   Tipo: A   Nombre: ca    Valor: 185.158.133.1
-   Tipo: A   Nombre: mx    Valor: 185.158.133.1
-   Tipo: A   Nombre: es    Valor: 185.158.133.1
-   Tipo: A   Nombre: fr    Valor: 185.158.133.1
-   Tipo: A   Nombre: br    Valor: 185.158.133.1
-   ```
-   (Si usas Cloudflare, activa "proxy" solo si vas a marcar la casilla correspondiente en Lovable.)
-
-2. **En Lovable → Project Settings → Domains → Connect Domain** agregas cada subdominio uno por uno. Lovable verificará el DNS y emitirá SSL automático (5-30 min).
-
-3. **En Google Search Console**: agregar cada subdominio como propiedad separada (te ayudo a generar los meta-tags de verificación después).
-
-## Detalles técnicos
-
-- La detección se hace **client-side** con `window.location.hostname`, por lo que no se rompe el SSR/preview.
-- Durante desarrollo (`localhost`, `*.lovable.app`) → cae al modo IP actual, sin cambios.
-- El catálogo de productos sigue siendo **único** en Supabase; solo cambian precio mostrado y pasarela.
-- Los emails transaccionales incluirán el subdominio de origen del pedido para tracking.
-- Ningún cambio destructivo en pagos existentes: si Stripe ya está configurado en modo live, sigue funcionando; solo se selecciona la moneda correcta según subdominio.
-
-## Fuera de este plan (posibles fases 2/3)
-
-- Traducciones completas de páginas de producto por idioma nativo (hoy solo IU tiene i18n).
-- Métodos de pago locales adicionales (PIX en `br.`, Bizum en `es.`).
-- CDN geolocalizado.
-
-## Fase 1 primero — confirmación
-
-Antes de que empiece a escribir código, confírmame:
-
-1. ¿La tabla de mapeo país→moneda→pasarela está OK, o quieres cambiar algo (por ejemplo `ca.` en francés en vez de inglés)?
-2. ¿Empezamos con los 7 subdominios de la tabla, o solo con los 3 primeros (`us`, `pe`, `ca`) para probar?
-3. ¿Quieres el banner de "cambiar a tu región" activado desde el inicio, o lo dejamos para después?
+Resultado esperado: con VPN en USA o desde Perú, la página no queda blanca; si se bloquea la detección IP, el sitio usa fallback seguro y sigue vendiendo.

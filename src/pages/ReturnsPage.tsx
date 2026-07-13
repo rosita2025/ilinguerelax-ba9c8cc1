@@ -204,6 +204,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Se preferir não solicitar reembolso, você pode trocar sua compra por outro produto digital de valor igual ou inferior sem custo adicional. Se o novo produto for mais caro, você paga apenas a diferença. Esta opção se aplica desde que o pedido cumpra as condições da plataforma de compra correspondente.",
       },
+      {
+        icon: ShieldOff,
+        title: "O que acontece com o download e o acesso",
+        content:
+          "Quando um reembolso ou troca é aprovado, o acesso ao produto digital anterior é revogado: os links de download deixam de funcionar, o acesso na plataforma é cancelado e você se compromete a apagar as cópias já baixadas ou impressas. Se for troca, liberamos o novo produto assim que o anterior for confirmado como desativado. Solicite sua troca ou reembolso pelo WhatsApp +1 251 272 4704 para agilizar o processo.",
+      },
     ],
     amazonTitle: "Solicite sua devolução na Amazon",
     amazonText:

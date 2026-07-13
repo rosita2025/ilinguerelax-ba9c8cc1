@@ -60,7 +60,7 @@ const ProductCoreanoRelax = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const clearCart = useCheckoutPruebaStore((s) => s.clear);
+  
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const pricing = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {

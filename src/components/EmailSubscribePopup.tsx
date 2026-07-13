@@ -79,10 +79,10 @@ export const EmailSubscribePopup = () => {
             <Gift className="w-6 h-6 text-primary" />
           </div>
           <h3 className="text-xl font-bold text-foreground">
-            Recibe recursos gratis 🎁
+            10% de descuento 🎁
           </h3>
           <p className="text-sm text-muted-foreground mt-1.5">
-            Suscríbete y recibe consejos, ofertas exclusivas y descuentos en tus productos favoritos.
+            Suscríbete y recibe un <strong>cupón del 10%</strong> para tu primera compra en ILINGUE RELAX.
           </p>
         </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 
 export interface AdminPricing {
   /** USD price for Tier-1 / global regions. `null` until the DB responds. */

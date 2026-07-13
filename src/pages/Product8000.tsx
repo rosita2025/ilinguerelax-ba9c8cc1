@@ -457,7 +457,7 @@ const Product8000 = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xl font-black text-foreground">Hoy pagas solo:</span>
-                  <span className="text-3xl font-black text-primary">$20 USD</span>
+                  <span className="text-3xl font-black text-primary">{tier.priceLabel}</span>
                 </div>
               </div>
               

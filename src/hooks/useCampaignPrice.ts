@@ -281,8 +281,10 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
     if (typeof window !== "undefined") {
-      const forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
-      if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD, "forced");
+      try {
+        const forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+        if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD, "forced");
+      } catch { /* ignore */ }
     }
     const cached = readCache();
     if (cached) return build(cached.currency, cached.countryCode, priceUSD, originalUSD, "cache");
@@ -297,8 +299,10 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
   });
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const forced = params.get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+    let forced: CampaignCurrency | undefined;
+    try {
+      forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+    } catch { /* ignore */ }
     if (forced && RATES[forced]) {
       setState(build(forced, "", priceUSD, originalUSD, "forced"));
       return;
@@ -351,7 +355,7 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
   const setCurrency = (c: CampaignCurrency) => {
     if (!RATES[c]) return;
     const payload: CachedDetection = { currency: c, countryCode: state.countryCode, timestamp: Date.now() };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch { /* ignore */ }
     setState(build(c, state.countryCode, priceUSD, originalUSD, "manual"));
   };
 

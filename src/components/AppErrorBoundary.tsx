@@ -4,6 +4,7 @@ import { MessageCircle, RefreshCw } from "lucide-react";
 
 interface Props {
   children: ReactNode;
+  resetKey?: string;
 }
 
 interface State {
@@ -15,6 +16,12 @@ export class AppErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(): State {
     return { hasError: true };
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false });
+    }
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {

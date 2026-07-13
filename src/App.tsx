@@ -158,6 +158,11 @@ const CheckoutSlugRedirect = () => {
   return <Navigate to={slug ? `/checkouts/${slug}` : "/checkouts"} replace />;
 };
 
+const RouteErrorBoundary = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  return <AppErrorBoundary resetKey={location.pathname}>{children}</AppErrorBoundary>;
+};
+
 
 
 const App = () => (
@@ -168,7 +173,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <AppErrorBoundary>
+            <RouteErrorBoundary>
               <CartSyncWrapper>
                 <RouteTracker />
                 <AutoTranslate />
@@ -255,7 +260,7 @@ const App = () => (
                   </Routes>
                 </Suspense>
               </CartSyncWrapper>
-            </AppErrorBoundary>
+            </RouteErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

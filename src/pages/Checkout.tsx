@@ -12,6 +12,7 @@ import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
+import { MoreProductsPanel } from "@/components/checkout/MoreProductsPanel";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
-import type { UpsellItem } from "@/config/checkoutCatalog";
+import { CHECKOUT_CATALOG, type UpsellItem } from "@/config/checkoutCatalog";
 
 interface DBRow {
   id: string;
@@ -60,8 +60,22 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
     return () => { cancelled = true; };
   }, []);
 
+  // Build equivalence map: admin sku -> [catalog ids that reference this sku]
+  const equivalentIdsFor = (row: DBRow): string[] => {
+    const ids = new Set<string>([row.sku, row.id]);
+    Object.values(CHECKOUT_CATALOG).forEach((c) => {
+      if (c.adminSku === row.sku || c.id === row.sku) ids.add(c.id);
+    });
+    return Array.from(ids);
+  };
+
   const excluded = new Set([...excludeIds]);
-  const available = rows.filter((r) => !excluded.has(r.sku) && !excluded.has(r.id));
+  const cartIds = new Set(items.map((i) => i.id));
+  const available = rows.filter((r) => {
+    const equivs = equivalentIdsFor(r);
+    if (equivs.some((id) => excluded.has(id))) return false;
+    return true;
+  });
 
   const discountFor = (r: DBRow) => {
     const match = upsells.find((u) => u.id === r.sku || u.id === r.id);
@@ -154,7 +168,8 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
 
       <ul className="divide-y">
         {available.slice(0, 6).map((r) => {
-          const inCart = items.some((i) => i.id === r.sku);
+          const equivs = equivalentIdsFor(r);
+          const inCart = equivs.some((id) => cartIds.has(id));
           const priced = pricedItem(r);
           const hasDiscount = priced.discount > 0;
           const discountPct = Math.round(priced.discount * 100);

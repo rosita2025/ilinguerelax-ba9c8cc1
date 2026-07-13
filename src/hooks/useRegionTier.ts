@@ -60,6 +60,36 @@ export interface RegionInfo {
  */
 // Subdominios regionales desactivados — usamos solo ilinguerelax.com y detección por IP.
 
+const MANUAL_KEY = "ilr_country_manual";
+
+export function getManualCountryOverride(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = localStorage.getItem(MANUAL_KEY);
+    return v ? v.toUpperCase() : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setManualCountryOverride(country: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(MANUAL_KEY, country.toUpperCase());
+    localStorage.setItem("ilr_country", country.toUpperCase());
+    // Invalidate the IP cache so the new choice takes over completely.
+    localStorage.removeItem(STORAGE_KEY);
+  } catch { /* ignore */ }
+}
+
+export function clearManualCountryOverride() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(MANUAL_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+  } catch { /* ignore */ }
+}
+
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
     if (typeof window !== "undefined") {
@@ -73,6 +103,13 @@ export function useRegionTier(): RegionInfo {
       if (urlOverride) {
         try { localStorage.setItem("ilr_country", urlOverride); } catch { /* ignore */ }
         return { tier: classify(urlOverride), country: urlOverride, loading: false };
+      }
+
+      // Manual override (from CountryPicker) beats IP detection.
+      const manual = getManualCountryOverride();
+      if (manual) {
+        try { localStorage.setItem("ilr_country", manual); } catch { /* ignore */ }
+        return { tier: classify(manual), country: manual, loading: false };
       }
     }
     // Prioridad: cache de detección por IP
@@ -104,3 +141,4 @@ export function useRegionTier(): RegionInfo {
 
   return state;
 }
+

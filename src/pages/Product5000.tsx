@@ -284,7 +284,6 @@ const Product5000 = () => {
     if (!pricing5000Ready) return;
     handleBuyClick();
     if (useTiendaOnly) {
-      clearCart();
       addItem({
         id: "5000-palabras-ingles",
         name: "Inglés Relax · 5,000 Palabras (Digital PDF)",

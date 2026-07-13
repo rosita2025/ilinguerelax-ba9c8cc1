@@ -83,7 +83,6 @@ const Product1000Verbos = () => {
       num_items: 1,
     });
     if (isPeru) {
-      clear();
       addItem({ ...cartItem, quantity: 1 });
       toast.success("Producto agregado al carrito");
       navigate("/checkouts/1000-verbos");

@@ -102,7 +102,6 @@ const ProductCoreanoRelax = () => {
   const handleBuyStore = () => {
     if (!pricingReady) return;
     trackInitiate();
-    clearCart();
     addItem({
       id: "coreano-100-mapas",
       name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",

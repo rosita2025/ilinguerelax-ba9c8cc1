@@ -149,15 +149,37 @@ export const StickyBuyBar = ({
 
   const handleBuy = () => {
     if (disabled || isLoading || clickLock) return;
-    // Single-click guard: prevent accidental double navigation that would
-    // open more than one checkout page for the same product.
+    // Short single-click guard (1.2s) — swallows accidental double-taps
+    // without making the button feel sluggish.
     setClickLock(true);
-    setTimeout(() => setClickLock(false), 4000);
+    setTimeout(() => setClickLock(false), 1200);
     if (onBuyClick) {
       onBuyClick();
     } else if (buyUrl) {
-      window.location.href = buyUrl;
+      // assign() starts navigation synchronously in the same event tick.
+      window.location.assign(buyUrl);
     }
+  };
+
+  // Preconnect + prefetch checkout URL on hover/touch so navigation is instant.
+  const warmupCheckout = () => {
+    if (!buyUrl || typeof document === "undefined") return;
+    try {
+      const url = new URL(buyUrl, window.location.origin);
+      const key = `__ilr_prefetch_${url.href}`;
+      if ((window as any)[key]) return;
+      (window as any)[key] = true;
+      const pre = document.createElement("link");
+      pre.rel = "preconnect";
+      pre.href = url.origin;
+      document.head.appendChild(pre);
+      if (url.origin === window.location.origin) {
+        const pf = document.createElement("link");
+        pf.rel = "prefetch";
+        pf.href = url.pathname + url.search;
+        document.head.appendChild(pf);
+      }
+    } catch {}
   };
 
   // Never render on checkout / admin / thank-you routes

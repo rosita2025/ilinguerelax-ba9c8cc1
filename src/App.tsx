@@ -11,6 +11,7 @@ import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";
+import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
 
 import { BrevoChatToggle } from "@/components/BrevoChatToggle";
 import { AutoTranslate } from "@/components/AutoTranslate";
@@ -170,6 +171,7 @@ const App = () => (
               <AutoTranslate />
               <BrevoChatToggle />
               <CookieConsent />
+              <EmailSubscribePopup />
               
               <Suspense fallback={<PageFallback />}>
                 <Routes>

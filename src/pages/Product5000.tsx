@@ -691,7 +691,7 @@ const Product5000 = () => {
                 INCLUIDOS GRATIS • LATINOAMÉRICA
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
+                2 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
               </h2>
               <p className="text-sm md:text-base text-muted-foreground mt-2">
                 Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local.

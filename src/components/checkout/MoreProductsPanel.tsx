@@ -54,7 +54,6 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
         .from("digital_products")
         .select("id, sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, active, is_upsell, sort_order")
         .eq("active", true)
-        .eq("is_upsell", false)
         .order("sort_order", { ascending: true });
       if (!cancelled && data) setRows(data as DBRow[]);
     })();

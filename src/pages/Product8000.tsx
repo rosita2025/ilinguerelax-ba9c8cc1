@@ -552,10 +552,9 @@ const Product8000 = () => {
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$20</span>
-                <span className="text-2xl text-muted-foreground line-through">$54</span>
-                <span className="text-accent font-bold">USD</span>
+              <div className="flex items-baseline justify-center gap-3 mb-4 flex-wrap">
+                <span className="text-5xl font-bold text-foreground">{tier.priceLabel}</span>
+                <span className="text-2xl text-muted-foreground line-through">{tier.originalLabel}</span>
               </div>
               <p className="text-muted-foreground mb-6">Pago único • Sin suscripciones • Acceso de por vida</p>
               <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>

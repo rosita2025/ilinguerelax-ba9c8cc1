@@ -230,7 +230,7 @@ const App = () => (
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
                   <Route path="/admin/orders" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/email-test" element={<Navigate to="/admin/orders" replace />} />
-                  <Route path="/admin/email-templates" element={<AdminGate><AdminEmailTemplates /></AdminGate>} />
+                  
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
                   <Route path="/checkouts" element={<NotFound />} />
                   <Route path="/checkouts/:slug" element={<Checkout />} />

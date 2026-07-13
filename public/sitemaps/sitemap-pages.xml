@@ -101,6 +101,11 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://ilinguerelax.com/devoluciones-y-reembolsos</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://ilinguerelax.com/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

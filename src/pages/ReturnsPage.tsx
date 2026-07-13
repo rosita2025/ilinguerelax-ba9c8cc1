@@ -151,6 +151,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Les livres physiques sont vendus et expédiés via Amazon, et leur politique de retour permet un remboursement jusqu'à 30 jours après la livraison. Elle s'applique en cas de livre endommagé, perdu, défectueux ou ne répondant pas à vos attentes. Les retours et remboursements sont gérés et garantis directement par Amazon.",
       },
+      {
+        icon: RefreshCw,
+        title: "Échange de produit sans frais supplémentaires",
+        content:
+          "Si vous préférez ne pas demander de remboursement, vous pouvez échanger votre achat contre un autre produit numérique de valeur égale ou inférieure, sans frais supplémentaires. Si le nouveau produit est plus cher, vous ne payez que la différence. Cette option s'applique tant que la commande respecte les conditions de la plateforme d'achat concernée.",
+      },
     ],
     amazonTitle: "Demandez votre retour sur Amazon",
     amazonText:

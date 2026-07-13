@@ -1,6 +1,6 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCartStore } from "@/stores/cartStore";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -9,10 +9,13 @@ import { motion } from "framer-motion";
 import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 const productImage = "/images/product-spanish-500-questions.png";
-const PRICE = "12.00";
+const ORIGINAL_PRICE = 40;
+const ADMIN_SKU = "500-questions-in-spanish-with-english-pronunciation";
+const TIENDA_PATH = "/checkouts/500-preguntas";
 
 const features = [
   "500 essential Spanish questions",
@@ -28,13 +31,32 @@ const features = [
 const ProductSpanish500Questions = () => {
   const navigate = useNavigate();
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
-  const campaign = useCampaignPrice(12, 40);
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, { tiendaPath: TIENDA_PATH });
+  const { useTiendaOnly, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, priceUsd: currentPrice } = tier;
+  const pricingReady = tier.loaded;
 
-  // Route directly to internal checkout — Shopify is intentionally bypassed.
   const handleBuyNow = () => {
-    setDrawerOpen(false);
-    navigate("/checkouts/500-preguntas");
+    if (!pricingReady) return;
+    if (useTiendaOnly) {
+      addItem({
+        id: "500-preguntas-spanish",
+        name: pricing.name ?? "500 Questions in Spanish (Digital PDF)",
+        price: currentPrice,
+        pricePen: pricePen ?? undefined,
+        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+        image: productImage,
+        description: "500 real Spanish questions with English pronunciation",
+        quantity: 1,
+      });
+      setDrawerOpen(false);
+      navigate(TIENDA_PATH);
+    } else if (tier.hotmartUrl) {
+      window.open(tier.hotmartUrl, "_blank", "noopener,noreferrer");
+    }
   };
+
 
 
   return (
@@ -45,8 +67,9 @@ const ProductSpanish500Questions = () => {
         canonicalUrl="https://ilinguerelax.com/products/500-questions-in-spanish-with-english-pronunciation"
         image="https://ilinguerelax.com/images/product-spanish-500-questions.png"
         type="product"
-        price={PRICE}
-        originalPrice="40"
+        price={currentPrice.toFixed(2)}
+        originalPrice={String(ORIGINAL_PRICE)}
+
         rating="4.8"
         reviewCount="0"
         sku="SPANISH-500-QUESTIONS"
@@ -90,10 +113,11 @@ const ProductSpanish500Questions = () => {
                   <span className="text-blue-600 font-semibold text-sm uppercase">Special Launch Price</span>
                 </div>
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-2">
-                  <span className={`${campaign.price.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground`}>{campaign.price}</span>
-                  <span className={`${campaign.price.length > 7 ? 'text-base md:text-2xl' : 'text-2xl'} text-muted-foreground line-through`}>{campaign.originalPrice}</span>
-                  <span className="text-sm md:text-base text-muted-foreground font-semibold">{campaign.currency}</span>
+                  <span className={`${tier.priceLabel.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground`}>{tier.priceLabel}</span>
+                  <span className={`${tier.priceLabel.length > 7 ? 'text-base md:text-2xl' : 'text-2xl'} text-muted-foreground line-through`}>{tier.originalLabel}</span>
+                  <span className="text-sm md:text-base text-muted-foreground font-semibold">{tier.currencyCode}</span>
                   <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold shadow-lg">SAVE 70%</span>
+
                 </div>
                 <p className="text-sm text-muted-foreground">💳 One-time payment • No subscription • Lifetime access</p>
               </motion.div>

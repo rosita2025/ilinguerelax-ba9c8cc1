@@ -1,4 +1,5 @@
-import { useState, useMemo, useRef, lazy, Suspense } from "react";
+import { useState, useMemo, useRef, Suspense } from "react";
+import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";

@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState, lazy, Suspense } from "react";
+import { useMemo, useRef, useState, Suspense } from "react";
+import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";

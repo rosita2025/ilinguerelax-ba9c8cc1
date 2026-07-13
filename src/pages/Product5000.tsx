@@ -1,4 +1,5 @@
-import { useState, useMemo, lazy, Suspense } from "react";
+import { useState, useMemo, Suspense } from "react";
+import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";

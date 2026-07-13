@@ -78,6 +78,15 @@ export const StickyBuyBar = ({
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [clickLock, setClickLock] = useState(false);
+  // Hide entirely on checkout / admin / thank-you routes so it can never
+  // navigate the user to *another* checkout while one is already in progress.
+  const isOnCheckout = typeof window !== "undefined" && (() => {
+    const p = window.location.pathname.toLowerCase();
+    return p.startsWith("/checkout") || p.startsWith("/checkouts") ||
+           p.startsWith("/admin") || p.includes("success") ||
+           p.startsWith("/gracias") || p.startsWith("/thank");
+  })();
   const [priceFlash, setPriceFlash] = useState(false);
   const flagEmojiStyle = {
     fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',

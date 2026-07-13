@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 
 export interface AdminPricing {
   /** USD price for Tier-1 / global regions. `null` until the DB responds. */
@@ -55,41 +56,60 @@ export function useAdminPricing(sku: string): AdminPricing {
       return;
     }
     let cancelled = false;
-    setState((s) => ({ ...s, loaded: false, missing: false }));
-    supabase
-      .from("digital_products")
-      .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
-      .eq("sku", sku)
-      .eq("active", true)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled) return;
-        if (!data) {
-          setState({ ...INITIAL, loaded: true, missing: true });
-          return;
-        }
-        const global = data.price_usd != null ? Number(data.price_usd) : null;
-        const latam = data.price_usd_latam != null ? Number(data.price_usd_latam) : global;
-        const tienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0
-          ? Number((data as any).price_usd_tienda)
-          : null;
-        const pen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : null;
-        setState({
-          priceGlobalUsd: global,
-          priceLatamUsd: latam,
-          priceTiendaUsd: tienda,
-          pricePen: pen,
-          name: (data as any).name ?? null,
-          description: (data as any).description ?? null,
-          hotmartUrl: (data as any).hotmart_url ?? null,
-          storeEnabled: (data as any).store_enabled !== false,
-          coverImageUrl: (data as any).cover_image_url ?? null,
-          loaded: true,
-          missing: false,
-        });
+
+    const fetchOne = async () => {
+      setState((s) => ({ ...s, loaded: s.loaded, missing: false }));
+      const { data } = await supabase
+        .from("digital_products")
+        .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
+        .eq("sku", sku)
+        .eq("active", true)
+        .maybeSingle();
+      if (cancelled) return;
+      if (!data) {
+        setState({ ...INITIAL, loaded: true, missing: true });
+        return;
+      }
+      const global = data.price_usd != null ? Number(data.price_usd) : null;
+      const latam = data.price_usd_latam != null ? Number(data.price_usd_latam) : global;
+      const tienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0
+        ? Number((data as any).price_usd_tienda)
+        : null;
+      const pen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : null;
+      setState({
+        priceGlobalUsd: global,
+        priceLatamUsd: latam,
+        priceTiendaUsd: tienda,
+        pricePen: pen,
+        name: (data as any).name ?? null,
+        description: (data as any).description ?? null,
+        hotmartUrl: (data as any).hotmart_url ?? null,
+        storeEnabled: (data as any).store_enabled !== false,
+        coverImageUrl: (data as any).cover_image_url ?? null,
+        loaded: true,
+        missing: false,
       });
+    };
+
+    fetchOne();
+
+    // Refetch when the admin publishes an edit (cross-tab broadcast, focus, bfcache, etc.)
+    const unsubscribeLocal = subscribeCatalogUpdates({ sku, onUpdate: fetchOne });
+
+    // Realtime: any change to this row in Supabase updates the detail page live.
+    const channel = supabase
+      .channel(`admin_pricing_${sku}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "digital_products", filter: `sku=eq.${sku}` },
+        () => { fetchOne(); }
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
+      unsubscribeLocal();
+      supabase.removeChannel(channel);
     };
   }, [sku]);
 

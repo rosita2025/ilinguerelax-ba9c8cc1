@@ -76,9 +76,18 @@ const ProductDynamic = () => {
     };
     load();
     const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load });
+    const channel = supabase
+      .channel(`product_dynamic_${slug}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "digital_products", filter: `sku=eq.${slug}` },
+        () => { load(); }
+      )
+      .subscribe();
     return () => {
       cancelled = true;
       unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [slug]);
 

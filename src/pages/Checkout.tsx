@@ -242,6 +242,16 @@ export default function Checkout() {
     upsellsFingerprint,
   ]);
 
+  // Safety net: if the buyer removes the main product from the cart, auto-add
+  // it back so the checkout never sits at $0 (which reads as "free" to buyers).
+  useEffect(() => {
+    if (!catalogItem) return;
+    const hasMain = items.some((i) => i.id === catalogItem.id);
+    if (!hasMain) {
+      addItem({ ...catalogItem, quantity: 1 });
+    }
+  }, [items, catalogItem, addItem]);
+
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.
   useAbandonedCheckoutTracker(slug, catalogItem?.name);

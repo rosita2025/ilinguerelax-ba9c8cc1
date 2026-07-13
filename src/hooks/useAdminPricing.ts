@@ -59,7 +59,17 @@ export function useAdminPricing(sku: string): AdminPricing {
 
     const fetchOne = async () => {
       setState((s) => ({ ...s, loaded: s.loaded, missing: false }));
-      let data: Awaited<ReturnType<typeof supabase.from<"digital_products">>["select"]> | null = null;
+      let data: {
+        price_usd: number | null;
+        price_usd_latam: number | null;
+        price_usd_tienda: number | null;
+        price_pen: number | null;
+        name: string | null;
+        description: string | null;
+        hotmart_url: string | null;
+        store_enabled: boolean | null;
+        cover_image_url: string | null;
+      } | null = null;
       try {
         const result = await supabase
           .from("digital_products")

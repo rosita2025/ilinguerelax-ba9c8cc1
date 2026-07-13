@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { detectCountryByIp, getCountryFromTimezone } from "@/lib/geoDetection";
 
 export type CampaignCurrency =
   | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
@@ -28,46 +29,15 @@ const STORAGE_KEY = "campaign_currency_v5";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 // Module-level dedupe: share a single IP-detection fetch across all hook instances.
-// Tries ipapi.co first, falls back to ipwho.is if it fails, times out or rate-limits.
 let inflightDetection: Promise<{ currency: CampaignCurrency; country: string } | null> | null = null;
-
-async function fetchIpapi(): Promise<{ currency: CampaignCurrency; country: string } | null> {
-  try {
-    const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    // ipapi.co returns { error: true, reason: "..." } on rate-limit with HTTP 200
-    if (data?.error) return null;
-    const country = (data.country_code || "").toUpperCase();
-    if (!country) return null;
-    return { currency: COUNTRY_TO_CURRENCY[country] || "USD", country };
-  } catch {
-    return null;
-  }
-}
-
-async function fetchIpwho(): Promise<{ currency: CampaignCurrency; country: string } | null> {
-  try {
-    const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (data?.success === false) return null;
-    const country = (data.country_code || "").toUpperCase();
-    if (!country) return null;
-    return { currency: COUNTRY_TO_CURRENCY[country] || "USD", country };
-  } catch {
-    return null;
-  }
-}
 
 function detectOnce(): Promise<{ currency: CampaignCurrency; country: string } | null> {
   if (inflightDetection) return inflightDetection;
   inflightDetection = (async () => {
-    const primary = await fetchIpapi();
-    if (primary) return primary;
-    const secondary = await fetchIpwho();
-    if (secondary) return secondary;
-    return null;
+    const detected = await detectCountryByIp({ fallbackCountry: "US" });
+    if (!detected?.countryCode) return null;
+    const country = detected.countryCode;
+    return { currency: COUNTRY_TO_CURRENCY[country] || "USD", country };
   })();
   return inflightDetection;
 }
@@ -203,48 +173,8 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   SK: "EUR", SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", MT: "EUR", CY: "EUR", HR: "EUR",
 };
 
-// Map IANA timezones to country codes for an instant, synchronous best-guess
-// (avoids the $USD → local currency flicker before the IP lookup resolves).
-const TIMEZONE_TO_COUNTRY: Record<string, string> = {
-  "America/Lima": "PE",
-  "America/Bogota": "CO",
-  "America/Mexico_City": "MX", "America/Monterrey": "MX", "America/Cancun": "MX", "America/Tijuana": "MX", "America/Chihuahua": "MX", "America/Hermosillo": "MX", "America/Merida": "MX", "America/Mazatlan": "MX",
-  "America/Argentina/Buenos_Aires": "AR", "America/Argentina/Cordoba": "AR", "America/Argentina/Mendoza": "AR", "America/Argentina/Salta": "AR", "America/Argentina/Tucuman": "AR", "America/Argentina/Ushuaia": "AR", "America/Argentina/Rio_Gallegos": "AR", "America/Argentina/San_Juan": "AR", "America/Argentina/San_Luis": "AR", "America/Argentina/La_Rioja": "AR", "America/Argentina/Catamarca": "AR", "America/Argentina/Jujuy": "AR", "America/Buenos_Aires": "AR",
-  "America/Santiago": "CL", "Pacific/Easter": "CL",
-  "America/Sao_Paulo": "BR", "America/Bahia": "BR", "America/Fortaleza": "BR", "America/Recife": "BR", "America/Manaus": "BR", "America/Belem": "BR", "America/Cuiaba": "BR", "America/Maceio": "BR", "America/Noronha": "BR", "America/Porto_Velho": "BR", "America/Rio_Branco": "BR", "America/Araguaina": "BR",
-  "America/Montevideo": "UY",
-  "America/La_Paz": "BO",
-  "America/Asuncion": "PY",
-  "America/Guatemala": "GT",
-  "America/Santo_Domingo": "DO",
-  "America/Costa_Rica": "CR",
-  "America/Tegucigalpa": "HN",
-  "America/Managua": "NI",
-  "America/Caracas": "VE",
-  "America/Panama": "PA",
-  "America/Guayaquil": "EC", "Pacific/Galapagos": "EC",
-  "America/El_Salvador": "SV",
-  "America/Toronto": "CA", "America/Vancouver": "CA", "America/Edmonton": "CA", "America/Winnipeg": "CA", "America/Halifax": "CA", "America/St_Johns": "CA", "America/Montreal": "CA",
-  "Europe/Madrid": "ES", "Europe/Paris": "FR", "Europe/Berlin": "DE", "Europe/Rome": "IT", "Europe/Lisbon": "PT", "Europe/Dublin": "IE", "Europe/Amsterdam": "NL", "Europe/Brussels": "BE", "Europe/Vienna": "AT", "Europe/Helsinki": "FI", "Europe/Athens": "GR", "Europe/Luxembourg": "LU", "Europe/Bratislava": "SK", "Europe/Ljubljana": "SI", "Europe/Tallinn": "EE", "Europe/Riga": "LV", "Europe/Vilnius": "LT", "Europe/Malta": "MT", "Asia/Nicosia": "CY", "Europe/Zagreb": "HR",
-  "Europe/London": "GB",
-  "Australia/Sydney": "AU", "Australia/Melbourne": "AU", "Australia/Brisbane": "AU", "Australia/Perth": "AU", "Australia/Adelaide": "AU", "Australia/Hobart": "AU", "Australia/Darwin": "AU",
-  "Pacific/Auckland": "NZ", "Pacific/Chatham": "NZ",
-  "Europe/Stockholm": "SE",
-  "Europe/Oslo": "NO",
-  "Europe/Copenhagen": "DK",
-  "Europe/Zurich": "CH",
-  "Asia/Tokyo": "JP",
-  "Asia/Seoul": "KR",
-  "Asia/Singapore": "SG",
-  "Asia/Hong_Kong": "HK",
-  "Asia/Taipei": "TW",
-};
-
 function guessCountryFromTimezone(): string | null {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return TIMEZONE_TO_COUNTRY[tz] || null;
-  } catch { return null; }
+  return getCountryFromTimezone() || null;
 }
 
 export function readInitialCampaignCurrency(): CampaignCurrency {

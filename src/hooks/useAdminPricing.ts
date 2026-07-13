@@ -59,12 +59,28 @@ export function useAdminPricing(sku: string): AdminPricing {
 
     const fetchOne = async () => {
       setState((s) => ({ ...s, loaded: s.loaded, missing: false }));
-      const { data } = await supabase
-        .from("digital_products")
-        .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
-        .eq("sku", sku)
-        .eq("active", true)
-        .maybeSingle();
+      let data: {
+        price_usd: number | null;
+        price_usd_latam: number | null;
+        price_usd_tienda: number | null;
+        price_pen: number | null;
+        name: string | null;
+        description: string | null;
+        hotmart_url: string | null;
+        store_enabled: boolean | null;
+        cover_image_url: string | null;
+      } | null = null;
+      try {
+        const result = await supabase
+          .from("digital_products")
+          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
+          .eq("sku", sku)
+          .eq("active", true)
+          .maybeSingle();
+        data = result.data as typeof data;
+      } catch {
+        data = null;
+      }
       if (cancelled) return;
       if (!data) {
         setState({ ...INITIAL, loaded: true, missing: true });

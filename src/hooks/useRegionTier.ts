@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { detectCountryByIp } from "@/lib/geoDetection";
 
 export type RegionTier = "latam" | "global";
 
@@ -39,21 +40,9 @@ let inflight: Promise<{ tier: RegionTier; country: string } | null> | null = nul
 async function detect(): Promise<{ tier: RegionTier; country: string } | null> {
   if (inflight) return inflight;
   inflight = (async () => {
-    // Try ipapi.co, then ipwho.is
-    for (const url of ["https://ipwho.is/", "https://ipwho.is/"]) {
-      try {
-        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-        if (!res.ok) continue;
-        const data = await res.json();
-        if (data?.error || data?.success === false) continue;
-        const country = (data.country_code || data.country || "").toUpperCase();
-        if (!country) continue;
-        return { tier: classify(country), country };
-      } catch {
-        // try next
-      }
-    }
-    return null;
+    const detected = await detectCountryByIp({ fallbackCountry: "US" });
+    if (!detected?.countryCode) return null;
+    return { tier: classify(detected.countryCode), country: detected.countryCode };
   })();
   return inflight;
 }

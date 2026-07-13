@@ -1,6 +1,8 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, RefreshCw } from "lucide-react";
+import { reportClientError } from "@/lib/errorReporter";
+
 
 interface Props {
   children: ReactNode;
@@ -26,6 +28,12 @@ export class AppErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("App render recovered", error, info.componentStack);
+    reportClientError({
+      source: "react.errorBoundary",
+      message: error?.message,
+      stack: error?.stack,
+      componentStack: info.componentStack ?? undefined,
+    });
   }
 
   render() {

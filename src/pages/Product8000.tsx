@@ -288,15 +288,15 @@ const Product8000 = () => {
                     Precio Especial Por Tiempo Limitado
                   </span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$20</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">{tier.priceLabel}</span>
+                  <span className="text-2xl text-muted-foreground line-through">{tier.originalLabel}</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
                     
-                    AHORRA 63%
+                    OFERTA
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">💳 Pago único • Sin suscripciones • Acceso de por vida</p>

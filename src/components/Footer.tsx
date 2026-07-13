@@ -43,6 +43,9 @@ export const Footer = () => {
             <Link to="/condiciones" className="hover:text-primary-foreground transition-colors">
               {c.terms}
             </Link>
+            <Link to="/copyright" className="hover:text-primary-foreground transition-colors">
+              {c.copyright}
+            </Link>
           </nav>
 
           <div className="flex items-center gap-4">

@@ -188,18 +188,10 @@ export default function Checkout() {
   // when the admin edits the catalog and pushes an update — without dropping items or state.
   useEffect(() => {
     if (!catalogItem) return;
-    // Prune the cart to items that actually belong to THIS checkout URL
-    // (main product + declared upsells). Prevents leftovers from a previous
-    // /checkouts/:slug visit (e.g. Patrones) sneaking into a new purchase
-    // (e.g. 1,000 Verbos) and getting delivered by mistake.
-    const allowed = new Set<string>([
-      catalogItem.id,
-      ...((catalogItem.upsells ?? []).map((u) => u.id)),
-    ]);
-    for (const it of items) {
-      if (!allowed.has(it.id)) removeItem(it.id);
-    }
-
+    // NOTE: previously we pruned the cart to only the main product + declared
+    // upsells. That broke multi-product checkout (adding Patrones + Coreano
+    // and paying both together). Now we preserve every line the user added
+    // and only ensure the main product of THIS /checkouts/:slug URL exists.
     const existing = items.find((i) => i.id === catalogItem.id);
     if (!existing) {
       addItem({ ...catalogItem, quantity: 1 });

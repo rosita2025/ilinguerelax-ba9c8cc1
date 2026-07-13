@@ -85,7 +85,7 @@ export const EmailSubscribePopup = () => {
         body: { email: email.trim(), name: name.trim() || undefined, source: "popup" },
       });
       if (error) throw error;
-      try { localStorage.setItem(STORAGE_KEY, "subscribed"); } catch {}
+      try { writeState("subscribed", SUBSCRIBED_TTL_DAYS); } catch {}
       setSuccess(true);
     } catch (err) {
       console.error(err);

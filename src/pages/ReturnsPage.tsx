@@ -2,7 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Ban, Eye, Clock, Package, ExternalLink } from "lucide-react";
+import { Ban, Eye, Clock, Package, ExternalLink, RefreshCw } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
 
@@ -57,6 +57,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Los libros físicos se venden y envían a través de Amazon, y su política de devolución permite reembolso hasta 30 días después de la entrega. Aplica en casos de libro dañado, extraviado, defectuoso o si no cumple con tus expectativas. La devolución y el reembolso son gestionados y garantizados directamente por Amazon bajo su propia responsabilidad.",
       },
+      {
+        icon: RefreshCw,
+        title: "Cambio de producto sin costo adicional",
+        content:
+          "Si no deseas un reembolso, puedes solicitar el cambio por otro producto digital de igual o menor valor sin costo adicional. Si el nuevo producto tiene un precio mayor, solo abonas la diferencia. Esta opción aplica siempre que el pedido cumpla con las condiciones de la plataforma de compra correspondiente.",
+      },
     ],
     amazonTitle: "Solicita tu devolución en Amazon",
     amazonText:
@@ -97,6 +103,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         title: "Physical books — Amazon (up to 30 days)",
         content:
           "Physical books are sold and shipped through Amazon, and their return policy allows refunds up to 30 days after delivery. This applies to damaged, lost, defective books, or if the item does not meet your expectations. Returns and refunds are handled and guaranteed directly by Amazon under their own responsibility.",
+      },
+      {
+        icon: RefreshCw,
+        title: "Product exchange at no extra cost",
+        content:
+          "If you prefer not to request a refund, you can exchange your purchase for another digital product of equal or lower value at no additional cost. If the new product is more expensive, you only pay the difference. This option is available as long as the order meets the conditions of the corresponding purchase platform.",
       },
     ],
     amazonTitle: "Request your return on Amazon",
@@ -139,6 +151,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Les livres physiques sont vendus et expédiés via Amazon, et leur politique de retour permet un remboursement jusqu'à 30 jours après la livraison. Elle s'applique en cas de livre endommagé, perdu, défectueux ou ne répondant pas à vos attentes. Les retours et remboursements sont gérés et garantis directement par Amazon.",
       },
+      {
+        icon: RefreshCw,
+        title: "Échange de produit sans frais supplémentaires",
+        content:
+          "Si vous préférez ne pas demander de remboursement, vous pouvez échanger votre achat contre un autre produit numérique de valeur égale ou inférieure, sans frais supplémentaires. Si le nouveau produit est plus cher, vous ne payez que la différence. Cette option s'applique tant que la commande respecte les conditions de la plateforme d'achat concernée.",
+      },
     ],
     amazonTitle: "Demandez votre retour sur Amazon",
     amazonText:
@@ -179,6 +197,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         title: "Livros físicos — Amazon (até 30 dias)",
         content:
           "Os livros físicos são vendidos e enviados pela Amazon, e sua política de devolução permite reembolso em até 30 dias após a entrega. Aplica-se a livros danificados, extraviados, defeituosos ou que não atendam às suas expectativas. Devoluções e reembolsos são gerenciados e garantidos diretamente pela Amazon sob sua responsabilidade.",
+      },
+      {
+        icon: RefreshCw,
+        title: "Troca de produto sem custo adicional",
+        content:
+          "Se preferir não solicitar reembolso, você pode trocar sua compra por outro produto digital de valor igual ou inferior sem custo adicional. Se o novo produto for mais caro, você paga apenas a diferença. Esta opção se aplica desde que o pedido cumpra as condições da plataforma de compra correspondente.",
       },
     ],
     amazonTitle: "Solicite sua devolução na Amazon",

@@ -173,43 +173,6 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   SK: "EUR", SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", MT: "EUR", CY: "EUR", HR: "EUR",
 };
 
-// Map IANA timezones to country codes for an instant, synchronous best-guess
-// (avoids the $USD → local currency flicker before the IP lookup resolves).
-const TIMEZONE_TO_COUNTRY: Record<string, string> = {
-  "America/Lima": "PE",
-  "America/Bogota": "CO",
-  "America/Mexico_City": "MX", "America/Monterrey": "MX", "America/Cancun": "MX", "America/Tijuana": "MX", "America/Chihuahua": "MX", "America/Hermosillo": "MX", "America/Merida": "MX", "America/Mazatlan": "MX",
-  "America/Argentina/Buenos_Aires": "AR", "America/Argentina/Cordoba": "AR", "America/Argentina/Mendoza": "AR", "America/Argentina/Salta": "AR", "America/Argentina/Tucuman": "AR", "America/Argentina/Ushuaia": "AR", "America/Argentina/Rio_Gallegos": "AR", "America/Argentina/San_Juan": "AR", "America/Argentina/San_Luis": "AR", "America/Argentina/La_Rioja": "AR", "America/Argentina/Catamarca": "AR", "America/Argentina/Jujuy": "AR", "America/Buenos_Aires": "AR",
-  "America/Santiago": "CL", "Pacific/Easter": "CL",
-  "America/Sao_Paulo": "BR", "America/Bahia": "BR", "America/Fortaleza": "BR", "America/Recife": "BR", "America/Manaus": "BR", "America/Belem": "BR", "America/Cuiaba": "BR", "America/Maceio": "BR", "America/Noronha": "BR", "America/Porto_Velho": "BR", "America/Rio_Branco": "BR", "America/Araguaina": "BR",
-  "America/Montevideo": "UY",
-  "America/La_Paz": "BO",
-  "America/Asuncion": "PY",
-  "America/Guatemala": "GT",
-  "America/Santo_Domingo": "DO",
-  "America/Costa_Rica": "CR",
-  "America/Tegucigalpa": "HN",
-  "America/Managua": "NI",
-  "America/Caracas": "VE",
-  "America/Panama": "PA",
-  "America/Guayaquil": "EC", "Pacific/Galapagos": "EC",
-  "America/El_Salvador": "SV",
-  "America/Toronto": "CA", "America/Vancouver": "CA", "America/Edmonton": "CA", "America/Winnipeg": "CA", "America/Halifax": "CA", "America/St_Johns": "CA", "America/Montreal": "CA",
-  "Europe/Madrid": "ES", "Europe/Paris": "FR", "Europe/Berlin": "DE", "Europe/Rome": "IT", "Europe/Lisbon": "PT", "Europe/Dublin": "IE", "Europe/Amsterdam": "NL", "Europe/Brussels": "BE", "Europe/Vienna": "AT", "Europe/Helsinki": "FI", "Europe/Athens": "GR", "Europe/Luxembourg": "LU", "Europe/Bratislava": "SK", "Europe/Ljubljana": "SI", "Europe/Tallinn": "EE", "Europe/Riga": "LV", "Europe/Vilnius": "LT", "Europe/Malta": "MT", "Asia/Nicosia": "CY", "Europe/Zagreb": "HR",
-  "Europe/London": "GB",
-  "Australia/Sydney": "AU", "Australia/Melbourne": "AU", "Australia/Brisbane": "AU", "Australia/Perth": "AU", "Australia/Adelaide": "AU", "Australia/Hobart": "AU", "Australia/Darwin": "AU",
-  "Pacific/Auckland": "NZ", "Pacific/Chatham": "NZ",
-  "Europe/Stockholm": "SE",
-  "Europe/Oslo": "NO",
-  "Europe/Copenhagen": "DK",
-  "Europe/Zurich": "CH",
-  "Asia/Tokyo": "JP",
-  "Asia/Seoul": "KR",
-  "Asia/Singapore": "SG",
-  "Asia/Hong_Kong": "HK",
-  "Asia/Taipei": "TW",
-};
-
 function guessCountryFromTimezone(): string | null {
   return getCountryFromTimezone() || null;
 }

@@ -99,7 +99,7 @@ let inflightIpDetection: Promise<string | null> | null = null;
 async function detectCountryByIp(): Promise<string | null> {
   if (inflightIpDetection) return inflightIpDetection;
   inflightIpDetection = (async () => {
-    for (const url of ["https://ipapi.co/json/", "https://ipwho.is/"]) {
+    for (const url of ["https://ipwho.is/", "https://ipwho.is/"]) {
       try {
         const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
         if (!res.ok) continue;

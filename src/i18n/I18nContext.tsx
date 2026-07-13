@@ -80,7 +80,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
     const detectCountry = async () => {
       try {
-        const response = await fetch("https://ipapi.co/json/", {
+        const response = await fetch("https://ipwho.is/", {
           signal: AbortSignal.timeout(3000)
         });
         if (response.ok) {

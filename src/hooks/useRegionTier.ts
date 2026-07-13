@@ -40,7 +40,7 @@ async function detect(): Promise<{ tier: RegionTier; country: string } | null> {
   if (inflight) return inflight;
   inflight = (async () => {
     // Try ipapi.co, then ipwho.is
-    for (const url of ["https://ipapi.co/json/", "https://ipwho.is/"]) {
+    for (const url of ["https://ipwho.is/", "https://ipwho.is/"]) {
       try {
         const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
         if (!res.ok) continue;

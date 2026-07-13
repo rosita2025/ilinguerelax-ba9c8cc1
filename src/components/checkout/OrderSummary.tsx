@@ -14,9 +14,11 @@ interface OrderSummaryProps {
   collapsible?: boolean;
   /** When true, hides quantity +/- and remove buttons (fixed single-product checkout). */
   locked?: boolean;
+  /** Main product id — its remove/trash button is hidden so it cannot be deleted. */
+  mainProductId?: string;
 }
 
-export function OrderSummary({ collapsible = false, locked = false }: OrderSummaryProps) {
+export function OrderSummary({ collapsible = false, locked = false, mainProductId }: OrderSummaryProps) {
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
     useCheckoutPruebaStore();
   const region = useRegionTier();

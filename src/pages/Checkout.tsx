@@ -347,7 +347,7 @@ export default function Checkout() {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
         <div className="space-y-6">
           <BuyerInfoForm />
-          {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} />}
+          {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />}
           <PaymentMethodsGroup />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

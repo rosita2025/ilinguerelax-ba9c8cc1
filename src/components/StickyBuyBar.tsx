@@ -329,15 +329,6 @@ export const StickyBuyBar = ({
             </div>
           ) : (
             <div className="flex flex-col gap-1.5 w-full">
-              {/* Prominent 100% secure payment badge above CTA */}
-              {!disabled && (
-                <div className="flex justify-center">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-md ring-1 ring-emerald-400/50">
-                    <Lock className="w-3 h-3" />
-                    {lang === "en" ? "100% Secure Payment" : "Pago 100% Seguro"}
-                  </span>
-                </div>
-              )}
               <Button
                 type="button"
                 size="default"
@@ -488,12 +479,6 @@ export const StickyBuyBar = ({
                 </>
               )}
               </Button>
-              {!disabled && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-                  <Lock className="w-3 h-3" />
-                  {lang === "en" ? "100% Secure Payment" : "Pago 100% Seguro"}
-                </span>
-              )}
             </div>
             {secondaryCtaText && onSecondaryClick && (
               <Button

@@ -281,8 +281,10 @@ export function useCampaignPrice(priceUSD: number = 34.99, originalUSD: number =
   type State = Omit<CampaignPrice, "setCurrency">;
   const [state, setState] = useState<State>(() => {
     if (typeof window !== "undefined") {
-      const forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
-      if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD, "forced");
+      try {
+        const forced = new URLSearchParams(window.location.search).get("currency")?.toUpperCase() as CampaignCurrency | undefined;
+        if (forced && RATES[forced]) return build(forced, "", priceUSD, originalUSD, "forced");
+      } catch { /* ignore */ }
     }
     const cached = readCache();
     if (cached) return build(cached.currency, cached.countryCode, priceUSD, originalUSD, "cache");

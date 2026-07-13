@@ -291,11 +291,19 @@ function readCache(): CachedDetection | null {
 
 function format(currency: CampaignCurrency, usdAmount: number): { str: string; numeric: number } {
   const cfg = RATES[currency];
+  // Guard: when the base USD price hasn't loaded yet (0 or negative), the
+  // psychological `.nice()` adjustments (e.g. `rounded - 0.10`) would render
+  // as "S/-0.10". Return a clean zero instead while loading.
+  if (!isFinite(usdAmount) || usdAmount <= 0) {
+    const zeroStr = cfg.decimals > 0 ? (0).toFixed(cfg.decimals) : "0";
+    return { str: `${cfg.symbol}${zeroStr}`, numeric: 0 };
+  }
   const local = cfg.nice(usdAmount * cfg.rate);
+  const safeLocal = local < 0 ? 0 : local;
   const formatted = cfg.decimals > 0
-    ? local.toFixed(cfg.decimals)
-    : Math.round(local).toLocaleString("es-CO");
-  return { str: `${cfg.symbol}${formatted}`, numeric: local };
+    ? safeLocal.toFixed(cfg.decimals)
+    : Math.round(safeLocal).toLocaleString("es-CO");
+  return { str: `${cfg.symbol}${formatted}`, numeric: safeLocal };
 }
 
 function build(

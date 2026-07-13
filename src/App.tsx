@@ -56,6 +56,7 @@ const TermsPage = lazy(() => import("./pages/TermsPage"));
 const CopyrightPage = lazy(() => import("./pages/CopyrightPage"));
 const TrademarkPage = lazy(() => import("./pages/TrademarkPage"));
 const LicensesPage = lazy(() => import("./pages/LicensesPage"));
+const ShippingPage = lazy(() => import("./pages/ShippingPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -232,6 +233,8 @@ const App = () => (
                   <Route path="/aviso-trademark" element={<TrademarkPage />} />
                   <Route path="/licencias-y-avisos-legales" element={<LicensesPage />} />
                   <Route path="/licenses" element={<LicensesPage />} />
+                  <Route path="/envios-y-entregas" element={<ShippingPage />} />
+                  <Route path="/shipping-and-delivery" element={<ShippingPage />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />

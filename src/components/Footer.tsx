@@ -126,7 +126,7 @@ export const Footer = () => {
       links: [
         { to: "/contacto", label: c.contact },
         { to: "/faq", label: c.faq },
-        { to: "/faq#envios", label: c.shipping },
+        { to: "/envios-y-entregas", label: c.shipping },
         { to: "/faq#devoluciones", label: c.returns },
         { to: "/condiciones", label: c.terms },
         { to: "/privacidad", label: c.privacy },

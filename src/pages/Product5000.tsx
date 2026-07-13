@@ -161,27 +161,6 @@ const bonuses = [
       "Los 1,000 verbos más usados en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.",
     image: bonus2Verbos,
   },
-  {
-    icon: Sparkles,
-    title: "Regalo 3: 100 Frases Más Usadas por Nativos",
-    description:
-      "Las expresiones reales que usan los nativos todos los días para que hables como un local desde el principio.",
-    image: bonus3Frases,
-  },
-  {
-    icon: Globe,
-    title: "Regalo 4: 500 Preguntas Frecuentes en Inglés",
-    description:
-      "Las preguntas más comunes que necesitas dominar para conversaciones reales: trabajo, viajes y vida diaria.",
-    image: bonus4Preguntas,
-  },
-  {
-    icon: BookOpen,
-    title: "Regalo 5: Cómo Estudiar Inglés en 6 Meses",
-    description:
-      "Tu plan paso a paso para hablar inglés con confianza en solo 6 meses, sin perder tiempo ni motivación.",
-    image: bonus5Estudiar,
-  },
 ];
 const chapters = [
   "Casa y Hogar",

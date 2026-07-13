@@ -2,7 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Ban, Eye, Clock, Package, ExternalLink } from "lucide-react";
+import { Ban, Eye, Clock, Package, ExternalLink, RefreshCw } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
 

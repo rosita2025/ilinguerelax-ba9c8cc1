@@ -215,6 +215,7 @@ Deno.serve(async (req) => {
       // Product removed — tell IndexNow so it drops the URL from indexes.
       await pingIndexNow([productUrl(sku)]);
       pingSitemap().catch(() => {});
+      resubmitSitemapsGSC().catch(() => {});
       return json({ success: true });
     }
 

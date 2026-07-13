@@ -759,7 +759,7 @@ const Product5000 = () => {
           "Pronunciación ES",
           "Fonética UK/USA",
           "Descarga inmediata",
-          "4 Bonus GRATIS",
+          "2 Bonus GRATIS",
         ]}
         ctaText={`COMPRAR AHORA | ${safePriceLabel}`}
         onBuy={handleBuy}

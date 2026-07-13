@@ -162,8 +162,28 @@ const ProductSpanish500Questions = () => {
       </section>
 
       <Footer />
+
+      <StickyBuyBar
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
+        currencyCode={tier.currencyCode}
+        productName="500 Questions in Spanish with English Pronunciation"
+        rating={4.8}
+        reviewCount={0}
+        showReviews={false}
+        buyUrl={useTiendaOnly ? TIENDA_PATH : (tier.hotmartUrl || "#")}
+        onBuyClick={handleBuyNow}
+        ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
+        lang="en"
+        calmMode
+        dismissible
+      />
+
+      <div className="h-20 md:h-16" />
+
       <WhatsAppButton />
       <ScrollToTop showAfter={500} />
+
     </main>
   );
 };

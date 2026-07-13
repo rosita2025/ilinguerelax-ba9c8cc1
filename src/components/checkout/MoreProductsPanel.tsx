@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
-import { CHECKOUT_CATALOG, type UpsellItem } from "@/config/checkoutCatalog";
+import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 
 interface DBRow {
   id: string;
@@ -17,30 +17,30 @@ interface DBRow {
   price_usd_tienda: number | null;
   price_pen: number | null;
   cover_image_url: string | null;
-  active: boolean;
-  is_upsell: boolean;
-  sort_order: number;
+}
+
+interface UpsellRow extends DBRow {
+  discount_pct: number;
 }
 
 const T = {
-  es: { title: "Agrega más productos", sub: "Descuentos automáticos si aplica", add: "Agregar", added: "En el carrito", toast: "Producto agregado al carrito", auto: "Descuento automático" },
-  en: { title: "Add more products", sub: "Automatic discounts when available", add: "Add", added: "In cart", toast: "Product added to cart", auto: "Automatic discount" },
-  fr: { title: "Ajouter d'autres produits", sub: "Remises automatiques si disponibles", add: "Ajouter", added: "Dans le panier", toast: "Produit ajouté au panier", auto: "Remise automatique" },
-  pt: { title: "Adicionar mais produtos", sub: "Descontos automáticos quando disponíveis", add: "Adicionar", added: "No carrinho", toast: "Produto adicionado ao carrinho", auto: "Desconto automático" },
+  es: { title: "Ofertas exclusivas para este pedido", sub: "Solo hoy con descuento automático", add: "Agregar", added: "En el carrito", toast: "Producto agregado con descuento", auto: "Descuento" },
+  en: { title: "Exclusive offers for this order", sub: "Today only with automatic discount", add: "Add", added: "In cart", toast: "Product added with discount", auto: "Discount" },
+  fr: { title: "Offres exclusives pour cette commande", sub: "Aujourd'hui seulement avec remise automatique", add: "Ajouter", added: "Dans le panier", toast: "Produit ajouté avec remise", auto: "Remise" },
+  pt: { title: "Ofertas exclusivas para este pedido", sub: "Só hoje com desconto automático", add: "Adicionar", added: "No carrinho", toast: "Produto adicionado com desconto", auto: "Desconto" },
 } as const;
 
 interface Props {
-  excludeIds?: string[];
-  upsells?: UpsellItem[];
+  /** admin sku of the main product to fetch its configured upsells */
+  parentSku?: string | null;
 }
 
-const roundMoney = (value: number) => Math.round(value * 100) / 100;
+const roundMoney = (v: number) => Math.round(v * 100) / 100;
 
-export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }: Props) {
-  const [rows, setRows] = useState<DBRow[]>([]);
+export function MoreProductsPanel({ parentSku }: Props) {
+  const [upsells, setUpsells] = useState<UpsellRow[]>([]);
   const items = useCheckoutPruebaStore((s) => s.items);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
   const region = useRegionTier();
   const { language } = useI18n();
   const t = T[(language as keyof typeof T)] ?? T.es;
@@ -48,40 +48,43 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
   const isTiendaUsd = ["VE", "CU", "NI"].includes((region.country || "").toUpperCase());
 
   useEffect(() => {
+    if (!parentSku) { setUpsells([]); return; }
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("digital_products")
-        .select("id, sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, active, is_upsell, sort_order")
-        .eq("active", true)
+      const { data: links } = await supabase
+        .from("product_upsells")
+        .select("upsell_sku, discount_pct, sort_order")
+        .eq("product_sku", parentSku)
         .order("sort_order", { ascending: true });
-      if (!cancelled && data) setRows(data as DBRow[]);
+      if (!links || links.length === 0) { if (!cancelled) setUpsells([]); return; }
+      const skus = links.map((l: any) => l.upsell_sku);
+      const { data: prods } = await supabase
+        .from("digital_products")
+        .select("id, sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, active")
+        .in("sku", skus)
+        .eq("active", true);
+      if (cancelled) return;
+      const rows: UpsellRow[] = links
+        .map((l: any) => {
+          const p = (prods || []).find((x: any) => x.sku === l.upsell_sku);
+          return p ? { ...(p as DBRow), discount_pct: Number(l.discount_pct) || 0 } : null;
+        })
+        .filter(Boolean) as UpsellRow[];
+      setUpsells(rows);
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [parentSku]);
 
-  // Build equivalence map: admin sku -> [catalog ids that reference this sku]
-  const equivalentIdsFor = (row: DBRow): string[] => {
-    const ids = new Set<string>([row.sku, row.id]);
+  // equivalence: match catalog ids that reference same admin sku
+  const equivalentIdsFor = (sku: string): string[] => {
+    const ids = new Set<string>([sku]);
     Object.values(CHECKOUT_CATALOG).forEach((c) => {
-      if (c.adminSku === row.sku || c.id === row.sku) ids.add(c.id);
+      if (c.adminSku === sku) ids.add(c.id);
     });
     return Array.from(ids);
   };
 
-  const excluded = new Set([...excludeIds]);
-  const cartIds = new Set(items.map((i) => i.id));
-  const available = rows.filter((r) => {
-    const equivs = equivalentIdsFor(r);
-    if (equivs.some((id) => excluded.has(id))) return false;
-    return true;
-  });
-
-  const discountFor = (r: DBRow) => {
-    const match = upsells.find((u) => u.id === r.sku || u.id === r.id);
-    if (!match?.originalPrice || match.originalPrice <= match.price) return 0;
-    return Math.max(0, Math.min(95, (match.originalPrice - match.price) / match.originalPrice));
-  };
+  if (upsells.length === 0) return null;
 
   const regionalUsd = (r: DBRow) => {
     if (isTiendaUsd && r.price_usd_tienda && Number(r.price_usd_tienda) > 0) return Number(r.price_usd_tienda);
@@ -89,66 +92,38 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
     return Number(r.price_usd) || 0;
   };
 
-  const pricedItem = (r: DBRow) => {
-    const discount = discountFor(r);
-    const factor = 1 - discount;
+  const fmt = (usd: number, pen?: number | null) => {
+    if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
+    return `$${Number(usd).toFixed(2)}`;
+  };
+
+  const priced = (r: UpsellRow) => {
+    const factor = 1 - Math.max(0, Math.min(95, r.discount_pct)) / 100;
     const global = roundMoney((Number(r.price_usd) || 0) * factor);
     const latam = r.price_usd_latam && Number(r.price_usd_latam) > 0
-      ? roundMoney(Number(r.price_usd_latam) * factor)
-      : global;
+      ? roundMoney(Number(r.price_usd_latam) * factor) : global;
     const tienda = r.price_usd_tienda && Number(r.price_usd_tienda) > 0
-      ? roundMoney(Number(r.price_usd_tienda) * factor)
-      : undefined;
+      ? roundMoney(Number(r.price_usd_tienda) * factor) : undefined;
     const pen = r.price_pen && Number(r.price_pen) > 0
-      ? roundMoney(Number(r.price_pen) * factor)
-      : undefined;
+      ? roundMoney(Number(r.price_pen) * factor) : undefined;
     return {
-      discount,
       displayUsd: roundMoney(regionalUsd(r) * factor),
       originalDisplayUsd: regionalUsd(r),
+      originalPen: r.price_pen ? Number(r.price_pen) : undefined,
       price: global,
       pricePen: pen,
       regionPrices: { latam, global, ...(tienda != null ? { tienda } : {}) },
     };
   };
 
-  useEffect(() => {
-    available.forEach((r) => {
-      const current = items.find((i) => i.id === r.sku);
-      const priced = pricedItem(r);
-      if (!current || priced.discount <= 0) return;
-      const priceChanged = current.price !== priced.price || current.pricePen !== priced.pricePen;
-      const regionChanged = JSON.stringify(current.regionPrices ?? {}) !== JSON.stringify(priced.regionPrices);
-      if (priceChanged || regionChanged) {
-        syncItem({
-          id: r.sku,
-          name: r.name,
-          price: priced.price,
-          pricePen: priced.pricePen,
-          regionPrices: priced.regionPrices,
-          image: r.cover_image_url || "/placeholder.svg",
-          description: r.description || "",
-        });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, upsells, items.length, region.tier, region.country]);
-
-  if (available.length === 0) return null;
-
-  const fmt = (usd: number, pen?: number | null) => {
-    if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
-    return `$${Number(usd).toFixed(2)}`;
-  };
-
-  const handleAdd = (r: DBRow) => {
-    const priced = pricedItem(r);
+  const handleAdd = (r: UpsellRow) => {
+    const p = priced(r);
     addItem({
       id: r.sku,
       name: r.name,
-      price: priced.price,
-      pricePen: priced.pricePen,
-      regionPrices: priced.regionPrices,
+      price: p.price,
+      pricePen: p.pricePen,
+      regionPrices: p.regionPrices,
       image: r.cover_image_url || "/placeholder.svg",
       description: r.description || "",
       quantity: 1,
@@ -156,8 +131,10 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
     toast.success(t.toast);
   };
 
+  const cartIds = new Set(items.map((i) => i.id));
+
   return (
-    <section className="rounded-xl border bg-card p-4 sm:p-5">
+    <section className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 sm:p-5">
       <header className="flex items-center gap-2 mb-3">
         <Sparkles className="w-4 h-4 text-primary" />
         <div>
@@ -167,12 +144,11 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
       </header>
 
       <ul className="divide-y">
-        {available.slice(0, 6).map((r) => {
-          const equivs = equivalentIdsFor(r);
+        {upsells.map((r) => {
+          const equivs = equivalentIdsFor(r.sku);
           const inCart = equivs.some((id) => cartIds.has(id));
-          const priced = pricedItem(r);
-          const hasDiscount = priced.discount > 0;
-          const discountPct = Math.round(priced.discount * 100);
+          const p = priced(r);
+          const pct = Math.round(r.discount_pct);
           return (
             <li key={r.id} className="flex items-center gap-3 py-3">
               <img
@@ -184,18 +160,18 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium leading-snug line-clamp-2">{r.name}</p>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                  {hasDiscount && (
+                  {pct > 0 && (
                     <span className="text-xs text-muted-foreground line-through">
-                      {fmt(priced.originalDisplayUsd, r.price_pen)}
+                      {fmt(p.originalDisplayUsd, p.originalPen)}
                     </span>
                   )}
                   <p className="text-sm font-semibold text-primary">
-                    {fmt(priced.displayUsd, priced.pricePen)}
+                    {fmt(p.displayUsd, p.pricePen)}
                   </p>
                 </div>
-                {hasDiscount && (
+                {pct > 0 && (
                   <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 leading-tight">
-                    {t.auto} · -{discountPct}%
+                    {t.auto} -{pct}%
                   </p>
                 )}
               </div>

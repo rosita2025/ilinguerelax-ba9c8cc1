@@ -139,7 +139,7 @@ export function PaymentMethodsGroup() {
       try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
     };
     try {
-      const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
+      const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
         body: {
           environment: getStripeEnvironment(),
           items: s.items.map((i) => ({
@@ -157,8 +157,9 @@ export function PaymentMethodsGroup() {
           },
           returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
         },
-      });
-      if (error || !data?.clientSecret) throw new Error(error?.message || t.errorPayment);
+      }, { attempts: 3, baseDelayMs: 500 });
+      if (error || !data?.clientSecret) throw new Error((error as { message?: string } | null)?.message || t.errorPayment);
+
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),

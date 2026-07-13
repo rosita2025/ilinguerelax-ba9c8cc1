@@ -247,7 +247,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
 
               <div className="text-right shrink-0 space-y-0.5">
                 {hasDiscount && <Price usd={u.originalPrice!} strike />}
-                <Price usd={shownPrice} emphasis added={added} prefix="+" />
+                <Price usd={shownPrice} pen={u.pricePen} emphasis added={added} prefix="+" />
               </div>
             </button>
           );

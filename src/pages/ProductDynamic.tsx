@@ -7,8 +7,10 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 interface DBProduct {
   id: string;
@@ -88,6 +90,7 @@ const ProductDynamic = () => {
         : Number(product.price_usd))
     : 0;
   const local = useLocalCurrency(effectiveUsd);
+  const tier = useCountryTierRouting(slug ?? "");
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
@@ -288,6 +291,40 @@ const ProductDynamic = () => {
         </div>
       </main>
       <Footer />
+
+      {(() => {
+        const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
+        const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
+        const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
+        const hotmartExcluded = globalExcluded || (product.hotmart_excluded_countries ?? []).includes(effectiveCountry);
+        const storeOn = product.store_enabled && !storeExcluded;
+        const hotmartOn = !!product.hotmart_url && !hotmartExcluded;
+        const useHotmart = tier.useHotmartLatam && hotmartOn;
+        const priceLabel = tier.loaded ? tier.priceLabel : displayFormatted;
+        const originalLabel = tier.loaded ? tier.originalLabel : undefined;
+        const buyUrl = useHotmart
+          ? product.hotmart_url!
+          : storeOn
+            ? `/checkouts/${product.sku}`
+            : hotmartOn
+              ? product.hotmart_url!
+              : undefined;
+        if (!buyUrl) return null;
+        return (
+          <>
+            <StickyBuyBar
+              price={priceLabel}
+              originalPrice={originalLabel}
+              rating={4.8}
+              reviewCount={120}
+              productName={product.name}
+              ctaText={`${useHotmart ? "COMPRAR EN HOTMART" : "COMPRAR EN TIENDA"} · ${priceLabel}`}
+              buyUrl={buyUrl}
+            />
+            <div className="h-20 md:h-16" />
+          </>
+        );
+      })()}
     </>
   );
 };

@@ -168,7 +168,8 @@ export function MoreProductsPanel({ excludeIds = [] as string[], upsells = [] }:
 
       <ul className="divide-y">
         {available.slice(0, 6).map((r) => {
-          const inCart = items.some((i) => i.id === r.sku);
+          const equivs = equivalentIdsFor(r);
+          const inCart = equivs.some((id) => cartIds.has(id));
           const priced = pricedItem(r);
           const hasDiscount = priced.discount > 0;
           const discountPct = Math.round(priced.discount * 100);

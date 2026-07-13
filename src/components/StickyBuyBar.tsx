@@ -452,7 +452,14 @@ export const StickyBuyBar = ({
                     {disabled && <Clock className="w-5 h-5 ml-2" />}
                 </>
               )}
-            </Button>
+              </Button>
+              {!disabled && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                  <Lock className="w-3 h-3" />
+                  {lang === "en" ? "100% Secure Payment" : "Pago 100% Seguro"}
+                </span>
+              )}
+            </div>
             {secondaryCtaText && onSecondaryClick && (
               <Button
                 size="default"

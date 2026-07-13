@@ -1,5 +1,6 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
+import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -178,6 +179,8 @@ Deno.serve(async (req) => {
       if (p.active !== false) {
         await pingIndexNow([productUrl(p.sku)]);
         pingSitemap().catch(() => {});
+        resubmitSitemapsGSC().catch(() => {});
+        inspectUrlGSC(productUrl(p.sku)).catch(() => {});
       }
       return json({ success: true, sku: p.sku });
     }
@@ -199,6 +202,8 @@ Deno.serve(async (req) => {
       // Announce both old (now 404) and new URLs so search engines refresh.
       await pingIndexNow([productUrl(oldSku), productUrl(newSku)]);
       pingSitemap().catch(() => {});
+      resubmitSitemapsGSC().catch(() => {});
+      inspectUrlGSC(productUrl(newSku)).catch(() => {});
       return json({ success: true, sku: newSku });
     }
 
@@ -210,6 +215,7 @@ Deno.serve(async (req) => {
       // Product removed — tell IndexNow so it drops the URL from indexes.
       await pingIndexNow([productUrl(sku)]);
       pingSitemap().catch(() => {});
+      resubmitSitemapsGSC().catch(() => {});
       return json({ success: true });
     }
 
@@ -222,6 +228,8 @@ Deno.serve(async (req) => {
       // Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
       await pingIndexNow([productUrl(sku)]);
       pingSitemap().catch(() => {});
+      resubmitSitemapsGSC().catch(() => {});
+      inspectUrlGSC(productUrl(sku)).catch(() => {});
       return json({ success: true });
     }
 

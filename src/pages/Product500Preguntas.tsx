@@ -1,12 +1,15 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { LiveViewers } from "@/components/LiveViewers";

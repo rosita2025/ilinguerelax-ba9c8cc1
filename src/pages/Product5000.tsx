@@ -453,7 +453,7 @@ const Product5000 = () => {
                   className="inline-flex items-center gap-1 px-2.5 py-1 md:px-4 md:py-2 rounded-full bg-accent/10 text-accent text-[11px] md:text-sm font-medium whitespace-nowrap"
                 >
                   <Gift className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>5 Regalos Gratis</span>
+                  <span>2 Regalos Gratis</span>
                 </motion.div>
               </div>
 

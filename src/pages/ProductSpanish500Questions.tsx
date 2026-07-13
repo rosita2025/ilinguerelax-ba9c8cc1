@@ -17,7 +17,7 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 const productImage = "/images/product-spanish-500-questions.png";
 const ORIGINAL_PRICE = 40;
 const ADMIN_SKU = "500-questions-in-spanish-with-english-pronunciation";
-const TIENDA_PATH = "/checkouts/500-preguntas";
+const TIENDA_PATH = "/checkouts/500-questions-spanish";
 
 const features = [
   "500 essential Spanish questions",

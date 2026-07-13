@@ -233,20 +233,13 @@ export const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-6 border-t border-primary-foreground/10 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
-          <div className="space-y-1">
-            <p className="text-sm text-primary-foreground/50">
-              © {year} Youtumundial LLC. {c.rights}.
-            </p>
-            <p className="text-xs text-primary-foreground/40">
-              iLingue Relax™ is a trademark of Youtumundial LLC — Registered in the State of New Mexico, USA.
-            </p>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-primary-foreground/40">
-            <span>🇺🇸 USA</span>
-            <span>·</span>
-            <span>🌎 Global</span>
-          </div>
+        <div className="mt-12 pt-6 border-t border-primary-foreground/10 text-center space-y-1">
+          <p className="text-sm text-primary-foreground/50">
+            © {year} Youtumundial LLC. All rights reserved.
+          </p>
+          <p className="text-xs text-primary-foreground/40">
+            iLingue Relax™ is a trademark of Youtumundial LLC.
+          </p>
         </div>
       </div>
     </footer>

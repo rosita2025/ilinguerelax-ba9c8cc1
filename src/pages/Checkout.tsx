@@ -357,10 +357,7 @@ export default function Checkout() {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
         <div className="space-y-6">
           <BuyerInfoForm />
-          <MoreProductsPanel
-            excludeIds={[catalogItem?.id, catalogItem?.adminSku].filter(Boolean) as string[]}
-            upsells={catalogItem?.upsells ?? []}
-          />
+          <MoreProductsPanel parentSku={catalogItem?.adminSku ?? null} />
           <PaymentMethodsGroup />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

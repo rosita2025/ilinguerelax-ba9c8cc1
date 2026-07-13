@@ -1,12 +1,15 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { LiveViewers } from "@/components/LiveViewers";
@@ -37,11 +40,26 @@ const features = [
   "Acceso de por vida",
 ];
 
+const ADMIN_SKU = "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes";
+const CHECKOUT_PATH = "/checkouts/500-preguntas";
+
+const CART_ITEM_BASE = {
+  id: "500-preguntas-ingles",
+  name: "Inglés Relax · 500 Preguntas en Inglés (Digital PDF)",
+  image: product500PreguntasImage,
+  description: "500 preguntas en inglés con pronunciación para hispanohablantes",
+};
+
 const Product500Preguntas = () => {
-  const pricing = useAdminPricing("500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes");
-  const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const pricingReady = pricing.loaded && currentPrice > 0;
-  const campaign = useCampaignPrice(currentPrice, 54);
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, { fallbackHotmartUrl: HOTMART_URL, originalMultiplier: 2.5 });
+  const currentPrice = tier.priceUsd;
+  const pricingReady = tier.loaded;
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const isPeru = tier.isPeru;
+  const cartItem = { ...CART_ITEM_BASE, price: currentPrice, pricePen: tier.pricePen ?? undefined };
+
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 500 Preguntas en Inglés",
     content_category: "Digital Book",
@@ -63,7 +81,13 @@ const Product500Preguntas = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank");
+    if (tier.useHotmartLatam) {
+      window.location.href = tier.hotmartUrl || HOTMART_URL;
+    } else {
+      addItem({ ...cartItem, quantity: 1 });
+      toast.success("Producto agregado al carrito");
+      navigate(CHECKOUT_PATH);
+    }
   };
 
   return (
@@ -160,15 +184,19 @@ const Product500Preguntas = () => {
                     Precio Especial Por Tiempo Limitado
                   </span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">${currentPrice}</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">
+                    {pricingReady ? tier.priceLabel : "..."}
+                  </span>
+                  {pricingReady && (
+                    <span className="text-2xl text-muted-foreground line-through">{tier.originalLabel}</span>
+                  )}
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg"
                   >
-                    AHORRA 81%
+                    AHORRA 60%
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -267,13 +295,14 @@ const Product500Preguntas = () => {
       <Footer />
 
       <StickyBuyBar
-        price={campaign.price}
-        originalPrice={campaign.originalPrice}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
         productName="INGLÉS RELAX - 500 Preguntas en Inglés (Digital PDF)"
         rating={4.7}
         reviewCount={280}
         showReviews={true}
-        buyUrl={pricing.hotmartUrl || HOTMART_URL}
+        currencyCode={tier.currencyCode}
+        buyUrl={tier.useHotmartLatam ? (tier.hotmartUrl || HOTMART_URL) : CHECKOUT_PATH}
         onBuyClick={handleBuy}
       />
 

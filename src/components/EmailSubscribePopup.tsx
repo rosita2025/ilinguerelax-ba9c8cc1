@@ -23,9 +23,10 @@ export const EmailSubscribePopup = () => {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === "subscribed" || saved === "dismissed") return;
     } catch {}
-    // Skip on admin/checkout/success pages
-    const p = window.location.pathname;
-    if (p.startsWith("/admin") || p.startsWith("/checkout") || p.includes("success")) return;
+    // Skip on admin/checkout/success/thank-you pages
+    const p = window.location.pathname.toLowerCase();
+    const BLOCKED = ["/admin", "/checkout", "/checkouts", "/pago", "/pagos", "/pay", "/success", "/gracias", "/thank", "/descarga", "/order"];
+    if (BLOCKED.some((b) => p.startsWith(b)) || p.includes("success") || p.includes("checkout")) return;
 
     const t = setTimeout(() => setOpen(true), DELAY_MS);
     return () => clearTimeout(t);

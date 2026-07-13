@@ -13,15 +13,15 @@ type FormatKey = "digital" | "physical";
 
 // Map each product to a language tab
 const getProductLangKey = (p: Product): LangKey => {
-  if (p.id === "coreano-relax") return "korean";
-  if (p.id === "portuguese-5000") return "portuguese";
+  if (p.id === "coreano-relax" || p.targetLanguage === "ko") return "korean";
+  if (p.id === "portuguese-5000" || p.targetLanguage === "pt") return "portuguese";
   // Coming soon languages (other than portuguese) go to "soon"
   if (p.comingSoon && ["german-5000", "italian-5000", "french-5000", "dutch-5000"].includes(p.id)) {
     return "soon";
   }
   // English-target products (for Spanish speakers learning English)
   const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas", "patrones-especiales"];
-  if (englishIds.includes(p.id)) return "english";
+  if (englishIds.includes(p.id) || p.targetLanguage === "en") return "english";
   // Spanish-target products (for English speakers learning Spanish)
   return "spanish";
 };

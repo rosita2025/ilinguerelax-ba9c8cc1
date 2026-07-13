@@ -2,7 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Ban, Eye, Clock, Package, ExternalLink, RefreshCw } from "lucide-react";
+import { Ban, Eye, Clock, Package, ExternalLink, RefreshCw, ShieldOff, MessageCircle } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
 
@@ -63,6 +63,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Si no deseas un reembolso, puedes solicitar el cambio por otro producto digital de igual o menor valor sin costo adicional. Si el nuevo producto tiene un precio mayor, solo abonas la diferencia. Esta opción aplica siempre que el pedido cumpla con las condiciones de la plataforma de compra correspondiente.",
       },
+      {
+        icon: ShieldOff,
+        title: "Qué pasa con la descarga y el acceso",
+        content:
+          "Cuando se aprueba un reembolso o cambio, se revoca el acceso al producto digital anterior: los enlaces de descarga dejan de funcionar, se cancela el acceso en la plataforma y te comprometes a eliminar las copias ya descargadas o impresas. En caso de cambio, activamos el nuevo producto una vez confirmada la desactivación del anterior. Solicita tu cambio o reembolso por WhatsApp al +1 251 272 4704 para agilizar el proceso.",
+      },
     ],
     amazonTitle: "Solicita tu devolución en Amazon",
     amazonText:
@@ -109,6 +115,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         title: "Product exchange at no extra cost",
         content:
           "If you prefer not to request a refund, you can exchange your purchase for another digital product of equal or lower value at no additional cost. If the new product is more expensive, you only pay the difference. This option is available as long as the order meets the conditions of the corresponding purchase platform.",
+      },
+      {
+        icon: ShieldOff,
+        title: "What happens to your download and access",
+        content:
+          "When a refund or exchange is approved, access to the previous digital product is revoked: download links stop working, platform access is canceled, and you agree to delete any already-downloaded or printed copies. For exchanges, we activate the new product as soon as the previous one is confirmed as deactivated. Request your exchange or refund via WhatsApp +1 251 272 4704 to speed up the process.",
       },
     ],
     amazonTitle: "Request your return on Amazon",
@@ -157,6 +169,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Si vous préférez ne pas demander de remboursement, vous pouvez échanger votre achat contre un autre produit numérique de valeur égale ou inférieure, sans frais supplémentaires. Si le nouveau produit est plus cher, vous ne payez que la différence. Cette option s'applique tant que la commande respecte les conditions de la plateforme d'achat concernée.",
       },
+      {
+        icon: ShieldOff,
+        title: "Ce qui se passe avec le téléchargement et l'accès",
+        content:
+          "Lorsqu'un remboursement ou un échange est approuvé, l'accès au produit numérique précédent est révoqué : les liens de téléchargement cessent de fonctionner, l'accès sur la plateforme est annulé et vous vous engagez à supprimer les copies déjà téléchargées ou imprimées. En cas d'échange, nous activons le nouveau produit dès la désactivation confirmée du précédent. Demandez votre échange ou remboursement via WhatsApp +1 251 272 4704 pour accélérer le processus.",
+      },
     ],
     amazonTitle: "Demandez votre retour sur Amazon",
     amazonText:
@@ -203,6 +221,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         title: "Troca de produto sem custo adicional",
         content:
           "Se preferir não solicitar reembolso, você pode trocar sua compra por outro produto digital de valor igual ou inferior sem custo adicional. Se o novo produto for mais caro, você paga apenas a diferença. Esta opção se aplica desde que o pedido cumpra as condições da plataforma de compra correspondente.",
+      },
+      {
+        icon: ShieldOff,
+        title: "O que acontece com o download e o acesso",
+        content:
+          "Quando um reembolso ou troca é aprovado, o acesso ao produto digital anterior é revogado: os links de download deixam de funcionar, o acesso na plataforma é cancelado e você se compromete a apagar as cópias já baixadas ou impressas. Se for troca, liberamos o novo produto assim que o anterior for confirmado como desativado. Solicite sua troca ou reembolso pelo WhatsApp +1 251 272 4704 para agilizar o processo.",
       },
     ],
     amazonTitle: "Solicite sua devolução na Amazon",
@@ -278,15 +302,26 @@ const ReturnsPage = () => {
             <p className="text-muted-foreground max-w-xl mx-auto mb-5">
               {c.amazonText}
             </p>
-            <a
-              href={AMAZON_STORE}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
-            >
-              {c.amazonCta}
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href={AMAZON_STORE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
+              >
+                {c.amazonCta}
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <a
+                href="https://wa.me/12512724704"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] text-white px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
+              >
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp +1 251 272 4704
+              </a>
+            </div>
           </motion.div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">

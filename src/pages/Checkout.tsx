@@ -245,6 +245,19 @@ export default function Checkout() {
       <Helmet>
         <title>Checkout Prueba 1 · ILINGUE RELAX</title>
         <meta name="robots" content="noindex, nofollow" />
+        {/* Preconnect a los orígenes críticos del checkout para reducir de
+            2–7 s a ~1–2 s el tiempo de apertura del iframe de Stripe. */}
+        <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.stripe.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://m.stripe.network" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://m.stripe.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://checkout.stripe.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://opyitzdvvurdyyyzkwwv.supabase.co" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.paypal.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://q.stripe.com" />
+        {/* Prefetch temprano del bundle de stripe.js para que ya esté en caché
+            cuando montemos EmbeddedCheckoutProvider. */}
+        <link rel="preload" as="script" href="https://js.stripe.com/v3" crossOrigin="anonymous" />
       </Helmet>
 
       

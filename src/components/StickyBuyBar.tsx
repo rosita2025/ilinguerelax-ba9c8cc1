@@ -78,6 +78,15 @@ export const StickyBuyBar = ({
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [clickLock, setClickLock] = useState(false);
+  // Hide entirely on checkout / admin / thank-you routes so it can never
+  // navigate the user to *another* checkout while one is already in progress.
+  const isOnCheckout = typeof window !== "undefined" && (() => {
+    const p = window.location.pathname.toLowerCase();
+    return p.startsWith("/checkout") || p.startsWith("/checkouts") ||
+           p.startsWith("/admin") || p.includes("success") ||
+           p.startsWith("/gracias") || p.startsWith("/thank");
+  })();
   const [priceFlash, setPriceFlash] = useState(false);
   const flagEmojiStyle = {
     fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
@@ -139,14 +148,20 @@ export const StickyBuyBar = ({
   }, [price]);
 
   const handleBuy = () => {
-    if (!disabled && !isLoading) {
-      if (onBuyClick) {
-        onBuyClick();
-      } else if (buyUrl) {
-        window.open(buyUrl, "_blank");
-      }
+    if (disabled || isLoading || clickLock) return;
+    // Single-click guard: prevent accidental double navigation that would
+    // open more than one checkout page for the same product.
+    setClickLock(true);
+    setTimeout(() => setClickLock(false), 4000);
+    if (onBuyClick) {
+      onBuyClick();
+    } else if (buyUrl) {
+      window.location.href = buyUrl;
     }
   };
+
+  // Never render on checkout / admin / thank-you routes
+  if (isOnCheckout) return null;
 
   // Render stars with partial fill
   const renderStars = () => {

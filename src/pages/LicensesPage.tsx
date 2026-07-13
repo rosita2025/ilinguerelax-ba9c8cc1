@@ -2,7 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { ScrollText, Trademark, Users, Package, Image as ImageIcon, Scale, Mail } from "lucide-react";
+import { ScrollText, BadgeCheck, Users, Package, Image as ImageIcon, Scale, Mail } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
 

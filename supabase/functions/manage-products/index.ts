@@ -179,6 +179,8 @@ Deno.serve(async (req) => {
       if (p.active !== false) {
         await pingIndexNow([productUrl(p.sku)]);
         pingSitemap().catch(() => {});
+        resubmitSitemapsGSC().catch(() => {});
+        inspectUrlGSC(productUrl(p.sku)).catch(() => {});
       }
       return json({ success: true, sku: p.sku });
     }

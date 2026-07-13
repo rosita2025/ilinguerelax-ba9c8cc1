@@ -100,7 +100,7 @@ export const Footer = () => {
             © 2026 iLingue Relax. {c.rights}.
           </p>
           <p className="text-xs text-primary-foreground/40">
-            ilinguerelax.com is operated by Youtumundial LLC
+            ilinguerelax.com is operated by Youtumundial LLC. iLingue Relax™ is a trademark of Youtumundial LLC.
           </p>
         </div>
 

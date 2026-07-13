@@ -153,11 +153,6 @@ export const Footer = () => {
           external: true,
         },
         {
-          to: "mailto:hola@ilinguerelax.com",
-          label: "hola@ilinguerelax.com",
-          external: true,
-        },
-        {
           to: "https://wa.me/12512724704",
           label: "WhatsApp",
           external: true,

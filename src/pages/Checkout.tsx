@@ -387,7 +387,7 @@ export default function Checkout() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <SectionErrorBoundary name="order-summary-desktop" extra={{ slug: catalogItem?.id }}>
-            <OrderSummary />
+            <OrderSummary mainProductId={catalogItem?.id} />
           </SectionErrorBoundary>
         </aside>
       </div>

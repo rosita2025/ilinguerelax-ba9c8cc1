@@ -291,8 +291,8 @@ const ProductSpanish5000Digital = () => {
               {/* Price block */}
               <div className="p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-3 flex-wrap">
-                  <span className="text-4xl md:text-5xl font-black text-foreground">${currentPrice}</span>
-                  <span className="text-xl text-muted-foreground line-through mb-1">${ORIGINAL_PRICE}</span>
+                  <span className="text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
+                  <span className="text-xl text-muted-foreground line-through mb-1">{tier.originalLabel}</span>
                   <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">
                     SAVE {DISCOUNT_PCT}%
                   </span>
@@ -302,13 +302,14 @@ const ProductSpanish5000Digital = () => {
                 </p>
                 <Button
                   onClick={handleBuyNow}
-                  disabled={isRedirecting}
+                  disabled={isRedirecting || !pricingReady}
                   size="lg"
                   className="mt-4 w-full h-14 text-base font-black shadow-hero"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${currentPrice}`}
+                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — ${tier.priceLabel}`}
                 </Button>
+
                 <Button
                   onClick={handleAddToCart}
                   variant="outline"
@@ -485,20 +486,21 @@ const ProductSpanish5000Digital = () => {
             5,000 essential Spanish words · English pronunciation · 3 free bonuses.
           </p>
           <div className="flex items-baseline justify-center gap-3 mb-4">
-            <span className="text-5xl font-black">${currentPrice}</span>
-            <span className="text-xl line-through text-muted-foreground">${ORIGINAL_PRICE}</span>
+            <span className="text-5xl font-black">{tier.priceLabel}</span>
+            <span className="text-xl line-through text-muted-foreground">{tier.originalLabel}</span>
             <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">-{DISCOUNT_PCT}%</span>
           </div>
           <Button
             onClick={handleBuyNow}
-            disabled={isRedirecting}
+            disabled={isRedirecting || !pricingReady}
             size="lg"
             className="h-14 px-8 text-base font-black shadow-hero"
           >
             <ShoppingCart className="w-5 h-5 mr-2" />
-            {isRedirecting ? "Redirecting…" : `GET IT NOW — $${currentPrice}`}
+            {isRedirecting ? "Redirecting…" : `GET IT NOW — ${tier.priceLabel}`}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
+
           <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1">
             <Shield className="w-3 h-3" /> Secure checkout · 30-day money-back guarantee
           </p>
@@ -545,13 +547,14 @@ const ProductSpanish5000Digital = () => {
 
       <StickyBuyBar
         productName="Spanish 5,000 Words — Digital PDF"
-        price={localizedPrice}
-        originalPrice={localizedOriginal}
-        currencyCode={currency}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
+        currencyCode={tier.currencyCode}
         flag={flag}
         buyUrl={useTiendaOnly ? TIENDA_PATH_SP5K : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
         onBuyClick={handleBuyNow}
-        ctaText={useTiendaOnly ? `GET IT NOW — ${localizedPrice}` : `BUY ON HOTMART — ${localizedPrice}`}
+        ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
+
         lang="en"
         rating={4.8}
         reviewCount={500}

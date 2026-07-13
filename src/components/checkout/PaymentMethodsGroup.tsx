@@ -15,6 +15,8 @@ import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
+import { invokeWithRetry } from "@/lib/invokeWithRetry";
+
 
 type Method = "card" | "paypal" | "transfer" | "cash" | "yape";
 
@@ -137,7 +139,7 @@ export function PaymentMethodsGroup() {
       try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
     };
     try {
-      const { data, error } = await supabase.functions.invoke("create-checkout-prueba", {
+      const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
         body: {
           environment: getStripeEnvironment(),
           items: s.items.map((i) => ({
@@ -155,8 +157,9 @@ export function PaymentMethodsGroup() {
           },
           returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
         },
-      });
-      if (error || !data?.clientSecret) throw new Error(error?.message || t.errorPayment);
+      }, { attempts: 3, baseDelayMs: 500 });
+      if (error || !data?.clientSecret) throw new Error((error as { message?: string } | null)?.message || t.errorPayment);
+
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
@@ -203,7 +206,7 @@ export function PaymentMethodsGroup() {
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
       }, { onConflict: "email,source" }).then(() => {});
 
-      const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
+      const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
           orderId: `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
           items: s.items.map((i) => {
@@ -226,8 +229,9 @@ export function PaymentMethodsGroup() {
           autoReturn: "approved",
           paymentType,
         },
-      });
-      if (error || !data?.init_point) throw new Error(error?.message || t.mpError);
+      }, { attempts: 3, baseDelayMs: 500 });
+      if (error || !data?.init_point) throw new Error((error as { message?: string } | null)?.message || t.mpError);
+
       window.location.assign(data.init_point);
     } catch (err) {
       redirectingRef.current = false;

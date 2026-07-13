@@ -202,6 +202,8 @@ Deno.serve(async (req) => {
       // Announce both old (now 404) and new URLs so search engines refresh.
       await pingIndexNow([productUrl(oldSku), productUrl(newSku)]);
       pingSitemap().catch(() => {});
+      resubmitSitemapsGSC().catch(() => {});
+      inspectUrlGSC(productUrl(newSku)).catch(() => {});
       return json({ success: true, sku: newSku });
     }
 

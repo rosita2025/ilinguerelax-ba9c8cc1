@@ -57,7 +57,7 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const useTiendaOnly = !useHotmartLatam;
 
   const priceGlobalUsd = pricing.priceGlobalUsd ?? opts.fallbackPriceGlobalUsd ?? 0;
-  const priceLatamUsd = pricing.priceLatamUsd ?? priceGlobalUsd;
+  const priceLatamUsd = pricing.priceLatamUsd ?? opts.fallbackPriceLatamUsd ?? priceGlobalUsd;
   const priceTiendaUsd = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? priceLatamUsd;
   const pricePen = pricing.pricePen ?? opts.fallbackPricePen ?? null;
 

@@ -97,7 +97,7 @@ export const Footer = () => {
 
         <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-center space-y-1">
           <p className="text-sm text-primary-foreground/50">
-            © 2026 Youtumundial LLC. All Rights Reserved.
+            © {new Date().getFullYear()} Youtumundial LLC. All Rights Reserved.
           </p>
           <p className="text-xs text-primary-foreground/40">
             iLingue Relax™ is a trademark of Youtumundial LLC.

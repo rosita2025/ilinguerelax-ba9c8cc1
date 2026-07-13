@@ -56,6 +56,7 @@ const TermsPage = lazy(() => import("./pages/TermsPage"));
 const CopyrightPage = lazy(() => import("./pages/CopyrightPage"));
 const TrademarkPage = lazy(() => import("./pages/TrademarkPage"));
 const LicensesPage = lazy(() => import("./pages/LicensesPage"));
+const ShippingPage = lazy(() => import("./pages/ShippingPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));

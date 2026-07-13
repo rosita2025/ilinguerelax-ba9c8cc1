@@ -11,18 +11,49 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  countdown: number;
 }
 
 export class AppErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
+  state: State = { hasError: false, countdown: 5 };
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   static getDerivedStateFromError(): State {
-    return { hasError: true };
+    return { hasError: true, countdown: 5 };
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
-      this.setState({ hasError: false });
+      this.clearTimer();
+      this.setState({ hasError: false, countdown: 5 });
+    }
+    if (this.state.hasError && !prevState.hasError) {
+      this.startTimer();
+    }
+  }
+
+  componentWillUnmount() {
+    this.clearTimer();
+  }
+
+  private startTimer() {
+    this.clearTimer();
+    this.timer = setInterval(() => {
+      this.setState((s) => {
+        if (s.countdown <= 1) {
+          this.clearTimer();
+          window.location.reload();
+          return { ...s, countdown: 0 };
+        }
+        return { ...s, countdown: s.countdown - 1 };
+      });
+    }, 1000);
+  }
+
+  private clearTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
     }
   }
 
@@ -42,22 +73,27 @@ export class AppErrorBoundary extends Component<Props, State> {
     return (
       <main className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
         <section className="w-full max-w-md rounded-xl border bg-card p-6 text-center shadow-lg space-y-4">
-          <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <RefreshCw className="h-5 w-5 text-primary" />
+          <div className="mx-auto h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+            <RefreshCw className="h-6 w-6 text-primary animate-spin" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold">Recarga la página</h1>
+            <h1 className="text-2xl font-bold">Recargando…</h1>
             <p className="text-sm text-muted-foreground">
-              La tienda no pudo cargar correctamente. Puedes recargar o pedir ayuda por WhatsApp.
+              La tienda tuvo un problema al cargar. Recargaremos automáticamente en{" "}
+              <span className="font-bold text-primary">{this.state.countdown}s</span>.
             </p>
           </div>
           <div className="grid gap-2">
-            <Button onClick={() => window.location.reload()} className="w-full gap-2">
-              <RefreshCw className="h-4 w-4" /> Recargar
+            <Button
+              onClick={() => window.location.reload()}
+              size="lg"
+              className="w-full gap-2 text-base font-semibold"
+            >
+              <RefreshCw className="h-5 w-5" /> Recargar ahora
             </Button>
             <Button asChild variant="outline" className="w-full gap-2">
               <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="h-4 w-4" /> WhatsApp
+                <MessageCircle className="h-4 w-4" /> Ayuda por WhatsApp
               </a>
             </Button>
           </div>

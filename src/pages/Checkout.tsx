@@ -72,19 +72,29 @@ export default function Checkout() {
 
       // Run product + upsells queries in parallel to shave ~50% off the wait.
       const [{ data, error }, { data: upRows }] = await Promise.all([
-        supabase
-          .from("digital_products")
-          .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
-          .eq("sku", adminSku)
-          .eq("active", true)
-          .maybeSingle()
-          .catch(() => ({ data: null, error: new Error("catalog offline") })),
-        supabase
-          .from("product_upsells")
-          .select("upsell_sku, discount_pct, sort_order")
-          .eq("product_sku", adminSku)
-          .order("sort_order", { ascending: true })
-          .catch(() => ({ data: [] })),
+        (async () => {
+          try {
+            return await supabase
+              .from("digital_products")
+              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
+              .eq("sku", adminSku)
+              .eq("active", true)
+              .maybeSingle();
+          } catch {
+            return { data: null, error: new Error("catalog offline") };
+          }
+        })(),
+        (async () => {
+          try {
+            return await supabase
+              .from("product_upsells")
+              .select("upsell_sku, discount_pct, sort_order")
+              .eq("product_sku", adminSku)
+              .order("sort_order", { ascending: true });
+          } catch {
+            return { data: [] };
+          }
+        })(),
       ]);
 
       if (cancelled) return;
@@ -94,12 +104,24 @@ export default function Checkout() {
       let upsells: CatalogItem["upsells"] | null = null;
       if (upRows && upRows.length) {
         const skus = upRows.map((u) => u.upsell_sku);
-        const { data: upProducts } = await supabase
-          .from("digital_products")
-          .select("sku, name, description, price_usd, price_pen, cover_image_url")
-          .in("sku", skus)
-          .eq("active", true)
-          .catch(() => ({ data: [] }));
+        let upProducts: Array<{
+          sku: string;
+          name: string;
+          description: string | null;
+          price_usd: number;
+          price_pen: number | null;
+          cover_image_url: string | null;
+        }> = [];
+        try {
+          const result = await supabase
+            .from("digital_products")
+            .select("sku, name, description, price_usd, price_pen, cover_image_url")
+            .in("sku", skus)
+            .eq("active", true);
+          upProducts = (result.data ?? []) as typeof upProducts;
+        } catch {
+          upProducts = [];
+        }
         const bySku = new Map((upProducts ?? []).map((p) => [p.sku, p]));
         upsells = upRows
           .map((u) => {

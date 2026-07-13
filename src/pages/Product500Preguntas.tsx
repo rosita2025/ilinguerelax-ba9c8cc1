@@ -247,7 +247,6 @@ const Product500Preguntas = () => {
         </div>
       </section>
 
-      <CountdownTimer hoursFromNow={24} />
 
       {/* What's Included */}
       <section className="py-8 md:py-10">

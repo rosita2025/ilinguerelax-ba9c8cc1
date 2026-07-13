@@ -127,7 +127,7 @@ export const Footer = () => {
         { to: "/contacto", label: c.contact },
         { to: "/faq", label: c.faq },
         { to: "/envios-y-entregas", label: c.shipping },
-        { to: "/faq#devoluciones", label: c.returns },
+        { to: "/devoluciones-y-reembolsos", label: c.returns },
         { to: "/condiciones", label: c.terms },
         { to: "/privacidad", label: c.privacy },
         { to: "/copyright", label: c.copyright },

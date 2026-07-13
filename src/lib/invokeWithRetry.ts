@@ -102,9 +102,11 @@ export async function invokeWithRetry<T = unknown>(
   // Should not reach here, but keep TS happy.
   try {
     reportClientError({
+      source: "invokeWithRetry",
       message: `invokeWithRetry exhausted: ${fnName}`,
       extra: { fnName, attempts },
     });
   } catch { /* ignore */ }
+
   return { data: lastData as T | null, error: lastError };
 }

@@ -12,7 +12,12 @@ export const WhatsAppButton = ({ url, label = "¿Dudas?" }: WhatsAppButtonProps)
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed right-3 sm:right-5 bottom-[260px] md:bottom-[220px] z-[70] group"
+      className="fixed right-3 sm:right-5 z-[70] group"
+      style={{
+        // Sit safely above the sticky buy bar (whatever its current height).
+        // Falls back to a sensible default when the bar isn't mounted.
+        bottom: "calc(var(--sticky-bar-h, 120px) + 16px + env(safe-area-inset-bottom, 0px))",
+      }}
     >
       <div className="flex items-center gap-2">
         <span className="px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-sm font-semibold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">

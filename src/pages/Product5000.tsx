@@ -65,7 +65,7 @@ const product5000Image = productoPrincipalInglesRelax;
 
 // Bonus images (5 regalos)
 import bonus1Estructuras from "@/assets/bonus-1-estructuras-gramaticas.webp";
-import bonus2Verbos from "@/assets/bonus-2-1000-verbos-esenciales.webp";
+import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
 
 // About section image
 import aboutIlingueRelax from "@/assets/about-ilingue-relax.webp";
@@ -152,11 +152,11 @@ const bonuses = [
     image: bonus1Estructuras,
   },
   {
-    icon: RefreshCw,
-    title: "Regalo 2: 1,000 Verbos Esenciales (Presente, Pasado y Futuro)",
+    icon: BookOpen,
+    title: "Regalo 2: Cómo Estudiar Inglés Relax Paso a Paso en 6 Meses",
     description:
-      "Los 1,000 verbos más usados en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.",
-    image: bonus2Verbos,
+      "Tu plan paso a paso para hablar inglés con confianza en solo 6 meses con el método Inglés Relax, sin perder tiempo ni motivación.",
+    image: bonus5Estudiar,
   },
 ];
 const chapters = [

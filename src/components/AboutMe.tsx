@@ -42,20 +42,6 @@ export const AboutMe = () => {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { number: "10,000+", label: "Estudiantes" },
-              { number: "8,000", label: "Palabras" },
-              { number: "4.9/5", label: "Valoración" },
-              { number: "100%", label: "Garantía" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-card rounded-xl border border-border p-4 text-center">
-                <div className="text-2xl md:text-3xl font-bold text-primary mb-1">{stat.number}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>

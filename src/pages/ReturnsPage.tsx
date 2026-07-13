@@ -302,15 +302,26 @@ const ReturnsPage = () => {
             <p className="text-muted-foreground max-w-xl mx-auto mb-5">
               {c.amazonText}
             </p>
-            <a
-              href={AMAZON_STORE}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
-            >
-              {c.amazonCta}
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href={AMAZON_STORE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
+              >
+                {c.amazonCta}
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <a
+                href="https://wa.me/12512724704"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] text-white px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
+              >
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp +1 251 272 4704
+              </a>
+            </div>
           </motion.div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">

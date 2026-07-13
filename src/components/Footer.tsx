@@ -3,55 +3,183 @@ import { Instagram, Facebook } from "lucide-react";
 import { useI18n } from "@/i18n/I18nContext";
 
 export const Footer = () => {
-  const { t, language } = useI18n();
+  const { language } = useI18n();
 
   const content = {
-    es: { products: "Productos", about: "Sobre Nosotros", contact: "Contacto", privacy: "Privacidad", terms: "Condiciones", copyright: "Copyright", trademark: "Trademark", rights: "Todos los derechos reservados" },
-    en: { products: "Products", about: "About Us", contact: "Contact", privacy: "Privacy", terms: "Terms", copyright: "Copyright", trademark: "Trademark", rights: "All rights reserved" },
-    fr: { products: "Produits", about: "À Propos", contact: "Contact", privacy: "Confidentialité", terms: "Conditions", copyright: "Copyright", trademark: "Marque", rights: "Tous droits réservés" },
-    pt: { products: "Produtos", about: "Sobre Nós", contact: "Contato", privacy: "Privacidade", terms: "Termos", copyright: "Copyright", trademark: "Marca", rights: "Todos os direitos reservados" },
+    es: {
+      brand: "ILINGUE RELAX",
+      services: "SERVICIOS",
+      categories: "CATEGORÍAS",
+      community: "COMUNIDAD",
+      about: "Sobre Nosotros",
+      contact: "Contacto",
+      faq: "Preguntas Frecuentes",
+      shipping: "Envíos y Entregas",
+      returns: "Devoluciones y Reembolsos",
+      help: "Centro de Ayuda",
+      terms: "Términos y Condiciones",
+      privacy: "Política de Privacidad",
+      copyright: "Aviso de Copyright",
+      trademark: "Aviso de Marca",
+      blog: "Blog",
+      reviews: "Dejar Reseña",
+      products: "Todos los Productos",
+      english: "Inglés",
+      spanish: "Español",
+      other: "Otros Idiomas",
+      rights: "Todos los derechos reservados",
+      tagline: "Aprende idiomas sin estrés — con pronunciación real.",
+    },
+    en: {
+      brand: "ILINGUE RELAX",
+      services: "SERVICES",
+      categories: "CATEGORIES",
+      community: "COMMUNITY",
+      about: "About Us",
+      contact: "Contact",
+      faq: "FAQ",
+      shipping: "Shipping & Delivery",
+      returns: "Returns & Refunds",
+      help: "Help Center",
+      terms: "Terms & Conditions",
+      privacy: "Privacy Policy",
+      copyright: "Copyright Notice",
+      trademark: "Trademark Notice",
+      blog: "Blog",
+      reviews: "Leave a Review",
+      products: "All Products",
+      english: "English",
+      spanish: "Spanish",
+      other: "Other Languages",
+      rights: "All Rights Reserved",
+      tagline: "Learn languages stress-free — with real pronunciation.",
+    },
+    fr: {
+      brand: "ILINGUE RELAX",
+      services: "SERVICES",
+      categories: "CATÉGORIES",
+      community: "COMMUNAUTÉ",
+      about: "À Propos",
+      contact: "Contact",
+      faq: "FAQ",
+      shipping: "Livraison",
+      returns: "Retours et Remboursements",
+      help: "Centre d'Aide",
+      terms: "Conditions Générales",
+      privacy: "Politique de Confidentialité",
+      copyright: "Avis de Copyright",
+      trademark: "Avis de Marque",
+      blog: "Blog",
+      reviews: "Laisser un Avis",
+      products: "Tous les Produits",
+      english: "Anglais",
+      spanish: "Espagnol",
+      other: "Autres Langues",
+      rights: "Tous droits réservés",
+      tagline: "Apprenez les langues sans stress — avec vraie prononciation.",
+    },
+    pt: {
+      brand: "ILINGUE RELAX",
+      services: "SERVIÇOS",
+      categories: "CATEGORIAS",
+      community: "COMUNIDADE",
+      about: "Sobre Nós",
+      contact: "Contato",
+      faq: "Perguntas Frequentes",
+      shipping: "Envio e Entrega",
+      returns: "Devoluções e Reembolsos",
+      help: "Central de Ajuda",
+      terms: "Termos e Condições",
+      privacy: "Política de Privacidade",
+      copyright: "Aviso de Copyright",
+      trademark: "Aviso de Marca",
+      blog: "Blog",
+      reviews: "Deixar Avaliação",
+      products: "Todos os Produtos",
+      english: "Inglês",
+      spanish: "Espanhol",
+      other: "Outros Idiomas",
+      rights: "Todos os direitos reservados",
+      tagline: "Aprenda idiomas sem estresse — com pronúncia real.",
+    },
   };
 
   const c = content[language];
+  const year = new Date().getFullYear();
+
+  const columns = [
+    {
+      title: c.brand,
+      links: [
+        { to: "/sobre-nosotros", label: c.about },
+        { to: "/blog", label: c.blog },
+        { to: "/dejar-resena", label: c.reviews },
+        { to: "/sitemap.xml", label: "Sitemap", external: true },
+      ],
+    },
+    {
+      title: c.services,
+      links: [
+        { to: "/contacto", label: c.contact },
+        { to: "/faq", label: c.faq },
+        { to: "/faq#envios", label: c.shipping },
+        { to: "/faq#devoluciones", label: c.returns },
+        { to: "/condiciones", label: c.terms },
+        { to: "/privacidad", label: c.privacy },
+        { to: "/copyright", label: c.copyright },
+        { to: "/trademark", label: c.trademark },
+      ],
+    },
+    {
+      title: c.categories,
+      links: [
+        { to: "/products", label: c.products },
+        { to: "/aprender/ingles-espanol", label: c.english },
+        { to: "/aprender/espanol-ingles", label: c.spanish },
+        { to: "/aprender", label: c.other },
+      ],
+    },
+    {
+      title: c.community,
+      links: [
+        {
+          to: "https://www.instagram.com/ilinguerelax/",
+          label: "Instagram",
+          external: true,
+        },
+        {
+          to: "https://web.facebook.com/ilinguerelax/",
+          label: "Facebook",
+          external: true,
+        },
+        {
+          to: "mailto:hola@ilinguerelax.com",
+          label: "hola@ilinguerelax.com",
+          external: true,
+        },
+        {
+          to: "https://wa.me/12512724704",
+          label: "WhatsApp",
+          external: true,
+        },
+      ],
+    },
+  ];
 
   return (
-    <footer className="py-12 bg-foreground">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold text-primary-foreground tracking-tight">
+    <footer className="bg-foreground text-primary-foreground">
+      <div className="container px-4 md:px-6 py-14">
+        {/* Brand row */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 pb-8 border-b border-primary-foreground/10">
+          <Link to="/" className="flex flex-col">
+            <span className="text-2xl font-bold tracking-tight">
               iLingue <span className="font-light">Relax</span>
             </span>
+            <span className="text-sm text-primary-foreground/60 mt-1 max-w-md">
+              {c.tagline}
+            </span>
           </Link>
-
-          <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm text-primary-foreground/70">
-            <Link to="/products" className="hover:text-primary-foreground transition-colors">
-              {c.products}
-            </Link>
-            <Link to="/sobre-nosotros" className="hover:text-primary-foreground transition-colors">
-              {c.about}
-            </Link>
-            <Link to="/contacto" className="hover:text-primary-foreground transition-colors">
-              {c.contact}
-            </Link>
-            <Link to="/faq" className="hover:text-primary-foreground transition-colors">
-              FAQ
-            </Link>
-            <Link to="/privacidad" className="hover:text-primary-foreground transition-colors">
-              {c.privacy}
-            </Link>
-            <Link to="/condiciones" className="hover:text-primary-foreground transition-colors">
-              {c.terms}
-            </Link>
-            <Link to="/copyright" className="hover:text-primary-foreground transition-colors">
-              {c.copyright}
-            </Link>
-            <Link to="/trademark" className="hover:text-primary-foreground transition-colors">
-              {c.trademark}
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <a
               href="https://www.instagram.com/ilinguerelax/"
               target="_blank"
@@ -73,15 +201,58 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-center space-y-1">
-          <p className="text-sm text-primary-foreground/50">
-            © {new Date().getFullYear()} Youtumundial LLC. All Rights Reserved.
-          </p>
-          <p className="text-xs text-primary-foreground/40">
-            iLingue Relax™ is a trademark of Youtumundial LLC.
-          </p>
+        {/* Columns */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {columns.map((col) => (
+            <div key={col.title}>
+              <h3 className="text-sm font-bold tracking-wider mb-4 text-primary-foreground">
+                {col.title}
+              </h3>
+              <ul className="space-y-2.5 text-sm text-primary-foreground/70">
+                {col.links.map((link) =>
+                  link.external ? (
+                    <li key={link.label}>
+                      <a
+                        href={link.to}
+                        target={link.to.startsWith("http") ? "_blank" : undefined}
+                        rel={link.to.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className="hover:text-primary-foreground transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ) : (
+                    <li key={link.label}>
+                      <Link
+                        to={link.to}
+                        className="hover:text-primary-foreground transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
+          ))}
         </div>
 
+        {/* Bottom */}
+        <div className="mt-12 pt-6 border-t border-primary-foreground/10 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
+          <div className="space-y-1">
+            <p className="text-sm text-primary-foreground/50">
+              © {year} Youtumundial LLC. {c.rights}.
+            </p>
+            <p className="text-xs text-primary-foreground/40">
+              iLingue Relax™ is a trademark of Youtumundial LLC — Registered in the State of New Mexico, USA.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-primary-foreground/40">
+            <span>🇺🇸 USA</span>
+            <span>·</span>
+            <span>🌎 Global</span>
+          </div>
+        </div>
       </div>
     </footer>
   );

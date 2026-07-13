@@ -206,7 +206,7 @@ export function PaymentMethodsGroup() {
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
       }, { onConflict: "email,source" }).then(() => {});
 
-      const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
+      const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
           orderId: `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
           items: s.items.map((i) => {
@@ -229,8 +229,9 @@ export function PaymentMethodsGroup() {
           autoReturn: "approved",
           paymentType,
         },
-      });
-      if (error || !data?.init_point) throw new Error(error?.message || t.mpError);
+      }, { attempts: 3, baseDelayMs: 500 });
+      if (error || !data?.init_point) throw new Error((error as { message?: string } | null)?.message || t.mpError);
+
       window.location.assign(data.init_point);
     } catch (err) {
       redirectingRef.current = false;

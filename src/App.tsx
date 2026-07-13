@@ -225,6 +225,8 @@ const App = () => (
                   <Route path="/faq" element={<FAQPage />} />
                   <Route path="/privacidad" element={<PrivacyPage />} />
                   <Route path="/condiciones" element={<TermsPage />} />
+                  <Route path="/copyright" element={<CopyrightPage />} />
+                  <Route path="/aviso-copyright" element={<CopyrightPage />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />

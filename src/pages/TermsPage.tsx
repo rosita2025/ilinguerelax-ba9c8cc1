@@ -74,7 +74,9 @@ Libros físicos (próximamente en Amazon):
 
 • iLingue Relax® y nuestro logotipo son marcas registradas.
 • El contenido de nuestros ebooks y guías es propiedad exclusiva de iLingue Relax.
-• Queda estrictamente prohibida la reproducción, distribución o comunicación pública sin autorización previa por escrito.`
+• Queda estrictamente prohibida la reproducción, distribución o comunicación pública sin autorización previa por escrito.
+
+iLingue Relax™ is a trademark owned by Youtumundial LLC and is registered in the State of New Mexico, United States. The trademark, brand name, logos, and all related branding elements are the exclusive property of Youtumundial LLC. Any unauthorized use, reproduction, imitation, or distribution of the iLingue Relax™ trademark or any confusingly similar designation is strictly prohibited and may violate applicable trademark and intellectual property laws.`
   },
   {
     icon: AlertTriangle,

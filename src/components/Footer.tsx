@@ -6,38 +6,10 @@ export const Footer = () => {
   const { t, language } = useI18n();
 
   const content = {
-    es: {
-      products: "Productos",
-      about: "Sobre Nosotros",
-      contact: "Contacto",
-      privacy: "Privacidad",
-      terms: "Condiciones",
-      rights: "Todos los derechos reservados",
-    },
-    en: {
-      products: "Products",
-      about: "About Us",
-      contact: "Contact",
-      privacy: "Privacy",
-      terms: "Terms",
-      rights: "All rights reserved",
-    },
-    fr: {
-      products: "Produits",
-      about: "À Propos",
-      contact: "Contact",
-      privacy: "Confidentialité",
-      terms: "Conditions",
-      rights: "Tous droits réservés",
-    },
-    pt: {
-      products: "Produtos",
-      about: "Sobre Nós",
-      contact: "Contato",
-      privacy: "Privacidade",
-      terms: "Termos",
-      rights: "Todos os direitos reservados",
-    },
+    es: { products: "Productos", about: "Sobre Nosotros", contact: "Contacto", privacy: "Privacidad", terms: "Condiciones", copyright: "Copyright", rights: "Todos los derechos reservados" },
+    en: { products: "Products", about: "About Us", contact: "Contact", privacy: "Privacy", terms: "Terms", copyright: "Copyright", rights: "All rights reserved" },
+    fr: { products: "Produits", about: "À Propos", contact: "Contact", privacy: "Confidentialité", terms: "Conditions", copyright: "Copyright", rights: "Tous droits réservés" },
+    pt: { products: "Produtos", about: "Sobre Nós", contact: "Contato", privacy: "Privacidade", terms: "Termos", copyright: "Copyright", rights: "Todos os direitos reservados" },
   };
 
   const c = content[language];
@@ -70,6 +42,9 @@ export const Footer = () => {
             </Link>
             <Link to="/condiciones" className="hover:text-primary-foreground transition-colors">
               {c.terms}
+            </Link>
+            <Link to="/copyright" className="hover:text-primary-foreground transition-colors">
+              {c.copyright}
             </Link>
           </nav>
 

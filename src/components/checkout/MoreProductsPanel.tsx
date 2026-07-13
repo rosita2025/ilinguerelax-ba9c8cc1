@@ -41,6 +41,7 @@ export function MoreProductsPanel({ parentSku }: Props) {
   const [upsells, setUpsells] = useState<UpsellRow[]>([]);
   const items = useCheckoutPruebaStore((s) => s.items);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
   const region = useRegionTier();
   const { language } = useI18n();
   const t = T[(language as keyof typeof T)] ?? T.es;

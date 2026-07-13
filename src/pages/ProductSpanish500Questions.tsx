@@ -1,6 +1,6 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCartStore } from "@/stores/cartStore";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -9,10 +9,13 @@ import { motion } from "framer-motion";
 import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 const productImage = "/images/product-spanish-500-questions.png";
-const PRICE = "12.00";
+const ORIGINAL_PRICE = 40;
+const ADMIN_SKU = "500-questions-in-spanish-with-english-pronunciation";
+const TIENDA_PATH = "/checkouts/500-preguntas";
 
 const features = [
   "500 essential Spanish questions",
@@ -28,13 +31,32 @@ const features = [
 const ProductSpanish500Questions = () => {
   const navigate = useNavigate();
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
-  const campaign = useCampaignPrice(12, 40);
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, { tiendaPath: TIENDA_PATH });
+  const { useTiendaOnly, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, priceUsd: currentPrice } = tier;
+  const pricingReady = tier.loaded;
 
-  // Route directly to internal checkout — Shopify is intentionally bypassed.
   const handleBuyNow = () => {
-    setDrawerOpen(false);
-    navigate("/checkouts/500-preguntas");
+    if (!pricingReady) return;
+    if (useTiendaOnly) {
+      addItem({
+        id: "500-preguntas-spanish",
+        name: pricing.name ?? "500 Questions in Spanish (Digital PDF)",
+        price: currentPrice,
+        pricePen: pricePen ?? undefined,
+        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+        image: productImage,
+        description: "500 real Spanish questions with English pronunciation",
+        quantity: 1,
+      });
+      setDrawerOpen(false);
+      navigate(TIENDA_PATH);
+    } else if (tier.hotmartUrl) {
+      window.open(tier.hotmartUrl, "_blank", "noopener,noreferrer");
+    }
   };
+
 
 
   return (

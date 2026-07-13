@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
@@ -6,6 +6,8 @@ import type { UpsellItem } from "@/config/checkoutCatalog";
 
 interface Props {
   upsells: UpsellItem[];
+  /** SKU of the main product. Bundle discount only applies when it's in the cart. */
+  mainProductId?: string;
 }
 
 /** Muestra el precio en moneda local si aplica; si no, en USD. Una sola moneda. */

@@ -104,6 +104,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Physical books are sold and shipped through Amazon, and their return policy allows refunds up to 30 days after delivery. This applies to damaged, lost, defective books, or if the item does not meet your expectations. Returns and refunds are handled and guaranteed directly by Amazon under their own responsibility.",
       },
+      {
+        icon: RefreshCw,
+        title: "Product exchange at no extra cost",
+        content:
+          "If you prefer not to request a refund, you can exchange your purchase for another digital product of equal or lower value at no additional cost. If the new product is more expensive, you only pay the difference. This option is available as long as the order meets the conditions of the corresponding purchase platform.",
+      },
     ],
     amazonTitle: "Request your return on Amazon",
     amazonText:

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
@@ -6,6 +6,8 @@ import type { UpsellItem } from "@/config/checkoutCatalog";
 
 interface Props {
   upsells: UpsellItem[];
+  /** SKU of the main product. Bundle discount only applies when it's in the cart. */
+  mainProductId?: string;
 }
 
 /** Muestra el precio en moneda local si aplica; si no, en USD. Una sola moneda. */
@@ -65,12 +67,45 @@ function SavingsInline({ usd }: { usd: number }) {
   );
 }
 
-export function UpsellPanel({ upsells }: Props) {
+export function UpsellPanel({ upsells, mainProductId }: Props) {
   const items = useCheckoutPruebaStore((s) => s.items);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
+  const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
+
+  // Bundle discount only applies while the main product stays in the cart.
+  // If the buyer removes the main product, upsells stay in the cart but are
+  // charged at their normal (non-bundle) price = originalPrice when it exists.
+  const mainInCart = mainProductId
+    ? items.some((i) => i.id === mainProductId)
+    : true;
+
+  const effectivePrice = (u: UpsellItem) =>
+    mainInCart ? u.price : (u.originalPrice ?? u.price);
+
+  // Keep any upsell already in the cart repriced to the effective price so the
+  // order total reflects the bundle rule in real time (add/remove main product).
+  useEffect(() => {
+    upsells.forEach((u) => {
+      const inCart = items.find((i) => i.id === u.id);
+      if (!inCart) return;
+      const target = effectivePrice(u);
+      if (inCart.price !== target) {
+        syncItem({
+          id: u.id,
+          name: u.name,
+          price: target,
+          pricePen: u.pricePen,
+          image: u.image,
+          description: u.description,
+        });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mainInCart, upsells, items.length]);
 
   const totalSavings = useMemo(() => {
+    if (!mainInCart) return 0;
     return upsells.reduce((sum, u) => {
       const added = items.some((i) => i.id === u.id);
       if (added && u.originalPrice && u.originalPrice > u.price) {
@@ -78,7 +113,7 @@ export function UpsellPanel({ upsells }: Props) {
       }
       return sum;
     }, 0);
-  }, [upsells, items]);
+  }, [upsells, items, mainInCart]);
 
   if (!upsells?.length) return null;
 
@@ -94,7 +129,9 @@ export function UpsellPanel({ upsells }: Props) {
               Agrega a tu pedido y ahorra
             </h3>
             <p className="text-[11px] text-muted-foreground">
-              Solo disponible en esta compra
+              {mainInCart
+                ? "Solo disponible en esta compra"
+                : "Precio normal (sin el descuento del combo)"}
             </p>
           </div>
         </div>
@@ -104,7 +141,9 @@ export function UpsellPanel({ upsells }: Props) {
       <div className="space-y-2.5">
         {upsells.map((u) => {
           const added = items.some((i) => i.id === u.id);
-          const hasDiscount = u.originalPrice && u.originalPrice > u.price;
+          const shownPrice = effectivePrice(u);
+          const hasDiscount =
+            mainInCart && !!u.originalPrice && u.originalPrice > u.price;
           const percentOff = hasDiscount
             ? Math.round(((u.originalPrice! - u.price) / u.originalPrice!) * 100)
             : 0;
@@ -121,7 +160,7 @@ export function UpsellPanel({ upsells }: Props) {
                   addItem({
                     id: u.id,
                     name: u.name,
-                    price: u.price,
+                    price: shownPrice,
                     pricePen: u.pricePen,
                     image: u.image,
                     description: u.description,
@@ -190,7 +229,7 @@ export function UpsellPanel({ upsells }: Props) {
 
               <div className="text-right shrink-0 space-y-0.5">
                 {hasDiscount && <Price usd={u.originalPrice!} strike />}
-                <Price usd={u.price} emphasis added={added} prefix="+" />
+                <Price usd={shownPrice} emphasis added={added} prefix="+" />
               </div>
             </button>
           );

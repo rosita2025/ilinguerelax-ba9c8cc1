@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
+
 
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
@@ -243,25 +243,17 @@ export default function Checkout() {
     upsellsFingerprint,
   ]);
 
-  // Safety net: if the buyer removes the main product from the cart, auto-add
-  // it back so the checkout never sits at $0 (which reads as "free" to buyers).
+  // Safety net: if the cart ends up completely empty, re-add the main product
+  // so the checkout never sits at $0. If the buyer removed the main product
+  // but kept an upsell, we RESPECT that choice — the upsell is repriced to its
+  // normal (non-discounted) price inside <UpsellPanel /> since the bundle
+  // discount only applies when the main product is present.
   useEffect(() => {
     if (!catalogItem) return;
-    const hasMain = items.some((i) => i.id === catalogItem.id);
-    if (!hasMain) {
+    if (items.length === 0) {
       addItem({ ...catalogItem, quantity: 1 });
-      toast.info(
-        language === "en"
-          ? `“${catalogItem.name}” was re-added to your cart. This product cannot be removed here.`
-          : language === "fr"
-          ? `« ${catalogItem.name} » a été rajouté au panier. Ce produit ne peut pas être retiré ici.`
-          : language === "pt"
-          ? `“${catalogItem.name}” foi adicionado novamente ao carrinho. Este produto não pode ser removido aqui.`
-          : `“${catalogItem.name}” se agregó de nuevo a tu carrito. Este producto no se puede quitar desde aquí.`,
-        { duration: 4500 }
-      );
     }
-  }, [items, catalogItem, addItem, language]);
+  }, [items, catalogItem, addItem]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.
@@ -355,7 +347,7 @@ export default function Checkout() {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
         <div className="space-y-6">
           <BuyerInfoForm />
-          {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} />}
+          {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />}
           <PaymentMethodsGroup />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

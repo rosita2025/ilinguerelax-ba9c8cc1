@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useRegionTier } from "@/hooks/useRegionTier";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 interface Props {
@@ -10,22 +11,39 @@ interface Props {
   mainProductId?: string;
 }
 
-/** Muestra el precio en moneda local si aplica; si no, en USD. Una sola moneda. */
+/**
+ * Muestra el precio en moneda local si aplica; si no, en USD.
+ * Si el item tiene un `pen` nativo (precio real en soles) y el visitante es
+ * de Perú, muestra ese precio EXACTO — así el panel y el resumen del pedido
+ * nunca discrepan (evita el bug del 75 vs 29.75 soles).
+ */
 function Price({
   usd,
+  pen,
   strike = false,
   emphasis = false,
   added = false,
   prefix = "",
 }: {
   usd: number;
+  pen?: number;
   strike?: boolean;
   emphasis?: boolean;
   added?: boolean;
   prefix?: string;
 }) {
+  const { country } = useRegionTier();
   const local = useLocalCurrency(usd);
-  const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
+  const isPeru = country === "PE";
+
+  let label: string;
+  if (isPeru && typeof pen === "number" && pen > 0) {
+    label = `S/ ${pen.toFixed(2)}`;
+  } else if (!local.isUsd && !local.loading) {
+    label = local.formatted;
+  } else {
+    label = `$${usd.toFixed(2)}`;
+  }
 
   if (strike) {
     return (

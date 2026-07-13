@@ -350,7 +350,7 @@ export default function Checkout() {
 
       <div className="lg:hidden max-w-6xl mx-auto px-3 sm:px-4 pt-3">
         <SectionErrorBoundary name="order-summary-mobile" extra={{ slug: catalogItem?.id }}>
-          <OrderSummary collapsible />
+          <OrderSummary collapsible mainProductId={catalogItem?.id} />
         </SectionErrorBoundary>
       </div>
 
@@ -387,7 +387,7 @@ export default function Checkout() {
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <SectionErrorBoundary name="order-summary-desktop" extra={{ slug: catalogItem?.id }}>
-            <OrderSummary />
+            <OrderSummary mainProductId={catalogItem?.id} />
           </SectionErrorBoundary>
         </aside>
       </div>

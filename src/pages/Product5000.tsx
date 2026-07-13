@@ -592,13 +592,17 @@ const Product5000 = () => {
                 >
                   <a
                     href={buyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={useTiendaOnly ? "_self" : "_blank"}
+                    rel={useTiendaOnly ? undefined : "noopener noreferrer"}
                     onClick={handleBuyClick}
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    DESCARGAR AHORA
+                    {isPeru
+                      ? "COMPRAR EN TIENDA (PERÚ)"
+                      : useHotmartLatam
+                      ? "COMPRAR EN HOTMART"
+                      : "COMPRAR AHORA"}
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </a>
                 </Button>
@@ -606,8 +610,13 @@ const Product5000 = () => {
 
               {/* Secondary CTA */}
               <p className="text-center text-sm text-muted-foreground mb-6">
-                👆 Haz clic para asegurar tu copia al precio de oferta
+                {isPeru
+                  ? "👆 Pago local en soles (Yape, Plin, tarjetas, transferencia)"
+                  : useHotmartLatam
+                  ? "👆 Pago en tu moneda local vía Hotmart"
+                  : "👆 Pago seguro en USD (tarjetas internacionales)"}
               </p>
+
 
               {/* Trust Badges */}
               <TrustBadges lang="es" variant="grid" />

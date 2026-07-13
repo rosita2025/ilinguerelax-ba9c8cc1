@@ -424,7 +424,7 @@ const Product8000 = () => {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-                🎯 <span className="text-gradient">¿Qué recibes HOY por solo $20?</span>
+                🎯 <span className="text-gradient">¿Qué recibes HOY por solo {tier.priceLabel}?</span>
               </h2>
               <p className="text-muted-foreground">Todo esto incluido en un solo pago</p>
             </div>

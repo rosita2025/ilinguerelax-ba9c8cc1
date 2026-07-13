@@ -23,11 +23,28 @@ function shouldSend(key: string) {
   return true;
 }
 
+function readContext() {
+  const ctx: Record<string, string | undefined> = {};
+  try {
+    ctx.country = localStorage.getItem("ilr_country") ?? undefined;
+  } catch { /* ignore */ }
+  try {
+    ctx.language =
+      document?.documentElement?.lang ||
+      (typeof navigator !== "undefined" ? navigator.language : undefined);
+  } catch { /* ignore */ }
+  try {
+    ctx.referrer = typeof document !== "undefined" ? document.referrer : undefined;
+  } catch { /* ignore */ }
+  return ctx;
+}
+
 export function reportClientError(payload: Payload) {
   try {
     const key = `${payload.source}|${payload.message ?? ""}|${(payload.stack ?? "").slice(0, 200)}`;
     if (!shouldSend(key)) return;
 
+    const ctx = readContext();
     const body = JSON.stringify({
       ...payload,
       url: typeof location !== "undefined" ? location.href : undefined,
@@ -37,6 +54,10 @@ export function reportClientError(payload: Payload) {
         typeof window !== "undefined"
           ? `${window.innerWidth}x${window.innerHeight}`
           : undefined,
+      country: ctx.country,
+      language: ctx.language,
+      referrer: ctx.referrer,
+      extra: { ...(payload.extra ?? {}), country: ctx.country, language: ctx.language },
       release: RELEASE,
     });
 

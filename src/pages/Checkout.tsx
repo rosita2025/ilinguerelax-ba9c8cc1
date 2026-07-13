@@ -243,25 +243,17 @@ export default function Checkout() {
     upsellsFingerprint,
   ]);
 
-  // Safety net: if the buyer removes the main product from the cart, auto-add
-  // it back so the checkout never sits at $0 (which reads as "free" to buyers).
+  // Safety net: if the cart ends up completely empty, re-add the main product
+  // so the checkout never sits at $0. If the buyer removed the main product
+  // but kept an upsell, we RESPECT that choice — the upsell is repriced to its
+  // normal (non-discounted) price inside <UpsellPanel /> since the bundle
+  // discount only applies when the main product is present.
   useEffect(() => {
     if (!catalogItem) return;
-    const hasMain = items.some((i) => i.id === catalogItem.id);
-    if (!hasMain) {
+    if (items.length === 0) {
       addItem({ ...catalogItem, quantity: 1 });
-      toast.info(
-        language === "en"
-          ? `“${catalogItem.name}” was re-added to your cart. This product cannot be removed here.`
-          : language === "fr"
-          ? `« ${catalogItem.name} » a été rajouté au panier. Ce produit ne peut pas être retiré ici.`
-          : language === "pt"
-          ? `“${catalogItem.name}” foi adicionado novamente ao carrinho. Este produto não pode ser removido aqui.`
-          : `“${catalogItem.name}” se agregó de nuevo a tu carrito. Este producto no se puede quitar desde aquí.`,
-        { duration: 4500 }
-      );
     }
-  }, [items, catalogItem, addItem, language]);
+  }, [items, catalogItem, addItem]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.

@@ -68,13 +68,21 @@ export function useDigitalProducts() {
     let cancelled = false;
 
     const fetchAll = async () => {
-      const { data, error } = await supabase
-        .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, sort_order")
-        .eq("active", true)
-        .order("sort_order", { ascending: true });
+      let data: DBProduct[] | null = null;
+      let error: unknown = null;
+      try {
+        const result = await supabase
+          .from("digital_products")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, sort_order")
+          .eq("active", true)
+          .order("sort_order", { ascending: true });
+        data = result.data as DBProduct[] | null;
+        error = result.error;
+      } catch (err) {
+        error = err;
+      }
       if (cancelled) return;
-      if (!error && data) setItems((data as DBProduct[]).map(toProduct));
+      if (!error && data) setItems(data.map(toProduct));
       setLoading(false);
     };
 

@@ -63,12 +63,20 @@ const ProductDynamic = () => {
     if (!slug) return;
     let cancelled = false;
     const load = async () => {
-      const { data, error } = await supabase
-        .from("digital_products")
-        .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
-        .eq("sku", slug)
-        .eq("active", true)
-        .maybeSingle();
+      let data: unknown = null;
+      let error: unknown = null;
+      try {
+        const result = await supabase
+          .from("digital_products")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+          .eq("sku", slug)
+          .eq("active", true)
+          .maybeSingle();
+        data = result.data;
+        error = result.error;
+      } catch (err) {
+        error = err;
+      }
       if (cancelled) return;
       if (error || !data) setNotFound(true);
       else { setProduct(data as unknown as DBProduct); setNotFound(false); }

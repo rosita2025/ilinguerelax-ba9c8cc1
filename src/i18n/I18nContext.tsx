@@ -11,6 +11,7 @@ import {
   languageNames,
   languageFlags,
 } from "./index";
+import { detectCountryByIp } from "@/lib/geoDetection";
 
 interface I18nContextType {
   language: Language;
@@ -53,8 +54,14 @@ function countryFromSubdomain(): string {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   // Subdominio fuerza país + idioma (us. → EN, uk. → EN, eu. → ES, pe. → ES, mx. → ES).
   const subCountry = typeof window !== "undefined" ? countryFromSubdomain() : "";
-  const savedLang = typeof window !== "undefined" ? localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null : null;
-  const savedCurrency = typeof window !== "undefined" ? localStorage.getItem(CURRENCY_STORAGE_KEY) as Currency | null : null;
+  const savedLang = (() => {
+    try { return typeof window !== "undefined" ? localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null : null; }
+    catch { return null; }
+  })();
+  const savedCurrency = (() => {
+    try { return typeof window !== "undefined" ? localStorage.getItem(CURRENCY_STORAGE_KEY) as Currency | null : null; }
+    catch { return null; }
+  })();
 
   const initialLang: Language = subCountry
     ? detectLanguageFromCountry(subCountry)
@@ -65,7 +72,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   const [language, setLanguageState] = useState<Language>(initialLang);
   const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
-  const savedCountry = typeof window !== "undefined" ? localStorage.getItem("ilr_country") : null;
+  const savedCountry = (() => {
+    try { return typeof window !== "undefined" ? localStorage.getItem("ilr_country") : null; }
+    catch { return null; }
+  })();
   const [countryCode, setCountryCode] = useState<string>(subCountry || savedCountry || "US");
 
   // Detect country in background WITHOUT blocking render
@@ -80,28 +90,22 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
     const detectCountry = async () => {
       try {
-        const response = await fetch("https://ipwho.is/", {
-          signal: AbortSignal.timeout(3000)
-        });
-        if (response.ok) {
-          const data = await response.json();
-          const country = data.country_code || "US";
-          setCountryCode(country);
-          try { localStorage.setItem("ilr_country", country); } catch {}
+        const detected = await detectCountryByIp({ fallbackCountry: "US" });
+        const country = detected?.countryCode || "US";
+        setCountryCode(country);
+        try { localStorage.setItem("ilr_country", country); } catch {}
 
-          if (!savedLang) {
-            const detectedLang = detectLanguageFromCountry(country);
-            setLanguageState(detectedLang);
-            console.log(`Country detected: ${country} → Language: ${detectedLang}`);
-          }
+        if (!savedLang) {
+          const detectedLang = detectLanguageFromCountry(country);
+          setLanguageState(detectedLang);
+        }
 
-          if (!savedCurrency) {
-            const detectedCurrency = detectCurrency(country);
-            setCurrencyState(detectedCurrency);
-          }
+        if (!savedCurrency) {
+          const detectedCurrency = detectCurrency(country);
+          setCurrencyState(detectedCurrency);
         }
       } catch (error) {
-        console.log("Could not detect country, keeping Spanish as default");
+        setCountryCode("US");
       }
     };
 
@@ -111,12 +115,12 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   // Save preferences when they change
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    try { localStorage.setItem(LANGUAGE_STORAGE_KEY, lang); } catch { /* ignore */ }
   };
 
   const setCurrency = (curr: Currency) => {
     setCurrencyState(curr);
-    localStorage.setItem(CURRENCY_STORAGE_KEY, curr);
+    try { localStorage.setItem(CURRENCY_STORAGE_KEY, curr); } catch { /* ignore */ }
   };
 
   const t = translations[language];

@@ -28,12 +28,18 @@ async function loadAll(): Promise<Record<string, Row>> {
   if (cache) return cache;
   if (inflight) return inflight;
   inflight = (async () => {
-    const { data } = await supabase
-      .from("digital_products")
-      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen")
-      .eq("active", true);
+    let data: Row[] | null = null;
+    try {
+      const result = await supabase
+        .from("digital_products")
+        .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen")
+        .eq("active", true);
+      data = result.data as Row[] | null;
+    } catch {
+      data = [];
+    }
     const map: Record<string, Row> = {};
-    for (const r of (data as Row[]) ?? []) map[r.sku] = r;
+    for (const r of data ?? []) map[r.sku] = r;
     cache = map;
     return map;
   })();

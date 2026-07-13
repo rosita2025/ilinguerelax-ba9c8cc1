@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { products, comingSoonLanguages, getProductLink, type Product } from "@/data/products";
 import { useI18n } from "@/i18n/I18nContext";
 import { useCardPrice } from "@/hooks/useCardPrice";
+import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
 
 type LangKey = "english" | "spanish" | "portuguese" | "korean" | "soon";
@@ -12,15 +13,15 @@ type FormatKey = "digital" | "physical";
 
 // Map each product to a language tab
 const getProductLangKey = (p: Product): LangKey => {
-  if (p.id === "coreano-relax") return "korean";
-  if (p.id === "portuguese-5000") return "portuguese";
+  if (p.id === "coreano-relax" || p.targetLanguage === "ko") return "korean";
+  if (p.id === "portuguese-5000" || p.targetLanguage === "pt") return "portuguese";
   // Coming soon languages (other than portuguese) go to "soon"
   if (p.comingSoon && ["german-5000", "italian-5000", "french-5000", "dutch-5000"].includes(p.id)) {
     return "soon";
   }
   // English-target products (for Spanish speakers learning English)
   const englishIds = ["5000", "8000", "5000-book", "8000-book", "1000-verbos", "500-preguntas", "patrones-especiales"];
-  if (englishIds.includes(p.id)) return "english";
+  if (englishIds.includes(p.id) || p.targetLanguage === "en") return "english";
   // Spanish-target products (for English speakers learning Spanish)
   return "spanish";
 };
@@ -64,6 +65,7 @@ const langStyles: Record<LangKey, { ring: string; bg: string; chip: string; tabA
 export const Languages = () => {
   const { language, formatPrice } = useI18n();
   const cardPrice = useCardPrice();
+  const { items: adminItems } = useDigitalProducts();
   const [activeFormat, setActiveFormat] = useState<FormatKey>("digital");
   const [activeTab, setActiveTab] = useState<LangKey>("english");
 
@@ -160,14 +162,26 @@ export const Languages = () => {
 
   const c = content[language];
 
+  // Merge static products with admin (DB) products, dedup by slug. Admin wins.
+  const merged: Product[] = useMemo(() => {
+    const map = new Map<string, Product>();
+    products.forEach((p) => map.set(p.slug, p));
+    adminItems.forEach((p) => {
+      const existing = map.get(p.slug);
+      // Prefer static entry's rich metadata (image, discount, features) but pull in new DB-only products.
+      if (!existing) map.set(p.slug, p);
+    });
+    return Array.from(map.values());
+  }, [adminItems]);
+
   // Filter by selected format first, then group by language
   const grouped = useMemo(() => {
     const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], korean: [], soon: [] };
-    products
+    merged
       .filter((p) => (activeFormat === "physical" ? p.isPhysical : !p.isPhysical))
       .forEach((p) => g[getProductLangKey(p)].push(p));
     return g;
-  }, [activeFormat]);
+  }, [activeFormat, merged]);
 
   const tabs: { key: LangKey; flag: string }[] = [
     { key: "english", flag: "🇬🇧" },

@@ -68,7 +68,6 @@ export function useDigitalProducts() {
         .from("digital_products")
         .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, sort_order")
         .eq("active", true)
-        .eq("is_upsell", false)
         .order("sort_order", { ascending: true });
       if (cancelled) return;
       if (!error && data) setItems((data as DBProduct[]).map(toProduct));

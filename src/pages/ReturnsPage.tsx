@@ -110,6 +110,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "If you prefer not to request a refund, you can exchange your purchase for another digital product of equal or lower value at no additional cost. If the new product is more expensive, you only pay the difference. This option is available as long as the order meets the conditions of the corresponding purchase platform.",
       },
+      {
+        icon: ShieldOff,
+        title: "What happens to your download and access",
+        content:
+          "When a refund or exchange is approved, access to the previous digital product is revoked: download links stop working, platform access is canceled, and you agree to delete any already-downloaded or printed copies. For exchanges, we activate the new product as soon as the previous one is confirmed as deactivated. Request your exchange or refund via WhatsApp +1 251 272 4704 to speed up the process.",
+      },
     ],
     amazonTitle: "Request your return on Amazon",
     amazonText:

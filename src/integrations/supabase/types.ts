@@ -134,6 +134,51 @@ export type Database = {
         }
         Relationships: []
       }
+      client_error_logs: {
+        Row: {
+          component_stack: string | null
+          created_at: string
+          extra: Json | null
+          id: string
+          message: string | null
+          release: string | null
+          route: string | null
+          source: string
+          stack: string | null
+          url: string | null
+          user_agent: string | null
+          viewport: string | null
+        }
+        Insert: {
+          component_stack?: string | null
+          created_at?: string
+          extra?: Json | null
+          id?: string
+          message?: string | null
+          release?: string | null
+          route?: string | null
+          source: string
+          stack?: string | null
+          url?: string | null
+          user_agent?: string | null
+          viewport?: string | null
+        }
+        Update: {
+          component_stack?: string | null
+          created_at?: string
+          extra?: Json | null
+          id?: string
+          message?: string | null
+          release?: string | null
+          route?: string | null
+          source?: string
+          stack?: string | null
+          url?: string | null
+          user_agent?: string | null
+          viewport?: string | null
+        }
+        Relationships: []
+      }
       digital_email_sends: {
         Row: {
           created_at: string

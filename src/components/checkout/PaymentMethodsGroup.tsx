@@ -466,7 +466,8 @@ export function PaymentMethodsGroup() {
     wasValidRef.current = valid;
   }, [valid]);
 
-  const isFree = total <= 0 && items.length > 0;
+  const isFree = total <= 0 && items.length > 0 && !!coupon && couponPercent >= 100;
+  const isInvalidZero = total <= 0 && items.length > 0 && !isFree;
   const [freeLoading, setFreeLoading] = useState(false);
   const submitFreeOrder = async () => {
     if (!valid) { requestBuyerInfo(); return; }
@@ -530,7 +531,21 @@ export function PaymentMethodsGroup() {
         </div>
       )}
 
-      {!isFree && methods.map((m) => {
+      {isInvalidZero && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 p-4">
+          <p className="text-sm text-amber-900 dark:text-amber-100 font-medium">
+            {language === "en"
+              ? "The total cannot be $0. Please add a product before paying."
+              : language === "pt"
+              ? "O total não pode ser $0. Adicione um produto antes de pagar."
+              : language === "fr"
+              ? "Le total ne peut pas être $0. Ajoutez un produit avant de payer."
+              : "El total no puede ser $0. Agrega un producto antes de pagar."}
+          </p>
+        </div>
+      )}
+
+      {!isFree && !isInvalidZero && methods.map((m) => {
         const isSelected = valid && selected === m.id;
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;

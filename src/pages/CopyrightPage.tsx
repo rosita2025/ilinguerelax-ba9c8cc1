@@ -147,11 +147,6 @@ const CopyrightPage = () => {
                 </motion.div>
               );
             })}
-
-            <div className="text-center pt-6 border-t border-border space-y-1">
-              <p className="text-sm text-muted-foreground">{c.footerLine1}</p>
-              <p className="text-xs text-muted-foreground/80">{c.footerLine2}</p>
-            </div>
           </div>
         </div>
       </section>

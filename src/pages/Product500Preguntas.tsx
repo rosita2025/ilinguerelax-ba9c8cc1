@@ -40,11 +40,26 @@ const features = [
   "Acceso de por vida",
 ];
 
+const ADMIN_SKU = "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes";
+const CHECKOUT_PATH = "/checkouts/500-preguntas";
+
+const CART_ITEM_BASE = {
+  id: "500-preguntas-ingles",
+  name: "Inglés Relax · 500 Preguntas en Inglés (Digital PDF)",
+  image: product500PreguntasImage,
+  description: "500 preguntas en inglés con pronunciación para hispanohablantes",
+};
+
 const Product500Preguntas = () => {
-  const pricing = useAdminPricing("500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes");
-  const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const pricingReady = pricing.loaded && currentPrice > 0;
-  const campaign = useCampaignPrice(currentPrice, 54);
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, { fallbackHotmartUrl: HOTMART_URL, originalMultiplier: 2.5 });
+  const currentPrice = tier.priceUsd;
+  const pricingReady = tier.loaded;
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const isPeru = tier.isPeru;
+  const cartItem = { ...CART_ITEM_BASE, price: currentPrice, pricePen: tier.pricePen ?? undefined };
+
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 500 Preguntas en Inglés",
     content_category: "Digital Book",
@@ -66,7 +81,13 @@ const Product500Preguntas = () => {
       currency: "USD",
       num_items: 1,
     });
-    window.open(pricing.hotmartUrl || HOTMART_URL, "_blank");
+    if (tier.useHotmartLatam) {
+      window.location.href = tier.hotmartUrl || HOTMART_URL;
+    } else {
+      addItem({ ...cartItem, quantity: 1 });
+      toast.success("Producto agregado al carrito");
+      navigate(CHECKOUT_PATH);
+    }
   };
 
   return (

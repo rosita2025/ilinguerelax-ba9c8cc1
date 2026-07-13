@@ -77,7 +77,7 @@ export function ContactForm({ onValid, onChange }: Props) {
       form.setValue("country", cached.toUpperCase());
       return;
     }
-    fetch("https://ipapi.co/json/")
+    fetch("https://ipwho.is/")
       .then((r) => r.json())
       .then((d) => {
         if (d?.country_code && COUNTRIES.some((c) => c.code === d.country_code)) {

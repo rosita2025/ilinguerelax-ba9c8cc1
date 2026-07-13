@@ -33,7 +33,7 @@ let inflightDetection: Promise<{ currency: CampaignCurrency; country: string } |
 
 async function fetchIpapi(): Promise<{ currency: CampaignCurrency; country: string } | null> {
   try {
-    const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
+    const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3000) });
     if (!res.ok) return null;
     const data = await res.json();
     // ipapi.co returns { error: true, reason: "..." } on rate-limit with HTTP 200

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
-import type { UpsellItem } from "@/config/checkoutCatalog";
+import { CHECKOUT_CATALOG, type UpsellItem } from "@/config/checkoutCatalog";
 
 interface DBRow {
   id: string;

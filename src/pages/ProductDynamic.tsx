@@ -90,6 +90,7 @@ const ProductDynamic = () => {
         : Number(product.price_usd))
     : 0;
   const local = useLocalCurrency(effectiveUsd);
+  const tier = useCountryTierRouting(slug ?? "");
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {

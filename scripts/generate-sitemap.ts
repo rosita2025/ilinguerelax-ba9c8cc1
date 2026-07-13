@@ -106,7 +106,8 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
 // --------------------------------------------------------------------------
 // Dynamic products from Supabase
 // --------------------------------------------------------------------------
-async function getDbProductSlugs(): Promise<string[]> {
+interface DbProduct { sku: string; updated_at?: string }
+async function getDbProducts(): Promise<DbProduct[]> {
   const url = process.env.VITE_SUPABASE_URL;
   const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
@@ -117,13 +118,15 @@ async function getDbProductSlugs(): Promise<string[]> {
     const supabase = createClient(url, key);
     const { data, error } = await supabase
       .from("digital_products")
-      .select("sku, active")
+      .select("sku, updated_at, active")
       .eq("active", true);
     if (error) {
       console.warn("[sitemap] Supabase error:", error.message);
       return [];
     }
-    return (data ?? []).map((r: any) => r.sku).filter(Boolean);
+    return (data ?? [])
+      .filter((r: any) => r.sku)
+      .map((r: any) => ({ sku: r.sku, updated_at: r.updated_at }));
   } catch (err) {
     console.warn("[sitemap] Supabase fetch failed:", (err as Error).message);
     return [];

@@ -288,15 +288,15 @@ const Product8000 = () => {
                     Precio Especial Por Tiempo Limitado
                   </span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$20</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
+                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                  <span className="text-5xl md:text-6xl font-black text-foreground">{tier.priceLabel}</span>
+                  <span className="text-2xl text-muted-foreground line-through">{tier.originalLabel}</span>
                   <motion.span
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg">
                     
-                    AHORRA 63%
+                    OFERTA
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">💳 Pago único • Sin suscripciones • Acceso de por vida</p>
@@ -424,7 +424,7 @@ const Product8000 = () => {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-                🎯 <span className="text-gradient">¿Qué recibes HOY por solo $20?</span>
+                🎯 <span className="text-gradient">¿Qué recibes HOY por solo {tier.priceLabel}?</span>
               </h2>
               <p className="text-muted-foreground">Todo esto incluido en un solo pago</p>
             </div>
@@ -457,7 +457,7 @@ const Product8000 = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xl font-black text-foreground">Hoy pagas solo:</span>
-                  <span className="text-3xl font-black text-primary">$20 USD</span>
+                  <span className="text-3xl font-black text-primary">{tier.priceLabel}</span>
                 </div>
               </div>
               
@@ -552,10 +552,9 @@ const Product8000 = () => {
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
-              <div className="flex items-baseline justify-center gap-3 mb-4">
-                <span className="text-5xl font-bold text-foreground">$20</span>
-                <span className="text-2xl text-muted-foreground line-through">$54</span>
-                <span className="text-accent font-bold">USD</span>
+              <div className="flex items-baseline justify-center gap-3 mb-4 flex-wrap">
+                <span className="text-5xl font-bold text-foreground">{tier.priceLabel}</span>
+                <span className="text-2xl text-muted-foreground line-through">{tier.originalLabel}</span>
               </div>
               <p className="text-muted-foreground mb-6">Pago único • Sin suscripciones • Acceso de por vida</p>
               <Button variant="hero" size="xl" className="w-full" onClick={handleBuyNow}>
@@ -658,11 +657,11 @@ const Product8000 = () => {
 
       {/* Sticky Buy Bar — 4-tier routing */}
       <StickyBuyBar
-        price={campaign.price}
-        originalPrice={campaign.originalPrice}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
         rating={4.9}
         reviewCount={10000}
-        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${campaign.price}` : `COMPRAR EN HOTMART · ${campaign.price}`}
+        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${tier.priceLabel}` : `COMPRAR EN HOTMART · ${tier.priceLabel}`}
         buyUrl={useTiendaOnly ? TIENDA_PATH_8000 : (tier.hotmartUrl || HOTMART_8000_LATAM)}
         onBuyClick={handleBuyNow} />
       

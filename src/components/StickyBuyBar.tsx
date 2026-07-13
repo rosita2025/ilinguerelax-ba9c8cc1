@@ -430,8 +430,9 @@ export const StickyBuyBar = ({
               )}
             </div>
 
-            {/* Buy Button */}
-            <Button
+            {/* Buy Button with 100% secure badge */}
+            <div className="flex flex-col items-center gap-1">
+              <Button
               size="default"
               className={`whitespace-nowrap h-14 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_6px_24px_rgba(16,185,129,0.5)] text-base px-8 font-extrabold tracking-wide transition-all hover:scale-[1.03] active:scale-[0.98] ${pulse ? 'ring-4 ring-emerald-400/40 scale-[1.02]' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
               onClick={handleBuy}

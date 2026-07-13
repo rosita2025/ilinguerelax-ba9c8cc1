@@ -466,7 +466,8 @@ export function PaymentMethodsGroup() {
     wasValidRef.current = valid;
   }, [valid]);
 
-  const isFree = total <= 0 && items.length > 0;
+  const isFree = total <= 0 && items.length > 0 && !!coupon && couponPercent >= 100;
+  const isInvalidZero = total <= 0 && items.length > 0 && !isFree;
   const [freeLoading, setFreeLoading] = useState(false);
   const submitFreeOrder = async () => {
     if (!valid) { requestBuyerInfo(); return; }

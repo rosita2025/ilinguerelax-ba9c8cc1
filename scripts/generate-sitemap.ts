@@ -190,12 +190,17 @@ async function main() {
     if (/^sitemap-.*\.xml$/.test(f)) unlinkSync(join(SITEMAPS_DIR, f));
   }
 
-  const [blogEntries, dbSlugs] = await Promise.all([getBlogEntries(), getDbProductSlugs()]);
+  const [blogEntries, dbProducts] = await Promise.all([getBlogEntries(), getDbProducts()]);
 
+  const lastmodBySlug = new Map<string, string>();
+  for (const p of dbProducts) {
+    if (p.updated_at) lastmodBySlug.set(p.sku, p.updated_at.slice(0, 10));
+  }
+  const dbSlugs = dbProducts.map((p) => p.sku);
   const productSlugs = Array.from(new Set([...hardcodedProductSlugs, ...dbSlugs]));
   const productEntries: SitemapEntry[] = productSlugs.map((slug) => ({
     path: `/products/${slug}`,
-    lastmod: TODAY,
+    lastmod: lastmodBySlug.get(slug) ?? TODAY,
     changefreq: "weekly",
     priority: "0.85",
   }));

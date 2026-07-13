@@ -215,7 +215,7 @@ const Product5000 = () => {
   });
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const clearCart = useCheckoutPruebaStore((s) => s.clear);
+  
   const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
   const isLatam = useHotmartLatam;
   const pricing5000Ready = tier.loaded;

@@ -228,6 +228,8 @@ const App = () => (
                   <Route path="/condiciones" element={<TermsPage />} />
                   <Route path="/copyright" element={<CopyrightPage />} />
                   <Route path="/aviso-copyright" element={<CopyrightPage />} />
+                  <Route path="/trademark" element={<TrademarkPage />} />
+                  <Route path="/aviso-trademark" element={<TrademarkPage />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/dejar-resena" element={<DejarResena />} />

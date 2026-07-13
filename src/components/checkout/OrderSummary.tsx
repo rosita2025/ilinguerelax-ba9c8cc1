@@ -93,7 +93,31 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                     <p className="text-xs text-muted-foreground truncate">{item.description}</p>
                   )}
                   {!locked && (
-                    <div className="flex items-center justify-end mt-1.5">
+                    <div className="flex items-center justify-between gap-2 mt-1.5">
+                      <div className="flex items-center border rounded-md">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                          disabled={item.quantity <= 1}
+                          aria-label="-"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </Button>
+                        <span className="text-xs w-6 text-center">{item.quantity}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          aria-label="+"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
                       <Button
                         type="button"
                         variant="ghost"
@@ -106,6 +130,7 @@ export function OrderSummary({ collapsible = false, locked = false }: OrderSumma
                       </Button>
                     </div>
                   )}
+
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
                   {penMode && item.pricePen != null

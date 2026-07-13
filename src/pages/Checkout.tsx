@@ -77,12 +77,14 @@ export default function Checkout() {
           .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
           .eq("sku", adminSku)
           .eq("active", true)
-          .maybeSingle(),
+          .maybeSingle()
+          .catch(() => ({ data: null, error: new Error("catalog offline") })),
         supabase
           .from("product_upsells")
           .select("upsell_sku, discount_pct, sort_order")
           .eq("product_sku", adminSku)
-          .order("sort_order", { ascending: true }),
+          .order("sort_order", { ascending: true })
+          .catch(() => ({ data: [] })),
       ]);
 
       if (cancelled) return;
@@ -96,7 +98,8 @@ export default function Checkout() {
           .from("digital_products")
           .select("sku, name, description, price_usd, price_pen, cover_image_url")
           .in("sku", skus)
-          .eq("active", true);
+          .eq("active", true)
+          .catch(() => ({ data: [] }));
         const bySku = new Map((upProducts ?? []).map((p) => [p.sku, p]));
         upsells = upRows
           .map((u) => {

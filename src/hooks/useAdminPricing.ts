@@ -64,7 +64,8 @@ export function useAdminPricing(sku: string): AdminPricing {
         .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
         .eq("sku", sku)
         .eq("active", true)
-        .maybeSingle();
+        .maybeSingle()
+        .catch(() => ({ data: null }));
       if (cancelled) return;
       if (!data) {
         setState({ ...INITIAL, loaded: true, missing: true });

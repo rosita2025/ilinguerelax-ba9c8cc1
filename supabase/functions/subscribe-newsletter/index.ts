@@ -1,5 +1,41 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { upsertBrevoContact } from '../_shared/brevoContact.ts';
+import { sendEmail } from '../_shared/brevo.ts';
+
+const FROM = 'iLingue Relax <hola@ilinguerelax.com>';
+const REPLY_TO = 'hola@ilinguerelax.com';
+
+function buildWelcomeEmail(name?: string) {
+  const hola = name ? `Hola ${name},` : 'Hola,';
+  const subject = `${name ? name + ', b' : 'B'}ienvenid@ a iLingue Relax`;
+  const text = `${hola}
+
+Bienvenid@ a iLingue Relax. Gracias por suscribirte.
+
+Como regalo de bienvenida, aquí tienes tu cupón del 10% de descuento:
+
+    NEW10
+
+Úsalo al finalizar tu compra en la tienda.
+
+Si necesitas cualquier cosa, escríbenos a hola@ilinguerelax.com.
+
+Un saludo,
+El equipo de iLingue Relax
+hola@ilinguerelax.com`;
+
+  const html = `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #111;">
+  <p>${hola}</p>
+  <p>Bienvenid@ a <strong>iLingue Relax</strong>. Gracias por suscribirte.</p>
+  <p>Como regalo de bienvenida, aquí tienes tu cupón del <strong>10% de descuento</strong>:</p>
+  <p style="font-family: monospace; font-size: 18px; padding: 8px 0;"><strong>NEW10</strong></p>
+  <p>Úsalo al finalizar tu compra en la tienda.</p>
+  <p>Si necesitas cualquier cosa, escríbenos a <a href="mailto:hola@ilinguerelax.com">hola@ilinguerelax.com</a>.</p>
+  <p>Un saludo,<br/>El equipo de iLingue Relax<br/>hola@ilinguerelax.com</p>
+</div>`;
+
+  return { subject, text, html };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -29,6 +65,20 @@ Deno.serve(async (req) => {
       productName: `newsletter:${source}`,
       provider: 'popup',
     });
+
+    // Enviar email de bienvenida sencillo (texto normal, sin colores)
+    const { subject, text, html } = buildWelcomeEmail(name);
+    const result = await sendEmail({
+      from: FROM,
+      to: email,
+      replyTo: REPLY_TO,
+      subject,
+      html,
+      text,
+    } as any);
+    if ((result as any)?.error) {
+      console.warn('welcome email send failed', (result as any).error);
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,

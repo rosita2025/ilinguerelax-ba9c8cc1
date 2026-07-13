@@ -67,8 +67,9 @@ const ProductSpanish500Questions = () => {
         canonicalUrl="https://ilinguerelax.com/products/500-questions-in-spanish-with-english-pronunciation"
         image="https://ilinguerelax.com/images/product-spanish-500-questions.png"
         type="product"
-        price={PRICE}
-        originalPrice="40"
+        price={currentPrice.toFixed(2)}
+        originalPrice={String(ORIGINAL_PRICE)}
+
         rating="4.8"
         reviewCount="0"
         sku="SPANISH-500-QUESTIONS"

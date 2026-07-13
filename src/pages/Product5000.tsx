@@ -66,9 +66,6 @@ const product5000Image = productoPrincipalInglesRelax;
 // Bonus images (5 regalos)
 import bonus1Estructuras from "@/assets/bonus-1-estructuras-gramaticas.webp";
 import bonus2Verbos from "@/assets/bonus-2-1000-verbos-esenciales.webp";
-import bonus3Frases from "@/assets/bonus-3-100-frases-nativos.webp";
-import bonus4Preguntas from "@/assets/bonus-4-500-preguntas-frecuentes.webp";
-import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
 
 // About section image
 import aboutIlingueRelax from "@/assets/about-ilingue-relax.webp";

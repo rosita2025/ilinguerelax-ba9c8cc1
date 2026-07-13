@@ -326,6 +326,7 @@ const ProductDynamic = () => {
         );
       })()}
     </>
+  );
 };
 
 export default ProductDynamic;

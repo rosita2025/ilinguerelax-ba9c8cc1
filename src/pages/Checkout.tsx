@@ -300,7 +300,7 @@ export default function Checkout() {
       </header>
 
       <div className="lg:hidden max-w-6xl mx-auto px-3 sm:px-4 pt-3">
-        <OrderSummary collapsible locked={!!catalogItem} />
+        <OrderSummary collapsible />
       </div>
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
@@ -335,7 +335,7 @@ export default function Checkout() {
         </div>
 
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
-          <OrderSummary locked={!!catalogItem} />
+          <OrderSummary />
         </aside>
       </div>
 

@@ -16,6 +16,7 @@ import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
 
 import { BrevoChatToggle } from "@/components/BrevoChatToggle";
 import { AutoTranslate } from "@/components/AutoTranslate";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 
 const Products = lazy(() => import("./pages/Products"));
 const Product5000 = lazy(() => import("./pages/Product5000"));
@@ -167,15 +168,16 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <CartSyncWrapper>
-              <RouteTracker />
-              <AutoTranslate />
-              <BrevoChatToggle />
-              <CookieConsent />
-              <EmailSubscribePopup />
-              
-              <Suspense fallback={<PageFallback />}>
-                <Routes>
+            <AppErrorBoundary>
+              <CartSyncWrapper>
+                <RouteTracker />
+                <AutoTranslate />
+                <BrevoChatToggle />
+                <CookieConsent />
+                <EmailSubscribePopup />
+                
+                <Suspense fallback={<PageFallback />}>
+                  <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/products" element={<Products />} />
                   <Route path="/aprender" element={<LearnCategory />} />
@@ -250,9 +252,10 @@ const App = () => (
                   <Route path="/products/:slug" element={<ProductDynamic />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </CartSyncWrapper>
+                  </Routes>
+                </Suspense>
+              </CartSyncWrapper>
+            </AppErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

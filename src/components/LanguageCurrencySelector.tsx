@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Globe } from "lucide-react";
 import { CampaignCurrency } from "@/hooks/useCampaignPrice";
+import { detectCountryByIp as detectGeoCountry } from "@/lib/geoDetection";
 
 type CountryOption = {
   code: string;
@@ -99,17 +100,9 @@ let inflightIpDetection: Promise<string | null> | null = null;
 async function detectCountryByIp(): Promise<string | null> {
   if (inflightIpDetection) return inflightIpDetection;
   inflightIpDetection = (async () => {
-    for (const url of ["https://ipwho.is/", "https://ipwho.is/"]) {
-      try {
-        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-        if (!res.ok) continue;
-        const data = await res.json();
-        if (data?.error || data?.success === false) continue;
-        const country = (data.country_code || data.country || "").toString().toUpperCase();
-        if (country && COUNTRIES.some((c) => c.code === country)) return country;
-      } catch { /* try next */ }
-    }
-    return null;
+    const detected = await detectGeoCountry({ fallbackCountry: "US" });
+    const country = detected?.countryCode;
+    return country && COUNTRIES.some((c) => c.code === country) ? country : "US";
   })();
   return inflightIpDetection;
 }

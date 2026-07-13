@@ -295,13 +295,14 @@ const Product500Preguntas = () => {
       <Footer />
 
       <StickyBuyBar
-        price={campaign.price}
-        originalPrice={campaign.originalPrice}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
         productName="INGLÉS RELAX - 500 Preguntas en Inglés (Digital PDF)"
         rating={4.7}
         reviewCount={280}
         showReviews={true}
-        buyUrl={pricing.hotmartUrl || HOTMART_URL}
+        currencyCode={tier.currencyCode}
+        buyUrl={tier.useHotmartLatam ? (tier.hotmartUrl || HOTMART_URL) : CHECKOUT_PATH}
         onBuyClick={handleBuy}
       />
 

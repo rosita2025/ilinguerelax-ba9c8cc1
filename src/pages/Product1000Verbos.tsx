@@ -51,15 +51,15 @@ const features = [
 
 const Product1000Verbos = () => {
   const pricing = useAdminPricing(ADMIN_SKU_1000_VERBOS);
-  const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const pricingReady = pricing.loaded && currentPrice > 0;
-  const campaign = useCampaignPrice(currentPrice, 54);
+  const tier = useCountryTierRouting(ADMIN_SKU_1000_VERBOS, { fallbackHotmartUrl: HOTMART_URL, originalMultiplier: 2.5 });
+  const currentPrice = tier.priceUsd;
+  const pricingReady = tier.loaded;
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const { country } = useRegionTier();
-  const isPeru = country === "PE";
-  const cartItem = { ...CART_ITEM_BASE, price: currentPrice, pricePen: pricing.pricePen ?? undefined };
+  const isPeru = tier.isPeru;
+  const cartItem = { ...CART_ITEM_BASE, price: currentPrice, pricePen: tier.pricePen ?? undefined };
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",

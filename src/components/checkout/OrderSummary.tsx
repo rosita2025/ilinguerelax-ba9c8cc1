@@ -94,7 +94,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   {item.description && (
                     <p className="text-xs text-muted-foreground truncate">{item.description}</p>
                   )}
-                  {!locked && (
+                  {!locked && item.id !== mainProductId && (
                     <div className="flex items-center justify-end mt-1.5">
                       <Button
                         type="button"

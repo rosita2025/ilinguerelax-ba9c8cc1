@@ -139,6 +139,31 @@ export const StickyBuyBar = ({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Publish the sticky bar's real height as a CSS variable so floating
+  // buttons (WhatsApp, ScrollToTop) can position themselves safely above it
+  // and never overlap — regardless of email form, product name length, etc.
+  const barRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = barRef.current;
+    const root = document.documentElement;
+    const setVar = (h: number) => {
+      root.style.setProperty("--sticky-bar-h", `${Math.round(h)}px`);
+    };
+    if (!el) {
+      setVar(0);
+      return () => root.style.removeProperty("--sticky-bar-h");
+    }
+    setVar(el.getBoundingClientRect().height);
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) setVar(entry.contentRect.height);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--sticky-bar-h");
+    };
+  }, [dismissed]);
+
   // When the price changes (e.g. user selects a different bundle), pop the bar
   // open and flash it so they see the new total immediately.
   useEffect(() => {

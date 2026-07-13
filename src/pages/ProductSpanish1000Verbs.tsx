@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
+
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
@@ -160,8 +162,28 @@ const ProductSpanish1000Verbs = () => {
       </section>
 
       <Footer />
+
+      <StickyBuyBar
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
+        currencyCode={tier.currencyCode}
+        productName="1,000 Verbs in Spanish — Past, Present & Future"
+        rating={4.8}
+        reviewCount={0}
+        showReviews={false}
+        buyUrl={useTiendaOnly ? TIENDA_PATH : (tier.hotmartUrl || "#")}
+        onBuyClick={handleBuyNow}
+        ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
+        lang="en"
+        calmMode
+        dismissible
+      />
+
+      <div className="h-20 md:h-16" />
+
       <WhatsAppButton />
       <ScrollToTop showAfter={500} />
+
     </main>
   );
 };

@@ -14,6 +14,8 @@ export const EmailSubscribePopup = () => {
   const [name, setName] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const COUPON = "NEW10";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -50,9 +52,8 @@ export const EmailSubscribePopup = () => {
         body: { email: email.trim(), name: name.trim() || undefined, source: "popup" },
       });
       if (error) throw error;
-      toast.success("¡Gracias! Te hemos suscrito ✨");
       try { localStorage.setItem(STORAGE_KEY, "subscribed"); } catch {}
-      setOpen(false);
+      setSuccess(true);
     } catch (err) {
       console.error(err);
       toast.error("No se pudo suscribir. Intenta de nuevo.");
@@ -74,68 +75,104 @@ export const EmailSubscribePopup = () => {
           <X className="w-4 h-4" />
         </button>
 
-        <div className="bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6 pb-4 text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mb-3">
-            <Gift className="w-6 h-6 text-primary" />
+        {success ? (
+          <div className="p-6 text-center space-y-4">
+            <div className="mx-auto w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center">
+              <Gift className="w-7 h-7 text-primary" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground">¡Listo! 🎉</h3>
+            <p className="text-sm text-muted-foreground">
+              Tu cupón del <strong>10% de descuento</strong>:
+            </p>
+            <div className="flex items-center justify-center gap-2">
+              <code className="px-4 py-2.5 rounded-lg bg-primary/10 border-2 border-dashed border-primary text-primary font-bold text-lg tracking-widest">
+                {COUPON}
+              </code>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard?.writeText(COUPON);
+                  toast.success("Cupón copiado");
+                }}
+              >
+                Copiar
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Úsalo al finalizar tu compra en el checkout.
+            </p>
+            <Button onClick={() => setOpen(false)} className="w-full">
+              Empezar a comprar
+            </Button>
           </div>
-          <h3 className="text-xl font-bold text-foreground">
-            Recibe recursos gratis 🎁
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1.5">
-            Suscríbete y recibe consejos, ofertas exclusivas y descuentos en tus productos favoritos.
-          </p>
-        </div>
+        ) : (
+          <>
+            <div className="bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6 pb-4 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mb-3">
+                <Gift className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground">
+                10% de descuento 🎁
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1.5">
+                Suscríbete y recibe un <strong>cupón del 10%</strong> para tu primera compra en ILINGUE RELAX.
+              </p>
+            </div>
 
-        <form onSubmit={submit} className="p-6 pt-4 space-y-3">
-          <Input
-            type="text"
-            placeholder="Tu nombre (opcional)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={120}
-            disabled={loading}
-          />
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="email"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              className="pl-9"
-            />
-          </div>
+            <form onSubmit={submit} className="p-6 pt-4 space-y-3">
+              <Input
+                type="text"
+                placeholder="Tu nombre (opcional)"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={120}
+                disabled={loading}
+              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="email"
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="pl-9"
+                />
+              </div>
 
-          <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={accepted}
-              onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-0.5 accent-primary"
-              disabled={loading}
-            />
-            <span>
-              Acepto recibir emails de <strong>ILINGUE RELAX</strong> con ofertas y contenido educativo. Puedo darme de baja cuando quiera.
-            </span>
-          </label>
+              <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={accepted}
+                  onChange={(e) => setAccepted(e.target.checked)}
+                  className="mt-0.5 accent-primary"
+                  disabled={loading}
+                />
+                <span>
+                  Acepto recibir emails de <strong>ILINGUE RELAX</strong> con ofertas y contenido educativo. Puedo darme de baja cuando quiera.
+                </span>
+              </label>
 
-          <Button
-            type="submit"
-            disabled={loading || !accepted}
-            className="w-full"
-          >
-            {loading ? "Enviando..." : "Suscribirme gratis"}
-          </Button>
-          <button
-            type="button"
-            onClick={dismiss}
-            className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            No, gracias
-          </button>
-        </form>
+              <Button
+                type="submit"
+                disabled={loading || !accepted}
+                className="w-full"
+              >
+                {loading ? "Enviando..." : "Obtener mi 10% de descuento"}
+              </Button>
+              <button
+                type="button"
+                onClick={dismiss}
+                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                No, gracias
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );

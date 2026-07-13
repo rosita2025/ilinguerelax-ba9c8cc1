@@ -313,13 +313,14 @@ const Product1000Verbos = () => {
       <Footer />
 
       <StickyBuyBar
-        price={campaign.price}
-        originalPrice={campaign.originalPrice}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
         productName="INGLÉS RELAX - 1,000 Verbos Esenciales (Digital PDF)"
         rating={4.8}
         reviewCount={350}
         showReviews={true}
-        buyUrl={isPeru ? "/checkouts/1000-verbos" : (pricing.hotmartUrl || HOTMART_URL)}
+        currencyCode={tier.currencyCode}
+        buyUrl={tier.useHotmartLatam ? (tier.hotmartUrl || HOTMART_URL) : "/checkouts/1000-verbos"}
         onBuyClick={handleBuy}
       />
 

@@ -228,6 +228,8 @@ Deno.serve(async (req) => {
       // Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
       await pingIndexNow([productUrl(sku)]);
       pingSitemap().catch(() => {});
+      resubmitSitemapsGSC().catch(() => {});
+      inspectUrlGSC(productUrl(sku)).catch(() => {});
       return json({ success: true });
     }
 

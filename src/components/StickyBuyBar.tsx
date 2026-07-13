@@ -148,14 +148,20 @@ export const StickyBuyBar = ({
   }, [price]);
 
   const handleBuy = () => {
-    if (!disabled && !isLoading) {
-      if (onBuyClick) {
-        onBuyClick();
-      } else if (buyUrl) {
-        window.open(buyUrl, "_blank");
-      }
+    if (disabled || isLoading || clickLock) return;
+    // Single-click guard: prevent accidental double navigation that would
+    // open more than one checkout page for the same product.
+    setClickLock(true);
+    setTimeout(() => setClickLock(false), 4000);
+    if (onBuyClick) {
+      onBuyClick();
+    } else if (buyUrl) {
+      window.location.href = buyUrl;
     }
   };
+
+  // Never render on checkout / admin / thank-you routes
+  if (isOnCheckout) return null;
 
   // Render stars with partial fill
   const renderStars = () => {

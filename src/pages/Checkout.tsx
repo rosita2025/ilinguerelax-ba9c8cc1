@@ -12,6 +12,7 @@ import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
+import { MoreProductsPanel } from "@/components/checkout/MoreProductsPanel";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
@@ -358,6 +359,7 @@ export default function Checkout() {
         <div className="space-y-6">
           <BuyerInfoForm />
           {catalogItem?.upsells && <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />}
+          <MoreProductsPanel excludeIds={[catalogItem?.id, catalogItem?.adminSku, ...(catalogItem?.upsells?.map((u) => u.id) ?? [])].filter(Boolean) as string[]} />
           <PaymentMethodsGroup />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

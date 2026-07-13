@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart, Zap, TrendingUp, X } from "lucide-react";
+import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart, Zap, TrendingUp, X, Lock } from "lucide-react";
 
 interface StickyBuyBarProps {
   price: string;
@@ -303,6 +303,15 @@ export const StickyBuyBar = ({
             </div>
           ) : (
             <div className="flex flex-col gap-1.5 w-full">
+              {/* Prominent 100% secure payment badge above CTA */}
+              {!disabled && (
+                <div className="flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-md ring-1 ring-emerald-400/50">
+                    <Lock className="w-3 h-3" />
+                    {lang === "en" ? "100% Secure Payment" : "Pago 100% Seguro"}
+                  </span>
+                </div>
+              )}
               <Button
                 type="button"
                 size="default"
@@ -421,8 +430,9 @@ export const StickyBuyBar = ({
               )}
             </div>
 
-            {/* Buy Button */}
-            <Button
+            {/* Buy Button with 100% secure badge */}
+            <div className="flex flex-col items-center gap-1">
+              <Button
               size="default"
               className={`whitespace-nowrap h-14 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_6px_24px_rgba(16,185,129,0.5)] text-base px-8 font-extrabold tracking-wide transition-all hover:scale-[1.03] active:scale-[0.98] ${pulse ? 'ring-4 ring-emerald-400/40 scale-[1.02]' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
               onClick={handleBuy}
@@ -442,7 +452,14 @@ export const StickyBuyBar = ({
                     {disabled && <Clock className="w-5 h-5 ml-2" />}
                 </>
               )}
-            </Button>
+              </Button>
+              {!disabled && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                  <Lock className="w-3 h-3" />
+                  {lang === "en" ? "100% Secure Payment" : "Pago 100% Seguro"}
+                </span>
+              )}
+            </div>
             {secondaryCtaText && onSecondaryClick && (
               <Button
                 size="default"

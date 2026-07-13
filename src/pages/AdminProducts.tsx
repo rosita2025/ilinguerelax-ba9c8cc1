@@ -63,6 +63,29 @@ const AdminProducts = () => {
 
   useEffect(() => { void load(); /* eslint-disable-next-line */ }, [adminKey]);
 
+  // Sanity: warn si un producto activo no tiene entrada en CHECKOUT_CATALOG
+  // (para que /checkouts/:slug funcione con slug corto). ProductDynamic también
+  // acepta el sku completo como slug, pero conviene registrar el alias.
+  useEffect(() => {
+    if (!products.length) return;
+    (async () => {
+      try {
+        const mod = await import("@/config/checkoutCatalog");
+        const knownSkus = new Set(
+          Object.values(mod.CHECKOUT_CATALOG)
+            .map((c) => c.adminSku)
+            .filter(Boolean) as string[],
+        );
+        const missing = products
+          .filter((p) => p.active && !knownSkus.has(p.sku))
+          .map((p) => p.sku);
+        if (missing.length) {
+          console.warn("[CHECKOUT_CATALOG] Productos activos sin alias corto en catalogo:", missing);
+        }
+      } catch { /* ignore */ }
+    })();
+  }, [products]);
+
   const toggle = async (sku: string, active: boolean) => {
     try {
       const { error } = await supabase.functions.invoke("manage-products", {

@@ -29,7 +29,7 @@ const features = [
 ];
 
 const ADMIN_SKU = "1-000-verbs-in-spanish-past-present-future-with-english-pronunciation";
-const TIENDA_PATH = "/checkouts/1000-verbos";
+const TIENDA_PATH = "/checkouts/1000-verbs-spanish";
 
 const ProductSpanish1000Verbs = () => {
   const navigate = useNavigate();

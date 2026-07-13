@@ -1,24 +1,85 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
+import { supabase } from "@/integrations/supabase/client";
 import { useCardPrice } from "@/hooks/useCardPrice";
 
-const COREANO_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
+interface LaunchProduct {
+  sku: string;
+  name: string;
+  description: string | null;
+  cover_image_url: string | null;
+  target_language: string;
+}
+
+const FLAG: Record<string, string> = {
+  es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",
+  de: "🇩🇪", it: "🇮🇹", ja: "🇯🇵", nl: "🇳🇱",
+};
+const LANG_NAME: Record<string, string> = {
+  es: "Español", en: "Inglés", fr: "Francés", pt: "Portugués", ko: "Coreano",
+  de: "Alemán", it: "Italiano", ja: "Japonés", nl: "Neerlandés",
+};
+
+const FALLBACK: LaunchProduct = {
+  sku: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
+  name: "Aprende coreano con +100 Mapas Mentales",
+  description: "Método visual y natural conectado con k-dramas, K-pop y cultura coreana. Desde cero (A1) hasta nivel avanzado.",
+  cover_image_url: coverAsset.url,
+  target_language: "ko",
+};
 
 export const CoreanoLaunchBanner = () => {
   const cardPrice = useCardPrice();
+  const [product, setProduct] = useState<LaunchProduct>(FALLBACK);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const { data } = await supabase
+        .from("digital_products")
+        .select("sku, name, description, cover_image_url, target_language, created_at")
+        .eq("active", true)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (!cancelled && data && data.length > 0) {
+        setProduct(data[0] as LaunchProduct);
+      }
+    };
+    load();
+
+    // Realtime: any change to digital_products refreshes the banner.
+    const channel = supabase
+      .channel("launch-banner-products")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "digital_products" },
+        () => load(),
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const flag = FLAG[product.target_language] ?? "🌟";
+  const langName = LANG_NAME[product.target_language] ?? "idioma";
+
   return (
     <section className="py-10 md:py-14 bg-gradient-to-br from-primary/5 via-background to-accent/10">
       <div className="container mx-auto px-4">
         <Link
-          to="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
+          to={`/products/${product.sku}`}
           className="group block rounded-2xl border border-primary/20 bg-card shadow-lg hover:shadow-xl transition-all overflow-hidden"
         >
           <div className="grid md:grid-cols-2 gap-0 items-center">
             <div className="relative aspect-[4/3] md:aspect-auto md:h-full overflow-hidden bg-muted">
               <img
-                src={coverAsset.url}
-                alt="Coreano Sin Complicaciones · 100 Mapas Mentales"
+                src={product.cover_image_url || coverAsset.url}
+                alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
@@ -28,16 +89,18 @@ export const CoreanoLaunchBanner = () => {
             </div>
 
             <div className="p-6 md:p-8 space-y-3">
-              <p className="text-sm font-semibold text-primary">🇰🇷 Coreano Sin Complicaciones</p>
+              <p className="text-sm font-semibold text-primary">{flag} Nuevo en {langName}</p>
               <h2 className="text-2xl md:text-3xl font-bold text-balance">
-                Aprende coreano con <span className="text-gradient">+100 Mapas Mentales</span>
+                {product.name}
               </h2>
-              <p className="text-muted-foreground text-pretty">
-                Método visual y natural conectado con k-dramas, K-pop y cultura coreana. Desde cero (A1) hasta nivel avanzado.
-              </p>
+              {product.description && (
+                <p className="text-muted-foreground text-pretty line-clamp-3">
+                  {product.description}
+                </p>
+              )}
               <div className="flex items-center gap-3 pt-2 flex-wrap">
-                <span className="text-3xl font-bold text-primary">{cardPrice.format(COREANO_SKU, 10)}</span>
-                <span className="text-sm text-muted-foreground">{cardPrice.currencyLabel(COREANO_SKU)} · pago único</span>
+                <span className="text-3xl font-bold text-primary">{cardPrice.format(product.sku, 10)}</span>
+                <span className="text-sm text-muted-foreground">{cardPrice.currencyLabel(product.sku)} · pago único</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
               </div>
               <div className="inline-flex items-center gap-2 text-primary font-semibold pt-2 group-hover:gap-3 transition-all">

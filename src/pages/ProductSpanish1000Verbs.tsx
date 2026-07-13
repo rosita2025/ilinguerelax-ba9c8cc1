@@ -1,4 +1,5 @@
 import { useCartStore } from "@/stores/cartStore";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -8,11 +9,11 @@ import { motion } from "framer-motion";
 import { Sparkles, ShoppingCart, Star, Check, Shield } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 const productImage = "/images/product-spanish-1000-verbs.png";
-const PRICE_FALLBACK = 12;
+const ORIGINAL_PRICE = 54;
 
 const features = [
   "1,000 essential Spanish verbs",
@@ -25,21 +26,39 @@ const features = [
   "Lifetime access",
 ];
 
+const ADMIN_SKU = "1-000-verbs-in-spanish-past-present-future-with-english-pronunciation";
+const TIENDA_PATH = "/checkouts/1000-verbos";
+
 const ProductSpanish1000Verbs = () => {
   const navigate = useNavigate();
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
-  const pricing = useAdminPricing("1-000-verbs-in-spanish-past-present-future-with-english-pronunciation");
-  const currentPrice = pricing.priceGlobalUsd ?? 0;
-  const pricingReady = pricing.loaded && currentPrice > 0;
-  const campaign = useCampaignPrice(currentPrice, 54);
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, { tiendaPath: TIENDA_PATH });
+  const currentPrice = tier.priceUsd;
+  const pricingReady = tier.loaded;
+  const { useTiendaOnly, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
 
   const handleBuyNow = () => {
     if (!pricingReady) return;
-    // Route directly to internal checkout — Shopify is intentionally bypassed here
-    // to avoid the phantom "Spanish Relax - 1,000 Verbs in Spanish" line item.
-    setDrawerOpen(false);
-    navigate("/checkouts/1000-verbos");
+    if (useTiendaOnly) {
+      addItem({
+        id: "1000-verbos-spanish",
+        name: pricing.name ?? "1,000 Verbs in Spanish (Digital PDF)",
+        price: currentPrice,
+        pricePen: pricePen ?? undefined,
+        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+        image: productImage,
+        description: "1,000 Spanish verbs conjugated in past, present & future",
+        quantity: 1,
+      });
+      setDrawerOpen(false);
+      navigate(TIENDA_PATH);
+    } else if (tier.hotmartUrl) {
+      window.open(tier.hotmartUrl, "_blank", "noopener,noreferrer");
+    }
   };
+
 
   return (
     <main className="min-h-screen bg-background">

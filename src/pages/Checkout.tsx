@@ -16,6 +16,7 @@ import { getCatalogItem, CHECKOUT_CATALOG, type CatalogItem } from "@/config/che
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
+import { getStripe } from "@/lib/stripe";
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();

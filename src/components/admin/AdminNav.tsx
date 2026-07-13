@@ -10,7 +10,6 @@ const tabs = [
   { to: "/admin/funnel", label: "Funnel", icon: BarChart3 },
   { to: "/admin/seo", label: "SEO", icon: Search },
   { to: "/admin/bots", label: "Bots", icon: Shield },
-  { to: "/admin/email-templates", label: "Plantillas", icon: Mail },
 ];
 
 export const AdminNav = () => {

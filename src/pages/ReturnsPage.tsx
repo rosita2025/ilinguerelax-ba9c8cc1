@@ -198,6 +198,12 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
         content:
           "Os livros físicos são vendidos e enviados pela Amazon, e sua política de devolução permite reembolso em até 30 dias após a entrega. Aplica-se a livros danificados, extraviados, defeituosos ou que não atendam às suas expectativas. Devoluções e reembolsos são gerenciados e garantidos diretamente pela Amazon sob sua responsabilidade.",
       },
+      {
+        icon: RefreshCw,
+        title: "Troca de produto sem custo adicional",
+        content:
+          "Se preferir não solicitar reembolso, você pode trocar sua compra por outro produto digital de valor igual ou inferior sem custo adicional. Se o novo produto for mais caro, você paga apenas a diferença. Esta opção se aplica desde que o pedido cumpra as condições da plataforma de compra correspondente.",
+      },
     ],
     amazonTitle: "Solicite sua devolução na Amazon",
     amazonText:

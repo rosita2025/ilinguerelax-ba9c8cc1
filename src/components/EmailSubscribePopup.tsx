@@ -52,9 +52,8 @@ export const EmailSubscribePopup = () => {
         body: { email: email.trim(), name: name.trim() || undefined, source: "popup" },
       });
       if (error) throw error;
-      toast.success("¡Gracias! Te hemos suscrito ✨");
       try { localStorage.setItem(STORAGE_KEY, "subscribed"); } catch {}
-      setOpen(false);
+      setSuccess(true);
     } catch (err) {
       console.error(err);
       toast.error("No se pudo suscribir. Intenta de nuevo.");

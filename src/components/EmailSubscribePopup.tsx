@@ -14,6 +14,8 @@ export const EmailSubscribePopup = () => {
   const [name, setName] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const COUPON = "NEW10";
 
   useEffect(() => {
     if (typeof window === "undefined") return;

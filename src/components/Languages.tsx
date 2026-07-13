@@ -162,14 +162,26 @@ export const Languages = () => {
 
   const c = content[language];
 
+  // Merge static products with admin (DB) products, dedup by slug. Admin wins.
+  const merged: Product[] = useMemo(() => {
+    const map = new Map<string, Product>();
+    products.forEach((p) => map.set(p.slug, p));
+    adminItems.forEach((p) => {
+      const existing = map.get(p.slug);
+      // Prefer static entry's rich metadata (image, discount, features) but pull in new DB-only products.
+      if (!existing) map.set(p.slug, p);
+    });
+    return Array.from(map.values());
+  }, [adminItems]);
+
   // Filter by selected format first, then group by language
   const grouped = useMemo(() => {
     const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], korean: [], soon: [] };
-    products
+    merged
       .filter((p) => (activeFormat === "physical" ? p.isPhysical : !p.isPhysical))
       .forEach((p) => g[getProductLangKey(p)].push(p));
     return g;
-  }, [activeFormat]);
+  }, [activeFormat, merged]);
 
   const tabs: { key: LangKey; flag: string }[] = [
     { key: "english", flag: "🇬🇧" },

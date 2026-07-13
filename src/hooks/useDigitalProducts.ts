@@ -56,14 +56,18 @@ function toProduct(p: DBProduct): Product {
   };
 }
 
-/** Fetches active products from the admin panel (digital_products table). */
+/** Fetches active products from the admin panel (digital_products table).
+ *  Auto-refreshes on mount, on tab focus, and on realtime changes so that
+ *  edits made in /admin/products propagate to the homepage and /products
+ *  without a manual redeploy. */
 export function useDigitalProducts() {
   const [items, setItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+
+    const fetchAll = async () => {
       const { data, error } = await supabase
         .from("digital_products")
         .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, sort_order")
@@ -72,8 +76,32 @@ export function useDigitalProducts() {
       if (cancelled) return;
       if (!error && data) setItems((data as DBProduct[]).map(toProduct));
       setLoading(false);
-    })();
-    return () => { cancelled = true; };
+    };
+
+    fetchAll();
+
+    // Refetch when the tab regains focus (covers reload-in-background & admin edits in another tab).
+    const onFocus = () => { fetchAll(); };
+    const onVisible = () => { if (document.visibilityState === "visible") fetchAll(); };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+
+    // Live-refresh via Supabase realtime whenever the admin edits a product.
+    const channel = supabase
+      .channel("digital_products_public_feed")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "digital_products" },
+        () => { fetchAll(); }
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return { items, loading };

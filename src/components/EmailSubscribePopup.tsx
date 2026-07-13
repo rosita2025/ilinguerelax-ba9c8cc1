@@ -5,8 +5,43 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const STORAGE_KEY = "ilr_newsletter_popup_v1";
+const STORAGE_KEY = "ilr_newsletter_popup_v2";
+const COOKIE_KEY = "ilr_newsletter_popup";
 const DELAY_MS = 15000; // 15s
+// Configurable TTLs (days)
+const DISMISS_TTL_DAYS = 7;      // "cerrar" → no vuelve por 7 días
+const SUBSCRIBED_TTL_DAYS = 365; // ya suscrito → no vuelve por 1 año
+
+type PopupState = { status: "dismissed" | "subscribed"; until: number };
+
+function readState(): PopupState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as PopupState;
+      if (parsed?.until && parsed.until > Date.now()) return parsed;
+      if (parsed?.until && parsed.until <= Date.now()) localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {}
+  try {
+    const m = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_KEY}=([^;]+)`));
+    if (m) {
+      const parsed = JSON.parse(decodeURIComponent(m[1])) as PopupState;
+      if (parsed?.until && parsed.until > Date.now()) return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+function writeState(status: "dismissed" | "subscribed", ttlDays: number) {
+  const until = Date.now() + ttlDays * 24 * 60 * 60 * 1000;
+  const payload: PopupState = { status, until };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch {}
+  try {
+    const expires = new Date(until).toUTCString();
+    document.cookie = `${COOKIE_KEY}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expires}; path=/; SameSite=Lax`;
+  } catch {}
+}
 
 export const EmailSubscribePopup = () => {
   const [open, setOpen] = useState(false);
@@ -19,10 +54,7 @@ export const EmailSubscribePopup = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === "subscribed" || saved === "dismissed") return;
-    } catch {}
+    if (readState()) return;
     // Skip on admin/checkout/success/thank-you pages
     const p = window.location.pathname.toLowerCase();
     const BLOCKED = ["/admin", "/checkout", "/checkouts", "/pago", "/pagos", "/pay", "/success", "/gracias", "/thank", "/descarga", "/order"];
@@ -34,7 +66,7 @@ export const EmailSubscribePopup = () => {
 
   const dismiss = () => {
     setOpen(false);
-    try { localStorage.setItem(STORAGE_KEY, "dismissed"); } catch {}
+    writeState("dismissed", DISMISS_TTL_DAYS);
   };
 
   const submit = async (e: React.FormEvent) => {

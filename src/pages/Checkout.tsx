@@ -182,13 +182,13 @@ export default function Checkout() {
         adminSku: data.sku,
         upsells: upsells ?? undefined,
         ...(pricePen != null && { pricePen }),
-        ...((priceLatam != null || priceTienda != null || staticItem?.regionPrices) && {
-          regionPrices: {
-            latam: priceLatam ?? staticItem?.regionPrices?.latam ?? priceGlobal,
-            global: priceGlobal,
-            tienda: priceTienda ?? staticItem?.regionPrices?.tienda,
-          },
-        }),
+        // Always emit regionPrices so any region resolves to a valid price,
+        // even for brand-new admin products that only have price_usd set.
+        regionPrices: {
+          latam: priceLatam ?? staticItem?.regionPrices?.latam ?? priceGlobal,
+          global: priceGlobal,
+          tienda: priceTienda ?? staticItem?.regionPrices?.tienda ?? priceGlobal,
+        },
       } as CatalogItem);
       setDbMissing(false);
       setLoadingDb(false);
@@ -280,13 +280,13 @@ export default function Checkout() {
         <div className="max-w-md text-center space-y-4">
           <h1 className="text-2xl font-bold">Producto no encontrado</h1>
           <p className="text-muted-foreground">
-            El producto <code className="px-1.5 py-0.5 rounded bg-muted">{slug}</code> no existe en el catálogo.
+            El producto <code className="px-1.5 py-0.5 rounded bg-muted">{slug}</code> no está activo en el catálogo.
           </p>
           <p className="text-xs text-muted-foreground">
-            Slugs disponibles: {Object.keys(CHECKOUT_CATALOG).join(", ")}
+            Verifica que exista en <code>/admin/products</code> y que esté marcado como <strong>activo</strong>. El SKU del admin debe coincidir con la URL <code>/checkouts/&lt;sku&gt;</code>.
           </p>
-          <Link to="/" className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium">
-            Volver al inicio
+          <Link to="/products" className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium">
+            Ver todos los productos
           </Link>
         </div>
       </div>

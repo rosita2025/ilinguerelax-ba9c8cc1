@@ -66,9 +66,6 @@ const product5000Image = productoPrincipalInglesRelax;
 // Bonus images (5 regalos)
 import bonus1Estructuras from "@/assets/bonus-1-estructuras-gramaticas.webp";
 import bonus2Verbos from "@/assets/bonus-2-1000-verbos-esenciales.webp";
-import bonus3Frases from "@/assets/bonus-3-100-frases-nativos.webp";
-import bonus4Preguntas from "@/assets/bonus-4-500-preguntas-frecuentes.webp";
-import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
 
 // About section image
 import aboutIlingueRelax from "@/assets/about-ilingue-relax.webp";
@@ -160,27 +157,6 @@ const bonuses = [
     description:
       "Los 1,000 verbos más usados en inglés conjugados en presente, pasado y futuro con pronunciación adaptada para hispanohablantes.",
     image: bonus2Verbos,
-  },
-  {
-    icon: Sparkles,
-    title: "Regalo 3: 100 Frases Más Usadas por Nativos",
-    description:
-      "Las expresiones reales que usan los nativos todos los días para que hables como un local desde el principio.",
-    image: bonus3Frases,
-  },
-  {
-    icon: Globe,
-    title: "Regalo 4: 500 Preguntas Frecuentes en Inglés",
-    description:
-      "Las preguntas más comunes que necesitas dominar para conversaciones reales: trabajo, viajes y vida diaria.",
-    image: bonus4Preguntas,
-  },
-  {
-    icon: BookOpen,
-    title: "Regalo 5: Cómo Estudiar Inglés en 6 Meses",
-    description:
-      "Tu plan paso a paso para hablar inglés con confianza en solo 6 meses, sin perder tiempo ni motivación.",
-    image: bonus5Estudiar,
   },
 ];
 const chapters = [
@@ -474,7 +450,7 @@ const Product5000 = () => {
                   className="inline-flex items-center gap-1 px-2.5 py-1 md:px-4 md:py-2 rounded-full bg-accent/10 text-accent text-[11px] md:text-sm font-medium whitespace-nowrap"
                 >
                   <Gift className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>5 Regalos Gratis</span>
+                  <span>2 Regalos Gratis</span>
                 </motion.div>
               </div>
 
@@ -702,7 +678,7 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* 4 Bonus GRATIS Section */}
+      {/* 2 Bonus GRATIS Section */}
       <section className="py-10 md:py-14 bg-gradient-to-b from-accent/5 to-background">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
@@ -712,7 +688,7 @@ const Product5000 = () => {
                 INCLUIDOS GRATIS • LATINOAMÉRICA
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                5 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
+                2 Regalos Gratis Incluidos al Comprar el Libro Inglés Relax
               </h2>
               <p className="text-sm md:text-base text-muted-foreground mt-2">
                 Paga con <span className="font-bold text-foreground">tarjeta</span>, transferencia o efectivo en tu moneda local.
@@ -780,7 +756,7 @@ const Product5000 = () => {
           "Pronunciación ES",
           "Fonética UK/USA",
           "Descarga inmediata",
-          "4 Bonus GRATIS",
+          "2 Bonus GRATIS",
         ]}
         ctaText={`COMPRAR AHORA | ${safePriceLabel}`}
         onBuy={handleBuy}

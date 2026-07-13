@@ -291,8 +291,8 @@ const ProductSpanish5000Digital = () => {
               {/* Price block */}
               <div className="p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-3 flex-wrap">
-                  <span className="text-4xl md:text-5xl font-black text-foreground">${currentPrice}</span>
-                  <span className="text-xl text-muted-foreground line-through mb-1">${ORIGINAL_PRICE}</span>
+                  <span className="text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
+                  <span className="text-xl text-muted-foreground line-through mb-1">{tier.originalLabel}</span>
                   <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">
                     SAVE {DISCOUNT_PCT}%
                   </span>
@@ -302,13 +302,14 @@ const ProductSpanish5000Digital = () => {
                 </p>
                 <Button
                   onClick={handleBuyNow}
-                  disabled={isRedirecting}
+                  disabled={isRedirecting || !pricingReady}
                   size="lg"
                   className="mt-4 w-full h-14 text-base font-black shadow-hero"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — $${currentPrice}`}
+                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — ${tier.priceLabel}`}
                 </Button>
+
                 <Button
                   onClick={handleAddToCart}
                   variant="outline"

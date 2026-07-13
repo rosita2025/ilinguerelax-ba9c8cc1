@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { products, comingSoonLanguages, getProductLink, type Product } from "@/data/products";
 import { useI18n } from "@/i18n/I18nContext";
 import { useCardPrice } from "@/hooks/useCardPrice";
+import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
 
 type LangKey = "english" | "spanish" | "portuguese" | "korean" | "soon";

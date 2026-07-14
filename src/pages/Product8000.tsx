@@ -659,6 +659,8 @@ const Product8000 = () => {
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
+        currencyCode={tier.currencyCode}
+        flag={tier.isPeru ? "🇵🇪" : undefined}
         rating={4.9}
         reviewCount={10000}
         ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${tier.priceLabel}` : `COMPRAR EN HOTMART · ${tier.priceLabel}`}

@@ -317,6 +317,7 @@ const AdminEmailTest = () => {
   };
   const problemCount = useMemo(() => rows.filter((r) => !validateRow(r).ok).length, [rows]);
 
+  const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir(key === "date" ? "desc" : "asc"); }
   };
@@ -325,6 +326,7 @@ const AdminEmailTest = () => {
     const q = query.trim().toLowerCase();
     let list = rows.filter((r) => {
       if (sourceFilter !== "all" && r.source !== sourceFilter) return false;
+      if (onlyProblems && validateRow(r).ok) return false;
       if (!q) return true;
       return (
         r.order_ref.toLowerCase().includes(q) ||

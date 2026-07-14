@@ -7,9 +7,9 @@ export type Language = "es" | "en" | "fr" | "pt";
 export type Currency =
   | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
   | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
-  | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "PYG" | "UYU" | "HTG" | "VES"
+  | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "NIO" | "CUP" | "PYG" | "UYU" | "HTG" | "VES"
   | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
-  | "JPY" | "KRW" | "CNY" | "INR";
+  | "JPY" | "KRW" | "CNY" | "INR" | "NZD" | "SGD" | "HKD" | "TWD";
 
 export const translations = {
   es,
@@ -119,18 +119,18 @@ const countryToCurrency: Record<string, Currency> = {
 
   // Otras principales
   BR: "BRL", MX: "MXN", CO: "COP", AR: "ARS", CA: "CAD", VE: "VES",
-  AU: "AUD", NZ: "AUD", PE: "PEN",
+  AU: "AUD", NZ: "NZD", PE: "PEN",
 
   // LATAM Hotmart (moneda local)
   CL: "CLP", BO: "BOB", CR: "CRC", DO: "DOP",
-  GT: "GTQ", HN: "HNL", PY: "PYG", UY: "UYU", HT: "HTG",
+  GT: "GTQ", HN: "HNL", NI: "NIO", CU: "CUP", PY: "PYG", UY: "UYU", HT: "HTG",
 
   // Europa fuera Eurozona
   CH: "CHF", SE: "SEK", NO: "NOK", DK: "DKK",
   PL: "PLN", CZ: "CZK",
 
   // Asia principal
-  JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR",
+  JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR", SG: "SGD", HK: "HKD", TW: "TWD",
 };
 
 // Currency symbols and formatting
@@ -142,8 +142,9 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   COP: { symbol: "$", position: "before", decimals: 0 },
   ARS: { symbol: "$", position: "before", decimals: 0 },
   GBP: { symbol: "£", position: "before", decimals: 2 },
-  CAD: { symbol: "$", position: "before", decimals: 2 },
+  CAD: { symbol: "C$", position: "before", decimals: 2 },
   AUD: { symbol: "A$", position: "before", decimals: 2 },
+  NZD: { symbol: "NZ$", position: "before", decimals: 2 },
   PEN: { symbol: "S/", position: "before", decimals: 2 },
   CLP: { symbol: "$", position: "before", decimals: 0 },
   BOB: { symbol: "Bs ", position: "before", decimals: 2 },
@@ -151,6 +152,8 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   DOP: { symbol: "RD$", position: "before", decimals: 2 },
   GTQ: { symbol: "Q", position: "before", decimals: 2 },
   HNL: { symbol: "L", position: "before", decimals: 2 },
+  NIO: { symbol: "C$", position: "before", decimals: 2 },
+  CUP: { symbol: "$", position: "before", decimals: 2 },
   PYG: { symbol: "₲", position: "before", decimals: 0 },
   UYU: { symbol: "$U", position: "before", decimals: 2 },
   HTG: { symbol: "G ", position: "before", decimals: 2 },
@@ -165,6 +168,9 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   KRW: { symbol: "₩", position: "before", decimals: 0 },
   CNY: { symbol: "¥", position: "before", decimals: 2 },
   INR: { symbol: "₹", position: "before", decimals: 0 },
+  SGD: { symbol: "S$", position: "before", decimals: 2 },
+  HKD: { symbol: "HK$", position: "before", decimals: 2 },
+  TWD: { symbol: "NT$", position: "before", decimals: 0 },
 };
 
 // Exchange rates from USD (updated May 2026 — approximate)
@@ -178,6 +184,7 @@ export const exchangeRates: Record<Currency, number> = {
   GBP: 0.75,
   CAD: 1.38,
   AUD: 1.55,
+  NZD: 1.65,
   PEN: 3.70,
   CLP: 950,
   BOB: 6.9,
@@ -185,6 +192,8 @@ export const exchangeRates: Record<Currency, number> = {
   DOP: 60,
   GTQ: 7.8,
   HNL: 24.8,
+  NIO: 36.7,
+  CUP: 24,
   PYG: 7300,
   UYU: 40,
   HTG: 132,
@@ -199,6 +208,9 @@ export const exchangeRates: Record<Currency, number> = {
   KRW: 1350,
   CNY: 7.2,
   INR: 84,
+  SGD: 1.35,
+  HKD: 7.8,
+  TWD: 32,
 };
 
 // Detect currency from country

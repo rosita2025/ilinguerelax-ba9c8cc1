@@ -66,9 +66,6 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const initialLang: Language = subCountry
     ? detectLanguageFromCountry(subCountry)
     : (savedLang || "es");
-  const initialCurrency: Currency = subCountry
-    ? detectCurrency(subCountry)
-    : (savedCurrency || "USD");
 
   const [language, setLanguageState] = useState<Language>(initialLang);
   const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
@@ -76,6 +73,11 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     try { return typeof window !== "undefined" ? localStorage.getItem("ilr_country") : null; }
     catch { return null; }
   })();
+  const initialCurrency: Currency = subCountry
+    ? detectCurrency(subCountry)
+    : savedCountry
+      ? detectCurrency(savedCountry)
+      : (savedCurrency || "USD");
   const [countryCode, setCountryCode] = useState<string>(subCountry || savedCountry || "US");
 
   // Detect country in background WITHOUT blocking render
@@ -85,9 +87,6 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       try { localStorage.setItem("ilr_country", subCountry); } catch {}
       return;
     }
-    // Si el usuario ya guardó preferencias manuales, respetarlas.
-    if (savedLang && savedCurrency) return;
-
     const detectCountry = async () => {
       try {
         const detected = await detectCountryByIp({ fallbackCountry: "US" });
@@ -100,10 +99,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
           setLanguageState(detectedLang);
         }
 
-        if (!savedCurrency) {
-          const detectedCurrency = detectCurrency(country);
-          setCurrencyState(detectedCurrency);
-        }
+        const detectedCurrency = detectCurrency(country);
+        setCurrencyState(detectedCurrency);
+        try { localStorage.setItem(CURRENCY_STORAGE_KEY, detectedCurrency); } catch { /* ignore */ }
       } catch (error) {
         setCountryCode("US");
       }

@@ -36,6 +36,13 @@ const COUNTRY_TO_CURRENCY: Record<string, CurrencyInfo> = {
   NI: { code: "NIO", symbol: "C$", rate: 36.7, locale: "es-NI" },
   CU: { code: "CUP", symbol: "$", rate: 24, locale: "es-CU" },
   PR: { code: "USD", symbol: "$", rate: 1, locale: "es-PR" },
+  HT: { code: "HTG", symbol: "G", rate: 132, locale: "fr-HT" },
+  JM: { code: "JMD", symbol: "J$", rate: 158, locale: "en-JM" },
+  TT: { code: "TTD", symbol: "TT$", rate: 6.8, locale: "en-TT" },
+  BB: { code: "BBD", symbol: "Bds$", rate: 2, locale: "en-BB" },
+  BZ: { code: "BZD", symbol: "BZ$", rate: 2, locale: "en-BZ" },
+  GY: { code: "GYD", symbol: "G$", rate: 209, locale: "en-GY" },
+  SR: { code: "SRD", symbol: "Sr$", rate: 37, locale: "nl-SR" },
 
   // Norteamérica
   US: { code: "USD", symbol: "$", rate: 1, locale: "en-US" },

@@ -219,17 +219,30 @@ export const detectCurrency = (countryCode: string): Currency => {
   return countryToCurrency[countryCode.toUpperCase()] || "USD";
 };
 
+/**
+ * Currencies whose "$" symbol collides with USD — render with ISO code prefix
+ * (e.g. "MXN 278" instead of "$278") so the buyer never confuses local money
+ * with dollars. Must match the ambiguous set in `useLocalCurrency`.
+ */
+const AMBIGUOUS_DOLLAR_CURRENCIES = new Set<Currency>([
+  "MXN", "ARS", "COP", "CLP", "BRL", "CRC",
+] as unknown as Currency[]);
+
 // Format price with currency
 export const formatPrice = (priceInUSD: number, currency: Currency): string => {
   const config = currencyConfig[currency];
   const rate = exchangeRates[currency];
   const convertedPrice = priceInUSD * rate;
-  
+
   const formattedNumber = convertedPrice.toLocaleString(undefined, {
     minimumFractionDigits: config.decimals,
     maximumFractionDigits: config.decimals,
   });
-  
+
+  if (currency !== "USD" && AMBIGUOUS_DOLLAR_CURRENCIES.has(currency)) {
+    return `${currency} ${formattedNumber}`;
+  }
+
   if (config.position === "before") {
     return `${config.symbol}${formattedNumber}`;
   }

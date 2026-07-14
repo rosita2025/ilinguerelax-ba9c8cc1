@@ -5,8 +5,10 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle } from "lucide-react";
+import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+
 
 const ACCESS_KEY = "8000A";
 const MAX_ATTEMPTS = 5;
@@ -26,9 +28,17 @@ const DescargaIngles8000 = () => {
   const [attempts, setAttempts] = useState(0);
   const [blocked, setBlocked] = useState(false);
 
+  const [emailCaptured, setEmailCaptured] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
   useEffect(() => {
     const stored = sessionStorage.getItem("ingles8000_unlocked");
     if (stored === "yes") setUnlocked(true);
+    const emailDone = localStorage.getItem("ingles8000_email_captured");
+    if (emailDone === "yes") setEmailCaptured(true);
   }, []);
 
   const handleUnlock = (e: React.FormEvent) => {
@@ -49,6 +59,35 @@ const DescargaIngles8000 = () => {
       }
     }
   };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError("");
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setEmailError("Ingresa un correo válido.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error: fnError } = await supabase.functions.invoke("register-download-email", {
+        body: {
+          email: cleanEmail,
+          name: name.trim() || undefined,
+          productName: "8.000 Palabras en Inglés con Pronunciación",
+          productSlug: "ingles-8000",
+        },
+      });
+      if (fnError) console.warn("register-download-email:", fnError);
+    } catch (err) {
+      console.warn("register-download-email error:", err);
+    } finally {
+      localStorage.setItem("ingles8000_email_captured", "yes");
+      setEmailCaptured(true);
+      setSubmitting(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -121,7 +121,28 @@ export default function CheckoutSuccess() {
     }
   };
 
-  // Send confirmation email once, then ~90s later send the digital-delivery email
+  // Global Meta Pixel: fire Purchase once per order (dedupe via sessionStorage).
+  useEffect(() => {
+    if (!isVerifiedBuyer) return;
+    const key = `fbq-purchase:${orderNumber}`;
+    if (sessionStorage.getItem(key)) return;
+    try {
+      const w = window as unknown as { fbq?: (...a: unknown[]) => void };
+      if (typeof w.fbq === "function") {
+        w.fbq("track", "Purchase", {
+          value: Number(total.toFixed(2)),
+          currency: "USD",
+          content_ids: items.map((i) => i.id),
+          content_type: "product",
+          num_items: items.reduce((n, i) => n + (i.quantity || 1), 0),
+          order_id: orderNumber,
+        });
+        sessionStorage.setItem(key, "1");
+      }
+    } catch { /* ignore */ }
+  }, [isVerifiedBuyer, orderNumber, total, items]);
+
+
   useEffect(() => {
     if (sentRef.current) return;
     if (!isVerifiedBuyer) return;

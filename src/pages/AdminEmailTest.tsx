@@ -554,6 +554,18 @@ const AdminEmailTest = () => {
                           <span className={`inline-flex items-center gap-1 text-[11px] ${v.emailSent ? "text-emerald-700" : v.shouldDeliver ? "text-red-700" : "text-muted-foreground"}`}>
                             {v.emailSent ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Email {v.shouldDeliver ? "" : "(pago pendiente)"}
                           </span>
+                          {!v.ok && v.shouldDeliver && v.hasSkus && !v.emailSent && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-6 px-2 mt-1 text-[11px]"
+                              onClick={() => retryDelivery(r)}
+                              disabled={retrying.has(r.id)}
+                            >
+                              <Send className={`w-3 h-3 mr-1 ${retrying.has(r.id) ? "animate-pulse" : ""}`} />
+                              {retrying.has(r.id) ? "Reenviando…" : "Reintentar envío"}
+                            </Button>
+                          )}
                         </div>
                       </td>
                       <td className="py-3 pr-3 text-xs">

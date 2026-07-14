@@ -33,13 +33,13 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
   const penMode = penTotals !== null;
-  // Regla estricta: solo PE muestra soles nativos. Todo lo demás (VE/CU/NI, LATAM, Global) se muestra en USD.
-  const useLocal = false;
+  // PE: soles nativos. Otros países con moneda local (MX, AR, CO, BR, EU, etc.): USD + referencia.
+  const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading;
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
       : `$${usd.toFixed(2)}`;
-  void localSubtotal; void localDiscount; void localTotal; void useLocal;
+  void localSubtotal; void localDiscount;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
 

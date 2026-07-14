@@ -403,6 +403,14 @@ const AdminEmailTest = () => {
                   {s === "all" ? "Todos" : sourceLabel[s as Source]}
                 </Button>
               ))}
+              <Button
+                size="sm"
+                variant={onlyProblems ? "destructive" : "outline"}
+                onClick={() => setOnlyProblems((v) => !v)}
+              >
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                Con problemas ({problemCount})
+              </Button>
             </div>
             <div className="text-xs text-muted-foreground ml-auto">
               {visibleRows.length} de {rows.length} pedidos

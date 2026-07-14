@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook } from "lucide-react";
 import { useI18n } from "@/i18n/I18nContext";
+import { CountryPicker } from "@/components/CountryPicker";
+
 
 export const Footer = () => {
   const { language } = useI18n();

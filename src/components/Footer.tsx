@@ -240,7 +240,10 @@ export const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-6 border-t border-primary-foreground/10 text-center space-y-1">
+        <div className="mt-12 pt-6 border-t border-primary-foreground/10 text-center space-y-2">
+          <div className="flex justify-center">
+            <CountryPicker lang={language === "en" ? "en" : "es"} className="!text-primary-foreground/70 hover:!text-primary-foreground" />
+          </div>
           <p className="text-sm text-primary-foreground/50">
             © {year} Youtumundial LLC. All rights reserved.
           </p>
@@ -248,6 +251,7 @@ export const Footer = () => {
             iLingue Relax™ is a trademark of Youtumundial LLC.
           </p>
         </div>
+
       </div>
     </footer>
   );

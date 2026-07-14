@@ -26,7 +26,11 @@ async function resolveMaterials(
   const seen = new Set<string>();
 
   for (const it of items) {
-    const skuHint = (it?.sku || "").toString().toLowerCase();
+    // Normalize catalog-id aliases (e.g. "coreano-100-mapas") to the real
+    // digital_products.sku before matching. Without this, Yape/Plin buyers
+    // don't receive materials when the cart uses catalog IDs.
+    const rawSku = (it?.sku || "").toString().toLowerCase();
+    const skuHint = (normalizeSku(rawSku) || rawSku).toLowerCase();
     const nameHint = (it?.name || "").toString().toLowerCase();
     if (!skuHint && !nameHint) continue;
 

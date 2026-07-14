@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail, Loader2 } from "lucide-react";
+import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,7 +31,7 @@ const DescargaIngles8000 = () => {
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  // (envío en segundo plano, sin estado de carga visible)
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
@@ -207,12 +207,8 @@ const DescargaIngles8000 = () => {
                 />
               </div>
               {emailError && <p className="text-sm text-destructive">{emailError}</p>}
-              <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Guardando…</>
-                ) : (
-                  <>Continuar a la descarga</>
-                )}
+              <Button type="submit" className="w-full">
+                Continuar a la descarga
               </Button>
               <p className="text-xs text-muted-foreground text-center">
                 Al continuar aceptas recibir avisos ocasionales de ILINGUE RELAX.

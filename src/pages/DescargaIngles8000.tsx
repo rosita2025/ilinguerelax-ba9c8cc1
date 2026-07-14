@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 
-const ACCESS_KEY = "8000A";
+const ACCESS_KEY = "1234";
 const MAX_ATTEMPTS = 5;
 const WHATSAPP_URL = "https://wa.me/12512724704";
 

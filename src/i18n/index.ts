@@ -113,6 +113,7 @@ const countryToCurrency: Record<string, Currency> = {
   // EUR
   ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR", NL: "EUR",
   BE: "EUR", AT: "EUR", IE: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
+  SK: "EUR", SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", MT: "EUR", CY: "EUR", HR: "EUR",
 
   // GBP
   GB: "GBP", UK: "GBP",

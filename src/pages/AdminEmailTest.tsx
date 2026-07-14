@@ -347,7 +347,7 @@ const AdminEmailTest = () => {
       return av.localeCompare(bv) * dir;
     });
     return list;
-  }, [rows, query, sourceFilter, sortKey, sortDir]);
+  }, [rows, query, sourceFilter, sortKey, sortDir, onlyProblems]);
 
 
   return (

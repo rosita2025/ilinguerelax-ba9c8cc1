@@ -67,8 +67,6 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     ? detectLanguageFromCountry(subCountry)
     : (savedLang || "es");
 
-  const [language, setLanguageState] = useState<Language>(initialLang);
-  const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
   const savedCountry = (() => {
     try { return typeof window !== "undefined" ? localStorage.getItem("ilr_country") : null; }
     catch { return null; }
@@ -78,6 +76,8 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     : savedCountry
       ? detectCurrency(savedCountry)
       : (savedCurrency || "USD");
+  const [language, setLanguageState] = useState<Language>(initialLang);
+  const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
   const [countryCode, setCountryCode] = useState<string>(subCountry || savedCountry || "US");
 
   // Detect country in background WITHOUT blocking render

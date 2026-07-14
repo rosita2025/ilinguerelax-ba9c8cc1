@@ -226,7 +226,8 @@ const App = () => (
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
                  <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreanoRelax />} />
                  <Route path="/descarga/coreano-100-mapas" element={<DescargaCoreano />} />
-                 <Route path="/descarga/patrones-ingles" element={<DescargaPatrones />} />
+                <Route path="/descarga/patrones-ingles" element={<DescargaPatrones />} />
+                <Route path="/descarga/8000-ingles" element={<DescargaIngles8000 />} />
                   <Route path="/products/estructuras-gramaticales-ingles-a1-c1" element={<ProductEstructurasGramaticalesIngles />} />
                   <Route path="/vista-previa/patrones-especiales" element={<VistaPreviaPatrones />} />
                   <Route path="/vista-previa/coreano-100-mapas-mentales" element={<VistaPreviaCoreano />} />

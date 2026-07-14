@@ -105,47 +105,52 @@ export const CountryPicker = ({ lang = "es", className = "" }: Props) => {
       <DialogTrigger asChild>
         <button
           type="button"
-          className={`inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground underline underline-offset-2 decoration-dotted transition-colors ${className}`}
+          aria-label={`${t.notIn} ${currentName}? ${t.change}`}
+          className={`inline-flex items-center gap-1.5 text-xs sm:text-[11px] font-medium text-muted-foreground hover:text-foreground underline underline-offset-2 decoration-dotted transition-colors min-h-[32px] px-2 py-1 rounded-md max-w-full ${className}`}
         >
-          <Globe className="w-3 h-3" />
-          <span>
+          <Globe className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="truncate">
             {t.notIn} <span className="font-semibold">{currentFlag} {currentName}</span>? · {t.change}
           </span>
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t.title}</DialogTitle>
-          <DialogDescription>{t.desc}</DialogDescription>
+      <DialogContent className="max-w-md w-[calc(100vw-1.5rem)] p-0 gap-0 max-h-[90vh] sm:max-h-[85vh] flex flex-col">
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-3 flex-shrink-0 text-left">
+          <DialogTitle className="text-base sm:text-lg">{t.title}</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">{t.desc}</DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-2">
-          {COUNTRIES.map((c) => {
-            const active = c.code === cc;
-            return (
-              <button
-                key={c.code}
-                type="button"
-                onClick={() => pick(c.code)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-left text-sm transition-all ${
-                  active
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border hover:border-primary/50 hover:bg-muted"
-                }`}
-              >
-                <span className="text-lg leading-none">{c.flag}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold truncate">{c.name}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">{TIER_LABEL[c.tier]}</div>
-                </div>
-                {active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
-              </button>
-            );
-          })}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-2 overscroll-contain">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {COUNTRIES.map((c) => {
+              const active = c.code === cc;
+              return (
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={() => pick(c.code)}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 min-h-[48px] rounded-lg border text-left text-sm transition-all active:scale-[0.98] ${
+                    active
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border hover:border-primary/50 hover:bg-muted"
+                  }`}
+                >
+                  <span className="text-xl leading-none flex-shrink-0">{c.flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{c.name}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">{TIER_LABEL[c.tier]}</div>
+                  </div>
+                  {active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <Button variant="outline" size="sm" onClick={auto} className="mt-2">
-          <Globe className="w-4 h-4 mr-2" />
-          {t.autoDetect}
-        </Button>
+        <div className="p-4 sm:p-6 pt-3 border-t border-border flex-shrink-0 bg-background">
+          <Button variant="outline" size="default" onClick={auto} className="w-full min-h-[44px]">
+            <Globe className="w-4 h-4 mr-2" />
+            {t.autoDetect}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

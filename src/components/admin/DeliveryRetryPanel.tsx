@@ -32,7 +32,10 @@ const reasonLabel: Record<string, string> = {
   max_attempts_reached: "Reintentos agotados",
 };
 
+type Resp = { config: Config | null; alerts: Alert[]; runReport?: { retried?: number; alerts?: number; skipped?: number } | null };
+
 export default function DeliveryRetryPanel() {
+  const { adminKey } = useAdminKey();
   const [config, setConfig] = useState<Config | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,13 +45,15 @@ export default function DeliveryRetryPanel() {
   const load = useCallback(async (action: "get" | "run" = "get") => {
     setLoading(true);
     try {
-      const { data, error } = await adminInvoke("manage-delivery-retry", { action });
+      const { data, error } = await adminInvoke<Resp>("manage-delivery-retry", {
+        body: { adminKey, action },
+      });
       if (error) throw error;
       setConfig(data?.config ?? null);
       setDraft(data?.config ?? null);
       setAlerts(data?.alerts ?? []);
       if (action === "run" && data?.runReport) {
-        const r = data.runReport as { retried?: number; alerts?: number; skipped?: number };
+        const r = data.runReport;
         toast.success(`Reintentos: ${r.retried ?? 0} · Alertas: ${r.alerts ?? 0} · Saltados: ${r.skipped ?? 0}`);
       }
     } catch (e) {
@@ -57,15 +62,17 @@ export default function DeliveryRetryPanel() {
       setLoading(false);
       setRunning(false);
     }
-  }, []);
+  }, [adminKey]);
 
-  useEffect(() => { load("get"); }, [load]);
+  useEffect(() => { if (adminKey) load("get"); }, [load, adminKey]);
 
   const saveConfig = async () => {
     if (!draft) return;
     setLoading(true);
     try {
-      const { error } = await adminInvoke("manage-delivery-retry", { action: "update", config: draft });
+      const { error } = await adminInvoke("manage-delivery-retry", {
+        body: { adminKey, action: "update", config: draft },
+      });
       if (error) throw error;
       toast.success("Configuración guardada");
       await load("get");
@@ -76,12 +83,15 @@ export default function DeliveryRetryPanel() {
 
   const resolveAlert = async (id: string) => {
     try {
-      await adminInvoke("manage-delivery-retry", { action: "resolve_alert", id });
+      await adminInvoke("manage-delivery-retry", {
+        body: { adminKey, action: "resolve_alert", id },
+      });
       setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, resolved: true } : a)));
     } catch (e) {
       toast.error((e as Error).message || "Error");
     }
   };
+
 
   const open = alerts.filter((a) => !a.resolved);
 

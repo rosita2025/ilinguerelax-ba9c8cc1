@@ -52,33 +52,14 @@ export default function Checkout() {
   const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
   const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
-  const [metaPixelId, setMetaPixelId] = useState<string | null>(null);
-  const [pixelReady, setPixelReady] = useState<string | null>(null);
-
-  // Product-scoped Meta Pixel: loads fbq (once) and fires PageView +
-  // InitiateCheckout for THIS product's pixel id. Only fires inside /checkout/:sku.
+  // Global Meta Pixel (loaded in index.html): fire InitiateCheckout on entry.
   useEffect(() => {
-    if (!metaPixelId) return;
-    const w = window as unknown as { fbq?: ((...a: unknown[]) => void) & { callMethod?: unknown; queue?: unknown[]; loaded?: boolean; version?: string; push?: unknown }; _fbq?: unknown };
-    if (!w.fbq) {
-      const n = function (...args: unknown[]) {
-        // @ts-expect-error dynamic fbq stub
-        n.callMethod ? n.callMethod.apply(n, args) : n.queue!.push(args);
-      } as typeof w.fbq & { callMethod?: unknown; queue: unknown[]; loaded: boolean; version: string; push: unknown };
-      n.queue = []; n.loaded = true; n.version = "2.0"; n.push = n;
-      w.fbq = n; w._fbq = n;
-      const s = document.createElement("script");
-      s.async = true;
-      s.src = "https://connect.facebook.net/en_US/fbevents.js";
-      document.head.appendChild(s);
-    }
-    if (pixelReady !== metaPixelId) {
-      w.fbq!("init", metaPixelId);
-      setPixelReady(metaPixelId);
-    }
-    w.fbq!("trackSingle", metaPixelId, "PageView");
-    w.fbq!("trackSingle", metaPixelId, "InitiateCheckout");
-  }, [metaPixelId, pixelReady]);
+    try {
+      const w = window as unknown as { fbq?: (...a: unknown[]) => void };
+      if (typeof w.fbq === "function") w.fbq("track", "InitiateCheckout");
+    } catch { /* ignore */ }
+  }, [slug]);
+
 
   // Always live-load product + upsells from admin (`digital_products` +
   // `product_upsells`) so /checkouts/:slug mirrors /admin/products/:sku
@@ -107,7 +88,7 @@ export default function Checkout() {
           try {
             return await supabase
               .from("digital_products")
-              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, meta_pixel_id")
+              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
               .eq("sku", adminSku)
               .eq("active", true)
               .maybeSingle();
@@ -196,8 +177,7 @@ export default function Checkout() {
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
-      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null; meta_pixel_id?: string | null };
-      setMetaPixelId((rowWithTienda.meta_pixel_id || "").toString().replace(/[^0-9]/g, "") || null);
+      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null };
       const priceTienda = rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0 ? Number(rowWithTienda.price_usd_tienda) : null;
       const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
       setDbItem({

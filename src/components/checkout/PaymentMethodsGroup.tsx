@@ -833,6 +833,10 @@ export function PaymentMethodsGroup() {
                   localAmount={local.amount}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "ILINGUE RELAX"}
                   buyerEmail={buyer.email.trim() || undefined}
+                  buyerName={buyer.fullName.trim() || undefined}
+                  buyerPhone={buyer.phone || undefined}
+                  buyerCountry={(region.country || "").toUpperCase() || undefined}
+                  skus={items.map((i) => i.id)}
                   onApproved={(orderId) => {
                     supabase.from("email_contacts").upsert({
                       email: buyer.email.trim().toLowerCase(),

@@ -60,7 +60,7 @@ const DescargaIngles8000 = () => {
     }
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError("");
     const cleanEmail = email.trim().toLowerCase();
@@ -68,25 +68,21 @@ const DescargaIngles8000 = () => {
       setEmailError("Ingresa un correo válido.");
       return;
     }
-    setSubmitting(true);
-    try {
-      const { error: fnError } = await supabase.functions.invoke("register-download-email", {
+    // Fire-and-forget: no bloquear al usuario esperando a Brevo
+    supabase.functions
+      .invoke("register-download-email", {
         body: {
           email: cleanEmail,
           name: name.trim() || undefined,
           productName: "8.000 Palabras en Inglés con Pronunciación",
           productSlug: "ingles-8000",
         },
-      });
-      if (fnError) console.warn("register-download-email:", fnError);
-    } catch (err) {
-      console.warn("register-download-email error:", err);
-    } finally {
-      localStorage.setItem("ingles8000_email_captured", "yes");
-      setEmailCaptured(true);
-      setSubmitting(false);
-    }
+      })
+      .catch((err) => console.warn("register-download-email error:", err));
+    localStorage.setItem("ingles8000_email_captured", "yes");
+    setEmailCaptured(true);
   };
+
 
 
   return (

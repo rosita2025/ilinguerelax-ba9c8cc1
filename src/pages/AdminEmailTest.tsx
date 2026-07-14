@@ -439,8 +439,10 @@ const AdminEmailTest = () => {
             </div>
           </header>
 
+          <DeliveryRetryPanel />
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card
                 key={s}

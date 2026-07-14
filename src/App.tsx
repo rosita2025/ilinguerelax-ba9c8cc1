@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";
@@ -152,11 +152,20 @@ const RouteTracker = () => {
   return null;
 };
 
-const PageFallback = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-  </div>
-);
+const PageFallback = () => {
+  // Evita el "flash" del spinner en cargas rápidas: sólo se muestra si tarda > 400ms
+  const [show, setShow] = React.useState(false);
+  React.useEffect(() => {
+    const t = setTimeout(() => setShow(true), 400);
+    return () => clearTimeout(t);
+  }, []);
+  if (!show) return <div className="min-h-screen bg-background" aria-hidden />;
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin opacity-70" />
+    </div>
+  );
+};
 
 const CheckoutSlugRedirect = () => {
   const { slug } = useParams();

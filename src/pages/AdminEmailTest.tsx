@@ -520,7 +520,7 @@ const AdminEmailTest = () => {
                   })}
                   {visibleRows.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="py-10 text-center text-muted-foreground">
+                      <td colSpan={12} className="py-10 text-center text-muted-foreground">
                         {loading ? "Cargando pedidos…" : rows.length === 0 ? "Aún no hay pedidos registrados en ninguna fuente." : "Sin resultados para el filtro actual."}
                       </td>
 

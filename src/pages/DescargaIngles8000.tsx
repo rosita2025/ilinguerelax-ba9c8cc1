@@ -13,11 +13,11 @@ const MAX_ATTEMPTS = 5;
 const WHATSAPP_URL = "https://wa.me/12512724704";
 
 // Enlaces de Google Drive (actualiza estas URLs cuando tengas los enlaces finales)
-const FILE_MAIN_URL = "https://drive.google.com/drive/folders/REEMPLAZAR-ENLACE-8000";
+const FILE_MAIN_URL = "https://drive.google.com/file/d/1OpOLhD1QflcCqk9oay9IxpasgzMfV9-Z/view?usp=sharing";
 const FILE_MAIN_NAME = "8.000 Palabras en Inglés con Pronunciación en Español · Fonética UK/USA";
 
-const BONO_URL = "https://drive.google.com/drive/folders/REEMPLAZAR-ENLACE-BONO";
-const BONO_NAME = "Bono · Audio y Guía de Pronunciación";
+const BONO_URL = "";
+const BONO_NAME = "";
 
 const DescargaIngles8000 = () => {
   const [key, setKey] = useState("");
@@ -156,20 +156,22 @@ const DescargaIngles8000 = () => {
                 </Button>
               </div>
 
-              <div className="rounded-xl border bg-card p-5 flex flex-col md:flex-row md:items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-6 h-6 text-primary" />
+              {BONO_URL && (
+                <div className="rounded-xl border bg-card p-5 flex flex-col md:flex-row md:items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <FileText className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-pretty">{BONO_NAME}</p>
+                    <p className="text-xs text-muted-foreground">Bono incluido · Google Drive</p>
+                  </div>
+                  <Button asChild variant="secondary" className="w-full md:w-auto whitespace-normal h-auto py-2">
+                    <a href={BONO_URL} target="_blank" rel="noopener noreferrer">
+                      <Download className="w-4 h-4 mr-2" /> Abrir en Drive
+                    </a>
+                  </Button>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-pretty">{BONO_NAME}</p>
-                  <p className="text-xs text-muted-foreground">Bono incluido · Google Drive</p>
-                </div>
-                <Button asChild variant="secondary" className="w-full md:w-auto whitespace-normal h-auto py-2">
-                  <a href={BONO_URL} target="_blank" rel="noopener noreferrer">
-                    <Download className="w-4 h-4 mr-2" /> Abrir en Drive
-                  </a>
-                </Button>
-              </div>
+              )}
             </div>
 
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-900 dark:text-amber-200">

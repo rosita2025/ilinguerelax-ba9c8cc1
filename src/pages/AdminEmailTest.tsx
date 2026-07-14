@@ -304,7 +304,19 @@ const AdminEmailTest = () => {
   const upsellSkusOf = (r: OrderRow) =>
     r.productLines.filter((p) => p.role === "upsell").map((p) => p.sku || p.name).join(", ");
 
-  const toggleSort = (key: typeof sortKey) => {
+  const isPaid = (r: OrderRow) => {
+    const v = (r.status || "").toLowerCase();
+    return ["paid", "verified", "approved", "delivered", "sent", "opened", "completed", "succeeded"].includes(v);
+  };
+  const validateRow = (r: OrderRow) => {
+    const hasSkus = r.productLines.some((p) => !!p.sku);
+    const emailSent = !!(r.delivery?.message_id) || ["sent", "delivered", "opened"].includes((r.delivery?.status || "").toLowerCase());
+    const shouldDeliver = isPaid(r);
+    const ok = hasSkus && (!shouldDeliver || emailSent);
+    return { hasSkus, emailSent, shouldDeliver, ok };
+  };
+  const problemCount = useMemo(() => rows.filter((r) => !validateRow(r).ok).length, [rows]);
+
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir(key === "date" ? "desc" : "asc"); }
   };

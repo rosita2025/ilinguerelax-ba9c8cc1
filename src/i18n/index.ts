@@ -7,7 +7,7 @@ export type Language = "es" | "en" | "fr" | "pt";
 export type Currency =
   | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
   | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
-  | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "PYG" | "UYU" | "HTG"
+  | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "PYG" | "UYU" | "HTG" | "VES"
   | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
   | "JPY" | "KRW" | "CNY" | "INR";
 
@@ -118,7 +118,7 @@ const countryToCurrency: Record<string, Currency> = {
   GB: "GBP", UK: "GBP",
 
   // Otras principales
-  BR: "BRL", MX: "MXN", CO: "COP", AR: "ARS", CA: "CAD",
+  BR: "BRL", MX: "MXN", CO: "COP", AR: "ARS", CA: "CAD", VE: "VES",
   AU: "AUD", NZ: "AUD", PE: "PEN",
 
   // LATAM Hotmart (moneda local)
@@ -154,6 +154,7 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   PYG: { symbol: "₲", position: "before", decimals: 0 },
   UYU: { symbol: "$U", position: "before", decimals: 2 },
   HTG: { symbol: "G ", position: "before", decimals: 2 },
+  VES: { symbol: "Bs.S ", position: "before", decimals: 2 },
   CHF: { symbol: "CHF ", position: "before", decimals: 2 },
   SEK: { symbol: " kr", position: "after", decimals: 2 },
   NOK: { symbol: " kr", position: "after", decimals: 2 },
@@ -187,6 +188,7 @@ export const exchangeRates: Record<Currency, number> = {
   PYG: 7300,
   UYU: 40,
   HTG: 132,
+  VES: 100,
   CHF: 0.85,
   SEK: 10.5,
   NOK: 10.8,

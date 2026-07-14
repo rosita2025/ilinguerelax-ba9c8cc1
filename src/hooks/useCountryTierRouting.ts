@@ -1,5 +1,6 @@
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { detectCurrency, formatPrice } from "@/i18n";
 
 /**
  * Países que compran vía Hotmart LATAM (USD). El resto del mundo (incl. Perú y
@@ -30,7 +31,7 @@ export interface CountryTierRouting {
   hotmartUrl: string | null;
   /** Label listo para renderizar en hero y sticky bar. */
   priceLabel: string;
-  currencyCode: "PEN" | "USD";
+  currencyCode: string;
   originalLabel: string;
 }
 
@@ -68,12 +69,13 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
       : priceGlobalUsd;
 
   const mult = opts.originalMultiplier ?? 2.5;
+  const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   const priceLabel = isPeru && pricePen
     ? `S/ ${pricePen.toFixed(2)}`
-    : `$${priceUsd.toFixed(2)} USD`;
+    : formatPrice(priceUsd, displayCurrency);
   const originalLabel = isPeru && pricePen
     ? `S/ ${(pricePen * mult).toFixed(2)}`
-    : `$${(priceGlobalUsd * mult).toFixed(2)} USD`;
+    : formatPrice(priceGlobalUsd * mult, displayCurrency);
 
   const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;
   const loaded = (pricing.loaded || hasFallback) && (isPeru ? (pricePen ?? 0) > 0 : priceUsd > 0);
@@ -92,7 +94,7 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     pricePen,
     hotmartUrl: pricing.hotmartUrl || opts.fallbackHotmartUrl || null,
     priceLabel,
-    currencyCode: isPeru ? "PEN" : "USD",
+    currencyCode: displayCurrency,
     originalLabel,
   };
 }

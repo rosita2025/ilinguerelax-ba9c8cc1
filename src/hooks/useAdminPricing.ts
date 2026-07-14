@@ -90,7 +90,7 @@ export function useAdminPricing(sku: string): AdminPricing {
       const latam = data.price_usd_latam != null ? Number(data.price_usd_latam) : global;
       const tienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0
         ? Number((data as any).price_usd_tienda)
-        : null;
+        : latam;
       const pen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : null;
       setState({
         priceGlobalUsd: global,

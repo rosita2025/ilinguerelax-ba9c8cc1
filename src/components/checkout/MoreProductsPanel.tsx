@@ -6,6 +6,7 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
+import { formatLocalAmount } from "@/hooks/useLocalCurrency";
 
 interface DBRow {
   id: string;
@@ -140,7 +141,9 @@ export function MoreProductsPanel({ parentSku }: Props) {
 
   const fmt = (usd: number, pen?: number | null) => {
     if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
-    return `$${Number(usd).toFixed(2)}`;
+    if (isTiendaUsd) return `$${Number(usd).toFixed(2)}`;
+    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "");
+    return isUsd ? `$${Number(usd).toFixed(2)}` : formatted;
   };
 
   const priced = (r: UpsellRow) => {

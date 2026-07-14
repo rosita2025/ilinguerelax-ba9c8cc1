@@ -368,12 +368,8 @@ export const StickyBuyBar = ({
                   </span>
                 </div>
               )}
-              {/* Manual country override — helps VPN/mobile users see correct pricing */}
-              {!disabled && (
-                <div className="flex justify-center pt-0.5">
-                  <CountryPicker lang={lang} />
-                </div>
-              )}
+              {/* Country picker moved to global Footer to avoid duplication */}
+
               {secondaryCtaText && onSecondaryClick && (
                 <Button
                   type="button"

@@ -1,0 +1,1 @@
+ALTER TABLE public.digital_products DROP COLUMN IF EXISTS meta_pixel_id;

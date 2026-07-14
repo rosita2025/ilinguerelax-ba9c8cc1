@@ -246,7 +246,6 @@ export type Database = {
           is_physical: boolean
           is_upsell: boolean
           learner_language: string
-          meta_pixel_id: string | null
           mp_preference_template: Json | null
           name: string
           price_pen: number | null
@@ -280,7 +279,6 @@ export type Database = {
           is_physical?: boolean
           is_upsell?: boolean
           learner_language?: string
-          meta_pixel_id?: string | null
           mp_preference_template?: Json | null
           name: string
           price_pen?: number | null
@@ -314,7 +312,6 @@ export type Database = {
           is_physical?: boolean
           is_upsell?: boolean
           learner_language?: string
-          meta_pixel_id?: string | null
           mp_preference_template?: Json | null
           name?: string
           price_pen?: number | null

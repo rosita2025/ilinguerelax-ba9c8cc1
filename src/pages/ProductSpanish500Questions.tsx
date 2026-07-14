@@ -167,6 +167,7 @@ const ProductSpanish500Questions = () => {
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}
+        flag={tier.isPeru ? "🇵🇪" : undefined}
         productName="500 Questions in Spanish with English Pronunciation"
         rating={4.8}
         reviewCount={0}

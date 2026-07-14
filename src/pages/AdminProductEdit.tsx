@@ -41,6 +41,7 @@ interface Product {
   excluded_countries: string[];
   store_excluded_countries: string[];
   hotmart_excluded_countries: string[];
+  meta_pixel_id: string | null;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;

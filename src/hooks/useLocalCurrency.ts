@@ -149,16 +149,7 @@ export function useLocalCurrency(usdAmount: number): LocalPrice {
   const amount = roundNicely(usdAmount * info.rate);
   const isUsd = info.code === "USD";
 
-  let formatted: string;
-  try {
-    formatted = new Intl.NumberFormat(info.locale, {
-      style: "currency",
-      currency: info.code,
-      maximumFractionDigits: amount >= 100 ? 0 : 2,
-    }).format(amount);
-  } catch {
-    formatted = `${info.symbol} ${amount.toLocaleString()}`;
-  }
+  const formatted = formatWithCurrency(amount, info);
 
   return {
     country,

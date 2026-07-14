@@ -332,6 +332,8 @@ const ProductDynamic = () => {
             <StickyBuyBar
               price={priceLabel}
               originalPrice={originalLabel}
+              currencyCode={tier.loaded ? tier.currencyCode : local.currency}
+              flag={tier.isPeru ? "🇵🇪" : undefined}
               rating={4.8}
               reviewCount={120}
               productName={product.name}

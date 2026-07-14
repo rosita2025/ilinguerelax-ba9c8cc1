@@ -163,6 +163,67 @@ const DescargaIngles8000 = () => {
               </div>
             </div>
           </motion.div>
+        ) : !emailCaptured ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border bg-card p-6 md:p-10 shadow-sm"
+          >
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Mail className="w-7 h-7 text-primary" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">
+                Último paso: confirma tu correo
+              </h1>
+              <p className="text-muted-foreground mt-2 text-pretty">
+                Te enviaremos por correo enlaces de respaldo y avisos cuando publiquemos
+                nuevos materiales o mejoras de este producto. Sin spam.
+              </p>
+            </div>
+
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="dl-name">Tu nombre (opcional)</Label>
+                <Input
+                  id="dl-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ej. María"
+                  className="mt-2"
+                  maxLength={80}
+                  autoComplete="given-name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dl-email">Correo electrónico</Label>
+                <Input
+                  id="dl-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tucorreo@ejemplo.com"
+                  className="mt-2"
+                  maxLength={255}
+                  required
+                  autoComplete="email"
+                />
+              </div>
+              {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Guardando…</>
+                ) : (
+                  <>Continuar a la descarga</>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Al continuar aceptas recibir avisos ocasionales de ILINGUE RELAX.
+                Puedes darte de baja en cualquier momento.
+              </p>
+            </form>
+          </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 12 }}

@@ -187,7 +187,7 @@ export default function Checkout() {
         regionPrices: {
           latam: priceLatam ?? staticItem?.regionPrices?.latam ?? priceGlobal,
           global: priceGlobal,
-          tienda: priceTienda ?? staticItem?.regionPrices?.tienda ?? priceGlobal,
+          tienda: priceTienda ?? staticItem?.regionPrices?.tienda ?? priceLatam ?? priceGlobal,
         },
       } as CatalogItem);
       setDbMissing(false);

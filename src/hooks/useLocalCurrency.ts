@@ -26,7 +26,7 @@ const COUNTRY_TO_CURRENCY: Record<string, CurrencyInfo> = {
   PY: { code: "PYG", symbol: "₲", rate: 7300, locale: "es-PY" },
   BO: { code: "BOB", symbol: "Bs", rate: 6.9, locale: "es-BO" },
   EC: { code: "USD", symbol: "$", rate: 1, locale: "es-EC" },
-  VE: { code: "USD", symbol: "$", rate: 1, locale: "es-VE" },
+  VE: { code: "VES", symbol: "Bs.S", rate: 100, locale: "es-VE" },
   CR: { code: "CRC", symbol: "₡", rate: 520, locale: "es-CR" },
   GT: { code: "GTQ", symbol: "Q", rate: 7.8, locale: "es-GT" },
   DO: { code: "DOP", symbol: "RD$", rate: 60, locale: "es-DO" },

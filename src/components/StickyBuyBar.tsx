@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Shield, Star, ArrowRight, Clock, Loader2, Mail, ShoppingCart, Zap, TrendingUp, X, Lock } from "lucide-react";
-import { CountryPicker } from "@/components/CountryPicker";
+
 
 interface StickyBuyBarProps {
   price: string;
@@ -368,12 +368,8 @@ export const StickyBuyBar = ({
                   </span>
                 </div>
               )}
-              {/* Manual country override — helps VPN/mobile users see correct pricing */}
-              {!disabled && (
-                <div className="flex justify-center pt-0.5">
-                  <CountryPicker lang={lang} />
-                </div>
-              )}
+              {/* Country picker moved to global Footer to avoid duplication */}
+
               {secondaryCtaText && onSecondaryClick && (
                 <Button
                   type="button"
@@ -446,15 +442,8 @@ export const StickyBuyBar = ({
                 {flagBadge}
                 <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>
-              {!disabled && (
-                <div className="flex flex-col items-end gap-1">
-                  <p className="text-xs text-muted-foreground">
-                    {lang === "en" ? "You can change your country's currency at checkout" : "Puedes cambiar la moneda de tu país en el checkout"}
-                  </p>
-                  <CountryPicker lang={lang} />
-                </div>
-              )}
             </div>
+
 
             {/* Buy Button with 100% secure badge */}
             <div className="flex flex-col items-center gap-1">

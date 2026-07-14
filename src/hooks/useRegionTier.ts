@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { detectCountryByIp } from "@/lib/geoDetection";
 
-export type RegionTier = "latam" | "global";
+export type RegionTier = "latam" | "global" | "tienda";
 
 const STORAGE_KEY = "region_tier_v1";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-// Latinoamérica = países con precio reducido
+// Países que compran vía Hotmart LATAM (USD reducido latam).
 const LATAM = new Set([
-  "AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV",
-  "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE",
+  "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV",
+  "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY",
 ]);
+// Países con tier "tienda" (USD aún más reducido, sin acceso Hotmart).
+const TIENDA = new Set(["VE", "CU", "NI"]);
 
 interface Cached {
   tier: RegionTier;
@@ -19,7 +21,9 @@ interface Cached {
 }
 
 function classify(country: string): RegionTier {
-  return LATAM.has(country.toUpperCase()) ? "latam" : "global";
+  const c = country.toUpperCase();
+  if (TIENDA.has(c)) return "tienda";
+  return LATAM.has(c) ? "latam" : "global";
 }
 
 function readCache(): Cached | null {

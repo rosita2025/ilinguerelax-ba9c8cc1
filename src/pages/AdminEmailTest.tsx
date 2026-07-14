@@ -127,6 +127,7 @@ const AdminEmailTest = () => {
 
   const [query, setQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<Source | "all">("all");
+  const [onlyProblems, setOnlyProblems] = useState(false);
   const [sortKey, setSortKey] = useState<"date" | "order_ref" | "principal_sku" | "upsell_sku">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 

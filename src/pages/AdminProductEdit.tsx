@@ -70,7 +70,7 @@ const EMPTY: Product = {
   excluded_countries: [],
   store_excluded_countries: [],
   hotmart_excluded_countries: [],
-  meta_pixel_id: null,
+  
 };
 
 const AdminProductEdit = () => {

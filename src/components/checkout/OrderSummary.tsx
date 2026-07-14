@@ -33,13 +33,13 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
   const penMode = penTotals !== null;
-  // Regla estricta: solo PE muestra soles nativos. Todo lo demás (VE/CU/NI, LATAM, Global) se muestra en USD.
-  const useLocal = false;
+  // PE: soles nativos. Otros países con moneda local (MX, AR, CO, BR, EU, etc.): USD + referencia.
+  const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading;
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
       : `$${usd.toFixed(2)}`;
-  void localSubtotal; void localDiscount; void localTotal; void useLocal;
+  void localSubtotal; void localDiscount;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
 
@@ -115,6 +115,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen * item.quantity)
                     : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                  {showLocalRef && (
+                    <div className="text-[10px] font-normal text-muted-foreground">
+                      {formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -185,7 +190,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.total}</span>
             <div className="text-right">
               <div>{penMode ? formatPen(penTotals!.total) : `USD $${total.toFixed(2)}`}</div>
-
+              {showLocalRef && (
+                <div className="text-xs font-normal text-muted-foreground mt-0.5">
+                  ≈ {localTotal.formatted} {localTotal.currency}
+                </div>
+              )}
             </div>
           </div>
 

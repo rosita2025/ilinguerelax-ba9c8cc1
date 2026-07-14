@@ -47,6 +47,32 @@ export default function Checkout() {
     } catch { /* ignore */ }
   }, []);
 
+  // Product-scoped Meta Pixel: loads fbq (once) and fires PageView +
+  // InitiateCheckout for THIS product's pixel id. Only fires inside /checkout/:sku.
+  const [pixelReady, setPixelReady] = useState<string | null>(null);
+  useEffect(() => {
+    if (!metaPixelId) return;
+    const w = window as unknown as { fbq?: ((...a: unknown[]) => void) & { callMethod?: unknown; queue?: unknown[]; loaded?: boolean; version?: string; push?: unknown }; _fbq?: unknown };
+    if (!w.fbq) {
+      const n = function (...args: unknown[]) {
+        // @ts-expect-error dynamic fbq stub
+        n.callMethod ? n.callMethod.apply(n, args) : n.queue!.push(args);
+      } as typeof w.fbq & { callMethod?: unknown; queue: unknown[]; loaded: boolean; version: string; push: unknown };
+      n.queue = []; n.loaded = true; n.version = "2.0"; n.push = n;
+      w.fbq = n; w._fbq = n;
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = "https://connect.facebook.net/en_US/fbevents.js";
+      document.head.appendChild(s);
+    }
+    if (pixelReady !== metaPixelId) {
+      w.fbq!("init", metaPixelId);
+      setPixelReady(metaPixelId);
+    }
+    w.fbq!("trackSingle", metaPixelId, "PageView");
+    w.fbq!("trackSingle", metaPixelId, "InitiateCheckout");
+  }, [metaPixelId, pixelReady]);
+
   const staticItem = getCatalogItem(slug);
   const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
   const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);

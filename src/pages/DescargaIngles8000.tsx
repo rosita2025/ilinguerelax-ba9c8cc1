@@ -13,11 +13,11 @@ const MAX_ATTEMPTS = 5;
 const WHATSAPP_URL = "https://wa.me/12512724704";
 
 // Enlaces de Google Drive (actualiza estas URLs cuando tengas los enlaces finales)
-const FILE_MAIN_URL = "https://drive.google.com/drive/folders/REEMPLAZAR-ENLACE-8000";
+const FILE_MAIN_URL = "https://drive.google.com/file/d/1OpOLhD1QflcCqk9oay9IxpasgzMfV9-Z/view?usp=sharing";
 const FILE_MAIN_NAME = "8.000 Palabras en Inglés con Pronunciación en Español · Fonética UK/USA";
 
-const BONO_URL = "https://drive.google.com/drive/folders/REEMPLAZAR-ENLACE-BONO";
-const BONO_NAME = "Bono · Audio y Guía de Pronunciación";
+const BONO_URL = "";
+const BONO_NAME = "";
 
 const DescargaIngles8000 = () => {
   const [key, setKey] = useState("");

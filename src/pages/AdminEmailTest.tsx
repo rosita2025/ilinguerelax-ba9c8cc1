@@ -259,6 +259,7 @@ const AdminEmailTest = () => {
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
       setCounts(perSource);
+      setLastUpdated(new Date());
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: merged, counts: perSource })); } catch {}
     } catch (e) {
       if (!silent) toast.error((e as Error).message);

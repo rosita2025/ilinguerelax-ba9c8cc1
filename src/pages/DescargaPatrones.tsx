@@ -5,8 +5,9 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle } from "lucide-react";
+import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import patronesAsset from "@/assets/patrones-especiales-v1.1.pdf.asset.json";
 import palabrasAsset from "@/assets/1000-palabras-ingles-vip-v1.3.pdf.asset.json";
 
@@ -23,10 +24,16 @@ const DescargaPatrones = () => {
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
   const [blocked, setBlocked] = useState(false);
+  const [emailCaptured, setEmailCaptured] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
     const stored = sessionStorage.getItem("patrones_unlocked");
     if (stored === "yes") setUnlocked(true);
+    const emailDone = localStorage.getItem("patrones_email_captured");
+    if (emailDone === "yes") setEmailCaptured(true);
   }, []);
 
   const handleUnlock = (e: React.FormEvent) => {
@@ -46,6 +53,30 @@ const DescargaPatrones = () => {
         setError(`Clave incorrecta. Intentos restantes: ${MAX_ATTEMPTS - next}`);
       }
     }
+  };
+
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError("");
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setEmailError("Ingresa un correo válido.");
+      return;
+    }
+
+    supabase.functions
+      .invoke("register-download-email", {
+        body: {
+          email: cleanEmail,
+          name: name.trim() || undefined,
+          productName: "Patrones Especiales en Inglés",
+          productSlug: "patrones-ingles",
+        },
+      })
+      .catch((err) => console.warn("register-download-email error:", err));
+
+    localStorage.setItem("patrones_email_captured", "yes");
+    setEmailCaptured(true);
   };
 
   return (
@@ -120,6 +151,61 @@ const DescargaPatrones = () => {
                 </div>
               </div>
             </div>
+          </motion.div>
+        ) : !emailCaptured ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border bg-card p-6 md:p-10 shadow-sm"
+          >
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Mail className="w-7 h-7 text-primary" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">
+                Último paso: confirma tu correo
+              </h1>
+              <p className="text-muted-foreground mt-2 text-pretty">
+                Guardaremos tu correo para enviarte respaldo del material y avisos de nuevos productos de ILINGUE RELAX.
+              </p>
+            </div>
+
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="patrones-dl-name">Tu nombre (opcional)</Label>
+                <Input
+                  id="patrones-dl-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ej. María"
+                  className="mt-2"
+                  maxLength={80}
+                  autoComplete="given-name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="patrones-dl-email">Correo electrónico</Label>
+                <Input
+                  id="patrones-dl-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tucorreo@ejemplo.com"
+                  className="mt-2"
+                  maxLength={255}
+                  required
+                  autoComplete="email"
+                />
+              </div>
+              {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+              <Button type="submit" className="w-full">
+                Continuar a la descarga
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Al continuar aceptas recibir avisos ocasionales. Puedes darte de baja en cualquier momento.
+              </p>
+            </form>
           </motion.div>
         ) : (
           <motion.div

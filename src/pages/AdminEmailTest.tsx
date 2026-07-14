@@ -131,6 +131,14 @@ const AdminEmailTest = () => {
   const [onlyProblems, setOnlyProblems] = useState(false);
   const [sortKey, setSortKey] = useState<"date" | "order_ref" | "principal_sku" | "upsell_sku">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [liveOn, setLiveOn] = useState(false);
+  const [retrying, setRetrying] = useState<Set<string>>(new Set());
+  const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleReload = () => {
+    if (reloadTimer.current) clearTimeout(reloadTimer.current);
+    reloadTimer.current = setTimeout(() => load(true), 1200);
+  };
 
   const load = async (silent = false) => {
     if (!silent) setLoading(true);

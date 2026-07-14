@@ -1,0 +1,75 @@
+// Admin-only helpers to manage automatic digital-delivery retry.
+// Supports:
+//   { action: "get" }             -> { config, alerts, recentRetries }
+//   { action: "update", config }  -> updates public.digital_delivery_config
+//   { action: "run" }             -> triggers retry-digital-delivery synchronously
+//   { action: "resolve_alert", id } -> marks an alert as resolved
+
+import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: adminCorsHeaders });
+  const csrfBlock = await assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
+
+  try {
+    const body = await req.json().catch(() => ({} as any));
+    const expected = Deno.env.get("ADMIN_REVIEW_KEY") || "";
+    if (!expected || body?.adminKey !== expected) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    const action = String(body?.action || "get");
+
+    if (action === "update") {
+      const patch: Record<string, unknown> = {};
+      const c = body?.config ?? {};
+      if (typeof c.retry_after_minutes === "number") patch.retry_after_minutes = Math.max(1, Math.min(1440, c.retry_after_minutes));
+      if (typeof c.max_attempts === "number") patch.max_attempts = Math.max(1, Math.min(20, c.max_attempts));
+      if (typeof c.scan_window_hours === "number") patch.scan_window_hours = Math.max(1, Math.min(168, c.scan_window_hours));
+      if (typeof c.enabled === "boolean") patch.enabled = c.enabled;
+      await admin.from("digital_delivery_config").update(patch).eq("id", 1);
+    }
+
+    if (action === "resolve_alert" && body?.id) {
+      await admin.from("digital_delivery_alerts")
+        .update({ resolved: true, updated_at: new Date().toISOString() })
+        .eq("id", body.id);
+    }
+
+    let runReport: unknown = null;
+    if (action === "run") {
+      const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/retry-digital-delivery`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+        },
+        body: JSON.stringify({ force: true }),
+      });
+      runReport = await res.json().catch(() => ({ ok: res.ok }));
+    }
+
+    const [{ data: config }, { data: alerts }] = await Promise.all([
+      admin.from("digital_delivery_config").select("*").eq("id", 1).maybeSingle(),
+      admin.from("digital_delivery_alerts").select("*").order("created_at", { ascending: false }).limit(100),
+    ]);
+
+    return new Response(JSON.stringify({ config, alerts: alerts ?? [], runReport }), {
+      headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: (e as Error).message }), {
+      status: 500, headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

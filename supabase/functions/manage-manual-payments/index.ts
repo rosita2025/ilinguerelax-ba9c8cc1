@@ -2,6 +2,7 @@ import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 import { markAbandonedCartConverted } from "../_shared/thankYouEmail.ts";
+import { normalizeSku } from "../_shared/digitalSku.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,7 +26,11 @@ async function resolveMaterials(
   const seen = new Set<string>();
 
   for (const it of items) {
-    const skuHint = (it?.sku || "").toString().toLowerCase();
+    // Normalize catalog-id aliases (e.g. "coreano-100-mapas") to the real
+    // digital_products.sku before matching. Without this, Yape/Plin buyers
+    // don't receive materials when the cart uses catalog IDs.
+    const rawSku = (it?.sku || "").toString().toLowerCase();
+    const skuHint = (normalizeSku(rawSku) || rawSku).toLowerCase();
     const nameHint = (it?.name || "").toString().toLowerCase();
     if (!skuHint && !nameHint) continue;
 

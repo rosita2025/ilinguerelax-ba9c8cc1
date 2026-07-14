@@ -441,6 +441,7 @@ const AdminEmailTest = () => {
                       </button>
                     </th>
                     <th className="text-left py-2 pr-4">Detalle producto</th>
+                    <th className="text-left py-2 pr-3">Validación</th>
                     <th className="text-left py-2 pr-3">Entrega digital</th>
                     <th className="text-left py-2 pr-3">Estado pago</th>
                     <th className="text-left py-2 pr-3">Origen</th>

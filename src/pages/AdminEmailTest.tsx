@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search } from "lucide-react";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";

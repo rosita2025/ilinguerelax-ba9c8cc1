@@ -47,9 +47,16 @@ export default function Checkout() {
     } catch { /* ignore */ }
   }, []);
 
+  const staticItem = getCatalogItem(slug);
+  const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
+  const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
+  const [loadingDb, setLoadingDb] = useState(false);
+  const [dbMissing, setDbMissing] = useState(false);
+  const [metaPixelId, setMetaPixelId] = useState<string | null>(null);
+  const [pixelReady, setPixelReady] = useState<string | null>(null);
+
   // Product-scoped Meta Pixel: loads fbq (once) and fires PageView +
   // InitiateCheckout for THIS product's pixel id. Only fires inside /checkout/:sku.
-  const [pixelReady, setPixelReady] = useState<string | null>(null);
   useEffect(() => {
     if (!metaPixelId) return;
     const w = window as unknown as { fbq?: ((...a: unknown[]) => void) & { callMethod?: unknown; queue?: unknown[]; loaded?: boolean; version?: string; push?: unknown }; _fbq?: unknown };
@@ -72,13 +79,6 @@ export default function Checkout() {
     w.fbq!("trackSingle", metaPixelId, "PageView");
     w.fbq!("trackSingle", metaPixelId, "InitiateCheckout");
   }, [metaPixelId, pixelReady]);
-
-  const staticItem = getCatalogItem(slug);
-  const [dbItem, setDbItem] = useState<CatalogItem | null>(null);
-  const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
-  const [loadingDb, setLoadingDb] = useState(false);
-  const [dbMissing, setDbMissing] = useState(false);
-  const [metaPixelId, setMetaPixelId] = useState<string | null>(null);
 
   // Always live-load product + upsells from admin (`digital_products` +
   // `product_upsells`) so /checkouts/:slug mirrors /admin/products/:sku

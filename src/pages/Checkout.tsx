@@ -80,7 +80,7 @@ export default function Checkout() {
           try {
             return await supabase
               .from("digital_products")
-              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
+              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, meta_pixel_id")
               .eq("sku", adminSku)
               .eq("active", true)
               .maybeSingle();

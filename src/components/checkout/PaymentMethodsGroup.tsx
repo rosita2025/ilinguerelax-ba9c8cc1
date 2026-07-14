@@ -176,7 +176,7 @@ export function PaymentMethodsGroup() {
     // Depend only on region.tier/country — buyer/items are read fresh from
     // the store inside the callback, so the reference stays stable across
     // typing and avoids remounting the EmbeddedCheckoutProvider (blank screen).
-  }, [region.tier, region.country]);
+  }, [region.tier, region.country, language, t.completeYourData, t.errorPayment]);
 
   // Memoize the options object per cart signature. A new object reference on
   // every render forces Stripe to remount the iframe → blank/duplicated form.
@@ -833,6 +833,10 @@ export function PaymentMethodsGroup() {
                   localAmount={local.amount}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "ILINGUE RELAX"}
                   buyerEmail={buyer.email.trim() || undefined}
+                  buyerName={buyer.fullName.trim() || undefined}
+                  buyerPhone={buyer.phone || undefined}
+                  buyerCountry={(region.country || "").toUpperCase() || undefined}
+                  skus={items.map((i) => i.id)}
                   onApproved={(orderId) => {
                     supabase.from("email_contacts").upsert({
                       email: buyer.email.trim().toLowerCase(),

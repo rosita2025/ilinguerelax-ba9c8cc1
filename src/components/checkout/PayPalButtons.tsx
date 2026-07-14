@@ -4,8 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 
 declare global {
   interface Window {
-    paypal?: any;
+    paypal?: {
+      Buttons: (options: PayPalButtonOptions) => { render: (container: HTMLElement) => void | Promise<void> };
+    };
   }
+}
+
+interface PayPalButtonOptions {
+  style: { layout: string; color: string; shape: string; label: string; height: number };
+  createOrder: () => Promise<string>;
+  onApprove: (data: { orderID: string }) => Promise<void>;
+  onError: (error: unknown) => void;
+  onCancel: () => void;
 }
 
 let sdkPromise: Promise<void> | null = null;
@@ -19,7 +29,7 @@ async function loadPayPalSdk(currency: string): Promise<void> {
   if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
   if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
   document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => s.remove());
-  delete (window as any).paypal;
+  window.paypal = undefined;
   loadedClientId = clientId;
   loadedCurrency = currency;
   sdkPromise = new Promise<void>((resolve, reject) => {
@@ -44,6 +54,10 @@ interface Props {
   amountUsd: number;
   description: string;
   buyerEmail?: string;
+  buyerName?: string;
+  buyerPhone?: string;
+  buyerCountry?: string;
+  skus?: string[];
   localCurrency?: string;
   localAmount?: number;
   onApproved: (orderId: string) => void;
@@ -75,7 +89,7 @@ function friendlyMessage(phase: Phase, raw: string): string {
   return raw || "Ocurrió un error con PayPal.";
 }
 
-export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrency, localAmount, onApproved, onError }: Props) {
+export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<ErrState | null>(null);
@@ -91,6 +105,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
   // Fallback ocurre cuando el comprador tiene una moneda local detectada
   // pero PayPal no la acepta (p. ej. PEN, ARS, COP, CLP).
   const fallbackToUsd = providedLocal && !localSupported;
+  const skusKey = skus.map((sku) => String(sku).trim()).filter(Boolean).join(",");
 
   const correlationIdRef = useRef<string>(
     (globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
@@ -172,7 +187,14 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
             try {
               const cap = await invokeWithRetry<{ status: string }>(
                 "paypal-capture-order",
-                { orderId: data.orderID },
+                {
+                  orderId: data.orderID,
+                  buyerEmail,
+                  buyerName,
+                  buyerPhone,
+                  buyerCountry,
+                  skus: skusKey.split(",").filter(Boolean),
+                },
                 "capture",
               );
               if (cap?.status !== "COMPLETED") {
@@ -216,7 +238,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
       }
     })();
     return () => { cancelled = true; };
-  }, [amount, currency, description, buyerEmail, reloadKey]);
+  }, [amount, amountUsd, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey, onApproved, onError]);
 
   const correlationId = correlationIdRef.current;
 
@@ -225,7 +247,9 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, localCurrenc
       await navigator.clipboard.writeText(correlationId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
-    } catch {}
+    } catch {
+      setCopied(false);
+    }
   };
 
   const handleReload = () => {

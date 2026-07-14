@@ -1,9 +1,28 @@
 // Capture a PayPal order server-side after buyer approves in the popup.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
+
+function parseSkus(value: unknown): string[] {
+  const raw = Array.isArray(value) ? value : typeof value === "string" ? value.split(",") : [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const item of raw) {
+    const sku = String(item ?? "").trim().slice(0, 180);
+    if (!sku || seen.has(sku)) continue;
+    seen.add(sku);
+    out.push(sku);
+  }
+  return out;
+}
+
+function cleanString(value: unknown, max: number): string | undefined {
+  const text = String(value ?? "").trim();
+  return text ? text.slice(0, max) : undefined;
+}
 
 async function getAccessToken(): Promise<string> {
   const id = Deno.env.get("PAYPAL_CLIENT_ID");
@@ -29,11 +48,16 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const orderId = String(body.orderId ?? "").trim();
+    const checkoutEmail = cleanString(body.buyerEmail, 254);
+    const checkoutName = cleanString(body.buyerName, 120);
+    const checkoutPhone = cleanString(body.buyerPhone, 40);
+    const checkoutCountry = cleanString(body.buyerCountry, 2)?.toUpperCase();
+    const skus = parseSkus(body.skus);
     // Correlation id from header or body; falls back to server-side trace.
     const rawCorr = String(req.headers.get("x-correlation-id") ?? body.correlationId ?? "").slice(0, 64);
     const clientCorr = /^[A-Za-z0-9._:-]{6,64}$/.test(rawCorr) ? rawCorr : null;
     const correlationId = clientCorr ?? `srv-${traceId}`;
-    console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "input", env: PAYPAL_ENV, orderId, clientProvided: !!clientCorr }));
+    console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "input", env: PAYPAL_ENV, orderId, clientProvided: !!clientCorr, skuCount: skus.length, hasCheckoutEmail: !!checkoutEmail }));
     if (!/^[A-Z0-9]{5,32}$/i.test(orderId)) {
       console.warn(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "reject", reason: "invalid_orderId", orderId }));
       return new Response(JSON.stringify({ error: "Invalid orderId", trace: traceId, correlationId }), {
@@ -79,13 +103,15 @@ Deno.serve(async (req) => {
       echoedCorr, corrMatches,
       ms: Date.now() - t0,
     }));
-    if (status === "COMPLETED" && payerEmail) {
-      const payerName = [data.payer?.name?.given_name, data.payer?.name?.surname].filter(Boolean).join(" ").trim() || undefined;
+    if (status === "COMPLETED" && (payerEmail || checkoutEmail)) {
+      const payerName = checkoutName || [data.payer?.name?.given_name, data.payer?.name?.surname].filter(Boolean).join(" ").trim() || undefined;
+      const customerEmail = checkoutEmail || payerEmail;
+      const customerCountry = checkoutCountry || payerCountry || undefined;
       const productName = pu?.description || pu?.items?.[0]?.name || "Pedido ILINGUE RELAX";
       await sendThankYouEmail({
-        customerEmail: payerEmail,
+        customerEmail,
         customerName: payerName,
-        customerCountry: payerCountry || undefined,
+        customerCountry,
         productName,
         amount: capturedAmount ? Number(capturedAmount) : undefined,
         currency: capturedCurrency ?? "USD",
@@ -93,6 +119,31 @@ Deno.serve(async (req) => {
         orderNumber: captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : undefined,
         idempotencyKey: captureId || orderId,
       });
+      if (skus.length > 0) {
+        const digitalClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        const { error: digitalErr } = await digitalClient.functions.invoke("send-digital-ilinguerelax", {
+          body: {
+            customerEmail,
+            customerName: payerName,
+            customerPhone: checkoutPhone,
+            customerCountry,
+            orderId: captureId || orderId,
+            skus,
+            amount: capturedAmount ? Number(capturedAmount) : undefined,
+            currency: capturedCurrency ?? "USD",
+            provider: "paypal",
+            idempotencyKey: `digital:paypal:${captureId || orderId}:${skus.slice().sort().join(",")}`,
+          },
+        });
+        if (digitalErr) {
+          console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_error", error: digitalErr.message, skuCount: skus.length }));
+        } else {
+          console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_sent", skuCount: skus.length }));
+        }
+      }
     }
     return new Response(JSON.stringify({
       status, order: data, trace: traceId, correlationId,

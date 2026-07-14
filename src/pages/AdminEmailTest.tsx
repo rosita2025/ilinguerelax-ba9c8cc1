@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search } from "lucide-react";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
@@ -127,6 +127,7 @@ const AdminEmailTest = () => {
 
   const [query, setQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<Source | "all">("all");
+  const [onlyProblems, setOnlyProblems] = useState(false);
   const [sortKey, setSortKey] = useState<"date" | "order_ref" | "principal_sku" | "upsell_sku">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -303,6 +304,19 @@ const AdminEmailTest = () => {
   const upsellSkusOf = (r: OrderRow) =>
     r.productLines.filter((p) => p.role === "upsell").map((p) => p.sku || p.name).join(", ");
 
+  const isPaid = (r: OrderRow) => {
+    const v = (r.status || "").toLowerCase();
+    return ["paid", "verified", "approved", "delivered", "sent", "opened", "completed", "succeeded"].includes(v);
+  };
+  const validateRow = (r: OrderRow) => {
+    const hasSkus = r.productLines.some((p) => !!p.sku);
+    const emailSent = !!(r.delivery?.message_id) || ["sent", "delivered", "opened"].includes((r.delivery?.status || "").toLowerCase());
+    const shouldDeliver = isPaid(r);
+    const ok = hasSkus && (!shouldDeliver || emailSent);
+    return { hasSkus, emailSent, shouldDeliver, ok };
+  };
+  const problemCount = useMemo(() => rows.filter((r) => !validateRow(r).ok).length, [rows]);
+
   const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir(key === "date" ? "desc" : "asc"); }
@@ -312,6 +326,7 @@ const AdminEmailTest = () => {
     const q = query.trim().toLowerCase();
     let list = rows.filter((r) => {
       if (sourceFilter !== "all" && r.source !== sourceFilter) return false;
+      if (onlyProblems && validateRow(r).ok) return false;
       if (!q) return true;
       return (
         r.order_ref.toLowerCase().includes(q) ||
@@ -332,7 +347,7 @@ const AdminEmailTest = () => {
       return av.localeCompare(bv) * dir;
     });
     return list;
-  }, [rows, query, sourceFilter, sortKey, sortDir]);
+  }, [rows, query, sourceFilter, sortKey, sortDir, onlyProblems]);
 
 
   return (
@@ -388,6 +403,14 @@ const AdminEmailTest = () => {
                   {s === "all" ? "Todos" : sourceLabel[s as Source]}
                 </Button>
               ))}
+              <Button
+                size="sm"
+                variant={onlyProblems ? "destructive" : "outline"}
+                onClick={() => setOnlyProblems((v) => !v)}
+              >
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                Con problemas ({problemCount})
+              </Button>
             </div>
             <div className="text-xs text-muted-foreground ml-auto">
               {visibleRows.length} de {rows.length} pedidos
@@ -418,6 +441,7 @@ const AdminEmailTest = () => {
                       </button>
                     </th>
                     <th className="text-left py-2 pr-4">Detalle producto</th>
+                    <th className="text-left py-2 pr-3">Validación</th>
                     <th className="text-left py-2 pr-3">Entrega digital</th>
                     <th className="text-left py-2 pr-3">Estado pago</th>
                     <th className="text-left py-2 pr-3">Origen</th>
@@ -436,6 +460,7 @@ const AdminEmailTest = () => {
                   {visibleRows.map((r) => {
                     const pSku = principalSkuOf(r);
                     const uSku = upsellSkusOf(r);
+                    const v = validateRow(r);
                     return (
                     <tr key={r.id} className="border-b last:border-0 align-top">
                       <td className="py-3 pr-4 font-mono text-sm font-bold whitespace-nowrap">{r.order_ref}</td>
@@ -446,6 +471,20 @@ const AdminEmailTest = () => {
                         {uSku ? <span className="px-2 py-0.5 rounded bg-accent/10 text-accent-foreground">{uSku}</span> : <span className="text-muted-foreground">sin upsell</span>}
                       </td>
                       <td className="py-3 pr-4 text-xs">{renderProducts(r)}</td>
+                      <td className="py-3 pr-3">
+                        <div className="flex flex-col gap-1">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${v.ok ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
+                            {v.ok ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
+                            {v.ok ? "OK" : "Revisar"}
+                          </span>
+                          <span className={`inline-flex items-center gap-1 text-[11px] ${v.hasSkus ? "text-emerald-700" : "text-red-700"}`}>
+                            {v.hasSkus ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} SKUs
+                          </span>
+                          <span className={`inline-flex items-center gap-1 text-[11px] ${v.emailSent ? "text-emerald-700" : v.shouldDeliver ? "text-red-700" : "text-muted-foreground"}`}>
+                            {v.emailSent ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Email {v.shouldDeliver ? "" : "(pago pendiente)"}
+                          </span>
+                        </div>
+                      </td>
                       <td className="py-3 pr-3 text-xs">
                         {r.delivery ? (
                           <div className="space-y-1">
@@ -481,7 +520,7 @@ const AdminEmailTest = () => {
                   })}
                   {visibleRows.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="py-10 text-center text-muted-foreground">
+                      <td colSpan={12} className="py-10 text-center text-muted-foreground">
                         {loading ? "Cargando pedidos…" : rows.length === 0 ? "Aún no hay pedidos registrados en ninguna fuente." : "Sin resultados para el filtro actual."}
                       </td>
 

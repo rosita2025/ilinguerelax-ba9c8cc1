@@ -100,22 +100,30 @@ const COUNTRY_TO_CURRENCY: Record<string, CurrencyInfo> = {
 
 const DEFAULT: CurrencyInfo = { code: "USD", symbol: "$", rate: 1, locale: "en-US" };
 
+/** Currencies whose symbol collides with USD "$" — force ISO code prefix. */
+const AMBIGUOUS_DOLLAR = new Set(["MXN", "ARS", "COP", "CLP", "CUP", "DOP", "UYU", "BRL", "CRC"]);
+
+function formatWithCurrency(amount: number, info: CurrencyInfo): string {
+  const isUsd = info.code === "USD";
+  const useCode = !isUsd && (AMBIGUOUS_DOLLAR.has(info.code) || info.symbol === "$");
+  try {
+    return new Intl.NumberFormat(info.locale, {
+      style: "currency",
+      currency: info.code,
+      currencyDisplay: useCode ? "code" : "symbol",
+      maximumFractionDigits: amount >= 100 ? 0 : 2,
+    }).format(amount);
+  } catch {
+    return `${info.symbol} ${amount.toLocaleString()}`;
+  }
+}
+
 /** Formatea un monto USD a la moneda local del país (no-hook, útil dentro de .map()). */
 export function formatLocalAmount(usdAmount: number, country: string): { formatted: string; isUsd: boolean } {
   const info = COUNTRY_TO_CURRENCY[country] || DEFAULT;
   const amount = roundNicely(usdAmount * info.rate);
   const isUsd = info.code === "USD";
-  let formatted: string;
-  try {
-    formatted = new Intl.NumberFormat(info.locale, {
-      style: "currency",
-      currency: info.code,
-      maximumFractionDigits: amount >= 100 ? 0 : 2,
-    }).format(amount);
-  } catch {
-    formatted = `${info.symbol} ${amount.toLocaleString()}`;
-  }
-  return { formatted, isUsd };
+  return { formatted: formatWithCurrency(amount, info), isUsd };
 }
 
 export interface LocalPrice {

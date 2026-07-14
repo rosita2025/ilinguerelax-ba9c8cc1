@@ -301,6 +301,7 @@ const Product500Preguntas = () => {
         reviewCount={280}
         showReviews={true}
         currencyCode={tier.currencyCode}
+        flag={tier.isPeru ? "🇵🇪" : undefined}
         buyUrl={tier.useHotmartLatam ? (tier.hotmartUrl || HOTMART_URL) : CHECKOUT_PATH}
         onBuyClick={handleBuy}
       />

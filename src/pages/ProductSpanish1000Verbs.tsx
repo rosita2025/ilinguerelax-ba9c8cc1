@@ -167,6 +167,7 @@ const ProductSpanish1000Verbs = () => {
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}
+        flag={tier.isPeru ? "🇵🇪" : undefined}
         productName="1,000 Verbs in Spanish — Past, Present & Future"
         rating={4.8}
         reviewCount={0}

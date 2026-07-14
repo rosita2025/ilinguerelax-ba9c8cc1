@@ -323,6 +323,7 @@ const Product1000Verbos = () => {
         reviewCount={350}
         showReviews={true}
         currencyCode={tier.currencyCode}
+        flag={tier.isPeru ? "🇵🇪" : undefined}
         buyUrl={tier.useHotmartLatam ? (tier.hotmartUrl || HOTMART_URL) : "/checkouts/1000-verbos"}
         onBuyClick={handleBuy}
       />

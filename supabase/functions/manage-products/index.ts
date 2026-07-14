@@ -47,6 +47,7 @@ interface ProductIn {
   excluded_countries?: string[] | null;
   store_excluded_countries?: string[] | null;
   hotmart_excluded_countries?: string[] | null;
+  meta_pixel_id?: string | null;
   upsells?: UpsellIn[];
 }
 

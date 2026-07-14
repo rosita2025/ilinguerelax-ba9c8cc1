@@ -376,6 +376,28 @@ const AdminProductEdit = () => {
             
           </Card>
 
+          <Card className="p-6 space-y-3">
+            <div>
+              <h2 className="font-semibold">📘 Meta Pixel (Facebook) — solo checkout</h2>
+              <p className="text-xs text-muted-foreground">
+                Se dispara únicamente en <code className="text-[11px]">/checkout/{`{sku}`}</code>. Déjalo vacío para no rastrear este producto.
+              </p>
+            </div>
+            <div>
+              <Label>Pixel ID</Label>
+              <Input
+                inputMode="numeric"
+                value={product.meta_pixel_id ?? ""}
+                onChange={(e) => update("meta_pixel_id", e.target.value.replace(/[^0-9]/g, "") || null)}
+                placeholder="p. ej. 24959578143733255"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Solo números. Eventos que se envían: <b>PageView</b>, <b>InitiateCheckout</b>, <b>Purchase</b>.
+              </p>
+            </div>
+          </Card>
+
+
           <Card className="p-6 space-y-4">
             <h2 className="font-semibold">🛒 Canales de venta por país</h2>
             <p className="text-xs text-muted-foreground">

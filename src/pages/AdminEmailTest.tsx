@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
@@ -130,6 +131,14 @@ const AdminEmailTest = () => {
   const [onlyProblems, setOnlyProblems] = useState(false);
   const [sortKey, setSortKey] = useState<"date" | "order_ref" | "principal_sku" | "upsell_sku">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [liveOn, setLiveOn] = useState(false);
+  const [retrying, setRetrying] = useState<Set<string>>(new Set());
+  const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleReload = () => {
+    if (reloadTimer.current) clearTimeout(reloadTimer.current);
+    reloadTimer.current = setTimeout(() => load(true), 1200);
+  };
 
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -250,6 +259,7 @@ const AdminEmailTest = () => {
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
       setCounts(perSource);
+      setLastUpdated(new Date());
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: merged, counts: perSource })); } catch {}
     } catch (e) {
       if (!silent) toast.error((e as Error).message);
@@ -260,12 +270,61 @@ const AdminEmailTest = () => {
 
   useEffect(() => {
     if (!adminKey) return;
-    // Silent background refresh so cached data shows instantly
     load(rows.length > 0);
-    const t = setInterval(() => load(true), 30000);
-    return () => clearInterval(t);
+    const t = setInterval(() => load(true), 15000);
+
+    // Realtime: recompute validación cuando llega/actualiza un envío digital,
+    // un evento del funnel (webhook Stripe/PayPal/MP) o un pago manual.
+    const ch = supabase
+      .channel("admin-orders-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "digital_email_sends" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "email_send_log" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "funnel_events" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => { setLiveOn(true); scheduleReload(); })
+      .subscribe((status) => setLiveOn(status === "SUBSCRIBED"));
+
+    // Focus / visibility → refresh inmediato (por si el usuario vuelve tras un webhook tardío)
+    const onFocus = () => load(true);
+    const onVis = () => { if (document.visibilityState === "visible") load(true); };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      clearInterval(t);
+      if (reloadTimer.current) clearTimeout(reloadTimer.current);
+      supabase.removeChannel(ch);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVis);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
+
+  const retryDelivery = async (r: OrderRow) => {
+    if (!r.email || r.email === "—") { toast.error("Falta email del cliente"); return; }
+    const skus = r.productLines.map((p) => p.sku).filter(Boolean) as string[];
+    if (skus.length === 0) { toast.error("Sin SKUs en la orden"); return; }
+    setRetrying((prev) => new Set(prev).add(r.id));
+    try {
+      const { error } = await supabase.functions.invoke("send-digital-ilinguerelax", {
+        body: {
+          customerEmail: r.email,
+          customerName: r.customer !== "—" ? r.customer : undefined,
+          orderId: r.order_ref,
+          skus,
+          provider: r.source,
+          force: true,
+        },
+      });
+      if (error) throw error;
+      toast.success("Reenvío disparado — la validación se actualizará en unos segundos");
+      scheduleReload();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setRetrying((prev) => { const n = new Set(prev); n.delete(r.id); return n; });
+    }
+  };
+
 
   const statusColor = (s: string) => {
     const v = s.toLowerCase();
@@ -361,13 +420,25 @@ const AdminEmailTest = () => {
                 <ShoppingBag className="w-7 h-7 text-primary" /> Pedidos de clientes
               </h1>
               <p className="text-muted-foreground text-sm mt-1">
-                Vista unificada: Yape/Plin, Stripe, PayPal y Mercado Pago. Actualiza cada 30s.
+                Vista unificada con validación automática. Se recalcula al llegar cada webhook (Stripe, PayPal, Mercado Pago, Yape/Plin) y reintento de envío digital.
               </p>
             </div>
-            <Button variant="outline" onClick={() => load(false)} disabled={loading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refrescar
-            </Button>
+            <div className="flex items-center gap-3">
+              <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${liveOn ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-muted bg-muted text-muted-foreground"}`}>
+                <Radio className={`w-3 h-3 ${liveOn ? "animate-pulse" : ""}`} />
+                {liveOn ? "En vivo" : "Sin conexión live"}
+              </span>
+              {lastUpdated && (
+                <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+                  Actualizado {lastUpdated.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                </span>
+              )}
+              <Button variant="outline" onClick={() => load(false)} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refrescar
+              </Button>
+            </div>
           </header>
+
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
@@ -483,6 +554,18 @@ const AdminEmailTest = () => {
                           <span className={`inline-flex items-center gap-1 text-[11px] ${v.emailSent ? "text-emerald-700" : v.shouldDeliver ? "text-red-700" : "text-muted-foreground"}`}>
                             {v.emailSent ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Email {v.shouldDeliver ? "" : "(pago pendiente)"}
                           </span>
+                          {!v.ok && v.shouldDeliver && v.hasSkus && !v.emailSent && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-6 px-2 mt-1 text-[11px]"
+                              onClick={() => retryDelivery(r)}
+                              disabled={retrying.has(r.id)}
+                            >
+                              <Send className={`w-3 h-3 mr-1 ${retrying.has(r.id) ? "animate-pulse" : ""}`} />
+                              {retrying.has(r.id) ? "Reenviando…" : "Reintentar envío"}
+                            </Button>
+                          )}
                         </div>
                       </td>
                       <td className="py-3 pr-3 text-xs">

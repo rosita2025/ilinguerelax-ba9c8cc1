@@ -297,7 +297,7 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Checkout Prueba 1 · ILINGUE RELAX</title>
+        <title>{`Checkout · iLingue Relax · ${isPeru ? "PE" : "GLOBAL"}`}</title>
         <meta name="robots" content="noindex, nofollow" />
         {/* Preconnect a los orígenes críticos del checkout para reducir de
             2–7 s a ~1–2 s el tiempo de apertura del iframe de Stripe. */}

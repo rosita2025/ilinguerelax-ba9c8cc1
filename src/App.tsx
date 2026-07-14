@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";

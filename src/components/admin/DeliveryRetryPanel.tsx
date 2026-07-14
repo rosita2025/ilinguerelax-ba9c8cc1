@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { useAdminKey } from "@/components/admin/AdminGate";
 import { toast } from "sonner";
-import { RefreshCw, Timer, ShieldAlert, CheckCircle2, PlayCircle } from "lucide-react";
+import { RefreshCw, ShieldAlert, CheckCircle2, PlayCircle, Timer } from "lucide-react";
 
 interface Config {
   retry_after_minutes: number;

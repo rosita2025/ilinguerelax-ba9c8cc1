@@ -460,6 +460,7 @@ const AdminEmailTest = () => {
                   {visibleRows.map((r) => {
                     const pSku = principalSkuOf(r);
                     const uSku = upsellSkusOf(r);
+                    const v = validateRow(r);
                     return (
                     <tr key={r.id} className="border-b last:border-0 align-top">
                       <td className="py-3 pr-4 font-mono text-sm font-bold whitespace-nowrap">{r.order_ref}</td>

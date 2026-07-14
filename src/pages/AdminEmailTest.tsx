@@ -420,13 +420,25 @@ const AdminEmailTest = () => {
                 <ShoppingBag className="w-7 h-7 text-primary" /> Pedidos de clientes
               </h1>
               <p className="text-muted-foreground text-sm mt-1">
-                Vista unificada: Yape/Plin, Stripe, PayPal y Mercado Pago. Actualiza cada 30s.
+                Vista unificada con validación automática. Se recalcula al llegar cada webhook (Stripe, PayPal, Mercado Pago, Yape/Plin) y reintento de envío digital.
               </p>
             </div>
-            <Button variant="outline" onClick={() => load(false)} disabled={loading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refrescar
-            </Button>
+            <div className="flex items-center gap-3">
+              <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${liveOn ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-muted bg-muted text-muted-foreground"}`}>
+                <Radio className={`w-3 h-3 ${liveOn ? "animate-pulse" : ""}`} />
+                {liveOn ? "En vivo" : "Sin conexión live"}
+              </span>
+              {lastUpdated && (
+                <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+                  Actualizado {lastUpdated.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                </span>
+              )}
+              <Button variant="outline" onClick={() => load(false)} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refrescar
+              </Button>
+            </div>
           </header>
+
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (

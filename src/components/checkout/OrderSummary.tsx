@@ -115,6 +115,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen * item.quantity)
                     : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                  {showLocalRef && (
+                    <div className="text-[10px] font-normal text-muted-foreground">
+                      {formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

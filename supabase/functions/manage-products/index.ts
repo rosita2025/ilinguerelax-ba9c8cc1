@@ -150,7 +150,6 @@ Deno.serve(async (req) => {
         hotmart_excluded_countries: Array.isArray(p.hotmart_excluded_countries)
           ? p.hotmart_excluded_countries.map((c) => (c ?? "").toString().trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c))
           : [],
-        meta_pixel_id: p.meta_pixel_id?.toString().trim().replace(/[^0-9]/g, "") || null,
       };
 
       const { error: upErr } = await admin

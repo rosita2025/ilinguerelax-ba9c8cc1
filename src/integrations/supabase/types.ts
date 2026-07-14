@@ -179,6 +179,69 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_delivery_alerts: {
+        Row: {
+          created_at: string
+          customer_email: string | null
+          details: Json | null
+          id: string
+          reason: string
+          resolved: boolean
+          source: string
+          source_ref: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email?: string | null
+          details?: Json | null
+          id?: string
+          reason: string
+          resolved?: boolean
+          source: string
+          source_ref?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string
+          resolved?: boolean
+          source?: string
+          source_ref?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      digital_delivery_config: {
+        Row: {
+          enabled: boolean
+          id: number
+          max_attempts: number
+          retry_after_minutes: number
+          scan_window_hours: number
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          id?: number
+          max_attempts?: number
+          retry_after_minutes?: number
+          scan_window_hours?: number
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          id?: number
+          max_attempts?: number
+          retry_after_minutes?: number
+          scan_window_hours?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       digital_email_sends: {
         Row: {
           amount: number | null
@@ -194,9 +257,11 @@ export type Database = {
           idempotency_key: string
           last_event: string | null
           last_event_at: string | null
+          last_retry_at: string | null
           message_id: string | null
           order_id: string | null
           provider: string | null
+          retry_attempts: number
           skus: string[]
           status: string | null
         }
@@ -214,9 +279,11 @@ export type Database = {
           idempotency_key: string
           last_event?: string | null
           last_event_at?: string | null
+          last_retry_at?: string | null
           message_id?: string | null
           order_id?: string | null
           provider?: string | null
+          retry_attempts?: number
           skus?: string[]
           status?: string | null
         }
@@ -234,9 +301,11 @@ export type Database = {
           idempotency_key?: string
           last_event?: string | null
           last_event_at?: string | null
+          last_retry_at?: string | null
           message_id?: string | null
           order_id?: string | null
           provider?: string | null
+          retry_attempts?: number
           skus?: string[]
           status?: string | null
         }

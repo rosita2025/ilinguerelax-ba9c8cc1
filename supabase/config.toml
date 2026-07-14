@@ -39,3 +39,7 @@ project_id = "opyitzdvvurdyyyzkwwv"
     verify_jwt = false
   [functions.send-transactional-email]
     verify_jwt = true
+  [functions.retry-digital-delivery]
+    verify_jwt = false
+  [functions.manage-delivery-retry]
+    verify_jwt = false

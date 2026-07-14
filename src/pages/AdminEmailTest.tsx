@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminNav from "@/components/admin/AdminNav";
+import DeliveryRetryPanel from "@/components/admin/DeliveryRetryPanel";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -439,8 +440,10 @@ const AdminEmailTest = () => {
             </div>
           </header>
 
+          <DeliveryRetryPanel />
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card
                 key={s}

@@ -4,8 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 
 declare global {
   interface Window {
-    paypal?: any;
+    paypal?: {
+      Buttons: (options: PayPalButtonOptions) => { render: (container: HTMLElement) => void | Promise<void> };
+    };
   }
+}
+
+interface PayPalButtonOptions {
+  style: { layout: string; color: string; shape: string; label: string; height: number };
+  createOrder: () => Promise<string>;
+  onApprove: (data: { orderID: string }) => Promise<void>;
+  onError: (error: unknown) => void;
+  onCancel: () => void;
 }
 
 let sdkPromise: Promise<void> | null = null;
@@ -19,7 +29,7 @@ async function loadPayPalSdk(currency: string): Promise<void> {
   if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
   if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
   document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => s.remove());
-  delete (window as any).paypal;
+  window.paypal = undefined;
   loadedClientId = clientId;
   loadedCurrency = currency;
   sdkPromise = new Promise<void>((resolve, reject) => {
@@ -228,7 +238,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
       }
     })();
     return () => { cancelled = true; };
-  }, [amount, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey]);
+  }, [amount, amountUsd, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey, onApproved, onError]);
 
   const correlationId = correlationIdRef.current;
 
@@ -237,7 +247,9 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
       await navigator.clipboard.writeText(correlationId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
-    } catch {}
+    } catch {
+      setCopied(false);
+    }
   };
 
   const handleReload = () => {

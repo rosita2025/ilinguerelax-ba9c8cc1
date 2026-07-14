@@ -270,12 +270,61 @@ const AdminEmailTest = () => {
 
   useEffect(() => {
     if (!adminKey) return;
-    // Silent background refresh so cached data shows instantly
     load(rows.length > 0);
-    const t = setInterval(() => load(true), 30000);
-    return () => clearInterval(t);
+    const t = setInterval(() => load(true), 15000);
+
+    // Realtime: recompute validación cuando llega/actualiza un envío digital,
+    // un evento del funnel (webhook Stripe/PayPal/MP) o un pago manual.
+    const ch = supabase
+      .channel("admin-orders-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "digital_email_sends" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "email_send_log" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "funnel_events" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => { setLiveOn(true); scheduleReload(); })
+      .subscribe((status) => setLiveOn(status === "SUBSCRIBED"));
+
+    // Focus / visibility → refresh inmediato (por si el usuario vuelve tras un webhook tardío)
+    const onFocus = () => load(true);
+    const onVis = () => { if (document.visibilityState === "visible") load(true); };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      clearInterval(t);
+      if (reloadTimer.current) clearTimeout(reloadTimer.current);
+      supabase.removeChannel(ch);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVis);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
+
+  const retryDelivery = async (r: OrderRow) => {
+    if (!r.email || r.email === "—") { toast.error("Falta email del cliente"); return; }
+    const skus = r.productLines.map((p) => p.sku).filter(Boolean) as string[];
+    if (skus.length === 0) { toast.error("Sin SKUs en la orden"); return; }
+    setRetrying((prev) => new Set(prev).add(r.id));
+    try {
+      const { error } = await supabase.functions.invoke("send-digital-ilinguerelax", {
+        body: {
+          customerEmail: r.email,
+          customerName: r.customer !== "—" ? r.customer : undefined,
+          orderId: r.order_ref,
+          skus,
+          provider: r.source,
+          force: true,
+        },
+      });
+      if (error) throw error;
+      toast.success("Reenvío disparado — la validación se actualizará en unos segundos");
+      scheduleReload();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setRetrying((prev) => { const n = new Set(prev); n.delete(r.id); return n; });
+    }
+  };
+
 
   const statusColor = (s: string) => {
     const v = s.toLowerCase();

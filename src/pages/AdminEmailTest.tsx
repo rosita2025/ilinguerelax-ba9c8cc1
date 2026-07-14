@@ -226,17 +226,20 @@ const AdminEmailTest = () => {
         if (orderKey && matchedDigitalOrders.has(orderKey)) return;
         const src = providerToSource(r.provider);
         const skus = Array.isArray(r.skus) ? r.skus : [];
-        const products = skus.join(", ") || "—";
+        const products = skus.map((s: string) => productMap.get(s)?.name || s).join(", ") || "—";
+        const amountStr = r.amount != null
+          ? `${(r.currency || "USD").toUpperCase()} ${Number(r.amount).toFixed(2)}`
+          : "—";
         merged.push({
           id: `d-${r.id}`,
           source: src,
           created_at: r.created_at,
           order_ref: r.order_id || "—",
-          customer: "—",
+          customer: r.customer_name || "—",
           email: r.customer_email,
           products,
           productLines: buildProductLines(skus, products, productMap),
-          amount: "—",
+          amount: amountStr,
           status: r.status || "—",
           delivery: { status: r.status, last_event: r.last_event, last_event_at: r.last_event_at, message_id: r.message_id },
         });

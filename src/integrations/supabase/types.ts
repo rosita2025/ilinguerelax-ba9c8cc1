@@ -181,8 +181,13 @@ export type Database = {
       }
       digital_email_sends: {
         Row: {
+          amount: number | null
           created_at: string
+          currency: string | null
+          customer_country: string | null
           customer_email: string
+          customer_name: string | null
+          customer_phone: string | null
           event_count: number
           events: Json
           id: string
@@ -196,8 +201,13 @@ export type Database = {
           status: string | null
         }
         Insert: {
+          amount?: number | null
           created_at?: string
+          currency?: string | null
+          customer_country?: string | null
           customer_email: string
+          customer_name?: string | null
+          customer_phone?: string | null
           event_count?: number
           events?: Json
           id?: string
@@ -211,8 +221,13 @@ export type Database = {
           status?: string | null
         }
         Update: {
+          amount?: number | null
           created_at?: string
+          currency?: string | null
+          customer_country?: string | null
           customer_email?: string
+          customer_name?: string | null
+          customer_phone?: string | null
           event_count?: number
           events?: Json
           id?: string

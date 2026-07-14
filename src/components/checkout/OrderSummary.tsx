@@ -33,12 +33,14 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
   const penMode = penTotals !== null;
-  // PE: soles nativos. Otros países con moneda local (MX, AR, CO, BR, EU, etc.): USD + referencia.
+  // PE: soles nativos. Otros países con moneda local (MX, AR, CO, BR, VE, EU, etc.): moneda local principal + USD referencial.
   const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading;
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
-      : `$${usd.toFixed(2)}`;
+      : showLocalRef
+        ? _local.formatted
+        : `$${usd.toFixed(2)}`;
   void localSubtotal; void localDiscount;
   const hasRegionalItem = items.some((i) => i.regionPrices);
 
@@ -114,10 +116,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                 <div className="text-sm font-semibold shrink-0 text-right">
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen * item.quantity)
-                    : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                    : showLocalRef
+                      ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
+                      : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
                   {showLocalRef && (
                     <div className="text-[10px] font-normal text-muted-foreground">
-                      {formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted}
+                      USD ${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}
                     </div>
                   )}
                 </div>
@@ -189,10 +193,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
               {showLocalRef && (
                 <div className="text-xs font-normal text-muted-foreground mt-0.5">
-                  ≈ {localTotal.formatted} {localTotal.currency}
+                  ≈ USD ${total.toFixed(2)}
                 </div>
               )}
             </div>

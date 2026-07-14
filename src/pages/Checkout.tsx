@@ -52,6 +52,7 @@ export default function Checkout() {
   const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
   const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
+  const [metaPixelId, setMetaPixelId] = useState<string | null>(null);
 
   // Always live-load product + upsells from admin (`digital_products` +
   // `product_upsells`) so /checkouts/:slug mirrors /admin/products/:sku

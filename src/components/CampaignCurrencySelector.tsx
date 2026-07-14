@@ -20,6 +20,7 @@ const FLAGS: Record<CampaignCurrency, string> = {
   CRC: "🇨🇷",
   HNL: "🇭🇳",
   NIO: "🇳🇮",
+  CUP: "🇨🇺",
   VES: "🇻🇪",
   NZD: "🇳🇿",
   SEK: "🇸🇪",

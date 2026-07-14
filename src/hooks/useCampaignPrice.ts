@@ -5,7 +5,7 @@ export type CampaignCurrency =
   | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
   | "COP" | "ARS" | "PEN" | "MXN" | "CLP" | "BRL"
   | "UYU" | "BOB" | "PYG" | "GTQ" | "DOP" | "CRC"
-  | "HNL" | "NIO" | "VES"
+  | "HNL" | "NIO" | "CUP" | "VES"
   | "NZD" | "SEK" | "NOK" | "DKK" | "CHF"
   | "JPY" | "KRW" | "SGD" | "HKD" | "TWD";
 
@@ -119,6 +119,8 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     const rounded = Math.round(n);
     return rounded - 0.10;
   }},
+  // CUP (Peso cubano) — referencia local aproximada
+  CUP: { symbol: "$",    rate: 24, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   // VES (Bolívar venezolano) — alta volatilidad; mantener conservador
   VES: { symbol: "Bs.S", rate: 100, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   NZD: { symbol: "NZ$",  rate: 1.65, decimals: 2, nice: (n) => Math.round(n) - 0.10 },
@@ -152,6 +154,7 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   CR: "CRC",
   HN: "HNL",
   NI: "NIO",
+  CU: "CUP",
   VE: "VES",
   PA: "USD", // Panamá usa USD
   EC: "USD", // Ecuador usa USD
@@ -264,7 +267,7 @@ export const CAMPAIGN_CURRENCIES: CampaignCurrency[] = [
   "SEK", "NOK", "DKK",
   "JPY", "KRW", "SGD", "HKD", "TWD",
   "MXN", "COP", "ARS", "PEN", "CLP", "BRL",
-  "UYU", "BOB", "PYG", "GTQ", "DOP", "CRC", "HNL", "NIO", "VES",
+  "UYU", "BOB", "PYG", "GTQ", "DOP", "CRC", "HNL", "NIO", "CUP", "VES",
 ];
 
 /**

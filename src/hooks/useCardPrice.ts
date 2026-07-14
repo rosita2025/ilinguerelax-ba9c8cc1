@@ -9,9 +9,9 @@ import { LATAM_HOTMART_COUNTRIES, TIENDA_USD_COUNTRIES } from "./useCountryTierR
  * and returns a formatter that renders card prices according to the 4-tier model:
  *
  *   - Peru (PE): native `S/ X.XX PEN` from admin `price_pen`.
- *   - Tienda USD (VE/CU/NI): USD from admin `price_usd_tienda` ($7 por defecto).
- *   - LATAM Hotmart: USD from admin `price_usd_latam` ($10).
- *   - Global (US/CA/EU/Asia/HT/resto): local currency from admin `price_usd` ($15).
+  *   - Tienda (VE/CU/NI): local currency from admin `price_usd_tienda` ($7 base).
+  *   - LATAM Hotmart: local currency from admin `price_usd_latam` ($10 base).
+  *   - Global (US/CA/EU/Asia/HT/resto): local currency from admin `price_usd` ($15 base).
  */
 interface Row {
   sku: string;
@@ -81,9 +81,7 @@ export function useCardPrice(): CardPriceFormatter {
 
   const displayCurrency = isPeru
     ? "PEN"
-    : isTiendaUsd
-      ? "USD"
-      : detectCurrency(cc || "US");
+    : detectCurrency(cc || "US");
 
   const regionLabel: RegionLabel = isPeru
     ? "PE"
@@ -103,10 +101,10 @@ export function useCardPrice(): CardPriceFormatter {
       return formatPrice(fallbackUsd, "PEN");
     }
 
-    // VE / CU / NI → USD Tienda ($7 por defecto), sin conversión a moneda local
+    // VE / CU / NI → precio Tienda convertido a moneda local del país
     if (isTiendaUsd) {
       const usd = row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd;
-      return `$${Number(usd).toFixed(2)}`;
+      return formatPrice(Number(usd), displayCurrency as any);
     }
 
     // LATAM Hotmart → moneda local convertida desde USD LATAM
@@ -122,7 +120,6 @@ export function useCardPrice(): CardPriceFormatter {
 
   const currencyLabel = (_sku: string | null | undefined): string => {
     if (isPeru) return "PEN";
-    if (isTiendaUsd) return "USD";
     return displayCurrency;
   };
 

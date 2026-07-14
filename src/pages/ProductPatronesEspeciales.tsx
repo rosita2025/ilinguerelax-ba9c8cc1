@@ -22,6 +22,7 @@ import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { detectCurrency, formatPrice } from "@/i18n";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
@@ -95,13 +96,14 @@ const ProductPatronesEspeciales = () => {
   const PRICE_USD = isTiendaUsdCountry ? TIENDA_USD : useHotmartLatam ? LATAM_USD : GLOBAL_USD;
   const pricingReady = pricingAdmin.loaded && (isPeru ? (pricingAdmin.pricePen ?? 0) > 0 : PRICE_USD > 0);
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
+  const displayCurrency = isPeru ? "PEN" : detectCurrency(visitorCountry || "US");
   // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
   const priceLabel = isPeru && pricingAdmin.pricePen
     ? `S/ ${pricingAdmin.pricePen.toFixed(2)}`
-    : (useTiendaOnly ? `$${PRICE_USD.toFixed(2)} USD` : `$${PRICE_USD.toFixed(2)} USD`);
+    : formatPrice(PRICE_USD, displayCurrency);
   const originalLabel = isPeru && pricingAdmin.pricePen
     ? `S/ ${(pricingAdmin.pricePen * 2.5).toFixed(2)}`
-    : `$${ORIGINAL_USD.toFixed(2)} USD`;
+    : formatPrice(ORIGINAL_USD, displayCurrency);
   const HOTMART_URL = pricingAdmin.hotmartUrl || HOTMART_URL_LATAM;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({
@@ -703,7 +705,7 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         price={priceLabel}
         originalPrice={originalLabel}
-        currencyCode={isPeru ? "PEN" : "USD"}
+        currencyCode={displayCurrency}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
         rating={4.9}
         reviewCount={6}

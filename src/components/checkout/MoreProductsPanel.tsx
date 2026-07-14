@@ -141,7 +141,6 @@ export function MoreProductsPanel({ parentSku }: Props) {
 
   const fmt = (usd: number, pen?: number | null) => {
     if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
-    if (isTiendaUsd) return `$${Number(usd).toFixed(2)}`;
     const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "");
     return isUsd ? `$${Number(usd).toFixed(2)}` : formatted;
   };

@@ -42,9 +42,11 @@ const COUNTRIES: CountryOption[] = [
   { code: "HN", flag: "🇭🇳", label: "Honduras", currency: "HNL", region: "Americas" },
   { code: "NI", flag: "🇳🇮", label: "Nicaragua", currency: "NIO", region: "Americas" },
   { code: "VE", flag: "🇻🇪", label: "Venezuela", currency: "VES", region: "Americas" },
+  { code: "CU", flag: "🇨🇺", label: "Cuba", currency: "CUP", region: "Americas" },
   { code: "PA", flag: "🇵🇦", label: "Panamá", currency: "USD", region: "Americas" },
   { code: "EC", flag: "🇪🇨", label: "Ecuador", currency: "USD", region: "Americas" },
   { code: "SV", flag: "🇸🇻", label: "El Salvador", currency: "USD", region: "Americas" },
+  { code: "PR", flag: "🇵🇷", label: "Puerto Rico", currency: "USD", region: "Americas" },
   // Europe
   { code: "GB", flag: "🇬🇧", label: "United Kingdom", currency: "GBP", region: "Europe" },
   { code: "IE", flag: "🇮🇪", label: "Ireland", currency: "EUR", region: "Europe" },
@@ -92,7 +94,11 @@ function readInitialCountry(): string {
   return "US";
 }
 
-const I18N_SUPPORTED: Currency[] = ["USD", "EUR", "BRL", "MXN", "COP", "ARS", "GBP", "CAD", "AUD", "PEN"];
+const I18N_SUPPORTED: Currency[] = [
+  "USD", "EUR", "GBP", "CAD", "AUD", "NZD", "BRL", "MXN", "COP", "ARS", "PEN",
+  "CLP", "BOB", "CRC", "DOP", "GTQ", "HNL", "NIO", "CUP", "PYG", "UYU", "HTG", "VES",
+  "CHF", "SEK", "NOK", "DKK", "PLN", "CZK", "JPY", "KRW", "CNY", "INR", "SGD", "HKD", "TWD",
+];
 
 // Detect country via IP so the header selector reflects the visitor's real
 // location even on pages that don't call useCampaignPrice (e.g. /admin, /blog).

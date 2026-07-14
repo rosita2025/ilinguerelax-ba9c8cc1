@@ -185,7 +185,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.total}</span>
             <div className="text-right">
               <div>{penMode ? formatPen(penTotals!.total) : `USD $${total.toFixed(2)}`}</div>
-
+              {showLocalRef && (
+                <div className="text-xs font-normal text-muted-foreground mt-0.5">
+                  ≈ {localTotal.formatted} {localTotal.currency}
+                </div>
+              )}
             </div>
           </div>
 

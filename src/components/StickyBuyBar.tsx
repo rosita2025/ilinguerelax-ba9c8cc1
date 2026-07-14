@@ -446,15 +446,8 @@ export const StickyBuyBar = ({
                 {flagBadge}
                 <span className="text-sm text-muted-foreground">{currencyCode}</span>
               </div>
-              {!disabled && (
-                <div className="flex flex-col items-end gap-1">
-                  <p className="text-xs text-muted-foreground">
-                    {lang === "en" ? "You can change your country's currency at checkout" : "Puedes cambiar la moneda de tu país en el checkout"}
-                  </p>
-                  <CountryPicker lang={lang} />
-                </div>
-              )}
             </div>
+
 
             {/* Buy Button with 100% secure badge */}
             <div className="flex flex-col items-center gap-1">

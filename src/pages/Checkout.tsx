@@ -177,8 +177,7 @@ export default function Checkout() {
       const imgBust = data.cover_image_url ? `?v=${cb}` : "";
       const priceGlobal = Number(data.price_usd);
       const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
-      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null; meta_pixel_id?: string | null };
-      setMetaPixelId((rowWithTienda.meta_pixel_id || "").toString().replace(/[^0-9]/g, "") || null);
+      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null };
       const priceTienda = rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0 ? Number(rowWithTienda.price_usd_tienda) : null;
       const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
       setDbItem({

@@ -331,6 +331,44 @@ export default function Checkout() {
   // fill name+email but leave without completing card payment.
   useAbandonedCheckoutTracker(slug, catalogItem?.name);
 
+  // Fire InitiateCheckout for every /checkouts/:slug (Pixel + CAPI + funnel_events).
+  // Includes product_id + value + currency so /admin/live cuenta "Continuar pago"
+  // por producto para TODOS los SKUs de la tienda (no solo Hotmart).
+  const initiatedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!catalogItem) return;
+    const sku = catalogItem.adminSku || catalogItem.id;
+    if (!sku || initiatedRef.current === sku) return;
+    initiatedRef.current = sku;
+
+    const tier = (region.tier || "global") as "peru" | "latam" | "tienda" | "global";
+    const priceForTier =
+      tier === "peru" && catalogItem.pricePen != null
+        ? Number(catalogItem.pricePen)
+        : Number(
+            catalogItem.regionPrices?.[tier === "peru" ? "latam" : tier] ??
+            catalogItem.price
+          );
+    const currency = tier === "peru" ? "PEN" : "USD";
+    const cartTotal = items.reduce((sum, it) => {
+      const p = tier === "peru" && it.pricePen != null
+        ? Number(it.pricePen)
+        : Number(it.regionPrices?.[tier === "peru" ? "latam" : tier] ?? it.price);
+      return sum + p * (it.quantity || 1);
+    }, 0);
+    const value = cartTotal > 0 ? cartTotal : priceForTier;
+
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: catalogItem.name,
+      content_ids: [sku],
+      content_type: "product",
+      value,
+      currency,
+      num_items: items.length || 1,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogItem?.adminSku, catalogItem?.id]);
+
   if (loadingDb && !catalogItem && !slugUnknown) {
     // Silent background fetch — don't block UI with a loader
   }

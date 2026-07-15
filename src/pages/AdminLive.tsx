@@ -103,7 +103,7 @@ const AdminLive = () => {
   const { adminKey } = useAdminKey();
   const [data, setData] = useState<LiveData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [windowMin] = useState(1);
+  const [windowMin, setWindowMin] = useState<1 | 5 | 15 | 60>(1);
 
   const load = async () => {
     setLoading(true);
@@ -168,7 +168,7 @@ const AdminLive = () => {
                 <Globe className="w-7 h-7 text-primary" /> Plataforma en vivo
               </h1>
               <p className="text-sm text-muted-foreground">
-                Datos reales del sitio · productos, páginas, países, checkout y compras · actualizado {timeAgo(data.generatedAt)} atrás
+                Datos reales · humanos (bots excluidos) · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · actualizado {timeAgo(data.generatedAt)} atrás
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -181,9 +181,22 @@ const AdminLive = () => {
                 <span className="text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
-              <span className="h-9 inline-flex items-center rounded-md border bg-background px-3 text-sm text-muted-foreground">
-                Ahora mismo
-              </span>
+              <div className="inline-flex rounded-md border bg-background overflow-hidden">
+                {([1, 5, 15, 60] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setWindowMin(m)}
+                    className={`px-3 h-9 text-sm transition-colors ${
+                      windowMin === m
+                        ? "bg-primary text-primary-foreground font-semibold"
+                        : "text-muted-foreground hover:bg-muted"
+                    }`}
+                    title={`Últimos ${m} min · humanos (bots excluidos)`}
+                  >
+                    {m < 60 ? `${m}m` : "1h"}
+                  </button>
+                ))}
+              </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>
           </div>

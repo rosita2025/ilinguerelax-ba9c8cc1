@@ -422,6 +422,17 @@ export function PaymentMethodsGroup() {
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
+      try {
+        const s3 = useCheckoutPruebaStore.getState();
+        const totals = calcTotals(s3.items, s3.couponPercent, region.tier);
+        trackPaymentError({
+          provider: `mercadopago_${paymentType}`,
+          skus: s3.items.map((i) => i.id),
+          reason: err instanceof Error ? err.message : String(err),
+          value: totals.total,
+          currency: "USD",
+        });
+      } catch { /* noop */ }
       toast({
         title: t.mpError,
         description: err instanceof Error ? err.message : t.tryAgain,

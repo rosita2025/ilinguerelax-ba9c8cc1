@@ -158,6 +158,8 @@ const AdminBrevoLogs = () => {
                     <th className="px-3 py-2 text-left">Evento</th>
                     <th className="px-3 py-2 text-left">Email</th>
                     <th className="px-3 py-2 text-left">Producto</th>
+                    <th className="px-3 py-2 text-left">País</th>
+                    <th className="px-3 py-2 text-left">Método</th>
                     <th className="px-3 py-2 text-left">Orden / SKU</th>
                     <th className="px-3 py-2 text-left">Estado</th>
                   </tr>
@@ -165,7 +167,7 @@ const AdminBrevoLogs = () => {
                 <tbody>
                   {logs.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="text-center py-10 text-muted-foreground">
+                      <td colSpan={9} className="text-center py-10 text-muted-foreground">
                         {loading ? "Cargando…" : "Aún no hay registros con estos filtros."}
                       </td>
                     </tr>
@@ -173,6 +175,11 @@ const AdminBrevoLogs = () => {
                   {logs.map((row) => {
                     const meta = EVENT_LABELS[row.event_type] ?? { label: row.event_type, color: "bg-muted text-foreground" };
                     const isOpen = openId === row.id;
+                    const attrs = (row.attributes ?? {}) as Record<string, unknown>;
+                    const countryName = (attrs.COUNTRY_NAME || attrs.PAIS || attrs.COUNTRY || "—") as string;
+                    const countryCode = (attrs.COUNTRY_CODE || attrs.COUNTRY || "") as string;
+                    const provider = (attrs.LAST_PROVIDER || attrs.PAYMENT_METHOD || row.origin || "—") as string;
+                    const paymentMethod = (attrs.PAYMENT_METHOD || attrs.STRIPE_PAYMENT_METHOD || "") as string;
                     return (
                       <>
                         <tr key={row.id} className="border-t hover:bg-muted/30 cursor-pointer" onClick={() => setOpenId(isOpen ? null : row.id)}>
@@ -183,8 +190,20 @@ const AdminBrevoLogs = () => {
                           <td className="px-3 py-2">
                             <Badge className={`${meta.color} font-normal`}>{meta.label}</Badge>
                           </td>
-                          <td className="px-3 py-2 truncate max-w-[200px]">{row.email ?? "—"}</td>
-                          <td className="px-3 py-2 truncate max-w-[220px]">{row.product_name ?? "—"}</td>
+                          <td className="px-3 py-2 truncate max-w-[180px]">{row.email ?? "—"}</td>
+                          <td className="px-3 py-2 truncate max-w-[200px]">{row.product_name ?? "—"}</td>
+                          <td className="px-3 py-2 text-xs whitespace-nowrap">
+                            <div>{countryName}</div>
+                            {countryCode && countryCode !== countryName && (
+                              <div className="text-muted-foreground font-mono">{countryCode}</div>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-xs whitespace-nowrap">
+                            <div className="capitalize">{provider}</div>
+                            {paymentMethod && (
+                              <div className="text-muted-foreground uppercase text-[10px]">{paymentMethod}</div>
+                            )}
+                          </td>
                           <td className="px-3 py-2 text-xs">
                             <div>{row.order_ref ?? "—"}</div>
                             {row.product_sku && <div className="text-muted-foreground">{row.product_sku}</div>}
@@ -200,7 +219,7 @@ const AdminBrevoLogs = () => {
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-amber-700 text-xs font-medium">
-                                <AlertTriangle className="w-3.5 h-3.5" /> Omitido
+                                <AlertTriangle className="w-3.5 h-3.5" /> Pendiente
                               </span>
                             )}
                           </td>

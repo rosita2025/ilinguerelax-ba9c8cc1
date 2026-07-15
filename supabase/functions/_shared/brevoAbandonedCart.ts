@@ -19,9 +19,11 @@ interface Args {
   language?: string;        // es|en|fr|pt
   country?: string;         // ISO-2, e.g. PE, US, FR
   source?: string;          // "checkout" | "hotmart" | ...
+  productCategory?: string; // categoría/tipo de oferta explícita (opcional)
 }
 
 import { logBrevoSync } from "./brevoLog.ts";
+import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
@@ -109,18 +111,30 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   } else {
     attributes.TIENDA_SKU = a.productSku;
   }
+  // Categoría/tipo de oferta para agrupar en Brevo (8,000 palabras, pack, coreano…)
+  const category = inferProductCategory({
+    productName: a.productName,
+    sku: a.productSku,
+    explicit: a.productCategory,
+  });
+  const categoryLabel = CATEGORY_LABEL[category];
+  attributes.CATEGORIA = category;
+  attributes.PRODUCT_CATEGORY = category;
+  attributes.CATEGORIA_LABEL = categoryLabel;
+
   const noteParts = [
     origin === "hotmart" ? "Hotmart" : "Tienda",
     "abandonado",
     a.productName || "",
+    `cat=${categoryLabel}`,
     `sku=${a.productSku}`,
     typeof a.priceUsd === "number" ? `usd=${a.priceUsd}` : "",
   ].filter(Boolean);
   attributes.ABANDONED_NOTE = noteParts.join(" · ");
 
-  // TAGS: atributo tipo texto/categoría en Brevo para filtrar de un vistazo.
+  // TAGS: incluye categoría para filtrar por oferta abandonada
   const eventKind: "compra" | "abandonado" = "abandonado";
-  const tagList = [eventKind, origin, `${eventKind}_${origin}`];
+  const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
   attributes.TAGS = tagList.join(",");
   attributes.SEGMENTO = `${eventKind}_${origin}`;
 

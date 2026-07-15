@@ -15,6 +15,8 @@ interface Args {
   currency?: string;
   orderNumber?: string;
   provider?: string;
+  origin?: "hotmart" | "tienda"; // canal real de venta para separar en Brevo
+
 }
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";

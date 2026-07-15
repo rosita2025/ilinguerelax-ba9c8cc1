@@ -305,8 +305,11 @@ export const useMetaPixelViewContent = (params: ViewContentParams, _pixelId?: st
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
+    logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
+    markViewContentFired(params as unknown as Record<string, unknown>);
   }, [params.content_name]);
 };
+
 
 export const useSpanishRelaxPixel = useHotmartPixel;
 export const trackSpanishRelaxEvent = trackHotmartEvent;

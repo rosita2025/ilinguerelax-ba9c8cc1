@@ -149,6 +149,7 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
         value: typeof params.value === "number" ? params.value : null,
         currency: typeof params.currency === "string" ? params.currency : null,
         session_id: getSessionId(),
+        client_id: getClientId(),
         page_path: window.location.pathname,
         country: getCountry(),
         referrer: getAttributionReferrer(),

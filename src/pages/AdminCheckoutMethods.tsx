@@ -291,6 +291,15 @@ export default function AdminCheckoutMethods() {
               <a href={`/checkouts/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
             </Button>
             <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="outline" onClick={async () => {
+                if (!confirm("Auto-rellenar métodos Stripe oficiales para TODAS las regiones Stripe? (upsert — no borra métodos manuales)")) return;
+                const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "sync_all_stripe" } });
+                if (error || data?.error) return toast.error(error?.message || data?.error);
+                toast.success(`✅ ${data.regions?.length || 0} regiones sincronizadas (${data.upserted} métodos)`);
+                invalidateCheckoutMethodsCache(); load();
+              }}>
+                ⚡ Auto Stripe (todas)
+              </Button>
               <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>
                 <Plus className="w-4 h-4 mr-1" /> Nueva región
               </Button>

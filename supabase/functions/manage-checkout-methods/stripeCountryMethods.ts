@@ -57,7 +57,6 @@ const M = {
   promptpay: { method_key: "stripe_promptpay",        label: "PromptPay",            icon: "Smartphone",  note: "Tailandia" },
   konbini:   { method_key: "stripe_konbini",          label: "Konbini",              icon: "Banknote",    note: "Tiendas de conveniencia Japón" },
   // Nuevos / emergentes 2025-2026
-  pagoefectivo: { method_key: "stripe_pagoefectivo", label: "PagoEfectivo",         icon: "Banknote",    note: "Voucher efectivo Perú" },
   mbway:     { method_key: "stripe_mb_way",           label: "MB WAY",               icon: "Smartphone",  note: "Pago móvil Portugal" },
   satispay:  { method_key: "stripe_satispay",         label: "Satispay",             icon: "Smartphone",  note: "Italia" },
   zip:       { method_key: "stripe_zip",              label: "Zip",                  icon: "CreditCard",  note: "Compra ahora, paga después (AU/US)" },

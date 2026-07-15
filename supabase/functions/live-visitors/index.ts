@@ -314,6 +314,9 @@ serve(async (req) => {
       if (v.product_name !== "Sin producto") byProduct[v.product_name] = (byProduct[v.product_name] || 0) + 1;
       bySource[v.source] = (bySource[v.source] || 0) + 1;
       byChannel[v.source_channel] = (byChannel[v.source_channel] || 0) + 1;
+      if (v.campaign) byCampaign[v.campaign] = (byCampaign[v.campaign] || 0) + 1;
+      const scMap = bySourceCountry[v.source] || (bySourceCountry[v.source] = {});
+      scMap[c] = (scMap[c] || 0) + 1;
       if (new Date(v.last_seen).getTime() >= fiveMinCutoff) activeFive.add(v.session_id);
     }
 

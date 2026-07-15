@@ -86,6 +86,14 @@ export const EmailSubscribePopup = () => {
       });
       if (error) throw error;
       try { writeState("subscribed", SUBSCRIBED_TTL_DAYS); } catch {}
+      // Guardar datos del suscriptor para autocompletar el checkout
+      try {
+        localStorage.setItem(
+          "ilr_buyer",
+          JSON.stringify({ email: email.trim().toLowerCase(), name: name.trim() || "", coupon: COUPON, ts: Date.now() }),
+        );
+        window.dispatchEvent(new CustomEvent("ilr:buyer-updated"));
+      } catch {}
       setSuccess(true);
     } catch (err) {
       console.error(err);

@@ -357,14 +357,14 @@ export default function AdminCheckoutMethods() {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-10 px-4">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <header className="space-y-2">
-            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+      <main className="min-h-dvh bg-background py-4 sm:py-10 px-3 sm:px-4">
+        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+          <header className="space-y-1.5 sm:space-y-2">
+            <div className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">
               <Lock className="w-3.5 h-3.5" /> Vista privada · solo admin
             </div>
-            <h1 className="text-3xl font-bold">Métodos de pago por región</h1>
-            <p className="text-muted-foreground text-sm">
+            <h1 className="text-xl sm:text-3xl font-bold leading-tight">Métodos de pago por región</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Configura qué métodos aparecen en cada país/región según la IP del comprador.
               El cliente <strong>no</strong> ve esta página.
             </p>

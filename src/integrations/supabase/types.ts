@@ -134,6 +134,48 @@ export type Database = {
         }
         Relationships: []
       }
+      brevo_product_audiences: {
+        Row: {
+          active: boolean
+          created_at: string
+          event_kind: string
+          id: string
+          label: string | null
+          list_id: number
+          match_type: string
+          match_value: string
+          notes: string | null
+          tag: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          event_kind?: string
+          id?: string
+          label?: string | null
+          list_id: number
+          match_type: string
+          match_value: string
+          notes?: string | null
+          tag?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          event_kind?: string
+          id?: string
+          label?: string | null
+          list_id?: number
+          match_type?: string
+          match_value?: string
+          notes?: string | null
+          tag?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brevo_sync_logs: {
         Row: {
           attributes: Json | null

@@ -595,7 +595,33 @@ export default function AdminCheckoutMethods() {
                 </Card>
               );
             })}
-          </div>
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <p className="text-xs text-muted-foreground">
+                      Página {currentPage} de {totalPages} · {regions.length} regiones
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="outline" className="h-8" disabled={currentPage <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                        ← Anterior
+                      </Button>
+                      {Array.from({ length: totalPages }).map((_, i) => {
+                        const n = i + 1;
+                        return (
+                          <Button key={n} size="sm" variant={n === currentPage ? "default" : "ghost"} className="h-8 w-8 p-0" onClick={() => setPage(n)}>
+                            {n}
+                          </Button>
+                        );
+                      })}
+                      <Button size="sm" variant="outline" className="h-8" disabled={currentPage >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
+                        Siguiente →
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           <Card className="p-4 bg-muted/40 text-xs text-muted-foreground space-y-1">
             <p><strong>Detección:</strong> IP del comprador vía ipapi.co → se busca el código de país en <code>country_codes</code> de cada región. La región con código <code>*</code> es el fallback global.</p>

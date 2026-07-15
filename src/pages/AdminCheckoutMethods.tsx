@@ -620,38 +620,78 @@ export default function AdminCheckoutMethods() {
               </div>
               <div>
                 <Label>Países (click para agregar/quitar)</Label>
-                <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded max-h-40 overflow-auto bg-muted/20">
-                  {COUNTRY_LIST.map(c => {
-                    const active = regionEdit.country_codes.includes(c.code);
-                    return (
-                      <button
-                        key={c.code}
-                        type="button"
-                        onClick={() => {
-                          const set = new Set(regionEdit.country_codes);
-                          if (active) set.delete(c.code); else set.add(c.code);
-                          const nextCountries = Array.from(set);
-                          // Auto-derivar código de región y bandera del primer país si es nueva región
-                          const isNew = !regions.some(r => r.code === regionEdit.code);
-                          const patch: Partial<Region> = { country_codes: nextCountries };
-                          if (isNew && nextCountries.length > 0) {
-                            const first = COUNTRY_LIST.find(x => x.code === nextCountries[0]);
-                            if (first) {
-                              patch.code = first.code;
-                              if (!regionEdit.flag) patch.flag = first.flag;
-                              if (!regionEdit.name || regionEdit.name === regionEdit.code) patch.name = first.name;
-                            }
-                          }
-                          setRegionEdit({ ...regionEdit, ...patch });
-                        }}
-                        className={`text-[11px] px-2 py-1 rounded border ${active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"}`}
-                        title={c.name}
-                      >
-                        {c.flag} {c.code}
-                      </button>
-                    );
-                  })}
-                </div>
+                {(() => {
+                  // Countries already taken by OTHER regions — hidden to avoid duplicates.
+                  const takenByOthers = new Map<string, { code: string; name: string; flag: string | null }>();
+                  for (const r of regions) {
+                    if (r.code === regionEdit.code) continue;
+                    for (const cc of r.country_codes || []) {
+                      if (cc === "*") continue;
+                      takenByOthers.set(cc, { code: r.code, name: r.name, flag: r.flag });
+                    }
+                  }
+                  const available = COUNTRY_LIST.filter(c => !takenByOthers.has(c.code));
+                  const taken = COUNTRY_LIST.filter(c => takenByOthers.has(c.code));
+                  return (
+                    <>
+                      <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded max-h-40 overflow-auto bg-muted/20">
+                        {available.map(c => {
+                          const active = regionEdit.country_codes.includes(c.code);
+                          return (
+                            <button
+                              key={c.code}
+                              type="button"
+                              onClick={() => {
+                                const set = new Set(regionEdit.country_codes);
+                                if (active) set.delete(c.code); else set.add(c.code);
+                                const nextCountries = Array.from(set);
+                                const isNew = !regions.some(r => r.code === regionEdit.code);
+                                const patch: Partial<Region> = { country_codes: nextCountries };
+                                if (isNew && nextCountries.length > 0) {
+                                  const first = COUNTRY_LIST.find(x => x.code === nextCountries[0]);
+                                  if (first) {
+                                    patch.code = first.code;
+                                    if (!regionEdit.flag) patch.flag = first.flag;
+                                    if (!regionEdit.name || regionEdit.name === regionEdit.code) patch.name = first.name;
+                                  }
+                                }
+                                setRegionEdit({ ...regionEdit, ...patch });
+                              }}
+                              className={`text-[11px] px-2 py-1 rounded border ${active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"}`}
+                              title={c.name}
+                            >
+                              {c.flag} {c.code}
+                            </button>
+                          );
+                        })}
+                        {available.length === 0 && (
+                          <p className="text-[11px] text-muted-foreground p-1">Todos los países ya están asignados a otras regiones.</p>
+                        )}
+                      </div>
+                      {taken.length > 0 && (
+                        <details className="mt-2">
+                          <summary className="text-[11px] text-muted-foreground cursor-pointer">
+                            {taken.length} país(es) ya asignados a otras regiones (ocultos)
+                          </summary>
+                          <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded bg-muted/10 opacity-60">
+                            {taken.map(c => {
+                              const owner = takenByOthers.get(c.code)!;
+                              return (
+                                <span
+                                  key={c.code}
+                                  className="text-[11px] px-2 py-1 rounded border bg-background text-muted-foreground line-through"
+                                  title={`${c.name} → ya en región ${owner.name} (${owner.code})`}
+                                >
+                                  {c.flag} {c.code}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </details>
+                      )}
+                    </>
+                  );
+                })()}
                 <p className="text-[11px] text-muted-foreground mt-1">
                   El código de región se asigna automáticamente según el país seleccionado
                   {regionEdit.code ? <> — actual: <code className="font-mono">{regionEdit.code}</code></> : null}.

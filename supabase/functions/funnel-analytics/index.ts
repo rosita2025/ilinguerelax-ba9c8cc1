@@ -200,7 +200,7 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, shopifyRes, manualRes] = await Promise.all([
+    const [hotmartRes, manualRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
         .select("product_id, purchased_at, raw_payload, status")
@@ -208,17 +208,13 @@ serve(async (req) => {
         .gte("purchased_at", fromDate.toISOString())
         .lte("purchased_at", toDate.toISOString()),
       supabase
-        .from("shopify_sales")
-        .select("product_key, country, order_created_at")
-        .gte("order_created_at", fromDate.toISOString())
-        .lte("order_created_at", toDate.toISOString()),
-      supabase
         .from("manual_payments")
         .select("items, amount_usd, buyer_country, created_at, status, verified_at")
         .in("status", ["approved", "verified", "completed"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
     ]);
+    const shopifyRes = { data: [] as any[] };
 
     type RealPurchase = { at: string; productId: string; country: string; usd: number };
     const realPurchases: RealPurchase[] = [];

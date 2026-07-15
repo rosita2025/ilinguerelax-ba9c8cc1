@@ -271,6 +271,30 @@ export default function AdminCheckoutMethods() {
     toast.success(`+ ${q.label}`); load();
   }
 
+  async function reorderMethod(m: Method, dir: -1 | 1) {
+    const siblings = methods
+      .filter(x => x.region_code === m.region_code)
+      .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
+    const idx = siblings.findIndex(x => x.id === m.id);
+    const targetIdx = idx + dir;
+    if (idx < 0 || targetIdx < 0 || targetIdx >= siblings.length) return;
+    const other = siblings[targetIdx];
+    // Optimistic swap
+    setMethods(prev => prev.map(x => {
+      if (x.id === m.id) return { ...x, sort_order: other.sort_order };
+      if (x.id === other.id) return { ...x, sort_order: m.sort_order };
+      return x;
+    }));
+    const [r1, r2] = await Promise.all([
+      adminInvoke<any>("manage-checkout-methods", { body: { action: "save_method", method: { ...m, sort_order: other.sort_order } } }),
+      adminInvoke<any>("manage-checkout-methods", { body: { action: "save_method", method: { ...other, sort_order: m.sort_order } } }),
+    ]);
+    if (r1.error || r1.data?.error || r2.error || r2.data?.error) {
+      toast.error("No se pudo reordenar");
+      load();
+    }
+  }
+
 
 
   return (

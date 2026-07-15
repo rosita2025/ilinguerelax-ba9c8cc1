@@ -96,6 +96,36 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
       return;
     }
     console.log(`[brevo-contact] upserted ${email}`);
+
+    // Deduplicar: si el comprador estaba en la lista de carrito abandonado,
+    // quitarlo para que no reciba más correos de recuperación ni cuente doble.
+    const abandonedRaw = Deno.env.get("BREVO_ABANDONED_CART_LIST_ID");
+    const abandonedId = abandonedRaw ? Number(abandonedRaw) : NaN;
+    if (Number.isFinite(abandonedId)) {
+      try {
+        const rm = await fetch(
+          `${GATEWAY_URL}/contacts/lists/${abandonedId}/contacts/remove`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "X-Connection-Api-Key": BREVO_API_KEY,
+            },
+            body: JSON.stringify({ emails: [email] }),
+          },
+        );
+        if (rm.ok) {
+          console.log(`[brevo-contact] removed ${email} from abandoned-cart list`);
+        } else if (rm.status !== 400 && rm.status !== 404) {
+          // 400/404 = ya no estaba en la lista → ignorar
+          const body = await rm.text();
+          console.warn(`[brevo-contact] remove-from-abandoned failed [${rm.status}]: ${body}`);
+        }
+      } catch (e) {
+        console.warn("[brevo-contact] remove-from-abandoned network error:", e instanceof Error ? e.message : String(e));
+      }
+    }
   } catch (e) {
     console.error("[brevo-contact] network error:", e instanceof Error ? e.message : String(e));
   }

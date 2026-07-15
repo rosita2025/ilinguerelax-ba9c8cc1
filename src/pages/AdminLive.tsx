@@ -62,6 +62,8 @@ interface LiveData {
   byProduct: Record<string, number>;
   bySource: Record<string, number>;
   byChannel: Record<string, number>;
+  byCampaign: Record<string, number>;
+  bySourceCountry: Record<string, Record<string, number>>;
   byEvent: Record<string, number>;
   revenueByCountry: Record<string, number>;
   visitors: Visitor[];

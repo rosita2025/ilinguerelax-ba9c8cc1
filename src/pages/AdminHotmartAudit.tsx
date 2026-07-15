@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Search, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Clock, XCircle, RotateCcw, AlertOctagon, Ban } from "lucide-react";
+import { RefreshCw, Search, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Clock, XCircle, RotateCcw, AlertOctagon, Ban, Send } from "lucide-react";
 import { toast } from "sonner";
 
 type MappedStatus = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "abandoned" | "unknown";
@@ -67,6 +67,7 @@ const AdminHotmartAudit = () => {
   const [rows, setRows] = useState<AuditRow[]>([]);
   const [summary, setSummary] = useState<Summary>({ approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 });
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [status, setStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
@@ -104,6 +105,28 @@ const AdminHotmartAudit = () => {
     } finally { setLoading(false); }
   }, [adminKey, status, search]);
 
+  const forceBrevoSync = useCallback(async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; synced: number; syncTargets: number }>(
+        "list-hotmart-audit",
+        { body: { adminKey, status, search, limit: 300, forceSync: true } },
+      );
+      if (error) throw error;
+      setRows(data?.rows ?? []);
+      if (data?.summary) setSummary(data.summary);
+      const synced = data?.synced ?? 0;
+      const targets = data?.syncTargets ?? 0;
+      if (targets === 0) {
+        toast.success("Brevo ya está al día", { description: "No hay contactos pendientes de sincronizar." });
+      } else {
+        toast.success(`Sincronizados ${synced}/${targets} contactos con Brevo`);
+      }
+    } catch (e) {
+      toast.error("No se pudo forzar la sincronización con Brevo", { description: (e as Error).message });
+    } finally { setSyncing(false); }
+  }, [adminKey, status, search]);
+
   useEffect(() => { void load(); }, [load]);
 
   // Auto-refresh cada 30s para reflejar nuevos eventos y sincronizar contactos a Brevo
@@ -136,10 +159,16 @@ const AdminHotmartAudit = () => {
                 Cada evento recibido de Hotmart (compra, pendiente, rechazo, reembolso, chargeback, cancelación, carrito abandonado) con el evento original, el estado mapeado y la hora exacta.
               </p>
             </div>
-            <Button onClick={() => void load()} disabled={loading} variant="outline" size="sm">
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-              Actualizar
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => void forceBrevoSync()} disabled={syncing || loading} size="sm">
+                <Send className={`w-4 h-4 mr-2 ${syncing ? "animate-pulse" : ""}`} />
+                {syncing ? "Sincronizando…" : "Sincronizar Brevo"}
+              </Button>
+              <Button onClick={() => void load()} disabled={loading} variant="outline" size="sm">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                Actualizar
+              </Button>
+            </div>
           </header>
 
           <div className="grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7">

@@ -78,7 +78,7 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   AR: [M.paypal],
   CL: [M.paypal],
   CO: [M.paypal],
-  PE: [M.pagoefectivo, M.paypal],
+  PE: [M.paypal],
   UY: [M.paypal],
 
   // Zona euro — SEPA + locales

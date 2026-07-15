@@ -12,7 +12,7 @@ import {
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
-import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone } from "lucide-react";
+import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;

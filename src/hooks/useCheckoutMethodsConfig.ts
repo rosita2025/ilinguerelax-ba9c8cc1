@@ -33,23 +33,30 @@ const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "fam
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }
 interface MethodRow { region_code: string; method_key: string; enabled: boolean; sort_order: number | null }
 
-// Cache en memoria — las regiones cambian poquísimo, así evitamos re-consulta
-// en cada montaje de <PaymentMethodsGroup />.
+// Cache en memoria con TTL corto — evita re-consulta en cada montaje pero
+// permite ver cambios del admin sin recargar la pestaña por completo.
+const CACHE_TTL_MS = 30_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
+let cacheAt = 0;
+
+export function invalidateCheckoutMethodsCache() {
+  cachePromise = null;
+  cacheAt = 0;
+}
 
 async function loadAll() {
-  if (!cachePromise) {
-    cachePromise = (async () => {
-      const [{ data: regions }, { data: methods }] = await Promise.all([
-        supabase.from("checkout_regions").select("code, country_codes, enabled, sort_order").eq("enabled", true),
-        supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order").eq("enabled", true),
-      ]);
-      return {
-        regions: (regions ?? []) as RegionRow[],
-        methods: (methods ?? []) as MethodRow[],
-      };
-    })().catch(() => ({ regions: [], methods: [] }));
-  }
+  if (cachePromise && Date.now() - cacheAt < CACHE_TTL_MS) return cachePromise;
+  cacheAt = Date.now();
+  cachePromise = (async () => {
+    const [{ data: regions }, { data: methods }] = await Promise.all([
+      supabase.from("checkout_regions").select("code, country_codes, enabled, sort_order").eq("enabled", true),
+      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order").eq("enabled", true),
+    ]);
+    return {
+      regions: (regions ?? []) as RegionRow[],
+      methods: (methods ?? []) as MethodRow[],
+    };
+  })().catch(() => ({ regions: [], methods: [] }));
   return cachePromise;
 }
 

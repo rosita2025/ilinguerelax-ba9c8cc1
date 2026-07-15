@@ -72,7 +72,7 @@ interface PruebaStore {
   couponPercent: number;
   buyer: BuyerInfo;
   setBuyer: (patch: Partial<BuyerInfo>) => void;
-  addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
+  addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }, opts?: { silent?: boolean }) => void;
   /** Update price/name/image/regionPrices of items already in cart (keeps quantity). */
   syncItem: (patch: Omit<PruebaItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (id: string) => void;

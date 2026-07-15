@@ -99,38 +99,42 @@ async function fetchGa4Live(): Promise<Ga4Live | null> {
   }
 }
 
-const classifyReferrer = (ref: string | null): { source: string; channel: string } => {
-  if (!ref) return { source: "Directo", channel: "Directo / manual" };
-  if (ref === "stripe-webhook") return { source: "Stripe", channel: "Pago" };
-  if (ref === "hotmart-webhook") return { source: "Hotmart", channel: "Pago" };
+const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+const classifyReferrer = (ref: string | null): { source: string; channel: string; campaign: string | null } => {
+  if (!ref) return { source: "Directo", channel: "Directo / manual", campaign: null };
+  if (ref === "stripe-webhook") return { source: "Stripe", channel: "Pago", campaign: null };
+  if (ref === "hotmart-webhook") return { source: "Hotmart", channel: "Pago", campaign: null };
   if (ref.startsWith("utm:")) {
-    const source = ref.split(":")[1] || "Campaña";
+    const parts = ref.split(":");
+    const source = parts[1] || "Campaña";
+    const campaign = parts[2] || null;
     const normalized = source.toLowerCase();
-    if (["google", "bing", "yahoo", "duckduckgo"].includes(normalized)) {
-      return { source: source[0]?.toUpperCase() + source.slice(1), channel: "Orgánico / búsqueda" };
-    }
-    if (["facebook", "instagram", "tiktok", "youtube", "x", "twitter"].includes(normalized)) {
-      return { source: source[0]?.toUpperCase() + source.slice(1), channel: "Social" };
-    }
-    return { source: source[0]?.toUpperCase() + source.slice(1), channel: "Campaña" };
+    let channel = "Campaña";
+    if (["google", "bing", "yahoo", "duckduckgo"].includes(normalized)) channel = "Orgánico / búsqueda";
+    else if (["facebook", "fb", "instagram", "ig", "tiktok", "youtube", "yt", "x", "twitter", "threads"].includes(normalized)) channel = "Social";
+    else if (["email", "newsletter", "mail", "resend", "brevo"].includes(normalized)) channel = "Email";
+    else if (["whatsapp", "wa"].includes(normalized)) channel = "Mensaje directo";
+    return { source: cap(source), channel, campaign: campaign || null };
   }
   try {
     const host = new URL(ref).hostname.toLowerCase().replace(/^www\./, "");
-    if (host.includes("google")) return { source: "Google", channel: "Orgánico / búsqueda" };
-    if (host.includes("bing") || host.includes("yahoo") || host.includes("duckduckgo")) return { source: host, channel: "Orgánico / búsqueda" };
-    if (host.includes("facebook") || host.includes("fb.")) return { source: "Facebook", channel: "Social" };
-    if (host.includes("instagram")) return { source: "Instagram", channel: "Social" };
-    if (host.includes("tiktok")) return { source: "TikTok", channel: "Social" };
-    if (host.includes("youtube") || host === "youtu.be") return { source: "YouTube", channel: "Social" };
-    if (host.includes("twitter") || host === "t.co" || host.includes("x.com")) return { source: "Twitter/X", channel: "Social" };
-    if (host.includes("whatsapp") || host === "wa.me") return { source: "WhatsApp", channel: "Mensaje directo" };
-    if (host.includes("hotmart")) return { source: "Hotmart", channel: "Pago" };
-    if (host.includes("paypal")) return { source: "PayPal", channel: "Pago" };
-    if (host.includes("stripe")) return { source: "Stripe", channel: "Pago" };
-    if (host.includes("amazon")) return { source: "Amazon", channel: "Marketplace" };
-    if (host.includes("ilinguerelax") || host.includes("lovable")) return { source: "Interno", channel: "Interno" };
-    return { source: host, channel: "Referido" };
-  } catch { return { source: "Directo", channel: "Directo / manual" }; }
+    const base = (s: string, c: string) => ({ source: s, channel: c, campaign: null });
+    if (host.includes("google")) return base("Google", "Orgánico / búsqueda");
+    if (host.includes("bing") || host.includes("yahoo") || host.includes("duckduckgo")) return base(cap(host), "Orgánico / búsqueda");
+    if (host.includes("facebook") || host.includes("fb.")) return base("Facebook", "Social");
+    if (host.includes("instagram")) return base("Instagram", "Social");
+    if (host.includes("threads")) return base("Threads", "Social");
+    if (host.includes("tiktok")) return base("TikTok", "Social");
+    if (host.includes("youtube") || host === "youtu.be") return base("YouTube", "Social");
+    if (host.includes("twitter") || host === "t.co" || host.includes("x.com")) return base("Twitter/X", "Social");
+    if (host.includes("whatsapp") || host === "wa.me") return base("WhatsApp", "Mensaje directo");
+    if (host.includes("hotmart")) return base("Hotmart", "Pago");
+    if (host.includes("paypal")) return base("PayPal", "Pago");
+    if (host.includes("stripe")) return base("Stripe", "Pago");
+    if (host.includes("amazon")) return base("Amazon", "Marketplace");
+    if (host.includes("ilinguerelax") || host.includes("lovable")) return base("Interno", "Interno");
+    return base(host, "Referido");
+  } catch { return { source: "Directo", channel: "Directo / manual", campaign: null }; }
 };
 
 const isAdminPath = (path: string | null): boolean => (path || "").startsWith("/admin");
@@ -235,6 +239,7 @@ serve(async (req) => {
       referrer: string | null;
       source: string;
       source_channel: string;
+      campaign: string | null;
       last_seen: string;
       event_count: number;
       last_event: string;
@@ -258,6 +263,7 @@ serve(async (req) => {
         referrer: (row.referrer as string) || null,
         source: traffic.source,
         source_channel: traffic.channel,
+        campaign: traffic.campaign,
         last_seen: row.created_at as string,
         event_count: 1,
         last_event: row.event_name as string,
@@ -275,6 +281,8 @@ serve(async (req) => {
     const byProduct: Record<string, number> = {};
     const bySource: Record<string, number> = {};
     const byChannel: Record<string, number> = {};
+    const byCampaign: Record<string, number> = {};
+    const bySourceCountry: Record<string, Record<string, number>> = {};
     const byEvent: Record<string, number> = {};
     const revenueByCountry: Record<string, number> = {};
     const activeFive = new Set<string>();
@@ -306,6 +314,9 @@ serve(async (req) => {
       if (v.product_name !== "Sin producto") byProduct[v.product_name] = (byProduct[v.product_name] || 0) + 1;
       bySource[v.source] = (bySource[v.source] || 0) + 1;
       byChannel[v.source_channel] = (byChannel[v.source_channel] || 0) + 1;
+      if (v.campaign) byCampaign[v.campaign] = (byCampaign[v.campaign] || 0) + 1;
+      const scMap = bySourceCountry[v.source] || (bySourceCountry[v.source] = {});
+      scMap[c] = (scMap[c] || 0) + 1;
       if (new Date(v.last_seen).getTime() >= fiveMinCutoff) activeFive.add(v.session_id);
     }
 
@@ -377,6 +388,8 @@ serve(async (req) => {
       byProduct,
       bySource,
       byChannel,
+      byCampaign,
+      bySourceCountry,
       byEvent: mergedByEvent,
       revenueByCountry,
       visitors: visitors.slice(0, 200),

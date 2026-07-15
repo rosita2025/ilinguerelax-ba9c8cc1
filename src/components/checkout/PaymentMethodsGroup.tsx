@@ -449,9 +449,18 @@ export function PaymentMethodsGroup() {
         return true;
       })
     : allMethods;
+  // Aplica el orden configurado en /admin/checkout-methods (según sort_order
+  // más bajo de cada familia en la región activa).
+  const familyOf = (id: Method) => (id === "card" ? "stripe" : id);
+  const orderIndex = (id: Method) => {
+    const fam = familyOf(id);
+    const i = methodsConfig.familyOrder.indexOf(fam as any);
+    return i === -1 ? 99 : i;
+  };
+  const orderedByAdmin = [...filteredByAdmin].sort((a, b) => orderIndex(a.id) - orderIndex(b.id));
   const methods = isPeru
-    ? filteredByAdmin.filter((m) => m.id !== "paypal")
-    : filteredByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
+    ? orderedByAdmin.filter((m) => m.id !== "paypal")
+    : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
 
 
 

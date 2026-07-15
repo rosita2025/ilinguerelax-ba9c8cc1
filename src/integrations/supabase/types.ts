@@ -134,6 +134,98 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_payment_methods: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          icon: string
+          id: string
+          label: string
+          method_key: string
+          note: string | null
+          region_code: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          icon?: string
+          id?: string
+          label: string
+          method_key: string
+          note?: string | null
+          region_code: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          icon?: string
+          id?: string
+          label?: string
+          method_key?: string
+          note?: string | null
+          region_code?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkout_payment_methods_region_code_fkey"
+            columns: ["region_code"]
+            isOneToOne: false
+            referencedRelation: "checkout_regions"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      checkout_regions: {
+        Row: {
+          code: string
+          country_codes: string[]
+          created_at: string
+          currency: string
+          description: string | null
+          enabled: boolean
+          flag: string | null
+          gateway: string | null
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          country_codes?: string[]
+          created_at?: string
+          currency: string
+          description?: string | null
+          enabled?: boolean
+          flag?: string | null
+          gateway?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          country_codes?: string[]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          enabled?: boolean
+          flag?: string | null
+          gateway?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       client_error_logs: {
         Row: {
           component_stack: string | null

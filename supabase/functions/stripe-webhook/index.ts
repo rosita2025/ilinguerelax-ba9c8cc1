@@ -276,6 +276,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     console.error("purchase tracking error:", trackingError);
   }
 
+  const coupon = extractStripeCoupon(session);
   await sendStripePurchaseEmails({
     adminClient,
     customerEmail,
@@ -286,6 +287,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     orderNumber,
     paymentKey,
     skus,
+    ...coupon,
   });
 
   return { delivered: true };

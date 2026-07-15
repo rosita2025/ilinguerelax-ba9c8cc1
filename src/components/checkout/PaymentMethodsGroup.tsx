@@ -657,7 +657,7 @@ export function PaymentMethodsGroup() {
 
 
 
-            {m.id === "card" && isSelected && showStripe && stripePromise && (
+            {isPrimaryCard && m.id === "card" && valid && selected === "card" && showStripe && stripePromise && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
                 {/* Aviso claro: falta 1 paso más (llenar tarjeta y pagar dentro de Stripe) */}
                 <div className="px-3 sm:px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-[12px] sm:text-sm text-amber-900 dark:text-amber-200 font-medium text-center">

@@ -248,6 +248,7 @@ export default function AdminCheckoutMethods() {
           <Card className="p-4 bg-muted/40 text-xs text-muted-foreground space-y-1">
             <p><strong>Detección:</strong> IP del comprador vía ipapi.co → se busca el código de país en <code>country_codes</code> de cada región. La región con código <code>*</code> es el fallback global.</p>
             <p><strong>Nota técnica:</strong> desactivar un método aquí lo oculta de la UI del checkout. Para Stripe, los métodos habilitados se pasan como <code>payment_method_types</code> a la sesión.</p>
+            <p><strong>⚡ Auto Stripe:</strong> según los países ISO de la región, añade automáticamente los métodos que Stripe soporta ahí: tarjeta + Link + wallets siempre; y locales por país (OXXO en MX, Cash App + ACH en US, SEPA en zona euro, iDEAL en NL, Bancontact en BE, Boleto/Pix en BR, Klarna/Affirm donde aplique, etc.). No borra los métodos manuales que ya tengas.</p>
           </Card>
         </div>
       </main>

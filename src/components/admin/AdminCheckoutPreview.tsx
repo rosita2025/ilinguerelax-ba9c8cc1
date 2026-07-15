@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,47 +7,133 @@ import { Eye, ExternalLink, RefreshCw, Monitor, Smartphone } from "lucide-react"
 
 type Country = { code: string; name: string; flag: string; region?: string };
 
-const COUNTRIES: Country[] = [
-  { code: "PE", name: "Perú", flag: "🇵🇪", region: "PE" },
-  { code: "MX", name: "México", flag: "🇲🇽", region: "MX" },
-  { code: "US", name: "Estados Unidos", flag: "🇺🇸", region: "US" },
-  { code: "CA", name: "Canadá", flag: "🇨🇦" },
-  { code: "BR", name: "Brasil", flag: "🇧🇷" },
-  { code: "AR", name: "Argentina", flag: "🇦🇷" },
-  { code: "CL", name: "Chile", flag: "🇨🇱" },
-  { code: "CO", name: "Colombia", flag: "🇨🇴" },
-  { code: "ES", name: "España", flag: "🇪🇸", region: "GLOBAL" },
-  { code: "DE", name: "Alemania", flag: "🇩🇪" },
-  { code: "FR", name: "Francia", flag: "🇫🇷" },
-  { code: "IT", name: "Italia", flag: "🇮🇹" },
-  { code: "PT", name: "Portugal", flag: "🇵🇹" },
-  { code: "NL", name: "P. Bajos", flag: "🇳🇱" },
-  { code: "GB", name: "Reino Unido", flag: "🇬🇧" },
-  { code: "AU", name: "Australia", flag: "🇦🇺" },
-  { code: "JP", name: "Japón", flag: "🇯🇵" },
-  { code: "SG", name: "Singapur", flag: "🇸🇬" },
-];
+type RegionLite = {
+  code: string;
+  name: string;
+  flag: string | null;
+  country_codes: string[];
+  enabled: boolean;
+};
+
+// Catálogo maestro (solo para resolver nombre/bandera legibles a partir del ISO)
+const COUNTRY_META: Record<string, { name: string; flag: string }> = {
+  PE: { name: "Perú", flag: "🇵🇪" },
+  MX: { name: "México", flag: "🇲🇽" },
+  US: { name: "Estados Unidos", flag: "🇺🇸" },
+  CA: { name: "Canadá", flag: "🇨🇦" },
+  BR: { name: "Brasil", flag: "🇧🇷" },
+  AR: { name: "Argentina", flag: "🇦🇷" },
+  CL: { name: "Chile", flag: "🇨🇱" },
+  CO: { name: "Colombia", flag: "🇨🇴" },
+  VE: { name: "Venezuela", flag: "🇻🇪" },
+  EC: { name: "Ecuador", flag: "🇪🇨" },
+  UY: { name: "Uruguay", flag: "🇺🇾" },
+  PY: { name: "Paraguay", flag: "🇵🇾" },
+  BO: { name: "Bolivia", flag: "🇧🇴" },
+  CR: { name: "Costa Rica", flag: "🇨🇷" },
+  PA: { name: "Panamá", flag: "🇵🇦" },
+  DO: { name: "R. Dominicana", flag: "🇩🇴" },
+  GT: { name: "Guatemala", flag: "🇬🇹" },
+  HN: { name: "Honduras", flag: "🇭🇳" },
+  SV: { name: "El Salvador", flag: "🇸🇻" },
+  NI: { name: "Nicaragua", flag: "🇳🇮" },
+  CU: { name: "Cuba", flag: "🇨🇺" },
+  ES: { name: "España", flag: "🇪🇸" },
+  DE: { name: "Alemania", flag: "🇩🇪" },
+  FR: { name: "Francia", flag: "🇫🇷" },
+  IT: { name: "Italia", flag: "🇮🇹" },
+  PT: { name: "Portugal", flag: "🇵🇹" },
+  NL: { name: "P. Bajos", flag: "🇳🇱" },
+  BE: { name: "Bélgica", flag: "🇧🇪" },
+  GB: { name: "Reino Unido", flag: "🇬🇧" },
+  IE: { name: "Irlanda", flag: "🇮🇪" },
+  CH: { name: "Suiza", flag: "🇨🇭" },
+  AT: { name: "Austria", flag: "🇦🇹" },
+  SE: { name: "Suecia", flag: "🇸🇪" },
+  NO: { name: "Noruega", flag: "🇳🇴" },
+  DK: { name: "Dinamarca", flag: "🇩🇰" },
+  FI: { name: "Finlandia", flag: "🇫🇮" },
+  PL: { name: "Polonia", flag: "🇵🇱" },
+  AU: { name: "Australia", flag: "🇦🇺" },
+  NZ: { name: "N. Zelanda", flag: "🇳🇿" },
+  JP: { name: "Japón", flag: "🇯🇵" },
+  KR: { name: "Corea del Sur", flag: "🇰🇷" },
+  SG: { name: "Singapur", flag: "🇸🇬" },
+  HK: { name: "Hong Kong", flag: "🇭🇰" },
+  IN: { name: "India", flag: "🇮🇳" },
+  AE: { name: "E.A.U.", flag: "🇦🇪" },
+  ZA: { name: "Sudáfrica", flag: "🇿🇦" },
+};
 
 const DEFAULT_SKU =
   "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
-export default function AdminCheckoutPreview() {
-  const [country, setCountry] = useState<Country>(COUNTRIES[0]);
+interface Props {
+  regions?: RegionLite[];
+}
+
+export default function AdminCheckoutPreview({ regions = [] }: Props) {
+  // Construir lista de países disponibles SOLO a partir de las regiones configuradas.
+  // La región con código "*" (global) se representa con un botón "🌐 Global".
+  const countries = useMemo<Country[]>(() => {
+    const list: Country[] = [];
+    const seen = new Set<string>();
+    let hasGlobal = false;
+
+    for (const r of regions) {
+      if (!r.enabled) continue;
+      for (const cc of r.country_codes || []) {
+        if (cc === "*") { hasGlobal = true; continue; }
+        if (seen.has(cc)) continue;
+        seen.add(cc);
+        const meta = COUNTRY_META[cc] ?? { name: cc, flag: "🏳️" };
+        list.push({ code: cc, name: meta.name, flag: meta.flag, region: r.code });
+      }
+    }
+
+    // Ordenar por región para agrupar visualmente
+    list.sort((a, b) => (a.region || "").localeCompare(b.region || ""));
+
+    if (hasGlobal) {
+      list.unshift({ code: "XX", name: "Resto del mundo (Global)", flag: "🌐", region: "*" });
+    }
+    return list;
+  }, [regions]);
+
+  const [country, setCountry] = useState<Country | null>(countries[0] ?? null);
   const [sku, setSku] = useState(DEFAULT_SKU);
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [nonce, setNonce] = useState(0);
 
+  // Si cambian las regiones y el país actual ya no existe, saltar al primero.
+  useEffect(() => {
+    if (!countries.length) { setCountry(null); return; }
+    if (!country || !countries.some(c => c.code === country.code)) {
+      setCountry(countries[0]);
+      setNonce((n) => n + 1);
+    }
+  }, [countries, country]);
+
   const url = useMemo(() => {
+    if (!country) return "";
     const q = new URLSearchParams({
       country: country.code,
       admin_preview: "1",
       _t: String(nonce),
     });
     return `/checkouts/${sku}?${q.toString()}`;
-  }, [sku, country.code, nonce]);
+  }, [sku, country, nonce]);
 
   const frameWidth = device === "mobile" ? 390 : "100%";
   const frameHeight = device === "mobile" ? 780 : 900;
+
+  if (!countries.length) {
+    return (
+      <Card className="p-4 text-sm text-muted-foreground border-primary/30">
+        Añade al menos una región para habilitar la vista previa por país.
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-4 space-y-3 border-primary/30">
@@ -55,10 +141,12 @@ export default function AdminCheckoutPreview() {
         <div className="flex items-center gap-2 mr-2">
           <Eye className="w-4 h-4 text-primary" />
           <span className="font-semibold text-sm">Vista previa por país</span>
-          <Badge variant="outline" className="text-[10px]">
-            {country.flag} {country.code}
-            {country.region ? ` · región ${country.region}` : ""}
-          </Badge>
+          {country && (
+            <Badge variant="outline" className="text-[10px]">
+              {country.flag} {country.code}
+              {country.region ? ` · región ${country.region}` : ""}
+            </Badge>
+          )}
         </div>
 
         <div className="flex items-center gap-1 ml-auto">
@@ -90,18 +178,20 @@ export default function AdminCheckoutPreview() {
             <RefreshCw className="w-3.5 h-3.5 mr-1" />
             Recargar
           </Button>
-          <Button asChild size="sm" variant="secondary" className="h-8">
-            <a href={url} target="_blank" rel="noreferrer">
-              <ExternalLink className="w-3.5 h-3.5 mr-1" />
-              Abrir
-            </a>
-          </Button>
+          {url && (
+            <Button asChild size="sm" variant="secondary" className="h-8">
+              <a href={url} target="_blank" rel="noreferrer">
+                <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                Abrir
+              </a>
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {COUNTRIES.map((c) => {
-          const active = c.code === country.code;
+        {countries.map((c) => {
+          const active = country?.code === c.code;
           return (
             <button
               key={c.code}
@@ -115,7 +205,7 @@ export default function AdminCheckoutPreview() {
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background hover:bg-muted"
               }`}
-              title={c.name}
+              title={`${c.name}${c.region ? ` · región ${c.region}` : ""}`}
             >
               {c.flag} {c.code}
             </button>
@@ -134,23 +224,25 @@ export default function AdminCheckoutPreview() {
         />
       </div>
 
-      <div className="rounded-lg border bg-muted/20 overflow-hidden flex justify-center">
-        <iframe
-          key={`${country.code}-${nonce}`}
-          src={url}
-          title={`Checkout preview ${country.code}`}
-          style={{
-            width: typeof frameWidth === "number" ? `${frameWidth}px` : frameWidth,
-            height: `${frameHeight}px`,
-            border: 0,
-            background: "white",
-          }}
-        />
-      </div>
+      {url && (
+        <div className="rounded-lg border bg-muted/20 overflow-hidden flex justify-center">
+          <iframe
+            key={`${country?.code}-${nonce}`}
+            src={url}
+            title={`Checkout preview ${country?.code}`}
+            style={{
+              width: typeof frameWidth === "number" ? `${frameWidth}px` : frameWidth,
+              height: `${frameHeight}px`,
+              border: 0,
+              background: "white",
+            }}
+          />
+        </div>
+      )}
 
       <p className="text-[11px] text-muted-foreground">
-        La vista previa refleja lo mismo que verá un comprador con IP de {country.flag} {country.name}.
-        Rellena nombre y correo dentro del iframe para desbloquear los métodos de pago.
+        Solo aparecen los países de las regiones configuradas arriba.
+        {country && <> Refleja lo que verá un comprador con IP de {country.flag} {country.name}.</>}
       </p>
     </Card>
   );

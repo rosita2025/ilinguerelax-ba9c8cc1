@@ -150,7 +150,10 @@ const AdminLive = () => {
   const totalForPct = Math.max(1, data.total);
   const topPages = Object.entries(data.byPageLabel || data.byPage).sort(([, a], [, b]) => b - a).slice(0, 12);
   const topProducts = Object.entries(data.byProduct || {}).sort(([, a], [, b]) => b - a).slice(0, 12);
-  const topSources = Object.entries(data.byChannel || data.bySource).sort(([, a], [, b]) => b - a).slice(0, 8);
+  const topChannels = Object.entries(data.byChannel || {}).sort(([, a], [, b]) => b - a);
+  const topSources = Object.entries(data.bySource || {}).sort(([, a], [, b]) => b - a);
+  const topCampaigns = Object.entries(data.byCampaign || {}).sort(([, a], [, b]) => b - a).slice(0, 8);
+  const totalSourceVisitors = Math.max(1, topSources.reduce((a, [, n]) => a + n, 0));
 
   return (
     <>

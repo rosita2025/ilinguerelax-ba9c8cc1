@@ -164,7 +164,13 @@ export default function AdminCheckoutMethods() {
   const [savingRegion, setSavingRegion] = useState<string | null>(null);
   const [savingDialog, setSavingDialog] = useState(false);
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 5;
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  const PAGE_SIZE = isMobile ? 2 : 5;
 
   async function load() {
     invalidateCheckoutMethodsCache();

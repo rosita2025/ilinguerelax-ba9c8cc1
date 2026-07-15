@@ -189,12 +189,13 @@ const AdminHotmartAudit = () => {
                     <th className="px-3 py-2 text-left">Email</th>
                     <th className="px-3 py-2 text-left">Producto</th>
                     <th className="px-3 py-2 text-left">Transacción</th>
+                    <th className="px-3 py-2 text-left">Brevo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="text-center py-10 text-muted-foreground">
+                      <td colSpan={8} className="text-center py-10 text-muted-foreground">
                         {loading ? "Cargando…" : "Aún no hay eventos registrados con estos filtros."}
                       </td>
                     </tr>
@@ -220,16 +221,22 @@ const AdminHotmartAudit = () => {
                           <td className="px-3 py-2 truncate max-w-[180px]">{row.email ?? "—"}</td>
                           <td className="px-3 py-2 truncate max-w-[200px] text-xs">{row.product ?? "—"}</td>
                           <td className="px-3 py-2 font-mono text-xs">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</td>
+                          <td className="px-3 py-2"><BrevoBadge info={row.brevo} /></td>
                         </tr>
                         {isOpen && (
                           <tr key={row.id + "-detail"} className="border-t bg-muted/20">
-                            <td colSpan={7} className="px-6 py-4">
-                              <div className="text-xs text-muted-foreground mb-2">
+                            <td colSpan={8} className="px-6 py-4 space-y-3">
+                              <div className="text-xs text-muted-foreground">
                                 Fuente: <span className="font-mono">{row.source === "purchase" ? "hotmart_purchases" : "abandoned_carts"}</span>
                                 {row.converted !== null && (
                                   <> · Convertido: <span className="font-mono">{row.converted ? "sí" : "no"}</span></>
                                 )}
                               </div>
+                              <BrevoDetail
+                                row={row}
+                                lookup={row.email ? brevoLookups[row.email.toLowerCase()] : undefined}
+                                onLookup={row.email ? () => void lookupBrevo(row.email!.toLowerCase()) : undefined}
+                              />
                               <pre className="text-xs bg-background border rounded p-3 overflow-auto max-h-96">
 {JSON.stringify(row.payload ?? {}, null, 2)}
                               </pre>
@@ -272,15 +279,21 @@ const AdminHotmartAudit = () => {
                         <span className="font-mono text-muted-foreground truncate">{row.event_raw}</span>
                         <span className="font-mono">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</span>
                       </div>
+                      <div className="mt-2"><BrevoBadge info={row.brevo} /></div>
                     </button>
                     {isOpen && (
-                      <div className="mt-3 bg-muted/20 rounded p-2">
-                        <div className="text-[11px] text-muted-foreground mb-2">
+                      <div className="mt-3 bg-muted/20 rounded p-2 space-y-3">
+                        <div className="text-[11px] text-muted-foreground">
                           Fuente: <span className="font-mono">{row.source === "purchase" ? "hotmart_purchases" : "abandoned_carts"}</span>
                           {row.converted !== null && (
                             <> · Convertido: <span className="font-mono">{row.converted ? "sí" : "no"}</span></>
                           )}
                         </div>
+                        <BrevoDetail
+                          row={row}
+                          lookup={row.email ? brevoLookups[row.email.toLowerCase()] : undefined}
+                          onLookup={row.email ? () => void lookupBrevo(row.email!.toLowerCase()) : undefined}
+                        />
                         <pre className="text-[11px] bg-background border rounded p-2 overflow-auto max-h-72">
 {JSON.stringify(row.payload ?? {}, null, 2)}
                         </pre>
@@ -291,6 +304,7 @@ const AdminHotmartAudit = () => {
               })}
             </div>
           </Card>
+
 
         </div>
       </main>

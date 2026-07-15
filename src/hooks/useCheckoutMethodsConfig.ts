@@ -41,7 +41,7 @@ interface MethodRow { region_code: string; method_key: string; enabled: boolean;
 
 // Cache en memoria con TTL corto — evita re-consulta en cada montaje pero
 // permite ver cambios del admin sin recargar la pestaña por completo.
-const CACHE_TTL_MS = 30_000;
+const CACHE_TTL_MS = 3_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
 let cacheAt = 0;
 const CACHE_VERSION_KEY = "ilr_checkout_methods_version";

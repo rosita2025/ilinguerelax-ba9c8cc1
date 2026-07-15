@@ -77,6 +77,7 @@ const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
 const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
 const AdminHotmartAudit = lazy(() => import("./pages/AdminHotmartAudit"));
 const AdminDebug = lazy(() => import("./pages/AdminDebug"));
+const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
 
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
 const LearnCategory = lazy(() => import("./pages/LearnCategory"));
@@ -270,6 +271,7 @@ const App = () => (
                   <Route path="/admin/orders" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/hotmart-audit" element={<AdminGate><AdminHotmartAudit /></AdminGate>} />
                   <Route path="/admin/debug" element={<AdminGate><AdminDebug /></AdminGate>} />
+                  <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />
                   
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />
                   <Route path="/checkouts" element={<NotFound />} />

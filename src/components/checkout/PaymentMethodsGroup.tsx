@@ -7,6 +7,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useCheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
 
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
@@ -432,15 +433,26 @@ export function PaymentMethodsGroup() {
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
   ];
-  // Solo 4 métodos: Stripe (agrupa Tarjeta / Apple Pay / Google Pay / Link /
-  // Cash App / ACH internamente en el iframe), Mercado Pago, Yape/Plin, PayPal.
-  // PayPal disponible en todo el mundo EXCEPTO Perú (allí solo rails locales + Stripe).
+  // Métodos habilitados dinámicamente desde /admin/checkout-methods.
+  // Perú conserva sus rails locales (transfer/cash/yape) por defecto; el resto
+  // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí
+  // deja de aparecer. Antes de cargar la config, mostramos el conjunto legacy
+  // para no parpadear.
+  const methodsConfig = useCheckoutMethodsConfig(country);
+  const filteredByAdmin = methodsConfig.loaded
+    ? allMethods.filter((m) => {
+        if (m.id === "card") return methodsConfig.stripe;
+        if (m.id === "paypal") return methodsConfig.paypal;
+        if (m.id === "transfer") return methodsConfig.transfer;
+        if (m.id === "cash") return methodsConfig.cash;
+        if (m.id === "yape") return methodsConfig.yape;
+        return true;
+      })
+    : allMethods;
   const methods = isPeru
-    ? allMethods.filter((m) => m.id !== "paypal")
-    : [
-        ...allMethods.filter((m) => m.id === "card"),
-        ...allMethods.filter((m) => m.id === "paypal"),
-      ];
+    ? filteredByAdmin.filter((m) => m.id !== "paypal")
+    : filteredByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
+
 
 
 

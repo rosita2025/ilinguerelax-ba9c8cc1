@@ -10,7 +10,7 @@ type Country = { code: string; name: string; flag: string; region?: string };
 type RegionLite = {
   code: string;
   name: string;
-  flag: string | null;
+  flag?: string | null;
   country_codes: string[];
   enabled: boolean;
 };

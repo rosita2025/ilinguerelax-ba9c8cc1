@@ -1120,6 +1120,18 @@ export function PaymentMethodsGroup() {
                     }, { onConflict: "email,source" }).then(() => {});
                     navigate(`/checkouts/success?paypal_order=${encodeURIComponent(orderId)}`);
                   }}
+                  onError={(err) => {
+                    try {
+                      const totals = calcTotals(items, couponPercent, region.tier);
+                      trackPaymentError({
+                        provider: "paypal",
+                        skus: items.map((i) => i.id),
+                        reason: err instanceof Error ? err.message : String(err),
+                        value: totals.total,
+                        currency: "USD",
+                      });
+                    } catch { /* noop */ }
+                  }}
                 />
 
                 <p className="text-[11px] text-center text-neutral-500">

@@ -12,7 +12,7 @@ import {
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
-import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck } from "lucide-react";
+import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -24,7 +24,7 @@ type Method = {
   note?: string | null; icon: string; enabled: boolean; sort_order: number;
 };
 
-const ICONS: Record<string, any> = { CreditCard, Banknote, Wallet, Smartphone };
+const ICONS: Record<string, any> = { CreditCard, Banknote, Wallet, Smartphone, Building2 };
 
 const PREVIEW_SKU = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 

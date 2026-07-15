@@ -68,6 +68,11 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   if (a.productName) attributes.LAST_PRODUCT = a.productName;
   if (a.skus && a.skus.length) attributes.LAST_SKUS = a.skus.join(", ");
   if (a.provider) attributes.LAST_PROVIDER = a.provider;
+  // ORIGEN separa claramente Hotmart vs Tienda propia (Stripe/PayPal/MP/Yape…)
+  const origin = a.origin ?? (a.provider === "hotmart" ? "hotmart" : "tienda");
+  attributes.ORIGEN = origin;
+  attributes.LAST_ORIGIN = origin;
+
   attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
 
   const listIdsRaw = Deno.env.get("BREVO_CUSTOMERS_LIST_ID");

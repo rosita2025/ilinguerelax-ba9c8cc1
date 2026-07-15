@@ -19,7 +19,29 @@ export const BUYER_FORM_ID = "buyer-info-form";
 export const BUYER_ERRORS_EVENT = "checkout:showBuyerErrors";
 
 export function BuyerInfoForm() {
-  const { buyer, setBuyer } = useCheckoutPruebaStore();
+  const { buyer, setBuyer, applyCoupon, coupon } = useCheckoutPruebaStore();
+
+  // Autocompleta nombre/email desde el popup de bienvenida (o compras previas)
+  // y aplica el cupón NEW10 si aún no hay ninguno.
+  useEffect(() => {
+    const hydrate = () => {
+      try {
+        const raw = localStorage.getItem("ilr_buyer");
+        if (!raw) return;
+        const saved = JSON.parse(raw) as { email?: string; name?: string; coupon?: string };
+        const patch: Partial<{ fullName: string; email: string }> = {};
+        if (saved.email && !buyer.email) patch.email = saved.email;
+        if (saved.name && !buyer.fullName) patch.fullName = saved.name;
+        if (patch.email || patch.fullName) setBuyer(patch);
+        if (saved.coupon && !coupon) applyCoupon(saved.coupon);
+      } catch { /* ignore */ }
+    };
+    hydrate();
+    window.addEventListener("ilr:buyer-updated", hydrate);
+    return () => window.removeEventListener("ilr:buyer-updated", hydrate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const region = useRegionTier();
   const { language } = useI18n();
   const t = getCheckoutUI(language);

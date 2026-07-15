@@ -124,6 +124,23 @@ Deno.serve(async (req) => {
           });
         } catch (_) { /* conflict ignored */ }
 
+        // Hotmart puede exponer el cupón en varias rutas según webhook version
+        const couponRaw =
+          data?.purchase?.offer?.coupon_code ??
+          data?.purchase?.offer?.code ??
+          data?.purchase?.coupon?.code ??
+          data?.purchase?.coupon_code ??
+          data?.purchase?.origin?.src ??
+          undefined;
+        const couponCode = couponRaw ? String(couponRaw).trim().toUpperCase() : undefined;
+        const couponAmountRaw = Number(
+          data?.purchase?.price?.discount_value ??
+          data?.purchase?.discount?.value ??
+          data?.purchase?.coupon?.value ??
+          NaN,
+        );
+        const couponAmount = Number.isFinite(couponAmountRaw) && couponAmountRaw > 0 ? couponAmountRaw : undefined;
+
         await upsertBrevoContact({
           email: buyerEmail,
           name: buyerName,
@@ -138,6 +155,8 @@ Deno.serve(async (req) => {
           origin: "hotmart",
           hotmartProductId: productId,
           hotmartProductCode: productCode,
+          couponCode,
+          couponAmount,
         });
       } catch (e) {
         console.warn("brevo customer sync failed:", e instanceof Error ? e.message : String(e));

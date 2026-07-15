@@ -124,8 +124,9 @@ export default function AdminCheckoutPreview({ regions = [] }: Props) {
     return `/checkouts/${sku}?${q.toString()}`;
   }, [sku, country, nonce]);
 
-  const frameWidth = device === "mobile" ? 390 : "100%";
-  const frameHeight = device === "mobile" ? 780 : 900;
+  const isMobileDevice = device === "mobile";
+  const frameWidth = isMobileDevice ? 360 : "100%";
+  const frameHeight = isMobileDevice ? 720 : 700;
 
   if (!countries.length) {
     return (

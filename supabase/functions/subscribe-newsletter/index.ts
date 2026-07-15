@@ -7,17 +7,41 @@ const FROM = 'iLingue Relax <hola@ilinguerelax.com>';
 const REPLY_TO = 'hola@ilinguerelax.com';
 const COUPON = 'NEW10';
 
-type Lang = 'es' | 'en' | 'fr' | 'pt';
-const SUPPORTED: Lang[] = ['es', 'en', 'fr', 'pt'];
+type Lang = 'es' | 'en' | 'fr' | 'pt' | 'de' | 'it' | 'nl' | 'ja' | 'ko' | 'zh' | 'ru' | 'ar' | 'hi' | 'tr';
+const SUPPORTED: Lang[] = ['es','en','fr','pt','de','it','nl','ja','ko','zh','ru','ar','hi','tr'];
 
 const FALLBACK_COUNTRY_LANG: Record<string, Lang> = {
+  // Spanish
   ES: 'es', MX: 'es', AR: 'es', CL: 'es', CO: 'es', PE: 'es', VE: 'es', UY: 'es',
   BO: 'es', EC: 'es', PY: 'es', CR: 'es', PA: 'es', DO: 'es', GT: 'es', HN: 'es',
   NI: 'es', SV: 'es', CU: 'es', PR: 'es',
-  US: 'en', CA: 'en', GB: 'en', AU: 'en', NZ: 'en', IE: 'en', IN: 'en', ZA: 'en',
-  PH: 'en', SG: 'en',
-  FR: 'fr', BE: 'fr', CH: 'fr', LU: 'fr', MC: 'fr', SN: 'fr', CI: 'fr', CM: 'fr',
+  // English
+  US: 'en', CA: 'en', GB: 'en', AU: 'en', NZ: 'en', IE: 'en', ZA: 'en', PH: 'en', SG: 'en',
+  // French
+  FR: 'fr', BE: 'fr', LU: 'fr', MC: 'fr', SN: 'fr', CI: 'fr', CM: 'fr',
+  // Portuguese
   BR: 'pt', PT: 'pt', AO: 'pt', MZ: 'pt',
+  // German
+  DE: 'de', AT: 'de', CH: 'de', LI: 'de',
+  // Italian
+  IT: 'it', SM: 'it', VA: 'it',
+  // Dutch
+  NL: 'nl',
+  // Japanese
+  JP: 'ja',
+  // Korean
+  KR: 'ko',
+  // Chinese
+  CN: 'zh', TW: 'zh', HK: 'zh', MO: 'zh',
+  // Russian
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
+  // Arabic
+  SA: 'ar', AE: 'ar', EG: 'ar', MA: 'ar', DZ: 'ar', TN: 'ar', QA: 'ar', KW: 'ar',
+  BH: 'ar', OM: 'ar', JO: 'ar', LB: 'ar', IQ: 'ar', LY: 'ar', SY: 'ar', YE: 'ar', SD: 'ar',
+  // Hindi
+  IN: 'hi',
+  // Turkish
+  TR: 'tr',
 };
 
 const T: Record<Lang, {
@@ -68,6 +92,106 @@ const T: Record<Lang, {
     couponCta: 'Use-o ao finalizar a compra em',
     helpLine: 'Se precisar de algo, escreva para',
     signoff: 'Um abraço,\nA equipe iLingue Relax',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  de: {
+    subject: 'Willkommen bei iLingue Relax! Hier ist Ihr 10% Rabatt-Gutschein 🎁',
+    hello: (n) => (n ? `Hallo ${n} 👋` : 'Hallo 👋'),
+    welcome: 'Willkommen bei iLingue Relax! Danke für Ihre Anmeldung.',
+    giftIntro: 'Als Willkommensgeschenk erhalten Sie 10% Rabatt auf alle unsere digitalen Produkte:',
+    couponCta: 'Verwenden Sie ihn beim Bezahlen auf',
+    helpLine: 'Bei Fragen schreiben Sie uns an',
+    signoff: 'Herzliche Grüße,\nIhr iLingue Relax Team',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  it: {
+    subject: 'Benvenuto in iLingue Relax! Ecco il tuo coupon del 10% di sconto 🎁',
+    hello: (n) => (n ? `Ciao ${n} 👋` : 'Ciao 👋'),
+    welcome: 'Benvenuto in iLingue Relax! Grazie per esserti iscritto.',
+    giftIntro: 'Come regalo di benvenuto, ecco il tuo coupon del 10% di sconto su tutti i nostri prodotti digitali:',
+    couponCta: 'Usalo al checkout su',
+    helpLine: 'Per qualsiasi cosa, scrivici a',
+    signoff: 'Cordiali saluti,\nIl team di iLingue Relax',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  nl: {
+    subject: 'Welkom bij iLingue Relax! Hier is je 10% kortingsbon 🎁',
+    hello: (n) => (n ? `Hallo ${n} 👋` : 'Hallo 👋'),
+    welcome: 'Welkom bij iLingue Relax! Bedankt voor je inschrijving.',
+    giftIntro: 'Als welkomstcadeau ontvang je 10% korting op al onze digitale producten:',
+    couponCta: 'Gebruik hem bij het afrekenen op',
+    helpLine: 'Voor vragen kun je ons mailen op',
+    signoff: 'Vriendelijke groet,\nHet iLingue Relax team',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  ja: {
+    subject: 'iLingue Relaxへようこそ！10%割引クーポンをお届けします 🎁',
+    hello: (n) => (n ? `${n} さん、こんにちは 👋` : 'こんにちは 👋'),
+    welcome: 'iLingue Relaxへようこそ！ご登録ありがとうございます。',
+    giftIntro: 'ご登録の特典として、すべてのデジタル商品でご利用いただける10%割引クーポンをプレゼントします：',
+    couponCta: 'こちらでご購入時にご利用ください：',
+    helpLine: 'ご不明な点がございましたら、お気軽にご連絡ください：',
+    signoff: 'よろしくお願いいたします。\niLingue Relax チーム',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  ko: {
+    subject: 'iLingue Relax에 오신 것을 환영합니다! 10% 할인 쿠폰을 드립니다 🎁',
+    hello: (n) => (n ? `${n}님, 안녕하세요 👋` : '안녕하세요 👋'),
+    welcome: 'iLingue Relax에 오신 것을 환영합니다! 구독해 주셔서 감사합니다.',
+    giftIntro: '환영 선물로 모든 디지털 상품에 사용 가능한 10% 할인 쿠폰을 드립니다:',
+    couponCta: '결제 시 사용하세요:',
+    helpLine: '문의사항이 있으시면 아래로 연락 주세요:',
+    signoff: '감사합니다,\niLingue Relax 팀',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  zh: {
+    subject: '欢迎来到 iLingue Relax！这是您的 10% 折扣券 🎁',
+    hello: (n) => (n ? `${n} 您好 👋` : '您好 👋'),
+    welcome: '欢迎来到 iLingue Relax！感谢您的订阅。',
+    giftIntro: '作为欢迎礼物，这是您所有数字产品的 10% 折扣券：',
+    couponCta: '结账时使用：',
+    helpLine: '如有任何问题，请联系：',
+    signoff: '此致敬礼,\niLingue Relax 团队',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  ru: {
+    subject: 'Добро пожаловать в iLingue Relax! Ваш купон на скидку 10% 🎁',
+    hello: (n) => (n ? `Здравствуйте, ${n} 👋` : 'Здравствуйте 👋'),
+    welcome: 'Добро пожаловать в iLingue Relax! Спасибо за подписку.',
+    giftIntro: 'В качестве приветственного подарка вот ваш купон на скидку 10% на все наши цифровые продукты:',
+    couponCta: 'Используйте его при оформлении заказа на',
+    helpLine: 'Если вам что-то нужно, напишите нам на',
+    signoff: 'С уважением,\nКоманда iLingue Relax',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  ar: {
+    subject: 'مرحبًا بكم في iLingue Relax! إليك قسيمة خصم 10٪ 🎁',
+    hello: (n) => (n ? `مرحبًا ${n} 👋` : 'مرحبًا 👋'),
+    welcome: 'مرحبًا بكم في iLingue Relax! شكرًا لاشتراكك.',
+    giftIntro: 'كهدية ترحيبية، إليك قسيمة خصم 10٪ على جميع منتجاتنا الرقمية:',
+    couponCta: 'استخدمها عند الدفع على',
+    helpLine: 'إذا احتجت أي شيء، راسلنا على',
+    signoff: 'مع أطيب التحيات،\nفريق iLingue Relax',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  hi: {
+    subject: 'iLingue Relax में आपका स्वागत है! यह रहा आपका 10% छूट कूपन 🎁',
+    hello: (n) => (n ? `नमस्ते ${n} 👋` : 'नमस्ते 👋'),
+    welcome: 'iLingue Relax में आपका स्वागत है! सदस्यता लेने के लिए धन्यवाद।',
+    giftIntro: 'स्वागत उपहार के रूप में, हमारे सभी डिजिटल उत्पादों पर आपका 10% छूट कूपन:',
+    couponCta: 'चेकआउट पर इसका उपयोग करें:',
+    helpLine: 'किसी भी सहायता के लिए हमें लिखें:',
+    signoff: 'सादर,\niLingue Relax टीम',
+    productsUrl: 'https://ilinguerelax.com/products',
+  },
+  tr: {
+    subject: 'iLingue Relax\'e hoş geldiniz! İşte %10 indirim kuponunuz 🎁',
+    hello: (n) => (n ? `Merhaba ${n} 👋` : 'Merhaba 👋'),
+    welcome: 'iLingue Relax\'e hoş geldiniz! Abone olduğunuz için teşekkürler.',
+    giftIntro: 'Hoş geldin hediyesi olarak, tüm dijital ürünlerimizde geçerli %10 indirim kuponunuz:',
+    couponCta: 'Ödeme sırasında kullanın:',
+    helpLine: 'Herhangi bir şeye ihtiyacınız olursa bize yazın:',
+    signoff: 'Saygılarımızla,\niLingue Relax ekibi',
     productsUrl: 'https://ilinguerelax.com/products',
   },
 };

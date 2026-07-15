@@ -255,7 +255,7 @@ const App = () => (
                   <Route path="/admin" element={<AdminGate><AdminHome /></AdminGate>} />
                   <Route path="/admin/live" element={<AdminGate><AdminLive /></AdminGate>} />
                   <Route path="/admin/reviews" element={<AdminGate><AdminReviews /></AdminGate>} />
-                  <Route path="/admin/funnel" element={<AdminGate><AdminFunnel /></AdminGate>} />
+                  
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />
                   <Route path="/admin/bots" element={<AdminGate><AdminBots /></AdminGate>} />
                   

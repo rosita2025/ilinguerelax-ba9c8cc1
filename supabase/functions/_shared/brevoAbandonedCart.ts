@@ -65,7 +65,12 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     attributes.LANG = lang;
   }
   if (a.country) attributes.COUNTRY = a.country.toUpperCase();
-  if (a.source) attributes.ABANDONED_SOURCE = a.source;
+  if (a.source) {
+    attributes.ABANDONED_SOURCE = a.source;
+    // ORIGEN: hotmart | tienda (mismo atributo que en compras, para segmentar en Brevo)
+    attributes.ORIGEN = a.source === "hotmart" ? "hotmart" : "tienda";
+  }
+
   const phoneClean = (a.phone || "").replace(/[^\d+]/g, "");
   if (phoneClean.startsWith("+") && phoneClean.length >= 8) {
     attributes.SMS = phoneClean;

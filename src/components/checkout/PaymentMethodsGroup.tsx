@@ -596,14 +596,28 @@ export function PaymentMethodsGroup() {
                     </span>
                   )}
                 </div>
-                {m.id === "card" ? (
+                {m.id === "card" && (m.title === (isPeru ? t.cardTitlePeru : t.cardTitleGlobal)) ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <LogoBadge src={visaLogo} alt="Visa" />
                     <LogoBadge src={mastercardLogo} alt="Mastercard" />
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
-                ) : m.id === "transfer" ? (
+                ) : m.title === "Cash App Pay" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Cash App" bg="#00D64F" color="#000000" />
+                  </div>
+                ) : m.title.includes("ACH") ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
+                    <BankBadge label="US Bank" bg="#eeeeee" color="#0A2540" />
+                  </div>
+                ) : m.title === "Link (Stripe)" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <LinkBadge />
+                  </div>
+                ) : null}
+                {m.id === "card" ? null : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
                     <BankBadge label="BBVA" bg="#004481" color="#ffffff" />

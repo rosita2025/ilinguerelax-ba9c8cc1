@@ -134,6 +134,57 @@ export type Database = {
         }
         Relationships: []
       }
+      brevo_sync_logs: {
+        Row: {
+          attributes: Json | null
+          created_at: string
+          email: string | null
+          error: string | null
+          event_type: string
+          http_status: number | null
+          id: string
+          order_ref: string | null
+          origin: string | null
+          product_name: string | null
+          product_sku: string | null
+          response: string | null
+          source: string | null
+          status: string
+        }
+        Insert: {
+          attributes?: Json | null
+          created_at?: string
+          email?: string | null
+          error?: string | null
+          event_type: string
+          http_status?: number | null
+          id?: string
+          order_ref?: string | null
+          origin?: string | null
+          product_name?: string | null
+          product_sku?: string | null
+          response?: string | null
+          source?: string | null
+          status: string
+        }
+        Update: {
+          attributes?: Json | null
+          created_at?: string
+          email?: string | null
+          error?: string | null
+          event_type?: string
+          http_status?: number | null
+          id?: string
+          order_ref?: string | null
+          origin?: string | null
+          product_name?: string | null
+          product_sku?: string | null
+          response?: string | null
+          source?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       checkout_method_suppressions: {
         Row: {
           method_key: string

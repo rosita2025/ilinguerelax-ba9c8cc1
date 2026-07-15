@@ -36,7 +36,7 @@ function markSent(email: string, slug: string) {
 export function useAbandonedCheckoutTracker(slug: string | undefined, productName?: string) {
   const buyer = useCheckoutPruebaStore((s) => s.buyer);
   const items = useCheckoutPruebaStore((s) => s.items);
-  const { language } = useI18n();
+  const { language, countryCode } = useI18n();
   const timer = useRef<number | null>(null);
   const trackedRef = useRef<string>("");
 
@@ -48,14 +48,12 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
     if (!EMAIL_RE.test(email) || name.length < 3) return;
 
     const slugKey = slug || productName || "checkout";
-    // Cart snapshot para el link de recuperación tipo Shopify.
     const cart = items.map((i) => ({ id: i.id, q: i.quantity }));
-    const fingerprint = `${email}::${slugKey}::${JSON.stringify(cart)}`;
+    const fingerprint = `${email}::${slugKey}::${language}::${JSON.stringify(cart)}`;
     if (trackedRef.current === fingerprint) return;
     if (alreadySent(email, slugKey)) return;
 
     if (timer.current) window.clearTimeout(timer.current);
-    // Debounce 2s so we don't ping while user is still typing
     timer.current = window.setTimeout(async () => {
       try {
         await supabase.functions.invoke("track-abandoned-checkout", {
@@ -65,6 +63,7 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
             phone,
             product_type: slugKey,
             language,
+            country: countryCode || "",
             cart,
           },
         });
@@ -78,5 +77,5 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
     return () => {
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, [buyer.email, buyer.fullName, buyer.phone, items, slug, productName, language]);
+  }, [buyer.email, buyer.fullName, buyer.phone, items, slug, productName, language, countryCode]);
 }

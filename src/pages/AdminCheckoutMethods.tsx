@@ -171,6 +171,9 @@ export default function AdminCheckoutMethods() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
   const PAGE_SIZE = isMobile ? 2 : 5;
+  const [search, setSearch] = useState("");
+  const [filterCountry, setFilterCountry] = useState("");
+  const [filterGateway, setFilterGateway] = useState("");
 
   async function load() {
     invalidateCheckoutMethodsCache();

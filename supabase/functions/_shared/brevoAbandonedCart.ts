@@ -65,11 +65,26 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     attributes.LANG = lang;
   }
   if (a.country) attributes.COUNTRY = a.country.toUpperCase();
+  const origin = a.source === "hotmart" ? "hotmart" : "tienda";
   if (a.source) {
     attributes.ABANDONED_SOURCE = a.source;
-    // ORIGEN: hotmart | tienda (mismo atributo que en compras, para segmentar en Brevo)
-    attributes.ORIGEN = a.source === "hotmart" ? "hotmart" : "tienda";
+    attributes.ORIGEN = origin;
   }
+  // IDs de canal para saber en Brevo qué producto/plataforma abandonó
+  if (origin === "hotmart") {
+    attributes.HOTMART_PRODUCT_ID = a.productSku;
+    attributes.HOTMART_PRODUCT_CODE = a.productSku;
+  } else {
+    attributes.TIENDA_SKU = a.productSku;
+  }
+  const noteParts = [
+    origin === "hotmart" ? "Hotmart" : "Tienda",
+    "abandonado",
+    a.productName || "",
+    `sku=${a.productSku}`,
+    typeof a.priceUsd === "number" ? `usd=${a.priceUsd}` : "",
+  ].filter(Boolean);
+  attributes.ABANDONED_NOTE = noteParts.join(" · ");
 
   const phoneClean = (a.phone || "").replace(/[^\d+]/g, "");
   if (phoneClean.startsWith("+") && phoneClean.length >= 8) {

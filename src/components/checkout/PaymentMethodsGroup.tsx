@@ -76,6 +76,18 @@ type MethodBadge = { label: string; bg: string; color: string };
 type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
 
 const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> = {
+  stripe_apple_pay: {
+    icon: Smartphone,
+    title: "Apple Pay",
+    sub: "Paga con Touch ID / Face ID desde tu iPhone, iPad o Mac (Safari).",
+    badges: [{ label: " Pay", bg: "#000000", color: "#ffffff" }],
+  },
+  stripe_google_pay: {
+    icon: Smartphone,
+    title: "Google Pay",
+    sub: "Paga con tu cuenta Google desde Android o Chrome.",
+    badges: [{ label: "G Pay", bg: "#ffffff", color: "#1F2937" }],
+  },
   stripe_oxxo: {
     icon: Banknote,
     title: "OXXO",

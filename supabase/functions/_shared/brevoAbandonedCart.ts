@@ -24,6 +24,7 @@ interface Args {
 
 import { logBrevoSync } from "./brevoLog.ts";
 import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
+import { resolveBrevoAudiences } from "./brevoProductAudiences.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
@@ -135,6 +136,20 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   // TAGS: incluye categoría para filtrar por oferta abandonada
   const eventKind: "compra" | "abandonado" = "abandonado";
   const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
+
+  // Audiencias/segmentos por producto (tabla brevo_product_audiences, editable en admin)
+  const audiences = await resolveBrevoAudiences({
+    eventKind,
+    origin,
+    hotmartProductId: origin === "hotmart" ? a.productSku : undefined,
+    hotmartProductCode: origin === "hotmart" ? a.productSku : undefined,
+    tiendaSku: origin === "tienda" ? a.productSku : undefined,
+    skus: [a.productSku].filter(Boolean),
+    category,
+  });
+  for (const t of audiences.tags) tagList.push(t);
+  if (audiences.labels.length) attributes.PRODUCT_AUDIENCES = audiences.labels.join(", ");
+
   attributes.TAGS = tagList.join(",");
   attributes.SEGMENTO = `${eventKind}_${origin}`;
 
@@ -165,7 +180,7 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
       ? Deno.env.get("BREVO_LIST_HOTMART_ABANDONO")
       : Deno.env.get("BREVO_LIST_TIENDA_ABANDONO"),
   );
-  const allListIds = Array.from(new Set([listId, ...extraListIds]));
+  const allListIds = Array.from(new Set([listId, ...extraListIds, ...audiences.listIds]));
 
   const payload = {
     email,

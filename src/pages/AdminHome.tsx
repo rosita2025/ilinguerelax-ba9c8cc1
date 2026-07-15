@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -59,6 +59,13 @@ const panels = [
     title: "Logs de Brevo",
     desc: "Ver qué evento llegó (compra Hotmart, abandono Hotmart, checkout tienda) y qué campos se enviaron a Brevo, con éxito/fallo.",
     color: "text-rose-600",
+  },
+  {
+    to: "/admin/brevo-audiences",
+    icon: Users,
+    title: "Audiencias Brevo por producto",
+    desc: "Vincula cada producto (Hotmart ID/Code, SKU tienda o categoría) a listas de Brevo. Automatiza secuencias específicas por oferta sin tocar código.",
+    color: "text-violet-600",
   },
 ];
 

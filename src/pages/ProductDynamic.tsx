@@ -100,12 +100,14 @@ const ProductDynamic = () => {
     };
   }, [slug]);
 
-  // Pick the correct USD price based on visitor region (LATAM vs. rest of the world).
+  // Pick the correct USD price based on visitor region (tienda VE/CU/NI, LATAM, or global).
   const region = useRegionTier();
   const effectiveUsd = product
-    ? (region.tier === "latam" && product.price_usd_latam != null
-        ? Number(product.price_usd_latam)
-        : Number(product.price_usd))
+    ? (region.tier === "tienda" && product.price_usd_tienda != null
+        ? Number(product.price_usd_tienda)
+        : region.tier === "latam" && product.price_usd_latam != null
+          ? Number(product.price_usd_latam)
+          : Number(product.price_usd))
     : 0;
   const local = useLocalCurrency(effectiveUsd);
   const tier = useCountryTierRouting(slug ?? "");

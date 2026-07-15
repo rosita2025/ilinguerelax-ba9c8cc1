@@ -379,6 +379,53 @@ const AdminLive = () => {
               })}
             </div>
           </Card>
+
+          {data.bots && (data.bots.events > 0 || data.bots.sessions > 0) && (
+            <Card className="p-4 border-amber-500/30 bg-amber-500/5">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                <h2 className="font-semibold flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-amber-600" /> Bots detectados
+                </h2>
+                <div className="flex gap-4 text-xs text-muted-foreground">
+                  <span><b className="text-foreground tabular-nums">{data.bots.sessions}</b> sesiones</span>
+                  <span><b className="text-foreground tabular-nums">{data.bots.events}</b> eventos</span>
+                  <span className="text-emerald-600">Humanos: <b className="tabular-nums">{data.activeNow || data.total}</b></span>
+                </div>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-2">Motivo de detección</div>
+                  <div className="space-y-1.5">
+                    {Object.entries(data.bots.byReason).sort(([, a], [, b]) => b - a).map(([reason, n]) => (
+                      <div key={reason} className="flex justify-between text-sm">
+                        <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded">{reason}</span>
+                        <span className="tabular-nums text-muted-foreground">{n}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-2">Últimos eventos bot</div>
+                  <div className="space-y-1 max-h-48 overflow-y-auto text-xs">
+                    {data.bots.recent.slice(0, 10).map((b, i) => {
+                      const info = getCountryInfo(b.country);
+                      return (
+                        <div key={`${b.created_at}-${i}`} className="flex items-center gap-2 border-b last:border-0 py-1">
+                          <span>{info?.flag || "🌐"}</span>
+                          <span className="font-mono bg-muted px-1.5 rounded shrink-0">{b.bot_reason}</span>
+                          <span className="truncate text-muted-foreground" title={b.user_agent || ""}>{b.page_path || "—"}</span>
+                          <span className="tabular-nums text-muted-foreground shrink-0">{timeAgo(b.created_at)}</span>
+                        </div>
+                      );
+                    })}
+                    {data.bots.recent.length === 0 && (
+                      <p className="text-muted-foreground text-center py-4">Sin eventos bot recientes.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
         </div>
       </main>
     </>

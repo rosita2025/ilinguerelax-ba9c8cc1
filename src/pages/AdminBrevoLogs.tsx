@@ -28,8 +28,18 @@ interface LogRow {
 
 const EVENT_LABELS: Record<string, { label: string; color: string }> = {
   hotmart_purchase:  { label: "Hotmart · Compra",           color: "bg-emerald-100 text-emerald-800" },
-  hotmart_abandoned: { label: "Hotmart · Carrito abandonado", color: "bg-amber-100 text-amber-800" },
+  hotmart_pending:   { label: "Hotmart · Pendiente",        color: "bg-amber-100 text-amber-800" },
+  hotmart_refused:   { label: "Hotmart · Rechazado",        color: "bg-red-100 text-red-800" },
+  hotmart_refunded:  { label: "Hotmart · Reembolso",        color: "bg-orange-100 text-orange-800" },
+  hotmart_chargeback:{ label: "Hotmart · Chargeback",       color: "bg-rose-200 text-rose-900" },
+  hotmart_cancelled: { label: "Hotmart · Cancelado",        color: "bg-slate-200 text-slate-800" },
+  hotmart_abandoned: { label: "Hotmart · Carrito abandonado", color: "bg-yellow-100 text-yellow-800" },
   tienda_purchase:   { label: "Tienda · Compra",            color: "bg-indigo-100 text-indigo-800" },
+  tienda_pending:    { label: "Tienda · Pendiente",         color: "bg-amber-100 text-amber-800" },
+  tienda_refused:    { label: "Tienda · Rechazado",         color: "bg-red-100 text-red-800" },
+  tienda_refunded:   { label: "Tienda · Reembolso",         color: "bg-orange-100 text-orange-800" },
+  tienda_chargeback: { label: "Tienda · Chargeback",        color: "bg-rose-200 text-rose-900" },
+  tienda_cancelled:  { label: "Tienda · Cancelado",         color: "bg-slate-200 text-slate-800" },
   tienda_abandoned:  { label: "Tienda · Carrito abandonado",  color: "bg-fuchsia-100 text-fuchsia-800" },
 };
 

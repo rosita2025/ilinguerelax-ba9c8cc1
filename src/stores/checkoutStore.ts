@@ -122,15 +122,32 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
 
 
       addItem: (item) => {
+        // Productos digitales = 1 unidad por SKU. addItem es IDEMPOTENTE:
+        // si el mismo SKU ya está en el carrito, NO acumula cantidad (evita
+        // duplicados cuando el usuario vuelve al checkout, cuando el enlace
+        // de recuperación se procesa dos veces, o cuando "Añadir al carrito"
+        // se pulsa varias veces desde la ficha de producto).
         const existing = get().items.find((i) => i.id === item.id);
         if (existing) {
+          // Refresca datos mutables (precio/imagen/nombre) sin tocar cantidad.
           set({
             items: get().items.map((i) =>
-              i.id === item.id ? { ...i, quantity: i.quantity + (item.quantity ?? 1) } : i,
+              i.id === item.id
+                ? {
+                    ...i,
+                    name: item.name ?? i.name,
+                    price: item.price ?? i.price,
+                    image: item.image ?? i.image,
+                    description: item.description ?? i.description,
+                    regionPrices: item.regionPrices ?? i.regionPrices,
+                    pricePen: item.pricePen ?? i.pricePen,
+                    quantity: 1,
+                  }
+                : i,
             ),
           });
         } else {
-          set({ items: [...get().items, { ...item, quantity: item.quantity ?? 1 }] });
+          set({ items: [...get().items, { ...item, quantity: 1 }] });
         }
       },
 

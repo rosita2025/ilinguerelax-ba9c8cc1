@@ -11,6 +11,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 interface DBProduct {
   id: string;

@@ -168,7 +168,7 @@ const AdminLive = () => {
                 <Globe className="w-7 h-7 text-primary" /> Plataforma en vivo
               </h1>
               <p className="text-sm text-muted-foreground">
-                Datos reales del sitio · productos, páginas, países, checkout y compras · actualizado {timeAgo(data.generatedAt)} atrás
+                Datos reales · humanos (bots excluidos) · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · actualizado {timeAgo(data.generatedAt)} atrás
               </p>
             </div>
             <div className="flex items-center gap-3">

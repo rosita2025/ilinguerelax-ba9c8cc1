@@ -62,9 +62,22 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   // Brevo uses NOMBRE/APELLIDOS (aliased to firstname/lastname) and COUNTRY_CODE in this account.
   if (first) attributes.NOMBRE = first;
   if (last) attributes.APELLIDOS = last;
+  const rawPhoneTrim = (a.phone || "").trim();
   if (phone) {
     attributes.SMS = phone;
     attributes.WHATSAPP = phone;
+    attributes.TELEFONO_PROVISTO = "si";
+    attributes.PHONE_PROVIDED = true;
+  } else {
+    attributes.TELEFONO_PROVISTO = "no";
+    attributes.PHONE_PROVIDED = false;
+    if (rawPhoneTrim) {
+      // Hotmart mandó algo pero no es E.164 válido → dejar rastro sin romper Brevo
+      attributes.PHONE_RAW = rawPhoneTrim.slice(0, 32);
+      attributes.PHONE_STATUS = "invalid_format";
+    } else {
+      attributes.PHONE_STATUS = "missing";
+    }
   }
   if (a.country) attributes.COUNTRY_CODE = a.country.toUpperCase();
   if (a.orderNumber) attributes.LAST_ORDER = a.orderNumber;
@@ -136,24 +149,50 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
     order_ref: a.orderNumber,
   } as const;
 
+  const send = (p: Record<string, unknown>) => fetch(`${GATEWAY_URL}/contacts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "X-Connection-Api-Key": BREVO_API_KEY,
+    },
+    body: JSON.stringify(p),
+  });
+
   try {
-    const res = await fetch(`${GATEWAY_URL}/contacts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": BREVO_API_KEY,
-      },
-      body: JSON.stringify(payload),
-    });
+    let res = await send(payload);
     if (!res.ok) {
       const body = await res.text();
-      console.error(`[brevo-contact] upsert failed [${res.status}]: ${body}`);
-      await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes, error: body });
-      return;
+      // Si Brevo rechaza por teléfono inválido, reintentar sin SMS/WHATSAPP
+      // y marcar PHONE_STATUS=rejected para no perder el contacto.
+      if (res.status === 400 && /phone|sms|whatsapp/i.test(body) && (attributes.SMS || attributes.WHATSAPP)) {
+        const retryAttrs = { ...attributes };
+        delete retryAttrs.SMS;
+        delete retryAttrs.WHATSAPP;
+        retryAttrs.TELEFONO_PROVISTO = "no";
+        retryAttrs.PHONE_PROVIDED = false;
+        retryAttrs.PHONE_STATUS = "rejected_by_brevo";
+        retryAttrs.PHONE_RAW = String(attributes.SMS ?? attributes.WHATSAPP ?? "").slice(0, 32);
+        const retryPayload = { ...payload, attributes: retryAttrs };
+        res = await send(retryPayload);
+        if (res.ok) {
+          console.log(`[brevo-contact] upserted ${email} (sin teléfono, rechazado por Brevo)`);
+          await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes: retryAttrs, response: "upserted (phone rejected)" });
+        } else {
+          const retryBody = await res.text();
+          console.error(`[brevo-contact] retry failed [${res.status}]: ${retryBody}`);
+          await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes: retryAttrs, error: retryBody });
+          return;
+        }
+      } else {
+        console.error(`[brevo-contact] upsert failed [${res.status}]: ${body}`);
+        await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes, error: body });
+        return;
+      }
+    } else {
+      console.log(`[brevo-contact] upserted ${email}`);
+      await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes, response: "upserted" });
     }
-    console.log(`[brevo-contact] upserted ${email}`);
-    await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes, response: "upserted" });
 
     // Deduplicar: si el comprador estaba en la lista de carrito abandonado,
     // quitarlo para que no reciba más correos de recuperación ni cuente doble.

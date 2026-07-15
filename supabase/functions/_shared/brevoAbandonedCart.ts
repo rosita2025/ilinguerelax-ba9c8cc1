@@ -94,10 +94,24 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   attributes.TAGS = tagList.join(",");
   attributes.SEGMENTO = `${eventKind}_${origin}`;
 
-  const phoneClean = (a.phone || "").replace(/[^\d+]/g, "");
-  if (phoneClean.startsWith("+") && phoneClean.length >= 8) {
+  const rawPhone = (a.phone || "").trim();
+  const phoneClean = rawPhone.replace(/[^\d+]/g, "");
+  const phoneValid = phoneClean.startsWith("+") && phoneClean.length >= 8 && phoneClean.length <= 16;
+  if (phoneValid) {
     attributes.SMS = phoneClean;
     attributes.WHATSAPP = phoneClean;
+    attributes.TELEFONO_PROVISTO = "si";
+    attributes.PHONE_PROVIDED = true;
+    attributes.PHONE_STATUS = "ok";
+  } else {
+    attributes.TELEFONO_PROVISTO = "no";
+    attributes.PHONE_PROVIDED = false;
+    if (rawPhone) {
+      attributes.PHONE_RAW = rawPhone.slice(0, 32);
+      attributes.PHONE_STATUS = "invalid_format";
+    } else {
+      attributes.PHONE_STATUS = "missing";
+    }
   }
 
   const parseIds = (raw?: string | null) =>

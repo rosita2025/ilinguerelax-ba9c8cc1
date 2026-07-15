@@ -4,6 +4,9 @@
 //
 // Uses the Lovable connector gateway. Never call api.brevo.com directly.
 
+import { logBrevoSync } from "./brevoLog.ts";
+
+
 interface Args {
   email: string;
   name?: string;

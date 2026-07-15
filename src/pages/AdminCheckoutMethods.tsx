@@ -81,7 +81,7 @@ const CHECKOUT_METHODS: { key: string; label: string; note: string; icon: string
   { key: "stripe_card", label: "Stripe — tarjeta / wallets", note: "Tarjeta, Apple Pay, Google Pay y Link dentro de Stripe", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
   { key: "stripe_us_bank_account", label: "Stripe — ACH transferencia", note: "Transferencia bancaria de USA dentro de Stripe", icon: "Building2", regions: ["US"] },
   { key: "stripe_cashapp", label: "Stripe — Cash App Pay", note: "Cash App para compradores de Estados Unidos dentro de Stripe", icon: "Smartphone", regions: ["US"] },
-  { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "GLOBAL"] },
+  { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },

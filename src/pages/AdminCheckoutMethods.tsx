@@ -310,10 +310,30 @@ export default function AdminCheckoutMethods() {
                         </div>
                       );
                     })}
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-[11px] font-medium text-muted-foreground mb-1.5">Agregar rápido:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {QUICK_METHODS.map(q => {
+                          const already = rms.some(m => m.method_key === q.key);
+                          return (
+                            <button
+                              key={q.key}
+                              type="button"
+                              disabled={already}
+                              onClick={() => quickAdd(r.code, q)}
+                              className={`text-[11px] px-2 py-1 rounded border ${already ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                              title={q.note}
+                            >
+                              {already ? "✓ " : "+ "}{q.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-2 mt-2">
                       <Button size="sm" variant="outline"
                         onClick={() => setMethodEdit(emptyMethod(r.code))}>
-                        <Plus className="w-3.5 h-3.5 mr-1" /> Agregar
+                        <Plus className="w-3.5 h-3.5 mr-1" /> Personalizado
                       </Button>
                       <Button size="sm" variant="default"
                         onClick={() => autofillStripe(r.code)}
@@ -322,6 +342,7 @@ export default function AdminCheckoutMethods() {
                         <Zap className="w-3.5 h-3.5 mr-1" /> Auto Stripe
                       </Button>
                     </div>
+
                   </div>
                 </Card>
               );

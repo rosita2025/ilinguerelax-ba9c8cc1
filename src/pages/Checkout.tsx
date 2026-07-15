@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Lock, ShieldCheck, MessageCircle, ArrowLeft } from "lucide-react";
+import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 

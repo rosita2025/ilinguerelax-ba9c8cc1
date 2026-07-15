@@ -558,7 +558,7 @@ export function PaymentMethodsGroup() {
         const Icon = m.icon;
         return (
           <div
-            key={m.id}
+            key={`${m.id}-${m.title}`}
             className={cn(
               "rounded-xl border overflow-hidden transition-colors",
               isSelected

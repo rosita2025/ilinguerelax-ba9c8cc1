@@ -21,6 +21,7 @@ interface DBProduct {
   target_language: string;
   price_usd: number;
   price_usd_latam: number | null;
+  price_usd_tienda: number | null;
   price_pen: number | null;
   cover_image_url: string | null;
   is_upsell: boolean;

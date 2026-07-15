@@ -239,6 +239,7 @@ serve(async (req) => {
       referrer: string | null;
       source: string;
       source_channel: string;
+      campaign: string | null;
       last_seen: string;
       event_count: number;
       last_event: string;

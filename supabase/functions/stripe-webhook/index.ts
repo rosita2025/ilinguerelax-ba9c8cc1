@@ -121,7 +121,7 @@ const hasAsyncStripeMethod = (methodTypes: unknown): boolean => {
 };
 
 async function recordStripePurchase(params: {
-  adminClient: ReturnType<typeof createClient>;
+  adminClient: any;
   eventKey: string;
   sourceId: string;
   paymentIntentId?: string;
@@ -166,7 +166,7 @@ async function recordStripePurchase(params: {
 }
 
 async function sendStripePurchaseEmails(params: {
-  adminClient: ReturnType<typeof createClient>;
+  adminClient: any;
   customerEmail: string;
   customerName: string;
   customerPhone?: string;

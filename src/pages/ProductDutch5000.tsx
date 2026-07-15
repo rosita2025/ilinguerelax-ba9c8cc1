@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const productDutch5000Image = "/images/product-dutch-5000.png";
+const productDutch5000Image = "/images/product-dutch-5000.webp";
 
 const features = [
   "5,000 palabras esenciales en neerlandés",

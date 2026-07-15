@@ -1,14 +1,14 @@
 import { BookOpen, Gift, Brain, AlertTriangle, FileText, ClipboardList, RefreshCw, XCircle } from "lucide-react";
 
-import preview8kIndex from "@/assets/preview-8k-index.png";
-import preview8kPronunciation from "@/assets/preview-8k-pronunciation.png";
-import bonus8kTemario from "@/assets/bonus-8k-temario.png";
-import bonus8kFormulario from "@/assets/bonus-8k-formulario.png";
-import bonus8kEjemplos from "@/assets/bonus-8k-ejemplos.png";
-import bonus8kRecuerda from "@/assets/bonus-8k-recuerda.png";
-import bonus8kErrores from "@/assets/bonus-8k-errores.png";
-import bonus8kAviso from "@/assets/bonus-8k-aviso.png";
-import bonus8kNotas from "@/assets/bonus-8k-notas.png";
+import preview8kIndex from "@/assets/preview-8k-index.webp";
+import preview8kPronunciation from "@/assets/preview-8k-pronunciation.webp";
+import bonus8kTemario from "@/assets/bonus-8k-temario.webp";
+import bonus8kFormulario from "@/assets/bonus-8k-formulario.webp";
+import bonus8kEjemplos from "@/assets/bonus-8k-ejemplos.webp";
+import bonus8kRecuerda from "@/assets/bonus-8k-recuerda.webp";
+import bonus8kErrores from "@/assets/bonus-8k-errores.webp";
+import bonus8kAviso from "@/assets/bonus-8k-aviso.webp";
+import bonus8kNotas from "@/assets/bonus-8k-notas.webp";
 
 const previewItems = [
   "8,000 PALABRAS organizadas por temas y niveles (A1 a C1)",

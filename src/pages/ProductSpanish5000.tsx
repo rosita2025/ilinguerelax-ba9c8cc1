@@ -38,7 +38,7 @@ import productSpanish5000DigitalOnlyImage from "@/assets/spanish-5000-digital-on
 
 // Preview images
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
-import previewSpanishPhrases from "@/assets/preview-spanish-phrases.png";
+import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";
 import previewSpanishUpdates from "@/assets/preview-spanish-updates.jpg";
 
@@ -199,7 +199,7 @@ const ProductSpanish5000 = () => {
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
       </Helmet>
-      <SEO title="5,000 Spanish Words Physical Book · Pronunciation" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.png" type="product" price="33" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="5000 Spanish words physical book, learn Spanish for English speakers, Spanish vocabulary book, Spanish pronunciation, Spanish Relax book, Spanish ebook bundle" />
+      <SEO title="5,000 Spanish Words Physical Book · Pronunciation" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.webp" type="product" price="33" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="5000 Spanish words physical book, learn Spanish for English speakers, Spanish vocabulary book, Spanish pronunciation, Spanish Relax book, Spanish ebook bundle" />
       <Navbar />
 
       {/* Hero Section */}

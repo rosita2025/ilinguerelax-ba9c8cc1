@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import customerBook2 from "@/assets/customer-book-2.webp";
 import customerBook4 from "@/assets/customer-book-4.webp";
-import looxReview5 from "@/assets/loox-review-5.png";
+import looxReview5 from "@/assets/loox-review-5.webp";
 
 type Review = {
   name: string;

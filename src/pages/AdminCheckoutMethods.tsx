@@ -187,6 +187,7 @@ export default function AdminCheckoutMethods() {
   const [methodEdit, setMethodEdit] = useState<Method | null>(null);
 
   async function load() {
+    invalidateCheckoutMethodsCache();
     setLoading(true);
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
     if (error || data?.error) { toast.error(error?.message || data?.error); setLoading(false); return; }

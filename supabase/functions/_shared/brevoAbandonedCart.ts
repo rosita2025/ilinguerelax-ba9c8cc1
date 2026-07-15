@@ -59,7 +59,12 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   if (a.productUrl) attributes.ABANDONED_CART_URL = a.productUrl;
   if (typeof a.priceUsd === "number") attributes.ABANDONED_PRICE_USD = a.priceUsd;
   if (a.couponCode) attributes.ABANDONED_COUPON = a.couponCode;
-  if (a.language) attributes.LANGUAGE = a.language.toLowerCase();
+  if (a.language) {
+    const lang = a.language.toLowerCase();
+    attributes.LANGUAGE = lang;   // segmentar automatización por idioma
+    attributes.LANG = lang;
+  }
+  if (a.country) attributes.COUNTRY = a.country.toUpperCase();
   if (a.source) attributes.ABANDONED_SOURCE = a.source;
   const phoneClean = (a.phone || "").replace(/[^\d+]/g, "");
   if (phoneClean.startsWith("+") && phoneClean.length >= 8) {

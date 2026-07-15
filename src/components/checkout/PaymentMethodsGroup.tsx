@@ -607,8 +607,6 @@ export function PaymentMethodsGroup() {
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="PagoEfectivo" bg="#EC0928" color="#ffffff" />
                     <BankBadge label="Western Union" bg="#FFDD00" color="#000000" />
-                    <BankBadge label="Tambo" bg="#E30613" color="#FFED00" />
-                    <BankBadge label="Kasnet" bg="#F58220" color="#ffffff" />
                   </div>
                 ) : m.id === "yape" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">

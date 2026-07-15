@@ -12,13 +12,6 @@ const panels = [
     color: "text-primary",
   },
   {
-    to: "/admin/shopify",
-    icon: ShoppingBag,
-    title: "Shopify · Ventas",
-    desc: "Panel estilo Power BI: Net Sales, AOV, LTV, repeat rate, top productos, países y métodos de pago.",
-    color: "text-emerald-600",
-  },
-  {
     to: "/admin/reviews",
     icon: Star,
     title: "Reseñas",

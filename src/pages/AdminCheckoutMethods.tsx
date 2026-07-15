@@ -337,6 +337,14 @@ export default function AdminCheckoutMethods() {
                         <Button size="icon" variant="ghost" onClick={() => setRegionEdit(r)}>
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>
+                        <Button size="sm" variant="secondary" className="h-7 px-2" title="Auto-rellenar métodos Stripe oficiales para esta región (según país)" onClick={async () => {
+                          const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "autofill_stripe", code: r.code } });
+                          if (error || data?.error) return toast.error(error?.message || data?.error);
+                          toast.success(`✅ ${data.added} métodos Stripe`);
+                          invalidateCheckoutMethodsCache(); load();
+                        }}>
+                          ⚡ Auto Stripe
+                        </Button>
                         <Button size="icon" variant="ghost" onClick={() => deleteRegion(r.code)}>
                           <Trash2 className="w-3.5 h-3.5 text-destructive" />
                         </Button>

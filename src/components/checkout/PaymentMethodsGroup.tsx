@@ -609,16 +609,8 @@ export function PaymentMethodsGroup() {
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
-                ) : m.id === "card" && m.title === "Cash App Pay" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
-                    <BankBadge label="Cash App" bg="#00D64F" color="#000000" />
-                  </div>
-                ) : m.id === "card" && m.title === "US Bank (ACH)" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
-                    <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
-                    <BankBadge label="US Bank" bg="#eeeeee" color="#0A2540" />
-                  </div>
                 ) : null}
+
                 {m.id === "card" ? null : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />

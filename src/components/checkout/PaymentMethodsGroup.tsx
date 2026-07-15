@@ -76,6 +76,18 @@ type MethodBadge = { label: string; bg: string; color: string };
 type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
 
 const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> = {
+  stripe_apple_pay: {
+    icon: Smartphone,
+    title: "Apple Pay",
+    sub: "Paga con Touch ID / Face ID desde tu iPhone, iPad o Mac (Safari).",
+    badges: [{ label: " Pay", bg: "#000000", color: "#ffffff" }],
+  },
+  stripe_google_pay: {
+    icon: Smartphone,
+    title: "Google Pay",
+    sub: "Paga con tu cuenta Google desde Android o Chrome.",
+    badges: [{ label: "G Pay", bg: "#ffffff", color: "#1F2937" }],
+  },
   stripe_oxxo: {
     icon: Banknote,
     title: "OXXO",
@@ -587,12 +599,10 @@ export function PaymentMethodsGroup() {
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
     { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
-    ...(enabledStripeKeys.has("stripe_apple_pay") ? [{ label: "Apple Pay", bg: "#000000", color: "#ffffff" }] : []),
     ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
-    ...(enabledStripeKeys.has("stripe_google_pay") ? [{ label: "Google Pay", bg: "#ffffff", color: "#1F2937" }] : []),
   ];
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
-    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_link")
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
     .map((key) => ({ id: "card", methodKey: key, badge: "Stripe", ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },

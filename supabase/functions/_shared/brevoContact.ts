@@ -26,6 +26,9 @@ interface Args {
   hotmartProductCode?: string;  // Hotmart ucode / product code
   tiendaSku?: string;           // SKU interno de la tienda propia
   productCategory?: string;     // categoría/tipo de oferta explícita (opcional)
+  couponCode?: string;          // código de cupón usado (ej. NEW10, BLACKFRIDAY)
+  couponPercent?: number;       // % de descuento aplicado (0-100)
+  couponAmount?: number;        // monto absoluto descontado (en la moneda de la orden)
 }
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";

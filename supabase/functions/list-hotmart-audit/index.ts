@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { adminKey, status, search, limit } = await req.json().catch(() => ({}));
+    const { adminKey, status, search, limit, forceSync } = await req.json().catch(() => ({}));
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expected || adminKey !== expected) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {

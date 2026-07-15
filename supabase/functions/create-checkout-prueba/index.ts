@@ -16,6 +16,7 @@ const BodySchema = z.object({
   environment: z.enum(["sandbox", "live"]).default("sandbox"),
   items: z.array(ItemSchema).min(1).max(20),
   currency: z.string().length(3).default("usd"),
+  stripePaymentMethod: z.enum(["card", "us_bank_account", "cashapp"]).default("card"),
   couponPercent: z.number().min(0).max(90).default(0),
   couponCode: z.string().max(20).optional(),
   contact: z.object({
@@ -96,6 +97,7 @@ Deno.serve(async (req) => {
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
+      payment_method_types: [body.stripePaymentMethod],
       return_url: body.returnUrl,
       // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
       adaptive_pricing: { enabled: true },

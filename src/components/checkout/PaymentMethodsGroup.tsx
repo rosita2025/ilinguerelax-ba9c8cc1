@@ -17,6 +17,7 @@ import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
+import { trackPaymentError } from "@/hooks/useMetaPixel";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape";

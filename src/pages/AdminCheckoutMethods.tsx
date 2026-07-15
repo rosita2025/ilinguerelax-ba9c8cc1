@@ -397,6 +397,9 @@ export default function AdminCheckoutMethods() {
             </div>
           </Card>
 
+          <AdminCheckoutPreview />
+
+
           {loading && <Card className="p-8 text-center text-muted-foreground">Cargando…</Card>}
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -312,4 +312,81 @@ const AdminHotmartAudit = () => {
   );
 };
 
+function BrevoBadge({ info }: { info: BrevoInfo | null }) {
+  if (!info) {
+    return <Badge className="bg-slate-200 text-slate-800 font-normal">Sin sincronizar</Badge>;
+  }
+  const ok = info.status === "success" || (info.http_status !== null && info.http_status >= 200 && info.http_status < 300);
+  const color = ok
+    ? (info.missing_fields.length > 0 ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800")
+    : "bg-red-100 text-red-800";
+  const label = ok
+    ? (info.missing_fields.length > 0 ? `Sincronizado · faltan ${info.missing_fields.length}` : "Sincronizado")
+    : "Error";
+  return <Badge className={`${color} font-normal`}>{label}</Badge>;
+}
+
+function BrevoDetail({
+  row,
+  lookup,
+  onLookup,
+}: {
+  row: AuditRow;
+  lookup?: { loading: boolean; data?: any; error?: string };
+  onLookup?: () => void;
+}) {
+  const info = row.brevo;
+  return (
+    <div className="rounded border bg-background p-3 text-xs space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-medium text-sm">Sincronización con Brevo</div>
+        {row.email && onLookup && (
+          <Button size="sm" variant="outline" onClick={onLookup} disabled={lookup?.loading}>
+            {lookup?.loading ? "Buscando…" : (lookup?.data ? "Actualizar" : "Buscar en Brevo")}
+          </Button>
+        )}
+      </div>
+
+      {info ? (
+        <div className="grid gap-1 sm:grid-cols-2">
+          <div><span className="text-muted-foreground">Último evento:</span> <span className="font-mono">{info.event_type || "—"}</span></div>
+          <div><span className="text-muted-foreground">Última sincronización:</span> <span className="font-mono">{fmtExact(info.last_sync_at)}</span></div>
+          <div><span className="text-muted-foreground">Estado:</span> <span className="font-mono">{info.status}{info.http_status ? ` (${info.http_status})` : ""}</span></div>
+          <div>
+            <span className="text-muted-foreground">Campos faltantes:</span>{" "}
+            {info.missing_fields.length === 0
+              ? <span className="text-emerald-700">ninguno</span>
+              : <span className="text-amber-700">{info.missing_fields.join(", ")}</span>}
+          </div>
+          {info.error && (
+            <div className="sm:col-span-2 text-red-700 break-all"><span className="text-muted-foreground">Error:</span> {info.error}</div>
+          )}
+        </div>
+      ) : (
+        <div className="text-muted-foreground">No se encontró un log de sincronización local para este email.</div>
+      )}
+
+      {lookup?.error && (
+        <div className="text-red-700 break-all">Error consultando Brevo: {lookup.error}</div>
+      )}
+
+      {lookup?.data && (
+        <div className="grid gap-1 sm:grid-cols-2 border-t pt-2">
+          <div><span className="text-muted-foreground">Brevo ID:</span> <span className="font-mono">{lookup.data.id ?? "—"}</span></div>
+          <div><span className="text-muted-foreground">Modificado:</span> <span className="font-mono">{lookup.data.modified_at ? fmtExact(lookup.data.modified_at) : "—"}</span></div>
+          <div><span className="text-muted-foreground">Creado:</span> <span className="font-mono">{lookup.data.created_at ? fmtExact(lookup.data.created_at) : "—"}</span></div>
+          <div><span className="text-muted-foreground">Listas:</span> <span className="font-mono">{(lookup.data.list_ids ?? []).join(", ") || "—"}</span></div>
+          <div className="sm:col-span-2">
+            <span className="text-muted-foreground">Campos faltantes en Brevo:</span>{" "}
+            {lookup.data.missing_fields?.length === 0
+              ? <span className="text-emerald-700">ninguno</span>
+              : <span className="text-amber-700">{(lookup.data.missing_fields ?? []).join(", ")}</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default AdminHotmartAudit;
+

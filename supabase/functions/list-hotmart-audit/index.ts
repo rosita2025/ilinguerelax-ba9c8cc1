@@ -243,7 +243,7 @@ Deno.serve(async (req) => {
     }
 
 
-    return new Response(JSON.stringify({ rows, summary }), {
+    return new Response(JSON.stringify({ rows, summary, synced: syncedCount, syncTargets: syncTargets.size }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

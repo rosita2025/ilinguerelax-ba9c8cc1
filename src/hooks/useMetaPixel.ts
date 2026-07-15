@@ -41,7 +41,7 @@ const getSessionId = (): string => {
   }
 };
 
-const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
+const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "BeginCheckout", "Purchase", "PaymentError", "Lead"]);
 const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
 // EU consent gating: in EU countries we must wait for explicit "accepted" before firing browser Pixel.

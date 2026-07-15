@@ -352,26 +352,42 @@ export default function AdminCheckoutMethods() {
                         </div>
                       );
                     })}
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-[11px] font-medium text-muted-foreground mb-1.5">Agregar rápido:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {QUICK_METHODS.map(q => {
-                          const already = rms.some(m => m.method_key === q.key);
-                          return (
-                            <button
-                              key={q.key}
-                              type="button"
-                              disabled={already}
-                              onClick={() => quickAdd(r.code, q)}
-                              className={`text-[11px] px-2 py-1 rounded border ${already ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
-                              title={q.note}
-                            >
-                              {already ? "✓ " : "+ "}{q.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    {(() => {
+                      const valid = methodsForRegion(r.country_codes);
+                      const available = QUICK_METHODS.filter(q => valid.has(q.key));
+                      const countryList = r.country_codes.filter(c => c && c !== "*").join(", ") || "—";
+                      return (
+                        <div className="mt-3 pt-3 border-t">
+                          <p className="text-[11px] font-medium text-muted-foreground mb-1.5">
+                            Métodos Stripe disponibles en <span className="text-foreground">{countryList}</span>:
+                          </p>
+                          {available.length === 0 ? (
+                            <p className="text-[11px] text-muted-foreground italic">
+                              Agrega países ISO a esta región para ver métodos disponibles.
+                            </p>
+                          ) : (
+                            <div className="flex flex-wrap gap-1">
+                              {available.map(q => {
+                                const already = rms.some(m => m.method_key === q.key);
+                                return (
+                                  <button
+                                    key={q.key}
+                                    type="button"
+                                    disabled={already}
+                                    onClick={() => quickAdd(r.code, q)}
+                                    className={`text-[11px] px-2 py-1 rounded border ${already ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                                    title={q.note}
+                                  >
+                                    {already ? "✓ " : "+ "}{q.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     <div className="grid grid-cols-2 gap-2 mt-2">
                       <Button size="sm" variant="outline"
                         onClick={() => setMethodEdit(emptyMethod(r.code))}>

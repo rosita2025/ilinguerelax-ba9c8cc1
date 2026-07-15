@@ -87,6 +87,7 @@ function keyToFamily(key: string): FamilyKey | null {
   const k = key.toLowerCase();
   if (k === "stripe_us_bank_account") return "stripeAch";
   if (k === "stripe_cashapp") return "stripeCashApp";
+  if (k === "stripe_klarna") return "stripeKlarna";
   if (k.startsWith("stripe_")) return "stripe";
   if (k === "paypal") return "paypal";
   if (k === "yape_plin") return "yape";

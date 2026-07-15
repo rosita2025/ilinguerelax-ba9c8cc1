@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Search, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Clock, XCircle, RotateCcw, AlertOctagon, Ban } from "lucide-react";
+import { RefreshCw, Search, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Clock, XCircle, RotateCcw, AlertOctagon, Ban, Send } from "lucide-react";
 import { toast } from "sonner";
 
 type MappedStatus = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "abandoned" | "unknown";

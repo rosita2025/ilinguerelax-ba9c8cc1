@@ -80,7 +80,7 @@ export default function Checkout() {
       if (Array.isArray(payload?.c)) {
         for (const c of payload.c) {
           if (!c?.id) continue;
-          const cat = getCatalogItem(c.id) || CHECKOUT_CATALOG.find((x) => x.id === c.id);
+          const cat = getCatalogItem(c.id) || Object.values(CHECKOUT_CATALOG).find((x) => x.id === c.id);
           if (cat) {
             addItem({
               id: cat.id,

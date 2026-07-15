@@ -29,7 +29,18 @@ interface Args {
   couponCode?: string;          // código de cupón usado (ej. NEW10, BLACKFRIDAY)
   couponPercent?: number;       // % de descuento aplicado (0-100)
   couponAmount?: number;        // monto absoluto descontado (en la moneda de la orden)
+  /** Estado del ciclo de vida de la compra. Default "compra" (aprobada). */
+  purchaseStatus?: "compra" | "pendiente" | "rechazado" | "reembolso" | "chargeback" | "cancelado";
 }
+
+const STATUS_EVENT_MAP: Record<string, string> = {
+  compra: "purchase",
+  pendiente: "pending",
+  rechazado: "refused",
+  reembolso: "refunded",
+  chargeback: "chargeback",
+  cancelado: "cancelled",
+};
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 

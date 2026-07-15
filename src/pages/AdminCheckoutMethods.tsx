@@ -111,13 +111,13 @@ export default function AdminCheckoutMethods() {
           <Card className="p-4 border-primary/30 bg-primary/5 flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold mr-2">Vista previa checkout:</span>
             <Button asChild size="sm">
-              <a href={`/checkout/${PREVIEW_SKU}?region=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
+              <a href={`/checkout/${PREVIEW_SKU}?country=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
             </Button>
             <Button asChild size="sm" variant="secondary">
-              <a href={`/checkout/${PREVIEW_SKU}?region=US`} target="_blank" rel="noreferrer">🇺🇸 USA</a>
+              <a href={`/checkout/${PREVIEW_SKU}?country=US`} target="_blank" rel="noreferrer">🇺🇸 USA (Stripe)</a>
             </Button>
             <Button asChild size="sm" variant="secondary">
-              <a href={`/checkout/${PREVIEW_SKU}?region=GLOBAL`} target="_blank" rel="noreferrer">🌎 Global</a>
+              <a href={`/checkout/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
             </Button>
             <div className="ml-auto">
               <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>

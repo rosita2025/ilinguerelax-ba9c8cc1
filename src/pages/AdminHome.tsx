@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -52,6 +52,13 @@ const panels = [
     title: "Órdenes / Pedidos",
     desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).",
     color: "text-sky-600",
+  },
+  {
+    to: "/admin/brevo-logs",
+    icon: Activity,
+    title: "Logs de Brevo",
+    desc: "Ver qué evento llegó (compra Hotmart, abandono Hotmart, checkout tienda) y qué campos se enviaron a Brevo, con éxito/fallo.",
+    color: "text-rose-600",
   },
 ];
 

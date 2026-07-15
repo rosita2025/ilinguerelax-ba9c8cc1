@@ -4,6 +4,9 @@
 //
 // Uses the Lovable connector gateway. Never call api.brevo.com directly.
 
+import { logBrevoSync } from "./brevoLog.ts";
+
+
 interface Args {
   email: string;
   name?: string;
@@ -108,6 +111,18 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   };
   if (listIds && listIds.length) payload.listIds = listIds;
 
+  const eventOrigin = origin;
+  const event_type = eventOrigin === "hotmart" ? "hotmart_purchase" : "tienda_purchase";
+  const baseLog = {
+    event_type,
+    source: "brevo_contact",
+    origin: eventOrigin,
+    email,
+    product_name: a.productName,
+    product_sku: a.tiendaSku ?? a.hotmartProductId ?? a.hotmartProductCode ?? (a.skus?.[0]),
+    order_ref: a.orderNumber,
+  } as const;
+
   try {
     const res = await fetch(`${GATEWAY_URL}/contacts`, {
       method: "POST",
@@ -121,9 +136,11 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
     if (!res.ok) {
       const body = await res.text();
       console.error(`[brevo-contact] upsert failed [${res.status}]: ${body}`);
+      await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes, error: body });
       return;
     }
     console.log(`[brevo-contact] upserted ${email}`);
+    await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes, response: "upserted" });
 
     // Deduplicar: si el comprador estaba en la lista de carrito abandonado,
     // quitarlo para que no reciba más correos de recuperación ni cuente doble.
@@ -155,6 +172,8 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
       }
     }
   } catch (e) {
-    console.error("[brevo-contact] network error:", e instanceof Error ? e.message : String(e));
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[brevo-contact] network error:", msg);
+    await logBrevoSync({ ...baseLog, status: "failed", attributes, error: `network: ${msg}` });
   }
 }

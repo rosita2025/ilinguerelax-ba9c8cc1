@@ -432,21 +432,16 @@ export function PaymentMethodsGroup() {
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
   ];
-  // USA-only extra rows — visually separate Cash App and US Bank (ACH).
-  // Both use id="card" so they open the same Stripe Embedded Checkout,
-  // where Stripe surfaces the correct method automatically.
-  const usaExtraMethods: typeof allMethods = isUsa ? [
-    { id: "card", icon: Smartphone, title: "Cash App Pay", sub: "Pay instantly with your Cash App balance (US only).", badge: "Stripe" },
-    { id: "card", icon: Building2, title: "US Bank (ACH)", sub: "Direct bank transfer from your US checking/savings account.", badge: "Stripe" },
-  ] : [];
+  // Solo 4 métodos: Stripe (agrupa Tarjeta / Apple Pay / Google Pay / Link /
+  // Cash App / ACH internamente en el iframe), Mercado Pago, Yape/Plin, PayPal.
   // PayPal disponible en todo el mundo EXCEPTO Perú (allí solo rails locales + Stripe).
   const methods = isPeru
     ? allMethods.filter((m) => m.id !== "paypal")
     : [
         ...allMethods.filter((m) => m.id === "card"),
-        ...usaExtraMethods,
         ...allMethods.filter((m) => m.id === "paypal"),
       ];
+
 
 
   // Fuera de Perú solo hay un método (Stripe). Auto-seleccionarlo y auto-abrir

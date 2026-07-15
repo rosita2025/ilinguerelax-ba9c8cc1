@@ -192,6 +192,7 @@ const App = () => (
             <RouteErrorBoundary>
               <CartSyncWrapper>
                 <RouteTracker />
+                <ProductViewTracker />
                 <AutoTranslate />
                 <BrevoChatToggle />
                 <CookieConsent />

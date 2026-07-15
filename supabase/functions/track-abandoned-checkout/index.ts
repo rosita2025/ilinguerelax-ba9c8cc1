@@ -50,7 +50,8 @@ Deno.serve(async (req) => {
     const name = String(body.name || "Cliente").trim() || "Cliente";
     const phone = String(body.phone || "").trim();
     const productType = String(body.product_type || body.slug || "checkout").slice(0, 80);
-    const language = body.language ? String(body.language) : detectLanguage(email);
+    const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
+    const language = (body.language ? String(body.language) : detectLanguage(email, country)).toLowerCase();
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")

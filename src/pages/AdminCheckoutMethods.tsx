@@ -397,7 +397,7 @@ export default function AdminCheckoutMethods() {
             </div>
           </Card>
 
-          <AdminCheckoutPreview />
+          <AdminCheckoutPreview regions={regions} />
 
 
           {loading && <Card className="p-8 text-center text-muted-foreground">Cargando…</Card>}

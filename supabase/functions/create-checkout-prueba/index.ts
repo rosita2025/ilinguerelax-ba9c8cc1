@@ -92,6 +92,18 @@ Deno.serve(async (req) => {
       .join(" · ")
       .slice(0, 300);
     const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
+    const checkoutMetadata = {
+      source: "checkout-prueba-1",
+      customer_email: body.contact.email,
+      customer_name: fullName,
+      customer_phone: body.contact.phone,
+      customer_country: body.contact.country,
+      coupon_code: body.couponCode ?? "",
+      coupon_percent: String(body.couponPercent),
+      items_count: String(body.items.length),
+      items_summary: productSummary,
+      skus: deliverySkus,
+    };
 
     const session = await stripe.checkout.sessions.create({
       line_items,
@@ -104,18 +116,10 @@ Deno.serve(async (req) => {
       customer_email: body.contact.email,
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",
+        receipt_email: body.contact.email,
+        metadata: checkoutMetadata,
       },
-      metadata: {
-        source: "checkout-prueba-1",
-        customer_name: fullName,
-        customer_phone: body.contact.phone,
-        customer_country: body.contact.country,
-        coupon_code: body.couponCode ?? "",
-        coupon_percent: String(body.couponPercent),
-        items_count: String(body.items.length),
-        items_summary: productSummary,
-        skus: deliverySkus,
-      },
+      metadata: checkoutMetadata,
     });
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {

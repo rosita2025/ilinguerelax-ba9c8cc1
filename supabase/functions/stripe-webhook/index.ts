@@ -104,6 +104,232 @@ const labelStripeProduct = (session: any) => {
   return { product_id: "stripe-checkout", content_name: "Stripe Checkout Purchase", value: amount, currency };
 };
 
+const getAdminClient = () => createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+);
+
+const getPaymentIntentId = (session: any): string | undefined => {
+  const pi = session?.payment_intent;
+  if (!pi) return undefined;
+  return typeof pi === "string" ? pi : pi.id;
+};
+
+const hasAsyncStripeMethod = (methodTypes: unknown): boolean => {
+  const list = Array.isArray(methodTypes) ? methodTypes.map((m) => String(m)) : [];
+  return list.some((m) => m === "us_bank_account" || m === "cashapp");
+};
+
+async function recordStripePurchase(params: {
+  adminClient: any;
+  eventKey: string;
+  sourceId: string;
+  paymentIntentId?: string;
+  customerEmail: string;
+  customerName: string;
+  customerCountry?: string | null;
+  purchase: { product_id: string; content_name: string; value: number; currency: string };
+  itemsSummary?: string;
+  skus?: string;
+  eventType: string;
+}) {
+  const { adminClient, eventKey, sourceId, paymentIntentId, customerEmail, customerName, customerCountry, purchase, itemsSummary, skus, eventType } = params;
+  const { data: existing } = await adminClient
+    .from("funnel_events")
+    .select("id")
+    .eq("event_name", "Purchase")
+    .eq("session_id", eventKey)
+    .maybeSingle();
+  if (existing) return;
+
+  await adminClient.from("funnel_events").insert({
+    event_name: "Purchase",
+    product_id: purchase.product_id,
+    value: purchase.value,
+    currency: purchase.currency,
+    session_id: eventKey,
+    page_path: "/payment-success",
+    country: customerCountry || null,
+    referrer: JSON.stringify({
+      provider: "stripe",
+      event_type: eventType,
+      session_id: sourceId,
+      payment_intent_id: paymentIntentId || null,
+      external_reference: eventKey ? `ILR-ST-${String(eventKey).slice(-8).toUpperCase()}` : undefined,
+      customer_email: customerEmail,
+      customer_name: customerName,
+      items_summary: itemsSummary || purchase.content_name,
+      skus: skus || "",
+      status: "approved",
+    }).slice(0, 2000),
+  });
+}
+
+async function sendStripePurchaseEmails(params: {
+  adminClient: any;
+  customerEmail: string;
+  customerName: string;
+  customerPhone?: string;
+  customerCountry?: string;
+  purchase: { content_name: string; value: number; currency: string };
+  orderNumber: string;
+  paymentKey: string;
+  skus: string[];
+}) {
+  const { adminClient, customerEmail, customerName, customerPhone, customerCountry, purchase, orderNumber, paymentKey, skus } = params;
+  await sendThankYouEmail({
+    customerEmail,
+    customerName,
+    customerPhone,
+    customerCountry,
+    productName: purchase.content_name,
+    amount: purchase.value,
+    currency: purchase.currency,
+    provider: "stripe",
+    orderNumber,
+    idempotencyKey: `stripe:${paymentKey}`,
+  });
+
+  if (skus.length === 0) {
+    console.log("[stripe-webhook] no skus in metadata; skipping digital delivery", { paymentKey });
+    return;
+  }
+
+  const { error: digitalErr } = await adminClient.functions.invoke("send-digital-ilinguerelax", {
+    body: {
+      customerEmail,
+      customerName,
+      customerPhone,
+      customerCountry,
+      orderId: orderNumber,
+      skus,
+      amount: purchase.value,
+      currency: purchase.currency,
+      provider: "stripe",
+      idempotencyKey: `digital:stripe:${paymentKey}`,
+    },
+  });
+  if (digitalErr) console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);
+}
+
+async function handlePaidCheckoutSession(session: any, eventType: string) {
+  if (session.payment_status !== "paid") {
+    console.log("[stripe-webhook] checkout session not paid yet; waiting for async success", {
+      sessionId: session.id,
+      paymentStatus: session.payment_status,
+      eventType,
+    });
+    return { delivered: false, reason: "payment_not_paid" };
+  }
+
+  const customerEmail = session.customer_email || session.customer_details?.email || session.metadata?.customer_email;
+  const customerName = session.customer_details?.name || session.metadata?.customer_name || "Valued Customer";
+  if (!customerEmail) {
+    console.log("No customer email found in session");
+    return { delivered: false, reason: "missing_email" };
+  }
+
+  const adminClient = getAdminClient();
+  const purchase = await labelStripeProduct(session);
+  const paymentKey = getPaymentIntentId(session) || session.id;
+  const orderNumber = `ILR-ST-${String(paymentKey).slice(-8).toUpperCase()}`;
+  const skus = normalizeSkus(splitSkuList(session.metadata?.skus));
+
+  try {
+    await recordStripePurchase({
+      adminClient,
+      eventKey: paymentKey,
+      sourceId: session.id,
+      paymentIntentId: getPaymentIntentId(session),
+      customerEmail,
+      customerName,
+      customerCountry: session.customer_details?.address?.country || session.metadata?.customer_country,
+      purchase,
+      itemsSummary: session.metadata?.items_summary,
+      skus: session.metadata?.skus,
+      eventType,
+    });
+  } catch (trackingError) {
+    console.error("purchase tracking error:", trackingError);
+  }
+
+  await sendStripePurchaseEmails({
+    adminClient,
+    customerEmail,
+    customerName,
+    customerPhone: session.customer_details?.phone || session.metadata?.customer_phone || undefined,
+    customerCountry: session.customer_details?.address?.country || session.metadata?.customer_country || undefined,
+    purchase,
+    orderNumber,
+    paymentKey,
+    skus,
+  });
+
+  return { delivered: true };
+}
+
+async function handleSucceededPaymentIntent(paymentIntent: any, eventType: string) {
+  const metadata = paymentIntent.metadata || {};
+  if (metadata.source !== "checkout-prueba-1" && !metadata.skus) {
+    console.log("[stripe-webhook] payment_intent.succeeded ignored; no checkout metadata", { paymentIntentId: paymentIntent.id });
+    return { delivered: false, reason: "not_checkout" };
+  }
+  if (!hasAsyncStripeMethod(paymentIntent.payment_method_types)) {
+    console.log("[stripe-webhook] payment_intent.succeeded ignored for immediate method", { paymentIntentId: paymentIntent.id });
+    return { delivered: false, reason: "immediate_method" };
+  }
+
+  const customerEmail = paymentIntent.receipt_email || metadata.customer_email;
+  const customerName = metadata.customer_name || "Valued Customer";
+  if (!customerEmail) {
+    console.log("[stripe-webhook] payment_intent.succeeded missing customer email", { paymentIntentId: paymentIntent.id });
+    return { delivered: false, reason: "missing_email" };
+  }
+
+  const adminClient = getAdminClient();
+  const purchase = {
+    product_id: "stripe-checkout",
+    content_name: metadata.items_summary || "iLingue Relax Digital",
+    value: Number(((paymentIntent.amount_received || paymentIntent.amount || 0) / 100).toFixed(2)),
+    currency: String(paymentIntent.currency || "usd").toUpperCase(),
+  };
+  const paymentKey = paymentIntent.id;
+  const orderNumber = `ILR-ST-${String(paymentKey).slice(-8).toUpperCase()}`;
+  const skus = normalizeSkus(splitSkuList(metadata.skus));
+
+  try {
+    await recordStripePurchase({
+      adminClient,
+      eventKey: paymentKey,
+      sourceId: paymentIntent.id,
+      paymentIntentId: paymentIntent.id,
+      customerEmail,
+      customerName,
+      customerCountry: metadata.customer_country,
+      purchase,
+      itemsSummary: metadata.items_summary,
+      skus: metadata.skus,
+      eventType,
+    });
+  } catch (trackingError) {
+    console.error("purchase tracking error:", trackingError);
+  }
+
+  await sendStripePurchaseEmails({
+    adminClient,
+    customerEmail,
+    customerName,
+    customerPhone: metadata.customer_phone || undefined,
+    customerCountry: metadata.customer_country || undefined,
+    purchase,
+    orderNumber,
+    paymentKey,
+    skus,
+  });
+
+  return { delivered: true };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -127,102 +353,34 @@ serve(async (req) => {
 
     console.log("Webhook event received:", event.type);
 
-    if (event.type === "checkout.session.completed") {
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as any;
-      
-      // Check if this is a Spanish Relax purchase
-      const customerEmail = session.customer_email || session.customer_details?.email;
-      const customerName = session.customer_details?.name || "Valued Customer";
-      
-      if (!customerEmail) {
-        console.log("No customer email found in session");
-        return new Response(JSON.stringify({ received: true, emailSent: false }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      console.log("Sending purchase emails to:", customerEmail);
-
-      const purchase = await labelStripeProduct(session);
-      try {
-        const adminClient = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-        );
-        await adminClient.from("funnel_events").insert({
-          event_name: "Purchase",
-          product_id: purchase.product_id,
-          value: purchase.value,
-          currency: purchase.currency,
-          session_id: session.client_reference_id || session.id,
-          page_path: "/payment-success",
-          country: session.customer_details?.address?.country || null,
-          referrer: JSON.stringify({
-            provider: "stripe",
-            session_id: session.id,
-            external_reference: session.id ? `ILR-ST-${String(session.id).slice(-8).toUpperCase()}` : session.id,
-            customer_email: customerEmail,
-            customer_name: customerName,
-            items_summary: session.metadata?.items_summary || purchase.content_name,
-            skus: session.metadata?.skus || "",
-            status: "approved",
-          }).slice(0, 2000),
-        });
-      } catch (trackingError) {
-        console.error("purchase tracking error:", trackingError);
-      }
-
-      const orderNumber = session.id ? `ILR-ST-${String(session.id).slice(-8).toUpperCase()}` : undefined;
-
-      await sendThankYouEmail({
-        customerEmail,
-        customerName,
-        customerPhone: session.customer_details?.phone || undefined,
-        customerCountry: session.customer_details?.address?.country || undefined,
-        productName: purchase.content_name,
-        amount: purchase.value,
-        currency: purchase.currency,
-        provider: "stripe",
-        orderNumber,
-        idempotencyKey: session.id,
-      });
-
-      // Digital delivery — always trigger server-side so it goes out even if
-      // the buyer closes the tab before landing on /checkout/success.
-      try {
-        const skus = normalizeSkus(splitSkuList(session.metadata?.skus));
-        if (skus.length > 0) {
-          const digitalClient = createClient(
-            Deno.env.get("SUPABASE_URL")!,
-            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-          );
-          const { error: digitalErr } = await digitalClient.functions.invoke("send-digital-ilinguerelax", {
-            body: {
-              customerEmail,
-              customerName,
-              customerPhone: session.customer_details?.phone || undefined,
-              customerCountry: session.customer_details?.address?.country || undefined,
-              orderId: orderNumber,
-              skus,
-              amount: purchase.value,
-              currency: purchase.currency,
-              provider: "stripe",
-              idempotencyKey: `digital:${session.id}`,
-            },
-          });
-          if (digitalErr) console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);
-        } else {
-          console.log("[stripe-webhook] no skus in metadata; skipping digital delivery");
-        }
-      } catch (digitalException) {
-        console.error("digital delivery exception:", digitalException);
-      }
+      const result = await handlePaidCheckoutSession(session, event.type);
 
 
       return new Response(
-        JSON.stringify({ received: true, emailsSent: true }),
+        JSON.stringify({ received: true, ...result }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    if (event.type === "payment_intent.succeeded") {
+      const result = await handleSucceededPaymentIntent(event.data.object as any, event.type);
+      return new Response(
+        JSON.stringify({ received: true, ...result }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    if (event.type === "checkout.session.async_payment_failed" || event.type === "payment_intent.payment_failed") {
+      console.warn("[stripe-webhook] async payment failed; no digital delivery", {
+        eventType: event.type,
+        id: event.data?.object?.id,
+        metadata: event.data?.object?.metadata || {},
+      });
+      return new Response(JSON.stringify({ received: true, delivered: false, reason: "payment_failed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
 

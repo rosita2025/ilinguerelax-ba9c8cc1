@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { pushAbandonedCartToBrevo } from "../_shared/brevoAbandonedCart.ts";
+import { normalizeSku } from "../_shared/digitalSku.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -59,13 +60,17 @@ Deno.serve(async (req) => {
     const email = String(body.email || "").trim().toLowerCase();
     const name = String(body.name || "Cliente").trim() || "Cliente";
     const phone = String(body.phone || "").trim();
-    const productType = String(body.product_type || body.slug || "checkout").slice(0, 180);
+    const rawProductType = String(body.product_type || body.slug || "checkout").slice(0, 180);
+    const productType = normalizeSku(rawProductType) || rawProductType;
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")
           .slice(0, 20)
-          .map((c) => ({ id: String(c.id).slice(0, 60), q: Math.max(1, Math.min(20, Number(c.q) || 1)) }))
+          .map((c) => {
+            const rawId = String(c.id).slice(0, 180);
+            return { id: normalizeSku(rawId) || rawId, q: Math.max(1, Math.min(20, Number(c.q) || 1)) };
+          })
       : [];
 
     if (!EMAIL_RE.test(email)) {
@@ -133,7 +138,7 @@ Deno.serve(async (req) => {
     try {
       const { data: product } = await supabase
         .from("digital_products")
-        .select("name, price_usd, slug")
+        .select("name, price_usd, sku")
         .eq("sku", productType)
         .maybeSingle();
       const site = "https://ilinguerelax.com";
@@ -146,9 +151,8 @@ Deno.serve(async (req) => {
       };
       const recoverB64 = btoa(unescape(encodeURIComponent(JSON.stringify(recoverPayload))))
         .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-      const baseUrl = product?.slug
-        ? `${site}/checkouts/${product.slug}`
-        : `${site}/products/${productType}`;
+      const checkoutSku = (product as { sku?: string } | null)?.sku || productType;
+      const baseUrl = `${site}/checkouts/${checkoutSku}`;
       const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
       await pushAbandonedCartToBrevo({
         email,

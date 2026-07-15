@@ -16,6 +16,8 @@ interface Args {
   productUrl?: string;      // absolute checkout / product page URL
   priceUsd?: number;
   couponCode?: string;      // e.g. "NEW10"
+  couponPercent?: number;   // % de descuento sugerido/aplicado
+  couponAmount?: number;    // monto absoluto (misma moneda que priceUsd)
   language?: string;        // es|en|fr|pt
   country?: string;         // ISO-2, e.g. PE, US, FR
   source?: string;          // "checkout" | "hotmart" | ...
@@ -64,7 +66,7 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   if (a.productName) attributes.ABANDONED_PRODUCT_NAME = a.productName;
   if (a.productUrl) attributes.ABANDONED_CART_URL = a.productUrl;
   if (typeof a.priceUsd === "number") attributes.ABANDONED_PRICE_USD = a.priceUsd;
-  if (a.couponCode) attributes.ABANDONED_COUPON = a.couponCode;
+  // ABANDONED_COUPON se setea más abajo con normalización + tag/nota
   if (a.language) {
     const lang = a.language.toLowerCase();
     attributes.LANGUAGE = lang;   // segmentar automatización por idioma
@@ -135,6 +137,22 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   attributes.PRODUCT_CATEGORY = category;
   attributes.CATEGORIA_LABEL = categoryLabel;
 
+  // Cupón sugerido/aplicado en el carrito abandonado (para segmentar campañas por descuento)
+  const couponCodeRaw = (a.couponCode || "").trim().toUpperCase();
+  const couponCode = couponCodeRaw.slice(0, 32);
+  const couponPercent = Number.isFinite(a.couponPercent as number) ? (a.couponPercent as number) : undefined;
+  const couponAmount = Number.isFinite(a.couponAmount as number) ? (a.couponAmount as number) : undefined;
+  if (couponCode) {
+    attributes.ABANDONED_COUPON = couponCode;
+    attributes.COUPON_USED = "si";
+    attributes.COUPON_APPLIED = true;
+  } else {
+    attributes.COUPON_USED = "no";
+    attributes.COUPON_APPLIED = false;
+  }
+  if (typeof couponPercent === "number" && couponPercent > 0) attributes.ABANDONED_COUPON_PERCENT = couponPercent;
+  if (typeof couponAmount === "number" && couponAmount > 0) attributes.ABANDONED_COUPON_AMOUNT = couponAmount;
+
   const noteParts = [
     origin === "hotmart" ? "Hotmart" : "Tienda",
     "abandonado",
@@ -142,12 +160,16 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     `cat=${categoryLabel}`,
     `sku=${a.productSku}`,
     typeof a.priceUsd === "number" ? `usd=${a.priceUsd}` : "",
+    couponCode
+      ? `cupón=${couponCode}${typeof couponPercent === "number" && couponPercent > 0 ? ` (-${couponPercent}%)` : typeof couponAmount === "number" && couponAmount > 0 ? ` (-${couponAmount})` : ""}`
+      : "",
   ].filter(Boolean);
   attributes.ABANDONED_NOTE = noteParts.join(" · ");
 
-  // TAGS: incluye categoría para filtrar por oferta abandonada
+  // TAGS: incluye categoría y cupón para filtrar por oferta/descuento abandonado
   const eventKind: "compra" | "abandonado" = "abandonado";
   const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
+  if (couponCode) tagList.push(`cupon_${couponCode.toLowerCase()}`);
 
   // Audiencias/segmentos por producto (tabla brevo_product_audiences, editable en admin)
   const audiences = await resolveBrevoAudiences({

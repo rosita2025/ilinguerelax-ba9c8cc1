@@ -25,6 +25,10 @@ interface Args {
   provider: "stripe" | "paypal" | "mercadopago";
   orderNumber?: string;
   idempotencyKey?: string;
+  couponCode?: string;
+  couponPercent?: number;
+  couponAmount?: number;
+  skus?: string[];
 }
 
 function getClient() {
@@ -104,10 +108,14 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
       phone: a.customerPhone,
       country: a.customerCountry,
       productName: a.productName,
+      skus: a.skus,
       amount: a.amount,
       currency: a.currency,
       orderNumber,
       provider: a.provider,
+      couponCode: a.couponCode,
+      couponPercent: a.couponPercent,
+      couponAmount: a.couponAmount,
     }),
     markAbandonedCartConverted(a.customerEmail),
   ]);

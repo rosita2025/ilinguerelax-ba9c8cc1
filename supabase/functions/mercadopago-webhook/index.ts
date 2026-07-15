@@ -294,6 +294,9 @@ Deno.serve(async (req) => {
           const customerName = [payment.payer?.first_name, payment.payer?.last_name]
             .filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail.split("@")[0];
           const orderNumber = payment.external_reference || `ILR-MP-${payment.id}`;
+          const couponCode = String(payment.metadata?.coupon_code || "").trim().toUpperCase() || undefined;
+          const couponPctRaw = Number(payment.metadata?.coupon_percent);
+          const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
           try {
             await sendThankYouEmail({
               customerEmail: payerEmail,
@@ -301,11 +304,14 @@ Deno.serve(async (req) => {
               customerPhone: payment.metadata?.customer_phone || undefined,
               customerCountry: payment.payer?.address?.country_id || undefined,
               productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
+              skus: getPaymentSkus(payment),
               amount: payment.transaction_amount ?? undefined,
               currency: payment.currency_id || "PEN",
               provider: "mercadopago",
               orderNumber,
               idempotencyKey: `mp-approved-${payment.id}`,
+              couponCode,
+              couponPercent,
             });
           } catch (e) {
             console.error("MP approved emails failed:", e);

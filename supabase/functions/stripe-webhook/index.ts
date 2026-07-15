@@ -175,19 +175,26 @@ async function sendStripePurchaseEmails(params: {
   orderNumber: string;
   paymentKey: string;
   skus: string[];
+  couponCode?: string;
+  couponPercent?: number;
+  couponAmount?: number;
 }) {
-  const { adminClient, customerEmail, customerName, customerPhone, customerCountry, purchase, orderNumber, paymentKey, skus } = params;
+  const { adminClient, customerEmail, customerName, customerPhone, customerCountry, purchase, orderNumber, paymentKey, skus, couponCode, couponPercent, couponAmount } = params;
   await sendThankYouEmail({
     customerEmail,
     customerName,
     customerPhone,
     customerCountry,
     productName: purchase.content_name,
+    skus,
     amount: purchase.value,
     currency: purchase.currency,
     provider: "stripe",
     orderNumber,
     idempotencyKey: `stripe:${paymentKey}`,
+    couponCode,
+    couponPercent,
+    couponAmount,
   });
 
   if (skus.length === 0) {
@@ -210,6 +217,22 @@ async function sendStripePurchaseEmails(params: {
     },
   });
   if (digitalErr) console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);
+}
+
+// Extrae info de cupón desde session.metadata (checkout propio) o total_details (Stripe promo codes)
+function extractStripeCoupon(source: any): { couponCode?: string; couponPercent?: number; couponAmount?: number } {
+  const md = source?.metadata || {};
+  const codeMeta = String(md.coupon_code || "").trim().toUpperCase() || undefined;
+  const pctMeta = Number(md.coupon_percent);
+  const couponPercent = Number.isFinite(pctMeta) && pctMeta > 0 ? pctMeta : undefined;
+  const amountDiscount = Number(source?.total_details?.amount_discount || 0);
+  const couponAmount = amountDiscount > 0 ? Number((amountDiscount / 100).toFixed(2)) : undefined;
+  const discountCode =
+    source?.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code ||
+    source?.total_details?.breakdown?.discounts?.[0]?.discount?.coupon?.name ||
+    undefined;
+  const couponCode = codeMeta || (discountCode ? String(discountCode).toUpperCase() : undefined);
+  return { couponCode, couponPercent, couponAmount };
 }
 
 async function handlePaidCheckoutSession(session: any, eventType: string) {
@@ -253,6 +276,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     console.error("purchase tracking error:", trackingError);
   }
 
+  const coupon = extractStripeCoupon(session);
   await sendStripePurchaseEmails({
     adminClient,
     customerEmail,
@@ -263,6 +287,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     orderNumber,
     paymentKey,
     skus,
+    ...coupon,
   });
 
   return { delivered: true };
@@ -315,6 +340,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     console.error("purchase tracking error:", trackingError);
   }
 
+  const coupon = extractStripeCoupon(paymentIntent);
   await sendStripePurchaseEmails({
     adminClient,
     customerEmail,
@@ -325,6 +351,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     orderNumber,
     paymentKey,
     skus,
+    ...coupon,
   });
 
   return { delivered: true };

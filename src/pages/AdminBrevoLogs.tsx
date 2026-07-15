@@ -87,8 +87,18 @@ const AdminBrevoLogs = () => {
     [
       { value: "all", label: "Todos los eventos" },
       { value: "hotmart_purchase", label: "Hotmart · Compra" },
+      { value: "hotmart_pending", label: "Hotmart · Pendiente" },
+      { value: "hotmart_refused", label: "Hotmart · Rechazado" },
+      { value: "hotmart_refunded", label: "Hotmart · Reembolso" },
+      { value: "hotmart_chargeback", label: "Hotmart · Chargeback" },
+      { value: "hotmart_cancelled", label: "Hotmart · Cancelado" },
       { value: "hotmart_abandoned", label: "Hotmart · Carrito abandonado" },
       { value: "tienda_purchase", label: "Tienda · Compra" },
+      { value: "tienda_pending", label: "Tienda · Pendiente" },
+      { value: "tienda_refused", label: "Tienda · Rechazado" },
+      { value: "tienda_refunded", label: "Tienda · Reembolso" },
+      { value: "tienda_chargeback", label: "Tienda · Chargeback" },
+      { value: "tienda_cancelled", label: "Tienda · Cancelado" },
       { value: "tienda_abandoned", label: "Tienda · Carrito abandonado" },
     ]
   ), []);

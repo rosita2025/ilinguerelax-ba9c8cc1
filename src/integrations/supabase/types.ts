@@ -809,39 +809,48 @@ export type Database = {
       }
       funnel_events: {
         Row: {
+          bot_reason: string | null
           country: string | null
           created_at: string
           currency: string | null
           event_name: string
           id: string
+          is_bot: boolean
           page_path: string | null
           product_id: string | null
           referrer: string | null
           session_id: string | null
+          user_agent: string | null
           value: number | null
         }
         Insert: {
+          bot_reason?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
           event_name: string
           id?: string
+          is_bot?: boolean
           page_path?: string | null
           product_id?: string | null
           referrer?: string | null
           session_id?: string | null
+          user_agent?: string | null
           value?: number | null
         }
         Update: {
+          bot_reason?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
           event_name?: string
           id?: string
+          is_bot?: boolean
           page_path?: string | null
           product_id?: string | null
           referrer?: string | null
           session_id?: string | null
+          user_agent?: string | null
           value?: number | null
         }
         Relationships: []

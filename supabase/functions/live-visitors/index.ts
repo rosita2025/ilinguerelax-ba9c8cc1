@@ -191,7 +191,7 @@ serve(async (req) => {
     const [{ data, error }, ga4] = await Promise.all([
       supabase
         .from("funnel_events")
-        .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at")
+        .select("event_name, product_id, value, currency, session_id, country, page_path, referrer, created_at, is_bot, bot_reason, user_agent")
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(5000),
@@ -199,13 +199,33 @@ serve(async (req) => {
     ]);
     if (error) throw error;
 
-    const BOT_REF = /(bot|crawler|spider|semrush|ahrefs|mj12|petalbot|yandex|baiduspider|pingdom|uptime|gtmetrix|pagespeed|lighthouse)/i;
-    const rows = (data || []).filter((row) => {
-      if (isAdminPath((row.page_path as string) || null)) return false;
-      const ref = (row.referrer as string) || "";
-      if (BOT_REF.test(ref)) return false;
-      return true;
-    });
+    const allRows = (data || []).filter((row) => !isAdminPath((row.page_path as string) || null));
+
+    // Split humans vs bots
+    const botRows = allRows.filter((r) => (r as { is_bot?: boolean }).is_bot === true);
+    const rows = allRows.filter((r) => (r as { is_bot?: boolean }).is_bot !== true);
+
+    // Bot summary
+    const botSessions = new Set<string>();
+    const botReasonCounts: Record<string, number> = {};
+    const botByCountry: Record<string, number> = {};
+    for (const b of botRows) {
+      const sid = (b.session_id as string) || `anon-${b.created_at}`;
+      botSessions.add(sid);
+      const reason = ((b as { bot_reason?: string }).bot_reason) || "desconocido";
+      botReasonCounts[reason] = (botReasonCounts[reason] || 0) + 1;
+      const c = (b.country as string) || "??";
+      botByCountry[c] = (botByCountry[c] || 0) + 1;
+    }
+    const botRecent = botRows.slice(0, 50).map((row) => ({
+      session_id: (row.session_id as string) || null,
+      country: (row.country as string) || null,
+      page_path: (row.page_path as string) || null,
+      event_name: row.event_name as string,
+      bot_reason: (row as { bot_reason?: string }).bot_reason || null,
+      user_agent: (row as { user_agent?: string }).user_agent || null,
+      created_at: row.created_at as string,
+    }));
 
     // Group by session — one entry per live visitor with their latest activity
     const bySession = new Map<string, {
@@ -361,6 +381,13 @@ serve(async (req) => {
       revenueByCountry,
       visitors: visitors.slice(0, 200),
       recentEvents,
+      bots: {
+        events: botRows.length,
+        sessions: botSessions.size,
+        byReason: botReasonCounts,
+        byCountry: botByCountry,
+        recent: botRecent,
+      },
       generatedAt: new Date().toISOString(),
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
   } catch (e) {

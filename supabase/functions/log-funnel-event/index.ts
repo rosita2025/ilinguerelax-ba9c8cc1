@@ -11,11 +11,15 @@ const ALLOWED = new Set(["PageView", "ViewContent", "AddToCart", "InitiateChecko
 // In-memory IP→country cache (lives during function instance lifetime)
 const ipCache = new Map<string, string>();
 
+// In-memory rate tracker per session (detects bursts characteristic of bots)
+const sessionRate = new Map<string, number[]>(); // sid -> timestamps ms
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX_EVENTS = 30; // >30 events / 60s = likely bot
+
 const resolveCountry = async (ip: string | null, fallback: string | null): Promise<string | null> => {
   if (!ip) return fallback;
   if (ipCache.has(ip)) return ipCache.get(ip)!;
   try {
-    // api.country.is is free, no key, generous limits
     const r = await fetch(`https://api.country.is/${ip}`, { signal: AbortSignal.timeout(2000) });
     if (r.ok) {
       const j = await r.json();
@@ -27,7 +31,7 @@ const resolveCountry = async (ip: string | null, fallback: string | null): Promi
   return fallback;
 };
 
-// Cached bot filter patterns loaded from public.bot_filters (refreshed every 60s).
+// Bot filter patterns from public.bot_filters (cached 60s)
 type FilterRow = { pattern: string; kind: string; enabled: boolean };
 let filtersCache: { ua: RegExp | null; referrer: RegExp | null; ips: Set<string>; expires: number } = {
   ua: null, referrer: null, ips: new Set(), expires: 0,
@@ -53,6 +57,35 @@ const loadFilters = async (supabase: ReturnType<typeof createClient>) => {
   return filtersCache;
 };
 
+// Built-in heuristics — catch automation frameworks even without custom filters
+const BUILTIN_BOT_UA = /(bot|crawler|spider|slurp|bingpreview|semrush|ahrefs|mj12|petalbot|yandex|baiduspider|pingdom|uptime|gtmetrix|pagespeed|lighthouse|headlesschrome|phantomjs|puppeteer|playwright|selenium|chrome-lighthouse|wget|curl|python-requests|python-urllib|scrapy|node-fetch|okhttp|axios\/|go-http-client|java\/|libwww|apachebench|masscan|zgrab|nmap|ruby|perl|http_request)/i;
+
+const classifyBot = (ua: string, sessionId: string | null, referer: string, filters: typeof filtersCache): string | null => {
+  // 1. no session id at all → almost certainly non-browser
+  if (!sessionId || sessionId.length < 6) return "no_session";
+  // 2. missing / trivial user-agent
+  if (!ua || ua.length < 15) return "empty_ua";
+  // 3. built-in known bot / automation signature
+  if (BUILTIN_BOT_UA.test(ua)) return "bot_ua";
+  // 4. custom filters (admin-managed)
+  if (filters.ua && filters.ua.test(ua)) return "bot_ua_custom";
+  if (filters.referrer && filters.referrer.test(referer)) return "bot_referrer";
+  // 5. burst rate — >RATE_MAX_EVENTS events in 60s from same session
+  const now = Date.now();
+  const arr = sessionRate.get(sessionId) || [];
+  const recent = arr.filter((t) => now - t < RATE_WINDOW_MS);
+  recent.push(now);
+  sessionRate.set(sessionId, recent);
+  if (recent.length > RATE_MAX_EVENTS) return "burst_rate";
+  // Occasionally prune the map
+  if (sessionRate.size > 5000) {
+    for (const [k, v] of sessionRate) {
+      if (v.every((t) => now - t > RATE_WINDOW_MS)) sessionRate.delete(k);
+    }
+  }
+  return null;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -67,18 +100,6 @@ serve(async (req) => {
     const xff = req.headers.get("x-forwarded-for") || "";
     const ip = xff.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
 
-    const filters = await loadFilters(supabase);
-    const skipReason =
-      (filters.ua && filters.ua.test(ua)) ? "bot_ua" :
-      (filters.referrer && filters.referrer.test(referer)) ? "bot_referrer" :
-      (ip && filters.ips.has(ip)) ? "bot_ip" : null;
-
-    if (skipReason) {
-      return new Response(JSON.stringify({ ok: true, skipped: skipReason }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const body = await req.json().catch(() => ({}));
     const event_name = String(body.event_name || "");
     if (!ALLOWED.has(event_name)) {
@@ -87,6 +108,12 @@ serve(async (req) => {
       });
     }
 
+    const filters = await loadFilters(supabase);
+    const sid = typeof body.session_id === "string" ? body.session_id : null;
+
+    let botReason: string | null = classifyBot(ua, sid, referer, filters);
+    if (!botReason && ip && filters.ips.has(ip)) botReason = "bot_ip";
+
     const country = await resolveCountry(ip, body.country || null);
 
     const { error } = await supabase.from("funnel_events").insert({
@@ -94,10 +121,13 @@ serve(async (req) => {
       product_id: body.product_id ?? null,
       value: typeof body.value === "number" ? body.value : null,
       currency: typeof body.currency === "string" ? body.currency : null,
-      session_id: body.session_id ?? null,
+      session_id: sid,
       page_path: body.page_path ?? null,
       country,
       referrer: typeof body.referrer === "string" ? body.referrer.slice(0, 500) : null,
+      is_bot: !!botReason,
+      bot_reason: botReason,
+      user_agent: ua ? ua.slice(0, 300) : null,
     });
 
     if (error) {
@@ -107,7 +137,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ ok: true, country }), {
+    return new Response(JSON.stringify({ ok: true, country, is_bot: !!botReason, bot_reason: botReason }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
  * Fallback: si no hay región configurada o falla la consulta, TODAS quedan
  * habilitadas para no romper el checkout existente.
  */
+export type FamilyKey = "stripe" | "paypal" | "transfer" | "cash" | "yape";
+
 export interface CheckoutMethodsConfig {
   loaded: boolean;
   regionCode: string | null;
@@ -18,14 +20,18 @@ export interface CheckoutMethodsConfig {
   transfer: boolean;
   cash: boolean;
   yape: boolean;
+  /** Orden de las familias según el sort_order más bajo en la región activa. */
+  familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded"> = {
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "paypal", "transfer", "cash", "yape"];
+
+const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
   stripe: true, paypal: true, transfer: true, cash: true, yape: true,
 };
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }
-interface MethodRow { region_code: string; method_key: string; enabled: boolean }
+interface MethodRow { region_code: string; method_key: string; enabled: boolean; sort_order: number | null }
 
 // Cache en memoria — las regiones cambian poquísimo, así evitamos re-consulta
 // en cada montaje de <PaymentMethodsGroup />.

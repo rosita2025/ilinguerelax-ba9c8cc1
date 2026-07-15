@@ -338,7 +338,9 @@ export default function AdminCheckoutMethods() {
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {regions.map((r) => {
-              const rms = methods.filter(m => m.region_code === r.code);
+              const rms = methods
+                .filter(m => m.region_code === r.code)
+                .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
               return (
                 <Card key={r.code} className={`p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
                   <div className="flex items-start justify-between mb-3">

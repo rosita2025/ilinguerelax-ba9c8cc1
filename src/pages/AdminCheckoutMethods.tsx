@@ -199,12 +199,36 @@ export default function AdminCheckoutMethods() {
   }
   useEffect(() => { load(); }, []);
 
-  async function saveRegion(r: Region) {
-    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "save_region", region: r },
+  async function saveRegion(r: Region, opts: { fromDialog?: boolean } = {}) {
+    const code = r.code.trim().toUpperCase();
+    if (!code) return toast.error("Código requerido");
+    if (!/^[A-Z0-9_-]{1,32}$/.test(code)) return toast.error("Código inválido (A-Z, 0-9, _-)");
+    if (!r.name.trim()) return toast.error("Nombre requerido");
+    if (!r.currency.trim()) return toast.error("Moneda requerida");
+
+    if (opts.fromDialog) setSavingDialog(true); else setSavingRegion(code);
+    // Optimistic UI: reflect changes immediately in the card grid.
+    const payload: Region = { ...r, code };
+    setRegions(prev => {
+      const idx = prev.findIndex(x => x.code === code);
+      if (idx < 0) return [...prev, payload].sort((a, b) => a.sort_order - b.sort_order);
+      const next = prev.slice(); next[idx] = payload; return next;
     });
-    if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success("Región guardada"); setRegionEdit(null); load();
+    try {
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "save_region", region: payload },
+      });
+      if (error || data?.error) throw new Error(error?.message || data?.error);
+      toast.success("✅ Región guardada");
+      if (opts.fromDialog) setRegionEdit(null);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message || "Error al guardar");
+      await load();
+    } finally {
+      setSavingDialog(false);
+      setSavingRegion(null);
+    }
   }
   async function deleteRegion(code: string) {
     if (!confirm(`Eliminar región ${code} y sus métodos?`)) return;
@@ -215,11 +239,23 @@ export default function AdminCheckoutMethods() {
     toast.success("Eliminada"); load();
   }
   async function saveMethod(m: Method) {
-    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "save_method", method: m },
-    });
-    if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success("Método guardado"); setMethodEdit(null); load();
+    if (!m.method_key.trim()) return toast.error("Clave requerida");
+    if (!/^[a-z0-9_]{1,48}$/.test(m.method_key)) return toast.error("Clave inválida (a-z, 0-9, _)");
+    if (!m.label.trim()) return toast.error("Etiqueta requerida");
+    setSavingDialog(true);
+    try {
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "save_method", method: m },
+      });
+      if (error || data?.error) throw new Error(error?.message || data?.error);
+      toast.success("✅ Método guardado");
+      setMethodEdit(null);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message || "Error al guardar");
+    } finally {
+      setSavingDialog(false);
+    }
   }
   async function deleteMethod(id: string) {
     if (!confirm("Eliminar método?")) return;

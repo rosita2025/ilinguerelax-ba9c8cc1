@@ -17,6 +17,7 @@ interface Args {
   priceUsd?: number;
   couponCode?: string;      // e.g. "NEW10"
   language?: string;        // es|en|fr|pt
+  country?: string;         // ISO-2, e.g. PE, US, FR
   source?: string;          // "checkout" | "hotmart" | ...
 }
 

@@ -72,6 +72,162 @@ const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
+type MethodBadge = { label: string; bg: string; color: string };
+type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
+
+const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> = {
+  stripe_oxxo: {
+    icon: Banknote,
+    title: "OXXO",
+    sub: "Paga en efectivo en tiendas OXXO dentro del formulario seguro de Stripe.",
+    badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
+  },
+  stripe_boleto: {
+    icon: Banknote,
+    title: "Boleto",
+    sub: "Voucher bancario para Brasil dentro de Stripe.",
+    badges: [{ label: "Boleto", bg: "#1F2937", color: "#ffffff" }],
+  },
+  stripe_pix: {
+    icon: Smartphone,
+    title: "Pix",
+    sub: "Transferencia instantánea para Brasil dentro de Stripe.",
+    badges: [{ label: "Pix", bg: "#32BCAD", color: "#06211F" }],
+  },
+  stripe_ideal: {
+    icon: Building2,
+    title: "iDEAL",
+    sub: "Banca online de Países Bajos dentro de Stripe.",
+    badges: [{ label: "iDEAL", bg: "#CC0066", color: "#ffffff" }],
+  },
+  stripe_bancontact: {
+    icon: Building2,
+    title: "Bancontact",
+    sub: "Pago local de Bélgica dentro de Stripe.",
+    badges: [{ label: "Bancontact", bg: "#005498", color: "#ffffff" }],
+  },
+  stripe_sepa_debit: {
+    icon: Banknote,
+    title: "SEPA débito directo",
+    sub: "Débito bancario para zona euro dentro de Stripe.",
+    badges: [{ label: "SEPA", bg: "#003399", color: "#ffffff" }],
+  },
+  stripe_giropay: {
+    icon: Building2,
+    title: "Giropay",
+    sub: "Banca online de Alemania dentro de Stripe.",
+    badges: [{ label: "Giropay", bg: "#0B5AA6", color: "#ffffff" }],
+  },
+  stripe_sofort: {
+    icon: Building2,
+    title: "Sofort",
+    sub: "Transferencia instantánea dentro de Stripe.",
+    badges: [{ label: "Sofort", bg: "#EE3423", color: "#ffffff" }],
+  },
+  stripe_eps: {
+    icon: Building2,
+    title: "EPS",
+    sub: "Banca online de Austria dentro de Stripe.",
+    badges: [{ label: "EPS", bg: "#C8102E", color: "#ffffff" }],
+  },
+  stripe_p24: {
+    icon: Building2,
+    title: "Przelewy24 (P24)",
+    sub: "Banca online de Polonia dentro de Stripe.",
+    badges: [{ label: "P24", bg: "#D71920", color: "#ffffff" }],
+  },
+  stripe_blik: {
+    icon: Smartphone,
+    title: "BLIK",
+    sub: "Pago móvil de Polonia dentro de Stripe.",
+    badges: [{ label: "BLIK", bg: "#111827", color: "#ffffff" }],
+  },
+  stripe_multibanco: {
+    icon: Banknote,
+    title: "Multibanco",
+    sub: "Pago local de Portugal dentro de Stripe.",
+    badges: [{ label: "Multibanco", bg: "#1F4E79", color: "#ffffff" }],
+  },
+  stripe_mb_way: {
+    icon: Smartphone,
+    title: "MB WAY",
+    sub: "Pago móvil de Portugal dentro de Stripe.",
+    badges: [{ label: "MB WAY", bg: "#00A3E0", color: "#001B2D" }],
+  },
+  stripe_twint: {
+    icon: Smartphone,
+    title: "TWINT",
+    sub: "Pago móvil de Suiza dentro de Stripe.",
+    badges: [{ label: "TWINT", bg: "#FF5A00", color: "#ffffff" }],
+  },
+  stripe_mobilepay: {
+    icon: Smartphone,
+    title: "MobilePay",
+    sub: "Pago móvil de Dinamarca/Finlandia dentro de Stripe.",
+    badges: [{ label: "MobilePay", bg: "#5A78FF", color: "#ffffff" }],
+  },
+  stripe_bacs_debit: {
+    icon: Banknote,
+    title: "Bacs débito directo",
+    sub: "Débito bancario de Reino Unido dentro de Stripe.",
+    badges: [{ label: "Bacs", bg: "#1F2937", color: "#ffffff" }],
+  },
+  stripe_acss_debit: {
+    icon: Banknote,
+    title: "Débito bancario Canadá",
+    sub: "Débito preautorizado de Canadá dentro de Stripe.",
+    badges: [{ label: "ACSS", bg: "#D80621", color: "#ffffff" }],
+  },
+  stripe_afterpay_clearpay: {
+    icon: CreditCard,
+    title: "Afterpay / Clearpay",
+    sub: "Compra ahora y paga en cuotas dentro de Stripe.",
+    badges: [{ label: "Afterpay", bg: "#B2FCE4", color: "#0A0A0A" }],
+  },
+  stripe_affirm: {
+    icon: CreditCard,
+    title: "Affirm",
+    sub: "Compra ahora y paga después dentro de Stripe.",
+    badges: [{ label: "Affirm", bg: "#4A4AF4", color: "#ffffff" }],
+  },
+  stripe_paypal: {
+    icon: Wallet,
+    title: "PayPal (Stripe)",
+    sub: "PayPal procesado dentro del formulario seguro de Stripe.",
+    badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
+  },
+  stripe_alipay: {
+    icon: Smartphone,
+    title: "Alipay",
+    sub: "Pago local de Asia dentro de Stripe.",
+    badges: [{ label: "Alipay", bg: "#1677FF", color: "#ffffff" }],
+  },
+  stripe_wechat_pay: {
+    icon: Smartphone,
+    title: "WeChat Pay",
+    sub: "Pago local de China dentro de Stripe.",
+    badges: [{ label: "WeChat", bg: "#07C160", color: "#001B0A" }],
+  },
+  stripe_grabpay: {
+    icon: Smartphone,
+    title: "GrabPay",
+    sub: "Pago local del sudeste asiático dentro de Stripe.",
+    badges: [{ label: "GrabPay", bg: "#00B14F", color: "#ffffff" }],
+  },
+  stripe_paynow: {
+    icon: Smartphone,
+    title: "PayNow",
+    sub: "Pago local de Singapur dentro de Stripe.",
+    badges: [{ label: "PayNow", bg: "#7B1FA2", color: "#ffffff" }],
+  },
+  stripe_konbini: {
+    icon: Banknote,
+    title: "Konbini",
+    sub: "Pago en tiendas de conveniencia de Japón dentro de Stripe.",
+    badges: [{ label: "Konbini", bg: "#D32F2F", color: "#ffffff" }],
+  },
+};
+
 export function PaymentMethodsGroup() {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
@@ -421,18 +577,26 @@ export function PaymentMethodsGroup() {
   // automáticamente según el país del comprador; nosotros solo mostramos los
   // logos correctos para que el cliente reconozca sus opciones y confíe.
   const country = (region.country || "").toUpperCase();
-  const cardBrandsByCountry = (_c: string): string[] => {
-    // Solo mostramos las marcas principales para mantener el badge limpio.
-    return ["Visa", "Mastercard", "Apple Pay", "Link"];
-  };
-  const cardBrands = cardBrandsByCountry(country);
   const cardSubtitle = isPeru
     ? t.cardSubtitlePeru(localBadge)
     : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
 
   const isUsa = country === "US";
-  const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
+  const methodsConfig = useCheckoutMethodsConfig(country);
+  const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
+  const primaryCardBadges: MethodBadge[] = [
+    { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+    { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+    ...(enabledStripeKeys.has("stripe_apple_pay") ? [{ label: "Apple Pay", bg: "#000000", color: "#ffffff" }] : []),
+    ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
+    ...(enabledStripeKeys.has("stripe_google_pay") ? [{ label: "Google Pay", bg: "#ffffff", color: "#1F2937" }] : []),
+  ];
+  const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_link")
+    .map((key) => ({ id: "card", methodKey: key, badge: "Stripe", ...STRIPE_VISIBLE_METHODS[key] }));
+  const allMethods: PaymentMethodRow[] = [
     { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
+    ...dynamicStripeRows,
     { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: "Stripe" },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: "Stripe" },
     { id: "stripe_klarna", icon: Wallet, title: "Klarna — Paga en 4", sub: "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: "Stripe" },
@@ -446,10 +610,14 @@ export function PaymentMethodsGroup() {
   // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí
   // deja de aparecer. Antes de cargar la config, mostramos el conjunto legacy
   // para no parpadear.
-  const methodsConfig = useCheckoutMethodsConfig(country);
   const filteredByAdmin = methodsConfig.loaded
     ? allMethods.filter((m) => {
-        if (m.id === "card") return methodsConfig.stripe;
+        if (m.id === "card") {
+          if (m.methodKey) return enabledStripeKeys.has(m.methodKey);
+          return methodsConfig.regionCode && methodsConfig.enabledMethodKeys.length > 0
+            ? enabledStripeKeys.has("stripe_card")
+            : methodsConfig.stripe;
+        }
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
         if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
@@ -643,10 +811,13 @@ export function PaymentMethodsGroup() {
                 </div>
                 {isPrimaryCard ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
-                    <LogoBadge src={visaLogo} alt="Visa" />
-                    <LogoBadge src={mastercardLogo} alt="Mastercard" />
-                    <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
-                    <LinkBadge />
+                    {primaryCardBadges.map((badge) => {
+                      if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
+                      if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
+                      if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+                      if (badge.label === "Link") return <LinkBadge key={badge.label} />;
+                      return <BankBadge key={badge.label} {...badge} />;
+                    })}
                   </div>
                 ) : null}
 
@@ -663,6 +834,10 @@ export function PaymentMethodsGroup() {
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
                     <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
+                  </div>
+                ) : m.badges?.length ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}
                   </div>
                 ) : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">

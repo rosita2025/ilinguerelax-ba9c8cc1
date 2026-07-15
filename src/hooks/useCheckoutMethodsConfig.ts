@@ -15,6 +15,8 @@ export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna
 export interface CheckoutMethodsConfig {
   loaded: boolean;
   regionCode: string | null;
+  /** Exact enabled method keys for the matched region (ex: stripe_card, stripe_oxxo). */
+  enabledMethodKeys: string[];
   stripe: boolean;
   stripeAch: boolean;
   stripeCashApp: boolean;
@@ -29,11 +31,11 @@ export interface CheckoutMethodsConfig {
 
 const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape"];
 
-const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
+const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
   stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: true, transfer: true, cash: true, yape: true,
 };
 
-const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
+const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
   stripe: true, stripeAch: true, stripeCashApp: true, stripeKlarna: true, paypal: true, transfer: false, cash: false, yape: false,
 };
 
@@ -73,7 +75,7 @@ async function loadAll() {
   cachePromise = (async () => {
     const [{ data: regions }, { data: methods }] = await Promise.all([
       supabase.from("checkout_regions").select("code, country_codes, enabled, sort_order").eq("enabled", true),
-      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order").eq("enabled", true),
+      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order"),
     ]);
     return {
       regions: (regions ?? []) as RegionRow[],
@@ -99,7 +101,7 @@ function keyToFamily(key: string): FamilyKey | null {
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
   const [version, setVersion] = useState(0);
   const [state, setState] = useState<CheckoutMethodsConfig>({
-    loaded: false, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
+    loaded: false, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
   });
 
   useEffect(() => {
@@ -148,24 +150,28 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
           ?? regions.find((r) => r.code.toUpperCase() === "GLOBAL");
       }
       if (!region) {
-        if (alive) setState({ loaded: true, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
+        if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
         return;
       }
       const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false };
       const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
+      const enabledMethodKeys: string[] = [];
+      let configuredMethods = 0;
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
+        configuredMethods += 1;
+        if (!m.enabled) continue;
+        enabledMethodKeys.push(m.method_key.toLowerCase());
         const fam = keyToFamily(m.method_key);
         if (!fam) continue;
         enabledFamilies[fam] = true;
         const ord = m.sort_order ?? 999;
         if (ord < familyMinOrder[fam]) familyMinOrder[fam] = ord;
       }
-      const anyEnabled = Object.values(enabledFamilies).some(Boolean);
-      const families = anyEnabled ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
+      const families = configuredMethods > 0 ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
       const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
         .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
-      if (alive) setState({ loaded: true, regionCode: region.code, ...families, familyOrder });
+      if (alive) setState({ loaded: true, regionCode: region.code, enabledMethodKeys, ...families, familyOrder });
     })();
     return () => { alive = false; };
   }, [country, version]);

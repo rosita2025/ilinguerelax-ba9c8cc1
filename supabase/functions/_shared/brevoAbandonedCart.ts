@@ -21,6 +21,8 @@ interface Args {
   source?: string;          // "checkout" | "hotmart" | ...
 }
 
+import { logBrevoSync } from "./brevoLog.ts";
+
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
 function splitName(full?: string): { first?: string; last?: string } {

@@ -35,6 +35,7 @@ function markSent(email: string, slug: string) {
  */
 export function useAbandonedCheckoutTracker(slug: string | undefined, productName?: string) {
   const buyer = useCheckoutPruebaStore((s) => s.buyer);
+  const items = useCheckoutPruebaStore((s) => s.items);
   const { language } = useI18n();
   const timer = useRef<number | null>(null);
   const trackedRef = useRef<string>("");
@@ -42,11 +43,14 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
   useEffect(() => {
     const email = buyer.email.trim().toLowerCase();
     const name = buyer.fullName.trim();
+    const phone = (buyer.phone || "").trim();
 
     if (!EMAIL_RE.test(email) || name.length < 3) return;
 
     const slugKey = slug || productName || "checkout";
-    const fingerprint = `${email}::${slugKey}`;
+    // Cart snapshot para el link de recuperación tipo Shopify.
+    const cart = items.map((i) => ({ id: i.id, q: i.quantity }));
+    const fingerprint = `${email}::${slugKey}::${JSON.stringify(cart)}`;
     if (trackedRef.current === fingerprint) return;
     if (alreadySent(email, slugKey)) return;
 
@@ -58,8 +62,10 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
           body: {
             email,
             name,
+            phone,
             product_type: slugKey,
             language,
+            cart,
           },
         });
         trackedRef.current = fingerprint;
@@ -72,5 +78,5 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
     return () => {
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, [buyer.email, buyer.fullName, slug, productName, language]);
+  }, [buyer.email, buyer.fullName, buyer.phone, items, slug, productName, language]);
 }

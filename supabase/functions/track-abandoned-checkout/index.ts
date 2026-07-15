@@ -29,8 +29,15 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const email = String(body.email || "").trim().toLowerCase();
     const name = String(body.name || "Cliente").trim() || "Cliente";
+    const phone = String(body.phone || "").trim();
     const productType = String(body.product_type || body.slug || "checkout").slice(0, 80);
     const language = body.language ? String(body.language) : detectLanguage(email);
+    const cart = Array.isArray(body.cart)
+      ? (body.cart as Array<{ id?: string; q?: number }>)
+          .filter((c) => c && typeof c.id === "string")
+          .slice(0, 20)
+          .map((c) => ({ id: String(c.id).slice(0, 60), q: Math.max(1, Math.min(20, Number(c.q) || 1)) }))
+      : [];
 
     if (!EMAIL_RE.test(email)) {
       return new Response(JSON.stringify({ error: "invalid email" }), {
@@ -92,9 +99,19 @@ Deno.serve(async (req) => {
         .eq("sku", productType)
         .maybeSingle();
       const site = "https://ilinguerelax.com";
-      const url = product?.slug
+      // Payload de recuperación estilo Shopify: al hacer clic en el email,
+      // /checkouts/:slug hidrata carrito + datos del cliente automáticamente.
+      const recoverPayload = {
+        v: 1,
+        b: { n: name, e: email, p: phone },
+        c: cart,
+      };
+      const recoverB64 = btoa(unescape(encodeURIComponent(JSON.stringify(recoverPayload))))
+        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const baseUrl = product?.slug
         ? `${site}/checkouts/${product.slug}`
         : `${site}/products/${productType}`;
+      const url = `${baseUrl}?r=${recoverB64}`;
       await pushAbandonedCartToBrevo({
         email,
         name,

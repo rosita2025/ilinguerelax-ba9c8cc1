@@ -29,6 +29,7 @@ export default function Checkout() {
   const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
   const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
   const updateQty = useCheckoutPruebaStore((s) => s.updateQuantity);
+  const setBuyer = useCheckoutPruebaStore((s) => s.setBuyer);
   const items = useCheckoutPruebaStore((s) => s.items);
   const region = useRegionTier();
   const { language } = useI18n();
@@ -45,6 +46,62 @@ export default function Checkout() {
       const url = `https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/create-checkout-prueba`;
       fetch(url, { method: "OPTIONS", mode: "cors" }).catch(() => {});
     } catch { /* ignore */ }
+  }, []);
+
+  // Recuperación de carrito estilo Shopify: /checkouts/:slug?r=<b64>
+  // decodifica {b:{n,e,p}, c:[{id,q}]} y rellena datos + carrito en cualquier
+  // dispositivo desde el enlace del email de carrito abandonado.
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const r = params.get("r");
+      if (!r) return;
+      const b64 = r.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = b64 + "===".slice((b64.length + 3) % 4);
+      const json = decodeURIComponent(escape(atob(padded)));
+      const payload = JSON.parse(json) as {
+        b?: { n?: string; e?: string; p?: string };
+        c?: Array<{ id?: string; q?: number }>;
+      };
+      if (payload?.b) {
+        setBuyer({
+          fullName: payload.b.n || "",
+          email: (payload.b.e || "").trim(),
+          phone: payload.b.p || "",
+        });
+        try {
+          localStorage.setItem("ilr_buyer", JSON.stringify({
+            name: payload.b.n || "",
+            email: payload.b.e || "",
+            phone: payload.b.p || "",
+          }));
+        } catch { /* ignore */ }
+      }
+      if (Array.isArray(payload?.c)) {
+        for (const c of payload.c) {
+          if (!c?.id) continue;
+          const cat = getCatalogItem(c.id) || Object.values(CHECKOUT_CATALOG).find((x) => x.id === c.id);
+          if (cat) {
+            addItem({
+              id: cat.id,
+              name: cat.name,
+              price: cat.price,
+              image: cat.image,
+              description: cat.description,
+              regionPrices: cat.regionPrices,
+              pricePen: cat.pricePen,
+              quantity: Math.max(1, Number(c.q) || 1),
+            });
+          }
+        }
+      }
+      // Limpiar el parámetro para que un refresh no vuelva a duplicar.
+      params.delete("r");
+      const clean = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState(null, "", clean);
+      toast.success("Recuperamos tu carrito ✨");
+    } catch { /* payload inválido, ignora */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const staticItem = getCatalogItem(slug);

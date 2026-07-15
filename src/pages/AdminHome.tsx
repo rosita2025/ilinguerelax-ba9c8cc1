@@ -53,6 +53,13 @@ const panels = [
     desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).",
     color: "text-sky-600",
   },
+  {
+    to: "/admin/brevo-logs",
+    icon: Activity,
+    title: "Logs de Brevo",
+    desc: "Ver qué evento llegó (compra Hotmart, abandono Hotmart, checkout tienda) y qué campos se enviaron a Brevo, con éxito/fallo.",
+    color: "text-rose-600",
+  },
 ];
 
 const AdminHome = () => {

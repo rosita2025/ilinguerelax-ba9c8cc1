@@ -92,6 +92,17 @@ Deno.serve(async (req) => {
       .slice(0, 300);
     const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
 
+    // Métodos de pago habilitados en Stripe:
+    // - card: tarjetas de crédito/débito globales
+    // - link: One-click de Stripe
+    // - us_bank_account: transferencia bancaria ACH (compradores USA)
+    // - customer_balance: transferencia bancaria internacional (virtual account)
+    // Nota: Efecty (Colombia) requiere moneda COP y country=CO;
+    // no es compatible con este checkout Global en USD.
+    const buyerCountry = body.contact.country.toUpperCase();
+    const paymentMethodTypes: string[] = ["card", "link"];
+    if (buyerCountry === "US") paymentMethodTypes.push("us_bank_account");
+
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
@@ -100,6 +111,7 @@ Deno.serve(async (req) => {
       // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
       adaptive_pricing: { enabled: true },
       customer_email: body.contact.email,
+      payment_method_types: paymentMethodTypes as any,
       payment_intent_data: {
         description: `Prueba 1 · ${productSummary}`,
       },

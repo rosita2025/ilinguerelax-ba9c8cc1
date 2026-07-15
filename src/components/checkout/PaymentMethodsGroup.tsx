@@ -254,7 +254,7 @@ export function PaymentMethodsGroup() {
     if (!valid) { requestBuyerInfo(); return; }
     if (m !== selected) setShowStripe(false);
     setSelected(m);
-    if (!["card", "stripe_ach", "stripe_cashapp"].includes(m)) setShowStripe(false);
+    if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
   };
 
   const handleBuyNow = () => {
@@ -263,7 +263,7 @@ export function PaymentMethodsGroup() {
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
-    if (["card", "stripe_ach", "stripe_cashapp"].includes(selected)) { setShowStripe(true); return; }
+    if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }
     // yape → user uses "Ya pagué" button in the manual panel
@@ -278,7 +278,7 @@ export function PaymentMethodsGroup() {
   }, []);
 
   useEffect(() => {
-    if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected))) return;
+    if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);
     const container = stripeContainerRef.current;
@@ -475,7 +475,7 @@ export function PaymentMethodsGroup() {
     : methodsConfig.loaded && methodsConfig.regionCode
       ? orderedByAdmin
       : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
-  const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp"].includes(m.id));
+  const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 
 
@@ -485,7 +485,7 @@ export function PaymentMethodsGroup() {
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
     if (!isPeru && stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
-      if (!selected || !["card", "stripe_ach", "stripe_cashapp"].includes(selected)) { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
+      if (!selected || !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
       if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
@@ -493,7 +493,7 @@ export function PaymentMethodsGroup() {
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".
   useEffect(() => {
-    if (showStripe && selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected)) {
+    if (showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) {
       const id = window.setTimeout(() => {
         stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 250);
@@ -592,7 +592,7 @@ export function PaymentMethodsGroup() {
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
-        const isStripeRow = ["card", "stripe_ach", "stripe_cashapp"].includes(m.id);
+        const isStripeRow = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id);
         const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
         // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
         const rowKey = `${m.id}-${m.title}`;
@@ -922,7 +922,7 @@ export function PaymentMethodsGroup() {
         </p>
       )}
 
-      {selected !== "yape" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}
@@ -936,7 +936,7 @@ export function PaymentMethodsGroup() {
         >
           {mpLoading ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
-          ) : selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected) ? (
+          ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
               ? "Continue to payment"
               : language === "pt"

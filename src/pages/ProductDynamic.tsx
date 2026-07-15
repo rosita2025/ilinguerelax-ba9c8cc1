@@ -11,6 +11,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 interface DBProduct {
   id: string;
@@ -111,6 +112,21 @@ const ProductDynamic = () => {
     : 0;
   const local = useLocalCurrency(effectiveUsd);
   const tier = useCountryTierRouting(slug ?? "");
+
+  // Track ViewContent per SKU for every product (existing + new) in /admin/live
+  useEffect(() => {
+    if (!product) return;
+    trackHotmartEvent("ViewContent", {
+      content_ids: [product.sku],
+      content_name: product.name,
+      content_type: "product",
+      value: effectiveUsd,
+      currency: "USD",
+      product_id: product.sku,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.sku]);
+
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {

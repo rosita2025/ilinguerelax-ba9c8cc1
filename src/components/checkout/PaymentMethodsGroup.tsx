@@ -19,7 +19,10 @@ import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from 
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "paypal" | "transfer" | "cash" | "yape";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape";
+
+const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
+const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
 
 const visaLogo = "/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg";
 const mastercardLogo = "/__l5e/assets-v1/94d65183-1752-495e-ac5b-70ec4cba62b2/mastercard.svg";
@@ -149,7 +152,7 @@ export function PaymentMethodsGroup() {
             quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
           })),
           currency: "usd",
-          stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : "card",
+          stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
           couponPercent: s.couponPercent,
           couponCode: s.coupon ?? undefined,
           contact: {
@@ -251,7 +254,7 @@ export function PaymentMethodsGroup() {
     if (!valid) { requestBuyerInfo(); return; }
     if (m !== selected) setShowStripe(false);
     setSelected(m);
-    if (!["card", "stripe_ach", "stripe_cashapp"].includes(m)) setShowStripe(false);
+    if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
   };
 
   const handleBuyNow = () => {
@@ -260,7 +263,7 @@ export function PaymentMethodsGroup() {
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
-    if (["card", "stripe_ach", "stripe_cashapp"].includes(selected)) { setShowStripe(true); return; }
+    if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }
     // yape → user uses "Ya pagué" button in the manual panel
@@ -275,7 +278,7 @@ export function PaymentMethodsGroup() {
   }, []);
 
   useEffect(() => {
-    if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected))) return;
+    if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);
     const container = stripeContainerRef.current;
@@ -432,6 +435,7 @@ export function PaymentMethodsGroup() {
     { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
     { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: "Stripe" },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: "Stripe" },
+    { id: "stripe_klarna", icon: Wallet, title: "Klarna — Paga en 4", sub: "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: "Stripe" },
     { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: priceBadge },
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
@@ -448,6 +452,7 @@ export function PaymentMethodsGroup() {
         if (m.id === "card") return methodsConfig.stripe;
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
         if (m.id === "paypal") return methodsConfig.paypal;
         if (m.id === "transfer") return methodsConfig.transfer;
         if (m.id === "cash") return methodsConfig.cash;
@@ -457,7 +462,7 @@ export function PaymentMethodsGroup() {
     : allMethods;
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
-  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id;
+  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
     const i = methodsConfig.familyOrder.indexOf(fam as any);
@@ -472,7 +477,7 @@ export function PaymentMethodsGroup() {
     : methodsConfig.loaded && methodsConfig.regionCode
       ? orderedByAdmin
       : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
-  const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp"].includes(m.id));
+  const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 
 
@@ -482,7 +487,7 @@ export function PaymentMethodsGroup() {
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
     if (!isPeru && stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
-      if (!selected || !["card", "stripe_ach", "stripe_cashapp"].includes(selected)) { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
+      if (!selected || !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
       if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
@@ -490,7 +495,7 @@ export function PaymentMethodsGroup() {
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".
   useEffect(() => {
-    if (showStripe && selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected)) {
+    if (showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) {
       const id = window.setTimeout(() => {
         stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 250);
@@ -589,7 +594,7 @@ export function PaymentMethodsGroup() {
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
-        const isStripeRow = ["card", "stripe_ach", "stripe_cashapp"].includes(m.id);
+        const isStripeRow = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id);
         const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
         // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
         const rowKey = `${m.id}-${m.title}`;
@@ -653,6 +658,11 @@ export function PaymentMethodsGroup() {
                 ) : m.id === "stripe_cashapp" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Cash App" bg="#00D632" color="#001B0A" />
+                  </div>
+                ) : m.id === "stripe_klarna" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
+                    <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
@@ -919,7 +929,7 @@ export function PaymentMethodsGroup() {
         </p>
       )}
 
-      {selected !== "yape" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}
@@ -933,7 +943,7 @@ export function PaymentMethodsGroup() {
         >
           {mpLoading ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
-          ) : selected && ["card", "stripe_ach", "stripe_cashapp"].includes(selected) ? (
+          ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
               ? "Continue to payment"
               : language === "pt"

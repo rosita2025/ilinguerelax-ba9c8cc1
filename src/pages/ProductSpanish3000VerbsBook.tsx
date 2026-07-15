@@ -142,7 +142,7 @@ const ProductSpanish3000VerbsBook = () => {
     try {
       const { error } = await supabase.from("store_subscribers").insert({
         email,
-        product_name: "Spanish Relax - 3,000 Verbs Mastery Physical Book",
+        product_type: "Spanish Relax - 3,000 Verbs Mastery Physical Book",
         store_name: "Pre-Order June 2026",
       });
       if (error && !error.message.toLowerCase().includes("duplicate")) {

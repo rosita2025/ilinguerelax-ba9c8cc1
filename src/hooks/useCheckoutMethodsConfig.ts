@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Fallback: si no hay región configurada o falla la consulta, TODAS quedan
  * habilitadas para no romper el checkout existente.
  */
-export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "paypal" | "transfer" | "cash" | "yape";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
@@ -18,6 +18,7 @@ export interface CheckoutMethodsConfig {
   stripe: boolean;
   stripeAch: boolean;
   stripeCashApp: boolean;
+  stripeKlarna: boolean;
   paypal: boolean;
   transfer: boolean;
   cash: boolean;
@@ -26,14 +27,14 @@ export interface CheckoutMethodsConfig {
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "paypal", "transfer", "cash", "yape"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape"];
 
 const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
-  stripe: true, stripeAch: false, stripeCashApp: false, paypal: true, transfer: true, cash: true, yape: true,
+  stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: true, transfer: true, cash: true, yape: true,
 };
 
 const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
-  stripe: true, stripeAch: true, stripeCashApp: true, paypal: true, transfer: false, cash: false, yape: false,
+  stripe: true, stripeAch: true, stripeCashApp: true, stripeKlarna: true, paypal: true, transfer: false, cash: false, yape: false,
 };
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }

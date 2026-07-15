@@ -491,8 +491,70 @@ const AdminEmailTest = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
-            <div className="overflow-x-auto">
+          <Card className="p-4 md:p-6">
+            {/* Mobile card list */}
+            <div className="md:hidden space-y-3">
+              {visibleRows.map((r) => {
+                const pSku = principalSkuOf(r);
+                const uSku = upsellSkusOf(r);
+                const v = validateRow(r);
+                return (
+                  <div key={r.id} className="border rounded-lg p-3 space-y-2 bg-card">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-mono text-sm font-bold break-all">{r.order_ref}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${sourceColor[r.source]}`}>
+                        {sourceLabel[r.source]}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {pSku && <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-mono text-[11px] break-all">{pSku}</span>}
+                      {uSku && <span className="px-2 py-0.5 rounded bg-accent/10 text-accent-foreground font-mono text-[11px] break-all">{uSku}</span>}
+                    </div>
+                    <div className="text-xs">{renderProducts(r)}</div>
+                    <div className="flex flex-wrap gap-1.5 items-center">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${v.ok ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
+                        {v.ok ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
+                        {v.ok ? "OK" : "Revisar"}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${statusColor(r.status)}`}>{r.status}</span>
+                      {r.delivery && (
+                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${statusColor(r.delivery.status || "")}`}>
+                          <Mail className="w-3 h-3 inline mr-0.5" />{r.delivery.last_event || r.delivery.status}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground space-y-0.5 pt-1 border-t">
+                      <div className="font-medium text-foreground">{r.customer}</div>
+                      <div className="break-all">{r.email}</div>
+                      <div className="flex justify-between gap-2">
+                        <span>{r.amount}</span>
+                        <span>{fmt(r.created_at)}</span>
+                      </div>
+                    </div>
+                    {!v.ok && v.shouldDeliver && v.hasSkus && !v.emailSent && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full h-8 text-xs"
+                        onClick={() => retryDelivery(r)}
+                        disabled={retrying.has(r.id)}
+                      >
+                        <Send className={`w-3 h-3 mr-1 ${retrying.has(r.id) ? "animate-pulse" : ""}`} />
+                        {retrying.has(r.id) ? "Reenviando…" : "Reintentar envío digital"}
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+              {visibleRows.length === 0 && (
+                <div className="py-10 text-center text-muted-foreground text-sm">
+                  {loading ? "Cargando pedidos…" : rows.length === 0 ? "Aún no hay pedidos registrados." : "Sin resultados para el filtro actual."}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-xs uppercase text-muted-foreground border-b">
                   <tr>
@@ -616,6 +678,7 @@ const AdminEmailTest = () => {
               </table>
             </div>
           </Card>
+
         </div>
       </main>
     </>

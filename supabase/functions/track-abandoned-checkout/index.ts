@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
       const baseUrl = product?.slug
         ? `${site}/checkouts/${product.slug}`
         : `${site}/products/${productType}`;
-      const url = `${baseUrl}?r=${recoverB64}`;
+      const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
       await pushAbandonedCartToBrevo({
         email,
         name,
@@ -142,6 +142,7 @@ Deno.serve(async (req) => {
         priceUsd: (product as { price_usd?: number } | null)?.price_usd ?? undefined,
         couponCode: "NEW10",
         language,
+        country,
         source: "checkout",
       });
     } catch (e) {

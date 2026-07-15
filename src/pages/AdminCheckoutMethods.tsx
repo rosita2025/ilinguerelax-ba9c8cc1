@@ -76,21 +76,63 @@ const COUNTRY_LIST: { code: string; name: string; flag: string }[] = [
   { code: "ZA", name: "Sudáfrica", flag: "🇿🇦" },
 ];
 
+// Métodos válidos por país (mismo mapa que usa Auto Stripe en el backend).
+const STRIPE_LOCAL_BY_COUNTRY: Record<string, string[]> = {
+  US: ["stripe_cashapp", "stripe_us_bank_account", "stripe_affirm", "stripe_klarna"],
+  CA: ["stripe_acss_debit", "stripe_klarna"],
+  MX: ["stripe_oxxo"],
+  BR: ["stripe_boleto", "stripe_pix"],
+  DE: ["stripe_sepa_debit", "stripe_giropay", "stripe_klarna"],
+  NL: ["stripe_sepa_debit", "stripe_ideal"],
+  BE: ["stripe_sepa_debit", "stripe_bancontact"],
+  FR: ["stripe_sepa_debit", "stripe_klarna"],
+  ES: ["stripe_sepa_debit", "stripe_klarna"],
+  IT: ["stripe_sepa_debit"], PT: ["stripe_sepa_debit"], AT: ["stripe_sepa_debit"], IE: ["stripe_sepa_debit"],
+  PL: ["stripe_p24"],
+  GB: ["stripe_bacs_debit", "stripe_klarna"],
+  AU: ["stripe_au_becs_debit", "stripe_afterpay_clearpay"],
+  NZ: ["stripe_afterpay_clearpay"],
+  SG: ["stripe_grabpay"], MY: ["stripe_grabpay"],
+  HK: ["stripe_alipay"], IN: ["stripe_upi"],
+};
+
 const QUICK_METHODS: { key: string; label: string; note: string; icon: string }[] = [
   { key: "stripe_card", label: "Tarjeta débito/crédito", note: "Visa · Mastercard · Amex · Apple Pay · Google Pay", icon: "CreditCard" },
-  { key: "stripe_cashapp", label: "Cash App Pay", note: "Solo USA", icon: "Smartphone" },
-  { key: "stripe_us_bank_account", label: "Transferencia bancaria (ACH)", note: "Solo USA", icon: "Building2" },
   { key: "stripe_link", label: "Link (Stripe)", note: "1-click checkout", icon: "Wallet" },
+  { key: "stripe_cashapp", label: "Cash App Pay", note: "Solo USA", icon: "Smartphone" },
+  { key: "stripe_us_bank_account", label: "Transferencia ACH", note: "Solo USA", icon: "Building2" },
+  { key: "stripe_affirm", label: "Affirm", note: "USA - a plazos", icon: "CreditCard" },
+  { key: "stripe_acss_debit", label: "Débito bancario CA", note: "Canadá", icon: "Banknote" },
   { key: "stripe_sepa_debit", label: "SEPA Débito", note: "Zona euro", icon: "Building2" },
   { key: "stripe_ideal", label: "iDEAL", note: "Países Bajos", icon: "Banknote" },
   { key: "stripe_bancontact", label: "Bancontact", note: "Bélgica", icon: "Banknote" },
+  { key: "stripe_giropay", label: "Giropay", note: "Alemania", icon: "Building2" },
+  { key: "stripe_p24", label: "Przelewy24", note: "Polonia", icon: "Building2" },
+  { key: "stripe_bacs_debit", label: "Bacs Débito", note: "Reino Unido", icon: "Banknote" },
+  { key: "stripe_klarna", label: "Klarna", note: "Pago a plazos", icon: "CreditCard" },
   { key: "stripe_oxxo", label: "OXXO", note: "México - efectivo", icon: "Banknote" },
   { key: "stripe_boleto", label: "Boleto", note: "Brasil", icon: "Banknote" },
   { key: "stripe_pix", label: "Pix", note: "Brasil", icon: "Smartphone" },
-  { key: "stripe_klarna", label: "Klarna", note: "Pago a plazos", icon: "CreditCard" },
-  { key: "stripe_affirm", label: "Affirm", note: "USA - pago a plazos", icon: "CreditCard" },
+  { key: "stripe_au_becs_debit", label: "BECS Débito AU", note: "Australia", icon: "Banknote" },
+  { key: "stripe_afterpay_clearpay", label: "Afterpay", note: "AU / NZ", icon: "CreditCard" },
+  { key: "stripe_grabpay", label: "GrabPay", note: "SG / MY", icon: "Smartphone" },
+  { key: "stripe_alipay", label: "Alipay", note: "Asia", icon: "Smartphone" },
+  { key: "stripe_upi", label: "UPI", note: "India", icon: "Smartphone" },
   { key: "paypal", label: "PayPal", note: "Global", icon: "Wallet" },
 ];
+
+// Devuelve solo los método_key válidos para los países ISO de la región.
+// Tarjeta, Link y PayPal siempre están disponibles.
+function methodsForRegion(countryCodes: string[]): Set<string> {
+  const out = new Set<string>(["stripe_card", "stripe_link", "paypal"]);
+  for (const raw of countryCodes) {
+    const cc = String(raw || "").toUpperCase();
+    if (!cc || cc === "*") continue;
+    (STRIPE_LOCAL_BY_COUNTRY[cc] || []).forEach(k => out.add(k));
+  }
+  return out;
+}
+
 
 const PREVIEW_SKU = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 

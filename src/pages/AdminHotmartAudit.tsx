@@ -11,6 +11,16 @@ import { toast } from "sonner";
 
 type MappedStatus = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "abandoned" | "unknown";
 
+interface BrevoInfo {
+  status: string;
+  http_status: number | null;
+  event_type: string;
+  last_sync_at: string;
+  missing_fields: string[];
+  error: string | null;
+  attributes: Record<string, unknown> | null;
+}
+
 interface AuditRow {
   id: string;
   source: "purchase" | "abandoned";
@@ -22,7 +32,9 @@ interface AuditRow {
   product: string | null;
   converted: boolean | null;
   payload: unknown;
+  brevo: BrevoInfo | null;
 }
+
 
 interface Summary {
   approved: number; pending: number; refused: number; refunded: number; chargeback: number; cancelled: number; abandoned: number;

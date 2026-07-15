@@ -21,6 +21,7 @@ interface DBProduct {
   target_language: string;
   price_usd: number;
   price_usd_latam: number | null;
+  price_usd_tienda: number | null;
   price_pen: number | null;
   cover_image_url: string | null;
   is_upsell: boolean;
@@ -68,7 +69,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
           .eq("sku", slug)
           .eq("active", true)
           .maybeSingle();
@@ -99,12 +100,14 @@ const ProductDynamic = () => {
     };
   }, [slug]);
 
-  // Pick the correct USD price based on visitor region (LATAM vs. rest of the world).
+  // Pick the correct USD price based on visitor region (tienda VE/CU/NI, LATAM, or global).
   const region = useRegionTier();
   const effectiveUsd = product
-    ? (region.tier === "latam" && product.price_usd_latam != null
-        ? Number(product.price_usd_latam)
-        : Number(product.price_usd))
+    ? (region.tier === "tienda" && product.price_usd_tienda != null
+        ? Number(product.price_usd_tienda)
+        : region.tier === "latam" && product.price_usd_latam != null
+          ? Number(product.price_usd_latam)
+          : Number(product.price_usd))
     : 0;
   const local = useLocalCurrency(effectiveUsd);
   const tier = useCountryTierRouting(slug ?? "");

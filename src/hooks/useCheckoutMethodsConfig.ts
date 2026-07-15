@@ -38,10 +38,12 @@ interface MethodRow { region_code: string; method_key: string; enabled: boolean;
 const CACHE_TTL_MS = 30_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
 let cacheAt = 0;
+const CACHE_VERSION_KEY = "ilr_checkout_methods_version";
 
 export function invalidateCheckoutMethodsCache() {
   cachePromise = null;
   cacheAt = 0;
+  try { localStorage.setItem(CACHE_VERSION_KEY, String(Date.now())); } catch { /* noop */ }
 }
 
 async function loadAll() {
@@ -62,18 +64,34 @@ async function loadAll() {
 
 function keyToFamily(key: string): FamilyKey | null {
   const k = key.toLowerCase();
-  if (k.startsWith("stripe_")) return "stripe";
-  if (k === "paypal" || k.includes("paypal")) return "paypal";
-  if (k.includes("yape") || k.includes("plin")) return "yape";
-  if (k.includes("transfer") || k.includes("ach") || k.includes("bank")) return "transfer";
-  if (k.includes("cash") || k.includes("efectivo") || k.includes("oxxo") || k.includes("boleto") || k.includes("konbini")) return "cash";
+  // Solo cuentan los métodos reales que el checkout renderiza como filas.
+  // Submétodos internos de Stripe (cashapp, ach, klarna, link, etc.) no deben
+  // encender Stripe si el admin apagó la fila principal `stripe_card`.
+  if (k === "stripe_card") return "stripe";
+  if (k === "paypal") return "paypal";
+  if (k === "yape_plin") return "yape";
+  if (k === "mercadopago_transfer") return "transfer";
+  if (k === "mercadopago_cash") return "cash";
   return null;
 }
 
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
+  const [version, setVersion] = useState(0);
   const [state, setState] = useState<CheckoutMethodsConfig>({
     loaded: false, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
   });
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === CACHE_VERSION_KEY) {
+        cachePromise = null;
+        cacheAt = 0;
+        setVersion((v) => v + 1);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -109,7 +127,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       if (alive) setState({ loaded: true, regionCode: region.code, ...families, familyOrder });
     })();
     return () => { alive = false; };
-  }, [country]);
+  }, [country, version]);
 
   return state;
 }

@@ -70,6 +70,7 @@ Deno.serve(async (req) => {
       const m = body.method ?? {};
       if (!CODE_RE.test(String(m.region_code || ""))) return json({ error: "invalid region" }, 400);
       if (!KEY_RE.test(String(m.method_key || ""))) return json({ error: "invalid method_key" }, 400);
+      const id = String(m.id || "");
       const payload = {
         region_code: m.region_code,
         method_key: m.method_key,
@@ -79,11 +80,12 @@ Deno.serve(async (req) => {
         enabled: m.enabled !== false,
         sort_order: Number(m.sort_order || 0),
       };
-      const { error } = await db
-        .from("checkout_payment_methods")
-        .upsert(payload, { onConflict: "region_code,method_key" });
+      const query = id
+        ? db.from("checkout_payment_methods").update(payload).eq("id", id).select("*").single()
+        : db.from("checkout_payment_methods").upsert(payload, { onConflict: "region_code,method_key" }).select("*").single();
+      const { data, error } = await query;
       if (error) return json({ error: error.message }, 500);
-      return json({ ok: true });
+      return json({ ok: true, method: data });
     }
 
     if (action === "delete_method") {

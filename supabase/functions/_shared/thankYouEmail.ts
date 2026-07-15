@@ -25,6 +25,10 @@ interface Args {
   provider: "stripe" | "paypal" | "mercadopago";
   orderNumber?: string;
   idempotencyKey?: string;
+  couponCode?: string;
+  couponPercent?: number;
+  couponAmount?: number;
+  skus?: string[];
 }
 
 function getClient() {

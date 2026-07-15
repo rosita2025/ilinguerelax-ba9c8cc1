@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getClientId } from "@/lib/clientId";
 
 declare global {
   interface Window {

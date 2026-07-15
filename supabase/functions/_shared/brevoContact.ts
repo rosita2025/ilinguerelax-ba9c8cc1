@@ -16,7 +16,9 @@ interface Args {
   orderNumber?: string;
   provider?: string;
   origin?: "hotmart" | "tienda"; // canal real de venta para separar en Brevo
-
+  hotmartProductId?: string;    // Hotmart numeric product id
+  hotmartProductCode?: string;  // Hotmart ucode / product code
+  tiendaSku?: string;           // SKU interno de la tienda propia
 }
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";

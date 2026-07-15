@@ -12,7 +12,7 @@ import {
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
-import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck } from "lucide-react";
+import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -24,7 +24,7 @@ type Method = {
   note?: string | null; icon: string; enabled: boolean; sort_order: number;
 };
 
-const ICONS: Record<string, any> = { CreditCard, Banknote, Wallet, Smartphone };
+const ICONS: Record<string, any> = { CreditCard, Banknote, Wallet, Smartphone, Building2 };
 
 const PREVIEW_SKU = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
@@ -90,6 +90,15 @@ export default function AdminCheckoutMethods() {
       body: { action: "toggle_method", id: m.id, enabled: !m.enabled },
     });
     if (error || data?.error) { toast.error(error?.message || data?.error); load(); }
+  }
+  async function autofillStripe(code: string) {
+    if (!confirm(`Auto-rellenar métodos Stripe disponibles según los países de ${code}?\nNo borra métodos existentes; solo añade o actualiza los de Stripe.`)) return;
+    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+      body: { action: "autofill_stripe", code },
+    });
+    if (error || data?.error) return toast.error(error?.message || data?.error);
+    toast.success(`Añadidos ${data.added} métodos Stripe`);
+    load();
   }
 
   return (
@@ -218,10 +227,18 @@ export default function AdminCheckoutMethods() {
                         </div>
                       );
                     })}
-                    <Button size="sm" variant="outline" className="w-full mt-2"
-                      onClick={() => setMethodEdit(emptyMethod(r.code))}>
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Agregar método
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <Button size="sm" variant="outline"
+                        onClick={() => setMethodEdit(emptyMethod(r.code))}>
+                        <Plus className="w-3.5 h-3.5 mr-1" /> Agregar
+                      </Button>
+                      <Button size="sm" variant="default"
+                        onClick={() => autofillStripe(r.code)}
+                        disabled={!r.country_codes.some(c => c && c !== "*")}
+                        title="Añade los métodos Stripe disponibles según los países de la región">
+                        <Zap className="w-3.5 h-3.5 mr-1" /> Auto Stripe
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               );
@@ -231,6 +248,7 @@ export default function AdminCheckoutMethods() {
           <Card className="p-4 bg-muted/40 text-xs text-muted-foreground space-y-1">
             <p><strong>Detección:</strong> IP del comprador vía ipapi.co → se busca el código de país en <code>country_codes</code> de cada región. La región con código <code>*</code> es el fallback global.</p>
             <p><strong>Nota técnica:</strong> desactivar un método aquí lo oculta de la UI del checkout. Para Stripe, los métodos habilitados se pasan como <code>payment_method_types</code> a la sesión.</p>
+            <p><strong>⚡ Auto Stripe:</strong> según los países ISO de la región, añade automáticamente los métodos que Stripe soporta ahí: tarjeta + Link + wallets siempre; y locales por país (OXXO en MX, Cash App + ACH en US, SEPA en zona euro, iDEAL en NL, Bancontact en BE, Boleto/Pix en BR, Klarna/Affirm donde aplique, etc.). No borra los métodos manuales que ya tengas.</p>
           </Card>
         </div>
       </main>

@@ -194,20 +194,85 @@ serve(async (req) => {
           totals.checkout++;
           totals.checkoutSessions.add(sid);
           break;
-        case "Purchase": {
-          b.purchases++;
-          totals.purchases++;
-          const v = Number(r.value || 0);
-          b.revenue += v;
-          totals.revenue += v;
-          totals.purchaseSessions.add(sid);
-          pAgg.purchases++;
-          pAgg.revenue += v;
-          cAgg.purchases++;
-          cAgg.revenue += v;
-          break;
-        }
+        // Purchase events from the pixel are IGNORED — real purchases come
+        // from Hotmart webhooks, Shopify orders, and verified manual payments.
       }
+    }
+
+    // ---------- REAL purchases (USD only for revenue) ----------
+    const [hotmartRes, shopifyRes, manualRes] = await Promise.all([
+      supabase
+        .from("hotmart_purchases")
+        .select("product_id, purchased_at, raw_payload, status")
+        .eq("status", "approved")
+        .gte("purchased_at", fromDate.toISOString())
+        .lte("purchased_at", toDate.toISOString()),
+      supabase
+        .from("shopify_sales")
+        .select("product_key, country, order_created_at")
+        .gte("order_created_at", fromDate.toISOString())
+        .lte("order_created_at", toDate.toISOString()),
+      supabase
+        .from("manual_payments")
+        .select("items, amount_usd, buyer_country, created_at, status, verified_at")
+        .in("status", ["approved", "verified", "completed"])
+        .gte("created_at", fromDate.toISOString())
+        .lte("created_at", toDate.toISOString()),
+    ]);
+
+    type RealPurchase = { at: string; productId: string; country: string; usd: number };
+    const realPurchases: RealPurchase[] = [];
+
+    for (const h of (hotmartRes.data ?? []) as any[]) {
+      const price = h.raw_payload?.data?.purchase?.price ?? {};
+      const currency = price.currency_code || price.currency_value || "";
+      const usd = currency === "USD" ? Number(price.value || 0) : 0;
+      const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
+        || h.raw_payload?.data?.buyer?.address?.country
+        || "??";
+      realPurchases.push({
+        at: h.purchased_at,
+        productId: h.product_id || String(h.raw_payload?.data?.product?.id ?? "hotmart"),
+        country: buyerCountry,
+        usd,
+      });
+    }
+    for (const s of (shopifyRes.data ?? []) as any[]) {
+      realPurchases.push({
+        at: s.order_created_at,
+        productId: s.product_key || "shopify",
+        country: s.country || "??",
+        usd: 0, // Shopify revenue not stored locally
+      });
+    }
+    for (const m of (manualRes.data ?? []) as any[]) {
+      const items = Array.isArray(m.items) ? m.items : [];
+      const firstSku = items[0]?.sku || items[0]?.product_id || "manual";
+      realPurchases.push({
+        at: m.verified_at || m.created_at,
+        productId: firstSku,
+        country: m.buyer_country || "??",
+        usd: Number(m.amount_usd || 0),
+      });
+    }
+
+    for (const p of realPurchases) {
+      const k = bucketKey(p.at);
+      const b = ensure(k);
+      b.purchases++;
+      b.revenue += p.usd;
+      totals.purchases++;
+      totals.revenue += p.usd;
+
+      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0 };
+      pAgg.purchases++;
+      pAgg.revenue += p.usd;
+      byProductAgg.set(p.productId, pAgg);
+
+      const cAgg = byCountryAgg.get(p.country) || { sessions: new Set<string>(), purchases: 0, revenue: 0 };
+      cAgg.purchases++;
+      cAgg.revenue += p.usd;
+      byCountryAgg.set(p.country, cAgg);
     }
 
     // Fill missing buckets so the chart renders zeros

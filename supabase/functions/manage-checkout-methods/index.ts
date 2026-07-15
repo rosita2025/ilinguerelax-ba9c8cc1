@@ -103,6 +103,32 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+
+    if (action === "autofill_stripe") {
+      const code = String(body.code || "");
+      if (!CODE_RE.test(code)) return json({ error: "invalid region code" }, 400);
+      const { data: region, error: rErr } = await db
+        .from("checkout_regions").select("*").eq("code", code).maybeSingle();
+      if (rErr || !region) return json({ error: rErr?.message || "region not found" }, 404);
+
+      const suggested = stripeMethodsFor(region.country_codes || []);
+      const rows = suggested.map((m, idx) => ({
+        region_code: code,
+        method_key: m.method_key,
+        label: m.label,
+        note: m.note,
+        icon: m.icon,
+        enabled: true,
+        sort_order: idx + 1,
+      }));
+      // upsert por (region_code, method_key) — no borra métodos manuales existentes con otras claves
+      const { error } = await db
+        .from("checkout_payment_methods")
+        .upsert(rows, { onConflict: "region_code,method_key" });
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true, added: rows.length });
+    }
+
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     return json({ error: String((e as Error).message || e) }, 500);

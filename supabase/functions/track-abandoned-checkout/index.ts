@@ -115,6 +115,7 @@ Deno.serve(async (req) => {
       await pushAbandonedCartToBrevo({
         email,
         name,
+        phone,
         productSku: productType,
         productName: (product as { name?: string } | null)?.name,
         productUrl: url,

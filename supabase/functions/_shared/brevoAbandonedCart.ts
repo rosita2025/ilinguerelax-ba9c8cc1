@@ -25,6 +25,7 @@ interface Args {
 import { logBrevoSync } from "./brevoLog.ts";
 import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
 import { resolveBrevoAudiences } from "./brevoProductAudiences.ts";
+import { normalizeCountry } from "./brevoCountry.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
@@ -69,7 +70,18 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     attributes.LANGUAGE = lang;   // segmentar automatización por idioma
     attributes.LANG = lang;
   }
-  if (a.country) attributes.COUNTRY = a.country.toUpperCase();
+  const country = normalizeCountry(a.country);
+  if (country.code) {
+    attributes.COUNTRY = country.code;
+    attributes.COUNTRY_CODE = country.code;
+    attributes.PAIS_CODE = country.code;
+  }
+  if (country.name) {
+    attributes.COUNTRY_NAME = country.name;
+    attributes.PAIS = country.name;
+  }
+  attributes.COUNTRY_STATUS = country.status;
+  if (country.status !== "ok" && country.raw) attributes.COUNTRY_RAW = country.raw.slice(0, 64);
   // Validación estricta de ORIGEN: solo 'hotmart' o 'tienda'.
   // Fuentes conocidas de tienda propia: checkout, stripe, paypal, mercadopago, yape, plin, manual, web.
   const rawSource = (a.source ?? "").toString().trim().toLowerCase();

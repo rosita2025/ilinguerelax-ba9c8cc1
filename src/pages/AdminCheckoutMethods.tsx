@@ -591,11 +591,11 @@ export default function AdminCheckoutMethods() {
 
       {/* Region editor */}
       <Dialog open={!!regionEdit} onOpenChange={(o) => !o && setRegionEdit(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[92vh] overflow-y-auto w-[calc(100vw-1.5rem)] sm:w-full">
           <DialogHeader><DialogTitle>{regionEdit?.code ? "Editar región" : "Nueva región"}</DialogTitle></DialogHeader>
           {regionEdit && (
             <div className="space-y-3">
-              <div className="grid grid-cols-[1fr_120px] gap-3">
+              <div className="grid grid-cols-[1fr_84px] sm:grid-cols-[1fr_120px] gap-3">
                 <div>
                   <Label>Nombre</Label>
                   <Input value={regionEdit.name} onChange={(e) => setRegionEdit({ ...regionEdit, name: e.target.value })} placeholder="Alemania" />

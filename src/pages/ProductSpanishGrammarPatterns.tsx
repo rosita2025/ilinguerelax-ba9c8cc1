@@ -124,7 +124,7 @@ const ProductSpanishGrammarPatterns = () => {
     try {
       const { error } = await supabase.from("store_subscribers").insert({
         email,
-        product_name: "Spanish Relax - Grammar Patterns A1-C1 Mastery",
+        product_type: "Spanish Relax - Grammar Patterns A1-C1 Mastery",
         store_name: "Grammar Patterns Updates",
       });
       if (error && !error.message.toLowerCase().includes("duplicate")) {

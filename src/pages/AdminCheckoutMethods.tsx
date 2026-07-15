@@ -409,10 +409,35 @@ export default function AdminCheckoutMethods() {
 
 
                   <div className="space-y-1.5">
-                    {rms.map(m => {
+                    {rms.map((m, idx) => {
                       const Icon = ICONS[m.icon] || CreditCard;
+                      const isFirst = idx === 0;
+                      const isLast = idx === rms.length - 1;
                       return (
                         <div key={m.id} className={`flex items-center gap-2 text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
+                          <div className="flex flex-col shrink-0">
+                            <button
+                              type="button"
+                              disabled={isFirst}
+                              onClick={() => reorderMethod(m, -1)}
+                              className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Subir"
+                            >
+                              <ArrowUp className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isLast}
+                              onClick={() => reorderMethod(m, 1)}
+                              className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Bajar"
+                            >
+                              <ArrowDown className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] tabular-nums px-1.5 py-0 shrink-0" title="Prioridad">
+                            {idx + 1}
+                          </Badge>
                           <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="font-medium leading-tight truncate">{m.label}</div>

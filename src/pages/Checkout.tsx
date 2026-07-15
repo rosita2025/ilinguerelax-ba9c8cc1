@@ -21,6 +21,7 @@ import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();

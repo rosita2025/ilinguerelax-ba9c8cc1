@@ -213,7 +213,9 @@ ${t.helpLine} ${REPLY_TO}.
 
 ${t.signoff}`;
 
-  const html = `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #111; max-width: 600px;">
+  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+  const html = `<div dir="${dir}" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #111; max-width: 600px;">
+
   <p>${hola}</p>
   <p>${t.welcome}</p>
   <p>${t.giftIntro}</p>

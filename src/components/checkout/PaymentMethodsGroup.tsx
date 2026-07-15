@@ -452,6 +452,7 @@ export function PaymentMethodsGroup() {
         if (m.id === "card") return methodsConfig.stripe;
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
         if (m.id === "paypal") return methodsConfig.paypal;
         if (m.id === "transfer") return methodsConfig.transfer;
         if (m.id === "cash") return methodsConfig.cash;

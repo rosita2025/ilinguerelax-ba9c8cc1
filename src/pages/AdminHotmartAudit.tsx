@@ -11,6 +11,16 @@ import { toast } from "sonner";
 
 type MappedStatus = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "abandoned" | "unknown";
 
+interface BrevoInfo {
+  status: string;
+  http_status: number | null;
+  event_type: string;
+  last_sync_at: string;
+  missing_fields: string[];
+  error: string | null;
+  attributes: Record<string, unknown> | null;
+}
+
 interface AuditRow {
   id: string;
   source: "purchase" | "abandoned";
@@ -22,7 +32,9 @@ interface AuditRow {
   product: string | null;
   converted: boolean | null;
   payload: unknown;
+  brevo: BrevoInfo | null;
 }
+
 
 interface Summary {
   approved: number; pending: number; refused: number; refunded: number; chargeback: number; cancelled: number; abandoned: number;
@@ -58,6 +70,24 @@ const AdminHotmartAudit = () => {
   const [status, setStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+
+  type BrevoLookup = { loading: boolean; data?: any; error?: string };
+  const [brevoLookups, setBrevoLookups] = useState<Record<string, BrevoLookup>>({});
+
+  const lookupBrevo = useCallback(async (email: string) => {
+    setBrevoLookups((s) => ({ ...s, [email]: { loading: true } }));
+    try {
+      const { data, error } = await adminInvoke<any>(
+        "brevo-lookup-contact",
+        { body: { adminKey, email } },
+      );
+      if (error) throw error;
+      setBrevoLookups((s) => ({ ...s, [email]: { loading: false, data } }));
+    } catch (e) {
+      setBrevoLookups((s) => ({ ...s, [email]: { loading: false, error: (e as Error).message } }));
+    }
+  }, [adminKey]);
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -159,12 +189,13 @@ const AdminHotmartAudit = () => {
                     <th className="px-3 py-2 text-left">Email</th>
                     <th className="px-3 py-2 text-left">Producto</th>
                     <th className="px-3 py-2 text-left">Transacción</th>
+                    <th className="px-3 py-2 text-left">Brevo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="text-center py-10 text-muted-foreground">
+                      <td colSpan={8} className="text-center py-10 text-muted-foreground">
                         {loading ? "Cargando…" : "Aún no hay eventos registrados con estos filtros."}
                       </td>
                     </tr>
@@ -190,16 +221,22 @@ const AdminHotmartAudit = () => {
                           <td className="px-3 py-2 truncate max-w-[180px]">{row.email ?? "—"}</td>
                           <td className="px-3 py-2 truncate max-w-[200px] text-xs">{row.product ?? "—"}</td>
                           <td className="px-3 py-2 font-mono text-xs">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</td>
+                          <td className="px-3 py-2"><BrevoBadge info={row.brevo} /></td>
                         </tr>
                         {isOpen && (
                           <tr key={row.id + "-detail"} className="border-t bg-muted/20">
-                            <td colSpan={7} className="px-6 py-4">
-                              <div className="text-xs text-muted-foreground mb-2">
+                            <td colSpan={8} className="px-6 py-4 space-y-3">
+                              <div className="text-xs text-muted-foreground">
                                 Fuente: <span className="font-mono">{row.source === "purchase" ? "hotmart_purchases" : "abandoned_carts"}</span>
                                 {row.converted !== null && (
                                   <> · Convertido: <span className="font-mono">{row.converted ? "sí" : "no"}</span></>
                                 )}
                               </div>
+                              <BrevoDetail
+                                row={row}
+                                lookup={row.email ? brevoLookups[row.email.toLowerCase()] : undefined}
+                                onLookup={row.email ? () => void lookupBrevo(row.email!.toLowerCase()) : undefined}
+                              />
                               <pre className="text-xs bg-background border rounded p-3 overflow-auto max-h-96">
 {JSON.stringify(row.payload ?? {}, null, 2)}
                               </pre>
@@ -242,15 +279,21 @@ const AdminHotmartAudit = () => {
                         <span className="font-mono text-muted-foreground truncate">{row.event_raw}</span>
                         <span className="font-mono">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</span>
                       </div>
+                      <div className="mt-2"><BrevoBadge info={row.brevo} /></div>
                     </button>
                     {isOpen && (
-                      <div className="mt-3 bg-muted/20 rounded p-2">
-                        <div className="text-[11px] text-muted-foreground mb-2">
+                      <div className="mt-3 bg-muted/20 rounded p-2 space-y-3">
+                        <div className="text-[11px] text-muted-foreground">
                           Fuente: <span className="font-mono">{row.source === "purchase" ? "hotmart_purchases" : "abandoned_carts"}</span>
                           {row.converted !== null && (
                             <> · Convertido: <span className="font-mono">{row.converted ? "sí" : "no"}</span></>
                           )}
                         </div>
+                        <BrevoDetail
+                          row={row}
+                          lookup={row.email ? brevoLookups[row.email.toLowerCase()] : undefined}
+                          onLookup={row.email ? () => void lookupBrevo(row.email!.toLowerCase()) : undefined}
+                        />
                         <pre className="text-[11px] bg-background border rounded p-2 overflow-auto max-h-72">
 {JSON.stringify(row.payload ?? {}, null, 2)}
                         </pre>
@@ -262,10 +305,88 @@ const AdminHotmartAudit = () => {
             </div>
           </Card>
 
+
         </div>
       </main>
     </>
   );
 };
 
+function BrevoBadge({ info }: { info: BrevoInfo | null }) {
+  if (!info) {
+    return <Badge className="bg-slate-200 text-slate-800 font-normal">Sin sincronizar</Badge>;
+  }
+  const ok = info.status === "success" || (info.http_status !== null && info.http_status >= 200 && info.http_status < 300);
+  const color = ok
+    ? (info.missing_fields.length > 0 ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800")
+    : "bg-red-100 text-red-800";
+  const label = ok
+    ? (info.missing_fields.length > 0 ? `Sincronizado · faltan ${info.missing_fields.length}` : "Sincronizado")
+    : "Error";
+  return <Badge className={`${color} font-normal`}>{label}</Badge>;
+}
+
+function BrevoDetail({
+  row,
+  lookup,
+  onLookup,
+}: {
+  row: AuditRow;
+  lookup?: { loading: boolean; data?: any; error?: string };
+  onLookup?: () => void;
+}) {
+  const info = row.brevo;
+  return (
+    <div className="rounded border bg-background p-3 text-xs space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-medium text-sm">Sincronización con Brevo</div>
+        {row.email && onLookup && (
+          <Button size="sm" variant="outline" onClick={onLookup} disabled={lookup?.loading}>
+            {lookup?.loading ? "Buscando…" : (lookup?.data ? "Actualizar" : "Buscar en Brevo")}
+          </Button>
+        )}
+      </div>
+
+      {info ? (
+        <div className="grid gap-1 sm:grid-cols-2">
+          <div><span className="text-muted-foreground">Último evento:</span> <span className="font-mono">{info.event_type || "—"}</span></div>
+          <div><span className="text-muted-foreground">Última sincronización:</span> <span className="font-mono">{fmtExact(info.last_sync_at)}</span></div>
+          <div><span className="text-muted-foreground">Estado:</span> <span className="font-mono">{info.status}{info.http_status ? ` (${info.http_status})` : ""}</span></div>
+          <div>
+            <span className="text-muted-foreground">Campos faltantes:</span>{" "}
+            {info.missing_fields.length === 0
+              ? <span className="text-emerald-700">ninguno</span>
+              : <span className="text-amber-700">{info.missing_fields.join(", ")}</span>}
+          </div>
+          {info.error && (
+            <div className="sm:col-span-2 text-red-700 break-all"><span className="text-muted-foreground">Error:</span> {info.error}</div>
+          )}
+        </div>
+      ) : (
+        <div className="text-muted-foreground">No se encontró un log de sincronización local para este email.</div>
+      )}
+
+      {lookup?.error && (
+        <div className="text-red-700 break-all">Error consultando Brevo: {lookup.error}</div>
+      )}
+
+      {lookup?.data && (
+        <div className="grid gap-1 sm:grid-cols-2 border-t pt-2">
+          <div><span className="text-muted-foreground">Brevo ID:</span> <span className="font-mono">{lookup.data.id ?? "—"}</span></div>
+          <div><span className="text-muted-foreground">Modificado:</span> <span className="font-mono">{lookup.data.modified_at ? fmtExact(lookup.data.modified_at) : "—"}</span></div>
+          <div><span className="text-muted-foreground">Creado:</span> <span className="font-mono">{lookup.data.created_at ? fmtExact(lookup.data.created_at) : "—"}</span></div>
+          <div><span className="text-muted-foreground">Listas:</span> <span className="font-mono">{(lookup.data.list_ids ?? []).join(", ") || "—"}</span></div>
+          <div className="sm:col-span-2">
+            <span className="text-muted-foreground">Campos faltantes en Brevo:</span>{" "}
+            {lookup.data.missing_fields?.length === 0
+              ? <span className="text-emerald-700">ninguno</span>
+              : <span className="text-amber-700">{(lookup.data.missing_fields ?? []).join(", ")}</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default AdminHotmartAudit;
+

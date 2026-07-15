@@ -47,6 +47,16 @@ Deno.serve(async (req) => {
     if (hRes.error) throw hRes.error;
     if (aRes.error) throw aRes.error;
 
+    type BrevoInfo = {
+      status: string;
+      http_status: number | null;
+      event_type: string;
+      last_sync_at: string;
+      missing_fields: string[];
+      error: string | null;
+      attributes: Record<string, unknown> | null;
+    };
+
     type Row = {
       id: string;
       source: "purchase" | "abandoned";
@@ -58,9 +68,10 @@ Deno.serve(async (req) => {
       product: string | null;
       converted: boolean | null;
       payload: unknown;
+      brevo: BrevoInfo | null;
     };
 
-    const purchases: Row[] = (hRes.data ?? []).map((r: any) => {
+    const purchases: Omit<Row, "brevo">[] = (hRes.data ?? []).map((r: any) => {
       const rawEvent = r?.raw_payload?.event ?? r?.raw_payload?.data?.purchase?.status ?? "UNKNOWN";
       const st = String(r.status || "").toLowerCase();
       const mapped: Row["mapped_status"] =
@@ -85,7 +96,7 @@ Deno.serve(async (req) => {
       };
     });
 
-    const abandoned: Row[] = (aRes.data ?? []).map((r: any) => ({
+    const abandoned: Omit<Row, "brevo">[] = (aRes.data ?? []).map((r: any) => ({
       id: r.id,
       source: "abandoned",
       received_at: r.created_at,
@@ -98,7 +109,54 @@ Deno.serve(async (req) => {
       payload: r,
     }));
 
-    let rows = [...purchases, ...abandoned].sort(
+    // Fetch latest Brevo sync log per email
+    const emails = Array.from(new Set(
+      [...purchases, ...abandoned].map((r) => (r.email ?? "").toLowerCase()).filter(Boolean),
+    ));
+    const brevoByEmail = new Map<string, BrevoInfo>();
+    if (emails.length > 0) {
+      const { data: logs } = await admin
+        .from("brevo_sync_logs")
+        .select("email, status, http_status, event_type, created_at, error, attributes")
+        .in("email", emails)
+        .order("created_at", { ascending: false })
+        .limit(2000);
+      for (const l of logs ?? []) {
+        const key = String(l.email || "").toLowerCase();
+        if (!key || brevoByEmail.has(key)) continue;
+        const attrs = (l.attributes ?? null) as Record<string, unknown> | null;
+        const missing: string[] = [];
+        if (attrs) {
+          const phoneProvided = attrs.PHONE_PROVIDED === true || attrs.TELEFONO_PROVISTO === "si";
+          if (!phoneProvided) missing.push("teléfono");
+          if (!attrs.COUNTRY_CODE && !attrs.PAIS_CODE) missing.push("país");
+          if (!attrs.NOMBRE) missing.push("nombre");
+          if (!attrs.APELLIDOS) missing.push("apellidos");
+        } else {
+          missing.push("sin sincronizar");
+        }
+        brevoByEmail.set(key, {
+          status: String(l.status ?? "unknown"),
+          http_status: l.http_status ?? null,
+          event_type: String(l.event_type ?? ""),
+          last_sync_at: l.created_at,
+          missing_fields: missing,
+          error: l.error ?? null,
+          attributes: attrs,
+        });
+      }
+    }
+
+    const withBrevo = (r: Omit<Row, "brevo">): Row => ({
+      ...r,
+      brevo: r.email ? (brevoByEmail.get(r.email.toLowerCase()) ?? null) : null,
+    });
+
+    const purchasesFull = purchases.map(withBrevo);
+    const abandonedFull = abandoned.map(withBrevo);
+
+
+    let rows = [...purchasesFull, ...abandonedFull].sort(
       (a, b) => new Date(b.received_at).getTime() - new Date(a.received_at).getTime(),
     );
 
@@ -110,11 +168,12 @@ Deno.serve(async (req) => {
     // Summary counts (last 7 days)
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const summary = { approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 };
-    for (const r of [...purchases, ...abandoned]) {
+    for (const r of [...purchasesFull, ...abandonedFull]) {
       if (r.received_at >= since && r.mapped_status in summary) {
         (summary as any)[r.mapped_status]++;
       }
     }
+
 
     return new Response(JSON.stringify({ rows, summary }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

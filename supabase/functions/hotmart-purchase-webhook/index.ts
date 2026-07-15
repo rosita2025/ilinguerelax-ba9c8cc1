@@ -61,18 +61,22 @@ Deno.serve(async (req) => {
 
     // Map Hotmart events → estado interno + estado Brevo
     const evUpper = (event || "").toString().toUpperCase();
-    let status = "approved";
-    let brevoStatus: "compra" | "pendiente" | "rechazado" | "reembolso" | "chargeback" | "cancelado" = "compra";
+    // Default seguro: PENDIENTE. Sólo marcamos "compra" con APPROVED/COMPLETE explícito
+    // para que OXXO/boleto/pix/waiting_payment jamás cuenten como venta cobrada.
+    let status = "pending";
+    let brevoStatus: "compra" | "pendiente" | "rechazado" | "reembolso" | "chargeback" | "cancelado" = "pendiente";
     if (evUpper.includes("REFUND")) { status = "refunded"; brevoStatus = "reembolso"; }
     else if (evUpper.includes("CHARGEBACK")) { status = "chargeback"; brevoStatus = "chargeback"; }
     else if (evUpper.includes("CANCEL")) { status = "cancelled"; brevoStatus = "cancelado"; }
     else if (evUpper.includes("REFUSED") || evUpper.includes("EXPIRED")) { status = "refused"; brevoStatus = "rechazado"; }
+    else if (evUpper.includes("APPROVED") || evUpper.includes("COMPLETE")) { status = "approved"; brevoStatus = "compra"; }
     else if (
       evUpper.includes("BILLET") || evUpper.includes("WAITING_PAYMENT") ||
       evUpper.includes("DELAYED") || evUpper.includes("PROTEST") ||
-      evUpper.includes("OUT_OF_SHOPPING_CART") || evUpper.includes("PIX")
+      evUpper.includes("OUT_OF_SHOPPING_CART") || evUpper.includes("PIX") ||
+      evUpper.includes("OXXO") || evUpper.includes("BOLETO")
     ) { status = "pending"; brevoStatus = "pendiente"; }
-    else if (evUpper.includes("APPROVED") || evUpper.includes("COMPLETE")) { status = "approved"; brevoStatus = "compra"; }
+    // Cualquier otro evento desconocido queda como "pendiente" por seguridad.
 
     // Persistir estado en hotmart_purchases (upsert siempre, no sólo aprobados)
     const product = labelHotmartProduct(productName, productCode, productId);

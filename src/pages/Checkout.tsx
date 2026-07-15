@@ -99,7 +99,7 @@ export default function Checkout() {
       params.delete("r");
       const clean = window.location.pathname + (params.toString() ? `?${params}` : "");
       window.history.replaceState(null, "", clean);
-      toast.success(t.cartRecovered || "Recuperamos tu carrito ✨");
+      toast.success("Recuperamos tu carrito ✨");
     } catch { /* payload inválido, ignora */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

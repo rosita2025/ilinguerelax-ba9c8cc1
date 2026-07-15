@@ -156,7 +156,7 @@ Deno.serve(async (req) => {
     const abandonedFull = abandoned.map(withBrevo);
 
 
-    let rows = [...purchases, ...abandoned].sort(
+    let rows = [...purchasesFull, ...abandonedFull].sort(
       (a, b) => new Date(b.received_at).getTime() - new Date(a.received_at).getTime(),
     );
 
@@ -168,11 +168,12 @@ Deno.serve(async (req) => {
     // Summary counts (last 7 days)
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const summary = { approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 };
-    for (const r of [...purchases, ...abandoned]) {
+    for (const r of [...purchasesFull, ...abandonedFull]) {
       if (r.received_at >= since && r.mapped_status in summary) {
         (summary as any)[r.mapped_status]++;
       }
     }
+
 
     return new Response(JSON.stringify({ rows, summary }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

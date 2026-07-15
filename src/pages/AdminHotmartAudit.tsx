@@ -159,10 +159,16 @@ const AdminHotmartAudit = () => {
                 Cada evento recibido de Hotmart (compra, pendiente, rechazo, reembolso, chargeback, cancelación, carrito abandonado) con el evento original, el estado mapeado y la hora exacta.
               </p>
             </div>
-            <Button onClick={() => void load()} disabled={loading} variant="outline" size="sm">
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-              Actualizar
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => void forceBrevoSync()} disabled={syncing || loading} size="sm">
+                <Send className={`w-4 h-4 mr-2 ${syncing ? "animate-pulse" : ""}`} />
+                {syncing ? "Sincronizando…" : "Sincronizar Brevo"}
+              </Button>
+              <Button onClick={() => void load()} disabled={loading} variant="outline" size="sm">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                Actualizar
+              </Button>
+            </div>
           </header>
 
           <div className="grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7">

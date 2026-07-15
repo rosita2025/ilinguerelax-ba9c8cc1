@@ -163,6 +163,7 @@ Deno.serve(async (req) => {
         productUrl: url,
         priceUsd: (product as { price_usd?: number } | null)?.price_usd ?? undefined,
         couponCode: "NEW10",
+        couponPercent: 10,
         language,
         country,
         source: "checkout",

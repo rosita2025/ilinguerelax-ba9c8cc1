@@ -10,6 +10,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import AdminNav from "@/components/admin/AdminNav";
+import AdminCheckoutPreview from "@/components/admin/AdminCheckoutPreview";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";

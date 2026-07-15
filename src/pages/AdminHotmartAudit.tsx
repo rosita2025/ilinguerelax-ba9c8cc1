@@ -147,7 +147,8 @@ const AdminHotmartAudit = () => {
           </Card>
 
           <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop: tabla */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                   <tr>
@@ -211,7 +212,56 @@ const AdminHotmartAudit = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Móvil: tarjetas */}
+            <div className="md:hidden divide-y">
+              {rows.length === 0 && (
+                <div className="text-center py-10 text-muted-foreground text-sm">
+                  {loading ? "Cargando…" : "Aún no hay eventos registrados con estos filtros."}
+                </div>
+              )}
+              {rows.map((row) => {
+                const meta = STATUS_META[row.mapped_status];
+                const Icon = meta.icon;
+                const isOpen = openId === row.id;
+                return (
+                  <div key={row.id} className="p-3">
+                    <button
+                      className="w-full text-left"
+                      onClick={() => setOpenId(isOpen ? null : row.id)}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <Badge className={`${meta.color} font-normal inline-flex items-center gap-1 shrink-0`}>
+                          <Icon className="w-3 h-3" /> {meta.label}
+                        </Badge>
+                        <span className="font-mono text-[11px] text-muted-foreground">{fmtExact(row.received_at)}</span>
+                      </div>
+                      <div className="mt-2 text-sm font-medium break-all">{row.email ?? "—"}</div>
+                      <div className="mt-1 text-xs text-muted-foreground break-all">{row.product ?? "—"}</div>
+                      <div className="mt-1 flex items-center justify-between gap-2 text-[11px]">
+                        <span className="font-mono text-muted-foreground truncate">{row.event_raw}</span>
+                        <span className="font-mono">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</span>
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className="mt-3 bg-muted/20 rounded p-2">
+                        <div className="text-[11px] text-muted-foreground mb-2">
+                          Fuente: <span className="font-mono">{row.source === "purchase" ? "hotmart_purchases" : "abandoned_carts"}</span>
+                          {row.converted !== null && (
+                            <> · Convertido: <span className="font-mono">{row.converted ? "sí" : "no"}</span></>
+                          )}
+                        </div>
+                        <pre className="text-[11px] bg-background border rounded p-2 overflow-auto max-h-72">
+{JSON.stringify(row.payload ?? {}, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </Card>
+
         </div>
       </main>
     </>

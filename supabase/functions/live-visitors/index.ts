@@ -381,6 +381,13 @@ serve(async (req) => {
       revenueByCountry,
       visitors: visitors.slice(0, 200),
       recentEvents,
+      bots: {
+        events: botRows.length,
+        sessions: botSessions.size,
+        byReason: botReasonCounts,
+        byCountry: botByCountry,
+        recent: botRecent,
+      },
       generatedAt: new Date().toISOString(),
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
   } catch (e) {

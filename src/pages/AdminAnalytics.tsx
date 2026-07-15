@@ -238,9 +238,36 @@ const AdminAnalytics = () => {
           </Card>
 
           {!data ? (
-            <Card className="p-12 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            </Card>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Card key={`k1-${i}`} className="p-4 space-y-2">
+                    <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                    <div className="h-7 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-3 w-16 bg-muted/70 animate-pulse rounded" />
+                  </Card>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Card key={`k2-${i}`} className="p-4 space-y-2">
+                    <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                    <div className="h-7 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-3 w-16 bg-muted/70 animate-pulse rounded" />
+                  </Card>
+                ))}
+              </div>
+              <Card className="p-4">
+                <div className="h-4 w-40 bg-muted animate-pulse rounded mb-3" />
+                <div className="h-72 bg-muted/40 animate-pulse rounded flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              </Card>
+              <Card className="p-4">
+                <div className="h-4 w-32 bg-muted animate-pulse rounded mb-3" />
+                <div className="h-56 bg-muted/40 animate-pulse rounded" />
+              </Card>
+            </>
           ) : (
             <>
               {/* KPI cards */}

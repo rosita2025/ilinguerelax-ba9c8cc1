@@ -67,11 +67,41 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     attributes.LANG = lang;
   }
   if (a.country) attributes.COUNTRY = a.country.toUpperCase();
-  const origin = a.source === "hotmart" ? "hotmart" : "tienda";
-  if (a.source) {
-    attributes.ABANDONED_SOURCE = a.source;
-    attributes.ORIGEN = origin;
+  // Validación estricta de ORIGEN: solo 'hotmart' o 'tienda'.
+  // Fuentes conocidas de tienda propia: checkout, stripe, paypal, mercadopago, yape, plin, manual, web.
+  const rawSource = (a.source ?? "").toString().trim().toLowerCase();
+  const HOTMART_SOURCES = new Set(["hotmart"]);
+  const TIENDA_SOURCES = new Set([
+    "checkout", "stripe", "paypal", "mercadopago", "mp",
+    "yape", "plin", "manual", "web", "tienda",
+  ]);
+  let origin: "hotmart" | "tienda";
+  let originStatus: "ok" | "missing" | "invalid" = "ok";
+  if (HOTMART_SOURCES.has(rawSource)) {
+    origin = "hotmart";
+  } else if (TIENDA_SOURCES.has(rawSource)) {
+    origin = "tienda";
+  } else {
+    originStatus = rawSource ? "invalid" : "missing";
+    origin = "tienda"; // fallback seguro: la tienda propia
+    console.warn(
+      `[brevo-abandoned] ORIGEN ${originStatus} (source="${rawSource}") → forzado a "${origin}"`,
+    );
+    await logBrevoSync({
+      event_type: "origen_validation",
+      source: "brevo_abandoned",
+      origin,
+      email: (a.email || "").trim().toLowerCase(),
+      product_name: a.productName,
+      product_sku: a.productSku,
+      status: "failed",
+      attributes: { received_source: rawSource || null, forced_to: origin },
+      error: `ORIGEN ${originStatus}`,
+    });
   }
+  if (a.source) attributes.ABANDONED_SOURCE = a.source;
+  attributes.ORIGEN = origin;
+  attributes.ORIGEN_STATUS = originStatus;
   // IDs de canal para saber en Brevo qué producto/plataforma abandonó
   if (origin === "hotmart") {
     attributes.HOTMART_PRODUCT_ID = a.productSku;

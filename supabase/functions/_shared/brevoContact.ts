@@ -90,9 +90,35 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   if (a.skus && a.skus.length) attributes.LAST_SKUS = a.skus.join(", ");
   if (a.provider) attributes.LAST_PROVIDER = a.provider;
   // ORIGEN separa claramente Hotmart vs Tienda propia (Stripe/PayPal/MP/Yape…)
-  const origin = a.origin ?? (a.provider === "hotmart" ? "hotmart" : "tienda");
+  // Validación estricta: debe ser 'hotmart' o 'tienda'. Si falta o viene mal,
+  // se infiere del provider y se registra un log para auditar el webhook fuente.
+  const rawOrigin = (a.origin ?? "").toString().trim().toLowerCase();
+  let origin: "hotmart" | "tienda";
+  let originStatus: "ok" | "missing" | "invalid" = "ok";
+  if (rawOrigin === "hotmart" || rawOrigin === "tienda") {
+    origin = rawOrigin;
+  } else {
+    originStatus = rawOrigin ? "invalid" : "missing";
+    origin = a.provider === "hotmart" ? "hotmart" : "tienda";
+    console.warn(
+      `[brevo-contact] ORIGEN ${originStatus} (recibido="${rawOrigin}", provider="${a.provider ?? ""}") → forzado a "${origin}"`,
+    );
+    await logBrevoSync({
+      event_type: "origen_validation",
+      source: "brevo_contact",
+      origin,
+      email: (a.email || "").trim().toLowerCase(),
+      product_name: a.productName,
+      product_sku: a.tiendaSku ?? a.hotmartProductId ?? a.hotmartProductCode ?? (a.skus?.[0]),
+      order_ref: a.orderNumber,
+      status: "failed",
+      attributes: { received_origin: rawOrigin || null, provider: a.provider ?? null, forced_to: origin },
+      error: `ORIGEN ${originStatus}`,
+    });
+  }
   attributes.ORIGEN = origin;
   attributes.LAST_ORIGIN = origin;
+  attributes.ORIGEN_STATUS = originStatus;
 
   // IDs exactos por canal para saber qué compró en cada plataforma.
   if (a.hotmartProductId) attributes.HOTMART_PRODUCT_ID = a.hotmartProductId;

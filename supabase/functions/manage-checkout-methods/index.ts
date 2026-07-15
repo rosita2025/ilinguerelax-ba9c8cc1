@@ -129,6 +129,39 @@ Deno.serve(async (req) => {
       return json({ ok: true, added: rows.length });
     }
 
+    if (action === "sync_all_stripe") {
+      // Re-aplica autofill a todas las regiones con gateway Stripe. Upsert por
+      // (region_code, method_key) — mantiene los métodos manuales existentes
+      // y refresca labels/notes/icons según el mapa oficial más reciente.
+      const { data: regions, error: rErr } = await db
+        .from("checkout_regions").select("code, country_codes, gateway").eq("enabled", true);
+      if (rErr) return json({ error: rErr.message }, 500);
+      let totalAdded = 0;
+      const touched: string[] = [];
+      for (const region of regions || []) {
+        const gw = String(region.gateway || "").toLowerCase();
+        if (!gw.includes("stripe")) continue;
+        const suggested = stripeMethodsFor(region.country_codes || []);
+        if (!suggested.length) continue;
+        const rows = suggested.map((m, idx) => ({
+          region_code: region.code,
+          method_key: m.method_key,
+          label: m.label,
+          note: m.note,
+          icon: m.icon,
+          enabled: true,
+          sort_order: idx + 1,
+        }));
+        const { error } = await db
+          .from("checkout_payment_methods")
+          .upsert(rows, { onConflict: "region_code,method_key" });
+        if (error) return json({ error: `region ${region.code}: ${error.message}` }, 500);
+        totalAdded += rows.length;
+        touched.push(region.code);
+      }
+      return json({ ok: true, regions: touched, upserted: totalAdded });
+    }
+
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     return json({ error: String((e as Error).message || e) }, 500);

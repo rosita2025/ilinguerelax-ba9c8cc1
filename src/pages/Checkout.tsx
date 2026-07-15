@@ -356,27 +356,8 @@ export default function Checkout() {
         </div>
       </header>
 
-      {/* High-conversion trust bar — región-aware (PE / GLOBAL) */}
-      <div className="border-b bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] sm:text-xs font-medium">
-          <span className="flex items-center gap-1.5 text-foreground">
-            <Zap className="w-3.5 h-3.5 text-accent" />
-            {language === "en" ? "Instant delivery by email" : language === "fr" ? "Livraison instantanée par email" : language === "pt" ? "Entrega instantânea por email" : "Entrega inmediata al correo"}
-          </span>
-          <span className="text-muted-foreground hidden sm:inline">·</span>
-          <span className="flex items-center gap-1.5 text-foreground">
-            <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
-            {language === "en" ? "7-day money-back guarantee" : language === "fr" ? "Garantie 7 jours satisfait ou remboursé" : language === "pt" ? "Garantia de 7 dias" : "Garantía de 7 días o te devolvemos tu dinero"}
-          </span>
-          <span className="text-muted-foreground hidden md:inline">·</span>
-          <span className="hidden md:flex items-center gap-1.5 text-foreground">
-            <Lock className="w-3.5 h-3.5 text-emerald-600" />
-            {isPeru
-              ? (language === "en" ? "Pay with Yape, Plin, card or Mercado Pago" : "Paga con Yape, Plin, tarjeta o Mercado Pago")
-              : (language === "en" ? "Pay with card, PayPal or Stripe" : language === "fr" ? "Payez par carte, PayPal ou Stripe" : language === "pt" ? "Pague com cartão, PayPal ou Stripe" : "Paga con tarjeta, PayPal o Stripe")}
-          </span>
-        </div>
-      </div>
+
+
 
 
 

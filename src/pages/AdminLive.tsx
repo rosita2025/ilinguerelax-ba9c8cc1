@@ -344,18 +344,103 @@ const AdminLive = () => {
                 <Activity className="w-4 h-4" /> Canal
               </h2>
               <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
-                {topSources.map(([source, n]) => (
+                {topChannels.slice(0, 8).map(([source, n]) => (
                   <div key={source} className="flex justify-between border-b last:border-0 pb-1 gap-3">
                     <span className="truncate" title={source}>{source}</span>
                     <span className="tabular-nums text-muted-foreground">{n}</span>
                   </div>
                 ))}
-                {topSources.length === 0 && (
-                  <p className="text-muted-foreground text-center py-6">Sin fuente.</p>
+                {topChannels.length === 0 && (
+                  <p className="text-muted-foreground text-center py-6">Sin canal.</p>
                 )}
               </div>
             </Card>
           </div>
+
+          <Card className="p-4">
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+              <h2 className="font-semibold flex items-center gap-2">
+                <Globe className="w-4 h-4 text-primary" /> Fuentes de tráfico en vivo
+              </h2>
+              <span className="text-xs text-muted-foreground">
+                Referer · canal · campaña · país · {totalSourceVisitors} visitantes clasificados
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {/* Fuente (referer) */}
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">Por fuente (referer)</div>
+                <div className="space-y-1.5 max-h-[300px] overflow-y-auto text-sm">
+                  {topSources.length === 0 && (
+                    <p className="text-muted-foreground text-center py-4">Sin fuentes.</p>
+                  )}
+                  {topSources.slice(0, 12).map(([source, n]) => {
+                    const pct = Math.round((n / totalSourceVisitors) * 100);
+                    const countries = Object.entries(data.bySourceCountry?.[source] || {})
+                      .sort(([, a], [, b]) => b - a)
+                      .slice(0, 3)
+                      .map(([c]) => getCountryInfo(c)?.flag || c)
+                      .join(" ");
+                    return (
+                      <div key={source} className="border-b last:border-0 pb-1.5">
+                        <div className="flex justify-between gap-3">
+                          <span className="truncate font-medium" title={source}>{source}</span>
+                          <span className="tabular-nums text-muted-foreground shrink-0">{n} · {pct}%</span>
+                        </div>
+                        {countries && (
+                          <div className="text-xs text-muted-foreground mt-0.5">{countries}</div>
+                        )}
+                        <div className="h-1 bg-muted rounded mt-1 overflow-hidden">
+                          <div className="h-full bg-primary/70" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Canal */}
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">Por canal</div>
+                <div className="space-y-1.5 max-h-[300px] overflow-y-auto text-sm">
+                  {topChannels.length === 0 && (
+                    <p className="text-muted-foreground text-center py-4">Sin canales.</p>
+                  )}
+                  {topChannels.map(([ch, n]) => {
+                    const pct = Math.round((n / totalSourceVisitors) * 100);
+                    return (
+                      <div key={ch} className="border-b last:border-0 pb-1.5">
+                        <div className="flex justify-between gap-3">
+                          <span className="truncate" title={ch}>{ch}</span>
+                          <span className="tabular-nums text-muted-foreground shrink-0">{n} · {pct}%</span>
+                        </div>
+                        <div className="h-1 bg-muted rounded mt-1 overflow-hidden">
+                          <div className="h-full bg-emerald-500/70" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Campaña */}
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">Por campaña (utm_campaign)</div>
+                <div className="space-y-1.5 max-h-[300px] overflow-y-auto text-sm">
+                  {topCampaigns.length === 0 && (
+                    <p className="text-muted-foreground text-center py-4">Sin campañas activas.<br/>Añade <code className="text-[10px]">?utm_source=facebook&amp;utm_campaign=verano</code> a tus enlaces.</p>
+                  )}
+                  {topCampaigns.map(([cmp, n]) => (
+                    <div key={cmp} className="flex justify-between border-b last:border-0 pb-1 gap-3">
+                      <span className="truncate" title={cmp}>{cmp}</span>
+                      <span className="tabular-nums text-muted-foreground shrink-0">{n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+
 
           <Card className="p-4">
             <h2 className="font-semibold mb-3">Feed real en vivo</h2>

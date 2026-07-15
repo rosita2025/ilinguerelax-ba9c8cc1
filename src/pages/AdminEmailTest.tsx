@@ -413,64 +413,65 @@ const AdminEmailTest = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-10 px-4">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <header className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <ShoppingBag className="w-7 h-7 text-primary" /> Pedidos de clientes
+      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4">
+        <div className="max-w-7xl mx-auto space-y-5 md:space-y-6">
+          <header className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl md:text-3xl font-bold flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 md:w-7 md:h-7 text-primary shrink-0" /> Pedidos de clientes
               </h1>
-              <p className="text-muted-foreground text-sm mt-1">
+              <p className="text-muted-foreground text-xs md:text-sm mt-1">
                 Vista unificada con validación automática. Se recalcula al llegar cada webhook (Stripe, PayPal, Mercado Pago, Yape/Plin) y reintento de envío digital.
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
               <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${liveOn ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-muted bg-muted text-muted-foreground"}`}>
                 <Radio className={`w-3 h-3 ${liveOn ? "animate-pulse" : ""}`} />
-                {liveOn ? "En vivo" : "Sin conexión live"}
+                {liveOn ? "En vivo" : "Sin conexión"}
               </span>
               {lastUpdated && (
                 <span className="text-[11px] text-muted-foreground whitespace-nowrap">
-                  Actualizado {lastUpdated.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                  {lastUpdated.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               )}
-              <Button variant="outline" onClick={() => load(false)} disabled={loading}>
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refrescar
+              <Button variant="outline" size="sm" className="ml-auto sm:ml-0 h-9" onClick={() => load(false)} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? "animate-spin" : ""}`} /> Refrescar
               </Button>
             </div>
           </header>
 
           <DeliveryRetryPanel />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
 
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card
                 key={s}
-                className={`p-4 cursor-pointer transition ${sourceFilter === s ? "ring-2 ring-primary" : ""}`}
+                className={`p-3 md:p-4 cursor-pointer transition active:scale-95 ${sourceFilter === s ? "ring-2 ring-primary" : ""}`}
                 onClick={() => setSourceFilter(sourceFilter === s ? "all" : s)}
               >
-                <div className="text-xs text-muted-foreground">{sourceLabel[s]}</div>
-                <div className="text-2xl font-bold mt-1">{counts[s]}</div>
+                <div className="text-[11px] md:text-xs text-muted-foreground">{sourceLabel[s]}</div>
+                <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1">{counts[s]}</div>
               </Card>
             ))}
           </div>
 
-          <Card className="p-4 flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[240px]">
+          <Card className="p-3 md:p-4 flex flex-wrap items-center gap-2 md:gap-3">
+            <div className="relative w-full md:flex-1 md:min-w-[240px]">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar por orden, SKU principal, SKU upsell, cliente o correo…"
-                className="pl-9"
+                placeholder="Buscar orden, SKU, cliente o correo…"
+                className="pl-9 h-10"
               />
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 md:gap-2 w-full md:w-auto">
               {(["all", "manual", "stripe", "paypal", "mercadopago", "digital"] as const).map((s) => (
                 <Button
                   key={s}
                   size="sm"
+                  className="h-9 px-3 text-xs"
                   variant={sourceFilter === s ? "default" : "outline"}
                   onClick={() => setSourceFilter(s)}
                 >
@@ -479,17 +480,19 @@ const AdminEmailTest = () => {
               ))}
               <Button
                 size="sm"
+                className="h-9 px-3 text-xs"
                 variant={onlyProblems ? "destructive" : "outline"}
                 onClick={() => setOnlyProblems((v) => !v)}
               >
                 <AlertTriangle className="w-3 h-3 mr-1" />
-                Con problemas ({problemCount})
+                Problemas ({problemCount})
               </Button>
             </div>
-            <div className="text-xs text-muted-foreground ml-auto">
+            <div className="text-xs text-muted-foreground w-full md:w-auto md:ml-auto text-right">
               {visibleRows.length} de {rows.length} pedidos
             </div>
           </Card>
+
 
           <Card className="p-4 md:p-6">
             {/* Mobile card list */}

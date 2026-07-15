@@ -26,6 +26,72 @@ type Method = {
 
 const ICONS: Record<string, any> = { CreditCard, Banknote, Wallet, Smartphone, Building2 };
 
+const COUNTRY_LIST: { code: string; name: string; flag: string }[] = [
+  { code: "*", name: "Global (fallback)", flag: "🌐" },
+  { code: "US", name: "Estados Unidos", flag: "🇺🇸" },
+  { code: "CA", name: "Canadá", flag: "🇨🇦" },
+  { code: "MX", name: "México", flag: "🇲🇽" },
+  { code: "BR", name: "Brasil", flag: "🇧🇷" },
+  { code: "AR", name: "Argentina", flag: "🇦🇷" },
+  { code: "CL", name: "Chile", flag: "🇨🇱" },
+  { code: "CO", name: "Colombia", flag: "🇨🇴" },
+  { code: "PE", name: "Perú", flag: "🇵🇪" },
+  { code: "VE", name: "Venezuela", flag: "🇻🇪" },
+  { code: "EC", name: "Ecuador", flag: "🇪🇨" },
+  { code: "UY", name: "Uruguay", flag: "🇺🇾" },
+  { code: "PY", name: "Paraguay", flag: "🇵🇾" },
+  { code: "BO", name: "Bolivia", flag: "🇧🇴" },
+  { code: "CR", name: "Costa Rica", flag: "🇨🇷" },
+  { code: "PA", name: "Panamá", flag: "🇵🇦" },
+  { code: "DO", name: "R. Dominicana", flag: "🇩🇴" },
+  { code: "GT", name: "Guatemala", flag: "🇬🇹" },
+  { code: "HN", name: "Honduras", flag: "🇭🇳" },
+  { code: "SV", name: "El Salvador", flag: "🇸🇻" },
+  { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
+  { code: "CU", name: "Cuba", flag: "🇨🇺" },
+  { code: "ES", name: "España", flag: "🇪🇸" },
+  { code: "FR", name: "Francia", flag: "🇫🇷" },
+  { code: "DE", name: "Alemania", flag: "🇩🇪" },
+  { code: "IT", name: "Italia", flag: "🇮🇹" },
+  { code: "PT", name: "Portugal", flag: "🇵🇹" },
+  { code: "NL", name: "Países Bajos", flag: "🇳🇱" },
+  { code: "BE", name: "Bélgica", flag: "🇧🇪" },
+  { code: "GB", name: "Reino Unido", flag: "🇬🇧" },
+  { code: "IE", name: "Irlanda", flag: "🇮🇪" },
+  { code: "CH", name: "Suiza", flag: "🇨🇭" },
+  { code: "AT", name: "Austria", flag: "🇦🇹" },
+  { code: "SE", name: "Suecia", flag: "🇸🇪" },
+  { code: "NO", name: "Noruega", flag: "🇳🇴" },
+  { code: "DK", name: "Dinamarca", flag: "🇩🇰" },
+  { code: "FI", name: "Finlandia", flag: "🇫🇮" },
+  { code: "PL", name: "Polonia", flag: "🇵🇱" },
+  { code: "AU", name: "Australia", flag: "🇦🇺" },
+  { code: "NZ", name: "Nueva Zelanda", flag: "🇳🇿" },
+  { code: "JP", name: "Japón", flag: "🇯🇵" },
+  { code: "KR", name: "Corea del Sur", flag: "🇰🇷" },
+  { code: "SG", name: "Singapur", flag: "🇸🇬" },
+  { code: "HK", name: "Hong Kong", flag: "🇭🇰" },
+  { code: "IN", name: "India", flag: "🇮🇳" },
+  { code: "AE", name: "Emiratos", flag: "🇦🇪" },
+  { code: "ZA", name: "Sudáfrica", flag: "🇿🇦" },
+];
+
+const QUICK_METHODS: { key: string; label: string; note: string; icon: string }[] = [
+  { key: "stripe_card", label: "Tarjeta débito/crédito", note: "Visa · Mastercard · Amex · Apple Pay · Google Pay", icon: "CreditCard" },
+  { key: "stripe_cashapp", label: "Cash App Pay", note: "Solo USA", icon: "Smartphone" },
+  { key: "stripe_us_bank_account", label: "Transferencia bancaria (ACH)", note: "Solo USA", icon: "Building2" },
+  { key: "stripe_link", label: "Link (Stripe)", note: "1-click checkout", icon: "Wallet" },
+  { key: "stripe_sepa_debit", label: "SEPA Débito", note: "Zona euro", icon: "Building2" },
+  { key: "stripe_ideal", label: "iDEAL", note: "Países Bajos", icon: "Banknote" },
+  { key: "stripe_bancontact", label: "Bancontact", note: "Bélgica", icon: "Banknote" },
+  { key: "stripe_oxxo", label: "OXXO", note: "México - efectivo", icon: "Banknote" },
+  { key: "stripe_boleto", label: "Boleto", note: "Brasil", icon: "Banknote" },
+  { key: "stripe_pix", label: "Pix", note: "Brasil", icon: "Smartphone" },
+  { key: "stripe_klarna", label: "Klarna", note: "Pago a plazos", icon: "CreditCard" },
+  { key: "stripe_affirm", label: "Affirm", note: "USA - pago a plazos", icon: "CreditCard" },
+  { key: "paypal", label: "PayPal", note: "Global", icon: "Wallet" },
+];
+
 const PREVIEW_SKU = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
 const emptyRegion = (): Region => ({
@@ -100,6 +166,23 @@ export default function AdminCheckoutMethods() {
     toast.success(`Añadidos ${data.added} métodos Stripe`);
     load();
   }
+
+  async function quickAdd(region_code: string, q: typeof QUICK_METHODS[number]) {
+    const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
+    if (existing) return toast.info(`${q.label} ya está agregado`);
+    const m: Method = {
+      id: "", region_code, method_key: q.key, label: q.label,
+      note: q.note, icon: q.icon, enabled: true,
+      sort_order: methods.filter(x => x.region_code === region_code).length + 1,
+    };
+    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+      body: { action: "save_method", method: m },
+    });
+    if (error || data?.error) return toast.error(error?.message || data?.error);
+    toast.success(`+ ${q.label}`); load();
+  }
+
+
 
   return (
     <>
@@ -227,10 +310,30 @@ export default function AdminCheckoutMethods() {
                         </div>
                       );
                     })}
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-[11px] font-medium text-muted-foreground mb-1.5">Agregar rápido:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {QUICK_METHODS.map(q => {
+                          const already = rms.some(m => m.method_key === q.key);
+                          return (
+                            <button
+                              key={q.key}
+                              type="button"
+                              disabled={already}
+                              onClick={() => quickAdd(r.code, q)}
+                              className={`text-[11px] px-2 py-1 rounded border ${already ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                              title={q.note}
+                            >
+                              {already ? "✓ " : "+ "}{q.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-2 mt-2">
                       <Button size="sm" variant="outline"
                         onClick={() => setMethodEdit(emptyMethod(r.code))}>
-                        <Plus className="w-3.5 h-3.5 mr-1" /> Agregar
+                        <Plus className="w-3.5 h-3.5 mr-1" /> Personalizado
                       </Button>
                       <Button size="sm" variant="default"
                         onClick={() => autofillStripe(r.code)}
@@ -239,6 +342,7 @@ export default function AdminCheckoutMethods() {
                         <Zap className="w-3.5 h-3.5 mr-1" /> Auto Stripe
                       </Button>
                     </div>
+
                   </div>
                 </Card>
               );
@@ -279,15 +383,48 @@ export default function AdminCheckoutMethods() {
                   <Input value={regionEdit.currency} onChange={(e) => setRegionEdit({ ...regionEdit, currency: e.target.value })} placeholder="MXN" />
                 </div>
                 <div>
-                  <Label>Pasarela</Label>
-                  <Input value={regionEdit.gateway || ""} onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })} placeholder="Stripe" />
+                  <Label>Proveedor de pago</Label>
+                  <select
+                    className="w-full border rounded h-10 px-2 bg-background"
+                    value={regionEdit.gateway || "Stripe"}
+                    onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })}
+                  >
+                    <option value="Stripe">Stripe (tarjeta + locales)</option>
+                    <option value="PayPal">PayPal</option>
+                    <option value="Stripe+PayPal">Stripe + PayPal</option>
+                    <option value="MercadoPago">Mercado Pago</option>
+                    <option value="Manual">Manual (Yape/Plin/otros)</option>
+                  </select>
                 </div>
               </div>
               <div>
-                <Label>Países ISO (separados por coma, usa * para fallback global)</Label>
-                <Input value={regionEdit.country_codes.join(",")}
+                <Label>Países (click para agregar/quitar)</Label>
+                <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded max-h-40 overflow-auto bg-muted/20">
+                  {COUNTRY_LIST.map(c => {
+                    const active = regionEdit.country_codes.includes(c.code);
+                    return (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => {
+                          const set = new Set(regionEdit.country_codes);
+                          if (active) set.delete(c.code); else set.add(c.code);
+                          setRegionEdit({ ...regionEdit, country_codes: Array.from(set) });
+                        }}
+                        className={`text-[11px] px-2 py-1 rounded border ${active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"}`}
+                        title={c.name}
+                      >
+                        {c.flag} {c.code}
+                      </button>
+                    );
+                  })}
+                </div>
+                <Input
+                  className="mt-2"
+                  value={regionEdit.country_codes.join(",")}
                   onChange={(e) => setRegionEdit({ ...regionEdit, country_codes: e.target.value.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) })}
-                  placeholder="MX,GT,HN" />
+                  placeholder="MX,GT,HN o * para fallback global"
+                />
               </div>
               <div>
                 <Label>Descripción</Label>

@@ -110,13 +110,9 @@ export default function Checkout() {
   const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
   const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
-  // Global Meta Pixel (loaded in index.html): fire InitiateCheckout on entry.
-  useEffect(() => {
-    try {
-      const w = window as unknown as { fbq?: (...a: unknown[]) => void };
-      if (typeof w.fbq === "function") w.fbq("track", "InitiateCheckout");
-    } catch { /* ignore */ }
-  }, [slug]);
+  // InitiateCheckout is fired below (once catalogItem is resolved) so we can
+  // include product_id + value + currency in the tracked event — this is what
+  // powers the "Continuar pago" counter in /admin/live for every SKU.
 
 
   // Always live-load product + upsells from admin (`digital_products` +

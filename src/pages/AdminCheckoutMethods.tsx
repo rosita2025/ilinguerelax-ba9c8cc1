@@ -253,7 +253,9 @@ export default function AdminCheckoutMethods() {
     if (r1.error || r1.data?.error || r2.error || r2.data?.error) {
       toast.error("No se pudo reordenar");
       load();
+      return;
     }
+    invalidateCheckoutMethodsCache();
   }
 
 

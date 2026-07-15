@@ -92,6 +92,8 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
     a.orderNumber ? `trx=${a.orderNumber}` : "",
   ].filter(Boolean);
   attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");
+  attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
+
 
   const listIdsRaw = Deno.env.get("BREVO_CUSTOMERS_LIST_ID");
   const listIds = listIdsRaw

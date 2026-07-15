@@ -321,7 +321,7 @@ serve(async (req) => {
     const cartRate = totals.viewContent ? (totals.addToCart / totals.viewContent) * 100 : 0;
     const checkoutRate = totals.addToCart ? (totals.checkout / totals.addToCart) * 100 : 0;
     const purchaseRate = totals.checkout ? (totals.purchases / totals.checkout) * 100 : 0;
-    const globalConversion = sessions ? (totals.purchaseSessions.size / sessions) * 100 : 0;
+    const globalConversion = sessions ? (totals.purchases / sessions) * 100 : 0;
     const abandonedRate = totals.checkout
       ? ((totals.checkout - totals.purchases) / totals.checkout) * 100
       : 0;

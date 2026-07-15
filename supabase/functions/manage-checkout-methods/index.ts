@@ -55,7 +55,34 @@ Deno.serve(async (req) => {
       };
       const { error } = await db.from("checkout_regions").upsert(payload, { onConflict: "code" });
       if (error) return json({ error: error.message }, 500);
-      return json({ ok: true });
+
+      // Autofill automático de métodos Stripe según los países de la región.
+      // Upsert por (region_code, method_key) — no borra métodos manuales con
+      // otras claves y refresca labels/notes/icons según el mapa oficial.
+      let autofilled = 0;
+      try {
+        const gw = String(payload.gateway || "stripe").toLowerCase();
+        if (gw.includes("stripe") || gw === "" || gw === "auto") {
+          const suggested = stripeMethodsFor(payload.country_codes || []);
+          if (suggested.length) {
+            const rows = suggested.map((m, idx) => ({
+              region_code: payload.code,
+              method_key: m.method_key,
+              label: m.label,
+              note: m.note,
+              icon: m.icon,
+              enabled: true,
+              sort_order: idx + 1,
+            }));
+            const { error: mErr } = await db
+              .from("checkout_payment_methods")
+              .upsert(rows, { onConflict: "region_code,method_key" });
+            if (!mErr) autofilled = rows.length;
+          }
+        }
+      } catch (_) { /* noop: no bloquea el guardado de la región */ }
+
+      return json({ ok: true, autofilled });
     }
 
     if (action === "delete_region") {

@@ -7,7 +7,7 @@ const REPLY_TO = 'hola@ilinguerelax.com';
 
 function buildWelcomeEmail(name?: string) {
   const hola = name ? `Hola ${name},` : 'Hola,';
-  const subject = `¡Bienvenidos iLingue Relax! Te daré 10 por ciento`;
+  const subject = `¡Bienvenidos a iLingue Relax! Te daré el cupón 10% de descuento 🎁`;
   const text = `${hola}
 
 Bienvenid@ a iLingue Relax. Gracias por suscribirte.

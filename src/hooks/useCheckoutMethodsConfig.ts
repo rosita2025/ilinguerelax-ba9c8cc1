@@ -39,11 +39,25 @@ const CACHE_TTL_MS = 30_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
 let cacheAt = 0;
 const CACHE_VERSION_KEY = "ilr_checkout_methods_version";
+const BROADCAST_NAME = "ilr_checkout_methods";
+const SAME_TAB_EVENT = "ilr:checkout-methods-invalidated";
+
+function getBroadcastChannel(): BroadcastChannel | null {
+  if (typeof window === "undefined" || typeof BroadcastChannel === "undefined") return null;
+  const w = window as unknown as { __ilrCheckoutMethodsBC?: BroadcastChannel };
+  if (!w.__ilrCheckoutMethodsBC) {
+    try { w.__ilrCheckoutMethodsBC = new BroadcastChannel(BROADCAST_NAME); } catch { return null; }
+  }
+  return w.__ilrCheckoutMethodsBC ?? null;
+}
 
 export function invalidateCheckoutMethodsCache() {
   cachePromise = null;
   cacheAt = 0;
-  try { localStorage.setItem(CACHE_VERSION_KEY, String(Date.now())); } catch { /* noop */ }
+  const stamp = String(Date.now());
+  try { localStorage.setItem(CACHE_VERSION_KEY, stamp); } catch { /* noop */ }
+  try { getBroadcastChannel()?.postMessage({ type: "invalidate", stamp }); } catch { /* noop */ }
+  try { window.dispatchEvent(new CustomEvent(SAME_TAB_EVENT, { detail: stamp })); } catch { /* noop */ }
 }
 
 async function loadAll() {
@@ -64,9 +78,6 @@ async function loadAll() {
 
 function keyToFamily(key: string): FamilyKey | null {
   const k = key.toLowerCase();
-  // Solo cuentan los métodos reales que el checkout renderiza como filas.
-  // Submétodos internos de Stripe (cashapp, ach, klarna, link, etc.) no deben
-  // encender Stripe si el admin apagó la fila principal `stripe_card`.
   if (k === "stripe_card") return "stripe";
   if (k === "paypal") return "paypal";
   if (k === "yape_plin") return "yape";
@@ -82,16 +93,29 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
   });
 
   useEffect(() => {
+    const bump = () => {
+      cachePromise = null;
+      cacheAt = 0;
+      setVersion((v) => v + 1);
+    };
     const onStorage = (event: StorageEvent) => {
-      if (event.key === CACHE_VERSION_KEY) {
-        cachePromise = null;
-        cacheAt = 0;
-        setVersion((v) => v + 1);
-      }
+      if (event.key === CACHE_VERSION_KEY) bump();
+    };
+    const onSameTab = () => bump();
+    const bc = getBroadcastChannel();
+    const onMessage = (ev: MessageEvent) => {
+      if (ev?.data?.type === "invalidate") bump();
     };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener(SAME_TAB_EVENT, onSameTab as EventListener);
+    bc?.addEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(SAME_TAB_EVENT, onSameTab as EventListener);
+      bc?.removeEventListener("message", onMessage);
+    };
   }, []);
+
 
   useEffect(() => {
     let alive = true;

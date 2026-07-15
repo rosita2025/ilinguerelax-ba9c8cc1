@@ -676,7 +676,7 @@ export default function AdminCheckoutMethods() {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <p className="text-xs text-muted-foreground">
-                      Página {currentPage} de {totalPages} · {regions.length} regiones
+                      Página {currentPage} de {totalPages} · {filteredRegions.length} regiones
                     </p>
                     <div className="flex items-center gap-1">
                       <Button size="sm" variant="outline" className="h-8" disabled={currentPage <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>

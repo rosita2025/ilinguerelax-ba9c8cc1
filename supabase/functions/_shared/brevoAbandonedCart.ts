@@ -10,6 +10,7 @@
 interface Args {
   email: string;
   name?: string;
+  phone?: string;           // E.164 international (WhatsApp/SMS)
   productSku: string;
   productName?: string;
   productUrl?: string;      // absolute checkout / product page URL

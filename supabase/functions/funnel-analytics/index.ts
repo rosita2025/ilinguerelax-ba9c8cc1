@@ -220,6 +220,9 @@ serve(async (req) => {
     const realPurchases: RealPurchase[] = [];
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
+      const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
+      // Skip test/sandbox transactions
+      if (/test|sandbox/i.test(txn)) continue;
       const price = h.raw_payload?.data?.purchase?.price ?? {};
       const currency = price.currency_code || price.currency_value || "";
       const usd = currency === "USD" ? Number(price.value || 0) : 0;

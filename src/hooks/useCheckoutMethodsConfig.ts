@@ -75,7 +75,7 @@ async function loadAll() {
   cachePromise = (async () => {
     const [{ data: regions }, { data: methods }] = await Promise.all([
       supabase.from("checkout_regions").select("code, country_codes, enabled, sort_order").eq("enabled", true),
-      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order").eq("enabled", true),
+      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order"),
     ]);
     return {
       regions: (regions ?? []) as RegionRow[],
@@ -156,8 +156,11 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false };
       const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
       const enabledMethodKeys: string[] = [];
+      let configuredMethods = 0;
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
+        configuredMethods += 1;
+        if (!m.enabled) continue;
         enabledMethodKeys.push(m.method_key.toLowerCase());
         const fam = keyToFamily(m.method_key);
         if (!fam) continue;
@@ -165,8 +168,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         const ord = m.sort_order ?? 999;
         if (ord < familyMinOrder[fam]) familyMinOrder[fam] = ord;
       }
-      const anyEnabled = Object.values(enabledFamilies).some(Boolean);
-      const families = anyEnabled ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
+      const families = configuredMethods > 0 ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
       const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
         .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
       if (alive) setState({ loaded: true, regionCode: region.code, enabledMethodKeys, ...families, familyOrder });

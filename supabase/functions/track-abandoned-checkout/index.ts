@@ -61,7 +61,6 @@ Deno.serve(async (req) => {
     const phone = String(body.phone || "").trim();
     const productType = String(body.product_type || body.slug || "checkout").slice(0, 80);
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
-    const language = (body.language ? String(body.language) : detectLanguage(email, country)).toLowerCase();
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")
@@ -80,6 +79,15 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Resolver idioma: body.language > tabla country_language_map > TLD > "es"
+    let language: string;
+    if (body.language) {
+      language = String(body.language).toLowerCase();
+    } else {
+      const langMap = await loadCountryLangMap(supabase);
+      language = langMap[country] || detectFromTld(email);
+    }
 
     // Upsert-like: reset existing open cart or create new
     const { data: existing } = await supabase

@@ -221,9 +221,19 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       },
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<PruebaStore>;
-        const cleanItems = Array.isArray(p.items)
+        const rawItems = Array.isArray(p.items)
           ? p.items.filter((i) => !PHANTOM_IDS.has(i.id))
           : current.items;
+        // Dedupe defensivo: colapsa cualquier SKU repetido a UNA sola línea
+        // con cantidad 1 (productos digitales = 1 unidad). Limpia carritos
+        // heredados de la versión anterior que acumulaba cantidades.
+        const seen = new Set<string>();
+        const cleanItems: PruebaItem[] = [];
+        for (const it of rawItems) {
+          if (seen.has(it.id)) continue;
+          seen.add(it.id);
+          cleanItems.push({ ...it, quantity: 1 });
+        }
         return {
           ...current,
           ...p,

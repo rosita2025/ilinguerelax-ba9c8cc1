@@ -37,6 +37,15 @@ interface RecentEvent {
   currency: string | null;
   created_at: string;
 }
+interface BotRecent {
+  session_id: string | null;
+  country: string | null;
+  page_path: string | null;
+  event_name: string;
+  bot_reason: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
 interface LiveData {
   windowMinutes: number;
   total: number;
@@ -57,6 +66,13 @@ interface LiveData {
   revenueByCountry: Record<string, number>;
   visitors: Visitor[];
   recentEvents: RecentEvent[];
+  bots?: {
+    events: number;
+    sessions: number;
+    byReason: Record<string, number>;
+    byCountry: Record<string, number>;
+    recent: BotRecent[];
+  };
   generatedAt: string;
 }
 

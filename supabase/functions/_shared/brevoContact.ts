@@ -98,18 +98,31 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");
   attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
 
+  // TAGS: atributo tipo texto/categoría en Brevo para filtrar de un vistazo.
+  // Se envía como lista separada por comas: "compra,hotmart,compra_hotmart"
+  const eventKind: "compra" | "abandonado" = "compra";
+  const tagList = [eventKind, origin, `${eventKind}_${origin}`];
+  attributes.TAGS = tagList.join(",");
+  attributes.SEGMENTO = `${eventKind}_${origin}`;
 
-  const listIdsRaw = Deno.env.get("BREVO_CUSTOMERS_LIST_ID");
-  const listIds = listIdsRaw
-    ? listIdsRaw.split(",").map((s) => Number(s.trim())).filter((n) => Number.isFinite(n))
-    : undefined;
+  const parseIds = (raw?: string | null) =>
+    raw ? raw.split(",").map((s) => Number(s.trim())).filter((n) => Number.isFinite(n)) : [];
+
+  const listIds = [
+    ...parseIds(Deno.env.get("BREVO_CUSTOMERS_LIST_ID")),
+    ...parseIds(
+      origin === "hotmart"
+        ? Deno.env.get("BREVO_LIST_HOTMART_COMPRA")
+        : Deno.env.get("BREVO_LIST_TIENDA_COMPRA"),
+    ),
+  ];
 
   const payload: Record<string, unknown> = {
     email,
     attributes,
     updateEnabled: true,
   };
-  if (listIds && listIds.length) payload.listIds = listIds;
+  if (listIds.length) payload.listIds = Array.from(new Set(listIds));
 
   const eventOrigin = origin;
   const event_type = eventOrigin === "hotmart" ? "hotmart_purchase" : "tienda_purchase";

@@ -88,16 +88,31 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   ].filter(Boolean);
   attributes.ABANDONED_NOTE = noteParts.join(" · ");
 
+  // TAGS: atributo tipo texto/categoría en Brevo para filtrar de un vistazo.
+  const eventKind: "compra" | "abandonado" = "abandonado";
+  const tagList = [eventKind, origin, `${eventKind}_${origin}`];
+  attributes.TAGS = tagList.join(",");
+  attributes.SEGMENTO = `${eventKind}_${origin}`;
+
   const phoneClean = (a.phone || "").replace(/[^\d+]/g, "");
   if (phoneClean.startsWith("+") && phoneClean.length >= 8) {
     attributes.SMS = phoneClean;
     attributes.WHATSAPP = phoneClean;
   }
 
+  const parseIds = (raw?: string | null) =>
+    raw ? raw.split(",").map((s) => Number(s.trim())).filter((n) => Number.isFinite(n)) : [];
+  const extraListIds = parseIds(
+    origin === "hotmart"
+      ? Deno.env.get("BREVO_LIST_HOTMART_ABANDONO")
+      : Deno.env.get("BREVO_LIST_TIENDA_ABANDONO"),
+  );
+  const allListIds = Array.from(new Set([listId, ...extraListIds]));
+
   const payload = {
     email,
     attributes,
-    listIds: [listId],
+    listIds: allListIds,
     updateEnabled: true,
   };
 

@@ -147,19 +147,27 @@ Deno.serve(async (req) => {
       if (rErr || !region) return json({ error: rErr?.message || "region not found" }, 404);
 
       const suggested = stripeMethodsFor(region.country_codes || []);
-      const rows = suggested.map((m, idx) => ({
-        region_code: code,
-        method_key: m.method_key,
-        label: m.label,
-        note: m.note,
-        icon: m.icon,
-        enabled: true,
-        sort_order: idx + 1,
-      }));
-      // upsert por (region_code, method_key) — no borra métodos manuales existentes con otras claves
-      const { error } = await db
+      const { data: existing, error: exErr } = await db
         .from("checkout_payment_methods")
-        .upsert(rows, { onConflict: "region_code,method_key" });
+        .select("method_key, sort_order")
+        .eq("region_code", code);
+      if (exErr) return json({ error: exErr.message }, 500);
+      const existingRows = existing ?? [];
+      const existingKeys = new Set(existingRows.map((x: { method_key: string }) => x.method_key));
+      const maxOrder = existingRows.reduce((max: number, x: { sort_order: number | null }) => Math.max(max, Number(x.sort_order || 0)), 0);
+      const rows = suggested
+        .filter((m) => !existingKeys.has(m.method_key))
+        .map((m, idx) => ({
+          region_code: code,
+          method_key: m.method_key,
+          label: m.label,
+          note: m.note,
+          icon: m.icon,
+          enabled: true,
+          sort_order: maxOrder + idx + 1,
+        }));
+      if (!rows.length) return json({ ok: true, added: 0 });
+      const { error } = await db.from("checkout_payment_methods").insert(rows);
       if (error) return json({ error: error.message }, 500);
       return json({ ok: true, added: rows.length });
     }
@@ -178,18 +186,30 @@ Deno.serve(async (req) => {
         if (!gw.includes("stripe")) continue;
         const suggested = stripeMethodsFor(region.country_codes || []);
         if (!suggested.length) continue;
-        const rows = suggested.map((m, idx) => ({
-          region_code: region.code,
-          method_key: m.method_key,
-          label: m.label,
-          note: m.note,
-          icon: m.icon,
-          enabled: true,
-          sort_order: idx + 1,
-        }));
-        const { error } = await db
+        const { data: existing, error: exErr } = await db
           .from("checkout_payment_methods")
-          .upsert(rows, { onConflict: "region_code,method_key" });
+          .select("method_key, sort_order")
+          .eq("region_code", region.code);
+        if (exErr) return json({ error: `region ${region.code}: ${exErr.message}` }, 500);
+        const existingRows = existing ?? [];
+        const existingKeys = new Set(existingRows.map((x: { method_key: string }) => x.method_key));
+        const maxOrder = existingRows.reduce((max: number, x: { sort_order: number | null }) => Math.max(max, Number(x.sort_order || 0)), 0);
+        const rows = suggested
+          .filter((m) => !existingKeys.has(m.method_key))
+          .map((m, idx) => ({
+            region_code: region.code,
+            method_key: m.method_key,
+            label: m.label,
+            note: m.note,
+            icon: m.icon,
+            enabled: true,
+            sort_order: maxOrder + idx + 1,
+          }));
+        if (!rows.length) {
+          touched.push(region.code);
+          continue;
+        }
+        const { error } = await db.from("checkout_payment_methods").insert(rows);
         if (error) return json({ error: `region ${region.code}: ${error.message}` }, 500);
         totalAdded += rows.length;
         touched.push(region.code);

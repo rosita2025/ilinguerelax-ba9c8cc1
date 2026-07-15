@@ -77,11 +77,49 @@ const COUNTRY_LIST: { code: string; name: string; flag: string }[] = [
   { code: "ZA", name: "Sudáfrica", flag: "🇿🇦" },
 ];
 
-const CHECKOUT_METHODS: { key: string; label: string; note: string; icon: string; regions: ("PE" | "US" | "GLOBAL")[] }[] = [
+type CheckoutMethodDef = {
+  key: string;
+  label: string;
+  note: string;
+  icon: string;
+  regions?: ("PE" | "US" | "GLOBAL")[];
+  countryCodes?: string[];
+  baseStripe?: boolean;
+};
+
+const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "stripe_card", label: "Stripe — tarjeta / wallets", note: "Tarjeta, Apple Pay, Google Pay y Link dentro de Stripe", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
+  { key: "stripe_link", label: "Link (Stripe)", note: "Autocompletado con 1 clic de Stripe", icon: "Wallet", baseStripe: true },
+  { key: "stripe_apple_pay", label: "Apple Pay", note: "iPhone / Safari", icon: "Smartphone", baseStripe: true },
+  { key: "stripe_google_pay", label: "Google Pay", note: "Android / Chrome", icon: "Smartphone", baseStripe: true },
   { key: "stripe_us_bank_account", label: "Stripe — ACH transferencia", note: "Transferencia bancaria de USA dentro de Stripe", icon: "Building2", regions: ["US"] },
   { key: "stripe_cashapp", label: "Stripe — Cash App Pay", note: "Cash App para compradores de Estados Unidos dentro de Stripe", icon: "Smartphone", regions: ["US"] },
   { key: "stripe_klarna", label: "Stripe — Klarna (Pay in 4)", note: "Paga en 4 cuotas sin interés (USA/UE)", icon: "Wallet", regions: ["US", "GLOBAL"] },
+  { key: "stripe_affirm", label: "Affirm", note: "Compra ahora, paga después", icon: "CreditCard", countryCodes: ["US", "*"] },
+  { key: "stripe_afterpay_clearpay", label: "Afterpay / Clearpay", note: "Paga en 4", icon: "CreditCard", countryCodes: ["US", "CA", "GB", "AU", "NZ"] },
+  { key: "stripe_paypal", label: "PayPal (vía Stripe)", note: "PayPal procesado por Stripe", icon: "Wallet", countryCodes: ["*", "US", "CA", "MX", "BR", "AR", "CL", "CO", "PE", "UY", "DE", "AT", "NL", "BE", "FR", "ES", "IT", "PT", "IE", "GB", "CH", "NO", "SE", "DK", "AU", "NZ", "JP", "KR", "SG", "HK", "IN", "AE", "ZA"] },
+  { key: "stripe_oxxo", label: "OXXO", note: "Voucher efectivo México", icon: "Banknote", countryCodes: ["MX"] },
+  { key: "stripe_boleto", label: "Boleto", note: "Voucher bancario Brasil", icon: "Banknote", countryCodes: ["BR"] },
+  { key: "stripe_pix", label: "Pix", note: "Transferencia instantánea Brasil", icon: "Smartphone", countryCodes: ["BR"] },
+  { key: "stripe_sepa_debit", label: "SEPA débito directo", note: "Zona euro", icon: "Banknote", countryCodes: ["DE", "AT", "NL", "BE", "FR", "ES", "IT", "PT", "IE", "FI"] },
+  { key: "stripe_giropay", label: "Giropay", note: "Banca online Alemania", icon: "Building2", countryCodes: ["DE"] },
+  { key: "stripe_sofort", label: "Sofort", note: "Transferencia instantánea DE/AT", icon: "Building2", countryCodes: ["DE", "AT"] },
+  { key: "stripe_ideal", label: "iDEAL", note: "Banca online Países Bajos", icon: "Building2", countryCodes: ["NL"] },
+  { key: "stripe_bancontact", label: "Bancontact", note: "Bélgica", icon: "Building2", countryCodes: ["BE"] },
+  { key: "stripe_eps", label: "EPS", note: "Banca online Austria", icon: "Building2", countryCodes: ["AT"] },
+  { key: "stripe_p24", label: "Przelewy24 (P24)", note: "Banca online Polonia", icon: "Building2", countryCodes: ["PL"] },
+  { key: "stripe_blik", label: "BLIK", note: "Pago móvil Polonia", icon: "Smartphone", countryCodes: ["PL"] },
+  { key: "stripe_multibanco", label: "Multibanco", note: "Portugal", icon: "Banknote", countryCodes: ["PT"] },
+  { key: "stripe_mb_way", label: "MB WAY", note: "Pago móvil Portugal", icon: "Smartphone", countryCodes: ["PT"] },
+  { key: "stripe_twint", label: "TWINT", note: "Suiza", icon: "Smartphone", countryCodes: ["CH"] },
+  { key: "stripe_mobilepay", label: "MobilePay", note: "Dinamarca / Finlandia", icon: "Smartphone", countryCodes: ["DK", "FI"] },
+  { key: "stripe_bacs_debit", label: "Bacs débito directo", note: "Reino Unido", icon: "Banknote", countryCodes: ["GB"] },
+  { key: "stripe_acss_debit", label: "Débito bancario Canadá", note: "Débito preautorizado Canadá", icon: "Banknote", countryCodes: ["CA"] },
+  { key: "stripe_alipay", label: "Alipay", note: "China / Asia", icon: "Smartphone", countryCodes: ["SG", "HK"] },
+  { key: "stripe_wechat_pay", label: "WeChat Pay", note: "China", icon: "Smartphone", countryCodes: ["HK"] },
+  { key: "stripe_grabpay", label: "GrabPay", note: "Sudeste asiático", icon: "Smartphone", countryCodes: ["SG"] },
+  { key: "stripe_paynow", label: "PayNow", note: "Singapur", icon: "Smartphone", countryCodes: ["SG"] },
+  { key: "stripe_konbini", label: "Konbini", note: "Tiendas de conveniencia Japón", icon: "Banknote", countryCodes: ["JP"] },
   { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
@@ -97,7 +135,16 @@ function isCheckoutMethod(m: Method) {
 function availableMethodsForRegion(region: Region) {
   const isPeru = region.code === "PE" || region.country_codes.includes("PE");
   const isUs = region.code === "US" || region.country_codes.includes("US");
-  return CHECKOUT_METHODS.filter(m => m.regions.includes(isPeru ? "PE" : isUs ? "US" : "GLOBAL"));
+  const family = isPeru ? "PE" : isUs ? "US" : "GLOBAL";
+  const codes = new Set(region.country_codes.map(c => c.toUpperCase()));
+  const stripeGateway = String(region.gateway || "Stripe").toLowerCase().includes("stripe");
+  return CHECKOUT_METHODS.filter(m => {
+    if (m.baseStripe) return stripeGateway;
+    if (m.regions?.includes(family)) return true;
+    if (!m.countryCodes?.length) return false;
+    if (m.countryCodes.includes("*") && (codes.size === 0 || codes.has("*"))) return true;
+    return m.countryCodes.some(c => codes.has(c));
+  });
 }
 
 
@@ -223,7 +270,17 @@ export default function AdminCheckoutMethods() {
 
   async function quickAdd(region_code: string, q: typeof CHECKOUT_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
-    if (existing) return toast.info(`${q.label} ya está agregado`);
+    if (existing) {
+      const nextEnabled = !existing.enabled;
+      setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: nextEnabled } : x));
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "toggle_method", id: existing.id, enabled: nextEnabled },
+      });
+      if (error || data?.error) { toast.error(error?.message || data?.error); load(); return; }
+      toast.success(`${nextEnabled ? "✅" : "⏸️"} ${q.label} ${nextEnabled ? "activado" : "desactivado"}`);
+      invalidateCheckoutMethodsCache();
+      return;
+    }
     const m: Method = {
       id: "", region_code, method_key: q.key, label: q.label,
       note: q.note, icon: q.icon, enabled: true,
@@ -457,16 +514,19 @@ export default function AdminCheckoutMethods() {
                             <div className="flex flex-wrap gap-1">
                               {available.map(q => {
                                 const already = rms.some(m => m.method_key === q.key);
+                                const existing = rms.find(m => m.method_key === q.key);
+                                const canReactivate = !!existing && !existing.enabled;
+                                const isActive = !!existing && existing.enabled;
                                 return (
                                   <button
                                     key={q.key}
                                     type="button"
-                                    disabled={already}
+                                    aria-pressed={isActive}
                                     onClick={() => quickAdd(r.code, q)}
-                                    className={`text-[11px] px-2 py-1 rounded border ${already ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                                    className={`text-[11px] px-2 py-1 rounded border ${isActive ? "bg-primary text-primary-foreground border-primary" : canReactivate ? "bg-background border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
                                     title={q.note}
                                   >
-                                    {already ? "✓ " : "+ "}{q.label}
+                                    {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{q.label}
                                   </button>
                                 );
                               })}

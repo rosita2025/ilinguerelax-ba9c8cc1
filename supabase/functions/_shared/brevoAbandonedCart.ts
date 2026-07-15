@@ -80,17 +80,34 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   };
 
   try {
-    const res = await fetch(`${GATEWAY_URL}/contacts`, {
+    const send = (body: typeof payload) => fetch(`${GATEWAY_URL}/contacts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "X-Connection-Api-Key": BREVO_API_KEY,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     });
+    let res = await send(payload);
     if (!res.ok) {
       const body = await res.text();
+      if (res.status === 400 && /phone|sms|whatsapp/i.test(body)) {
+        const retryPayload = {
+          ...payload,
+          attributes: { ...payload.attributes },
+        };
+        delete (retryPayload.attributes as Record<string, unknown>).SMS;
+        delete (retryPayload.attributes as Record<string, unknown>).WHATSAPP;
+        res = await send(retryPayload);
+        if (res.ok) {
+          console.log(`[brevo-abandoned] queued ${email} · ${a.productSku} (without phone)`);
+          return;
+        }
+        const retryBody = await res.text();
+        console.error(`[brevo-abandoned] upsert retry failed [${res.status}]: ${retryBody}`);
+        return;
+      }
       console.error(`[brevo-abandoned] upsert failed [${res.status}]: ${body}`);
       return;
     }

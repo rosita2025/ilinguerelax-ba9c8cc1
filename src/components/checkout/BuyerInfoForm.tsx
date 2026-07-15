@@ -21,18 +21,19 @@ export const BUYER_ERRORS_EVENT = "checkout:showBuyerErrors";
 export function BuyerInfoForm() {
   const { buyer, setBuyer, applyCoupon, coupon } = useCheckoutPruebaStore();
 
-  // Autocompleta nombre/email desde el popup de bienvenida (o compras previas)
-  // y aplica el cupón NEW10 si aún no hay ninguno.
+  // Autocompleta nombre/email/teléfono desde el popup de bienvenida
+  // (o compras previas / recuperación de carrito) y aplica el cupón NEW10.
   useEffect(() => {
     const hydrate = () => {
       try {
         const raw = localStorage.getItem("ilr_buyer");
         if (!raw) return;
-        const saved = JSON.parse(raw) as { email?: string; name?: string; coupon?: string };
-        const patch: Partial<{ fullName: string; email: string }> = {};
+        const saved = JSON.parse(raw) as { email?: string; name?: string; phone?: string; coupon?: string };
+        const patch: Partial<{ fullName: string; email: string; phone: string }> = {};
         if (saved.email && !buyer.email) patch.email = saved.email;
         if (saved.name && !buyer.fullName) patch.fullName = saved.name;
-        if (patch.email || patch.fullName) setBuyer(patch);
+        if (saved.phone && !buyer.phone) patch.phone = saved.phone;
+        if (patch.email || patch.fullName || patch.phone) setBuyer(patch);
         if (saved.coupon && !coupon) applyCoupon(saved.coupon);
       } catch { /* ignore */ }
     };
@@ -41,6 +42,20 @@ export function BuyerInfoForm() {
     return () => window.removeEventListener("ilr:buyer-updated", hydrate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Persist buyer edits into `ilr_buyer` so abandoned-cart recovery links
+  // pueden regenerar los datos en cualquier dispositivo (estilo Shopify).
+  useEffect(() => {
+    const email = (buyer.email || "").trim();
+    const name = (buyer.fullName || "").trim();
+    const phone = (buyer.phone || "").trim();
+    if (!email && !name && !phone) return;
+    try {
+      const raw = localStorage.getItem("ilr_buyer");
+      const prev = raw ? JSON.parse(raw) : {};
+      localStorage.setItem("ilr_buyer", JSON.stringify({ ...prev, email, name, phone }));
+    } catch { /* ignore */ }
+  }, [buyer.email, buyer.fullName, buyer.phone]);
 
   const region = useRegionTier();
   const { language } = useI18n();

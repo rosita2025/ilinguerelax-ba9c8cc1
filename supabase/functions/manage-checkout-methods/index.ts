@@ -1,5 +1,6 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { stripeMethodsFor } from "./stripeCountryMethods.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

@@ -156,6 +156,22 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   attributes.PRODUCT_CATEGORY = category;
   attributes.CATEGORIA_LABEL = categoryLabel;
 
+  // Cupón usado (para segmentar campañas por descuento)
+  const couponCodeRaw = (a.couponCode || "").trim().toUpperCase();
+  const couponCode = couponCodeRaw.slice(0, 32);
+  const couponPercent = Number.isFinite(a.couponPercent as number) ? (a.couponPercent as number) : undefined;
+  const couponAmount = Number.isFinite(a.couponAmount as number) ? (a.couponAmount as number) : undefined;
+  if (couponCode) {
+    attributes.LAST_COUPON = couponCode;
+    attributes.COUPON_USED = "si";
+    attributes.COUPON_APPLIED = true;
+  } else {
+    attributes.COUPON_USED = "no";
+    attributes.COUPON_APPLIED = false;
+  }
+  if (typeof couponPercent === "number" && couponPercent > 0) attributes.LAST_COUPON_PERCENT = couponPercent;
+  if (typeof couponAmount === "number" && couponAmount > 0) attributes.LAST_COUPON_AMOUNT = couponAmount;
+
   // NOTA legible tipo "Hotmart · 5,000 palabras · cat=5000_palabras · id=123456 · trx=HP123"
   const noteParts: string[] = [
     origin === "hotmart" ? "Hotmart" : "Tienda",
@@ -165,13 +181,17 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
     a.hotmartProductCode ? `code=${a.hotmartProductCode}` : "",
     tiendaSku ? `sku=${tiendaSku}` : "",
     a.orderNumber ? `trx=${a.orderNumber}` : "",
+    couponCode
+      ? `cupón=${couponCode}${typeof couponPercent === "number" && couponPercent > 0 ? ` (-${couponPercent}%)` : typeof couponAmount === "number" && couponAmount > 0 ? ` (-${couponAmount})` : ""}`
+      : "",
   ].filter(Boolean);
   attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");
   attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
 
-  // TAGS: incluye categoría para filtrar por oferta (ej. "compra,hotmart,compra_hotmart,cat_8000_palabras")
+  // TAGS: incluye categoría y cupón para filtrar por oferta/descuento
   const eventKind: "compra" | "abandonado" = "compra";
   const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
+  if (couponCode) tagList.push(`cupon_${couponCode.toLowerCase()}`);
 
   // Audiencias/segmentos por producto (tabla brevo_product_audiences, editable en admin)
   const audiences = await resolveBrevoAudiences({

@@ -279,15 +279,48 @@ export default function AdminCheckoutMethods() {
                   <Input value={regionEdit.currency} onChange={(e) => setRegionEdit({ ...regionEdit, currency: e.target.value })} placeholder="MXN" />
                 </div>
                 <div>
-                  <Label>Pasarela</Label>
-                  <Input value={regionEdit.gateway || ""} onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })} placeholder="Stripe" />
+                  <Label>Proveedor de pago</Label>
+                  <select
+                    className="w-full border rounded h-10 px-2 bg-background"
+                    value={regionEdit.gateway || "Stripe"}
+                    onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })}
+                  >
+                    <option value="Stripe">Stripe (tarjeta + locales)</option>
+                    <option value="PayPal">PayPal</option>
+                    <option value="Stripe+PayPal">Stripe + PayPal</option>
+                    <option value="MercadoPago">Mercado Pago</option>
+                    <option value="Manual">Manual (Yape/Plin/otros)</option>
+                  </select>
                 </div>
               </div>
               <div>
-                <Label>Países ISO (separados por coma, usa * para fallback global)</Label>
-                <Input value={regionEdit.country_codes.join(",")}
+                <Label>Países (click para agregar/quitar)</Label>
+                <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded max-h-40 overflow-auto bg-muted/20">
+                  {COUNTRY_LIST.map(c => {
+                    const active = regionEdit.country_codes.includes(c.code);
+                    return (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => {
+                          const set = new Set(regionEdit.country_codes);
+                          if (active) set.delete(c.code); else set.add(c.code);
+                          setRegionEdit({ ...regionEdit, country_codes: Array.from(set) });
+                        }}
+                        className={`text-[11px] px-2 py-1 rounded border ${active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"}`}
+                        title={c.name}
+                      >
+                        {c.flag} {c.code}
+                      </button>
+                    );
+                  })}
+                </div>
+                <Input
+                  className="mt-2"
+                  value={regionEdit.country_codes.join(",")}
                   onChange={(e) => setRegionEdit({ ...regionEdit, country_codes: e.target.value.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) })}
-                  placeholder="MX,GT,HN" />
+                  placeholder="MX,GT,HN o * para fallback global"
+                />
               </div>
               <div>
                 <Label>Descripción</Label>

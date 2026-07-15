@@ -179,6 +179,27 @@ export type Database = {
         }
         Relationships: []
       }
+      country_language_map: {
+        Row: {
+          country_code: string
+          created_at: string
+          language: string
+          updated_at: string
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          language: string
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          language?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       digital_delivery_alerts: {
         Row: {
           created_at: string

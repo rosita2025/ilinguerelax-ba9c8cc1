@@ -9,34 +9,44 @@ const corsHeaders = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Country ISO-2 → language code used by Brevo templates.
-const COUNTRY_TO_LANG: Record<string, string> = {
-  // Español
-  PE: "es", MX: "es", AR: "es", CL: "es", CO: "es", VE: "es", EC: "es",
-  BO: "es", PY: "es", UY: "es", CR: "es", GT: "es", HN: "es", NI: "es",
-  PA: "es", SV: "es", DO: "es", CU: "es", PR: "es", ES: "es",
-  // English
-  US: "en", GB: "en", CA: "en", AU: "en", NZ: "en", IE: "en", ZA: "en",
-  IN: "en", SG: "en", PH: "en",
-  // Français
-  FR: "fr", BE: "fr", CH: "fr", LU: "fr", MC: "fr", SN: "fr", CI: "fr",
-  MA: "fr", TN: "fr", DZ: "fr",
-  // Português
-  BR: "pt", PT: "pt", AO: "pt", MZ: "pt",
+// Fallback estático (usado si la tabla country_language_map no responde).
+const FALLBACK_COUNTRY_TO_LANG: Record<string, string> = {
+  PE:"es",MX:"es",AR:"es",CL:"es",CO:"es",VE:"es",EC:"es",BO:"es",PY:"es",UY:"es",
+  CR:"es",GT:"es",HN:"es",NI:"es",PA:"es",SV:"es",DO:"es",CU:"es",PR:"es",ES:"es",
+  US:"en",GB:"en",CA:"en",AU:"en",NZ:"en",IE:"en",ZA:"en",IN:"en",SG:"en",PH:"en",
+  FR:"fr",BE:"fr",CH:"fr",LU:"fr",MC:"fr",SN:"fr",CI:"fr",MA:"fr",TN:"fr",DZ:"fr",
+  BR:"pt",PT:"pt",AO:"pt",MZ:"pt",
 };
 
-function detectLanguage(email: string, country?: string): string {
-  const cc = (country || "").toUpperCase();
-  if (COUNTRY_TO_LANG[cc]) return COUNTRY_TO_LANG[cc];
+// Cache en memoria del mapa configurable (10 min).
+let mapCache: { at: number; data: Record<string, string> } | null = null;
+async function loadCountryLangMap(sb: ReturnType<typeof createClient>): Promise<Record<string,string>> {
+  if (mapCache && Date.now() - mapCache.at < 10 * 60 * 1000) return mapCache.data;
+  try {
+    const { data, error } = await sb.from("country_language_map").select("country_code, language");
+    if (error || !data) throw error;
+    const map: Record<string, string> = {};
+    for (const row of data as Array<{ country_code: string; language: string }>) {
+      map[row.country_code.toUpperCase()] = row.language.toLowerCase();
+    }
+    mapCache = { at: Date.now(), data: map };
+    return map;
+  } catch (e) {
+    console.warn("[country-lang-map] fallback:", e instanceof Error ? e.message : String(e));
+    return FALLBACK_COUNTRY_TO_LANG;
+  }
+}
+
+function detectFromTld(email: string): string {
   const tldMap: Record<string, string> = {
-    ".br": "pt", ".pt": "pt",
-    ".fr": "fr", ".be": "fr", ".ca": "en",
-    ".us": "en", ".uk": "en", ".au": "en", ".ie": "en", ".in": "en",
-    ".mx": "es", ".ar": "es", ".cl": "es", ".co": "es", ".pe": "es", ".es": "es",
+    ".br":"pt",".pt":"pt",".fr":"fr",".be":"fr",".ca":"en",".us":"en",
+    ".uk":"en",".au":"en",".ie":"en",".in":"en",
+    ".mx":"es",".ar":"es",".cl":"es",".co":"es",".pe":"es",".es":"es",
   };
   for (const suf of Object.keys(tldMap)) if (email.endsWith(suf)) return tldMap[suf];
   return "es";
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -51,7 +61,6 @@ Deno.serve(async (req) => {
     const phone = String(body.phone || "").trim();
     const productType = String(body.product_type || body.slug || "checkout").slice(0, 80);
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
-    const language = (body.language ? String(body.language) : detectLanguage(email, country)).toLowerCase();
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")
@@ -70,6 +79,15 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Resolver idioma: body.language > tabla country_language_map > TLD > "es"
+    let language: string;
+    if (body.language) {
+      language = String(body.language).toLowerCase();
+    } else {
+      const langMap = await loadCountryLangMap(supabase);
+      language = langMap[country] || detectFromTld(email);
+    }
 
     // Upsert-like: reset existing open cart or create new
     const { data: existing } = await supabase

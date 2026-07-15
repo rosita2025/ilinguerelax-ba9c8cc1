@@ -154,7 +154,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     price: 12,
     pricePen: 35,
     regionPrices: { latam: 12, global: 12, tienda: 12 },
-    image: "/images/product-spanish-500-questions.png",
+    image: "/images/product-spanish-500-questions.webp",
     description: "500 essential Spanish questions with English pronunciation",
     productPath: "/products/500-questions-in-spanish-with-english-pronunciation",
     adminSku: "500-questions-in-spanish-with-english-pronunciation",

@@ -14,7 +14,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
-const productImage = "/images/product-spanish-500-questions.png";
+const productImage = "/images/product-spanish-500-questions.webp";
 const ORIGINAL_PRICE = 40;
 const ADMIN_SKU = "500-questions-in-spanish-with-english-pronunciation";
 const TIENDA_PATH = "/checkouts/500-questions-spanish";
@@ -67,7 +67,7 @@ const ProductSpanish500Questions = () => {
         title="500 Spanish Questions PDF · English Pronunciation"
         description="Master 500 real Spanish questions with English pronunciation. Talk confidently at work, travel and daily life. Instant PDF download for English speakers."
         canonicalUrl="https://ilinguerelax.com/products/500-questions-in-spanish-with-english-pronunciation"
-        image="https://ilinguerelax.com/images/product-spanish-500-questions.png"
+        image="https://ilinguerelax.com/images/product-spanish-500-questions.webp"
         type="product"
         price={currentPrice.toFixed(2)}
         originalPrice={String(ORIGINAL_PRICE)}

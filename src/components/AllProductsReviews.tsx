@@ -1,7 +1,7 @@
 import { Star, BadgeCheck } from "lucide-react";
 import customerBook2 from "@/assets/customer-book-2.webp";
 import inglesDigitalWhatsapp from "@/assets/review-ingles-digital-whatsapp.webp";
-import inglesFisico8000 from "@/assets/review-ingles-fisico-8000.jpg";
+import inglesFisico8000 from "@/assets/review-ingles-fisico-8000.webp";
 import spanishDigitalPages from "@/assets/review-spanish-digital-pages.jpg";
 
 interface Review {

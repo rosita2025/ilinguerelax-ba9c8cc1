@@ -85,7 +85,7 @@ const AMAZON_URL = "https://www.amazon.com/dp/B0GDTV8GWR";
 
 const MEDIA_SLIDES = [
   { type: "image" as const, src: product5000BookPerson, alt: "Persona con libro Inglés Relax" },
-  { type: "image" as const, src: "/images/product-5000-book-hero.jpg", alt: "Inglés Relax 5,000 Palabras - Libro Físico y Digital" },
+  { type: "image" as const, src: "/images/product-5000-book-hero.webp", alt: "Inglés Relax 5,000 Palabras - Libro Físico y Digital" },
   { type: "video" as const, src: "/videos/product-5000-book.mp4", alt: "" },
 ];
 

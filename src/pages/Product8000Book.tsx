@@ -37,13 +37,13 @@ import { toast } from "sonner";
 
 // Product images
 const bookImages = [
-  { src: "/images/8000-book-fisico-digital.png", alt: "Libro Físico Inglés Relax + Digital Gratis" },
-  { src: "/images/8000-book-cover.jpg", alt: "Portada Inglés Relax 8,000 Palabras - Versión 1.5" },
-  { src: "/images/8000-book-index.jpg", alt: "Índice del libro - 89 capítulos organizados por nivel A1 a C1" },
-  { src: "/images/8000-book-content.jpg", alt: "Vocabulario con pronunciación adaptada y fonética UK/USA" },
-  { src: "/images/8000-book-grammar.jpg", alt: "Gramática con método fórmulas - paso a paso" },
-  { src: "/images/8000-book-questions.jpg", alt: "Preguntas en inglés con estructura TO BE - Nivel A1" },
-  { src: "/images/8000-book-structures.jpg", alt: "Estructuras gramaticales con ejemplos - Hábitos y negativas" },
+  { src: "/images/8000-book-fisico-digital.webp", alt: "Libro Físico Inglés Relax + Digital Gratis" },
+  { src: "/images/8000-book-cover.webp", alt: "Portada Inglés Relax 8,000 Palabras - Versión 1.5" },
+  { src: "/images/8000-book-index.webp", alt: "Índice del libro - 89 capítulos organizados por nivel A1 a C1" },
+  { src: "/images/8000-book-content.webp", alt: "Vocabulario con pronunciación adaptada y fonética UK/USA" },
+  { src: "/images/8000-book-grammar.webp", alt: "Gramática con método fórmulas - paso a paso" },
+  { src: "/images/8000-book-questions.webp", alt: "Preguntas en inglés con estructura TO BE - Nivel A1" },
+  { src: "/images/8000-book-structures.webp", alt: "Estructuras gramaticales con ejemplos - Hábitos y negativas" },
 ];
 // URL intermedia para tracking de clics en Google Analytics (redirige a Amazon)
 const AMAZON_URL = "https://ilinguerelax.com/amazon";
@@ -149,7 +149,7 @@ const Product8000Book = () => {
         title="Libro Físico: 8,000 Palabras en Inglés Avanzado"
         description="Libro físico con 8,000 palabras en inglés y pronunciación en español. Nivel avanzado A1–C1, tapa blanda premium, envío mundial."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
-        image="https://ilinguerelax.com/product-8000-book.png"
+        image="https://ilinguerelax.com/product-8000-book.webp"
         type="product"
         price="25.00"
         rating=""

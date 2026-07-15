@@ -194,7 +194,7 @@ const Product8000 = () => {
         title="8,000 Palabras en Inglés PDF Nivel Avanzado"
         description="8,000 palabras en inglés con pronunciación en español y fonética UK/USA. Nivel A1 a C1, sin diccionarios. PDF descargable al instante."
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
-        image="https://ilinguerelax.com/product-8000.png"
+        image="https://ilinguerelax.com/product-8000.webp"
         type="product"
         price="20"
         originalPrice="54"
@@ -622,7 +622,7 @@ const Product8000 = () => {
           <div className="flex flex-col items-center gap-6 max-w-4xl mx-auto">
             {/* Bundle Image */}
             <img
-              src="/images/promo-8000-bundle.png"
+              src="/images/promo-8000-bundle.webp"
               alt="Inglés Relax 8,000 Palabras - Libro Físico + Digital Gratis"
               className="w-full max-w-md rounded-2xl shadow-2xl" />
             

@@ -36,7 +36,7 @@ import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
 import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
-import previewSpanishPhrases from "@/assets/preview-spanish-phrases.png";
+import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
@@ -226,7 +226,7 @@ const ProductSpanish5000Digital = () => {
         title={pricing.name ?? "5,000 Spanish Words PDF · English Pronunciation"}
         description={pricing.description ?? "Digital PDF with 5,000 essential Spanish words and English pronunciation. 3 free bonuses. Launch price $22 (was $35). Instant download."}
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
-        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/product-spanish-5000.png"}
+        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/product-spanish-5000.webp"}
         type="product"
         price={String(currentPrice)}
         originalPrice={String(ORIGINAL_PRICE)}

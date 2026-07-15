@@ -1,5 +1,5 @@
 import { BadgeCheck, BookOpen, GraduationCap, Globe, Sparkles } from "lucide-react";
-import authorPhoto from "@/assets/loox-review-7.png";
+import authorPhoto from "@/assets/loox-review-7.webp";
 import readingPhoto from "@/assets/crady-reading-spanish-relax.webp";
 
 export const MeetTheAuthor = () => {

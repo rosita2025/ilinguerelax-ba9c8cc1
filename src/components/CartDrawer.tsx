@@ -15,7 +15,7 @@ import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { useI18n } from "@/i18n/I18nContext";
 import { detectCurrency, formatPrice as formatPriceIntl } from "@/i18n";
-import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.png";
+import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.webp";
 import { BLOCKED_VARIANTS, isBlockedVariant } from "@/config/blockedVariants";
 
 // Hotmart checkout URL mapping for digital products

@@ -15,16 +15,16 @@ import reviewSpanish3 from "@/assets/review-spanish-3.jpg";
 import reviewSpanish4 from "@/assets/review-spanish-4.jpg";
 
 // Import English 8000 testimonial images
-import reviewEnglishIpad from "@/assets/review-english-ipad.png";
+import reviewEnglishIpad from "@/assets/review-english-ipad.webp";
 import reviewEnglishFrases from "@/assets/review-english-frases.jpg";
 import reviewBookCover from "@/assets/review-book-cover.jpg";
 import reviewPersonHolding from "@/assets/review-person-holding.jpg";
 import reviewSymptoms from "@/assets/review-symptoms.jpg";
 
 // Import real book review photos
-import reviewBookReal1 from "@/assets/review-book-real-1.jpg";
-import reviewBookReal2 from "@/assets/review-book-real-2.jpg";
-import reviewBookReal3 from "@/assets/review-book-real-3.jpg";
+import reviewBookReal1 from "@/assets/review-book-real-1.webp";
+import reviewBookReal2 from "@/assets/review-book-real-2.webp";
+import reviewBookReal3 from "@/assets/review-book-real-3.webp";
 
 // Real customer testimonial photos (WhatsApp + Hotmart screenshots)
 import clienteReal1 from "@/assets/cliente-real-1.webp";

@@ -14,7 +14,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
-const productImage = "/images/product-spanish-1000-verbs.png";
+const productImage = "/images/product-spanish-1000-verbs.webp";
 const ORIGINAL_PRICE = 54;
 
 const features = [
@@ -68,7 +68,7 @@ const ProductSpanish1000Verbs = () => {
         title={pricing.name ?? "1,000 Spanish Verbs PDF · English Pronunciation"}
         description={pricing.description ?? "Master 1,000 essential Spanish verbs in past, present and future with English pronunciation. Instant PDF download for English speakers."}
         canonicalUrl="https://ilinguerelax.com/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation"
-        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/images/product-spanish-1000-verbs.png"}
+        image={pricing.coverImageUrl ?? "https://ilinguerelax.com/images/product-spanish-1000-verbs.webp"}
         type="product"
         price={currentPrice.toFixed(2)}
         originalPrice="54"

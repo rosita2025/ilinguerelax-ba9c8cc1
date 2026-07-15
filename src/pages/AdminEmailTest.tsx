@@ -338,7 +338,7 @@ const AdminEmailTest = () => {
   const renderProducts = (r: OrderRow) => {
     if (!r.productLines.length) return <span className="text-muted-foreground">{r.products || "—"}</span>;
     return (
-      <div className="space-y-2 min-w-[320px]">
+      <div className="space-y-2 md:min-w-[320px]">
         {r.productLines.map((p, index) => (
           <div key={`${r.id}-${p.sku || p.name}-${index}`} className="rounded-md border bg-card p-2">
             <div className="flex items-start gap-2">

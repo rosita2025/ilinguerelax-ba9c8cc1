@@ -8,6 +8,7 @@ import React, { Suspense, useEffect } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";
+import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";

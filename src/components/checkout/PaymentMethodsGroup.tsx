@@ -558,13 +558,17 @@ export function PaymentMethodsGroup() {
         </div>
       )}
 
-      {!isFree && !isInvalidZero && methods.map((m) => {
-        const isSelected = valid && selected === m.id;
+      {!isFree && !isInvalidZero && methods.map((m, idx) => {
+        const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
+        const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
+        // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
+        const rowKey = `${m.id}-${m.title}`;
+        const isSelected = valid && selected === m.id && (m.id !== "card" || selectedCardRow === rowKey);
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
         return (
           <div
-            key={`${m.id}-${m.title}`}
+            key={rowKey}
             className={cn(
               "rounded-xl border overflow-hidden transition-colors",
               isSelected
@@ -574,7 +578,7 @@ export function PaymentMethodsGroup() {
           >
             <button
               type="button"
-              onClick={() => handleSelect(m.id)}
+              onClick={() => { setSelectedCardRow(rowKey); handleSelect(m.id); }}
               disabled={isLoading}
               aria-disabled={!valid}
               className={cn(
@@ -602,12 +606,21 @@ export function PaymentMethodsGroup() {
                     </span>
                   )}
                 </div>
-                {m.id === "card" && (m.title === (isPeru ? t.cardTitlePeru : t.cardTitleGlobal)) ? (
+                {isPrimaryCard ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <LogoBadge src={visaLogo} alt="Visa" />
                     <LogoBadge src={mastercardLogo} alt="Mastercard" />
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
+                  </div>
+                ) : m.id === "card" && m.title === "Cash App Pay" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Cash App" bg="#00D64F" color="#000000" />
+                  </div>
+                ) : m.id === "card" && m.title === "US Bank (ACH)" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
+                    <BankBadge label="US Bank" bg="#eeeeee" color="#0A2540" />
                   </div>
                 ) : null}
                 {m.id === "card" ? null : m.id === "transfer" ? (

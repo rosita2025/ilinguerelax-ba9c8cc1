@@ -71,6 +71,24 @@ const AdminHotmartAudit = () => {
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
 
+  type BrevoLookup = { loading: boolean; data?: any; error?: string };
+  const [brevoLookups, setBrevoLookups] = useState<Record<string, BrevoLookup>>({});
+
+  const lookupBrevo = useCallback(async (email: string) => {
+    setBrevoLookups((s) => ({ ...s, [email]: { loading: true } }));
+    try {
+      const { data, error } = await adminInvoke<any>(
+        "brevo-lookup-contact",
+        { body: { adminKey, email } },
+      );
+      if (error) throw error;
+      setBrevoLookups((s) => ({ ...s, [email]: { loading: false, data } }));
+    } catch (e) {
+      setBrevoLookups((s) => ({ ...s, [email]: { loading: false, error: (e as Error).message } }));
+    }
+  }, [adminKey]);
+
+
   const load = useCallback(async () => {
     setLoading(true);
     try {

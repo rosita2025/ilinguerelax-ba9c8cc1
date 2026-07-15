@@ -313,7 +313,7 @@ export default function Checkout() {
     if (!catalogItem) return;
     const hasMain = items.some((i) => i.id === catalogItem.id);
     if (!hasMain) {
-      addItem({ ...catalogItem, quantity: 1 });
+      addItem({ ...catalogItem, quantity: 1 }, { silent: true });
       toast.info(
         language === "en"
           ? `“${catalogItem.name}” was re-added to your cart. This product cannot be removed here.`

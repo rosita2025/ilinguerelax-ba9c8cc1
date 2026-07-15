@@ -219,6 +219,9 @@ export default function AdminCheckoutMethods() {
     if (error || data?.error) return toast.error(error?.message || data?.error);
     toast.success(`✓ ${data.regions?.length || 0} regiones sincronizadas (${data.upserted} métodos)`);
     load();
+  }
+
+
 
   async function quickAdd(region_code: string, q: typeof QUICK_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);

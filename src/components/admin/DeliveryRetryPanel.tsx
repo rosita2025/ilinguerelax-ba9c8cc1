@@ -136,13 +136,14 @@ export default function DeliveryRetryPanel() {
               onChange={(e) => setDraft({ ...draft, scan_window_hours: Number(e.target.value) })}
             />
           </label>
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 col-span-2 md:col-span-1">
             <label className="flex items-center gap-2 text-sm">
               <Switch checked={draft.enabled} onCheckedChange={(v) => setDraft({ ...draft, enabled: v })} />
               <span>Activo</span>
             </label>
             <Button size="sm" onClick={saveConfig} disabled={loading}>Guardar</Button>
           </div>
+
         </div>
       )}
 

@@ -16,7 +16,9 @@ interface Args {
   orderNumber?: string;
   provider?: string;
   origin?: "hotmart" | "tienda"; // canal real de venta para separar en Brevo
-
+  hotmartProductId?: string;    // Hotmart numeric product id
+  hotmartProductCode?: string;  // Hotmart ucode / product code
+  tiendaSku?: string;           // SKU interno de la tienda propia
 }
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
@@ -65,7 +67,10 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   if (a.orderNumber) attributes.LAST_ORDER = a.orderNumber;
   if (typeof a.amount === "number") attributes.LAST_ORDER_AMOUNT = a.amount;
   if (a.currency) attributes.LAST_ORDER_CURRENCY = a.currency.toUpperCase();
-  if (a.productName) attributes.LAST_PRODUCT = a.productName;
+  if (a.productName) {
+    attributes.LAST_PRODUCT = a.productName;
+    attributes.LAST_PRODUCT_NAME = a.productName;
+  }
   if (a.skus && a.skus.length) attributes.LAST_SKUS = a.skus.join(", ");
   if (a.provider) attributes.LAST_PROVIDER = a.provider;
   // ORIGEN separa claramente Hotmart vs Tienda propia (Stripe/PayPal/MP/Yape…)
@@ -73,7 +78,23 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   attributes.ORIGEN = origin;
   attributes.LAST_ORIGIN = origin;
 
+  // IDs exactos por canal para saber qué compró en cada plataforma.
+  if (a.hotmartProductId) attributes.HOTMART_PRODUCT_ID = a.hotmartProductId;
+  if (a.hotmartProductCode) attributes.HOTMART_PRODUCT_CODE = a.hotmartProductCode;
+  const tiendaSku = a.tiendaSku ?? (origin === "tienda" && a.skus?.length ? a.skus[0] : undefined);
+  if (tiendaSku) attributes.TIENDA_SKU = tiendaSku;
+  // NOTA legible tipo "Hotmart · 5,000 palabras · id=123456 · code=abcd · trx=HP123"
+  const noteParts: string[] = [
+    origin === "hotmart" ? "Hotmart" : "Tienda",
+    a.productName || "",
+    a.hotmartProductId ? `id=${a.hotmartProductId}` : "",
+    a.hotmartProductCode ? `code=${a.hotmartProductCode}` : "",
+    tiendaSku ? `sku=${tiendaSku}` : "",
+    a.orderNumber ? `trx=${a.orderNumber}` : "",
+  ].filter(Boolean);
+  attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");
   attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
+
 
   const listIdsRaw = Deno.env.get("BREVO_CUSTOMERS_LIST_ID");
   const listIds = listIdsRaw

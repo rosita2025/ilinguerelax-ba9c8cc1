@@ -31,11 +31,11 @@ export interface CheckoutMethodsConfig {
 
 const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape"];
 
-const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
+const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
   stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: true, transfer: true, cash: true, yape: true,
 };
 
-const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
+const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
   stripe: true, stripeAch: true, stripeCashApp: true, stripeKlarna: true, paypal: true, transfer: false, cash: false, yape: false,
 };
 

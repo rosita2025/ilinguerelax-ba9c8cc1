@@ -85,6 +85,7 @@ export function PaymentMethodsGroup() {
 
 
   const [selected, setSelected] = useState<Method | null>(null);
+  const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);

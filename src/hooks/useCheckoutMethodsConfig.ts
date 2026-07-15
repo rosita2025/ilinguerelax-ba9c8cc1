@@ -106,8 +106,4 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
 
   return state;
 }
-    return () => { alive = false; };
-  }, [country]);
 
-  return state;
-}

@@ -458,9 +458,14 @@ export function PaymentMethodsGroup() {
     return i === -1 ? 99 : i;
   };
   const orderedByAdmin = [...filteredByAdmin].sort((a, b) => orderIndex(a.id) - orderIndex(b.id));
+  // Si el admin configuró explícitamente la región (methodsConfig.loaded con
+  // regionCode), respetamos exactamente lo que habilitó, sin forzar el filtro
+  // legacy card+paypal fuera de Perú. Perú siempre oculta paypal directo.
   const methods = isPeru
     ? orderedByAdmin.filter((m) => m.id !== "paypal")
-    : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
+    : methodsConfig.loaded && methodsConfig.regionCode
+      ? orderedByAdmin
+      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
 
 
 

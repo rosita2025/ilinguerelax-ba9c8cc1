@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

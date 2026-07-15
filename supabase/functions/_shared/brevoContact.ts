@@ -62,9 +62,22 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   // Brevo uses NOMBRE/APELLIDOS (aliased to firstname/lastname) and COUNTRY_CODE in this account.
   if (first) attributes.NOMBRE = first;
   if (last) attributes.APELLIDOS = last;
+  const rawPhoneTrim = (a.phone || "").trim();
   if (phone) {
     attributes.SMS = phone;
     attributes.WHATSAPP = phone;
+    attributes.TELEFONO_PROVISTO = "si";
+    attributes.PHONE_PROVIDED = true;
+  } else {
+    attributes.TELEFONO_PROVISTO = "no";
+    attributes.PHONE_PROVIDED = false;
+    if (rawPhoneTrim) {
+      // Hotmart mandó algo pero no es E.164 válido → dejar rastro sin romper Brevo
+      attributes.PHONE_RAW = rawPhoneTrim.slice(0, 32);
+      attributes.PHONE_STATUS = "invalid_format";
+    } else {
+      attributes.PHONE_STATUS = "missing";
+    }
   }
   if (a.country) attributes.COUNTRY_CODE = a.country.toUpperCase();
   if (a.orderNumber) attributes.LAST_ORDER = a.orderNumber;

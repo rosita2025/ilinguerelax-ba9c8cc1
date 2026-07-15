@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, Shield, Mail } from "lucide-react";
+import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
 
@@ -9,7 +9,6 @@ const tabs = [
   { to: "/admin/reviews", label: "Reseñas", icon: Star },
   
   { to: "/admin/seo", label: "SEO", icon: Search },
-  { to: "/admin/bots", label: "Bots", icon: Shield },
 ];
 
 export const AdminNav = () => {

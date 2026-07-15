@@ -13,7 +13,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
-import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap, ArrowUp, ArrowDown, Save, Loader2 } from "lucide-react";
+import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, ArrowUp, ArrowDown, Save, Loader2 } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -77,94 +77,23 @@ const COUNTRY_LIST: { code: string; name: string; flag: string }[] = [
   { code: "ZA", name: "Sudáfrica", flag: "🇿🇦" },
 ];
 
-// Métodos válidos por país (mismo mapa que usa Auto Stripe en el backend).
-const STRIPE_LOCAL_BY_COUNTRY: Record<string, string[]> = {
-  US: ["stripe_cashapp", "stripe_us_bank_account", "stripe_affirm", "stripe_klarna", "stripe_afterpay_clearpay", "stripe_amazon_pay", "stripe_zip", "stripe_paypal"],
-  CA: ["stripe_acss_debit", "stripe_klarna", "stripe_afterpay_clearpay", "stripe_paypal"],
-  MX: ["stripe_oxxo", "stripe_paypal"],
-  BR: ["stripe_boleto", "stripe_pix", "stripe_paypal"],
-  PE: ["stripe_paypal"],
-  DE: ["stripe_sepa_debit", "stripe_giropay", "stripe_sofort", "stripe_klarna", "stripe_amazon_pay", "stripe_paypal"],
-  AT: ["stripe_sepa_debit", "stripe_eps", "stripe_sofort", "stripe_klarna", "stripe_paypal"],
-  NL: ["stripe_sepa_debit", "stripe_ideal", "stripe_klarna", "stripe_paypal"],
-  BE: ["stripe_sepa_debit", "stripe_bancontact", "stripe_klarna", "stripe_paypal"],
-  FR: ["stripe_sepa_debit", "stripe_klarna", "stripe_revolut_pay", "stripe_paypal"],
-  ES: ["stripe_sepa_debit", "stripe_klarna", "stripe_revolut_pay", "stripe_paypal"],
-  IT: ["stripe_sepa_debit", "stripe_klarna", "stripe_revolut_pay", "stripe_satispay", "stripe_paypal"],
-  PT: ["stripe_sepa_debit", "stripe_multibanco", "stripe_mb_way", "stripe_paypal"],
-  IE: ["stripe_sepa_debit", "stripe_klarna", "stripe_paypal"],
-  FI: ["stripe_sepa_debit", "stripe_klarna", "stripe_mobilepay", "stripe_paypal"],
-  PL: ["stripe_p24", "stripe_blik", "stripe_klarna", "stripe_paypal"],
-  GB: ["stripe_bacs_debit", "stripe_klarna", "stripe_afterpay_clearpay", "stripe_amazon_pay", "stripe_revolut_pay", "stripe_paypal"],
-  CH: ["stripe_twint", "stripe_klarna", "stripe_revolut_pay", "stripe_paypal"],
-  SE: ["stripe_klarna", "stripe_paypal"],
-  NO: ["stripe_klarna", "stripe_paypal"],
-  DK: ["stripe_mobilepay", "stripe_klarna", "stripe_paypal"],
-  AU: ["stripe_au_becs_debit", "stripe_afterpay_clearpay", "stripe_zip", "stripe_paypal", "stripe_amazon_pay"],
-  NZ: ["stripe_afterpay_clearpay", "stripe_paypal"],
-  JP: ["stripe_konbini", "stripe_paypal"],
-  KR: ["stripe_kakao_pay", "stripe_naver_pay", "stripe_payco", "stripe_samsung_pay", "stripe_paypal"],
-  SG: ["stripe_paynow", "stripe_grabpay", "stripe_alipay", "stripe_paypal"],
-  MY: ["stripe_fpx", "stripe_grabpay", "stripe_paypal"],
-  HK: ["stripe_alipay", "stripe_wechat_pay", "stripe_paypal"],
-  TH: ["stripe_promptpay", "stripe_paypal"],
-  IN: ["stripe_paypal"],
-};
-
-const QUICK_METHODS: { key: string; label: string; note: string; icon: string }[] = [
-  { key: "stripe_card", label: "Tarjeta débito/crédito", note: "Visa · Mastercard · Amex · Apple Pay · Google Pay", icon: "CreditCard" },
-  { key: "stripe_link", label: "Link (Stripe)", note: "1-click checkout", icon: "Wallet" },
-  { key: "stripe_paypal", label: "PayPal (vía Stripe)", note: "Cuenta PayPal", icon: "Wallet" },
-  { key: "stripe_cashapp", label: "Cash App Pay", note: "USA", icon: "Smartphone" },
-  { key: "stripe_us_bank_account", label: "Transferencia ACH", note: "USA", icon: "Building2" },
-  { key: "stripe_affirm", label: "Affirm", note: "USA · a plazos", icon: "CreditCard" },
-  { key: "stripe_klarna", label: "Klarna", note: "Pago a plazos", icon: "CreditCard" },
-  { key: "stripe_afterpay_clearpay", label: "Afterpay / Clearpay", note: "AU · NZ · UK · US", icon: "CreditCard" },
-  { key: "stripe_amazon_pay", label: "Amazon Pay", note: "Cuenta Amazon", icon: "Wallet" },
-  { key: "stripe_revolut_pay", label: "Revolut Pay", note: "UE / UK", icon: "Wallet" },
-  { key: "stripe_zip", label: "Zip", note: "AU · US", icon: "CreditCard" },
-  { key: "stripe_acss_debit", label: "Débito bancario CA", note: "Canadá", icon: "Banknote" },
-  { key: "stripe_sepa_debit", label: "SEPA Débito", note: "Zona euro", icon: "Building2" },
-  { key: "stripe_ideal", label: "iDEAL", note: "Países Bajos", icon: "Banknote" },
-  { key: "stripe_bancontact", label: "Bancontact", note: "Bélgica", icon: "Banknote" },
-  { key: "stripe_giropay", label: "Giropay", note: "Alemania", icon: "Building2" },
-  { key: "stripe_sofort", label: "Sofort", note: "DE · AT", icon: "Building2" },
-  { key: "stripe_eps", label: "EPS", note: "Austria", icon: "Building2" },
-  { key: "stripe_p24", label: "Przelewy24", note: "Polonia", icon: "Building2" },
-  { key: "stripe_blik", label: "BLIK", note: "Polonia", icon: "Smartphone" },
-  { key: "stripe_bacs_debit", label: "Bacs Débito", note: "Reino Unido", icon: "Banknote" },
-  { key: "stripe_multibanco", label: "Multibanco", note: "Portugal", icon: "Banknote" },
-  { key: "stripe_mb_way", label: "MB WAY", note: "Portugal", icon: "Smartphone" },
-  { key: "stripe_mobilepay", label: "MobilePay", note: "DK · FI", icon: "Smartphone" },
-  { key: "stripe_twint", label: "TWINT", note: "Suiza", icon: "Smartphone" },
-  { key: "stripe_satispay", label: "Satispay", note: "Italia", icon: "Smartphone" },
-  
-  { key: "stripe_oxxo", label: "OXXO", note: "México · efectivo", icon: "Banknote" },
-  { key: "stripe_boleto", label: "Boleto", note: "Brasil", icon: "Banknote" },
-  { key: "stripe_pix", label: "Pix", note: "Brasil", icon: "Smartphone" },
-  { key: "stripe_au_becs_debit", label: "BECS Débito AU", note: "Australia", icon: "Banknote" },
-  { key: "stripe_konbini", label: "Konbini", note: "Japón", icon: "Banknote" },
-  { key: "stripe_paynow", label: "PayNow", note: "Singapur", icon: "Smartphone" },
-  { key: "stripe_promptpay", label: "PromptPay", note: "Tailandia", icon: "Smartphone" },
-  { key: "stripe_fpx", label: "FPX", note: "Malasia", icon: "Building2" },
-  { key: "stripe_grabpay", label: "GrabPay", note: "SG · MY", icon: "Smartphone" },
-  { key: "stripe_alipay", label: "Alipay", note: "Asia", icon: "Smartphone" },
-  { key: "stripe_wechat_pay", label: "WeChat Pay", note: "China", icon: "Smartphone" },
-  { key: "stripe_kakao_pay", label: "Kakao Pay", note: "Corea", icon: "Smartphone" },
-  { key: "stripe_naver_pay", label: "Naver Pay", note: "Corea", icon: "Smartphone" },
-  { key: "paypal", label: "PayPal", note: "Global", icon: "Wallet" },
+const CHECKOUT_METHODS: { key: string; label: string; note: string; icon: string; regions: ("PE" | "GLOBAL")[] }[] = [
+  { key: "stripe_card", label: "Stripe", note: "Tarjeta, wallets y métodos locales dentro de Stripe", icon: "CreditCard", regions: ["PE", "GLOBAL"] },
+  { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "GLOBAL"] },
+  { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
+  { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
+  { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },
 ];
 
-// Devuelve solo los método_key válidos para los países ISO de la región.
-// Tarjeta, Link y PayPal siempre están disponibles.
-function methodsForRegion(countryCodes: string[]): Set<string> {
-  const out = new Set<string>(["stripe_card", "stripe_link", "paypal"]);
-  for (const raw of countryCodes) {
-    const cc = String(raw || "").toUpperCase();
-    if (!cc || cc === "*") continue;
-    (STRIPE_LOCAL_BY_COUNTRY[cc] || []).forEach(k => out.add(k));
-  }
-  return out;
+const CHECKOUT_METHOD_KEYS = new Set(CHECKOUT_METHODS.map(m => m.key));
+
+function isCheckoutMethod(m: Method) {
+  return CHECKOUT_METHOD_KEYS.has(m.method_key);
+}
+
+function availableMethodsForRegion(region: Region) {
+  const isPeru = region.code === "PE" || region.country_codes.includes("PE");
+  return CHECKOUT_METHODS.filter(m => m.regions.includes(isPeru ? "PE" : "GLOBAL"));
 }
 
 
@@ -174,11 +103,6 @@ const emptyRegion = (): Region => ({
   code: "", name: "", flag: "🌐", currency: "USD",
   gateway: "Stripe", description: "", country_codes: [], enabled: true, sort_order: 99,
 });
-const emptyMethod = (region_code: string): Method => ({
-  id: "", region_code, method_key: "", label: "",
-  note: "", icon: "CreditCard", enabled: true, sort_order: 99,
-});
-
 export default function AdminCheckoutMethods() {
   const [regions, setRegions] = useState<Region[]>([]);
   const [methods, setMethods] = useState<Method[]>([]);
@@ -194,7 +118,7 @@ export default function AdminCheckoutMethods() {
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
     if (error || data?.error) { toast.error(error?.message || data?.error); setLoading(false); return; }
     setRegions(data.regions || []);
-    setMethods(data.methods || []);
+    setMethods((data.methods || []).filter(isCheckoutMethod));
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -221,6 +145,7 @@ export default function AdminCheckoutMethods() {
       if (error || data?.error) throw new Error(error?.message || data?.error);
       toast.success("✅ Región guardada");
       if (opts.fromDialog) setRegionEdit(null);
+      invalidateCheckoutMethodsCache();
       await load();
     } catch (e) {
       toast.error((e as Error).message || "Error al guardar");
@@ -239,20 +164,36 @@ export default function AdminCheckoutMethods() {
     toast.success("Eliminada"); load();
   }
   async function saveMethod(m: Method) {
-    if (!m.method_key.trim()) return toast.error("Clave requerida");
-    if (!/^[a-z0-9_]{1,48}$/.test(m.method_key)) return toast.error("Clave inválida (a-z, 0-9, _)");
-    if (!m.label.trim()) return toast.error("Etiqueta requerida");
+    const method_key = m.method_key.trim().toLowerCase();
+    const label = m.label.trim();
+    if (!method_key) return toast.error("Tipo de método requerido");
+    if (!CHECKOUT_METHOD_KEYS.has(method_key)) return toast.error("Ese método no existe en el checkout público");
+    if (!label) return toast.error("Etiqueta requerida");
+    const payload = { ...m, method_key, label, sort_order: Number(m.sort_order || 0) };
     setSavingDialog(true);
+    setMethods(prev => {
+      const idx = prev.findIndex(x => x.id && x.id === payload.id);
+      if (idx >= 0) {
+        const next = prev.slice(); next[idx] = payload; return next;
+      }
+      const byKey = prev.findIndex(x => x.region_code === payload.region_code && x.method_key === payload.method_key);
+      if (byKey >= 0) {
+        const next = prev.slice(); next[byKey] = { ...next[byKey], ...payload, id: next[byKey].id }; return next;
+      }
+      return [...prev, payload];
+    });
     try {
       const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-        body: { action: "save_method", method: m },
+        body: { action: "save_method", method: payload },
       });
       if (error || data?.error) throw new Error(error?.message || data?.error);
       toast.success("✅ Método guardado");
       setMethodEdit(null);
+      invalidateCheckoutMethodsCache();
       await load();
     } catch (e) {
       toast.error((e as Error).message || "Error al guardar");
+      await load();
     } finally {
       setSavingDialog(false);
     }
@@ -263,40 +204,20 @@ export default function AdminCheckoutMethods() {
       body: { action: "delete_method", id },
     });
     if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success("Eliminado"); load();
+    toast.success("Eliminado"); invalidateCheckoutMethodsCache(); load();
   }
   async function toggleMethod(m: Method) {
     setMethods(prev => prev.map(x => x.id === m.id ? { ...x, enabled: !m.enabled } : x));
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
       body: { action: "toggle_method", id: m.id, enabled: !m.enabled },
     });
-    if (error || data?.error) { toast.error(error?.message || data?.error); load(); }
-  }
-  async function autofillStripe(code: string) {
-    if (!confirm(`Auto-rellenar métodos Stripe disponibles según los países de ${code}?\nNo borra métodos existentes; solo añade o actualiza los de Stripe.`)) return;
-    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "autofill_stripe", code },
-    });
-    if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success(`Añadidos ${data.added} métodos Stripe`);
-    load();
-  }
-
-  async function syncAllStripe() {
-    if (!confirm("Sincronizar TODAS las regiones Stripe con la matriz oficial de métodos por país?\nRefresca Klarna/Affirm/Link/SEPA/Bancontact/Pix/etc. según los países ISO. No borra métodos manuales.")) return;
-    const t = toast.loading("Sincronizando con Stripe…");
-    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "sync_all_stripe" },
-    });
-    toast.dismiss(t);
-    if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success(`✓ ${data.regions?.length || 0} regiones sincronizadas (${data.upserted} métodos)`);
-    load();
+    if (error || data?.error) { toast.error(error?.message || data?.error); load(); return; }
+    invalidateCheckoutMethodsCache();
   }
 
 
 
-  async function quickAdd(region_code: string, q: typeof QUICK_METHODS[number]) {
+  async function quickAdd(region_code: string, q: typeof CHECKOUT_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
     if (existing) return toast.info(`${q.label} ya está agregado`);
     const m: Method = {
@@ -308,7 +229,7 @@ export default function AdminCheckoutMethods() {
       body: { action: "save_method", method: m },
     });
     if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success(`+ ${q.label}`); load();
+    toast.success(`+ ${q.label}`); invalidateCheckoutMethodsCache(); load();
   }
 
   async function reorderMethod(m: Method, dir: -1 | 1) {
@@ -365,9 +286,6 @@ export default function AdminCheckoutMethods() {
               <a href={`/checkout/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
             </Button>
             <div className="ml-auto flex gap-2">
-              <Button size="sm" variant="outline" onClick={syncAllStripe}>
-                <Zap className="w-4 h-4 mr-1" /> Sincronizar Stripe
-              </Button>
               <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>
                 <Plus className="w-4 h-4 mr-1" /> Nueva región
               </Button>
@@ -451,6 +369,10 @@ export default function AdminCheckoutMethods() {
                     );
                   })()}
 
+                  <div className="mb-3 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[11px] text-muted-foreground">
+                    Stripe aparece como un solo botón. Cash App, ACH, Link, Klarna y wallets se manejan dentro del formulario seguro de Stripe, no como botones separados.
+                  </div>
+
 
                   <div className="space-y-1.5">
                     {rms.map((m, idx) => {
@@ -498,13 +420,11 @@ export default function AdminCheckoutMethods() {
                       );
                     })}
                     {(() => {
-                      const valid = methodsForRegion(r.country_codes);
-                      const available = QUICK_METHODS.filter(q => valid.has(q.key));
-                      const countryList = r.country_codes.filter(c => c && c !== "*").join(", ") || "—";
+                      const available = availableMethodsForRegion(r);
                       return (
                         <div className="mt-3 pt-3 border-t">
                           <p className="text-[11px] font-medium text-muted-foreground mb-1.5">
-                            Métodos Stripe disponibles en <span className="text-foreground">{countryList}</span>:
+                            Métodos reales del checkout:
                           </p>
                           {available.length === 0 ? (
                             <p className="text-[11px] text-muted-foreground italic">
@@ -544,8 +464,7 @@ export default function AdminCheckoutMethods() {
 
           <Card className="p-4 bg-muted/40 text-xs text-muted-foreground space-y-1">
             <p><strong>Detección:</strong> IP del comprador vía ipapi.co → se busca el código de país en <code>country_codes</code> de cada región. La región con código <code>*</code> es el fallback global.</p>
-            <p><strong>Nota técnica:</strong> desactivar un método aquí lo oculta de la UI del checkout. Para Stripe, los métodos habilitados se pasan como <code>payment_method_types</code> a la sesión.</p>
-            <p><strong>⚡ Auto Stripe:</strong> según los países ISO de la región, añade automáticamente los métodos que Stripe soporta ahí: tarjeta + Link + wallets siempre; y locales por país (OXXO en MX, Cash App + ACH en US, SEPA en zona euro, iDEAL en NL, Bancontact en BE, Boleto/Pix en BR, Klarna/Affirm donde aplique, etc.). No borra los métodos manuales que ya tengas.</p>
+            <p><strong>Métodos:</strong> esta pantalla controla solo las filas reales del checkout: Stripe, PayPal, Mercado Pago y Yape/Plin. Los métodos internos de Stripe no aparecen como botones separados.</p>
           </Card>
         </div>
       </main>
@@ -582,11 +501,11 @@ export default function AdminCheckoutMethods() {
                     value={regionEdit.gateway || "Stripe"}
                     onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })}
                   >
-                    <option value="Stripe">Stripe (tarjeta + locales)</option>
+                    <option value="Stripe">Stripe</option>
                     <option value="PayPal">PayPal</option>
                     <option value="Stripe+PayPal">Stripe + PayPal</option>
                     <option value="MercadoPago">Mercado Pago</option>
-                    <option value="Manual">Manual (Yape/Plin/otros)</option>
+                    <option value="Manual">Manual (Yape/Plin)</option>
                   </select>
                 </div>
               </div>
@@ -658,10 +577,26 @@ export default function AdminCheckoutMethods() {
                   <Input value={methodEdit.region_code} disabled />
                 </div>
                 <div>
-                  <Label>Clave (a-z, _)</Label>
-                  <Input value={methodEdit.method_key}
-                    onChange={(e) => setMethodEdit({ ...methodEdit, method_key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "") })}
-                    placeholder="stripe_oxxo" />
+                  <Label>Tipo real</Label>
+                  <select
+                    className="w-full border rounded h-10 px-2 bg-background"
+                    value={methodEdit.method_key}
+                    onChange={(e) => {
+                      const q = CHECKOUT_METHODS.find(x => x.key === e.target.value);
+                      setMethodEdit({
+                        ...methodEdit,
+                        method_key: e.target.value,
+                        label: methodEdit.label || q?.label || "",
+                        note: methodEdit.note || q?.note || "",
+                        icon: q?.icon || methodEdit.icon,
+                      });
+                    }}
+                  >
+                    <option value="">Seleccionar…</option>
+                    {availableMethodsForRegion(regions.find(r => r.code === methodEdit.region_code) || emptyRegion()).map(q => (
+                      <option key={q.key} value={q.key}>{q.label}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>

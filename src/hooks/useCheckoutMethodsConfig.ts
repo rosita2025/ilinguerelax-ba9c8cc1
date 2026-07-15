@@ -62,11 +62,14 @@ async function loadAll() {
 
 function keyToFamily(key: string): FamilyKey | null {
   const k = key.toLowerCase();
-  if (k.startsWith("stripe_")) return "stripe";
-  if (k === "paypal" || k.includes("paypal")) return "paypal";
-  if (k.includes("yape") || k.includes("plin")) return "yape";
-  if (k.includes("transfer") || k.includes("ach") || k.includes("bank")) return "transfer";
-  if (k.includes("cash") || k.includes("efectivo") || k.includes("oxxo") || k.includes("boleto") || k.includes("konbini")) return "cash";
+  // Solo cuentan los métodos reales que el checkout renderiza como filas.
+  // Submétodos internos de Stripe (cashapp, ach, klarna, link, etc.) no deben
+  // encender Stripe si el admin apagó la fila principal `stripe_card`.
+  if (k === "stripe_card") return "stripe";
+  if (k === "paypal") return "paypal";
+  if (k === "yape_plin") return "yape";
+  if (k === "mercadopago_transfer") return "transfer";
+  if (k === "mercadopago_cash") return "cash";
   return null;
 }
 

@@ -77,9 +77,11 @@ const COUNTRY_LIST: { code: string; name: string; flag: string }[] = [
   { code: "ZA", name: "Sudáfrica", flag: "🇿🇦" },
 ];
 
-const CHECKOUT_METHODS: { key: string; label: string; note: string; icon: string; regions: ("PE" | "GLOBAL")[] }[] = [
-  { key: "stripe_card", label: "Stripe", note: "Tarjeta, wallets y métodos locales dentro de Stripe", icon: "CreditCard", regions: ["PE", "GLOBAL"] },
-  { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "GLOBAL"] },
+const CHECKOUT_METHODS: { key: string; label: string; note: string; icon: string; regions: ("PE" | "US" | "GLOBAL")[] }[] = [
+  { key: "stripe_card", label: "Stripe — tarjeta / wallets", note: "Tarjeta, Apple Pay, Google Pay y Link dentro de Stripe", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
+  { key: "stripe_us_bank_account", label: "Stripe — ACH transferencia", note: "Transferencia bancaria de USA dentro de Stripe", icon: "Building2", regions: ["US"] },
+  { key: "stripe_cashapp", label: "Stripe — Cash App Pay", note: "Cash App para compradores de Estados Unidos dentro de Stripe", icon: "Smartphone", regions: ["US"] },
+  { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },
@@ -93,7 +95,8 @@ function isCheckoutMethod(m: Method) {
 
 function availableMethodsForRegion(region: Region) {
   const isPeru = region.code === "PE" || region.country_codes.includes("PE");
-  return CHECKOUT_METHODS.filter(m => m.regions.includes(isPeru ? "PE" : "GLOBAL"));
+  const isUs = region.code === "US" || region.country_codes.includes("US");
+  return CHECKOUT_METHODS.filter(m => m.regions.includes(isPeru ? "PE" : isUs ? "US" : "GLOBAL"));
 }
 
 
@@ -279,13 +282,13 @@ export default function AdminCheckoutMethods() {
           <Card className="p-4 border-primary/30 bg-primary/5 flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold mr-2">Vista previa checkout:</span>
             <Button asChild size="sm">
-              <a href={`/checkout/${PREVIEW_SKU}?country=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
+              <a href={`/checkouts/${PREVIEW_SKU}?country=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
             </Button>
             <Button asChild size="sm" variant="secondary">
-              <a href={`/checkout/${PREVIEW_SKU}?country=US`} target="_blank" rel="noreferrer">🇺🇸 USA (Stripe)</a>
+              <a href={`/checkouts/${PREVIEW_SKU}?country=US`} target="_blank" rel="noreferrer">🇺🇸 USA (Stripe)</a>
             </Button>
             <Button asChild size="sm" variant="secondary">
-              <a href={`/checkout/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
+              <a href={`/checkouts/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
             </Button>
             <div className="ml-auto flex gap-2">
               <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>
@@ -347,7 +350,7 @@ export default function AdminCheckoutMethods() {
                         >
                           {previewCountry ? (
                             <a
-                              href={`/checkout/${PREVIEW_SKU}?country=${previewCountry}&preview_region=${r.code}`}
+                              href={`/checkouts/${PREVIEW_SKU}?country=${previewCountry}&preview_region=${r.code}`}
                               target="_blank"
                               rel="noreferrer"
                             >
@@ -372,7 +375,7 @@ export default function AdminCheckoutMethods() {
                   })()}
 
                   <div className="mb-3 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[11px] text-muted-foreground">
-                    Stripe aparece como un solo botón. Cash App, ACH, Link, Klarna y wallets se manejan dentro del formulario seguro de Stripe, no como botones separados.
+                    En USA puedes activar Stripe tarjeta, Stripe ACH y Stripe Cash App como filas visibles. Las tres abren el formulario seguro de Stripe.
                   </div>
 
 
@@ -466,7 +469,7 @@ export default function AdminCheckoutMethods() {
 
           <Card className="p-4 bg-muted/40 text-xs text-muted-foreground space-y-1">
             <p><strong>Detección:</strong> IP del comprador vía ipapi.co → se busca el código de país en <code>country_codes</code> de cada región. La región con código <code>*</code> es el fallback global.</p>
-            <p><strong>Métodos:</strong> esta pantalla controla solo las filas reales del checkout: Stripe, PayPal, Mercado Pago y Yape/Plin. Los métodos internos de Stripe no aparecen como botones separados.</p>
+            <p><strong>Métodos:</strong> esta pantalla controla las filas reales del checkout. En USA, ACH y Cash App aparecen como opciones visibles de Stripe.</p>
           </Card>
         </div>
       </main>

@@ -10,12 +10,14 @@ import { supabase } from "@/integrations/supabase/client";
  * Fallback: si no hay región configurada o falla la consulta, TODAS quedan
  * habilitadas para no romper el checkout existente.
  */
-export type FamilyKey = "stripe" | "paypal" | "transfer" | "cash" | "yape";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "paypal" | "transfer" | "cash" | "yape";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
   regionCode: string | null;
   stripe: boolean;
+  stripeAch: boolean;
+  stripeCashApp: boolean;
   paypal: boolean;
   transfer: boolean;
   cash: boolean;
@@ -24,10 +26,14 @@ export interface CheckoutMethodsConfig {
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "paypal", "transfer", "cash", "yape"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "paypal", "transfer", "cash", "yape"];
 
 const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
-  stripe: true, paypal: true, transfer: true, cash: true, yape: true,
+  stripe: true, stripeAch: false, stripeCashApp: false, paypal: true, transfer: true, cash: true, yape: true,
+};
+
+const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "familyOrder"> = {
+  stripe: true, stripeAch: true, stripeCashApp: true, paypal: true, transfer: false, cash: false, yape: false,
 };
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }
@@ -79,6 +85,8 @@ async function loadAll() {
 function keyToFamily(key: string): FamilyKey | null {
   const k = key.toLowerCase();
   if (k === "stripe_card") return "stripe";
+  if (k === "stripe_us_bank_account") return "stripeAch";
+  if (k === "stripe_cashapp") return "stripeCashApp";
   if (k === "paypal") return "paypal";
   if (k === "yape_plin") return "yape";
   if (k === "mercadopago_transfer") return "transfer";
@@ -134,8 +142,8 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         if (alive) setState({ loaded: true, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
         return;
       }
-      const enabledFamilies = { stripe: false, paypal: false, transfer: false, cash: false, yape: false };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
+      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, paypal: false, transfer: false, cash: false, yape: false };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
         const fam = keyToFamily(m.method_key);
@@ -145,7 +153,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         if (ord < familyMinOrder[fam]) familyMinOrder[fam] = ord;
       }
       const anyEnabled = Object.values(enabledFamilies).some(Boolean);
-      const families = anyEnabled ? enabledFamilies : DEFAULT_ALL_ON;
+      const families = anyEnabled ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
       const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
         .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
       if (alive) setState({ loaded: true, regionCode: region.code, ...families, familyOrder });

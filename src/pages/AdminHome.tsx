@@ -26,13 +26,6 @@ const panels = [
     color: "text-amber-500",
   },
   {
-    to: "/admin/funnel",
-    icon: BarChart3,
-    title: "Funnel",
-    desc: "Vistas, leads, add-to-cart, checkouts y compras. Segmentado por producto, país y fuente.",
-    color: "text-primary",
-  },
-  {
     to: "/admin/seo",
     icon: Search,
     title: "SEO · Google",

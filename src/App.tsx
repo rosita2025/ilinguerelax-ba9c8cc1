@@ -63,7 +63,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminReviews = lazy(() => import("./pages/AdminReviews"));
-const AdminFunnel = lazy(() => import("./pages/AdminFunnel"));
+
 const AdminSEO = lazy(() => import("./pages/AdminSEO"));
 const AdminBots = lazy(() => import("./pages/AdminBots"));
 
@@ -255,7 +255,7 @@ const App = () => (
                   <Route path="/admin" element={<AdminGate><AdminHome /></AdminGate>} />
                   <Route path="/admin/live" element={<AdminGate><AdminLive /></AdminGate>} />
                   <Route path="/admin/reviews" element={<AdminGate><AdminReviews /></AdminGate>} />
-                  <Route path="/admin/funnel" element={<AdminGate><AdminFunnel /></AdminGate>} />
+                  
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />
                   <Route path="/admin/bots" element={<AdminGate><AdminBots /></AdminGate>} />
                   

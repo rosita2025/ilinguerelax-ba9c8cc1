@@ -66,7 +66,7 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   if (a.productName) attributes.ABANDONED_PRODUCT_NAME = a.productName;
   if (a.productUrl) attributes.ABANDONED_CART_URL = a.productUrl;
   if (typeof a.priceUsd === "number") attributes.ABANDONED_PRICE_USD = a.priceUsd;
-  if (a.couponCode) attributes.ABANDONED_COUPON = a.couponCode;
+  // ABANDONED_COUPON se setea más abajo con normalización + tag/nota
   if (a.language) {
     const lang = a.language.toLowerCase();
     attributes.LANGUAGE = lang;   // segmentar automatización por idioma

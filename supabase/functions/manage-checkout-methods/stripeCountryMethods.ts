@@ -56,6 +56,16 @@ const M = {
   paynow:    { method_key: "stripe_paynow",           label: "PayNow",               icon: "Smartphone",  note: "Singapur" },
   promptpay: { method_key: "stripe_promptpay",        label: "PromptPay",            icon: "Smartphone",  note: "Tailandia" },
   konbini:   { method_key: "stripe_konbini",          label: "Konbini",              icon: "Banknote",    note: "Tiendas de conveniencia Japón" },
+  // Nuevos / emergentes 2025-2026
+  pagoefectivo: { method_key: "stripe_pagoefectivo", label: "PagoEfectivo",         icon: "Banknote",    note: "Voucher efectivo Perú" },
+  mbway:     { method_key: "stripe_mb_way",           label: "MB WAY",               icon: "Smartphone",  note: "Pago móvil Portugal" },
+  satispay:  { method_key: "stripe_satispay",         label: "Satispay",             icon: "Smartphone",  note: "Italia" },
+  zip:       { method_key: "stripe_zip",              label: "Zip",                  icon: "CreditCard",  note: "Compra ahora, paga después (AU/US)" },
+  kakaopay:  { method_key: "stripe_kakao_pay",        label: "Kakao Pay",            icon: "Smartphone",  note: "Corea del Sur" },
+  naverpay:  { method_key: "stripe_naver_pay",        label: "Naver Pay",            icon: "Smartphone",  note: "Corea del Sur" },
+  payco:     { method_key: "stripe_payco",            label: "PAYCO",                icon: "Smartphone",  note: "Corea del Sur" },
+  samsungpay:{ method_key: "stripe_samsung_pay",      label: "Samsung Pay",          icon: "Smartphone",  note: "Corea del Sur" },
+  billie:    { method_key: "stripe_billie",           label: "Billie",               icon: "CreditCard",  note: "B2B pay-later (DE/AT/NL/SE)" },
 } as const;
 
 const EURO = [M.sepa];

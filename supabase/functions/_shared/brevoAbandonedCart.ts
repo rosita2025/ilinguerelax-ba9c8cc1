@@ -16,6 +16,8 @@ interface Args {
   productUrl?: string;      // absolute checkout / product page URL
   priceUsd?: number;
   couponCode?: string;      // e.g. "NEW10"
+  couponPercent?: number;   // % de descuento sugerido/aplicado
+  couponAmount?: number;    // monto absoluto (misma moneda que priceUsd)
   language?: string;        // es|en|fr|pt
   country?: string;         // ISO-2, e.g. PE, US, FR
   source?: string;          // "checkout" | "hotmart" | ...

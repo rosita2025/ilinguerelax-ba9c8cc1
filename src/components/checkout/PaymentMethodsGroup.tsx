@@ -612,7 +612,12 @@ export function PaymentMethodsGroup() {
   // para no parpadear.
   const filteredByAdmin = methodsConfig.loaded
     ? allMethods.filter((m) => {
-        if (m.id === "card") return m.methodKey ? enabledStripeKeys.has(m.methodKey) : methodsConfig.stripe;
+        if (m.id === "card") {
+          if (m.methodKey) return enabledStripeKeys.has(m.methodKey);
+          return methodsConfig.regionCode && methodsConfig.enabledMethodKeys.length > 0
+            ? enabledStripeKeys.has("stripe_card")
+            : methodsConfig.stripe;
+        }
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
         if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
@@ -806,10 +811,13 @@ export function PaymentMethodsGroup() {
                 </div>
                 {isPrimaryCard ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
-                    <LogoBadge src={visaLogo} alt="Visa" />
-                    <LogoBadge src={mastercardLogo} alt="Mastercard" />
-                    <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
-                    <LinkBadge />
+                    {primaryCardBadges.map((badge) => {
+                      if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
+                      if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
+                      if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+                      if (badge.label === "Link") return <LinkBadge key={badge.label} />;
+                      return <BankBadge key={badge.label} {...badge} />;
+                    })}
                   </div>
                 ) : null}
 
@@ -826,6 +834,10 @@ export function PaymentMethodsGroup() {
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
                     <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
+                  </div>
+                ) : m.badges?.length ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}
                   </div>
                 ) : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">

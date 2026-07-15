@@ -199,7 +199,10 @@ export default function AdminCheckoutMethods() {
       invalidateCheckoutMethodsCache();
       await load();
     } catch (e) {
-      toast.error(`❌ Error al guardar región ${code}: ${(e as Error).message || "desconocido"}`);
+      toast.error(`❌ Error al guardar región ${code}: ${(e as Error).message || "desconocido"}`, {
+        action: { label: "Reintentar", onClick: () => saveRegion(r, opts) },
+        duration: 10000,
+      });
       await load();
     } finally {
       setSavingDialog(false);
@@ -264,8 +267,12 @@ export default function AdminCheckoutMethods() {
       body: { action: "toggle_method", id: m.id, enabled: nextEnabled },
     });
     if (error || data?.error) {
-      toast.error(`❌ ${m.label}: ${error?.message || data?.error || "no se pudo actualizar"}`);
-      load();
+      // Revert optimistic change
+      setMethods(prev => prev.map(x => x.id === m.id ? { ...x, enabled: m.enabled } : x));
+      toast.error(`❌ ${m.label}: ${error?.message || data?.error || "no se pudo actualizar"}`, {
+        action: { label: "Reintentar", onClick: () => toggleMethod(m) },
+        duration: 10000,
+      });
       return;
     }
     toast.success(`${nextEnabled ? "✅" : "⏸️"} ${m.label} ${nextEnabled ? "activado" : "desactivado"}`);
@@ -277,12 +284,20 @@ export default function AdminCheckoutMethods() {
   async function quickAdd(region_code: string, q: typeof CHECKOUT_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
     if (existing) {
-      const nextEnabled = !existing.enabled;
+      const prevEnabled = existing.enabled;
+      const nextEnabled = !prevEnabled;
       setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: nextEnabled } : x));
       const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
         body: { action: "toggle_method", id: existing.id, enabled: nextEnabled },
       });
-      if (error || data?.error) { toast.error(error?.message || data?.error); load(); return; }
+      if (error || data?.error) {
+        setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: prevEnabled } : x));
+        toast.error(`❌ ${q.label}: ${error?.message || data?.error}`, {
+          action: { label: "Reintentar", onClick: () => quickAdd(region_code, q) },
+          duration: 10000,
+        });
+        return;
+      }
       toast.success(`${nextEnabled ? "✅" : "⏸️"} ${q.label} ${nextEnabled ? "activado" : "desactivado"}`);
       invalidateCheckoutMethodsCache();
       return;
@@ -295,7 +310,13 @@ export default function AdminCheckoutMethods() {
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
       body: { action: "save_method", method: m },
     });
-    if (error || data?.error) return toast.error(error?.message || data?.error);
+    if (error || data?.error) {
+      toast.error(`❌ ${q.label}: ${error?.message || data?.error}`, {
+        action: { label: "Reintentar", onClick: () => quickAdd(region_code, q) },
+        duration: 10000,
+      });
+      return;
+    }
     toast.success(`+ ${q.label}`); invalidateCheckoutMethodsCache(); load();
   }
 

@@ -121,7 +121,7 @@ export default function AdminCheckoutMethods() {
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
     if (error || data?.error) { toast.error(error?.message || data?.error); setLoading(false); return; }
     setRegions(data.regions || []);
-    setMethods((data.methods || []).filter(isCheckoutMethod));
+    setMethods(data.methods || []);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);

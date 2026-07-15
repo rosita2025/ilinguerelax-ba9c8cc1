@@ -81,14 +81,15 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   // IDs exactos por canal para saber qué compró en cada plataforma.
   if (a.hotmartProductId) attributes.HOTMART_PRODUCT_ID = a.hotmartProductId;
   if (a.hotmartProductCode) attributes.HOTMART_PRODUCT_CODE = a.hotmartProductCode;
-  if (a.tiendaSku) attributes.TIENDA_SKU = a.tiendaSku;
+  const tiendaSku = a.tiendaSku ?? (origin === "tienda" && a.skus?.length ? a.skus[0] : undefined);
+  if (tiendaSku) attributes.TIENDA_SKU = tiendaSku;
   // NOTA legible tipo "Hotmart · 5,000 palabras · id=123456 · code=abcd · trx=HP123"
   const noteParts: string[] = [
     origin === "hotmart" ? "Hotmart" : "Tienda",
     a.productName || "",
     a.hotmartProductId ? `id=${a.hotmartProductId}` : "",
     a.hotmartProductCode ? `code=${a.hotmartProductCode}` : "",
-    a.tiendaSku ? `sku=${a.tiendaSku}` : "",
+    tiendaSku ? `sku=${tiendaSku}` : "",
     a.orderNumber ? `trx=${a.orderNumber}` : "",
   ].filter(Boolean);
   attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");

@@ -171,6 +171,9 @@ export default function AdminCheckoutMethods() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
   const PAGE_SIZE = isMobile ? 2 : 5;
+  const [search, setSearch] = useState("");
+  const [filterCountry, setFilterCountry] = useState("");
+  const [filterGateway, setFilterGateway] = useState("");
 
   async function load() {
     invalidateCheckoutMethodsCache();
@@ -413,12 +416,80 @@ export default function AdminCheckoutMethods() {
           {loading && <Card className="p-8 text-center text-muted-foreground">Cargando…</Card>}
 
           {(() => {
-            const totalPages = Math.max(1, Math.ceil(regions.length / PAGE_SIZE));
+            const q = search.trim().toLowerCase();
+            const fc = filterCountry.trim().toUpperCase();
+            const fg = filterGateway.trim().toLowerCase();
+            const filteredRegions = regions.filter(r => {
+              if (fg && !(r.gateway || "").toLowerCase().includes(fg)) return false;
+              if (fc && !r.country_codes.map(c => c.toUpperCase()).includes(fc)) return false;
+              if (q) {
+                const inRegion =
+                  r.name.toLowerCase().includes(q) ||
+                  r.code.toLowerCase().includes(q) ||
+                  (r.gateway || "").toLowerCase().includes(q) ||
+                  r.country_codes.some(c => c.toLowerCase().includes(q));
+                const inMethods = methods.some(m =>
+                  m.region_code === r.code &&
+                  (m.label.toLowerCase().includes(q) || m.method_key.toLowerCase().includes(q))
+                );
+                if (!inRegion && !inMethods) return false;
+              }
+              return true;
+            });
+            const gateways = Array.from(new Set(regions.map(r => r.gateway).filter(Boolean))) as string[];
+            const totalPages = Math.max(1, Math.ceil(filteredRegions.length / PAGE_SIZE));
             const currentPage = Math.min(page, totalPages);
             const start = (currentPage - 1) * PAGE_SIZE;
-            const pageRegions = regions.slice(start, start + PAGE_SIZE);
+            const pageRegions = filteredRegions.slice(start, start + PAGE_SIZE);
+            const hasFilters = !!(q || fc || fg);
             return (
               <>
+                <Card className="p-3 sm:p-4 space-y-2">
+                  <div className="grid gap-2 sm:grid-cols-[1fr_180px_200px_auto]">
+                    <Input
+                      placeholder="🔍 Buscar región, método, país…"
+                      value={search}
+                      onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                      className="h-9"
+                    />
+                    <Input
+                      placeholder="País ISO (ej: MX, US)"
+                      value={filterCountry}
+                      onChange={(e) => { setFilterCountry(e.target.value.toUpperCase()); setPage(1); }}
+                      maxLength={3}
+                      className="h-9 uppercase"
+                    />
+                    <select
+                      value={filterGateway}
+                      onChange={(e) => { setFilterGateway(e.target.value); setPage(1); }}
+                      className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                    >
+                      <option value="">Todos los gateways</option>
+                      {gateways.map(g => <option key={g} value={g}>{g}</option>)}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-9"
+                      disabled={!hasFilters}
+                      onClick={() => { setSearch(""); setFilterCountry(""); setFilterGateway(""); setPage(1); }}
+                    >
+                      Limpiar
+                    </Button>
+                  </div>
+                  {hasFilters && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {filteredRegions.length} de {regions.length} regiones coinciden
+                    </p>
+                  )}
+                </Card>
+
+                {filteredRegions.length === 0 && !loading && (
+                  <Card className="p-6 text-center text-sm text-muted-foreground">
+                    Sin resultados para los filtros actuales.
+                  </Card>
+                )}
+
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {pageRegions.map((r) => {
                     const rms = methods
@@ -605,7 +676,7 @@ export default function AdminCheckoutMethods() {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <p className="text-xs text-muted-foreground">
-                      Página {currentPage} de {totalPages} · {regions.length} regiones
+                      Página {currentPage} de {totalPages} · {filteredRegions.length} regiones
                     </p>
                     <div className="flex items-center gap-1">
                       <Button size="sm" variant="outline" className="h-8" disabled={currentPage <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>

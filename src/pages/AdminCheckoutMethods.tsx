@@ -497,42 +497,48 @@ export default function AdminCheckoutMethods() {
                       const isFirst = idx === 0;
                       const isLast = idx === rms.length - 1;
                       return (
-                        <div key={m.id} className={`flex items-center gap-1.5 sm:gap-2 text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
-                          <div className="flex flex-col shrink-0">
-                            <button
-                              type="button"
-                              disabled={isFirst}
-                              onClick={() => reorderMethod(m, -1)}
-                              className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Subir"
-                            >
-                              <ArrowUp className="w-3 h-3" />
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isLast}
-                              onClick={() => reorderMethod(m, 1)}
-                              className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Bajar"
-                            >
-                              <ArrowDown className="w-3 h-3" />
-                            </button>
+                        <div key={m.id} className={`text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
+                          <div className="flex items-center gap-2">
+                            <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium leading-tight text-xs sm:text-sm">{m.label}</div>
+                              {m.note && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate">{m.note}</div>}
+                            </div>
+                            <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} className="shrink-0" />
                           </div>
-                          <Badge variant="outline" className="text-[10px] tabular-nums px-1.5 py-0 shrink-0 hidden sm:inline-flex" title="Prioridad">
-                            {idx + 1}
-                          </Badge>
-                          <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium leading-tight text-xs sm:text-sm truncate">{m.label}</div>
-                            {m.note && <div className="text-[10px] sm:text-[11px] text-muted-foreground truncate">{m.note}</div>}
+                          <div className="mt-1.5 flex items-center justify-between gap-1 pl-6">
+                            <div className="flex items-center gap-0.5">
+                              <button
+                                type="button"
+                                disabled={isFirst}
+                                onClick={() => reorderMethod(m, -1)}
+                                className="p-1.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Subir"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isLast}
+                                onClick={() => reorderMethod(m, 1)}
+                                className="p-1.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Bajar"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+                              <Badge variant="outline" className="text-[10px] tabular-nums px-1.5 py-0 ml-1" title="Prioridad">
+                                #{idx + 1}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-0.5">
+                              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setMethodEdit(m)}>
+                                <Pencil className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => deleteMethod(m.id)}>
+                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                              </Button>
+                            </div>
                           </div>
-                          <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} className="shrink-0" />
-                          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setMethodEdit(m)}>
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => deleteMethod(m.id)}>
-                            <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                          </Button>
                         </div>
                       );
                     })}

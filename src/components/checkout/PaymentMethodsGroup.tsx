@@ -85,6 +85,7 @@ export function PaymentMethodsGroup() {
 
 
   const [selected, setSelected] = useState<Method | null>(null);
+  const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
@@ -431,10 +432,21 @@ export function PaymentMethodsGroup() {
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
   ];
+  // USA-only extra rows — visually separate Cash App and US Bank (ACH).
+  // Both use id="card" so they open the same Stripe Embedded Checkout,
+  // where Stripe surfaces the correct method automatically.
+  const usaExtraMethods: typeof allMethods = isUsa ? [
+    { id: "card", icon: Smartphone, title: "Cash App Pay", sub: "Pay instantly with your Cash App balance (US only).", badge: "Stripe" },
+    { id: "card", icon: Building2, title: "US Bank (ACH)", sub: "Direct bank transfer from your US checking/savings account.", badge: "Stripe" },
+  ] : [];
   // PayPal disponible en todo el mundo EXCEPTO Perú (allí solo rails locales + Stripe).
   const methods = isPeru
     ? allMethods.filter((m) => m.id !== "paypal")
-    : allMethods.filter((m) => m.id === "card" || m.id === "paypal");
+    : [
+        ...allMethods.filter((m) => m.id === "card"),
+        ...usaExtraMethods,
+        ...allMethods.filter((m) => m.id === "paypal"),
+      ];
 
 
   // Fuera de Perú solo hay un método (Stripe). Auto-seleccionarlo y auto-abrir
@@ -442,7 +454,7 @@ export function PaymentMethodsGroup() {
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
     if (!isPeru && !(total <= 0 && items.length > 0)) {
-      if (selected !== "card") setSelected("card");
+      if (selected !== "card") { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
       if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
@@ -547,13 +559,17 @@ export function PaymentMethodsGroup() {
         </div>
       )}
 
-      {!isFree && !isInvalidZero && methods.map((m) => {
-        const isSelected = valid && selected === m.id;
+      {!isFree && !isInvalidZero && methods.map((m, idx) => {
+        const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
+        const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
+        // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
+        const rowKey = `${m.id}-${m.title}`;
+        const isSelected = valid && selected === m.id && (m.id !== "card" || selectedCardRow === rowKey);
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
         return (
           <div
-            key={`${m.id}-${m.title}`}
+            key={rowKey}
             className={cn(
               "rounded-xl border overflow-hidden transition-colors",
               isSelected
@@ -563,7 +579,7 @@ export function PaymentMethodsGroup() {
           >
             <button
               type="button"
-              onClick={() => handleSelect(m.id)}
+              onClick={() => { setSelectedCardRow(rowKey); handleSelect(m.id); }}
               disabled={isLoading}
               aria-disabled={!valid}
               className={cn(
@@ -591,19 +607,21 @@ export function PaymentMethodsGroup() {
                     </span>
                   )}
                 </div>
-                {m.id === "card" && (m.title === (isPeru ? t.cardTitlePeru : t.cardTitleGlobal)) ? (
+                {isPrimaryCard ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <LogoBadge src={visaLogo} alt="Visa" />
                     <LogoBadge src={mastercardLogo} alt="Mastercard" />
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
-                    {isUsa && (
-                      <>
-                        <BankBadge label="Cash App" bg="#00D64F" color="#000000" />
-                        <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
-                        <BankBadge label="US Bank" bg="#eeeeee" color="#0A2540" />
-                      </>
-                    )}
+                  </div>
+                ) : m.id === "card" && m.title === "Cash App Pay" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Cash App" bg="#00D64F" color="#000000" />
+                  </div>
+                ) : m.id === "card" && m.title === "US Bank (ACH)" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
+                    <BankBadge label="US Bank" bg="#eeeeee" color="#0A2540" />
                   </div>
                 ) : null}
                 {m.id === "card" ? null : m.id === "transfer" ? (
@@ -639,7 +657,7 @@ export function PaymentMethodsGroup() {
 
 
 
-            {m.id === "card" && isSelected && showStripe && stripePromise && (
+            {isPrimaryCard && m.id === "card" && valid && selected === "card" && showStripe && stripePromise && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
                 {/* Aviso claro: falta 1 paso más (llenar tarjeta y pagar dentro de Stripe) */}
                 <div className="px-3 sm:px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-[12px] sm:text-sm text-amber-900 dark:text-amber-200 font-medium text-center">

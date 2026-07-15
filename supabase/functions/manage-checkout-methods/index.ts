@@ -64,13 +64,20 @@ Deno.serve(async (req) => {
         if (gw.includes("stripe") || gw === "" || gw === "auto") {
           const suggested = stripeMethodsFor(payload.country_codes || []);
           if (suggested.length) {
-            const { data: existing } = await db
+            const [{ data: existing }, { data: suppressed }] = await Promise.all([
+              db
               .from("checkout_payment_methods")
               .select("method_key")
-              .eq("region_code", payload.code);
+              .eq("region_code", payload.code),
+              db
+                .from("checkout_method_suppressions")
+                .select("method_key")
+                .eq("region_code", payload.code),
+            ]);
             const existingKeys = new Set((existing ?? []).map((x: { method_key: string }) => x.method_key));
+            const suppressedKeys = new Set((suppressed ?? []).map((x: { method_key: string }) => x.method_key));
             const newRows = suggested
-              .filter((m) => !existingKeys.has(m.method_key))
+              .filter((m) => !existingKeys.has(m.method_key) && !suppressedKeys.has(m.method_key))
               .map((m, idx) => ({
                 region_code: payload.code,
                 method_key: m.method_key,
@@ -118,14 +125,32 @@ Deno.serve(async (req) => {
         : db.from("checkout_payment_methods").upsert(payload, { onConflict: "region_code,method_key" }).select("*").single();
       const { data, error } = await query;
       if (error) return json({ error: error.message }, 500);
+      await db
+        .from("checkout_method_suppressions")
+        .delete()
+        .eq("region_code", payload.region_code)
+        .eq("method_key", payload.method_key);
       return json({ ok: true, method: data });
     }
 
     if (action === "delete_method") {
       const id = String(body.id || "");
       if (!id) return json({ error: "missing id" }, 400);
+      const { data: method, error: findErr } = await db
+        .from("checkout_payment_methods")
+        .select("region_code, method_key")
+        .eq("id", id)
+        .maybeSingle();
+      if (findErr) return json({ error: findErr.message }, 500);
       const { error } = await db.from("checkout_payment_methods").delete().eq("id", id);
       if (error) return json({ error: error.message }, 500);
+      if (method?.region_code && method?.method_key) {
+        await db.from("checkout_method_suppressions").upsert({
+          region_code: method.region_code,
+          method_key: method.method_key,
+          suppressed_at: new Date().toISOString(),
+        });
+      }
       return json({ ok: true });
     }
 
@@ -147,16 +172,24 @@ Deno.serve(async (req) => {
       if (rErr || !region) return json({ error: rErr?.message || "region not found" }, 404);
 
       const suggested = stripeMethodsFor(region.country_codes || []);
-      const { data: existing, error: exErr } = await db
-        .from("checkout_payment_methods")
-        .select("method_key, sort_order")
-        .eq("region_code", code);
+      const [{ data: existing, error: exErr }, { data: suppressed, error: supErr }] = await Promise.all([
+        db
+          .from("checkout_payment_methods")
+          .select("method_key, sort_order")
+          .eq("region_code", code),
+        db
+          .from("checkout_method_suppressions")
+          .select("method_key")
+          .eq("region_code", code),
+      ]);
       if (exErr) return json({ error: exErr.message }, 500);
+      if (supErr) return json({ error: supErr.message }, 500);
       const existingRows = existing ?? [];
       const existingKeys = new Set(existingRows.map((x: { method_key: string }) => x.method_key));
+      const suppressedKeys = new Set((suppressed ?? []).map((x: { method_key: string }) => x.method_key));
       const maxOrder = existingRows.reduce((max: number, x: { sort_order: number | null }) => Math.max(max, Number(x.sort_order || 0)), 0);
       const rows = suggested
-        .filter((m) => !existingKeys.has(m.method_key))
+        .filter((m) => !existingKeys.has(m.method_key) && !suppressedKeys.has(m.method_key))
         .map((m, idx) => ({
           region_code: code,
           method_key: m.method_key,
@@ -186,16 +219,24 @@ Deno.serve(async (req) => {
         if (!gw.includes("stripe")) continue;
         const suggested = stripeMethodsFor(region.country_codes || []);
         if (!suggested.length) continue;
-        const { data: existing, error: exErr } = await db
-          .from("checkout_payment_methods")
-          .select("method_key, sort_order")
-          .eq("region_code", region.code);
+        const [{ data: existing, error: exErr }, { data: suppressed, error: supErr }] = await Promise.all([
+          db
+            .from("checkout_payment_methods")
+            .select("method_key, sort_order")
+            .eq("region_code", region.code),
+          db
+            .from("checkout_method_suppressions")
+            .select("method_key")
+            .eq("region_code", region.code),
+        ]);
         if (exErr) return json({ error: `region ${region.code}: ${exErr.message}` }, 500);
+        if (supErr) return json({ error: `region ${region.code}: ${supErr.message}` }, 500);
         const existingRows = existing ?? [];
         const existingKeys = new Set(existingRows.map((x: { method_key: string }) => x.method_key));
+        const suppressedKeys = new Set((suppressed ?? []).map((x: { method_key: string }) => x.method_key));
         const maxOrder = existingRows.reduce((max: number, x: { sort_order: number | null }) => Math.max(max, Number(x.sort_order || 0)), 0);
         const rows = suggested
-          .filter((m) => !existingKeys.has(m.method_key))
+          .filter((m) => !existingKeys.has(m.method_key) && !suppressedKeys.has(m.method_key))
           .map((m, idx) => ({
             region_code: region.code,
             method_key: m.method_key,

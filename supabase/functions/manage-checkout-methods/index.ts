@@ -56,28 +56,34 @@ Deno.serve(async (req) => {
       const { error } = await db.from("checkout_regions").upsert(payload, { onConflict: "code" });
       if (error) return json({ error: error.message }, 500);
 
-      // Autofill automático de métodos Stripe según los países de la región.
-      // Upsert por (region_code, method_key) — no borra métodos manuales con
-      // otras claves y refresca labels/notes/icons según el mapa oficial.
+      // Autofill de métodos Stripe SOLO para los que aún no existen en la región.
+      // Respeta toggles del admin: si desactivaste OXXO, no se reactiva al guardar.
       let autofilled = 0;
       try {
         const gw = String(payload.gateway || "stripe").toLowerCase();
         if (gw.includes("stripe") || gw === "" || gw === "auto") {
           const suggested = stripeMethodsFor(payload.country_codes || []);
           if (suggested.length) {
-            const rows = suggested.map((m, idx) => ({
-              region_code: payload.code,
-              method_key: m.method_key,
-              label: m.label,
-              note: m.note,
-              icon: m.icon,
-              enabled: true,
-              sort_order: idx + 1,
-            }));
-            const { error: mErr } = await db
+            const { data: existing } = await db
               .from("checkout_payment_methods")
-              .upsert(rows, { onConflict: "region_code,method_key" });
-            if (!mErr) autofilled = rows.length;
+              .select("method_key")
+              .eq("region_code", payload.code);
+            const existingKeys = new Set((existing ?? []).map((x: { method_key: string }) => x.method_key));
+            const newRows = suggested
+              .filter((m) => !existingKeys.has(m.method_key))
+              .map((m, idx) => ({
+                region_code: payload.code,
+                method_key: m.method_key,
+                label: m.label,
+                note: m.note,
+                icon: m.icon,
+                enabled: true,
+                sort_order: existingKeys.size + idx + 1,
+              }));
+            if (newRows.length) {
+              const { error: mErr } = await db.from("checkout_payment_methods").insert(newRows);
+              if (!mErr) autofilled = newRows.length;
+            }
           }
         }
       } catch (_) { /* noop: no bloquea el guardado de la región */ }

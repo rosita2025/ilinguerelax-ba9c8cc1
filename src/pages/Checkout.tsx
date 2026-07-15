@@ -92,7 +92,7 @@ export default function Checkout() {
               regionPrices: cat.regionPrices,
               pricePen: cat.pricePen,
               quantity: Math.max(1, Number(c.q) || 1),
-            });
+            }, { silent: true });
           }
         }
       }
@@ -285,7 +285,7 @@ export default function Checkout() {
     // and only ensure the main product of THIS /checkouts/:slug URL exists.
     const existing = items.find((i) => i.id === catalogItem.id);
     if (!existing) {
-      addItem({ ...catalogItem, quantity: 1 });
+      addItem({ ...catalogItem, quantity: 1 }, { silent: true });
     } else {
       // Same product already in cart → refresh mutable fields, force qty=1
       // (digital products are single-unit).
@@ -313,7 +313,7 @@ export default function Checkout() {
     if (!catalogItem) return;
     const hasMain = items.some((i) => i.id === catalogItem.id);
     if (!hasMain) {
-      addItem({ ...catalogItem, quantity: 1 });
+      addItem({ ...catalogItem, quantity: 1 }, { silent: true });
       toast.info(
         language === "en"
           ? `“${catalogItem.name}” was re-added to your cart. This product cannot be removed here.`

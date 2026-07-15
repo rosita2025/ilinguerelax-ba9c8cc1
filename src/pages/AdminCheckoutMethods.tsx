@@ -170,7 +170,7 @@ export default function AdminCheckoutMethods() {
     const method_key = m.method_key.trim().toLowerCase();
     const label = m.label.trim();
     if (!method_key) return toast.error("Tipo de método requerido");
-    if (!CHECKOUT_METHOD_KEYS.has(method_key)) return toast.error("Ese método no existe en el checkout público");
+    if (!/^[a-z0-9_]{1,48}$/.test(method_key)) return toast.error("method_key inválido (a-z, 0-9, _)");
     if (!label) return toast.error("Etiqueta requerida");
     const payload = { ...m, method_key, label, sort_order: Number(m.sort_order || 0) };
     setSavingDialog(true);

@@ -82,8 +82,13 @@ export default function AdminCheckoutPreview({ regions = [] }: Props) {
 
     for (const r of regions) {
       if (!r.enabled) continue;
-      for (const cc of r.country_codes || []) {
-        if (cc === "*") { hasGlobal = true; continue; }
+      const codes = r.country_codes || [];
+      // A region acts as "global" if its code is * / GLOBAL, or if it has no explicit countries.
+      if (r.code === "*" || r.code === "GLOBAL" || codes.length === 0 || codes.includes("*")) {
+        hasGlobal = true;
+      }
+      for (const cc of codes) {
+        if (cc === "*") continue;
         if (seen.has(cc)) continue;
         seen.add(cc);
         const meta = COUNTRY_META[cc] ?? { name: cc, flag: "🏳️" };

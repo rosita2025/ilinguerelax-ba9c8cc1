@@ -357,32 +357,34 @@ export default function AdminCheckoutMethods() {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-10 px-4">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <header className="space-y-2">
-            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+      <main className="min-h-dvh bg-background py-4 sm:py-10 px-3 sm:px-4">
+        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+          <header className="space-y-1.5 sm:space-y-2">
+            <div className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">
               <Lock className="w-3.5 h-3.5" /> Vista privada · solo admin
             </div>
-            <h1 className="text-3xl font-bold">Métodos de pago por región</h1>
-            <p className="text-muted-foreground text-sm">
+            <h1 className="text-xl sm:text-3xl font-bold leading-tight">Métodos de pago por región</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Configura qué métodos aparecen en cada país/región según la IP del comprador.
               El cliente <strong>no</strong> ve esta página.
             </p>
           </header>
 
-          <Card className="p-4 border-primary/30 bg-primary/5 flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold mr-2">Vista previa checkout:</span>
-            <Button asChild size="sm">
-              <a href={`/checkouts/${PREVIEW_SKU}?country=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
-            </Button>
-            <Button asChild size="sm" variant="secondary">
-              <a href={`/checkouts/${PREVIEW_SKU}?country=US`} target="_blank" rel="noreferrer">🇺🇸 USA (Stripe)</a>
-            </Button>
-            <Button asChild size="sm" variant="secondary">
-              <a href={`/checkouts/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
-            </Button>
-            <div className="ml-auto flex gap-2">
-              <Button size="sm" variant="outline" onClick={async () => {
+          <Card className="p-3 sm:p-4 border-primary/30 bg-primary/5 space-y-2">
+            <span className="text-xs sm:text-sm font-semibold block">Vista previa checkout:</span>
+            <div className="flex flex-wrap gap-1.5">
+              <Button asChild size="sm" className="h-8 flex-1 min-w-[110px] sm:flex-none">
+                <a href={`/checkouts/${PREVIEW_SKU}?country=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
+              </Button>
+              <Button asChild size="sm" variant="secondary" className="h-8 flex-1 min-w-[110px] sm:flex-none">
+                <a href={`/checkouts/${PREVIEW_SKU}?country=US`} target="_blank" rel="noreferrer">🇺🇸 USA</a>
+              </Button>
+              <Button asChild size="sm" variant="secondary" className="h-8 flex-1 min-w-[110px] sm:flex-none">
+                <a href={`/checkouts/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global</a>
+              </Button>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 sm:justify-end pt-1 border-t border-primary/10">
+              <Button size="sm" variant="outline" className="h-9 w-full sm:w-auto" onClick={async () => {
                 if (!confirm("Auto-rellenar métodos Stripe oficiales para TODAS las regiones Stripe? (upsert — no borra métodos manuales)")) return;
                 const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "sync_all_stripe" } });
                 if (error || data?.error) return toast.error(error?.message || data?.error);
@@ -391,7 +393,7 @@ export default function AdminCheckoutMethods() {
               }}>
                 ⚡ Auto Stripe (todas)
               </Button>
-              <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>
+              <Button size="sm" className="h-9 w-full sm:w-auto" onClick={() => setRegionEdit(emptyRegion())}>
                 <Plus className="w-4 h-4 mr-1" /> Nueva región
               </Button>
             </div>
@@ -408,42 +410,41 @@ export default function AdminCheckoutMethods() {
                 .filter(m => m.region_code === r.code)
                 .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
               return (
-                <Card key={r.code} className={`p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-bold text-lg flex items-center gap-2">
-                        <span className="text-2xl">{r.flag || "🌐"}</span> {r.name}
+                <Card key={r.code} className={`p-3 sm:p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-base sm:text-lg flex items-center gap-2 leading-tight">
+                        <span className="text-xl sm:text-2xl">{r.flag || "🌐"}</span>
+                        <span className="truncate">{r.name}</span>
                       </h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                         {r.currency} · {r.gateway || "—"}
                       </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5 break-words">
                         Países: {r.country_codes.length ? r.country_codes.join(", ") : "—"}
                       </p>
                     </div>
-                    <div className="flex flex-col gap-1 items-end">
-                      <Badge variant="outline" className="text-[10px]">{r.code}</Badge>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="default" className="h-7 px-2" onClick={() => saveRegion(r)} disabled={savingRegion === r.code}>
-                          {savingRegion === r.code ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Save className="w-3.5 h-3.5 mr-1" />}
-                          Guardar
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => setRegionEdit(r)}>
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button size="sm" variant="secondary" className="h-7 px-2" title="Auto-rellenar métodos Stripe oficiales para esta región (según país)" onClick={async () => {
-                          const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "autofill_stripe", code: r.code } });
-                          if (error || data?.error) return toast.error(error?.message || data?.error);
-                          toast.success(`✅ ${data.added} métodos Stripe`);
-                          invalidateCheckoutMethodsCache(); load();
-                        }}>
-                          ⚡ Auto Stripe
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => deleteRegion(r.code)}>
-                          <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
+                    <Badge variant="outline" className="text-[10px] shrink-0">{r.code}</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 mb-3">
+                    <Button size="sm" variant="default" className="h-8 px-2 text-xs" onClick={() => saveRegion(r)} disabled={savingRegion === r.code}>
+                      {savingRegion === r.code ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Save className="w-3.5 h-3.5 mr-1" />}
+                      Guardar
+                    </Button>
+                    <Button size="sm" variant="secondary" className="h-8 px-2 text-xs" title="Auto-rellenar métodos Stripe oficiales" onClick={async () => {
+                      const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "autofill_stripe", code: r.code } });
+                      if (error || data?.error) return toast.error(error?.message || data?.error);
+                      toast.success(`✅ ${data.added} métodos Stripe`);
+                      invalidateCheckoutMethodsCache(); load();
+                    }}>
+                      ⚡ Auto Stripe
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={() => setRegionEdit(r)}>
+                      <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => deleteRegion(r.code)}>
+                      <Trash2 className="w-3.5 h-3.5 mr-1" /> Eliminar
+                    </Button>
                   </div>
                   {r.description && <p className="text-xs text-muted-foreground mb-3">{r.description}</p>}
 
@@ -496,13 +497,13 @@ export default function AdminCheckoutMethods() {
                       const isFirst = idx === 0;
                       const isLast = idx === rms.length - 1;
                       return (
-                        <div key={m.id} className={`flex items-center gap-2 text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
+                        <div key={m.id} className={`flex items-center gap-1.5 sm:gap-2 text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
                           <div className="flex flex-col shrink-0">
                             <button
                               type="button"
                               disabled={isFirst}
                               onClick={() => reorderMethod(m, -1)}
-                              className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Subir"
                             >
                               <ArrowUp className="w-3 h-3" />
@@ -511,25 +512,25 @@ export default function AdminCheckoutMethods() {
                               type="button"
                               disabled={isLast}
                               onClick={() => reorderMethod(m, 1)}
-                              className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Bajar"
                             >
                               <ArrowDown className="w-3 h-3" />
                             </button>
                           </div>
-                          <Badge variant="outline" className="text-[10px] tabular-nums px-1.5 py-0 shrink-0" title="Prioridad">
+                          <Badge variant="outline" className="text-[10px] tabular-nums px-1.5 py-0 shrink-0 hidden sm:inline-flex" title="Prioridad">
                             {idx + 1}
                           </Badge>
                           <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium leading-tight truncate">{m.label}</div>
-                            {m.note && <div className="text-[11px] text-muted-foreground truncate">{m.note}</div>}
+                            <div className="font-medium leading-tight text-xs sm:text-sm truncate">{m.label}</div>
+                            {m.note && <div className="text-[10px] sm:text-[11px] text-muted-foreground truncate">{m.note}</div>}
                           </div>
-                          <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} />
-                          <Button size="icon" variant="ghost" onClick={() => setMethodEdit(m)}>
+                          <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} className="shrink-0" />
+                          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setMethodEdit(m)}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
-                          <Button size="icon" variant="ghost" onClick={() => deleteMethod(m.id)}>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => deleteMethod(m.id)}>
                             <Trash2 className="w-3.5 h-3.5 text-destructive" />
                           </Button>
                         </div>
@@ -590,11 +591,11 @@ export default function AdminCheckoutMethods() {
 
       {/* Region editor */}
       <Dialog open={!!regionEdit} onOpenChange={(o) => !o && setRegionEdit(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[92vh] overflow-y-auto w-[calc(100vw-1.5rem)] sm:w-full">
           <DialogHeader><DialogTitle>{regionEdit?.code ? "Editar región" : "Nueva región"}</DialogTitle></DialogHeader>
           {regionEdit && (
             <div className="space-y-3">
-              <div className="grid grid-cols-[1fr_120px] gap-3">
+              <div className="grid grid-cols-[1fr_84px] sm:grid-cols-[1fr_120px] gap-3">
                 <div>
                   <Label>Nombre</Label>
                   <Input value={regionEdit.name} onChange={(e) => setRegionEdit({ ...regionEdit, name: e.target.value })} placeholder="Alemania" />

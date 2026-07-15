@@ -209,6 +209,17 @@ export default function AdminCheckoutMethods() {
     load();
   }
 
+  async function syncAllStripe() {
+    if (!confirm("Sincronizar TODAS las regiones Stripe con la matriz oficial de métodos por país?\nRefresca Klarna/Affirm/Link/SEPA/Bancontact/Pix/etc. según los países ISO. No borra métodos manuales.")) return;
+    const t = toast.loading("Sincronizando con Stripe…");
+    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+      body: { action: "sync_all_stripe" },
+    });
+    toast.dismiss(t);
+    if (error || data?.error) return toast.error(error?.message || data?.error);
+    toast.success(`✓ ${data.regions?.length || 0} regiones sincronizadas (${data.upserted} métodos)`);
+    load();
+
   async function quickAdd(region_code: string, q: typeof QUICK_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
     if (existing) return toast.info(`${q.label} ya está agregado`);

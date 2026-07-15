@@ -7,6 +7,7 @@ interface SendArgs {
   to: string | string[];
   subject?: string;
   html?: string;
+  text?: string;
   replyTo?: string;
   /** Ignored (kept for legacy Brevo template compatibility). */
   templateId?: number;

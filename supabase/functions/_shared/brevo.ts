@@ -48,6 +48,7 @@ async function sendViaBrevo(args: SendArgs): Promise<SendResult> {
     subject: args.subject ?? "",
     htmlContent: args.html ?? "",
   };
+  if (args.text) payload.textContent = args.text;
   if (args.replyTo) payload.replyTo = { email: args.replyTo };
 
   const res = await fetch(`${GATEWAY_URL}/smtp/email`, {

@@ -267,7 +267,10 @@ export default function AdminCheckoutMethods() {
             <Button asChild size="sm" variant="secondary">
               <a href={`/checkout/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
             </Button>
-            <div className="ml-auto">
+            <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="outline" onClick={syncAllStripe}>
+                <Zap className="w-4 h-4 mr-1" /> Sincronizar Stripe
+              </Button>
               <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>
                 <Plus className="w-4 h-4 mr-1" /> Nueva región
               </Button>

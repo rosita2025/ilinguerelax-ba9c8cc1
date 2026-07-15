@@ -340,6 +340,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     console.error("purchase tracking error:", trackingError);
   }
 
+  const coupon = extractStripeCoupon(paymentIntent);
   await sendStripePurchaseEmails({
     adminClient,
     customerEmail,
@@ -350,6 +351,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     orderNumber,
     paymentKey,
     skus,
+    ...coupon,
   });
 
   return { delivered: true };

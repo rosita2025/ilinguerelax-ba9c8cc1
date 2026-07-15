@@ -58,7 +58,9 @@ const EVENT_COLORS: Record<string, string> = {
   ViewContent: "bg-blue-500/20 text-blue-300",
   AddToCart: "bg-amber-500/20 text-amber-300",
   InitiateCheckout: "bg-orange-500/20 text-orange-300",
+  BeginCheckout: "bg-orange-500/20 text-orange-300",
   Purchase: "bg-green-500/20 text-green-300",
+  PaymentError: "bg-red-500/20 text-red-300",
   Lead: "bg-purple-500/20 text-purple-300",
 };
 

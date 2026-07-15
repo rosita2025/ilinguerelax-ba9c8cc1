@@ -17,6 +17,7 @@ import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
+import { trackPaymentError } from "@/hooks/useMetaPixel";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape";
@@ -343,6 +344,17 @@ export function PaymentMethodsGroup() {
       return data.clientSecret;
     } catch (err) {
       setStripeError(mapStripeError(err, language as StripeLang));
+      try {
+        const s2 = useCheckoutPruebaStore.getState();
+        const totals = calcTotals(s2.items, s2.couponPercent, region.tier);
+        trackPaymentError({
+          provider: selected === "card" ? "stripe_card" : String(selected),
+          skus: s2.items.map((i) => i.id),
+          reason: err instanceof Error ? err.message : String(err),
+          value: totals.total,
+          currency: "USD",
+        });
+      } catch { /* noop */ }
       throw err;
     } finally {
       setStripeLoading(false);
@@ -410,6 +422,17 @@ export function PaymentMethodsGroup() {
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
+      try {
+        const s3 = useCheckoutPruebaStore.getState();
+        const totals = calcTotals(s3.items, s3.couponPercent, region.tier);
+        trackPaymentError({
+          provider: `mercadopago_${paymentType}`,
+          skus: s3.items.map((i) => i.id),
+          reason: err instanceof Error ? err.message : String(err),
+          value: totals.total,
+          currency: "USD",
+        });
+      } catch { /* noop */ }
       toast({
         title: t.mpError,
         description: err instanceof Error ? err.message : t.tryAgain,
@@ -1096,6 +1119,18 @@ export function PaymentMethodsGroup() {
                       metadata: { phone: buyer.phone ?? "", processor: "paypal", orderId },
                     }, { onConflict: "email,source" }).then(() => {});
                     navigate(`/checkouts/success?paypal_order=${encodeURIComponent(orderId)}`);
+                  }}
+                  onError={(err) => {
+                    try {
+                      const totals = calcTotals(items, couponPercent, region.tier);
+                      trackPaymentError({
+                        provider: "paypal",
+                        skus: items.map((i) => i.id),
+                        reason: err instanceof Error ? err.message : String(err),
+                        value: totals.total,
+                        currency: "USD",
+                      });
+                    } catch { /* noop */ }
                   }}
                 />
 

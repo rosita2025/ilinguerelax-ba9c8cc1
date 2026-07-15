@@ -21,7 +21,7 @@ import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
-import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
@@ -359,6 +359,15 @@ export default function Checkout() {
     const value = cartTotal > 0 ? cartTotal : priceForTier;
 
     trackHotmartEvent("InitiateCheckout", {
+      content_name: catalogItem.name,
+      content_ids: [sku],
+      content_type: "product",
+      value,
+      currency,
+      num_items: items.length || 1,
+    });
+    // GA4-style alias for the same funnel step, linked to the same SKU.
+    trackBeginCheckout({
       content_name: catalogItem.name,
       content_ids: [sku],
       content_type: "product",

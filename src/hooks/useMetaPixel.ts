@@ -41,7 +41,7 @@ const getSessionId = (): string => {
   }
 };
 
-const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Lead"]);
+const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "BeginCheckout", "Purchase", "PaymentError", "Lead"]);
 const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
 // EU consent gating: in EU countries we must wait for explicit "accepted" before firing browser Pixel.
@@ -293,6 +293,37 @@ export const trackLead = (
   }
   sendCapiEvent("Lead", eventId, params, email);
   logFunnelEvent("Lead", params);
+};
+
+// Track BeginCheckout — GA4-style alias for the moment the user reaches the
+// checkout page. Complements InitiateCheckout (Meta name) so /admin/debug
+// muestra ambos y podemos armar el embudo completo por SKU.
+export const trackBeginCheckout = (params: Record<string, unknown> = {}) => {
+  logFunnelEvent("BeginCheckout", params);
+};
+
+// Track PaymentError — dispara cuando falla un intento de pago (Stripe, PayPal,
+// Mercado Pago, Yape/Plin). Se enlaza al SKU vía content_ids para que
+// /admin/debug muestre el error junto al resto del embudo.
+export const trackPaymentError = (params: {
+  sku?: string | null;
+  skus?: string[];
+  provider: string;
+  reason?: string;
+  value?: number | null;
+  currency?: string | null;
+  content_name?: string;
+}) => {
+  const ids = params.skus?.length ? params.skus : params.sku ? [params.sku] : [];
+  logFunnelEvent("PaymentError", {
+    content_name: params.content_name || params.provider,
+    content_ids: ids,
+    content_type: "product",
+    provider: params.provider,
+    reason: (params.reason || "").slice(0, 200),
+    value: typeof params.value === "number" ? params.value : null,
+    currency: params.currency || null,
+  });
 };
 
 // ============================================

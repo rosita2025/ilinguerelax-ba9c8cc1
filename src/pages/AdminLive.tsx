@@ -91,7 +91,9 @@ const eventLabel: Record<string, string> = {
   ViewContent: "vio producto",
   AddToCart: "agregó carrito",
   InitiateCheckout: "continuó a pago",
+  BeginCheckout: "inició checkout",
   Purchase: "compró",
+  PaymentError: "falló pago",
   Lead: "dejó contacto",
 };
 

@@ -360,6 +360,9 @@ export default function AdminCheckoutMethods() {
                     <div className="flex flex-col gap-1 items-end">
                       <Badge variant="outline" className="text-[10px]">{r.code}</Badge>
                       <div className="flex gap-1">
+                        <Button size="sm" variant="default" className="h-7 px-2" onClick={() => saveRegion(r)}>
+                          Guardar
+                        </Button>
                         <Button size="icon" variant="ghost" onClick={() => setRegionEdit(r)}>
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>

@@ -7,7 +7,7 @@ const tabs = [
   { to: "/admin", label: "Inicio", icon: LayoutDashboard, end: true },
   { to: "/admin/live", label: "En vivo", icon: Globe },
   { to: "/admin/reviews", label: "Reseñas", icon: Star },
-  { to: "/admin/brevo-logs", label: "Brevo", icon: Mail },
+  
   { to: "/admin/hotmart-audit", label: "Hotmart", icon: ShieldCheck },
   { to: "/admin/seo", label: "SEO", icon: Search },
 ];

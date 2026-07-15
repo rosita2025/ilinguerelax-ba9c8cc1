@@ -270,7 +270,17 @@ export default function AdminCheckoutMethods() {
 
   async function quickAdd(region_code: string, q: typeof CHECKOUT_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
-    if (existing) return toast.info(`${q.label} ya está agregado`);
+    if (existing) {
+      if (existing.enabled) return toast.info(`${q.label} ya está agregado`);
+      setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: true } : x));
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "toggle_method", id: existing.id, enabled: true },
+      });
+      if (error || data?.error) { toast.error(error?.message || data?.error); load(); return; }
+      toast.success(`✅ ${q.label} activado`);
+      invalidateCheckoutMethodsCache();
+      return;
+    }
     const m: Method = {
       id: "", region_code, method_key: q.key, label: q.label,
       note: q.note, icon: q.icon, enabled: true,
@@ -504,16 +514,18 @@ export default function AdminCheckoutMethods() {
                             <div className="flex flex-wrap gap-1">
                               {available.map(q => {
                                 const already = rms.some(m => m.method_key === q.key);
+                                const existing = rms.find(m => m.method_key === q.key);
+                                const canReactivate = !!existing && !existing.enabled;
                                 return (
                                   <button
                                     key={q.key}
                                     type="button"
-                                    disabled={already}
+                                    disabled={already && !canReactivate}
                                     onClick={() => quickAdd(r.code, q)}
-                                    className={`text-[11px] px-2 py-1 rounded border ${already ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                                    className={`text-[11px] px-2 py-1 rounded border ${already && !canReactivate ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
                                     title={q.note}
                                   >
-                                    {already ? "✓ " : "+ "}{q.label}
+                                    {canReactivate ? "Activar " : already ? "✓ " : "+ "}{q.label}
                                   </button>
                                 );
                               })}

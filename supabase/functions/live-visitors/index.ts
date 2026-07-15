@@ -263,6 +263,7 @@ serve(async (req) => {
         referrer: (row.referrer as string) || null,
         source: traffic.source,
         source_channel: traffic.channel,
+        campaign: traffic.campaign,
         last_seen: row.created_at as string,
         event_count: 1,
         last_event: row.event_name as string,

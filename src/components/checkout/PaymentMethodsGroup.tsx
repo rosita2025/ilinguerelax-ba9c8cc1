@@ -72,6 +72,162 @@ const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
+type MethodBadge = { label: string; bg: string; color: string };
+type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
+
+const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> = {
+  stripe_oxxo: {
+    icon: Banknote,
+    title: "OXXO",
+    sub: "Paga en efectivo en tiendas OXXO dentro del formulario seguro de Stripe.",
+    badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
+  },
+  stripe_boleto: {
+    icon: Banknote,
+    title: "Boleto",
+    sub: "Voucher bancario para Brasil dentro de Stripe.",
+    badges: [{ label: "Boleto", bg: "#1F2937", color: "#ffffff" }],
+  },
+  stripe_pix: {
+    icon: Smartphone,
+    title: "Pix",
+    sub: "Transferencia instantánea para Brasil dentro de Stripe.",
+    badges: [{ label: "Pix", bg: "#32BCAD", color: "#06211F" }],
+  },
+  stripe_ideal: {
+    icon: Building2,
+    title: "iDEAL",
+    sub: "Banca online de Países Bajos dentro de Stripe.",
+    badges: [{ label: "iDEAL", bg: "#CC0066", color: "#ffffff" }],
+  },
+  stripe_bancontact: {
+    icon: Building2,
+    title: "Bancontact",
+    sub: "Pago local de Bélgica dentro de Stripe.",
+    badges: [{ label: "Bancontact", bg: "#005498", color: "#ffffff" }],
+  },
+  stripe_sepa_debit: {
+    icon: Banknote,
+    title: "SEPA débito directo",
+    sub: "Débito bancario para zona euro dentro de Stripe.",
+    badges: [{ label: "SEPA", bg: "#003399", color: "#ffffff" }],
+  },
+  stripe_giropay: {
+    icon: Building2,
+    title: "Giropay",
+    sub: "Banca online de Alemania dentro de Stripe.",
+    badges: [{ label: "Giropay", bg: "#0B5AA6", color: "#ffffff" }],
+  },
+  stripe_sofort: {
+    icon: Building2,
+    title: "Sofort",
+    sub: "Transferencia instantánea dentro de Stripe.",
+    badges: [{ label: "Sofort", bg: "#EE3423", color: "#ffffff" }],
+  },
+  stripe_eps: {
+    icon: Building2,
+    title: "EPS",
+    sub: "Banca online de Austria dentro de Stripe.",
+    badges: [{ label: "EPS", bg: "#C8102E", color: "#ffffff" }],
+  },
+  stripe_p24: {
+    icon: Building2,
+    title: "Przelewy24 (P24)",
+    sub: "Banca online de Polonia dentro de Stripe.",
+    badges: [{ label: "P24", bg: "#D71920", color: "#ffffff" }],
+  },
+  stripe_blik: {
+    icon: Smartphone,
+    title: "BLIK",
+    sub: "Pago móvil de Polonia dentro de Stripe.",
+    badges: [{ label: "BLIK", bg: "#111827", color: "#ffffff" }],
+  },
+  stripe_multibanco: {
+    icon: Banknote,
+    title: "Multibanco",
+    sub: "Pago local de Portugal dentro de Stripe.",
+    badges: [{ label: "Multibanco", bg: "#1F4E79", color: "#ffffff" }],
+  },
+  stripe_mb_way: {
+    icon: Smartphone,
+    title: "MB WAY",
+    sub: "Pago móvil de Portugal dentro de Stripe.",
+    badges: [{ label: "MB WAY", bg: "#00A3E0", color: "#001B2D" }],
+  },
+  stripe_twint: {
+    icon: Smartphone,
+    title: "TWINT",
+    sub: "Pago móvil de Suiza dentro de Stripe.",
+    badges: [{ label: "TWINT", bg: "#FF5A00", color: "#ffffff" }],
+  },
+  stripe_mobilepay: {
+    icon: Smartphone,
+    title: "MobilePay",
+    sub: "Pago móvil de Dinamarca/Finlandia dentro de Stripe.",
+    badges: [{ label: "MobilePay", bg: "#5A78FF", color: "#ffffff" }],
+  },
+  stripe_bacs_debit: {
+    icon: Banknote,
+    title: "Bacs débito directo",
+    sub: "Débito bancario de Reino Unido dentro de Stripe.",
+    badges: [{ label: "Bacs", bg: "#1F2937", color: "#ffffff" }],
+  },
+  stripe_acss_debit: {
+    icon: Banknote,
+    title: "Débito bancario Canadá",
+    sub: "Débito preautorizado de Canadá dentro de Stripe.",
+    badges: [{ label: "ACSS", bg: "#D80621", color: "#ffffff" }],
+  },
+  stripe_afterpay_clearpay: {
+    icon: CreditCard,
+    title: "Afterpay / Clearpay",
+    sub: "Compra ahora y paga en cuotas dentro de Stripe.",
+    badges: [{ label: "Afterpay", bg: "#B2FCE4", color: "#0A0A0A" }],
+  },
+  stripe_affirm: {
+    icon: CreditCard,
+    title: "Affirm",
+    sub: "Compra ahora y paga después dentro de Stripe.",
+    badges: [{ label: "Affirm", bg: "#4A4AF4", color: "#ffffff" }],
+  },
+  stripe_paypal: {
+    icon: Wallet,
+    title: "PayPal (Stripe)",
+    sub: "PayPal procesado dentro del formulario seguro de Stripe.",
+    badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
+  },
+  stripe_alipay: {
+    icon: Smartphone,
+    title: "Alipay",
+    sub: "Pago local de Asia dentro de Stripe.",
+    badges: [{ label: "Alipay", bg: "#1677FF", color: "#ffffff" }],
+  },
+  stripe_wechat_pay: {
+    icon: Smartphone,
+    title: "WeChat Pay",
+    sub: "Pago local de China dentro de Stripe.",
+    badges: [{ label: "WeChat", bg: "#07C160", color: "#001B0A" }],
+  },
+  stripe_grabpay: {
+    icon: Smartphone,
+    title: "GrabPay",
+    sub: "Pago local del sudeste asiático dentro de Stripe.",
+    badges: [{ label: "GrabPay", bg: "#00B14F", color: "#ffffff" }],
+  },
+  stripe_paynow: {
+    icon: Smartphone,
+    title: "PayNow",
+    sub: "Pago local de Singapur dentro de Stripe.",
+    badges: [{ label: "PayNow", bg: "#7B1FA2", color: "#ffffff" }],
+  },
+  stripe_konbini: {
+    icon: Banknote,
+    title: "Konbini",
+    sub: "Pago en tiendas de conveniencia de Japón dentro de Stripe.",
+    badges: [{ label: "Konbini", bg: "#D32F2F", color: "#ffffff" }],
+  },
+};
+
 export function PaymentMethodsGroup() {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();

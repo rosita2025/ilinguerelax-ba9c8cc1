@@ -454,7 +454,7 @@ export function PaymentMethodsGroup() {
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
     if (!isPeru && !(total <= 0 && items.length > 0)) {
-      if (selected !== "card") setSelected("card");
+      if (selected !== "card") { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
       if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);

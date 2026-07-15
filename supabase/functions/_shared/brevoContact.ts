@@ -29,7 +29,18 @@ interface Args {
   couponCode?: string;          // código de cupón usado (ej. NEW10, BLACKFRIDAY)
   couponPercent?: number;       // % de descuento aplicado (0-100)
   couponAmount?: number;        // monto absoluto descontado (en la moneda de la orden)
+  /** Estado del ciclo de vida de la compra. Default "compra" (aprobada). */
+  purchaseStatus?: "compra" | "pendiente" | "rechazado" | "reembolso" | "chargeback" | "cancelado";
 }
+
+const STATUS_EVENT_MAP: Record<string, string> = {
+  compra: "purchase",
+  pendiente: "pending",
+  rechazado: "refused",
+  reembolso: "refunded",
+  chargeback: "chargeback",
+  cancelado: "cancelled",
+};
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
@@ -188,9 +199,22 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");
   attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
 
-  // TAGS: incluye categoría y cupón para filtrar por oferta/descuento
+  // Estado del ciclo de vida (compra/pendiente/rechazado/reembolso/chargeback/cancelado)
+  const purchaseStatus = a.purchaseStatus ?? "compra";
+  attributes.PURCHASE_STATUS = purchaseStatus;
+  attributes.LAST_PURCHASE_STATUS = purchaseStatus;
+  attributes.LAST_PURCHASE_STATUS_AT = new Date().toISOString();
+
+  // TAGS: incluye categoría, cupón y estado para filtrar por oferta/descuento/estado
   const eventKind: "compra" | "abandonado" = "compra";
-  const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
+  const tagList = [
+    eventKind,
+    origin,
+    `${eventKind}_${origin}`,
+    `cat_${category}`,
+    `estado_${purchaseStatus}`,
+    `${purchaseStatus}_${origin}`,
+  ];
   if (couponCode) tagList.push(`cupon_${couponCode.toLowerCase()}`);
 
   // Audiencias/segmentos por producto (tabla brevo_product_audiences, editable en admin)
@@ -207,18 +231,21 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   if (audiences.labels.length) attributes.PRODUCT_AUDIENCES = audiences.labels.join(", ");
 
   attributes.TAGS = tagList.join(",");
-  attributes.SEGMENTO = `${eventKind}_${origin}`;
+  attributes.SEGMENTO = `${purchaseStatus}_${origin}`;
 
   const parseIds = (raw?: string | null) =>
     raw ? raw.split(",").map((s) => Number(s.trim())).filter((n) => Number.isFinite(n)) : [];
 
+  // Sólo agregar a la lista de "compradores" cuando la compra está aprobada.
   const listIds = [
     ...parseIds(Deno.env.get("BREVO_CUSTOMERS_LIST_ID")),
-    ...parseIds(
-      origin === "hotmart"
-        ? Deno.env.get("BREVO_LIST_HOTMART_COMPRA")
-        : Deno.env.get("BREVO_LIST_TIENDA_COMPRA"),
-    ),
+    ...(purchaseStatus === "compra"
+      ? parseIds(
+          origin === "hotmart"
+            ? Deno.env.get("BREVO_LIST_HOTMART_COMPRA")
+            : Deno.env.get("BREVO_LIST_TIENDA_COMPRA"),
+        )
+      : []),
     ...audiences.listIds,
   ];
 
@@ -230,7 +257,10 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   if (listIds.length) payload.listIds = Array.from(new Set(listIds));
 
   const eventOrigin = origin;
-  const event_type = eventOrigin === "hotmart" ? "hotmart_purchase" : "tienda_purchase";
+  const statusSuffix = STATUS_EVENT_MAP[purchaseStatus] ?? "purchase";
+  const event_type = eventOrigin === "hotmart"
+    ? `hotmart_${statusSuffix}`
+    : `tienda_${statusSuffix}`;
   const baseLog = {
     event_type,
     source: "brevo_contact",

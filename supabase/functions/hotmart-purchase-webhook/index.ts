@@ -59,33 +59,43 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Map Hotmart events to statuses
+    // Map Hotmart events → estado interno + estado Brevo
     const evUpper = (event || "").toString().toUpperCase();
     let status = "approved";
-    if (evUpper.includes("REFUND")) status = "refunded";
-    else if (evUpper.includes("CHARGEBACK")) status = "chargeback";
-    else if (evUpper.includes("CANCEL")) status = "cancelled";
-    else if (evUpper.includes("APPROVED") || evUpper.includes("COMPLETE")) status = "approved";
+    let brevoStatus: "compra" | "pendiente" | "rechazado" | "reembolso" | "chargeback" | "cancelado" = "compra";
+    if (evUpper.includes("REFUND")) { status = "refunded"; brevoStatus = "reembolso"; }
+    else if (evUpper.includes("CHARGEBACK")) { status = "chargeback"; brevoStatus = "chargeback"; }
+    else if (evUpper.includes("CANCEL")) { status = "cancelled"; brevoStatus = "cancelado"; }
+    else if (evUpper.includes("REFUSED") || evUpper.includes("EXPIRED")) { status = "refused"; brevoStatus = "rechazado"; }
+    else if (
+      evUpper.includes("BILLET") || evUpper.includes("WAITING_PAYMENT") ||
+      evUpper.includes("DELAYED") || evUpper.includes("PROTEST") ||
+      evUpper.includes("OUT_OF_SHOPPING_CART") || evUpper.includes("PIX")
+    ) { status = "pending"; brevoStatus = "pendiente"; }
+    else if (evUpper.includes("APPROVED") || evUpper.includes("COMPLETE")) { status = "approved"; brevoStatus = "compra"; }
 
+    // Persistir estado en hotmart_purchases (upsert siempre, no sólo aprobados)
+    const product = labelHotmartProduct(productName, productCode, productId);
+    const priceValue = Number(data?.purchase?.price?.value ?? data?.purchase?.full_price?.value ?? data?.purchase?.approved_price?.value ?? product.value);
+    const currency = String(data?.purchase?.price?.currency_code ?? data?.purchase?.currency_code ?? "USD").toUpperCase();
+
+    const { error: upsertErr } = await supabase.from("hotmart_purchases").upsert(
+      {
+        email: buyerEmail.toLowerCase().trim(),
+        transaction_code: transactionCode,
+        product_code: productCode ?? null,
+        product_id: productId ?? null,
+        purchased_at: new Date().toISOString(),
+        refund_deadline: new Date(Date.now() + 7 * 864e5).toISOString(),
+        status,
+        raw_payload: body,
+      },
+      { onConflict: "transaction_code" },
+    );
+    if (upsertErr) throw upsertErr;
+
+    // Sólo registrar Purchase en el funnel/píxel para aprobadas
     if (status === "approved") {
-      const { error } = await supabase.from("hotmart_purchases").upsert(
-        {
-          email: buyerEmail.toLowerCase().trim(),
-          transaction_code: transactionCode,
-          product_code: productCode ?? null,
-          product_id: productId ?? null,
-          purchased_at: new Date().toISOString(),
-          refund_deadline: new Date(Date.now() + 7 * 864e5).toISOString(),
-          status: "approved",
-          raw_payload: body,
-        },
-        { onConflict: "transaction_code" },
-      );
-      if (error) throw error;
-
-      const product = labelHotmartProduct(productName, productCode, productId);
-      const priceValue = Number(data?.purchase?.price?.value ?? data?.purchase?.full_price?.value ?? data?.purchase?.approved_price?.value ?? product.value);
-      const currency = String(data?.purchase?.price?.currency_code ?? data?.purchase?.currency_code ?? "USD").toUpperCase();
       await supabase.from("funnel_events").insert({
         event_name: "Purchase",
         product_id: product.id,
@@ -96,25 +106,20 @@ Deno.serve(async (req) => {
         country: data?.buyer?.address?.country || data?.purchase?.buyer?.address?.country || null,
         referrer: "hotmart-webhook",
       });
+    }
 
-      // Sync buyer as Brevo customer contact (idempotent; updates existing).
-      try {
-        const buyerName: string | undefined =
-          data?.buyer?.name ?? data?.purchase?.buyer?.name ?? undefined;
-        const buyerPhone: string | undefined =
-          data?.buyer?.checkout_phone ??
-          data?.buyer?.phone ??
-          data?.purchase?.buyer?.checkout_phone ??
-          data?.purchase?.buyer?.phone ??
-          undefined;
-        const buyerCountry: string | undefined =
-          data?.buyer?.address?.country_iso ??
-          data?.buyer?.address?.country ??
-          data?.purchase?.buyer?.address?.country_iso ??
-          data?.purchase?.buyer?.address?.country ??
-          undefined;
+    // Sincronizar SIEMPRE a Brevo (compra, pendiente, rechazado, reembolso, chargeback, cancelado)
+    try {
+      const buyerName: string | undefined =
+        data?.buyer?.name ?? data?.purchase?.buyer?.name ?? undefined;
+      const buyerPhone: string | undefined =
+        data?.buyer?.checkout_phone ?? data?.buyer?.phone ??
+        data?.purchase?.buyer?.checkout_phone ?? data?.purchase?.buyer?.phone ?? undefined;
+      const buyerCountry: string | undefined =
+        data?.buyer?.address?.country_iso ?? data?.buyer?.address?.country ??
+        data?.purchase?.buyer?.address?.country_iso ?? data?.purchase?.buyer?.address?.country ?? undefined;
 
-        // Persist to central contacts (dedupe on email+source).
+      if (status === "approved") {
         try {
           await supabase.from("email_contacts").insert({
             email: buyerEmail.toLowerCase().trim(),
@@ -123,50 +128,39 @@ Deno.serve(async (req) => {
             product_type: product.id,
           });
         } catch (_) { /* conflict ignored */ }
-
-        // Hotmart puede exponer el cupón en varias rutas según webhook version
-        const couponRaw =
-          data?.purchase?.offer?.coupon_code ??
-          data?.purchase?.offer?.code ??
-          data?.purchase?.coupon?.code ??
-          data?.purchase?.coupon_code ??
-          data?.purchase?.origin?.src ??
-          undefined;
-        const couponCode = couponRaw ? String(couponRaw).trim().toUpperCase() : undefined;
-        const couponAmountRaw = Number(
-          data?.purchase?.price?.discount_value ??
-          data?.purchase?.discount?.value ??
-          data?.purchase?.coupon?.value ??
-          NaN,
-        );
-        const couponAmount = Number.isFinite(couponAmountRaw) && couponAmountRaw > 0 ? couponAmountRaw : undefined;
-
-        await upsertBrevoContact({
-          email: buyerEmail,
-          name: buyerName,
-          phone: buyerPhone,
-          country: buyerCountry ? String(buyerCountry).slice(0, 2).toUpperCase() : undefined,
-          productName,
-          skus: [product.id],
-          amount: Number.isFinite(priceValue) ? priceValue : product.value,
-          currency,
-          orderNumber: transactionCode,
-          provider: "hotmart",
-          origin: "hotmart",
-          hotmartProductId: productId,
-          hotmartProductCode: productCode,
-          couponCode,
-          couponAmount,
-        });
-      } catch (e) {
-        console.warn("brevo customer sync failed:", e instanceof Error ? e.message : String(e));
       }
-    } else {
-      const { error } = await supabase
-        .from("hotmart_purchases")
-        .update({ status, raw_payload: body })
-        .eq("transaction_code", transactionCode);
-      if (error) throw error;
+
+      const couponRaw =
+        data?.purchase?.offer?.coupon_code ?? data?.purchase?.offer?.code ??
+        data?.purchase?.coupon?.code ?? data?.purchase?.coupon_code ??
+        data?.purchase?.origin?.src ?? undefined;
+      const couponCode = couponRaw ? String(couponRaw).trim().toUpperCase() : undefined;
+      const couponAmountRaw = Number(
+        data?.purchase?.price?.discount_value ?? data?.purchase?.discount?.value ??
+        data?.purchase?.coupon?.value ?? NaN,
+      );
+      const couponAmount = Number.isFinite(couponAmountRaw) && couponAmountRaw > 0 ? couponAmountRaw : undefined;
+
+      await upsertBrevoContact({
+        email: buyerEmail,
+        name: buyerName,
+        phone: buyerPhone,
+        country: buyerCountry ? String(buyerCountry).slice(0, 2).toUpperCase() : undefined,
+        productName,
+        skus: [product.id],
+        amount: Number.isFinite(priceValue) ? priceValue : product.value,
+        currency,
+        orderNumber: transactionCode,
+        provider: "hotmart",
+        origin: "hotmart",
+        hotmartProductId: productId,
+        hotmartProductCode: productCode,
+        couponCode,
+        couponAmount,
+        purchaseStatus: brevoStatus,
+      });
+    } catch (e) {
+      console.warn("brevo sync failed:", e instanceof Error ? e.message : String(e));
     }
 
     return new Response(JSON.stringify({ ok: true, status }), {

@@ -157,6 +157,20 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   // TAGS: incluye categoría para filtrar por oferta (ej. "compra,hotmart,compra_hotmart,cat_8000_palabras")
   const eventKind: "compra" | "abandonado" = "compra";
   const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
+
+  // Audiencias/segmentos por producto (tabla brevo_product_audiences, editable en admin)
+  const audiences = await resolveBrevoAudiences({
+    eventKind,
+    origin,
+    hotmartProductId: a.hotmartProductId,
+    hotmartProductCode: a.hotmartProductCode,
+    tiendaSku,
+    skus: a.skus,
+    category,
+  });
+  for (const t of audiences.tags) tagList.push(t);
+  if (audiences.labels.length) attributes.PRODUCT_AUDIENCES = audiences.labels.join(", ");
+
   attributes.TAGS = tagList.join(",");
   attributes.SEGMENTO = `${eventKind}_${origin}`;
 
@@ -170,6 +184,7 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
         ? Deno.env.get("BREVO_LIST_HOTMART_COMPRA")
         : Deno.env.get("BREVO_LIST_TIENDA_COMPRA"),
     ),
+    ...audiences.listIds,
   ];
 
   const payload: Record<string, unknown> = {

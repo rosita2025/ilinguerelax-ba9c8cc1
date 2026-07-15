@@ -92,16 +92,22 @@ Deno.serve(async (req) => {
       .slice(0, 300);
     const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
 
-    // Métodos de pago habilitados en Stripe:
-    // - card: tarjetas de crédito/débito globales
+    // Métodos de pago habilitados en Stripe (Global USD):
+    // - card: tarjetas crédito/débito globales
     // - link: One-click de Stripe
-    // - us_bank_account: transferencia bancaria ACH (compradores USA)
-    // - customer_balance: transferencia bancaria internacional (virtual account)
-    // Nota: Efecty (Colombia) requiere moneda COP y country=CO;
-    // no es compatible con este checkout Global en USD.
+    // - cashapp: Cash App Pay (solo compradores USA)
+    // - us_bank_account: transferencia bancaria ACH (solo USA)
+    // - customer_balance: transferencia bancaria internacional (virtual account, fuera de USA)
+    // Nota: Efecty/OXXO/Boleto requieren su moneda local y no son compatibles con USD.
     const buyerCountry = body.contact.country.toUpperCase();
     const paymentMethodTypes: string[] = ["card", "link"];
-    if (buyerCountry === "US") paymentMethodTypes.push("us_bank_account");
+    if (buyerCountry === "US") {
+      paymentMethodTypes.push("cashapp", "us_bank_account");
+    } else {
+      paymentMethodTypes.push("customer_balance");
+    }
+
+    const isCustomerBalance = paymentMethodTypes.includes("customer_balance");
 
     const session = await stripe.checkout.sessions.create({
       line_items,
@@ -112,6 +118,14 @@ Deno.serve(async (req) => {
       adaptive_pricing: { enabled: true },
       customer_email: body.contact.email,
       payment_method_types: paymentMethodTypes as any,
+      ...(isCustomerBalance && {
+        payment_method_options: {
+          customer_balance: {
+            funding_type: "bank_transfer",
+            bank_transfer: { type: "us_bank_transfer" },
+          },
+        },
+      }),
       payment_intent_data: {
         description: `Prueba 1 · ${productSummary}`,
       },

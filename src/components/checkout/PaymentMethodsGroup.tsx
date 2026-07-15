@@ -462,7 +462,7 @@ export function PaymentMethodsGroup() {
     : allMethods;
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
-  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id;
+  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
     const i = methodsConfig.familyOrder.indexOf(fam as any);

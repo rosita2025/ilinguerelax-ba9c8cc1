@@ -368,11 +368,6 @@ export default function Checkout() {
             <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
             {language === "en" ? "7-day money-back guarantee" : language === "fr" ? "Garantie 7 jours satisfait ou remboursé" : language === "pt" ? "Garantia de 7 dias" : "Garantía de 7 días o te devolvemos tu dinero"}
           </span>
-          <span className="text-muted-foreground hidden sm:inline">·</span>
-          <span className="flex items-center gap-1.5 text-foreground">
-            <Users className="w-3.5 h-3.5 text-primary" />
-            {language === "en" ? "+12,000 happy students" : language === "fr" ? "+12 000 étudiants satisfaits" : language === "pt" ? "+12.000 alunos felizes" : "+12,000 estudiantes felices"}
-          </span>
           <span className="text-muted-foreground hidden md:inline">·</span>
           <span className="hidden md:flex items-center gap-1.5 text-foreground">
             <Lock className="w-3.5 h-3.5 text-emerald-600" />

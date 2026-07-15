@@ -136,20 +136,20 @@ export default function AdminCheckoutPreview({ regions = [] }: Props) {
   }
 
   return (
-    <Card className="p-4 space-y-3 border-primary/30">
+    <Card className="p-3 sm:p-4 space-y-3 border-primary/30">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 mr-2">
-          <Eye className="w-4 h-4 text-primary" />
-          <span className="font-semibold text-sm">Vista previa por país</span>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <Eye className="w-4 h-4 text-primary shrink-0" />
+          <span className="font-semibold text-sm">Vista previa</span>
           {country && (
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-[10px] truncate">
               {country.flag} {country.code}
-              {country.region ? ` · región ${country.region}` : ""}
+              {country.region ? ` · ${country.region}` : ""}
             </Badge>
           )}
         </div>
 
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-1 flex-wrap justify-end">
           <Button
             size="icon"
             variant={device === "desktop" ? "default" : "outline"}
@@ -171,23 +171,24 @@ export default function AdminCheckoutPreview({ regions = [] }: Props) {
           <Button
             size="sm"
             variant="outline"
-            className="h-8"
+            className="h-8 px-2"
             onClick={() => setNonce((n) => n + 1)}
             title="Recargar"
           >
-            <RefreshCw className="w-3.5 h-3.5 mr-1" />
-            Recargar
+            <RefreshCw className="w-3.5 h-3.5 sm:mr-1" />
+            <span className="hidden sm:inline">Recargar</span>
           </Button>
           {url && (
-            <Button asChild size="sm" variant="secondary" className="h-8">
+            <Button asChild size="sm" variant="secondary" className="h-8 px-2">
               <a href={url} target="_blank" rel="noreferrer">
-                <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                Abrir
+                <ExternalLink className="w-3.5 h-3.5 sm:mr-1" />
+                <span className="hidden sm:inline">Abrir</span>
               </a>
             </Button>
           )}
         </div>
       </div>
+
 
       <div className="flex flex-wrap gap-1.5">
         {countries.map((c) => {

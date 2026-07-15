@@ -378,21 +378,8 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* Urgencia sutil */}
-      <div className="bg-accent/10 border-b border-accent/20">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-1.5 flex items-center justify-center gap-2 text-[11px] sm:text-xs text-accent-foreground/90">
-          <Clock className="w-3.5 h-3.5 text-accent animate-pulse" />
-          <span className="font-semibold">
-            {language === "en"
-              ? "Complete your purchase now — price and bonuses reserved for a few minutes"
-              : language === "fr"
-              ? "Finalisez votre achat — prix et bonus réservés quelques minutes"
-              : language === "pt"
-              ? "Finalize sua compra — preço e bônus reservados por alguns minutos"
-              : "Termina tu compra ahora — precio y bonos reservados por unos minutos"}
-          </span>
-        </div>
-      </div>
+
+
 
       <div className="lg:hidden max-w-6xl mx-auto px-3 sm:px-4 pt-3">
         <SectionErrorBoundary name="order-summary-mobile" extra={{ slug: catalogItem?.id }}>

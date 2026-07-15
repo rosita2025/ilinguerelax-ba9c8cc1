@@ -19,9 +19,11 @@ interface Args {
   language?: string;        // es|en|fr|pt
   country?: string;         // ISO-2, e.g. PE, US, FR
   source?: string;          // "checkout" | "hotmart" | ...
+  productCategory?: string; // categoría/tipo de oferta explícita (opcional)
 }
 
 import { logBrevoSync } from "./brevoLog.ts";
+import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 

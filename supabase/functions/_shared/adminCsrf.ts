@@ -15,6 +15,8 @@ const ALLOWED_ORIGINS = [
   // Lovable preview / sandbox subdomains
   /^https:\/\/[a-z0-9-]+\.lovable\.app$/i,
   /^https:\/\/[a-z0-9-]+\.lovable\.dev$/i,
+  /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/i,
+  /^https:\/\/[a-z0-9-]+\.lovable\.host$/i,
   // Local dev
   "http://localhost:8080",
   "http://localhost:5173",

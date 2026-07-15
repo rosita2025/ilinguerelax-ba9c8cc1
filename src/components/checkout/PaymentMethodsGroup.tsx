@@ -423,8 +423,14 @@ export function PaymentMethodsGroup() {
     ? t.cardSubtitlePeru(localBadge)
     : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
 
+  const isUsa = country === "US";
   const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
     { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
+    ...(isUsa ? [
+      { id: "card" as Method, icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with your Cash App balance (USA only)." : "Paga con tu saldo Cash App (solo USA).", badge: "Stripe" },
+      { id: "card" as Method, icon: Building2, title: language === "en" ? "Bank transfer (ACH)" : "Transferencia bancaria (ACH)", sub: language === "en" ? "Pay directly from your US bank account." : "Paga desde tu cuenta bancaria de EE. UU.", badge: "Stripe" },
+      { id: "card" as Method, icon: Wallet, title: "Link (Stripe)", sub: language === "en" ? "One-click checkout saved by Stripe." : "Pago con un clic guardado por Stripe.", badge: "Stripe" },
+    ] : []),
     { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: priceBadge },
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
@@ -434,6 +440,7 @@ export function PaymentMethodsGroup() {
   const methods = isPeru
     ? allMethods.filter((m) => m.id !== "paypal")
     : allMethods.filter((m) => m.id === "card" || m.id === "paypal");
+
 
   // Fuera de Perú solo hay un método (Stripe). Auto-seleccionarlo y auto-abrir
   // el formulario embebido en cuanto el comprador completa sus datos, para
@@ -551,7 +558,7 @@ export function PaymentMethodsGroup() {
         const Icon = m.icon;
         return (
           <div
-            key={m.id}
+            key={`${m.id}-${m.title}`}
             className={cn(
               "rounded-xl border overflow-hidden transition-colors",
               isSelected
@@ -589,14 +596,28 @@ export function PaymentMethodsGroup() {
                     </span>
                   )}
                 </div>
-                {m.id === "card" ? (
+                {m.id === "card" && (m.title === (isPeru ? t.cardTitlePeru : t.cardTitleGlobal)) ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <LogoBadge src={visaLogo} alt="Visa" />
                     <LogoBadge src={mastercardLogo} alt="Mastercard" />
                     <LogoBadge src={applePayLogo} alt="Apple Pay" bg="#000000" />
                     <LinkBadge />
                   </div>
-                ) : m.id === "transfer" ? (
+                ) : m.title === "Cash App Pay" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Cash App" bg="#00D64F" color="#000000" />
+                  </div>
+                ) : m.title.includes("ACH") ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
+                    <BankBadge label="US Bank" bg="#eeeeee" color="#0A2540" />
+                  </div>
+                ) : m.title === "Link (Stripe)" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <LinkBadge />
+                  </div>
+                ) : null}
+                {m.id === "card" ? null : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
                     <BankBadge label="BBVA" bg="#004481" color="#ffffff" />

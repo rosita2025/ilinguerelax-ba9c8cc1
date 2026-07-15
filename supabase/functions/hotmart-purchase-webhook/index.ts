@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -95,6 +96,49 @@ Deno.serve(async (req) => {
         country: data?.buyer?.address?.country || data?.purchase?.buyer?.address?.country || null,
         referrer: "hotmart-webhook",
       });
+
+      // Sync buyer as Brevo customer contact (idempotent; updates existing).
+      try {
+        const buyerName: string | undefined =
+          data?.buyer?.name ?? data?.purchase?.buyer?.name ?? undefined;
+        const buyerPhone: string | undefined =
+          data?.buyer?.checkout_phone ??
+          data?.buyer?.phone ??
+          data?.purchase?.buyer?.checkout_phone ??
+          data?.purchase?.buyer?.phone ??
+          undefined;
+        const buyerCountry: string | undefined =
+          data?.buyer?.address?.country_iso ??
+          data?.buyer?.address?.country ??
+          data?.purchase?.buyer?.address?.country_iso ??
+          data?.purchase?.buyer?.address?.country ??
+          undefined;
+
+        // Persist to central contacts (dedupe on email+source).
+        try {
+          await supabase.from("email_contacts").insert({
+            email: buyerEmail.toLowerCase().trim(),
+            name: buyerName ?? null,
+            source: "hotmart_purchase",
+            product_type: product.id,
+          });
+        } catch (_) { /* conflict ignored */ }
+
+        await upsertBrevoContact({
+          email: buyerEmail,
+          name: buyerName,
+          phone: buyerPhone,
+          country: buyerCountry ? String(buyerCountry).slice(0, 2).toUpperCase() : undefined,
+          productName,
+          skus: [product.id],
+          amount: Number.isFinite(priceValue) ? priceValue : product.value,
+          currency,
+          orderNumber: transactionCode,
+          provider: "hotmart",
+        });
+      } catch (e) {
+        console.warn("brevo customer sync failed:", e instanceof Error ? e.message : String(e));
+      }
     } else {
       const { error } = await supabase
         .from("hotmart_purchases")

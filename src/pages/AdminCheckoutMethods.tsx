@@ -13,7 +13,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
-import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap, ArrowUp, ArrowDown } from "lucide-react";
+import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap, ArrowUp, ArrowDown, Save, Loader2 } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -185,6 +185,8 @@ export default function AdminCheckoutMethods() {
   const [loading, setLoading] = useState(true);
   const [regionEdit, setRegionEdit] = useState<Region | null>(null);
   const [methodEdit, setMethodEdit] = useState<Method | null>(null);
+  const [savingRegion, setSavingRegion] = useState<string | null>(null);
+  const [savingDialog, setSavingDialog] = useState(false);
 
   async function load() {
     invalidateCheckoutMethodsCache();
@@ -197,12 +199,36 @@ export default function AdminCheckoutMethods() {
   }
   useEffect(() => { load(); }, []);
 
-  async function saveRegion(r: Region) {
-    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "save_region", region: r },
+  async function saveRegion(r: Region, opts: { fromDialog?: boolean } = {}) {
+    const code = r.code.trim().toUpperCase();
+    if (!code) return toast.error("Código requerido");
+    if (!/^[A-Z0-9_-]{1,32}$/.test(code)) return toast.error("Código inválido (A-Z, 0-9, _-)");
+    if (!r.name.trim()) return toast.error("Nombre requerido");
+    if (!r.currency.trim()) return toast.error("Moneda requerida");
+
+    if (opts.fromDialog) setSavingDialog(true); else setSavingRegion(code);
+    // Optimistic UI: reflect changes immediately in the card grid.
+    const payload: Region = { ...r, code };
+    setRegions(prev => {
+      const idx = prev.findIndex(x => x.code === code);
+      if (idx < 0) return [...prev, payload].sort((a, b) => a.sort_order - b.sort_order);
+      const next = prev.slice(); next[idx] = payload; return next;
     });
-    if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success("Región guardada"); setRegionEdit(null); load();
+    try {
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "save_region", region: payload },
+      });
+      if (error || data?.error) throw new Error(error?.message || data?.error);
+      toast.success("✅ Región guardada");
+      if (opts.fromDialog) setRegionEdit(null);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message || "Error al guardar");
+      await load();
+    } finally {
+      setSavingDialog(false);
+      setSavingRegion(null);
+    }
   }
   async function deleteRegion(code: string) {
     if (!confirm(`Eliminar región ${code} y sus métodos?`)) return;
@@ -213,11 +239,23 @@ export default function AdminCheckoutMethods() {
     toast.success("Eliminada"); load();
   }
   async function saveMethod(m: Method) {
-    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "save_method", method: m },
-    });
-    if (error || data?.error) return toast.error(error?.message || data?.error);
-    toast.success("Método guardado"); setMethodEdit(null); load();
+    if (!m.method_key.trim()) return toast.error("Clave requerida");
+    if (!/^[a-z0-9_]{1,48}$/.test(m.method_key)) return toast.error("Clave inválida (a-z, 0-9, _)");
+    if (!m.label.trim()) return toast.error("Etiqueta requerida");
+    setSavingDialog(true);
+    try {
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "save_method", method: m },
+      });
+      if (error || data?.error) throw new Error(error?.message || data?.error);
+      toast.success("✅ Método guardado");
+      setMethodEdit(null);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message || "Error al guardar");
+    } finally {
+      setSavingDialog(false);
+    }
   }
   async function deleteMethod(id: string) {
     if (!confirm("Eliminar método?")) return;
@@ -360,7 +398,8 @@ export default function AdminCheckoutMethods() {
                     <div className="flex flex-col gap-1 items-end">
                       <Badge variant="outline" className="text-[10px]">{r.code}</Badge>
                       <div className="flex gap-1">
-                        <Button size="sm" variant="default" className="h-7 px-2" onClick={() => saveRegion(r)}>
+                        <Button size="sm" variant="default" className="h-7 px-2" onClick={() => saveRegion(r)} disabled={savingRegion === r.code}>
+                          {savingRegion === r.code ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Save className="w-3.5 h-3.5 mr-1" />}
                           Guardar
                         </Button>
                         <Button size="icon" variant="ghost" onClick={() => setRegionEdit(r)}>
@@ -599,7 +638,10 @@ export default function AdminCheckoutMethods() {
           )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setRegionEdit(null)}>Cancelar</Button>
-            <Button onClick={() => regionEdit && saveRegion(regionEdit)}>Guardar</Button>
+            <Button onClick={() => regionEdit && saveRegion(regionEdit, { fromDialog: true })} disabled={savingDialog}>
+              {savingDialog ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
+              Guardar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -652,7 +694,10 @@ export default function AdminCheckoutMethods() {
           )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setMethodEdit(null)}>Cancelar</Button>
-            <Button onClick={() => methodEdit && saveMethod(methodEdit)}>Guardar</Button>
+            <Button onClick={() => methodEdit && saveMethod(methodEdit)} disabled={savingDialog}>
+              {savingDialog ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
+              Guardar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

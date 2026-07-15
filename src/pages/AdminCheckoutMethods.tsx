@@ -271,13 +271,13 @@ export default function AdminCheckoutMethods() {
   async function quickAdd(region_code: string, q: typeof CHECKOUT_METHODS[number]) {
     const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
     if (existing) {
-      if (existing.enabled) return toast.info(`${q.label} ya está agregado`);
-      setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: true } : x));
+      const nextEnabled = !existing.enabled;
+      setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: nextEnabled } : x));
       const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-        body: { action: "toggle_method", id: existing.id, enabled: true },
+        body: { action: "toggle_method", id: existing.id, enabled: nextEnabled },
       });
       if (error || data?.error) { toast.error(error?.message || data?.error); load(); return; }
-      toast.success(`✅ ${q.label} activado`);
+      toast.success(`${nextEnabled ? "✅" : "⏸️"} ${q.label} ${nextEnabled ? "activado" : "desactivado"}`);
       invalidateCheckoutMethodsCache();
       return;
     }
@@ -516,16 +516,17 @@ export default function AdminCheckoutMethods() {
                                 const already = rms.some(m => m.method_key === q.key);
                                 const existing = rms.find(m => m.method_key === q.key);
                                 const canReactivate = !!existing && !existing.enabled;
+                                const isActive = !!existing && existing.enabled;
                                 return (
                                   <button
                                     key={q.key}
                                     type="button"
-                                    disabled={already && !canReactivate}
+                                    aria-pressed={isActive}
                                     onClick={() => quickAdd(r.code, q)}
-                                    className={`text-[11px] px-2 py-1 rounded border ${already && !canReactivate ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                                    className={`text-[11px] px-2 py-1 rounded border ${isActive ? "bg-primary text-primary-foreground border-primary" : canReactivate ? "bg-background border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
                                     title={q.note}
                                   >
-                                    {canReactivate ? "Activar " : already ? "✓ " : "+ "}{q.label}
+                                    {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{q.label}
                                   </button>
                                 );
                               })}

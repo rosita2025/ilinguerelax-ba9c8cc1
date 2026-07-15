@@ -577,18 +577,26 @@ export function PaymentMethodsGroup() {
   // automáticamente según el país del comprador; nosotros solo mostramos los
   // logos correctos para que el cliente reconozca sus opciones y confíe.
   const country = (region.country || "").toUpperCase();
-  const cardBrandsByCountry = (_c: string): string[] => {
-    // Solo mostramos las marcas principales para mantener el badge limpio.
-    return ["Visa", "Mastercard", "Apple Pay", "Link"];
-  };
-  const cardBrands = cardBrandsByCountry(country);
   const cardSubtitle = isPeru
     ? t.cardSubtitlePeru(localBadge)
     : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
 
   const isUsa = country === "US";
-  const allMethods: { id: Method; icon: typeof CreditCard; title: string; sub: string; badge?: string }[] = [
+  const methodsConfig = useCheckoutMethodsConfig(country);
+  const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
+  const primaryCardBadges: MethodBadge[] = [
+    { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+    { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+    ...(enabledStripeKeys.has("stripe_apple_pay") ? [{ label: "Apple Pay", bg: "#000000", color: "#ffffff" }] : []),
+    ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
+    ...(enabledStripeKeys.has("stripe_google_pay") ? [{ label: "Google Pay", bg: "#ffffff", color: "#1F2937" }] : []),
+  ];
+  const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_link")
+    .map((key) => ({ id: "card", methodKey: key, badge: "Stripe", ...STRIPE_VISIBLE_METHODS[key] }));
+  const allMethods: PaymentMethodRow[] = [
     { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
+    ...dynamicStripeRows,
     { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: "Stripe" },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: "Stripe" },
     { id: "stripe_klarna", icon: Wallet, title: "Klarna — Paga en 4", sub: "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: "Stripe" },
@@ -602,10 +610,9 @@ export function PaymentMethodsGroup() {
   // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí
   // deja de aparecer. Antes de cargar la config, mostramos el conjunto legacy
   // para no parpadear.
-  const methodsConfig = useCheckoutMethodsConfig(country);
   const filteredByAdmin = methodsConfig.loaded
     ? allMethods.filter((m) => {
-        if (m.id === "card") return methodsConfig.stripe;
+        if (m.id === "card") return m.methodKey ? enabledStripeKeys.has(m.methodKey) : methodsConfig.stripe;
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
         if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;

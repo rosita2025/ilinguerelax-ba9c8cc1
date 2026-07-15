@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
 import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap, ArrowUp, ArrowDown } from "lucide-react";
 

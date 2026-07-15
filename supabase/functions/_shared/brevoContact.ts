@@ -7,6 +7,7 @@
 import { logBrevoSync } from "./brevoLog.ts";
 import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
 import { resolveBrevoAudiences } from "./brevoProductAudiences.ts";
+import { normalizeCountry } from "./brevoCountry.ts";
 
 
 interface Args {
@@ -82,7 +83,18 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
       attributes.PHONE_STATUS = "missing";
     }
   }
-  if (a.country) attributes.COUNTRY_CODE = a.country.toUpperCase();
+  const country = normalizeCountry(a.country);
+  if (country.code) {
+    attributes.COUNTRY_CODE = country.code;
+    attributes.COUNTRY = country.code;
+    attributes.PAIS_CODE = country.code;
+  }
+  if (country.name) {
+    attributes.COUNTRY_NAME = country.name;
+    attributes.PAIS = country.name;
+  }
+  attributes.COUNTRY_STATUS = country.status;
+  if (country.status !== "ok" && country.raw) attributes.COUNTRY_RAW = country.raw.slice(0, 64);
   if (a.orderNumber) attributes.LAST_ORDER = a.orderNumber;
   if (typeof a.amount === "number") attributes.LAST_ORDER_AMOUNT = a.amount;
   if (a.currency) attributes.LAST_ORDER_CURRENCY = a.currency.toUpperCase();

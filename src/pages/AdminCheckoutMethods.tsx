@@ -194,7 +194,12 @@ export default function AdminCheckoutMethods() {
         body: { action: "save_region", region: payload },
       });
       if (error || data?.error) throw new Error(error?.message || data?.error);
-      toast.success(`✅ Región ${code} guardada correctamente`);
+      const added = Number(data?.autofilled || 0);
+      toast.success(
+        added > 0
+          ? `✅ Región ${code} guardada · ${added} métodos Stripe auto-agregados según país`
+          : `✅ Región ${code} guardada correctamente`
+      );
       if (opts.fromDialog) setRegionEdit(null);
       invalidateCheckoutMethodsCache();
       await load();

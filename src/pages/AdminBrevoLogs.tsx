@@ -226,7 +226,7 @@ const AdminBrevoLogs = () => {
                         </tr>
                         {isOpen && (
                           <tr key={row.id + "-detail"} className="border-t bg-muted/20">
-                            <td colSpan={7} className="px-6 py-4">
+                            <td colSpan={9} className="px-6 py-4">
                               <div className="grid gap-4 md:grid-cols-2">
                                 <div>
                                   <div className="text-xs font-medium uppercase text-muted-foreground mb-1">Campos enviados a Brevo</div>

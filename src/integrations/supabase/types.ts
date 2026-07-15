@@ -134,6 +134,32 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_method_suppressions: {
+        Row: {
+          method_key: string
+          region_code: string
+          suppressed_at: string
+        }
+        Insert: {
+          method_key: string
+          region_code: string
+          suppressed_at?: string
+        }
+        Update: {
+          method_key?: string
+          region_code?: string
+          suppressed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkout_method_suppressions_region_code_fkey"
+            columns: ["region_code"]
+            isOneToOne: false
+            referencedRelation: "checkout_regions"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       checkout_payment_methods: {
         Row: {
           created_at: string

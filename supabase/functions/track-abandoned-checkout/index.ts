@@ -9,13 +9,32 @@ const corsHeaders = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function detectLanguage(email: string): string {
-  const map: Record<string, string> = {
+// Country ISO-2 → language code used by Brevo templates.
+const COUNTRY_TO_LANG: Record<string, string> = {
+  // Español
+  PE: "es", MX: "es", AR: "es", CL: "es", CO: "es", VE: "es", EC: "es",
+  BO: "es", PY: "es", UY: "es", CR: "es", GT: "es", HN: "es", NI: "es",
+  PA: "es", SV: "es", DO: "es", CU: "es", PR: "es", ES: "es",
+  // English
+  US: "en", GB: "en", CA: "en", AU: "en", NZ: "en", IE: "en", ZA: "en",
+  IN: "en", SG: "en", PH: "en",
+  // Français
+  FR: "fr", BE: "fr", CH: "fr", LU: "fr", MC: "fr", SN: "fr", CI: "fr",
+  MA: "fr", TN: "fr", DZ: "fr",
+  // Português
+  BR: "pt", PT: "pt", AO: "pt", MZ: "pt",
+};
+
+function detectLanguage(email: string, country?: string): string {
+  const cc = (country || "").toUpperCase();
+  if (COUNTRY_TO_LANG[cc]) return COUNTRY_TO_LANG[cc];
+  const tldMap: Record<string, string> = {
     ".br": "pt", ".pt": "pt",
-    ".fr": "fr", ".be": "fr",
-    ".us": "en", ".uk": "en", ".ca": "en", ".au": "en",
+    ".fr": "fr", ".be": "fr", ".ca": "en",
+    ".us": "en", ".uk": "en", ".au": "en", ".ie": "en", ".in": "en",
+    ".mx": "es", ".ar": "es", ".cl": "es", ".co": "es", ".pe": "es", ".es": "es",
   };
-  for (const suf of Object.keys(map)) if (email.endsWith(suf)) return map[suf];
+  for (const suf of Object.keys(tldMap)) if (email.endsWith(suf)) return tldMap[suf];
   return "es";
 }
 

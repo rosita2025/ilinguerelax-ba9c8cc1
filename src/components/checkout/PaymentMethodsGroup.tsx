@@ -466,6 +466,7 @@ export function PaymentMethodsGroup() {
     : methodsConfig.loaded && methodsConfig.regionCode
       ? orderedByAdmin
       : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
+  const stripeMethodAvailable = methods.some((m) => m.id === "card");
 
 
 
@@ -474,11 +475,11 @@ export function PaymentMethodsGroup() {
   // el formulario embebido en cuanto el comprador completa sus datos, para
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
-    if (!isPeru && !(total <= 0 && items.length > 0)) {
+    if (!isPeru && stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
       if (selected !== "card") { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
       if (valid && stripePromise && !showStripe) setShowStripe(true);
     }
-  }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
+  }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
 
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".

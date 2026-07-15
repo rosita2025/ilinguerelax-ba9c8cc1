@@ -38,10 +38,12 @@ interface MethodRow { region_code: string; method_key: string; enabled: boolean;
 const CACHE_TTL_MS = 30_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
 let cacheAt = 0;
+const CACHE_VERSION_KEY = "ilr_checkout_methods_version";
 
 export function invalidateCheckoutMethodsCache() {
   cachePromise = null;
   cacheAt = 0;
+  try { localStorage.setItem(CACHE_VERSION_KEY, String(Date.now())); } catch { /* noop */ }
 }
 
 async function loadAll() {
@@ -74,9 +76,22 @@ function keyToFamily(key: string): FamilyKey | null {
 }
 
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
+  const [version, setVersion] = useState(0);
   const [state, setState] = useState<CheckoutMethodsConfig>({
     loaded: false, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
   });
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === CACHE_VERSION_KEY) {
+        cachePromise = null;
+        cacheAt = 0;
+        setVersion((v) => v + 1);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -112,7 +127,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       if (alive) setState({ loaded: true, regionCode: region.code, ...families, familyOrder });
     })();
     return () => { alive = false; };
-  }, [country]);
+  }, [country, version]);
 
   return state;
 }

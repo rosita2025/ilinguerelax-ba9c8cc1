@@ -137,7 +137,7 @@ const QUICK_METHODS: { key: string; label: string; note: string; icon: string }[
   { key: "stripe_mobilepay", label: "MobilePay", note: "DK · FI", icon: "Smartphone" },
   { key: "stripe_twint", label: "TWINT", note: "Suiza", icon: "Smartphone" },
   { key: "stripe_satispay", label: "Satispay", note: "Italia", icon: "Smartphone" },
-  { key: "stripe_pagoefectivo", label: "PagoEfectivo", note: "Perú · efectivo", icon: "Banknote" },
+  
   { key: "stripe_oxxo", label: "OXXO", note: "México · efectivo", icon: "Banknote" },
   { key: "stripe_boleto", label: "Boleto", note: "Brasil", icon: "Banknote" },
   { key: "stripe_pix", label: "Pix", note: "Brasil", icon: "Smartphone" },

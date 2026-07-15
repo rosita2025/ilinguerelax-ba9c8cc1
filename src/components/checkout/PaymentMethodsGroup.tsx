@@ -152,7 +152,7 @@ export function PaymentMethodsGroup() {
             quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
           })),
           currency: "usd",
-          stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : "card",
+          stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
           couponPercent: s.couponPercent,
           couponCode: s.coupon ?? undefined,
           contact: {

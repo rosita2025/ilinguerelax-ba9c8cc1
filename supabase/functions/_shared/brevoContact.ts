@@ -6,6 +6,7 @@
 
 import { logBrevoSync } from "./brevoLog.ts";
 import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
+import { resolveBrevoAudiences } from "./brevoProductAudiences.ts";
 
 
 interface Args {

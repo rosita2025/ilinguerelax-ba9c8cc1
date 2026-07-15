@@ -42,7 +42,7 @@ async function loadAll() {
     cachePromise = (async () => {
       const [{ data: regions }, { data: methods }] = await Promise.all([
         supabase.from("checkout_regions").select("code, country_codes, enabled, sort_order").eq("enabled", true),
-        supabase.from("checkout_payment_methods").select("region_code, method_key, enabled").eq("enabled", true),
+        supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order").eq("enabled", true),
       ]);
       return {
         regions: (regions ?? []) as RegionRow[],
@@ -53,7 +53,7 @@ async function loadAll() {
   return cachePromise;
 }
 
-function keyToFamily(key: string): keyof typeof DEFAULT_ALL_ON | null {
+function keyToFamily(key: string): FamilyKey | null {
   const k = key.toLowerCase();
   if (k.startsWith("stripe_")) return "stripe";
   if (k === "paypal" || k.includes("paypal")) return "paypal";
@@ -65,7 +65,7 @@ function keyToFamily(key: string): keyof typeof DEFAULT_ALL_ON | null {
 
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
   const [state, setState] = useState<CheckoutMethodsConfig>({
-    loaded: false, regionCode: null, ...DEFAULT_ALL_ON,
+    loaded: false, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
   });
 
   useEffect(() => {
@@ -73,9 +73,6 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
     (async () => {
       const { regions, methods } = await loadAll();
       const iso = (country || "").toUpperCase();
-      // Match: región cuyos country_codes contienen el país; si ninguno matchea,
-      // fallback a una región con country_codes vacío (comodín) — por convención
-      // ese es "GLOBAL".
       let region = regions
         .slice()
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -85,21 +82,30 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
           ?? regions.find((r) => r.code.toUpperCase() === "GLOBAL");
       }
       if (!region) {
-        // No hay ninguna región configurada — deja todo habilitado (compat).
-        if (alive) setState({ loaded: true, regionCode: null, ...DEFAULT_ALL_ON });
+        if (alive) setState({ loaded: true, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
         return;
       }
       const enabledFamilies = { stripe: false, paypal: false, transfer: false, cash: false, yape: false };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
         const fam = keyToFamily(m.method_key);
-        if (fam) enabledFamilies[fam] = true;
+        if (!fam) continue;
+        enabledFamilies[fam] = true;
+        const ord = m.sort_order ?? 999;
+        if (ord < familyMinOrder[fam]) familyMinOrder[fam] = ord;
       }
-      // Si la región existe pero no tiene métodos cargados, no bloquees el checkout.
       const anyEnabled = Object.values(enabledFamilies).some(Boolean);
       const families = anyEnabled ? enabledFamilies : DEFAULT_ALL_ON;
-      if (alive) setState({ loaded: true, regionCode: region.code, ...families });
+      const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
+        .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
+      if (alive) setState({ loaded: true, regionCode: region.code, ...families, familyOrder });
     })();
+    return () => { alive = false; };
+  }, [country]);
+
+  return state;
+}
     return () => { alive = false; };
   }, [country]);
 

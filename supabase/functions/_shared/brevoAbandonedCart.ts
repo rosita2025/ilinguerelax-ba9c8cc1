@@ -10,6 +10,7 @@
 interface Args {
   email: string;
   name?: string;
+  phone?: string;           // E.164 international (WhatsApp/SMS)
   productSku: string;
   productName?: string;
   productUrl?: string;      // absolute checkout / product page URL
@@ -59,6 +60,11 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
   if (a.couponCode) attributes.ABANDONED_COUPON = a.couponCode;
   if (a.language) attributes.LANGUAGE = a.language.toLowerCase();
   if (a.source) attributes.ABANDONED_SOURCE = a.source;
+  const phoneClean = (a.phone || "").replace(/[^\d+]/g, "");
+  if (phoneClean.startsWith("+") && phoneClean.length >= 8) {
+    attributes.SMS = phoneClean;
+    attributes.WHATSAPP = phoneClean;
+  }
 
   const payload = {
     email,

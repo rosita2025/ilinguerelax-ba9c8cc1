@@ -56,6 +56,16 @@ const M = {
   paynow:    { method_key: "stripe_paynow",           label: "PayNow",               icon: "Smartphone",  note: "Singapur" },
   promptpay: { method_key: "stripe_promptpay",        label: "PromptPay",            icon: "Smartphone",  note: "Tailandia" },
   konbini:   { method_key: "stripe_konbini",          label: "Konbini",              icon: "Banknote",    note: "Tiendas de conveniencia Japón" },
+  // Nuevos / emergentes 2025-2026
+  pagoefectivo: { method_key: "stripe_pagoefectivo", label: "PagoEfectivo",         icon: "Banknote",    note: "Voucher efectivo Perú" },
+  mbway:     { method_key: "stripe_mb_way",           label: "MB WAY",               icon: "Smartphone",  note: "Pago móvil Portugal" },
+  satispay:  { method_key: "stripe_satispay",         label: "Satispay",             icon: "Smartphone",  note: "Italia" },
+  zip:       { method_key: "stripe_zip",              label: "Zip",                  icon: "CreditCard",  note: "Compra ahora, paga después (AU/US)" },
+  kakaopay:  { method_key: "stripe_kakao_pay",        label: "Kakao Pay",            icon: "Smartphone",  note: "Corea del Sur" },
+  naverpay:  { method_key: "stripe_naver_pay",        label: "Naver Pay",            icon: "Smartphone",  note: "Corea del Sur" },
+  payco:     { method_key: "stripe_payco",            label: "PAYCO",                icon: "Smartphone",  note: "Corea del Sur" },
+  samsungpay:{ method_key: "stripe_samsung_pay",      label: "Samsung Pay",          icon: "Smartphone",  note: "Corea del Sur" },
+  billie:    { method_key: "stripe_billie",           label: "Billie",               icon: "CreditCard",  note: "B2B pay-later (DE/AT/NL/SE)" },
 } as const;
 
 const EURO = [M.sepa];
@@ -69,7 +79,7 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   AR: [M.paypal],
   CL: [M.paypal],
   CO: [M.paypal],
-  PE: [M.paypal],
+  PE: [M.pagoefectivo, M.paypal],
   UY: [M.paypal],
 
   // Zona euro — SEPA + locales
@@ -79,8 +89,8 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   BE: [...EURO, M.bancontact, M.klarna, M.paypal],
   FR: [...EURO, M.klarna, M.paypal, M.revolut],
   ES: [...EURO, M.klarna, M.paypal, M.revolut],
-  IT: [...EURO, M.klarna, M.paypal, M.revolut],
-  PT: [...EURO, M.multibanco, M.paypal],
+  IT: [...EURO, M.klarna, M.paypal, M.revolut, M.satispay],
+  PT: [...EURO, M.multibanco, M.mbway, M.paypal],
   IE: [...EURO, M.klarna, M.paypal, M.revolut],
   FI: [...EURO, M.klarna, M.mobilepay, M.paypal],
   GR: [...EURO, M.paypal],
@@ -108,11 +118,12 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   DK: [M.mobilepay, M.klarna, M.paypal],
 
   // Oceanía
-  AU: [M.becs, M.afterpay, M.paypal, M.amazonpay],
+  AU: [M.becs, M.afterpay, M.zip, M.paypal, M.amazonpay],
   NZ: [M.afterpay, M.paypal],
 
   // Asia
   JP: [M.konbini, M.paypal],
+  KR: [M.kakaopay, M.naverpay, M.payco, M.samsungpay, M.paypal],
   SG: [M.paynow, M.grabpay, M.alipay, M.paypal],
   MY: [M.fpx, M.grabpay, M.paypal],
   HK: [M.alipay, M.wechat, M.paypal],

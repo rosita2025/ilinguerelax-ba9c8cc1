@@ -199,7 +199,10 @@ export default function AdminCheckoutMethods() {
       invalidateCheckoutMethodsCache();
       await load();
     } catch (e) {
-      toast.error(`❌ Error al guardar región ${code}: ${(e as Error).message || "desconocido"}`);
+      toast.error(`❌ Error al guardar región ${code}: ${(e as Error).message || "desconocido"}`, {
+        action: { label: "Reintentar", onClick: () => saveRegion(r, opts) },
+        duration: 10000,
+      });
       await load();
     } finally {
       setSavingDialog(false);

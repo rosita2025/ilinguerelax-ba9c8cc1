@@ -810,6 +810,7 @@ export type Database = {
       funnel_events: {
         Row: {
           bot_reason: string | null
+          client_id: string | null
           country: string | null
           created_at: string
           currency: string | null
@@ -825,6 +826,7 @@ export type Database = {
         }
         Insert: {
           bot_reason?: string | null
+          client_id?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
@@ -840,6 +842,7 @@ export type Database = {
         }
         Update: {
           bot_reason?: string | null
+          client_id?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null

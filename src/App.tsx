@@ -11,6 +11,7 @@ import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
+import { getClientId, initClientIdSync } from "@/lib/clientId";
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";
 import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
@@ -140,6 +141,7 @@ const getAttributionReferrer = () => {
 
 const RouteTracker = () => {
   const location = useLocation();
+  useEffect(() => { initClientIdSync(); }, []);
   useEffect(() => {
     if (location.pathname.startsWith("/admin")) return;
     try {
@@ -147,6 +149,7 @@ const RouteTracker = () => {
         body: {
           event_name: "PageView",
           session_id: getSid(),
+          client_id: getClientId(),
           page_path: location.pathname,
           country: localStorage.getItem("ilr_country"),
           referrer: getAttributionReferrer(),

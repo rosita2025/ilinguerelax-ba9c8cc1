@@ -82,7 +82,7 @@ const STRIPE_LOCAL_BY_COUNTRY: Record<string, string[]> = {
   CA: ["stripe_acss_debit", "stripe_klarna", "stripe_afterpay_clearpay", "stripe_paypal"],
   MX: ["stripe_oxxo", "stripe_paypal"],
   BR: ["stripe_boleto", "stripe_pix", "stripe_paypal"],
-  PE: ["stripe_pagoefectivo", "stripe_paypal"],
+  PE: ["stripe_paypal"],
   DE: ["stripe_sepa_debit", "stripe_giropay", "stripe_sofort", "stripe_klarna", "stripe_amazon_pay", "stripe_paypal"],
   AT: ["stripe_sepa_debit", "stripe_eps", "stripe_sofort", "stripe_klarna", "stripe_paypal"],
   NL: ["stripe_sepa_debit", "stripe_ideal", "stripe_klarna", "stripe_paypal"],
@@ -137,7 +137,7 @@ const QUICK_METHODS: { key: string; label: string; note: string; icon: string }[
   { key: "stripe_mobilepay", label: "MobilePay", note: "DK · FI", icon: "Smartphone" },
   { key: "stripe_twint", label: "TWINT", note: "Suiza", icon: "Smartphone" },
   { key: "stripe_satispay", label: "Satispay", note: "Italia", icon: "Smartphone" },
-  { key: "stripe_pagoefectivo", label: "PagoEfectivo", note: "Perú · efectivo", icon: "Banknote" },
+  
   { key: "stripe_oxxo", label: "OXXO", note: "México · efectivo", icon: "Banknote" },
   { key: "stripe_boleto", label: "Boleto", note: "Brasil", icon: "Banknote" },
   { key: "stripe_pix", label: "Pix", note: "Brasil", icon: "Smartphone" },

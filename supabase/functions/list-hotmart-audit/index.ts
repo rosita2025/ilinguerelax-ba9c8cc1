@@ -161,7 +161,8 @@ Deno.serve(async (req) => {
     const syncTargets = new Map<string, { name?: string; source: "purchase" | "abandoned"; product?: string; transaction?: string; status: string }>();
     for (const r of purchasesFull) {
       const key = (r.email ?? "").toLowerCase();
-      if (!key || r.brevo) continue;
+      if (!key) continue;
+      if (!forceSync && r.brevo) continue;
       if (syncTargets.has(key)) continue;
       const st = r.mapped_status === "approved" ? "compra"
         : r.mapped_status === "pending" ? "pendiente"
@@ -182,7 +183,8 @@ Deno.serve(async (req) => {
     }
     for (const r of abandonedFull) {
       const key = (r.email ?? "").toLowerCase();
-      if (!key || r.brevo || syncTargets.has(key)) continue;
+      if (!key || syncTargets.has(key)) continue;
+      if (!forceSync && r.brevo) continue;
       const p = r.payload as any;
       syncTargets.set(key, {
         name: p?.customer_name ?? undefined,
@@ -191,8 +193,10 @@ Deno.serve(async (req) => {
         status: "pendiente",
       });
     }
+    let syncedCount = 0;
     if (syncTargets.size > 0) {
-      const jobs = Array.from(syncTargets.entries()).slice(0, 25).map(async ([email, meta]) => {
+      const cap = forceSync ? 100 : 25;
+      const jobs = Array.from(syncTargets.entries()).slice(0, cap).map(async ([email, meta]) => {
         try {
           await upsertBrevoContact({
             email,
@@ -203,12 +207,18 @@ Deno.serve(async (req) => {
             origin: meta.source === "purchase" ? "hotmart" : undefined,
             purchaseStatus: meta.status as any,
           });
+          syncedCount++;
         } catch (err) {
           console.warn("[audit-auto-sync] failed", email, (err as Error).message);
         }
       });
-      // @ts-ignore Edge runtime
-      EdgeRuntime.waitUntil(Promise.allSettled(jobs));
+      if (forceSync) {
+        // Wait for completion so the UI can show the exact number synced.
+        await Promise.allSettled(jobs);
+      } else {
+        // @ts-ignore Edge runtime
+        EdgeRuntime.waitUntil(Promise.allSettled(jobs));
+      }
     }
 
 

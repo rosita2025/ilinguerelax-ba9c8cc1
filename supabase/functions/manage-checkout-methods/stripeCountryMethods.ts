@@ -79,7 +79,7 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   AR: [M.paypal],
   CL: [M.paypal],
   CO: [M.paypal],
-  PE: [M.paypal],
+  PE: [M.pagoefectivo, M.paypal],
   UY: [M.paypal],
 
   // Zona euro — SEPA + locales
@@ -89,8 +89,8 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   BE: [...EURO, M.bancontact, M.klarna, M.paypal],
   FR: [...EURO, M.klarna, M.paypal, M.revolut],
   ES: [...EURO, M.klarna, M.paypal, M.revolut],
-  IT: [...EURO, M.klarna, M.paypal, M.revolut],
-  PT: [...EURO, M.multibanco, M.paypal],
+  IT: [...EURO, M.klarna, M.paypal, M.revolut, M.satispay],
+  PT: [...EURO, M.multibanco, M.mbway, M.paypal],
   IE: [...EURO, M.klarna, M.paypal, M.revolut],
   FI: [...EURO, M.klarna, M.mobilepay, M.paypal],
   GR: [...EURO, M.paypal],
@@ -118,11 +118,12 @@ const LOCAL: Record<string, StripeMethodDef[]> = {
   DK: [M.mobilepay, M.klarna, M.paypal],
 
   // Oceanía
-  AU: [M.becs, M.afterpay, M.paypal, M.amazonpay],
+  AU: [M.becs, M.afterpay, M.zip, M.paypal, M.amazonpay],
   NZ: [M.afterpay, M.paypal],
 
   // Asia
   JP: [M.konbini, M.paypal],
+  KR: [M.kakaopay, M.naverpay, M.payco, M.samsungpay, M.paypal],
   SG: [M.paynow, M.grabpay, M.alipay, M.paypal],
   MY: [M.fpx, M.grabpay, M.paypal],
   HK: [M.alipay, M.wechat, M.paypal],

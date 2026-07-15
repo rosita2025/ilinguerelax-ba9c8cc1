@@ -127,10 +127,24 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   if (a.hotmartProductCode) attributes.HOTMART_PRODUCT_CODE = a.hotmartProductCode;
   const tiendaSku = a.tiendaSku ?? (origin === "tienda" && a.skus?.length ? a.skus[0] : undefined);
   if (tiendaSku) attributes.TIENDA_SKU = tiendaSku;
-  // NOTA legible tipo "Hotmart · 5,000 palabras · id=123456 · code=abcd · trx=HP123"
+
+  // Categoría/tipo de oferta para agrupar compradores (8,000 palabras, pack, coreano…)
+  const category = inferProductCategory({
+    productName: a.productName,
+    sku: tiendaSku ?? a.hotmartProductId ?? a.hotmartProductCode,
+    skus: a.skus,
+    explicit: a.productCategory,
+  });
+  const categoryLabel = CATEGORY_LABEL[category];
+  attributes.CATEGORIA = category;
+  attributes.PRODUCT_CATEGORY = category;
+  attributes.CATEGORIA_LABEL = categoryLabel;
+
+  // NOTA legible tipo "Hotmart · 5,000 palabras · cat=5000_palabras · id=123456 · trx=HP123"
   const noteParts: string[] = [
     origin === "hotmart" ? "Hotmart" : "Tienda",
     a.productName || "",
+    `cat=${categoryLabel}`,
     a.hotmartProductId ? `id=${a.hotmartProductId}` : "",
     a.hotmartProductCode ? `code=${a.hotmartProductCode}` : "",
     tiendaSku ? `sku=${tiendaSku}` : "",
@@ -139,10 +153,9 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
   attributes.LAST_PURCHASE_NOTE = noteParts.join(" · ");
   attributes.LAST_ORDER_DATE = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for Brevo date type
 
-  // TAGS: atributo tipo texto/categoría en Brevo para filtrar de un vistazo.
-  // Se envía como lista separada por comas: "compra,hotmart,compra_hotmart"
+  // TAGS: incluye categoría para filtrar por oferta (ej. "compra,hotmart,compra_hotmart,cat_8000_palabras")
   const eventKind: "compra" | "abandonado" = "compra";
-  const tagList = [eventKind, origin, `${eventKind}_${origin}`];
+  const tagList = [eventKind, origin, `${eventKind}_${origin}`, `cat_${category}`];
   attributes.TAGS = tagList.join(",");
   attributes.SEGMENTO = `${eventKind}_${origin}`;
 

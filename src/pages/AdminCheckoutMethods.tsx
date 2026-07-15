@@ -121,7 +121,7 @@ export default function AdminCheckoutMethods() {
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
     if (error || data?.error) { toast.error(error?.message || data?.error); setLoading(false); return; }
     setRegions(data.regions || []);
-    setMethods((data.methods || []).filter(isCheckoutMethod));
+    setMethods(data.methods || []);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -170,7 +170,7 @@ export default function AdminCheckoutMethods() {
     const method_key = m.method_key.trim().toLowerCase();
     const label = m.label.trim();
     if (!method_key) return toast.error("Tipo de método requerido");
-    if (!CHECKOUT_METHOD_KEYS.has(method_key)) return toast.error("Ese método no existe en el checkout público");
+    if (!/^[a-z0-9_]{1,48}$/.test(method_key)) return toast.error("method_key inválido (a-z, 0-9, _)");
     if (!label) return toast.error("Etiqueta requerida");
     const payload = { ...m, method_key, label, sort_order: Number(m.sort_order || 0) };
     setSavingDialog(true);
@@ -291,6 +291,15 @@ export default function AdminCheckoutMethods() {
               <a href={`/checkouts/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global (Stripe)</a>
             </Button>
             <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="outline" onClick={async () => {
+                if (!confirm("Auto-rellenar métodos Stripe oficiales para TODAS las regiones Stripe? (upsert — no borra métodos manuales)")) return;
+                const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "sync_all_stripe" } });
+                if (error || data?.error) return toast.error(error?.message || data?.error);
+                toast.success(`✅ ${data.regions?.length || 0} regiones sincronizadas (${data.upserted} métodos)`);
+                invalidateCheckoutMethodsCache(); load();
+              }}>
+                ⚡ Auto Stripe (todas)
+              </Button>
               <Button size="sm" onClick={() => setRegionEdit(emptyRegion())}>
                 <Plus className="w-4 h-4 mr-1" /> Nueva región
               </Button>
@@ -327,6 +336,14 @@ export default function AdminCheckoutMethods() {
                         </Button>
                         <Button size="icon" variant="ghost" onClick={() => setRegionEdit(r)}>
                           <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button size="sm" variant="secondary" className="h-7 px-2" title="Auto-rellenar métodos Stripe oficiales para esta región (según país)" onClick={async () => {
+                          const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "autofill_stripe", code: r.code } });
+                          if (error || data?.error) return toast.error(error?.message || data?.error);
+                          toast.success(`✅ ${data.added} métodos Stripe`);
+                          invalidateCheckoutMethodsCache(); load();
+                        }}>
+                          ⚡ Auto Stripe
                         </Button>
                         <Button size="icon" variant="ghost" onClick={() => deleteRegion(r.code)}>
                           <Trash2 className="w-3.5 h-3.5 text-destructive" />

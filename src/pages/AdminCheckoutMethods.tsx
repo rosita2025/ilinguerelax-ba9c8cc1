@@ -694,7 +694,10 @@ export default function AdminCheckoutMethods() {
           )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setMethodEdit(null)}>Cancelar</Button>
-            <Button onClick={() => methodEdit && saveMethod(methodEdit)}>Guardar</Button>
+            <Button onClick={() => methodEdit && saveMethod(methodEdit)} disabled={savingDialog}>
+              {savingDialog ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
+              Guardar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

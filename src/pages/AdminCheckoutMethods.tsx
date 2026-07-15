@@ -185,6 +185,8 @@ export default function AdminCheckoutMethods() {
   const [loading, setLoading] = useState(true);
   const [regionEdit, setRegionEdit] = useState<Region | null>(null);
   const [methodEdit, setMethodEdit] = useState<Method | null>(null);
+  const [savingRegion, setSavingRegion] = useState<string | null>(null);
+  const [savingDialog, setSavingDialog] = useState(false);
 
   async function load() {
     invalidateCheckoutMethodsCache();

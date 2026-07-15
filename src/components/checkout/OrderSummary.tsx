@@ -87,9 +87,6 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                     className="w-16 h-16 object-cover rounded-lg border"
                     loading="lazy"
                   />
-                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
-                    {item.quantity}
-                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{item.name}</p>
@@ -110,22 +107,21 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                       </Button>
                     </div>
                   )}
-
-
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
                   {penMode && item.pricePen != null
-                    ? formatPen(item.pricePen * item.quantity)
+                    ? formatPen(item.pricePen)
                     : showLocalRef
-                      ? formatLocalAmount(itemPrice(item, region.tier) * item.quantity, region.country).formatted
-                      : `$${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}`}
+                      ? formatLocalAmount(itemPrice(item, region.tier), region.country).formatted
+                      : `$${itemPrice(item, region.tier).toFixed(2)}`}
                   {showLocalRef && (
                     <div className="text-[10px] font-normal text-muted-foreground">
-                      USD ${(itemPrice(item, region.tier) * item.quantity).toFixed(2)}
+                      USD ${itemPrice(item, region.tier).toFixed(2)}
                     </div>
                   )}
                 </div>
               </div>
+
             ))}
           </div>
         )}

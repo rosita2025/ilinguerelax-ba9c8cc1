@@ -122,6 +122,7 @@ serve(async (req) => {
       value: typeof body.value === "number" ? body.value : null,
       currency: typeof body.currency === "string" ? body.currency : null,
       session_id: sid,
+      client_id: typeof body.client_id === "string" ? body.client_id.slice(0, 100) : null,
       page_path: body.page_path ?? null,
       country,
       referrer: typeof body.referrer === "string" ? body.referrer.slice(0, 500) : null,

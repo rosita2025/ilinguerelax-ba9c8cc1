@@ -181,9 +181,22 @@ const AdminLive = () => {
                 <span className="text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
                 <span className="text-xs text-muted-foreground">en vivo</span>
               </div>
-              <span className="h-9 inline-flex items-center rounded-md border bg-background px-3 text-sm text-muted-foreground">
-                Ahora mismo
-              </span>
+              <div className="inline-flex rounded-md border bg-background overflow-hidden">
+                {([1, 5, 15, 60] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setWindowMin(m)}
+                    className={`px-3 h-9 text-sm transition-colors ${
+                      windowMin === m
+                        ? "bg-primary text-primary-foreground font-semibold"
+                        : "text-muted-foreground hover:bg-muted"
+                    }`}
+                    title={`Últimos ${m} min · humanos (bots excluidos)`}
+                  >
+                    {m < 60 ? `${m}m` : "1h"}
+                  </button>
+                ))}
+              </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>
           </div>

@@ -102,15 +102,16 @@ export default function DeliveryRetryPanel() {
           <Timer className="w-5 h-5 text-primary" />
           <h2 className="text-lg font-semibold">Reintento automático de entrega digital</h2>
         </div>
-        <div className="ml-auto flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => load("get")} disabled={loading}>
+        <div className="w-full sm:w-auto sm:ml-auto flex gap-2">
+          <Button size="sm" variant="outline" className="flex-1 sm:flex-none" onClick={() => load("get")} disabled={loading}>
             <RefreshCw className={`w-3 h-3 mr-1 ${loading ? "animate-spin" : ""}`} /> Refrescar
           </Button>
-          <Button size="sm" onClick={() => { setRunning(true); load("run"); }} disabled={running || loading}>
+          <Button size="sm" className="flex-1 sm:flex-none" onClick={() => { setRunning(true); load("run"); }} disabled={running || loading}>
             <PlayCircle className={`w-3 h-3 mr-1 ${running ? "animate-spin" : ""}`} />
             Ejecutar ahora
           </Button>
         </div>
+
       </div>
 
       {draft && (

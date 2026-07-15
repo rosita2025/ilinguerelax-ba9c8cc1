@@ -659,6 +659,11 @@ export function PaymentMethodsGroup() {
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Cash App" bg="#00D632" color="#001B0A" />
                   </div>
+                ) : m.id === "stripe_klarna" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
+                    <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
+                  </div>
                 ) : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />

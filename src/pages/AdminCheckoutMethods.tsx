@@ -91,6 +91,15 @@ export default function AdminCheckoutMethods() {
     });
     if (error || data?.error) { toast.error(error?.message || data?.error); load(); }
   }
+  async function autofillStripe(code: string) {
+    if (!confirm(`Auto-rellenar métodos Stripe disponibles según los países de ${code}?\nNo borra métodos existentes; solo añade o actualiza los de Stripe.`)) return;
+    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+      body: { action: "autofill_stripe", code },
+    });
+    if (error || data?.error) return toast.error(error?.message || data?.error);
+    toast.success(`Añadidos ${data.added} métodos Stripe`);
+    load();
+  }
 
   return (
     <>

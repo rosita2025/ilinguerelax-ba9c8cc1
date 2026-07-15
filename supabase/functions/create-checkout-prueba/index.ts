@@ -105,18 +105,17 @@ Deno.serve(async (req) => {
       skus: deliverySkus,
     };
 
-    // Para "card" activamos automatic_payment_methods para que Stripe muestre
-    // TODOS los métodos locales relevantes al país del comprador
-    // (OXXO en México, iDEAL en Países Bajos, Boleto en Brasil, SEPA en zona
-    // euro, Konbini en Japón, etc.). Para las sub-familias específicas
-    // (ACH, Cash App, Klarna) forzamos ese único método.
+    // Para "card" omitimos payment_method_types: Stripe Checkout muestra
+    // automáticamente los métodos habilitados en el Dashboard según el país
+    // del comprador (OXXO, iDEAL, Boleto, SEPA, Konbini, etc.).
+    // Para sub-familias específicas (ACH, Cash App, Klarna) forzamos ese método.
     const useAutomatic = body.stripePaymentMethod === "card";
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
       ...(useAutomatic
-        ? { automatic_payment_methods: { enabled: true } }
+        ? {}
         : { payment_method_types: [body.stripePaymentMethod] }),
       return_url: body.returnUrl,
       // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.

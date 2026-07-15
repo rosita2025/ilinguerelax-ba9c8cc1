@@ -410,42 +410,41 @@ export default function AdminCheckoutMethods() {
                 .filter(m => m.region_code === r.code)
                 .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
               return (
-                <Card key={r.code} className={`p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-bold text-lg flex items-center gap-2">
-                        <span className="text-2xl">{r.flag || "🌐"}</span> {r.name}
+                <Card key={r.code} className={`p-3 sm:p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-base sm:text-lg flex items-center gap-2 leading-tight">
+                        <span className="text-xl sm:text-2xl">{r.flag || "🌐"}</span>
+                        <span className="truncate">{r.name}</span>
                       </h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                         {r.currency} · {r.gateway || "—"}
                       </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5 break-words">
                         Países: {r.country_codes.length ? r.country_codes.join(", ") : "—"}
                       </p>
                     </div>
-                    <div className="flex flex-col gap-1 items-end">
-                      <Badge variant="outline" className="text-[10px]">{r.code}</Badge>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="default" className="h-7 px-2" onClick={() => saveRegion(r)} disabled={savingRegion === r.code}>
-                          {savingRegion === r.code ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Save className="w-3.5 h-3.5 mr-1" />}
-                          Guardar
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => setRegionEdit(r)}>
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button size="sm" variant="secondary" className="h-7 px-2" title="Auto-rellenar métodos Stripe oficiales para esta región (según país)" onClick={async () => {
-                          const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "autofill_stripe", code: r.code } });
-                          if (error || data?.error) return toast.error(error?.message || data?.error);
-                          toast.success(`✅ ${data.added} métodos Stripe`);
-                          invalidateCheckoutMethodsCache(); load();
-                        }}>
-                          ⚡ Auto Stripe
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => deleteRegion(r.code)}>
-                          <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
+                    <Badge variant="outline" className="text-[10px] shrink-0">{r.code}</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 mb-3">
+                    <Button size="sm" variant="default" className="h-8 px-2 text-xs" onClick={() => saveRegion(r)} disabled={savingRegion === r.code}>
+                      {savingRegion === r.code ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Save className="w-3.5 h-3.5 mr-1" />}
+                      Guardar
+                    </Button>
+                    <Button size="sm" variant="secondary" className="h-8 px-2 text-xs" title="Auto-rellenar métodos Stripe oficiales" onClick={async () => {
+                      const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "autofill_stripe", code: r.code } });
+                      if (error || data?.error) return toast.error(error?.message || data?.error);
+                      toast.success(`✅ ${data.added} métodos Stripe`);
+                      invalidateCheckoutMethodsCache(); load();
+                    }}>
+                      ⚡ Auto Stripe
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={() => setRegionEdit(r)}>
+                      <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => deleteRegion(r.code)}>
+                      <Trash2 className="w-3.5 h-3.5 mr-1" /> Eliminar
+                    </Button>
                   </div>
                   {r.description && <p className="text-xs text-muted-foreground mb-3">{r.description}</p>}
 

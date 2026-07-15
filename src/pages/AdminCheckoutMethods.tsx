@@ -498,39 +498,29 @@ export default function AdminCheckoutMethods() {
           <DialogHeader><DialogTitle>{regionEdit?.code ? "Editar región" : "Nueva región"}</DialogTitle></DialogHeader>
           {regionEdit && (
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-[1fr_120px] gap-3">
                 <div>
-                  <Label>Código (único, MAYÚS)</Label>
-                  <Input value={regionEdit.code} onChange={(e) => setRegionEdit({ ...regionEdit, code: e.target.value.toUpperCase() })} placeholder="MX" />
+                  <Label>Nombre</Label>
+                  <Input value={regionEdit.name} onChange={(e) => setRegionEdit({ ...regionEdit, name: e.target.value })} placeholder="Alemania" />
                 </div>
                 <div>
-                  <Label>Bandera (emoji)</Label>
-                  <Input value={regionEdit.flag || ""} onChange={(e) => setRegionEdit({ ...regionEdit, flag: e.target.value })} />
+                  <Label>Bandera</Label>
+                  <Input value={regionEdit.flag || ""} onChange={(e) => setRegionEdit({ ...regionEdit, flag: e.target.value })} placeholder="🇩🇪" />
                 </div>
               </div>
               <div>
-                <Label>Nombre</Label>
-                <Input value={regionEdit.name} onChange={(e) => setRegionEdit({ ...regionEdit, name: e.target.value })} placeholder="México" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Moneda</Label>
-                  <Input value={regionEdit.currency} onChange={(e) => setRegionEdit({ ...regionEdit, currency: e.target.value })} placeholder="MXN" />
-                </div>
-                <div>
-                  <Label>Proveedor de pago</Label>
-                  <select
-                    className="w-full border rounded h-10 px-2 bg-background"
-                    value={regionEdit.gateway || "Stripe"}
-                    onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })}
-                  >
-                    <option value="Stripe">Stripe</option>
-                    <option value="PayPal">PayPal</option>
-                    <option value="Stripe+PayPal">Stripe + PayPal</option>
-                    <option value="MercadoPago">Mercado Pago</option>
-                    <option value="Manual">Manual (Yape/Plin)</option>
-                  </select>
-                </div>
+                <Label>Proveedor de pago</Label>
+                <select
+                  className="w-full border rounded h-10 px-2 bg-background"
+                  value={regionEdit.gateway || "Stripe"}
+                  onChange={(e) => setRegionEdit({ ...regionEdit, gateway: e.target.value })}
+                >
+                  <option value="Stripe">Stripe</option>
+                  <option value="PayPal">PayPal</option>
+                  <option value="Stripe+PayPal">Stripe + PayPal</option>
+                  <option value="MercadoPago">Mercado Pago</option>
+                  <option value="Manual">Manual (Yape/Plin)</option>
+                </select>
               </div>
               <div>
                 <Label>Países (click para agregar/quitar)</Label>
@@ -544,7 +534,19 @@ export default function AdminCheckoutMethods() {
                         onClick={() => {
                           const set = new Set(regionEdit.country_codes);
                           if (active) set.delete(c.code); else set.add(c.code);
-                          setRegionEdit({ ...regionEdit, country_codes: Array.from(set) });
+                          const nextCountries = Array.from(set);
+                          // Auto-derivar código de región y bandera del primer país si es nueva región
+                          const isNew = !regions.some(r => r.code === regionEdit.code);
+                          const patch: Partial<Region> = { country_codes: nextCountries };
+                          if (isNew && nextCountries.length > 0) {
+                            const first = COUNTRY_LIST.find(x => x.code === nextCountries[0]);
+                            if (first) {
+                              patch.code = first.code;
+                              if (!regionEdit.flag) patch.flag = first.flag;
+                              if (!regionEdit.name || regionEdit.name === regionEdit.code) patch.name = first.name;
+                            }
+                          }
+                          setRegionEdit({ ...regionEdit, ...patch });
                         }}
                         className={`text-[11px] px-2 py-1 rounded border ${active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"}`}
                         title={c.name}
@@ -554,16 +556,11 @@ export default function AdminCheckoutMethods() {
                     );
                   })}
                 </div>
-                <Input
-                  className="mt-2"
-                  value={regionEdit.country_codes.join(",")}
-                  onChange={(e) => setRegionEdit({ ...regionEdit, country_codes: e.target.value.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) })}
-                  placeholder="MX,GT,HN o * para fallback global"
-                />
-              </div>
-              <div>
-                <Label>Descripción</Label>
-                <Textarea rows={2} value={regionEdit.description || ""} onChange={(e) => setRegionEdit({ ...regionEdit, description: e.target.value })} />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  El código de región se asigna automáticamente según el país seleccionado
+                  {regionEdit.code ? <> — actual: <code className="font-mono">{regionEdit.code}</code></> : null}.
+                  Moneda: <strong>USD</strong> (Stripe convierte a la moneda local del comprador en el checkout).
+                </p>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

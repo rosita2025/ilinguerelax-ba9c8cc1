@@ -194,12 +194,12 @@ export default function AdminCheckoutMethods() {
         body: { action: "save_region", region: payload },
       });
       if (error || data?.error) throw new Error(error?.message || data?.error);
-      toast.success("✅ Región guardada");
+      toast.success(`✅ Región ${code} guardada correctamente`);
       if (opts.fromDialog) setRegionEdit(null);
       invalidateCheckoutMethodsCache();
       await load();
     } catch (e) {
-      toast.error((e as Error).message || "Error al guardar");
+      toast.error(`❌ Error al guardar región ${code}: ${(e as Error).message || "desconocido"}`);
       await load();
     } finally {
       setSavingDialog(false);
@@ -258,11 +258,17 @@ export default function AdminCheckoutMethods() {
     toast.success("Eliminado"); invalidateCheckoutMethodsCache(); load();
   }
   async function toggleMethod(m: Method) {
-    setMethods(prev => prev.map(x => x.id === m.id ? { ...x, enabled: !m.enabled } : x));
+    const nextEnabled = !m.enabled;
+    setMethods(prev => prev.map(x => x.id === m.id ? { ...x, enabled: nextEnabled } : x));
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-      body: { action: "toggle_method", id: m.id, enabled: !m.enabled },
+      body: { action: "toggle_method", id: m.id, enabled: nextEnabled },
     });
-    if (error || data?.error) { toast.error(error?.message || data?.error); load(); return; }
+    if (error || data?.error) {
+      toast.error(`❌ ${m.label}: ${error?.message || data?.error || "no se pudo actualizar"}`);
+      load();
+      return;
+    }
+    toast.success(`${nextEnabled ? "✅" : "⏸️"} ${m.label} ${nextEnabled ? "activado" : "desactivado"}`);
     invalidateCheckoutMethodsCache();
   }
 

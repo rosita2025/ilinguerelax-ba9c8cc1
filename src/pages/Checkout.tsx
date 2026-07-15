@@ -92,7 +92,7 @@ export default function Checkout() {
               regionPrices: cat.regionPrices,
               pricePen: cat.pricePen,
               quantity: Math.max(1, Number(c.q) || 1),
-            });
+            }, { silent: true });
           }
         }
       }

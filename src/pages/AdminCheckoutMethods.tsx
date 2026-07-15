@@ -381,20 +381,8 @@ export default function AdminCheckoutMethods() {
             </p>
           </header>
 
-          <Card className="p-3 sm:p-4 border-primary/30 bg-primary/5 space-y-2">
-            <span className="text-xs sm:text-sm font-semibold block">Vista previa checkout:</span>
-            <div className="flex flex-wrap gap-1.5">
-              <Button asChild size="sm" className="h-8 flex-1 min-w-[110px] sm:flex-none">
-                <a href={`/checkouts/${PREVIEW_SKU}?country=PE`} target="_blank" rel="noreferrer">🇵🇪 Perú</a>
-              </Button>
-              <Button asChild size="sm" variant="secondary" className="h-8 flex-1 min-w-[110px] sm:flex-none">
-                <a href={`/checkouts/${PREVIEW_SKU}?country=US`} target="_blank" rel="noreferrer">🇺🇸 USA</a>
-              </Button>
-              <Button asChild size="sm" variant="secondary" className="h-8 flex-1 min-w-[110px] sm:flex-none">
-                <a href={`/checkouts/${PREVIEW_SKU}?country=DE`} target="_blank" rel="noreferrer">🌎 Global</a>
-              </Button>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 sm:justify-end pt-1 border-t border-primary/10">
+          <Card className="p-3 sm:p-4 border-primary/30 bg-primary/5">
+            <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 sm:justify-end">
               <Button size="sm" variant="outline" className="h-9 w-full sm:w-auto" onClick={async () => {
                 if (!confirm("Auto-rellenar métodos Stripe oficiales para TODAS las regiones Stripe? (upsert — no borra métodos manuales)")) return;
                 const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "sync_all_stripe" } });

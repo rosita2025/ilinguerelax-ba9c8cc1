@@ -81,8 +81,14 @@ export const EmailSubscribePopup = () => {
     }
     setLoading(true);
     try {
+      let language: string | undefined;
+      let country: string | undefined;
+      try {
+        language = localStorage.getItem("ilingue_language") || undefined;
+        country = localStorage.getItem("ilr_country") || undefined;
+      } catch {}
       const { error } = await supabase.functions.invoke("subscribe-newsletter", {
-        body: { email: email.trim(), name: name.trim() || undefined, source: "popup" },
+        body: { email: email.trim(), name: name.trim() || undefined, source: "popup", language, country },
       });
       if (error) throw error;
       try { writeState("subscribed", SUBSCRIBED_TTL_DAYS); } catch {}

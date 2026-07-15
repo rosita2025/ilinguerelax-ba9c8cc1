@@ -135,6 +135,9 @@ Deno.serve(async (req) => {
           currency,
           orderNumber: transactionCode,
           provider: "hotmart",
+          origin: "hotmart",
+          hotmartProductId: productId,
+          hotmartProductCode: productCode,
         });
       } catch (e) {
         console.warn("brevo customer sync failed:", e instanceof Error ? e.message : String(e));

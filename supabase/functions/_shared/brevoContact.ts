@@ -5,6 +5,7 @@
 // Uses the Lovable connector gateway. Never call api.brevo.com directly.
 
 import { logBrevoSync } from "./brevoLog.ts";
+import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
 
 
 interface Args {
@@ -22,6 +23,7 @@ interface Args {
   hotmartProductId?: string;    // Hotmart numeric product id
   hotmartProductCode?: string;  // Hotmart ucode / product code
   tiendaSku?: string;           // SKU interno de la tienda propia
+  productCategory?: string;     // categoría/tipo de oferta explícita (opcional)
 }
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";

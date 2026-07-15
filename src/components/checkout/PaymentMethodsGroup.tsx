@@ -344,6 +344,17 @@ export function PaymentMethodsGroup() {
       return data.clientSecret;
     } catch (err) {
       setStripeError(mapStripeError(err, language as StripeLang));
+      try {
+        const s2 = useCheckoutPruebaStore.getState();
+        const totals = calcTotals(s2.items, s2.couponPercent, region.tier);
+        trackPaymentError({
+          provider: selected === "card" ? "stripe_card" : String(selected),
+          skus: s2.items.map((i) => i.id),
+          reason: err instanceof Error ? err.message : String(err),
+          value: totals.total,
+          currency: "USD",
+        });
+      } catch { /* noop */ }
       throw err;
     } finally {
       setStripeLoading(false);

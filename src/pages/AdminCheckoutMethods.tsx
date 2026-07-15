@@ -194,12 +194,12 @@ export default function AdminCheckoutMethods() {
         body: { action: "save_region", region: payload },
       });
       if (error || data?.error) throw new Error(error?.message || data?.error);
-      toast.success("✅ Región guardada");
+      toast.success(`✅ Región ${code} guardada correctamente`);
       if (opts.fromDialog) setRegionEdit(null);
       invalidateCheckoutMethodsCache();
       await load();
     } catch (e) {
-      toast.error((e as Error).message || "Error al guardar");
+      toast.error(`❌ Error al guardar región ${code}: ${(e as Error).message || "desconocido"}`);
       await load();
     } finally {
       setSavingDialog(false);

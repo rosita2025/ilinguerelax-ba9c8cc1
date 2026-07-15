@@ -41,7 +41,7 @@ interface MethodRow { region_code: string; method_key: string; enabled: boolean;
 
 // Cache en memoria con TTL corto — evita re-consulta en cada montaje pero
 // permite ver cambios del admin sin recargar la pestaña por completo.
-const CACHE_TTL_MS = 30_000;
+const CACHE_TTL_MS = 3_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
 let cacheAt = 0;
 const CACHE_VERSION_KEY = "ilr_checkout_methods_version";
@@ -110,19 +110,26 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       if (event.key === CACHE_VERSION_KEY) bump();
     };
     const onSameTab = () => bump();
+    const onFocus = () => bump();
+    const onVisibility = () => { if (document.visibilityState === "visible") bump(); };
     const bc = getBroadcastChannel();
     const onMessage = (ev: MessageEvent) => {
       if (ev?.data?.type === "invalidate") bump();
     };
     window.addEventListener("storage", onStorage);
     window.addEventListener(SAME_TAB_EVENT, onSameTab as EventListener);
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
     bc?.addEventListener("message", onMessage);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener(SAME_TAB_EVENT, onSameTab as EventListener);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
       bc?.removeEventListener("message", onMessage);
     };
   }, []);
+
 
 
   useEffect(() => {

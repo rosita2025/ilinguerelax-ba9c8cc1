@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock } from "lucide-react";
@@ -21,6 +21,7 @@ import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
@@ -109,13 +110,9 @@ export default function Checkout() {
   const [adminUpsells, setAdminUpsells] = useState<CatalogItem["upsells"] | null>(null);
   const [loadingDb, setLoadingDb] = useState(false);
   const [dbMissing, setDbMissing] = useState(false);
-  // Global Meta Pixel (loaded in index.html): fire InitiateCheckout on entry.
-  useEffect(() => {
-    try {
-      const w = window as unknown as { fbq?: (...a: unknown[]) => void };
-      if (typeof w.fbq === "function") w.fbq("track", "InitiateCheckout");
-    } catch { /* ignore */ }
-  }, [slug]);
+  // InitiateCheckout is fired below (once catalogItem is resolved) so we can
+  // include product_id + value + currency in the tracked event — this is what
+  // powers the "Continuar pago" counter in /admin/live for every SKU.
 
 
   // Always live-load product + upsells from admin (`digital_products` +
@@ -333,6 +330,44 @@ export default function Checkout() {
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.
   useAbandonedCheckoutTracker(slug, catalogItem?.name);
+
+  // Fire InitiateCheckout for every /checkouts/:slug (Pixel + CAPI + funnel_events).
+  // Includes product_id + value + currency so /admin/live cuenta "Continuar pago"
+  // por producto para TODOS los SKUs de la tienda (no solo Hotmart).
+  const initiatedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!catalogItem) return;
+    const sku = catalogItem.adminSku || catalogItem.id;
+    if (!sku || initiatedRef.current === sku) return;
+    initiatedRef.current = sku;
+
+    const tier = (region.tier || "global") as "peru" | "latam" | "tienda" | "global";
+    const priceForTier =
+      tier === "peru" && catalogItem.pricePen != null
+        ? Number(catalogItem.pricePen)
+        : Number(
+            catalogItem.regionPrices?.[tier === "peru" ? "latam" : tier] ??
+            catalogItem.price
+          );
+    const currency = tier === "peru" ? "PEN" : "USD";
+    const cartTotal = items.reduce((sum, it) => {
+      const p = tier === "peru" && it.pricePen != null
+        ? Number(it.pricePen)
+        : Number(it.regionPrices?.[tier === "peru" ? "latam" : tier] ?? it.price);
+      return sum + p * (it.quantity || 1);
+    }, 0);
+    const value = cartTotal > 0 ? cartTotal : priceForTier;
+
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: catalogItem.name,
+      content_ids: [sku],
+      content_type: "product",
+      value,
+      currency,
+      num_items: items.length || 1,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogItem?.adminSku, catalogItem?.id]);
 
   if (loadingDb && !catalogItem && !slugUnknown) {
     // Silent background fetch — don't block UI with a loader

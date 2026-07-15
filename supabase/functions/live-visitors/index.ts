@@ -388,6 +388,8 @@ serve(async (req) => {
       byProduct,
       bySource,
       byChannel,
+      byCampaign,
+      bySourceCountry,
       byEvent: mergedByEvent,
       revenueByCountry,
       visitors: visitors.slice(0, 200),

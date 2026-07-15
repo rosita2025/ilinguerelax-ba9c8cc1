@@ -150,8 +150,8 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         if (alive) setState({ loaded: true, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
         return;
       }
-      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, paypal: false, transfer: false, cash: false, yape: false };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
+      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
         const fam = keyToFamily(m.method_key);

@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     const email = String(body.email || "").trim().toLowerCase();
     const name = String(body.name || "Cliente").trim() || "Cliente";
     const phone = String(body.phone || "").trim();
-    const productType = String(body.product_type || body.slug || "checkout").slice(0, 80);
+    const productType = String(body.product_type || body.slug || "checkout").slice(0, 180);
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)

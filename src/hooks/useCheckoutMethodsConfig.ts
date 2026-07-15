@@ -15,6 +15,8 @@ export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna
 export interface CheckoutMethodsConfig {
   loaded: boolean;
   regionCode: string | null;
+  /** Exact enabled method keys for the matched region (ex: stripe_card, stripe_oxxo). */
+  enabledMethodKeys: string[];
   stripe: boolean;
   stripeAch: boolean;
   stripeCashApp: boolean;
@@ -99,7 +101,7 @@ function keyToFamily(key: string): FamilyKey | null {
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
   const [version, setVersion] = useState(0);
   const [state, setState] = useState<CheckoutMethodsConfig>({
-    loaded: false, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
+    loaded: false, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
   });
 
   useEffect(() => {
@@ -148,13 +150,15 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
           ?? regions.find((r) => r.code.toUpperCase() === "GLOBAL");
       }
       if (!region) {
-        if (alive) setState({ loaded: true, regionCode: null, ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
+        if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
         return;
       }
       const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false };
       const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity };
+      const enabledMethodKeys: string[] = [];
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
+        enabledMethodKeys.push(m.method_key.toLowerCase());
         const fam = keyToFamily(m.method_key);
         if (!fam) continue;
         enabledFamilies[fam] = true;
@@ -165,7 +169,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       const families = anyEnabled ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
       const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
         .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
-      if (alive) setState({ loaded: true, regionCode: region.code, ...families, familyOrder });
+      if (alive) setState({ loaded: true, regionCode: region.code, enabledMethodKeys, ...families, familyOrder });
     })();
     return () => { alive = false; };
   }, [country, version]);

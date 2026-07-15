@@ -24,6 +24,7 @@ interface Args {
 
 import { logBrevoSync } from "./brevoLog.ts";
 import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
+import { resolveBrevoAudiences } from "./brevoProductAudiences.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 

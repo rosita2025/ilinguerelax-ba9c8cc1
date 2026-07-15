@@ -53,20 +53,6 @@ const panels = [
     desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).",
     color: "text-sky-600",
   },
-  {
-    to: "/admin/brevo-logs",
-    icon: Activity,
-    title: "Logs de Brevo",
-    desc: "Ver qué evento llegó (compra Hotmart, abandono Hotmart, checkout tienda) y qué campos se enviaron a Brevo, con éxito/fallo.",
-    color: "text-rose-600",
-  },
-  {
-    to: "/admin/brevo-audiences",
-    icon: Users,
-    title: "Audiencias Brevo por producto",
-    desc: "Vincula cada producto (Hotmart ID/Code, SKU tienda o categoría) a listas de Brevo. Automatiza secuencias específicas por oferta sin tocar código.",
-    color: "text-violet-600",
-  },
 ];
 
 const AdminHome = () => {

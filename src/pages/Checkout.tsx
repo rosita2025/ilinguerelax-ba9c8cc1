@@ -366,6 +366,15 @@ export default function Checkout() {
       currency,
       num_items: items.length || 1,
     });
+    // GA4-style alias for the same funnel step, linked to the same SKU.
+    trackBeginCheckout({
+      content_name: catalogItem.name,
+      content_ids: [sku],
+      content_type: "product",
+      value,
+      currency,
+      num_items: items.length || 1,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalogItem?.adminSku, catalogItem?.id]);
 

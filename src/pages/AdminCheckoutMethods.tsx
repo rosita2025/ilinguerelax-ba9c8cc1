@@ -12,7 +12,7 @@ import {
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
-import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap } from "lucide-react";
+import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, Zap, ArrowUp, ArrowDown } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -271,6 +271,30 @@ export default function AdminCheckoutMethods() {
     toast.success(`+ ${q.label}`); load();
   }
 
+  async function reorderMethod(m: Method, dir: -1 | 1) {
+    const siblings = methods
+      .filter(x => x.region_code === m.region_code)
+      .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
+    const idx = siblings.findIndex(x => x.id === m.id);
+    const targetIdx = idx + dir;
+    if (idx < 0 || targetIdx < 0 || targetIdx >= siblings.length) return;
+    const other = siblings[targetIdx];
+    // Optimistic swap
+    setMethods(prev => prev.map(x => {
+      if (x.id === m.id) return { ...x, sort_order: other.sort_order };
+      if (x.id === other.id) return { ...x, sort_order: m.sort_order };
+      return x;
+    }));
+    const [r1, r2] = await Promise.all([
+      adminInvoke<any>("manage-checkout-methods", { body: { action: "save_method", method: { ...m, sort_order: other.sort_order } } }),
+      adminInvoke<any>("manage-checkout-methods", { body: { action: "save_method", method: { ...other, sort_order: m.sort_order } } }),
+    ]);
+    if (r1.error || r1.data?.error || r2.error || r2.data?.error) {
+      toast.error("No se pudo reordenar");
+      load();
+    }
+  }
+
 
 
   return (
@@ -314,7 +338,9 @@ export default function AdminCheckoutMethods() {
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {regions.map((r) => {
-              const rms = methods.filter(m => m.region_code === r.code);
+              const rms = methods
+                .filter(m => m.region_code === r.code)
+                .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
               return (
                 <Card key={r.code} className={`p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
                   <div className="flex items-start justify-between mb-3">
@@ -383,10 +409,35 @@ export default function AdminCheckoutMethods() {
 
 
                   <div className="space-y-1.5">
-                    {rms.map(m => {
+                    {rms.map((m, idx) => {
                       const Icon = ICONS[m.icon] || CreditCard;
+                      const isFirst = idx === 0;
+                      const isLast = idx === rms.length - 1;
                       return (
                         <div key={m.id} className={`flex items-center gap-2 text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
+                          <div className="flex flex-col shrink-0">
+                            <button
+                              type="button"
+                              disabled={isFirst}
+                              onClick={() => reorderMethod(m, -1)}
+                              className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Subir"
+                            >
+                              <ArrowUp className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isLast}
+                              onClick={() => reorderMethod(m, 1)}
+                              className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Bajar"
+                            >
+                              <ArrowDown className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] tabular-nums px-1.5 py-0 shrink-0" title="Prioridad">
+                            {idx + 1}
+                          </Badge>
                           <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="font-medium leading-tight truncate">{m.label}</div>

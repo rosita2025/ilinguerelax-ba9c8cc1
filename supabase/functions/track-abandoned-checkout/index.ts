@@ -99,9 +99,19 @@ Deno.serve(async (req) => {
         .eq("sku", productType)
         .maybeSingle();
       const site = "https://ilinguerelax.com";
-      const url = product?.slug
+      // Payload de recuperación estilo Shopify: al hacer clic en el email,
+      // /checkouts/:slug hidrata carrito + datos del cliente automáticamente.
+      const recoverPayload = {
+        v: 1,
+        b: { n: name, e: email, p: phone },
+        c: cart,
+      };
+      const recoverB64 = btoa(unescape(encodeURIComponent(JSON.stringify(recoverPayload))))
+        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const baseUrl = product?.slug
         ? `${site}/checkouts/${product.slug}`
         : `${site}/products/${productType}`;
+      const url = `${baseUrl}?r=${recoverB64}`;
       await pushAbandonedCartToBrevo({
         email,
         name,

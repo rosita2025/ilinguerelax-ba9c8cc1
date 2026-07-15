@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Card } from "@/components/ui/card";
-import { Activity, CreditCard, Eye, Globe, Loader2, MousePointerClick, ShoppingBag, Users } from "lucide-react";
+import { Activity, Bot, CreditCard, Eye, Globe, Loader2, MousePointerClick, ShoppingBag, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";

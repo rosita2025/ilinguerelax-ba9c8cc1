@@ -159,6 +159,45 @@ export default function AdminCheckoutMethods() {
                   </div>
                   {r.description && <p className="text-xs text-muted-foreground mb-3">{r.description}</p>}
 
+                  {(() => {
+                    const previewCountry = (r.country_codes.find(c => c && c !== "*") || "").toUpperCase();
+                    const isCore = r.code === "PE" || r.code === "US" || r.code === "GLOBAL" || r.code === "*";
+                    return (
+                      <div className="mb-3 flex flex-wrap items-center gap-2 p-2 rounded border border-dashed bg-muted/30">
+                        <Button
+                          asChild={!!previewCountry}
+                          disabled={!previewCountry}
+                          size="sm"
+                          variant={isCore ? "outline" : "default"}
+                          className="h-8"
+                        >
+                          {previewCountry ? (
+                            <a
+                              href={`/checkout/${PREVIEW_SKU}?country=${previewCountry}&preview_region=${r.code}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <Eye className="w-3.5 h-3.5 mr-1" />
+                              Vista previa ({previewCountry})
+                            </a>
+                          ) : (
+                            <span><Eye className="w-3.5 h-3.5 mr-1 inline" />Agrega un país ISO</span>
+                          )}
+                        </Button>
+                        {isCore ? (
+                          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3 text-primary" /> Región base — no se toca
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-muted-foreground">
+                            Aislado · no afecta Perú ni Global
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+
                   <div className="space-y-1.5">
                     {rms.map(m => {
                       const Icon = ICONS[m.icon] || CreditCard;

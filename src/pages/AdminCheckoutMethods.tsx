@@ -163,6 +163,8 @@ export default function AdminCheckoutMethods() {
   const [methodEdit, setMethodEdit] = useState<Method | null>(null);
   const [savingRegion, setSavingRegion] = useState<string | null>(null);
   const [savingDialog, setSavingDialog] = useState(false);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 5;
 
   async function load() {
     invalidateCheckoutMethodsCache();
@@ -404,11 +406,18 @@ export default function AdminCheckoutMethods() {
 
           {loading && <Card className="p-8 text-center text-muted-foreground">Cargando…</Card>}
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {regions.map((r) => {
-              const rms = methods
-                .filter(m => m.region_code === r.code)
-                .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
+          {(() => {
+            const totalPages = Math.max(1, Math.ceil(regions.length / PAGE_SIZE));
+            const currentPage = Math.min(page, totalPages);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageRegions = regions.slice(start, start + PAGE_SIZE);
+            return (
+              <>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {pageRegions.map((r) => {
+                    const rms = methods
+                      .filter(m => m.region_code === r.code)
+                      .sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
               return (
                 <Card key={r.code} className={`p-3 sm:p-5 border-2 ${r.enabled ? "border-primary/40" : "border-muted opacity-60"}`}>
                   <div className="flex items-start justify-between gap-2 mb-3">
@@ -586,7 +595,33 @@ export default function AdminCheckoutMethods() {
                 </Card>
               );
             })}
-          </div>
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <p className="text-xs text-muted-foreground">
+                      Página {currentPage} de {totalPages} · {regions.length} regiones
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="outline" className="h-8" disabled={currentPage <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                        ← Anterior
+                      </Button>
+                      {Array.from({ length: totalPages }).map((_, i) => {
+                        const n = i + 1;
+                        return (
+                          <Button key={n} size="sm" variant={n === currentPage ? "default" : "ghost"} className="h-8 w-8 p-0" onClick={() => setPage(n)}>
+                            {n}
+                          </Button>
+                        );
+                      })}
+                      <Button size="sm" variant="outline" className="h-8" disabled={currentPage >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
+                        Siguiente →
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           <Card className="p-4 bg-muted/40 text-xs text-muted-foreground space-y-1">
             <p><strong>Detección:</strong> IP del comprador vía ipapi.co → se busca el código de país en <code>country_codes</code> de cada región. La región con código <code>*</code> es el fallback global.</p>

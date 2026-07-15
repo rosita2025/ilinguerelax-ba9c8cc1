@@ -730,7 +730,7 @@ export default function AdminCheckoutMethods() {
 
       {/* Method editor */}
       <Dialog open={!!methodEdit} onOpenChange={(o) => !o && setMethodEdit(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[92vh] overflow-y-auto w-[calc(100vw-1.5rem)] sm:w-full">
           <DialogHeader><DialogTitle>{methodEdit?.id ? "Editar método" : "Nuevo método"}</DialogTitle></DialogHeader>
           {methodEdit && (
             <div className="space-y-3">

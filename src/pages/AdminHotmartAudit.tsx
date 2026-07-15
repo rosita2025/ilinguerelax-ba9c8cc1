@@ -105,6 +105,28 @@ const AdminHotmartAudit = () => {
     } finally { setLoading(false); }
   }, [adminKey, status, search]);
 
+  const forceBrevoSync = useCallback(async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; synced: number; syncTargets: number }>(
+        "list-hotmart-audit",
+        { body: { adminKey, status, search, limit: 300, forceSync: true } },
+      );
+      if (error) throw error;
+      setRows(data?.rows ?? []);
+      if (data?.summary) setSummary(data.summary);
+      const synced = data?.synced ?? 0;
+      const targets = data?.syncTargets ?? 0;
+      if (targets === 0) {
+        toast.success("Brevo ya está al día", { description: "No hay contactos pendientes de sincronizar." });
+      } else {
+        toast.success(`Sincronizados ${synced}/${targets} contactos con Brevo`);
+      }
+    } catch (e) {
+      toast.error("No se pudo forzar la sincronización con Brevo", { description: (e as Error).message });
+    } finally { setSyncing(false); }
+  }, [adminKey, status, search]);
+
   useEffect(() => { void load(); }, [load]);
 
   // Auto-refresh cada 30s para reflejar nuevos eventos y sincronizar contactos a Brevo

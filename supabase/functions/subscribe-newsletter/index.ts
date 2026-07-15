@@ -6,33 +6,60 @@ const FROM = 'iLingue Relax <hola@ilinguerelax.com>';
 const REPLY_TO = 'hola@ilinguerelax.com';
 
 function buildWelcomeEmail(name?: string) {
-  const hola = name ? `Hola ${name},` : 'Hola,';
+  const hola = name ? `Hola ${name} 👋` : 'Hola 👋';
   const subject = `¡Bienvenidos a iLingue Relax! Te daré el cupón 10% de descuento 🎁`;
   const text = `${hola}
 
-Bienvenid@ a iLingue Relax. Gracias por suscribirte.
+¡Bienvenid@ a iLingue Relax! Gracias por suscribirte.
 
-Como regalo de bienvenida, aquí tienes tu cupón del 10% de descuento:
+Como regalo de bienvenida, aquí tienes tu cupón exclusivo del 10% de descuento:
 
     NEW10
 
-Úsalo al finalizar tu compra en la tienda.
+Úsalo al finalizar tu compra en https://ilinguerelax.com/products
 
 Si necesitas cualquier cosa, escríbenos a hola@ilinguerelax.com.
 
 Un saludo,
-El equipo de iLingue Relax
-hola@ilinguerelax.com`;
+El equipo de iLingue Relax`;
 
-  const html = `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #111;">
-  <p>${hola}</p>
-  <p>Bienvenid@ a <strong>iLingue Relax</strong>. Gracias por suscribirte.</p>
-  <p>Como regalo de bienvenida, aquí tienes tu cupón del <strong>10% de descuento</strong>:</p>
-  <p style="font-family: monospace; font-size: 18px; padding: 8px 0;"><strong>NEW10</strong></p>
-  <p>Úsalo al finalizar tu compra en la tienda.</p>
-  <p>Si necesitas cualquier cosa, escríbenos a <a href="mailto:hola@ilinguerelax.com">hola@ilinguerelax.com</a>.</p>
-  <p>Un saludo,<br/>El equipo de iLingue Relax<br/>hola@ilinguerelax.com</p>
-</div>`;
+  const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;background-color:#f5f5f5;">
+  <div style="max-width:600px;margin:20px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background:linear-gradient(135deg,#1e3a5f 0%,#2c5282 100%);padding:36px 30px;text-align:center;">
+      <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:700;">🎁 ¡Bienvenid@ a iLingue Relax!</h1>
+    </div>
+    <div style="padding:36px 30px;">
+      <p style="font-size:18px;color:#333;margin:0 0 18px 0;">${hola}</p>
+      <p style="font-size:16px;color:#555;line-height:1.6;margin:0 0 22px 0;">
+        Gracias por suscribirte. Como regalo de bienvenida, te enviamos un cupón exclusivo del
+        <strong style="color:#e53e3e;">10% de descuento</strong> en todos nuestros productos digitales.
+      </p>
+      <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border:3px dashed #d97706;border-radius:12px;padding:26px;text-align:center;margin:26px 0;">
+        <p style="font-size:13px;color:#92400e;margin:0 0 8px 0;text-transform:uppercase;letter-spacing:1px;">Tu código exclusivo:</p>
+        <p style="font-size:36px;font-weight:800;color:#92400e;margin:0;letter-spacing:4px;">NEW10</p>
+      </div>
+      <p style="font-size:15px;color:#555;line-height:1.6;margin:0 0 24px 0;">
+        Usa este código al momento de pagar en la tienda para obtener el descuento.
+      </p>
+      <div style="text-align:center;margin:30px 0;">
+        <a href="https://ilinguerelax.com/products" style="display:inline-block;background:linear-gradient(135deg,#1e3a5f 0%,#2c5282 100%);color:#ffffff;text-decoration:none;padding:16px 36px;border-radius:50px;font-size:16px;font-weight:600;box-shadow:0 4px 15px rgba(30,58,95,0.3);">
+          🛒 Ver Productos
+        </a>
+      </div>
+      <p style="font-size:13px;color:#888;margin-top:26px;text-align:center;">
+        ⏰ Cupón por tiempo limitado. ¡Aprovéchalo!
+      </p>
+    </div>
+    <div style="background:#1e3a5f;padding:22px;text-align:center;">
+      <p style="color:#94a3b8;margin:0;font-size:13px;">© ${new Date().getFullYear()} iLingue Relax</p>
+      <p style="color:#64748b;margin:8px 0 0 0;font-size:12px;">hola@ilinguerelax.com</p>
+    </div>
+  </div>
+</body>
+</html>`;
 
   return { subject, text, html };
 }

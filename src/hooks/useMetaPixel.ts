@@ -215,6 +215,18 @@ const ensurePixelReady = () => {
 // HOTMART PIXEL
 // ============================================
 
+const markViewContentFired = (params: Record<string, unknown>) => {
+  if (typeof window === "undefined") return;
+  const w = window as unknown as { __vcFired?: Record<string, boolean> };
+  if (!w.__vcFired) w.__vcFired = {};
+  const path = typeof window.location !== "undefined" ? window.location.pathname : "";
+  if (path) w.__vcFired[path] = true;
+  const ids = (params as { content_ids?: unknown }).content_ids;
+  if (Array.isArray(ids)) for (const id of ids) if (typeof id === "string") w.__vcFired![`sku:${id}`] = true;
+  const pid = (params as { product_id?: unknown }).product_id;
+  if (typeof pid === "string") w.__vcFired[`sku:${pid}`] = true;
+};
+
 export const useHotmartPixel = (params: ViewContentParams) => {
   useEffect(() => {
     ensurePixelReady();
@@ -224,6 +236,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
     }
     sendCapiEvent("ViewContent", eventId, params as unknown as Record<string, unknown>);
     logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
+    markViewContentFired(params as unknown as Record<string, unknown>);
   }, [params.content_name]);
 };
 
@@ -239,7 +252,9 @@ export const trackHotmartEvent = (
   }
   sendCapiEvent(eventName, eventId, pixelParams);
   if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);
+  if (eventName === "ViewContent") markViewContentFired(pixelParams);
 };
+
 
 export const useHotmartPixelPageView = () => {
   useEffect(() => {

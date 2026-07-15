@@ -81,7 +81,37 @@ const AdminCheckoutMethods = () => {
             </Button>
           </header>
 
-          {error && <Card className="p-4 border-red-300 bg-red-50 text-red-800 text-sm">{error}</Card>}
+          <Card className="p-5 border-primary/30 bg-primary/5">
+            <h2 className="font-semibold mb-1">Vista previa de checkout (editor / desarrollador)</h2>
+            <p className="text-xs text-muted-foreground mb-3">
+              Abre los checkouts reales para revisar Stripe, PayPal, Mercado Pago, Yape y Plin sin romper nada. No borres estas páginas — quedan como referencia oficial.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="default">
+                <a href="/checkout/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion?region=PE" target="_blank" rel="noreferrer">
+                  🇵🇪 Checkout Perú (PEN · Yape/Plin/MP)
+                </a>
+              </Button>
+              <Button asChild size="sm" variant="secondary">
+                <a href="/checkout/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion?region=GLOBAL" target="_blank" rel="noreferrer">
+                  🌎 Checkout Global (USD · Stripe/PayPal)
+                </a>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a href="/checkout/100-mapas-mentales-para-aprender-coreano-hangul-c1?region=GLOBAL" target="_blank" rel="noreferrer">
+                  🇰🇷 Coreano (Global)
+                </a>
+              </Button>
+            </div>
+          </Card>
+
+          {error && (
+            <Card className="p-4 border-amber-300 bg-amber-50 text-amber-900 text-sm">
+              <div className="font-medium mb-1">No pudimos leer los métodos activos de Stripe ahora mismo</div>
+              <div className="text-xs opacity-80">{error}</div>
+              <div className="text-xs mt-2">La tabla de referencia por país sigue funcionando abajo. Los checkouts de Perú y Global no se ven afectados.</div>
+            </Card>
+          )}
 
           {loading && <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Cargando…</div>}
 

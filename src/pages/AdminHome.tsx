@@ -49,8 +49,8 @@ const panels = [
   {
     to: "/admin/orders",
     icon: Mail,
-    title: "Prueba de correo",
-    desc: "Envía un email transaccional real asociado a una orden y ve en vivo cómo el webhook de Brevo marca delivered / opened / bounced.",
+    title: "Órdenes / Pedidos",
+    desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).",
     color: "text-sky-600",
   },
 ];

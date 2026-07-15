@@ -167,6 +167,23 @@ export default function AdminCheckoutMethods() {
     load();
   }
 
+  async function quickAdd(region_code: string, q: typeof QUICK_METHODS[number]) {
+    const existing = methods.find(m => m.region_code === region_code && m.method_key === q.key);
+    if (existing) return toast.info(`${q.label} ya está agregado`);
+    const m: Method = {
+      id: "", region_code, method_key: q.key, label: q.label,
+      note: q.note, icon: q.icon, enabled: true,
+      sort_order: methods.filter(x => x.region_code === region_code).length + 1,
+    };
+    const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+      body: { action: "save_method", method: m },
+    });
+    if (error || data?.error) return toast.error(error?.message || data?.error);
+    toast.success(`+ ${q.label}`); load();
+  }
+
+
+
   return (
     <>
       <AdminNav />

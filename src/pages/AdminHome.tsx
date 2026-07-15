@@ -53,6 +53,13 @@ const panels = [
     desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).",
     color: "text-sky-600",
   },
+  {
+    to: "/admin/hotmart-audit",
+    icon: ClipboardList,
+    title: "Hotmart · Auditoría",
+    desc: "Eventos recibidos de Hotmart y carritos abandonados con estado mapeado (aprobado/pendiente/rechazado/posventa) y sync a Brevo.",
+    color: "text-orange-500",
+  },
 ];
 
 const AdminHome = () => {

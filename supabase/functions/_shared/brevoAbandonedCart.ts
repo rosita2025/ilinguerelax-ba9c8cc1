@@ -101,6 +101,17 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     updateEnabled: true,
   };
 
+  const origin = a.source === "hotmart" ? "hotmart" : "tienda";
+  const event_type = origin === "hotmart" ? "hotmart_abandoned" : "tienda_abandoned";
+  const baseLog = {
+    event_type,
+    source: "brevo_abandoned",
+    origin,
+    email,
+    product_name: a.productName,
+    product_sku: a.productSku,
+  } as const;
+
   try {
     const send = (body: typeof payload) => fetch(`${GATEWAY_URL}/contacts`, {
       method: "POST",
@@ -124,17 +135,23 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
         res = await send(retryPayload);
         if (res.ok) {
           console.log(`[brevo-abandoned] queued ${email} · ${a.productSku} (without phone)`);
+          await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes: retryPayload.attributes as Record<string, unknown>, response: "queued (without phone)" });
           return;
         }
         const retryBody = await res.text();
         console.error(`[brevo-abandoned] upsert retry failed [${res.status}]: ${retryBody}`);
+        await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes: retryPayload.attributes as Record<string, unknown>, error: retryBody });
         return;
       }
       console.error(`[brevo-abandoned] upsert failed [${res.status}]: ${body}`);
+      await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes, error: body });
       return;
     }
     console.log(`[brevo-abandoned] queued ${email} · ${a.productSku}`);
+    await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes, response: "queued" });
   } catch (e) {
-    console.error("[brevo-abandoned] network error:", e instanceof Error ? e.message : String(e));
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[brevo-abandoned] network error:", msg);
+    await logBrevoSync({ ...baseLog, status: "failed", attributes, error: `network: ${msg}` });
   }
 }

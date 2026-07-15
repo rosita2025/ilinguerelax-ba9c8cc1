@@ -491,18 +491,8 @@ export default function AdminCheckoutMethods() {
                       );
                     })()}
 
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <Button size="sm" variant="outline"
-                        onClick={() => setMethodEdit(emptyMethod(r.code))}>
-                        <Plus className="w-3.5 h-3.5 mr-1" /> Personalizado
-                      </Button>
-                      <Button size="sm" variant="default"
-                        onClick={() => autofillStripe(r.code)}
-                        disabled={!r.country_codes.some(c => c && c !== "*")}
-                        title="Añade los métodos Stripe disponibles según los países de la región">
-                        <Zap className="w-3.5 h-3.5 mr-1" /> Auto Stripe
-                      </Button>
-                    </div>
+
+
 
                   </div>
                 </Card>

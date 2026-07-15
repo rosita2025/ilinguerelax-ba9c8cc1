@@ -101,7 +101,7 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     updateEnabled: true,
   };
 
-  const origin = a.source === "hotmart" ? "hotmart" : "tienda";
+  // event log metadata (origin already defined above)
   const event_type = origin === "hotmart" ? "hotmart_abandoned" : "tienda_abandoned";
   const baseLog = {
     event_type,

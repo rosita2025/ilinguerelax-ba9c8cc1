@@ -1,5 +1,6 @@
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 
 const corsHeaders = adminCorsHeaders;
 
@@ -154,6 +155,63 @@ Deno.serve(async (req) => {
 
     const purchasesFull = purchases.map(withBrevo);
     const abandonedFull = abandoned.map(withBrevo);
+
+    // Auto-sync: any email present in audit but missing a Brevo log gets pushed
+    // to Brevo in the background (fire-and-forget, does not block the response).
+    const syncTargets = new Map<string, { name?: string; source: "purchase" | "abandoned"; product?: string; transaction?: string; status: string }>();
+    for (const r of purchasesFull) {
+      const key = (r.email ?? "").toLowerCase();
+      if (!key || r.brevo) continue;
+      if (syncTargets.has(key)) continue;
+      const st = r.mapped_status === "approved" ? "compra"
+        : r.mapped_status === "pending" ? "pendiente"
+        : r.mapped_status === "refused" ? "rechazado"
+        : r.mapped_status === "refunded" ? "reembolso"
+        : r.mapped_status === "chargeback" ? "chargeback"
+        : r.mapped_status === "cancelled" ? "cancelado"
+        : "compra";
+      const buyer = (r.payload as any)?.data?.buyer ?? {};
+      const product = (r.payload as any)?.data?.product ?? {};
+      syncTargets.set(key, {
+        name: [buyer.name, buyer.surname].filter(Boolean).join(" ") || buyer.name,
+        source: "purchase",
+        product: product.name ?? r.product ?? undefined,
+        transaction: r.transaction ?? undefined,
+        status: st,
+      });
+    }
+    for (const r of abandonedFull) {
+      const key = (r.email ?? "").toLowerCase();
+      if (!key || r.brevo || syncTargets.has(key)) continue;
+      const p = r.payload as any;
+      syncTargets.set(key, {
+        name: p?.customer_name ?? undefined,
+        source: "abandoned",
+        product: r.product ?? undefined,
+        status: "pendiente",
+      });
+    }
+    if (syncTargets.size > 0) {
+      const jobs = Array.from(syncTargets.entries()).slice(0, 25).map(async ([email, meta]) => {
+        try {
+          await upsertBrevoContact({
+            email,
+            name: meta.name,
+            productName: meta.product,
+            orderNumber: meta.transaction,
+            provider: meta.source === "purchase" ? "hotmart" : "abandoned",
+            origin: meta.source === "purchase" ? "hotmart" : undefined,
+            purchaseStatus: meta.status as any,
+          });
+        } catch (err) {
+          console.warn("[audit-auto-sync] failed", email, (err as Error).message);
+        }
+      });
+      // @ts-ignore Edge runtime
+      EdgeRuntime.waitUntil(Promise.allSettled(jobs));
+    }
+
+
 
 
     let rows = [...purchasesFull, ...abandonedFull].sort(

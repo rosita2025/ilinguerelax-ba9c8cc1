@@ -106,6 +106,14 @@ const AdminHotmartAudit = () => {
 
   useEffect(() => { void load(); }, [load]);
 
+  // Auto-refresh cada 30s para reflejar nuevos eventos y sincronizar contactos a Brevo
+  useEffect(() => {
+    const id = window.setInterval(() => { void load(); }, 30000);
+    const onFocus = () => { void load(); };
+    window.addEventListener("focus", onFocus);
+    return () => { window.clearInterval(id); window.removeEventListener("focus", onFocus); };
+  }, [load]);
+
   const statCards: Array<{ key: keyof Summary; label: string }> = [
     { key: "approved", label: "Aprobados" },
     { key: "pending", label: "Pendientes" },

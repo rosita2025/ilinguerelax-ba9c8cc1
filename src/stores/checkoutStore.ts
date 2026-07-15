@@ -122,7 +122,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
 
 
-      addItem: (item) => {
+      addItem: (item, opts) => {
         // Productos digitales = 1 unidad por SKU. addItem es IDEMPOTENTE:
         // si el mismo SKU ya está en el carrito, NO acumula cantidad (evita
         // duplicados cuando el usuario vuelve al checkout, cuando el enlace
@@ -149,6 +149,21 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
           });
         } else {
           set({ items: [...get().items, { ...item, quantity: 1 }] });
+          // Fire AddToCart for every real add — powers /admin/live "agregó al
+          // carrito" counter per producto. `silent: true` skips tracking for
+          // auto-populate (landing on /checkouts/:slug) and recovery links.
+          if (!opts?.silent) {
+            try {
+              trackHotmartEvent("AddToCart", {
+                content_name: item.name,
+                content_ids: [item.id],
+                content_type: "product",
+                value: Number(item.price) || 0,
+                currency: "USD",
+                num_items: 1,
+              });
+            } catch { /* ignore */ }
+          }
         }
       },
 

@@ -62,15 +62,27 @@ const AdminBrevoAbandonedStats = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: res, error } = await adminInvoke<StatsResponse>("stats-brevo-abandoned", {
-        body: { adminKey, days, country: country === "all" ? null : country },
-      });
+      const body: Record<string, unknown> = {
+        adminKey,
+        country: country === "all" ? null : country,
+      };
+      if (preset === "today") {
+        body.from = today; body.to = today;
+      } else if (preset === "yesterday") {
+        const y = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        body.from = y; body.to = y;
+      } else if (preset === "custom") {
+        body.from = customFrom; body.to = customTo;
+      } else {
+        body.days = days;
+      }
+      const { data: res, error } = await adminInvoke<StatsResponse>("stats-brevo-abandoned", { body });
       if (error) throw error;
       setData(res ?? null);
     } catch (e) {
       toast.error("No se pudieron cargar las estadísticas", { description: (e as Error).message });
     } finally { setLoading(false); }
-  }, [adminKey, days, country]);
+  }, [adminKey, days, country, preset, customFrom, customTo, today]);
 
   useEffect(() => { void load(); }, [load]);
 

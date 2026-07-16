@@ -81,6 +81,9 @@ async function upsertAlert(
 }
 
 // Best-effort SKU resolution from a manual_payments.items JSON blob.
+// STRICT: never cross-match products. Prefer exact SKU (with alias normalization),
+// then exact name equality; only fall back to a long shared prefix (>=12 chars)
+// so short/generic names like "coreano" or "palabras" can't match the wrong row.
 async function resolveSkusFromItems(
   admin: ReturnType<typeof createClient>,
   items: unknown,
@@ -88,27 +91,42 @@ async function resolveSkusFromItems(
   if (!Array.isArray(items)) return [];
   const raw: string[] = [];
   for (const it of items as Array<Record<string, unknown>>) {
-    const sku = String(it?.sku || it?.SKU || it?.id || "").trim();
-    if (sku) raw.push(sku);
+    const candidate = String(
+      it?.sku || it?.SKU || it?.adminSku || it?.admin_sku || it?.productSku ||
+      it?.slug || it?.id || it?.productId || ""
+    ).trim();
+    if (candidate) raw.push(candidate);
   }
   const normalized = normalizeSkus(raw);
-  if (normalized.length > 0) return normalized;
+  if (normalized.length > 0) {
+    // Verify these SKUs actually exist in digital_products before returning.
+    const { data } = await admin
+      .from("digital_products").select("sku").in("sku", normalized);
+    const known = new Set(((data ?? []) as Array<{ sku: string }>).map((r) => r.sku));
+    const verified = normalized.filter((s) => known.has(s));
+    if (verified.length > 0) return verified;
+  }
 
-  // Fallback: fuzzy match by name against digital_products.
+  // Strict name fallback.
   const names = (items as Array<Record<string, unknown>>)
     .map((it) => String(it?.name || "").trim().toLowerCase())
-    .filter(Boolean);
+    .filter((n) => n.length >= 8);
   if (names.length === 0) return [];
-  const { data } = await admin.from("digital_products").select("sku,name");
+  const { data } = await admin.from("digital_products").select("sku,name").eq("active", true);
   const products = (data ?? []) as Array<{ sku: string; name: string | null }>;
   const matched: string[] = [];
   for (const n of names) {
-    const hit = products.find((p) => {
-      const pn = (p.name || "").toLowerCase();
-      if (!pn) return false;
-      // simple heuristic: shared 15+ char substring or both contain a unique keyword
-      return pn === n || pn.includes(n) || n.includes(pn);
-    });
+    // 1) exact match
+    let hit = products.find((p) => (p.name || "").toLowerCase() === n);
+    // 2) shared prefix of at least 12 chars (start of both names is equal)
+    if (!hit) {
+      hit = products.find((p) => {
+        const pn = (p.name || "").toLowerCase();
+        if (pn.length < 12) return false;
+        const len = Math.min(pn.length, n.length, 20);
+        return len >= 12 && pn.substring(0, len) === n.substring(0, len);
+      });
+    }
     if (hit) matched.push(hit.sku);
   }
   return normalizeSkus(matched);

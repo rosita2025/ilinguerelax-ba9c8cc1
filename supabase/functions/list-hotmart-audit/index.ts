@@ -68,10 +68,9 @@ Deno.serve(async (req) => {
       transaction: string | null;
       product: string | null;
       converted: boolean | null;
-      amount_usd: number | null;
-      usd_source: "producer_commission" | "original_offer_price" | "price_usd" | "unavailable" | null;
-      local_amount: number | null;
-      local_currency: string | null;
+      payload: unknown;
+      brevo: BrevoInfo | null;
+    };
       payload: unknown;
       brevo: BrevoInfo | null;
     };

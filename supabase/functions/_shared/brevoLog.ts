@@ -2,7 +2,7 @@
 // into public.brevo_sync_logs so the admin can see what event arrived and
 // what was sent, with success/failure status.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export interface BrevoLogEntry {
   event_type: string;                // e.g. "hotmart_purchase", "hotmart_abandoned", "tienda_purchase", "tienda_abandoned"
@@ -19,7 +19,7 @@ export interface BrevoLogEntry {
   error?: string;
 }
 
-let cached: ReturnType<typeof createClient> | null = null;
+let cached: SupabaseClient<Record<string, unknown>, "public", Record<string, unknown>> | null = null;
 function client() {
   if (cached) return cached;
   const url = Deno.env.get("SUPABASE_URL");
@@ -39,7 +39,7 @@ export async function logBrevoSync(entry: BrevoLogEntry): Promise<void> {
       response: entry.response ? entry.response.slice(0, 4000) : null,
       error: entry.error ? entry.error.slice(0, 2000) : null,
     };
-    await c.from("brevo_sync_logs").insert(row);
+    await c.from("brevo_sync_logs").insert(row as Record<string, unknown>);
   } catch (e) {
     console.warn("[brevo-log] insert failed:", e instanceof Error ? e.message : String(e));
   }

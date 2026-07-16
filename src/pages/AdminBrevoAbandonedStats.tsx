@@ -96,9 +96,13 @@ const AdminBrevoAbandonedStats = () => {
       } else {
         body.days = days;
       }
-      const { data: res, error } = await adminInvoke<StatsResponse>("stats-brevo-abandoned", { body });
-      if (error) throw error;
-      setData(res ?? null);
+      const [statsRes, reportRes] = await Promise.all([
+        adminInvoke<StatsResponse>("stats-brevo-abandoned", { body }),
+        adminInvoke<SegmentReport>("report-brevo-segments", { body: { ...body, country: undefined } }),
+      ]);
+      if (statsRes.error) throw statsRes.error;
+      setData(statsRes.data ?? null);
+      if (!reportRes.error) setReport(reportRes.data ?? null);
     } catch (e) {
       toast.error("No se pudieron cargar las estadísticas", { description: (e as Error).message });
     } finally { setLoading(false); }

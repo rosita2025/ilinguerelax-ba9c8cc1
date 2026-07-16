@@ -11,6 +11,37 @@ const corsHeaders = {
 const isAdminPath = (p: string | null) =>
   !!p && (p.startsWith("/admin") || p.startsWith("/checkouts/"));
 
+// Classify a referrer string into a traffic source bucket for the funnel table.
+// Only meaningful for real browser events (PageView / InitiateCheckout / etc.);
+// gateway-injected Purchase events pack JSON into referrer and are excluded upstream.
+type TrafficSource =
+  | "pixel_meta"      // Facebook / Instagram (fbclid or fb/ig referrer)
+  | "google_organic"  // google.* without gclid/utm=cpc
+  | "google_ads"      // gclid or utm_medium=cpc/ppc from google
+  | "otro_organico"   // bing/yahoo/duckduckgo/ecosia
+  | "email"           // utm_source=email / mailchimp / brevo / newsletter
+  | "referral"        // any other external site
+  | "directo";        // no referrer at all
+function classifyTrafficSource(referrer: string | null): TrafficSource {
+  const raw = (referrer || "").trim().toLowerCase();
+  if (!raw) return "directo";
+  // fbclid or fb/ig hostnames
+  if (raw.includes("fbclid=") || /(?:^|[\/.@])(facebook|instagram|fb|m\.facebook|l\.facebook|lm\.facebook|fb\.watch)\b/.test(raw)) {
+    return "pixel_meta";
+  }
+  // Email tools
+  if (/utm_source=(email|newsletter|brevo|mailchimp|resend|sendinblue)/.test(raw) || raw.includes("mailto:") || raw.includes("brevo.com") || raw.includes("sendinblue")) {
+    return "email";
+  }
+  // Google ads vs organic
+  if (raw.includes("gclid=") || /utm_medium=(cpc|ppc|paid)/.test(raw)) return "google_ads";
+  if (/(?:^|[\/.@])google\./.test(raw) || raw.includes("google.com")) return "google_organic";
+  if (/(?:^|[\/.@])(bing|yahoo|duckduckgo|ecosia|yandex|baidu)\./.test(raw)) return "otro_organico";
+  return "referral";
+}
+
+
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 

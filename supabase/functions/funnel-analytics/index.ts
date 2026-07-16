@@ -375,6 +375,8 @@ serve(async (req) => {
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
       if (/test|sandbox/i.test(txn)) continue;
+      const buyerEmail = String(h.raw_payload?.data?.buyer?.email ?? h.email ?? "").toLowerCase();
+      if (/test|example\.com|postman|hotmart\.com\.br/.test(buyerEmail)) continue;
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;
       const purchase = h.raw_payload?.data?.purchase ?? {};

@@ -409,38 +409,75 @@ const AdminBrevoAbandonedStats = () => {
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="text-left text-muted-foreground border-b">
-                    <tr>
-                      <th className="py-2">Origen</th>
-                      <th>Segmento</th>
-                      <th className="text-right">Total</th>
-                      <th className="text-right">OK</th>
-                      <th className="text-right">Errores</th>
-                      <th className="text-right">% éxito</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {report.matrix.map((row) => {
-                      const rate = row.total ? Math.round((row.ok / row.total) * 100) : 0;
-                      return (
-                        <tr key={`${row.origen}-${row.segmento}`} className="border-b last:border-0">
-                          <td className="py-2">
-                            <Badge variant="outline" style={{ borderColor: ORIGIN_COLORS[row.origen] ?? "#64748b", color: ORIGIN_COLORS[row.origen] ?? "#64748b" }} className="capitalize">
-                              {row.origen}
-                            </Badge>
-                          </td>
-                          <td>{SEGMENT_LABELS[row.segmento] ?? row.segmento}</td>
-                          <td className="text-right font-semibold">{row.total.toLocaleString()}</td>
-                          <td className="text-right text-emerald-600">{row.ok}</td>
-                          <td className="text-right text-red-600">{row.error}</td>
-                          <td className="text-right">{rate}%</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                {(() => {
+                  const all = report.matrix;
+                  const q = matrixFilter.toLowerCase();
+                  const filtered = q
+                    ? all.filter((r) => r.origen.toLowerCase().includes(q) || r.segmento.toLowerCase().includes(q) || (SEGMENT_LABELS[r.segmento] ?? "").toLowerCase().includes(q))
+                    : all;
+                  const totalPages = Math.max(1, Math.ceil(filtered.length / matrixPageSize));
+                  const page = Math.min(matrixPage, totalPages);
+                  const start = (page - 1) * matrixPageSize;
+                  const rows = filtered.slice(start, start + matrixPageSize);
+                  return (
+                    <>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <Input placeholder="Filtrar origen/segmento…" value={matrixFilter}
+                          onChange={(e) => { setMatrixFilter(e.target.value); setMatrixPage(1); }}
+                          className="w-[220px] h-8" />
+                        <Select value={String(matrixPageSize)} onValueChange={(v) => { setMatrixPageSize(Number(v)); setMatrixPage(1); }}>
+                          <SelectTrigger className="w-[110px] h-8"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="10">10 / pág</SelectItem>
+                            <SelectItem value="15">15 / pág</SelectItem>
+                            <SelectItem value="25">25 / pág</SelectItem>
+                            <SelectItem value="50">50 / pág</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {filtered.length} filas · pág {page}/{totalPages}
+                        </span>
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead className="text-left text-muted-foreground border-b">
+                          <tr>
+                            <th className="py-2">Origen</th>
+                            <th>Segmento</th>
+                            <th className="text-right">Total</th>
+                            <th className="text-right">OK</th>
+                            <th className="text-right">Errores</th>
+                            <th className="text-right">% éxito</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rows.map((row) => {
+                            const rate = row.total ? Math.round((row.ok / row.total) * 100) : 0;
+                            return (
+                              <tr key={`${row.origen}-${row.segmento}`} className="border-b last:border-0">
+                                <td className="py-2">
+                                  <Badge variant="outline" style={{ borderColor: ORIGIN_COLORS[row.origen] ?? "#64748b", color: ORIGIN_COLORS[row.origen] ?? "#64748b" }} className="capitalize">
+                                    {row.origen}
+                                  </Badge>
+                                </td>
+                                <td>{SEGMENT_LABELS[row.segmento] ?? row.segmento}</td>
+                                <td className="text-right font-semibold">{row.total.toLocaleString()}</td>
+                                <td className="text-right text-emerald-600">{row.ok}</td>
+                                <td className="text-right text-red-600">{row.error}</td>
+                                <td className="text-right">{rate}%</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                      <div className="flex justify-end gap-2 mt-2">
+                        <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setMatrixPage(page - 1)}>Anterior</Button>
+                        <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setMatrixPage(page + 1)}>Siguiente</Button>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
+
             </Card>
           )}
         </div>

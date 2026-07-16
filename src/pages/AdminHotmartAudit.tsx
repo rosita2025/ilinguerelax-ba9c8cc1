@@ -129,13 +129,14 @@ const AdminHotmartAudit = () => {
   const forceBrevoSync = useCallback(async () => {
     setSyncing(true);
     try {
-      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; synced: number; syncTargets: number }>(
+      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; usdSummary?: UsdSummary; synced: number; syncTargets: number }>(
         "list-hotmart-audit",
         { body: { adminKey, status, search, limit: 300, forceSync: true } },
       );
       if (error) throw error;
       setRows(data?.rows ?? []);
       if (data?.summary) setSummary(data.summary);
+      if (data?.usdSummary) setUsdSummary(data.usdSummary);
       const synced = data?.synced ?? 0;
       const targets = data?.syncTargets ?? 0;
       if (targets === 0) {

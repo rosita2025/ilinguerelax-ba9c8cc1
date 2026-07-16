@@ -60,6 +60,20 @@ const panels = [
     desc: "Eventos recibidos de Hotmart y carritos abandonados con estado mapeado (aprobado/pendiente/rechazado/posventa) y sync a Brevo.",
     color: "text-orange-500",
   },
+  {
+    to: "/admin/analytics",
+    icon: LineChart,
+    title: "Analíticas · Funnel",
+    desc: "Embudo estilo Shopify: sesiones, add-to-cart, checkout y compras. Conversiones, top productos por país y tendencias.",
+    color: "text-violet-600",
+  },
+  {
+    to: "/admin/ga4-compare",
+    icon: GitCompare,
+    title: "GA4 · Comparativa",
+    desc: "Compara datos internos vs Google Analytics 4: usuarios, sesiones, eventos y fuentes de tráfico para detectar desviaciones.",
+    color: "text-rose-500",
+  },
 ];
 
 const AdminHome = () => {

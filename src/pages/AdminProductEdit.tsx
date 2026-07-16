@@ -207,12 +207,55 @@ const AdminProductEdit = () => {
       );
       if (!ok) return;
     }
+    // ⚠️ Guard drive_url: si cambió respecto al original, el admin debe tipear
+    // el SKU exacto para confirmar. Esto evita pegar el link de otro producto
+    // por error (causa raíz de envíos con PDF equivocado).
+    const newDrive = (product.drive_url ?? "").trim();
+    const driveChanged = !isNew && newDrive !== originalDriveUrl;
+    let confirmDriveChange = false;
+    if (driveChanged) {
+      const looksLikeDrive = /^https?:\/\/(drive|docs)\.google\.com\//i.test(newDrive);
+      if (newDrive && !looksLikeDrive) {
+        return toast({
+          title: "⚠️ Enlace inválido",
+          description: "drive_url debe ser un enlace de drive.google.com o docs.google.com.",
+          variant: "destructive",
+        });
+      }
+      const otherWithSame = allProducts.find(
+        (p) => p.sku !== product.sku && (p.drive_url ?? "").trim() === newDrive && newDrive !== "",
+      );
+      if (otherWithSame) {
+        return toast({
+          title: "⚠️ Drive URL duplicado",
+          description: `Ese enlace ya pertenece a "${otherWithSame.name}" (${otherWithSame.sku}). Un link no puede estar en dos productos.`,
+          variant: "destructive",
+        });
+      }
+      const aliasList = (product.sku_aliases ?? []).join(", ") || "(sin alias)";
+      const typed = window.prompt(
+        `⚠️ Vas a cambiar el enlace de entrega de este producto.\n\n` +
+          `SKU: ${product.sku}\n` +
+          `Alias: ${aliasList}\n\n` +
+          `Anterior:\n${originalDriveUrl || "(vacío)"}\n\nNuevo:\n${newDrive || "(vacío)"}\n\n` +
+          `Para confirmar, escribe el SKU exacto:`,
+      );
+      if (typed?.trim() !== product.sku) {
+        return toast({
+          title: "Confirmación cancelada",
+          description: "El SKU no coincide. Cambio de drive_url descartado.",
+          variant: "destructive",
+        });
+      }
+      confirmDriveChange = true;
+    }
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("manage-products", {
         body: {
           action: "upsert",
           adminKey,
+          confirmDriveChange,
           product: { ...product, upsells },
         },
       });

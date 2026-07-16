@@ -532,7 +532,7 @@ const AdminEmailTest = () => {
           <Card className="p-4 md:p-6">
             {/* Mobile card list */}
             <div className="md:hidden space-y-3">
-              {visibleRows.map((r) => {
+              {pagedRows.map((r) => {
                 const pSku = principalSkuOf(r);
                 const uSku = upsellSkusOf(r);
                 const v = validateRow(r);

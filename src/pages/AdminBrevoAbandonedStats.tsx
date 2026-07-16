@@ -22,6 +22,25 @@ interface StatsResponse {
   availableCountries: string[];
 }
 
+interface SegmentReport {
+  windowDays: number;
+  from: string;
+  to: string;
+  totals: { total: number; ok: number; error: number };
+  byOrigin: Array<{ origen: string; total: number }>;
+  bySegment: Array<{ segmento: string; total: number }>;
+  matrix: Array<{ origen: string; segmento: string; total: number; ok: number; error: number }>;
+}
+
+const SEGMENT_LABELS: Record<string, string> = {
+  abandoned_cart: "Carrito abandonado",
+  purchase: "Compra",
+  pending: "Pendiente de pago",
+  newsletter: "Newsletter",
+  other: "Otros",
+};
+const ORIGIN_COLORS: Record<string, string> = { hotmart: "#f97316", tienda: "#0d9488", otro: "#64748b" };
+
 const KPI = ({ label, value, icon, tone }: { label: string; value: number | string; icon: React.ReactNode; tone: string }) => (
   <Card className="p-4 flex items-center gap-4">
     <div className={`h-11 w-11 rounded-lg flex items-center justify-center ${tone}`}>{icon}</div>

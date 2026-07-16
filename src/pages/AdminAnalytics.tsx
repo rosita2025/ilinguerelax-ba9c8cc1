@@ -68,6 +68,8 @@ interface AnalyticsData {
     conversion: number;
   }>;
   byCountry: Array<{ country: string; sessions: number; purchases: number; revenue: number }>;
+  checkoutsByCountrySource?: Array<{ country: string; source: string; sessions: number }>;
+
   fx?: {
     base: string;
     source: string;

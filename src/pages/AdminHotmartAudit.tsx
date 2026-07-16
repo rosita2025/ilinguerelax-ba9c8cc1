@@ -205,6 +205,19 @@ const AdminHotmartAudit = () => {
             })}
           </div>
 
+          <div className="grid gap-2 grid-cols-2">
+            <Card className="p-3 border-emerald-200">
+              <div className="text-[11px] text-muted-foreground">Ingresos aprobados USD · 7d</div>
+              <div className="text-xl font-semibold text-emerald-700 mt-1">{fmtUsd(usdTotals.approved_usd)}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Sin conversión FX — USD nativo Hotmart</div>
+            </Card>
+            <Card className="p-3 border-amber-200">
+              <div className="text-[11px] text-muted-foreground">Monto pendiente USD · 7d</div>
+              <div className="text-xl font-semibold text-amber-700 mt-1">{fmtUsd(usdTotals.pending_usd)}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">commission PRODUCER → original_offer_price → price USD</div>
+            </Card>
+          </div>
+
           <Card className="p-4">
             <div className="grid gap-3 md:grid-cols-3">
               <div className="md:col-span-2">

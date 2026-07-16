@@ -285,6 +285,90 @@ const AdminBrevoAbandonedStats = () => {
               </>
             )}
           </Card>
+
+          {report && (
+            <Card className="p-4">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <h2 className="font-semibold">Reporte por ORIGEN × SEGMENTO</h2>
+                <span className="text-xs text-muted-foreground">{report.from} → {report.to} · {report.totals.total.toLocaleString()} envíos ({report.totals.ok} OK / {report.totals.error} err)</span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-2 text-muted-foreground">Por ORIGEN</h3>
+                  <div className="space-y-1">
+                    {report.byOrigin.map((o) => {
+                      const pct = report.totals.total ? Math.round((o.total / report.totals.total) * 100) : 0;
+                      return (
+                        <div key={o.origen}>
+                          <div className="flex justify-between text-sm">
+                            <span className="capitalize">{o.origen}</span>
+                            <span className="font-semibold">{o.total.toLocaleString()} ({pct}%)</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-muted overflow-hidden">
+                            <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: ORIGIN_COLORS[o.origen] ?? "#64748b" }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium mb-2 text-muted-foreground">Por SEGMENTO</h3>
+                  <div className="space-y-1">
+                    {report.bySegment.map((s) => {
+                      const pct = report.totals.total ? Math.round((s.total / report.totals.total) * 100) : 0;
+                      return (
+                        <div key={s.segmento}>
+                          <div className="flex justify-between text-sm">
+                            <span>{SEGMENT_LABELS[s.segmento] ?? s.segmento}</span>
+                            <span className="font-semibold">{s.total.toLocaleString()} ({pct}%)</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-muted overflow-hidden">
+                            <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-muted-foreground border-b">
+                    <tr>
+                      <th className="py-2">Origen</th>
+                      <th>Segmento</th>
+                      <th className="text-right">Total</th>
+                      <th className="text-right">OK</th>
+                      <th className="text-right">Errores</th>
+                      <th className="text-right">% éxito</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.matrix.map((row) => {
+                      const rate = row.total ? Math.round((row.ok / row.total) * 100) : 0;
+                      return (
+                        <tr key={`${row.origen}-${row.segmento}`} className="border-b last:border-0">
+                          <td className="py-2">
+                            <Badge variant="outline" style={{ borderColor: ORIGIN_COLORS[row.origen] ?? "#64748b", color: ORIGIN_COLORS[row.origen] ?? "#64748b" }} className="capitalize">
+                              {row.origen}
+                            </Badge>
+                          </td>
+                          <td>{SEGMENT_LABELS[row.segmento] ?? row.segmento}</td>
+                          <td className="text-right font-semibold">{row.total.toLocaleString()}</td>
+                          <td className="text-right text-emerald-600">{row.ok}</td>
+                          <td className="text-right text-red-600">{row.error}</td>
+                          <td className="text-right">{rate}%</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
         </div>
       </main>
     </>

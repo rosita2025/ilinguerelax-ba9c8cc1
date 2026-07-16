@@ -139,7 +139,11 @@ Deno.serve(async (req) => {
         if (attrs) {
           const phoneProvided = attrs.PHONE_PROVIDED === true || attrs.TELEFONO_PROVISTO === "si";
           if (!phoneProvided) missing.push("teléfono");
-          if (!attrs.COUNTRY_CODE && !attrs.PAIS_CODE) missing.push("país");
+          const countryOk = (attrs.COUNTRY_STATUS === "ok") || !!attrs.COUNTRY_CODE || !!attrs.PAIS_CODE;
+          if (!countryOk) {
+            const reason = (attrs.COUNTRY_MISSING_REASON || attrs.PAIS_MOTIVO || attrs.COUNTRY_STATUS || "desconocido") as string;
+            missing.push(`país (${reason})`);
+          }
           if (!attrs.NOMBRE) missing.push("nombre");
           if (!attrs.APELLIDOS) missing.push("apellidos");
         } else {

@@ -173,6 +173,9 @@ Deno.serve(async (req) => {
       const checkoutSku = (product as { sku?: string } | null)?.sku || productType;
       const baseUrl = `${site}/checkouts/${checkoutSku}`;
       const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
+      const countryReason = !country
+        ? (body.country_source === "ip" ? "ip_lookup_failed" : "ip_unavailable")
+        : (/^[A-Z]{2}$/.test(country) ? undefined : "invalid_format");
       brevoSynced = await pushAbandonedCartToBrevo({
         email,
         name,
@@ -185,6 +188,7 @@ Deno.serve(async (req) => {
         couponPercent: 10,
         language,
         country,
+        countryReason,
         source: "checkout",
         paymentMethod,
       });

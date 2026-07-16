@@ -128,6 +128,53 @@ const AdminBrevoAbandonedStats = () => {
           </section>
 
           <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="w-4 h-4 text-primary" />
+              <h2 className="font-semibold">Proyección de consumo mensual · Brevo</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <Label className="text-xs">Límite del plan (emails/mes)</Label>
+                <Input type="number" min={100} step={100} value={planCap} onChange={(e) => setPlanCap(Number(e.target.value) || 0)} />
+              </div>
+              <div>
+                <Label className="text-xs">Correos por secuencia de recuperación</Label>
+                <Input type="number" min={1} max={12} value={seqSteps} onChange={(e) => setSeqSteps(Number(e.target.value) || 0)} />
+              </div>
+              <div>
+                <Label className="text-xs">Otros envíos/mes (newsletter, campañas)</Label>
+                <Input type="number" min={0} step={50} value={extraMonthly} onChange={(e) => setExtraMonthly(Number(e.target.value) || 0)} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  ~{abandonsPerDay.toFixed(1)} abandonos/día × 30 × {seqSteps} correos = <strong className="text-foreground">{projectedRecovery.toLocaleString()}</strong> recuperación
+                  {" + "}<strong className="text-foreground">{extraMonthly.toLocaleString()}</strong> otros
+                </span>
+                <span className="font-semibold">{projectedTotal.toLocaleString()} / {planCap.toLocaleString()}</span>
+              </div>
+              <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
+                <div className={`h-full ${usageTone} transition-all`} style={{ width: `${usagePct}%` }} />
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{usagePct}% usado</span>
+                <span>{remaining.toLocaleString()} emails disponibles</span>
+              </div>
+              {usagePct >= 90 && (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-2 rounded">
+                  <AlertTriangle className="w-4 h-4" /> Estás cerca del límite. Considera subir de plan o reducir la frecuencia de la secuencia.
+                </div>
+              )}
+              {usagePct >= 70 && usagePct < 90 && (
+                <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 dark:bg-amber-950/30 p-2 rounded">
+                  <AlertTriangle className="w-4 h-4" /> Consumo alto. Revisa segmentación para no gastar emails en clientes ya convertidos.
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card className="p-4">
             <h2 className="font-semibold mb-3">Tendencia diaria</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">

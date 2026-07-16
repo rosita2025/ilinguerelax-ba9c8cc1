@@ -68,7 +68,6 @@ const AdminHotmartAudit = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<AuditRow[]>([]);
   const [summary, setSummary] = useState<Summary>({ approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 });
-  const [usdTotals, setUsdTotals] = useState<UsdTotals>({ approved_usd: 0, pending_usd: 0 });
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [status, setStatus] = useState<string>("all");

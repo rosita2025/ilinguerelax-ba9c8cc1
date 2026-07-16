@@ -69,8 +69,6 @@ Deno.serve(async (req) => {
       product: string | null;
       converted: boolean | null;
       payload: unknown;
-      brevo: BrevoInfo | null;
-    };
       payload: unknown;
       brevo: BrevoInfo | null;
     };

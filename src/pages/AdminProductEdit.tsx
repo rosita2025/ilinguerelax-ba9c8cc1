@@ -924,3 +924,68 @@ const AdminProductEdit = () => {
 
 
 export default AdminProductEdit;
+
+// -----------------------------------------------------------------------------
+// Change history panel: lists last 50 edits to this product so the admin can
+// see exactly what was modified, by field, and when.
+// -----------------------------------------------------------------------------
+function ChangeHistoryPanel({ sku, adminKey }: { sku: string; adminKey: string }) {
+  const [rows, setRows] = useState<Array<{ id: number; action: string; changed_fields: Record<string, { from: unknown; to: unknown }>; created_at: string }>>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { data } = await supabase.functions.invoke("manage-products", {
+        body: { action: "history", adminKey, sku },
+      });
+      setRows(data?.changes ?? []);
+    } finally { setLoading(false); }
+  };
+
+  useEffect(() => { if (open && rows.length === 0) load(); /* eslint-disable-next-line */ }, [open]);
+
+  const fmt = (v: unknown): string => {
+    if (v == null) return "—";
+    if (typeof v === "string") return v.length > 80 ? v.slice(0, 80) + "…" : v;
+    if (typeof v === "object") return JSON.stringify(v).slice(0, 120);
+    return String(v);
+  };
+
+  return (
+    <Card className="p-6 space-y-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-semibold">📜 Historial de cambios</h2>
+          <p className="text-xs text-muted-foreground">Últimas ediciones del producto (útil para rastrear qué versión recibió cada cliente).</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => { setOpen((o) => !o); if (!open) load(); }}>
+          {open ? "Ocultar" : "Ver historial"}
+        </Button>
+      </div>
+      {open && (
+        <div className="space-y-2 text-xs">
+          {loading && <div className="text-muted-foreground">Cargando…</div>}
+          {!loading && rows.length === 0 && <div className="text-muted-foreground">Sin cambios registrados aún.</div>}
+          {rows.map((r) => (
+            <div key={r.id} className="border rounded p-2 space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="font-mono">{new Date(r.created_at).toLocaleString()}</span>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase ${r.action === "updated" ? "bg-amber-100 text-amber-800" : r.action === "created" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{r.action}</span>
+              </div>
+              {Object.entries(r.changed_fields || {}).map(([field, diff]) => (
+                <div key={field} className="pl-2">
+                  <span className="font-mono text-primary">{field}</span>:{" "}
+                  <span className="text-red-700 line-through">{fmt(diff?.from)}</span>{" → "}
+                  <span className="text-emerald-700">{fmt(diff?.to)}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+

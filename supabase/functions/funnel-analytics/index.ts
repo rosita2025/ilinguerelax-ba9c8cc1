@@ -283,8 +283,9 @@ serve(async (req) => {
       const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
 
       if (p.pending) {
-        // Pending Hotmart: track separately, do NOT count as purchase/revenue
         pAgg.pending++;
+        if (p.source === "hotmart") pAgg.hotmartPending++; else pAgg.storePending++;
+      
       } else {
         b.purchases++;
         b.revenue += p.usd;

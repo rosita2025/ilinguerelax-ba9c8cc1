@@ -10,6 +10,11 @@ const corsHeaders = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function normalizeEmail(raw: unknown) {
+  const email = String(raw || "").trim().toLowerCase();
+  return email.endsWith("@gmail") ? `${email}.com` : email;
+}
+
 // Fallback estático (usado si la tabla country_language_map no responde).
 const FALLBACK_COUNTRY_TO_LANG: Record<string, string> = {
   PE:"es",MX:"es",AR:"es",CL:"es",CO:"es",VE:"es",EC:"es",BO:"es",PY:"es",UY:"es",
@@ -63,7 +68,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const email = String(body.email || "").trim().toLowerCase();
+    const email = normalizeEmail(body.email);
     const name = String(body.name || "Cliente").trim() || "Cliente";
     const phone = String(body.phone || "").trim();
     const rawProductType = String(body.product_type || body.slug || "checkout").slice(0, 180);

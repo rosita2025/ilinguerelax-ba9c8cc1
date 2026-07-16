@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { pushAbandonedCartToBrevo } from "../_shared/brevoAbandonedCart.ts";
 import { normalizeSku } from "../_shared/digitalSku.ts";
 
@@ -21,7 +21,13 @@ const FALLBACK_COUNTRY_TO_LANG: Record<string, string> = {
 
 // Cache en memoria del mapa configurable (10 min).
 let mapCache: { at: number; data: Record<string, string> } | null = null;
-async function loadCountryLangMap(sb: SupabaseClient<Record<string, unknown>, "public", Record<string, unknown>>): Promise<Record<string,string>> {
+type CountryMapClient = {
+  from: (table: "country_language_map") => {
+    select: (columns: string) => Promise<{ data: Array<{ country_code: string; language: string }> | null; error: unknown }>;
+  };
+};
+
+async function loadCountryLangMap(sb: CountryMapClient): Promise<Record<string,string>> {
   if (mapCache && Date.now() - mapCache.at < 10 * 60 * 1000) return mapCache.data;
   try {
     const { data, error } = await sb.from("country_language_map").select("country_code, language");

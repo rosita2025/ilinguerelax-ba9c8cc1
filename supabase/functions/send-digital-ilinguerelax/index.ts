@@ -392,14 +392,23 @@ serve(async (req) => {
       const keyLine = p.access_key
         ? `<div style="margin-top:10px;font-size:13px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>`
         : "";
+      const productTitle = p.name || prettifySlug(p.sku);
+      const checklistItems = [
+        `<li style="margin:4px 0;"><span style="color:#16a34a;font-weight:bold;">✓</span> <strong>${escapeHtml(t.mainLabel)}:</strong> ${escapeHtml(productTitle)}</li>`,
+        ...bonusList.map((b, i) => `<li style="margin:4px 0;"><span style="color:#16a34a;font-weight:bold;">✓</span> 🎁 <strong>${escapeHtml(t.bonusesTitle.replace(/^🎁\s*/, "").replace(/s?$/i, ""))}:</strong> ${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}</li>`),
+      ].join("");
+      const checklistHtml = `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;margin-top:12px;font-size:13px;color:#14532d;">
+        <div style="font-weight:bold;margin-bottom:6px;">${escapeHtml(t.checklistTitle)}</div>
+        <ul style="margin:0;padding-left:6px;list-style:none;">${checklistItems}</ul>
+      </div>`;
       const bonusHtml = bonusList.length
         ? `<div style="margin-top:14px;padding-top:14px;border-top:1px dashed ${BRAND.border};">
-            <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${t.bonusesTitle}</div>
+            <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">${t.bonusesTitle}</div>
             ${bonusList.map((b, i) => `
-              <div style="margin:6px 0;font-size:13px;color:#374151;">
-                <strong>${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}:</strong>
-                <a href="${escapeHtml(b.drive_url)}" style="color:${BRAND.primary};text-decoration:underline;">${escapeHtml(t.downloadBtn.replace(/^⬇\s*/, ""))}</a>
-                ${b.access_key ? ` · ${escapeHtml(t.keyLabel)}: <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code>` : ""}
+              <div style="margin:10px 0;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;">
+                <div style="font-size:14px;font-weight:bold;color:#78350f;margin-bottom:8px;">🎁 ${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}</div>
+                <a href="${escapeHtml(b.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-size:13px;">${escapeHtml(t.bonusBtn)}</a>
+                ${b.access_key ? `<div style="margin-top:8px;font-size:12px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code></div>` : ""}
               </div>`).join("")}
           </div>`
         : `<div style="margin-top:12px;font-size:12px;color:${BRAND.muted};font-style:italic;">${escapeHtml(t.noBonuses)}</div>`;
@@ -408,11 +417,12 @@ serve(async (req) => {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
             ${p.cover_image_url ? `<td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover_image_url)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>` : ""}
             <td valign="top">
-              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name || prettifySlug(p.sku))}</div>
+              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(productTitle)}</div>
               ${priceLine}
               ${catLine}
             </td>
           </tr></table>
+          ${checklistHtml}
           ${mainBtn}
           ${keyLine}
           ${bonusHtml}

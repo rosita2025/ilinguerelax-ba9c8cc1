@@ -218,7 +218,8 @@ serve(async (req) => {
     ]);
     const shopifyRes = { data: [] as any[] };
 
-    type RealPurchase = { at: string; productId: string; country: string; usd: number };
+    type PurchaseSource = "hotmart" | "store";
+    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource };
     const realPurchases: RealPurchase[] = [];
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
@@ -236,14 +237,7 @@ serve(async (req) => {
         productId: h.product_id || String(h.raw_payload?.data?.product?.id ?? "hotmart"),
         country: buyerCountry,
         usd,
-      });
-    }
-    for (const s of (shopifyRes.data ?? []) as any[]) {
-      realPurchases.push({
-        at: s.order_created_at,
-        productId: s.product_key || "shopify",
-        country: s.country || "??",
-        usd: 0, // Shopify revenue not stored locally
+        source: "hotmart",
       });
     }
     for (const m of (manualRes.data ?? []) as any[]) {
@@ -254,6 +248,7 @@ serve(async (req) => {
         productId: firstSku,
         country: m.buyer_country || "??",
         usd: Number(m.amount_usd || 0),
+        source: "store",
       });
     }
 
@@ -265,9 +260,10 @@ serve(async (req) => {
       totals.purchases++;
       totals.revenue += p.usd;
 
-      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0 };
+      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0 };
       pAgg.purchases++;
       pAgg.revenue += p.usd;
+      if (p.source === "hotmart") pAgg.hotmart++; else pAgg.store++;
       byProductAgg.set(p.productId, pAgg);
 
       const cAgg = byCountryAgg.get(p.country) || { sessions: new Set<string>(), purchases: 0, revenue: 0 };
@@ -275,6 +271,20 @@ serve(async (req) => {
       cAgg.revenue += p.usd;
       byCountryAgg.set(p.country, cAgg);
     }
+
+    // Lookup product names from digital_products (SKU → name)
+    const skuSet = Array.from(byProductAgg.keys()).filter((k) => k && k !== "sin_producto");
+    const nameMap = new Map<string, string>();
+    if (skuSet.length) {
+      const { data: prods } = await supabase
+        .from("digital_products")
+        .select("sku, name")
+        .in("sku", skuSet);
+      for (const p of (prods ?? []) as any[]) {
+        if (p.sku && p.name) nameMap.set(p.sku, p.name);
+      }
+    }
+
 
     // Fill missing buckets so the chart renders zeros
     const seriesKeys: string[] = [];

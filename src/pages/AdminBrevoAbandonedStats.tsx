@@ -42,11 +42,11 @@ const SEGMENT_LABELS: Record<string, string> = {
 const ORIGIN_COLORS: Record<string, string> = { hotmart: "#f97316", tienda: "#0d9488", otro: "#64748b" };
 
 const KPI = ({ label, value, icon, tone }: { label: string; value: number | string; icon: React.ReactNode; tone: string }) => (
-  <Card className="p-4 flex items-center gap-4">
-    <div className={`h-11 w-11 rounded-lg flex items-center justify-center ${tone}`}>{icon}</div>
-    <div>
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="text-2xl font-semibold">{value}</div>
+  <Card className="p-3 md:p-4 flex items-center gap-3 md:gap-4">
+    <div className={`h-9 w-9 md:h-11 md:w-11 rounded-lg flex items-center justify-center shrink-0 ${tone}`}>{icon}</div>
+    <div className="min-w-0">
+      <div className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground truncate">{label}</div>
+      <div className="text-lg md:text-2xl font-semibold">{value}</div>
     </div>
   </Card>
 );

@@ -171,7 +171,11 @@ const AdminDeliveryAudit = () => {
                   )}
                   <button
                     className="text-xs text-primary underline md:ml-auto"
-                    onClick={() => setExpanded((e) => ({ ...e, [r.id]: !open }))}
+                    onClick={() => {
+                      const next = !open;
+                      setExpanded((e) => ({ ...e, [r.id]: next }));
+                      if (next && !changesByRow[r.id]) loadChanges(r);
+                    }}
                   >
                     {open ? "Ocultar detalle" : "Ver detalle"}
                   </button>

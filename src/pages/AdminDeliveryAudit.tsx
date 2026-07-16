@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Search, ExternalLink } from "lucide-react";
+import { RefreshCw, Search, ExternalLink, History } from "lucide-react";
 
 interface AuditItem {
   sku: string;
@@ -54,6 +54,25 @@ const AdminDeliveryAudit = () => {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [changesByRow, setChangesByRow] = useState<Record<string, Array<{ id: string; sku: string; action: string; changed_fields: Record<string, { from: unknown; to: unknown } | unknown>; created_at: string }>>>({});
+  const [changesLoading, setChangesLoading] = useState<Record<string, boolean>>({});
+
+  const loadChanges = async (row: AuditRow) => {
+    const skus = Array.from(new Set([...(row.resolved_skus || []), ...((row.items || []).map((i) => i.sku))])).filter(Boolean);
+    if (!skus.length) return;
+    setChangesLoading((s) => ({ ...s, [row.id]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "history", skus, since: row.created_at },
+      });
+      if (error) throw error;
+      setChangesByRow((s) => ({ ...s, [row.id]: (data?.changes || []) }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setChangesLoading((s) => ({ ...s, [row.id]: false }));
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -152,7 +171,11 @@ const AdminDeliveryAudit = () => {
                   )}
                   <button
                     className="text-xs text-primary underline md:ml-auto"
-                    onClick={() => setExpanded((e) => ({ ...e, [r.id]: !open }))}
+                    onClick={() => {
+                      const next = !open;
+                      setExpanded((e) => ({ ...e, [r.id]: next }));
+                      if (next && !changesByRow[r.id]) loadChanges(r);
+                    }}
                   >
                     {open ? "Ocultar detalle" : "Ver detalle"}
                   </button>
@@ -210,6 +233,55 @@ const AdminDeliveryAudit = () => {
                         </tbody>
                       </table>
                     </div>
+                    {(() => {
+                      const changes = changesByRow[r.id];
+                      const loadingC = changesLoading[r.id];
+                      return (
+                        <div className="border rounded p-2 bg-muted/30">
+                          <div className="flex items-center gap-2 text-xs font-semibold mb-1">
+                            <History className="h-3.5 w-3.5" />
+                            Versión del producto usada en este envío
+                          </div>
+                          {loadingC && <div className="text-xs text-muted-foreground">Cargando historial…</div>}
+                          {!loadingC && !changes && (
+                            <button className="text-xs text-primary underline" onClick={() => loadChanges(r)}>
+                              Cargar cambios posteriores
+                            </button>
+                          )}
+                          {!loadingC && changes && changes.length === 0 && (
+                            <div className="text-xs text-emerald-700">
+                              ✅ Sin cambios desde el envío. Los datos actuales del producto coinciden con lo entregado.
+                            </div>
+                          )}
+                          {!loadingC && changes && changes.length > 0 && (
+                            <div className="space-y-2">
+                              <div className="text-xs text-amber-800">
+                                ⚠️ El producto se editó <strong>{changes.length}</strong> vez(ces) después de este envío. Un reintento hoy usaría la versión actual, no la que recibió el cliente.
+                              </div>
+                              <ul className="space-y-1 text-xs">
+                                {changes.slice(0, 8).map((c) => {
+                                  const fields = c.changed_fields && typeof c.changed_fields === "object" ? Object.keys(c.changed_fields) : [];
+                                  return (
+                                    <li key={c.id} className="border-t pt-1">
+                                      <div className="flex flex-wrap gap-2 items-center">
+                                        <code className="bg-background px-1.5 py-0.5 rounded">{c.sku}</code>
+                                        <span className="text-muted-foreground">{new Date(c.created_at).toLocaleString()}</span>
+                                        <Badge variant="outline" className="text-[10px]">{c.action}</Badge>
+                                      </div>
+                                      {fields.length > 0 && (
+                                        <div className="mt-0.5 text-muted-foreground">
+                                          Campos: <span className="font-mono">{fields.join(", ")}</span>
+                                        </div>
+                                      )}
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                     <div className="text-xs text-muted-foreground break-all">
                       idem: {r.idempotency_key || "—"} · msg: {r.message_id || "—"} · source: {r.source || "—"}
                     </div>

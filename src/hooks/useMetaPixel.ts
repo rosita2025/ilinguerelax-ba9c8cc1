@@ -26,16 +26,21 @@ const generateEventId = (): string => {
 
 // Persistent session id (per browser) for funnel attribution
 const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
+const FUNNEL_SESSION_TOUCHED_KEY = "ilr_funnel_sid_touched";
 const FUNNEL_REF_KEY = "ilr_funnel_ref";
 const LAST_CHECKOUT_KEY = "ilr_last_checkout";
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const getSessionId = (): string => {
   if (typeof window === "undefined") return "ssr";
   try {
+    const now = Date.now();
     let sid = localStorage.getItem(FUNNEL_SESSION_KEY);
-    if (!sid) {
+    const lastSeen = Number(localStorage.getItem(FUNNEL_SESSION_TOUCHED_KEY) || "0");
+    if (!sid || !lastSeen || now - lastSeen > SESSION_TIMEOUT_MS) {
       sid = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       localStorage.setItem(FUNNEL_SESSION_KEY, sid);
     }
+    localStorage.setItem(FUNNEL_SESSION_TOUCHED_KEY, String(now));
     return sid;
   } catch {
     return "anon";

@@ -431,6 +431,17 @@ const AdminEmailTest = () => {
     return list;
   }, [rows, query, sourceFilter, sortKey, sortDir, onlyProblems]);
 
+  const totalPages = Math.max(1, Math.ceil(visibleRows.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRows = useMemo(
+    () => visibleRows.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [visibleRows, currentPage, pageSize],
+  );
+
+  useEffect(() => { setPage(1); }, [query, sourceFilter, onlyProblems, pageSize]);
+
+
+
 
   return (
     <>

@@ -245,6 +245,9 @@ const Product5000 = () => {
   const prevBonusImage = () => {
     setCurrentBonusIndex((prev) => (prev - 1 + bonuses.length) % bonuses.length);
   };
+  // Fires Meta Pixel InitiateCheckout — only invoked when we navigate to our
+  // own /checkouts page. Hotmart routes skip this: Hotmart embeds the same
+  // pixel id (24959578143733255) and would double-count the event.
   const handleBuyClick = () => {
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 5,000 Palabras",
@@ -259,8 +262,8 @@ const Product5000 = () => {
 
   const handleBuy = async () => {
     if (!pricing5000Ready) return;
-    handleBuyClick();
     if (useTiendaOnly) {
+      handleBuyClick();
       addItem({
         id: "5000-palabras-ingles",
         name: "Inglés Relax · 5,000 Palabras (Digital PDF)",

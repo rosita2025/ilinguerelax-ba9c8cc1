@@ -38,6 +38,22 @@ const AdminBrevoAbandonedStats = () => {
   const [country, setCountry] = useState<string>("all");
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [planCap, setPlanCap] = useState<number>(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_plan_cap") : null;
+    return saved ? Number(saved) : 10000;
+  });
+  const [seqSteps, setSeqSteps] = useState<number>(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_seq_steps") : null;
+    return saved ? Number(saved) : 6;
+  });
+  const [extraMonthly, setExtraMonthly] = useState<number>(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_extra_monthly") : null;
+    return saved ? Number(saved) : 945;
+  });
+
+  useEffect(() => { window.localStorage.setItem("brevo_plan_cap", String(planCap)); }, [planCap]);
+  useEffect(() => { window.localStorage.setItem("brevo_seq_steps", String(seqSteps)); }, [seqSteps]);
+  useEffect(() => { window.localStorage.setItem("brevo_extra_monthly", String(extraMonthly)); }, [extraMonthly]);
 
   const load = useCallback(async () => {
     setLoading(true);

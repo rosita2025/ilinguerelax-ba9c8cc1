@@ -70,7 +70,8 @@ Deno.serve(async (req) => {
       product: string | null;
       converted: boolean | null;
       payload: unknown;
-      payload: unknown;
+      usd_amount: number | null;
+      usd_source: "producer" | "offer" | "price" | "none";
       brevo: BrevoInfo | null;
     };
 

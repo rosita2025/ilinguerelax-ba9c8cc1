@@ -84,11 +84,14 @@ function buildHtml(opts: {
 </body></html>`;
 }
 
-function computeWindow(step: Step) {
-  // Look at records created between (step days ago -12h) and (step days ago +12h)
-  const target = Date.now() - step * 86400000;
-  const from = new Date(target - 12 * 3600000).toISOString();
-  const to = new Date(target + 12 * 3600000).toISOString();
+function computeWindow(stepHours: Step) {
+  // Look at records created around (now - stepHours). Tight window for short
+  // steps (<24h) so they only match the current hour; wider ±12h window for
+  // multi-day steps so the daily send covers rows created earlier that day.
+  const target = Date.now() - stepHours * 3600000;
+  const halfWindow = stepHours < 24 ? 0.5 * 3600000 : 12 * 3600000;
+  const from = new Date(target - halfWindow).toISOString();
+  const to = new Date(target + halfWindow).toISOString();
   return { from, to };
 }
 

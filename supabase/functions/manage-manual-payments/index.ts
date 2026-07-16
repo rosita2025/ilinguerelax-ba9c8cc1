@@ -10,19 +10,20 @@ const corsHeaders = {
 };
 
 // Resuelve materiales digitales leyendo la tabla `digital_products`.
-// Estrategia: intenta coincidir por `sku` (si el ítem lo trae) o por match parcial en `name`.
+// Estrategia segura: SKU exacto primero; nombre solo como fallback estricto.
 async function resolveMaterials(
   admin: ReturnType<typeof createClient>,
   items: Array<{ name?: string; sku?: string }> = []
 ) {
-  if (!items.length) return [];
+  if (!items.length) return { materials: [], missing: [] };
   const { data: products } = await admin
     .from("digital_products")
     .select("sku, name, drive_url, access_key, bonuses, bonus_name, bonus_drive_url, bonus_access_key")
     .eq("active", true);
-  if (!products) return [];
+  if (!products) return { materials: [], missing: items.map((i) => i?.sku || i?.name || "producto sin identificar") };
 
   const out: Array<{ productName: string; downloadUrl: string; accessKey?: string }> = [];
+  const missing: string[] = [];
   const seen = new Set<string>();
 
   for (const it of items) {
@@ -52,7 +53,12 @@ async function resolveMaterials(
       });
     }
 
-    if (hit && hit.drive_url && !seen.has(hit.sku)) {
+    if (!hit || !hit.drive_url) {
+      missing.push(skuHint || nameHint || "producto sin identificar");
+      continue;
+    }
+
+    if (!seen.has(hit.sku)) {
       seen.add(hit.sku);
       out.push({
         productName: hit.name,
@@ -73,7 +79,7 @@ async function resolveMaterials(
       });
     }
   }
-  return out;
+  return { materials: out, missing };
 }
 
 async function sendTemplate(admin: ReturnType<typeof createClient>, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>) {
@@ -130,7 +136,22 @@ Deno.serve(async (req) => {
         .single();
       if (readErr || !order) throw readErr ?? new Error("Order not found");
 
-      // Marcar como verificada
+      const items = Array.isArray(order.items) ? order.items : [];
+      const productNames = items.map((i: any) => i?.name).filter(Boolean).join(" + ") || "Tu pedido ILINGUE RELAX";
+      const { materials, missing } = await resolveMaterials(admin, items);
+      if (materials.length === 0 || missing.length > 0) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "MATERIAL_NOT_CONFIGURED",
+          message: "Falta configurar el enlace Drive del producto comprado. No se envió correo digital automático.",
+          missing,
+        }), {
+          status: 422,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Marcar como verificada solo cuando los materiales están resueltos.
       const { error: updErr } = await admin
         .from("manual_payments")
         .update({
@@ -143,10 +164,6 @@ Deno.serve(async (req) => {
       if (updErr) throw updErr;
 
       // Enviar 1) gracias por tu compra y 2) entrega de materiales
-      const items = Array.isArray(order.items) ? order.items : [];
-      const productNames = items.map((i: any) => i?.name).filter(Boolean).join(" + ") || "Tu pedido ILINGUE RELAX";
-      const materials = await resolveMaterials(admin, items);
-
       await sendTemplate(admin, "thank-you", order.buyer_email, `manual-thanks-${order.order_number}`, {
         orderNumber: order.order_number,
         customerName: order.buyer_name,

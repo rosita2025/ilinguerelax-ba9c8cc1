@@ -374,13 +374,38 @@ serve(async (req) => {
       html,
     });
 
+    const itemsAudit = products.map((p) => {
+      const bonuses: Bonus[] = [
+        ...(p.bonus_drive_url ? [{ name: p.bonus_name || "Bonus", drive_url: p.bonus_drive_url, access_key: p.bonus_access_key }] : []),
+        ...((p.bonuses ?? []).filter((b) => b && b.drive_url)),
+      ];
+      return {
+        sku: p.sku,
+        name: p.name,
+        drive_url: p.drive_url,
+        drive_missing_reason: p.drive_url ? null : "no_drive_url_configured",
+        access_key_present: !!p.access_key,
+        bonuses: bonuses.map((b) => ({ name: b.name, drive_url: b.drive_url, has_key: !!b.access_key })),
+        bonus_count: bonuses.length,
+      };
+    });
+    const auditBase = {
+      customer_email: customerEmail, customer_name: customerName || null,
+      order_id: orderId || null, idempotency_key: idemKey,
+      requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+      resolved_skus: resolvedSkus, missing_skus: missingSkus,
+      items: itemsAudit, provider: provider || null, lang, country: customerCountry || resolvedCountry || null,
+    };
+
     if (r.error) {
       console.error("send-digital-ilinguerelax failed", r.error);
+      await writeAudit({ ...auditBase, status: "error", error: JSON.stringify(r.error) });
       return new Response(JSON.stringify({ success: false, error: r.error }), {
         status: 502, headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
+    const messageId = r.data?.messageId || r.data?.id || null;
     await supabase
       .from("digital_email_sends")
       .upsert({
@@ -393,12 +418,19 @@ serve(async (req) => {
         amount: typeof amount === "number" ? amount : (amount ? Number(amount) : null),
         currency: currency || null,
         skus: normalizedSkus,
-        message_id: r.data?.messageId || r.data?.id || null,
+        message_id: messageId,
         provider: provider || r.data?.provider || null,
         status: "sent",
         last_event: "sent",
         last_event_at: new Date().toISOString(),
       }, { onConflict: "idempotency_key" });
+
+    await writeAudit({
+      ...auditBase,
+      status: missingSkus.length > 0 ? "partial" : "sent",
+      message_id: messageId,
+    });
+
 
     // Sync buyer to Brevo "Clientes iLingue Relax" list. Runs after the email
     // to avoid blocking delivery if Brevo is slow; failures only log.

@@ -106,6 +106,7 @@ const T: Record<Lang, {
     downloadBtn: `⬇ Download / Open in Drive`,
     keyLabel: `Access key`,
     bonusesTitle: `🎁 Bonuses included`,
+    bonusFallback: (n) => `Bonus #${n}`,
     noBonuses: `No extra bonuses for this product.`,
     categoryLabel: `Category`,
     pending: `We'll send you the link within a few minutes.`,

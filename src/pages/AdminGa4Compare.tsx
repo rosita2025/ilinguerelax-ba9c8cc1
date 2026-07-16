@@ -93,23 +93,24 @@ export default function AdminGa4Compare() {
       <Helmet><title>GA4 vs Interno · Admin · iLingue Relax</title></Helmet>
       <AdminNav />
       <main className="min-h-dvh bg-background">
-        <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-          <header className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-2xl font-bold">Comparativa GA4 vs Pixel Interno</h1>
-              <p className="text-sm text-muted-foreground max-w-2xl">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
+          <header className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold leading-tight">Comparativa GA4 vs Pixel Interno</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mt-1">
                 Compara conteos reales de GA4 (Realtime) contra nuestros propios eventos (<code>funnel_events</code>).
                 Diferencias grandes suelen indicar adblockers, ITP de Safari, filtros de red o extensiones de privacidad.
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">
               {[15, 30, 60, 120].map((m) => (
-                <Button key={m} size="sm" variant={windowMinutes === m ? "default" : "outline"} onClick={() => setWindowMinutes(m)}>
-                  {m < 60 ? `${m} min` : `${m / 60} h`}
+                <Button key={m} size="sm" className="h-8 px-2 text-xs flex-1 sm:flex-none" variant={windowMinutes === m ? "default" : "outline"} onClick={() => setWindowMinutes(m)}>
+                  {m < 60 ? `${m}m` : `${m / 60}h`}
                 </Button>
               ))}
-              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-                <RefreshCw className={cn("w-4 h-4 mr-1", loading && "animate-spin")} /> Actualizar
+              <Button size="sm" className="h-8 px-2 text-xs" variant="outline" onClick={load} disabled={loading}>
+                <RefreshCw className={cn("w-3.5 h-3.5 sm:mr-1", loading && "animate-spin")} />
+                <span className="hidden sm:inline">Actualizar</span>
               </Button>
             </div>
           </header>

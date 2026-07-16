@@ -144,11 +144,11 @@ export default function AdminGa4Compare() {
               </div>
 
               <Tabs defaultValue="pages" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="pages">Por página</TabsTrigger>
-                  <TabsTrigger value="countries">Por país</TabsTrigger>
-                  <TabsTrigger value="sources">Fuentes</TabsTrigger>
-                  <TabsTrigger value="events">Eventos</TabsTrigger>
+                <TabsList className="w-full grid grid-cols-4 h-auto">
+                  <TabsTrigger value="pages" className="text-xs sm:text-sm px-1">Páginas</TabsTrigger>
+                  <TabsTrigger value="countries" className="text-xs sm:text-sm px-1">Países</TabsTrigger>
+                  <TabsTrigger value="sources" className="text-xs sm:text-sm px-1">Fuentes</TabsTrigger>
+                  <TabsTrigger value="events" className="text-xs sm:text-sm px-1">Eventos</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="pages" className="mt-4">

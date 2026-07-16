@@ -907,6 +907,9 @@ const AdminProductEdit = () => {
             </div>
           </Card>
 
+          {!isNew && <ChangeHistoryPanel sku={sku!} adminKey={adminKey} />}
+
+
           <div className="flex justify-end">
             <Button onClick={() => save()} disabled={saving} size="lg">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}

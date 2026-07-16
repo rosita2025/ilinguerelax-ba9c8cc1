@@ -104,9 +104,52 @@ Deno.serve(async (req) => {
 
     if (action === "upsert") {
       const p = body.product as ProductIn;
+      const confirmDriveChange = (body as { confirmDriveChange?: boolean }).confirmDriveChange === true;
       if (!p?.sku || !SKU_RE.test(p.sku)) return json({ error: "SKU inválido (usa minúsculas, números y guiones)" }, 400);
       if (!p.name?.trim()) return json({ error: "Nombre requerido" }, 400);
       if (p.price_usd == null || Number.isNaN(Number(p.price_usd))) return json({ error: "Precio USD requerido" }, 400);
+
+      // ⚠️ drive_url consistency guard: evita que un admin pegue por error el
+      // enlace de OTRO producto y termine enviando el PDF equivocado.
+      const newDrive = (p.drive_url ?? "").toString().trim();
+      const { data: currentRow } = await admin
+        .from("digital_products")
+        .select("drive_url,sku_aliases")
+        .eq("sku", p.sku)
+        .maybeSingle();
+      const currentDrive = ((currentRow?.drive_url as string | null) ?? "").trim();
+      const driveChanged = newDrive !== currentDrive;
+      if (driveChanged && newDrive) {
+        // 1) Formato: debe ser un enlace de Google Drive/Docs (dominio esperado)
+        const looksLikeDrive = /^https?:\/\/(drive|docs)\.google\.com\//i.test(newDrive);
+        if (!looksLikeDrive) {
+          return json({ error: "drive_url inválido: debe ser un enlace de drive.google.com o docs.google.com" }, 400);
+        }
+        // 2) Unicidad: ningún otro producto puede tener exactamente el mismo enlace
+        const { data: clashDrive } = await admin
+          .from("digital_products")
+          .select("sku,name")
+          .eq("drive_url", newDrive)
+          .neq("sku", p.sku)
+          .limit(1);
+        if (clashDrive && clashDrive.length) {
+          const other = clashDrive[0] as { sku: string; name: string };
+          return json({
+            error: `Ese drive_url ya pertenece al producto "${other.name}" (${other.sku}). Un enlace no puede estar en dos productos: rompería el envío por SKU.`,
+          }, 400);
+        }
+        // 3) Confirmación explícita del admin (el cliente debe pedirla escribiendo el SKU)
+        if (!confirmDriveChange) {
+          return json({
+            error: "drive_url_change_requires_confirmation",
+            requiresConfirmation: true,
+            sku: p.sku,
+            currentDrive: currentDrive || null,
+            newDrive,
+            aliases: (currentRow?.sku_aliases as string[] | null) ?? [],
+          }, 409);
+        }
+      }
 
       const row = {
         sku: p.sku,

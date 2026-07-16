@@ -1,0 +1,3 @@
+ALTER TABLE public.digital_products ADD COLUMN IF NOT EXISTS sku_aliases text[] NOT NULL DEFAULT '{}'::text[];
+CREATE INDEX IF NOT EXISTS idx_digital_products_sku_aliases ON public.digital_products USING GIN (sku_aliases);
+COMMENT ON COLUMN public.digital_products.sku_aliases IS 'Aliases cortos (ej. 1000-palabras-italiano) que resuelven al SKU real durante la entrega digital. Editables desde /admin/productos/:sku.';

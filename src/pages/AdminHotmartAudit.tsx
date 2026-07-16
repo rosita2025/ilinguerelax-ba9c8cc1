@@ -359,6 +359,10 @@ const AdminHotmartAudit = () => {
                         <span className="font-mono text-muted-foreground truncate">{row.event_raw}</span>
                         <span className="font-mono">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</span>
                       </div>
+                      <div className="mt-1 flex items-center justify-between gap-2 text-[11px]">
+                        <span className="text-muted-foreground">USD real Hotmart</span>
+                        <span className="font-mono font-semibold">{fmtUsd(row.usd_amount)} <span className="text-muted-foreground font-normal">· {USD_SOURCE_LABEL[row.usd_source]}</span></span>
+                      </div>
                       <div className="mt-2"><BrevoBadge info={row.brevo} /></div>
                     </button>
                     {isOpen && (

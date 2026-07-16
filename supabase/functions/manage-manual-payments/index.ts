@@ -9,10 +9,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+type ProductRow = {
+  sku: string;
+  name: string;
+  drive_url: string | null;
+  access_key: string | null;
+  bonuses: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
+  bonus_name: string | null;
+  bonus_drive_url: string | null;
+  bonus_access_key: string | null;
+};
+
 // Resuelve materiales digitales leyendo la tabla `digital_products`.
 // Estrategia segura: SKU exacto primero; nombre solo como fallback estricto.
 async function resolveMaterials(
-  admin: ReturnType<typeof createClient>,
+  admin: any,
   items: Array<{ name?: string; sku?: string }> = []
 ) {
   if (!items.length) return { materials: [], missing: [] };
@@ -21,6 +32,7 @@ async function resolveMaterials(
     .select("sku, name, drive_url, access_key, bonuses, bonus_name, bonus_drive_url, bonus_access_key")
     .eq("active", true);
   if (!products) return { materials: [], missing: items.map((i) => i?.sku || i?.name || "producto sin identificar") };
+  const rows = products as ProductRow[];
 
   const out: Array<{ productName: string; downloadUrl: string; accessKey?: string }> = [];
   const missing: string[] = [];
@@ -38,14 +50,14 @@ async function resolveMaterials(
     // 1) Prioridad absoluta: match por SKU exacto (evita colisiones por palabras
     //    genéricas como "hispanohablantes" o "pronunciacion" en varios productos).
     let hit = skuHint
-      ? products.find((p: any) => p.sku.toLowerCase() === skuHint)
+      ? rows.find((p) => p.sku.toLowerCase() === skuHint)
       : undefined;
 
     // 2) Fallback: match por nombre solo cuando NO había SKU o no se encontró exacto.
     //    Requerimos coincidencia del prefijo del nombre (primeras palabras), no de
     //    tokens sueltos, para no cruzar productos distintos.
     if (!hit && nameHint) {
-      hit = products.find((p: any) => {
+      hit = rows.find((p) => {
         const productNameLc = p.name.toLowerCase();
         const first3 = productNameLc.split(/[\s,|]+/).slice(0, 3).join(" ");
         const prefix = first3.substring(0, Math.min(20, first3.length));
@@ -82,7 +94,7 @@ async function resolveMaterials(
   return { materials: out, missing };
 }
 
-async function sendTemplate(admin: ReturnType<typeof createClient>, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>) {
+async function sendTemplate(admin: any, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>) {
   try {
     const { error } = await admin.functions.invoke("send-transactional-email", {
       body: { templateName, recipientEmail, idempotencyKey, templateData },

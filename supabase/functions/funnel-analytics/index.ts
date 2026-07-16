@@ -577,6 +577,12 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 30);
 
+    const checkoutsByCountrySource = Array.from(checkoutBySrcAgg.values())
+      .map((v) => ({ country: v.country, source: v.source, sessions: v.sessions.size }))
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 100);
+
+
     return new Response(
       JSON.stringify({
         range: { from: fromDate.toISOString(), to: toDate.toISOString(), granularity: gran },

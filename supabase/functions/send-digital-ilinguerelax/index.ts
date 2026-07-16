@@ -167,6 +167,34 @@ function langName(code: string | null, lang: Lang): string {
   return LANG_NAME[lang][c] || code;
 }
 
+// Fallback bonito para nombres vacíos: convierte SKU/slug en título legible.
+// Ej: "1-000-palabras-esenciales-para-aprender-coreano" → "1,000 Palabras Esenciales Para Aprender Coreano"
+function prettifySlug(slug: string): string {
+  if (!slug) return "";
+  // "1-000" → "1,000" (miles), luego separa por guiones
+  const withThousands = slug.replace(/(\d+)-(\d{3})(?=-|$)/g, "$1,$2");
+  return withThousands
+    .split("-")
+    .filter(Boolean)
+    .map((w) => (/^\d/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(" ");
+}
+
+// Extrae un nombre razonable para un bono cuando falta `name`:
+// 1) usa el name si existe, 2) intenta el filename del URL de Drive, 3) fallback localizado.
+function bonusDisplayName(b: { name?: string | null; drive_url?: string | null }, index: number, fallback: (n: number) => string): string {
+  const raw = (b.name || "").trim();
+  if (raw) return raw;
+  try {
+    const u = new URL(b.drive_url || "");
+    const seg = u.pathname.split("/").filter(Boolean);
+    // /file/d/{id}/view → no útil; probamos query title
+    const title = u.searchParams.get("title") || seg[seg.length - 1] || "";
+    if (title && !/^[A-Za-z0-9_-]{20,}$/.test(title) && title !== "view") return prettifySlug(title);
+  } catch (_) { /* ignore */ }
+  return fallback(index + 1);
+}
+
 async function detectLangFromIP(ip: string): Promise<{ country?: string; lang?: Lang }> {
   try {
     const r = await fetch(`https://ipapi.co/${ip}/json/`, { headers: { "user-agent": "ilinguerelax/1.0" } });

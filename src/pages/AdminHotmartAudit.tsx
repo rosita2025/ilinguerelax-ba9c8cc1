@@ -264,6 +264,7 @@ const AdminHotmartAudit = () => {
                     <th className="px-3 py-2 text-left">Email</th>
                     <th className="px-3 py-2 text-left">Producto</th>
                     <th className="px-3 py-2 text-left">Transacción</th>
+                    <th className="px-3 py-2 text-right">USD real Hotmart</th>
                     <th className="px-3 py-2 text-left">Brevo</th>
                   </tr>
                 </thead>

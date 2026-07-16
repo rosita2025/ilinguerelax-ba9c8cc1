@@ -44,8 +44,13 @@ function cartFromItems(items: PruebaItem[] | undefined) {
   return (items ?? []).map((i) => ({ id: i.id, q: i.quantity }));
 }
 
+function normalizeEmail(raw: string) {
+  const email = raw.trim().toLowerCase();
+  return email.endsWith("@gmail") ? `${email}.com` : email;
+}
+
 export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInput): Promise<boolean> {
-  const email = input.email.trim().toLowerCase();
+  const email = normalizeEmail(input.email);
   const name = (input.name || "").trim() || "Cliente";
   const phone = (input.phone || "").trim();
   const productType = input.productType || input.items?.[0]?.id || "checkout";
@@ -88,7 +93,7 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
   const trackedRef = useRef<string>("");
 
   useEffect(() => {
-    const email = buyer.email.trim().toLowerCase();
+    const email = normalizeEmail(buyer.email);
     const name = buyer.fullName.trim() || "Cliente";
     const phone = (buyer.phone || "").trim();
 

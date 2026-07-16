@@ -42,10 +42,12 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
 
   useEffect(() => {
     const email = buyer.email.trim().toLowerCase();
-    const name = buyer.fullName.trim();
+    const name = buyer.fullName.trim() || "Cliente";
     const phone = (buyer.phone || "").trim();
 
-    if (!EMAIL_RE.test(email) || name.length < 3) return;
+    // Fire as soon as we have a valid email — name is optional (Shopify behavior).
+    // This ensures we capture people who type email but never complete name/payment.
+    if (!EMAIL_RE.test(email)) return;
 
     const slugKey = slug || productName || "checkout";
     const cart = items.map((i) => ({ id: i.id, q: i.quantity }));

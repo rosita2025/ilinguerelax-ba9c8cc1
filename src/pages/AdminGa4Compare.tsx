@@ -254,20 +254,20 @@ function ComparisonTable({ header, rows }: { header: string; rows: Array<{ key: 
           <tbody>
             {rows.map((r) => (
               <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
-                <td className="py-2 pr-3 font-medium truncate max-w-[240px]" title={r.label}>{r.label}</td>
-                <td className="text-right px-3 tabular-nums">{r.ga4}</td>
-                <td className="text-right px-3 tabular-nums">{r.internal}</td>
-                <td className={cn("text-right px-3 tabular-nums font-medium",
+                <td className="py-2 pr-2 font-medium truncate max-w-[120px] sm:max-w-[240px] text-xs sm:text-sm" title={r.label}>{r.label}</td>
+                <td className="text-right px-1 sm:px-3 tabular-nums text-xs sm:text-sm">{r.ga4}</td>
+                <td className="text-right px-1 sm:px-3 tabular-nums text-xs sm:text-sm">{r.internal}</td>
+                <td className={cn("text-right px-1 sm:px-3 tabular-nums font-medium text-xs sm:text-sm",
                   r.diff > 0 ? "text-green-600" : r.diff < 0 ? "text-red-600" : "text-muted-foreground")}>
                   {r.diff > 0 ? "+" : ""}{r.diff}
                 </td>
-                <td className="pl-3 py-2">
-                  <div className="flex items-start gap-2">
-                    <Badge variant="outline" className={cn("gap-1", SEVERITY_STYLES[r.severity])}>
+                <td className="pl-1 sm:pl-3 py-2">
+                  <div className="flex flex-col sm:flex-row items-start gap-1 sm:gap-2">
+                    <Badge variant="outline" className={cn("gap-1 text-[10px] sm:text-xs shrink-0", SEVERITY_STYLES[r.severity])}>
                       {SEVERITY_ICON[r.severity]}
                       {r.severity === "ok" ? "OK" : r.severity === "warn" ? "Warn" : "Alta"}
                     </Badge>
-                    <span className="text-xs text-muted-foreground">{r.cause}</span>
+                    <span className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2 sm:line-clamp-none">{r.cause}</span>
                   </div>
                 </td>
               </tr>

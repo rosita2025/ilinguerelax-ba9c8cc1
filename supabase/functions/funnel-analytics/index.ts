@@ -295,7 +295,7 @@ serve(async (req) => {
     const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
-        .select("product_id, purchased_at, raw_payload, status")
+        .select("product_id, purchased_at, raw_payload, status, email, transaction_code")
         .in("status", ["approved", "pending"])
         .gte("purchased_at", fromDate.toISOString())
         .lte("purchased_at", toDate.toISOString()),
@@ -373,9 +373,9 @@ serve(async (req) => {
     };
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
-      const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
+      const txn = String(h.transaction_code ?? h.raw_payload?.data?.purchase?.transaction ?? h.raw_payload?.transaction ?? "");
       if (/test|sandbox/i.test(txn)) continue;
-      const buyerEmail = String(h.raw_payload?.data?.buyer?.email ?? h.email ?? "").toLowerCase();
+      const buyerEmail = String(h.email ?? h.raw_payload?.data?.buyer?.email ?? h.raw_payload?.data?.purchase?.buyer?.email ?? "").toLowerCase();
       if (/test|example\.com|postman|hotmart\.com\.br/.test(buyerEmail)) continue;
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;

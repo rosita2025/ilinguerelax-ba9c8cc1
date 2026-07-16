@@ -19,8 +19,8 @@ export class AppErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false, countdown: 5, retryCount: 0 };
   private timer: ReturnType<typeof setInterval> | null = null;
 
-  static getDerivedStateFromError(state: State): State {
-    return { hasError: true, countdown: 5, retryCount: state.retryCount };
+  static getDerivedStateFromError(): Partial<State> {
+    return { hasError: true, countdown: 5 };
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {

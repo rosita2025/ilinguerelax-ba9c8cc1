@@ -524,7 +524,7 @@ const AdminEmailTest = () => {
               </Button>
             </div>
             <div className="text-xs text-muted-foreground w-full md:w-auto md:ml-auto text-right">
-              {visibleRows.length} de {rows.length} pedidos
+              Mostrando {pagedRows.length} de {visibleRows.length} (total {rows.length})
             </div>
           </Card>
 

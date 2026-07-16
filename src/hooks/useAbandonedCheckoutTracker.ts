@@ -74,7 +74,7 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
       } catch (err) {
         console.warn("abandoned-cart track failed", err);
       }
-    }, 2000);
+    }, 1200);
 
     return () => {
       if (timer.current) window.clearTimeout(timer.current);

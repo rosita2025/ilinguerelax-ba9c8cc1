@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
     const rawProductType = String(body.product_type || body.slug || "checkout").slice(0, 180);
     const productType = normalizeSku(rawProductType) || rawProductType;
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
+    const paymentMethod = String(body.payment_method || "not_selected").trim().toLowerCase().slice(0, 40);
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")
@@ -124,6 +125,7 @@ Deno.serve(async (req) => {
     }
 
     // Central contacts
+    let brevoSynced = false;
     try {
       await supabase.from("email_contacts").insert({
         email,
@@ -154,7 +156,7 @@ Deno.serve(async (req) => {
       const checkoutSku = (product as { sku?: string } | null)?.sku || productType;
       const baseUrl = `${site}/checkouts/${checkoutSku}`;
       const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
-      await pushAbandonedCartToBrevo({
+      brevoSynced = await pushAbandonedCartToBrevo({
         email,
         name,
         phone,
@@ -167,12 +169,13 @@ Deno.serve(async (req) => {
         language,
         country,
         source: "checkout",
+        paymentMethod,
       });
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, brevoSynced }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

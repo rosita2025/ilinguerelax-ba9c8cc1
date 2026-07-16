@@ -156,6 +156,7 @@ const T: Record<Lang, {
     step3: `Se o produto pedir uma <strong>chave de acesso</strong>, copie-a deste e-mail.`,
     step4: `Repita com o <strong>produto adicional</strong> — cada um tem seu próprio link e chave.`,
     downloadBtn: `⬇ Baixar / Abrir no Drive`,
+    bonusBtn: `⬇ Baixar bônus`,
     keyLabel: `Chave de acesso`,
     bonusesTitle: `🎁 Bônus incluídos`,
     bonusFallback: (n) => `Bônus #${n}`,
@@ -163,6 +164,8 @@ const T: Record<Lang, {
     categoryLabel: `Categoria`,
     pending: `Enviaremos o link em alguns minutos.`,
     tip: `💡 <strong>Dica:</strong> salve os PDFs no seu telefone ou computador para tê-los sempre à mão, mesmo sem internet.`,
+    checklistTitle: `✅ Seu pedido inclui:`,
+    mainLabel: `Produto principal`,
   },
 };
 

@@ -56,7 +56,7 @@ function buildHtml(opts: {
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.08)">
         <tr><td style="padding:28px 28px 8px">
           <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:${opts.origin === "hotmart" ? "#fff7ed" : "#f0fdfa"};color:${opts.origin === "hotmart" ? "#c2410c" : "#0f766e"};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">
-            ${opts.origin === "hotmart" ? "Hotmart" : "Tienda iLingue Relax"} · Día ${opts.step}
+            ${opts.origin === "hotmart" ? "Hotmart" : "Tienda iLingue Relax"} · ${STEP_LABEL[opts.step]}
           </div>
           <h1 style="margin:12px 0 4px;font-size:22px;line-height:1.3">${greeting} 👋</h1>
           <p style="margin:0 0 12px;color:#475569">${stepMsg[opts.step]}</p>

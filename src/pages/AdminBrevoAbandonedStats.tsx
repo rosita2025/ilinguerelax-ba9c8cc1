@@ -62,6 +62,10 @@ const AdminBrevoAbandonedStats = () => {
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<SegmentReport | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState<string>(() => {
+    return (typeof window !== "undefined" && window.localStorage.getItem("brevo_auto_refresh")) || "60";
+  });
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [planCap, setPlanCap] = useState<number>(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_plan_cap") : null;
     return saved ? Number(saved) : 10000;
@@ -103,12 +107,23 @@ const AdminBrevoAbandonedStats = () => {
       if (statsRes.error) throw statsRes.error;
       setData(statsRes.data ?? null);
       if (!reportRes.error) setReport(reportRes.data ?? null);
+      setLastUpdated(new Date());
     } catch (e) {
       toast.error("No se pudieron cargar las estadísticas", { description: (e as Error).message });
     } finally { setLoading(false); }
   }, [adminKey, days, country, preset, customFrom, customTo, today]);
 
   useEffect(() => { void load(); }, [load]);
+
+  useEffect(() => {
+    window.localStorage.setItem("brevo_auto_refresh", autoRefresh);
+    if (autoRefresh === "off") return;
+    const ms = Number(autoRefresh) * 1000;
+    if (!ms) return;
+    const id = window.setInterval(() => { void load(); }, ms);
+    return () => window.clearInterval(id);
+  }, [autoRefresh, load]);
+
 
   const countryOptions = useMemo(() => data?.availableCountries ?? [], [data]);
   const totals = data?.totals ?? { total: 0, hotmart: 0, tienda: 0, errors: 0 };
@@ -166,12 +181,29 @@ const AdminBrevoAbandonedStats = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={autoRefresh} onValueChange={setAutoRefresh}>
+                <SelectTrigger className="w-[160px]"><SelectValue placeholder="Auto" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="off">Sin auto-refresh</SelectItem>
+                  <SelectItem value="15">Auto · 15 s</SelectItem>
+                  <SelectItem value="30">Auto · 30 s</SelectItem>
+                  <SelectItem value="60">Auto · 1 min</SelectItem>
+                  <SelectItem value="300">Auto · 5 min</SelectItem>
+                  <SelectItem value="900">Auto · 15 min</SelectItem>
+                </SelectContent>
+              </Select>
               <Button variant="outline" onClick={load} disabled={loading}>
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Actualizar
               </Button>
+              {lastUpdated && (
+                <span className="text-xs text-muted-foreground w-full text-right md:w-auto">
+                  Actualizado {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
             </div>
           </header>
+
 
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <KPI label="Total abandonos" value={totals.total} icon={<Globe className="w-5 h-5 text-white" />} tone="bg-slate-700" />

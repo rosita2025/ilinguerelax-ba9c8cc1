@@ -96,10 +96,20 @@ export default function AdminGa4Compare() {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
           <header className="flex items-start justify-between gap-3 flex-wrap">
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl sm:text-2xl font-bold leading-tight">Comparativa GA4 vs Pixel Interno</h1>
+              <h1 className="text-xl sm:text-2xl font-bold leading-tight flex items-center gap-2">
+                Comparativa GA4 vs Pixel Interno
+                <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-normal text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  EN VIVO
+                </span>
+              </h1>
               <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mt-1">
-                Compara conteos reales de GA4 (Realtime) contra nuestros propios eventos (<code>funnel_events</code>).
-                Diferencias grandes suelen indicar adblockers, ITP de Safari, filtros de red o extensiones de privacidad.
+                Datos reales de GA4 (Realtime API) vs eventos propios (<code>funnel_events</code>). Auto-refresh cada 20 s.
+                {data?.generatedAt && (
+                  <span className="block text-[10px] mt-0.5 opacity-70">
+                    Última actualización: {new Date(data.generatedAt).toLocaleTimeString()}
+                  </span>
+                )}
               </p>
             </div>
             <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">

@@ -72,6 +72,7 @@ const AdminBrevoAbandonedStats = () => {
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<SegmentReport | null>(null);
+  const [brevoReal, setBrevoReal] = useState<BrevoRealResponse | null>(null);
   const [autoRefresh, setAutoRefresh] = useState<string>(() => {
     return (typeof window !== "undefined" && window.localStorage.getItem("brevo_auto_refresh")) || "60";
   });

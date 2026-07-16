@@ -8,8 +8,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa",
 };
 
-const isAdminPath = (p: string | null) =>
-  !!p && (p.startsWith("/admin") || p.startsWith("/checkouts/"));
+const isExcludedPath = (p: string | null) =>
+  !!p && p.startsWith("/admin");
+
+// Shopify/GA-style sessionization: a browser id becomes a new session after
+// 30 minutes of inactivity. Older events used a persistent browser id, so the
+// analytics function splits historical rows into real visit sessions here.
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 
 // Classify a referrer string into a traffic source bucket for the funnel table.
 // Only meaningful for real browser events (PageView / InitiateCheckout / etc.);
@@ -113,7 +118,7 @@ serve(async (req) => {
     }
 
     const filtered = rows.filter(
-      (r) => !isAdminPath(r.page_path) && (includeBots || r.is_bot !== true),
+      (r) => !isExcludedPath(r.page_path) && (includeBots || r.is_bot !== true),
     );
 
     // Fetch abandoned carts within window
@@ -186,13 +191,27 @@ serve(async (req) => {
     // Unique sessions per (country, source) pair.
     const checkoutBySrcAgg = new Map<string, { country: string; source: TrafficSource; sessions: Set<string> }>();
 
+    const sessionState = new Map<string, { lastSeen: number; index: number }>();
+    const sessionKeyFor = (r: { session_id: string | null; created_at: string }) => {
+      const base = r.session_id?.trim() || `anon-${r.created_at}`;
+      const at = Date.parse(r.created_at);
+      if (!Number.isFinite(at)) return `${base}#0`;
 
+      const current = sessionState.get(base);
+      if (!current || at - current.lastSeen > SESSION_TIMEOUT_MS || at < current.lastSeen) {
+        const index = (current?.index || 0) + 1;
+        sessionState.set(base, { lastSeen: at, index });
+        return `${base}#${index}`;
+      }
 
+      current.lastSeen = at;
+      return `${base}#${current.index}`;
+    };
 
     for (const r of filtered) {
       const k = bucketKey(r.created_at);
       const b = ensure(k);
-      const sid = r.session_id || `anon-${r.created_at}`;
+      const sid = sessionKeyFor(r);
       b.sessions.add(sid);
       totals.sessions.add(sid);
 
@@ -224,16 +243,29 @@ serve(async (req) => {
           pAgg.views++;
           break;
         case "AddToCart":
-          b.addToCart++;
-          totals.addToCart++;
-          totals.cartSessions.add(sid);
+          if (!totals.cartSessions.has(sid)) {
+            b.addToCart++;
+            totals.addToCart++;
+            totals.cartSessions.add(sid);
+          }
           pAgg.carts++;
           break;
         case "InitiateCheckout":
         case "BeginCheckout": {
-          b.checkout++;
-          totals.checkout++;
-          totals.checkoutSessions.add(sid);
+          // Direct "Comprar / continuar pago" skips a visible cart but still
+          // represents cart intent in the funnel, so checkout sessions are also
+          // counted in the cart step if no AddToCart was seen first.
+          if (!totals.cartSessions.has(sid)) {
+            totals.cartSessions.add(sid);
+            b.addToCart++;
+            totals.addToCart++;
+            pAgg.carts++;
+          }
+          if (!totals.checkoutSessions.has(sid)) {
+            b.checkout++;
+            totals.checkout++;
+            totals.checkoutSessions.add(sid);
+          }
           const src = classifyTrafficSource(r.referrer);
           const country = r.country || "??";
           const key = `${country}::${src}`;

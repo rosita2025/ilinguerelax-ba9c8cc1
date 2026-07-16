@@ -146,9 +146,10 @@ serve(async (req) => {
 
     const byProductAgg = new Map<
       string,
-      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number }
+      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
+
 
 
     for (const r of filtered) {
@@ -169,9 +170,10 @@ serve(async (req) => {
       const pKey = r.product_id || "sin_producto";
       let pAgg = byProductAgg.get(pKey);
       if (!pAgg) {
-        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0 };
+        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
         byProductAgg.set(pKey, pAgg);
       }
+
 
 
       switch (r.event_name) {
@@ -202,11 +204,11 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, manualRes] = await Promise.all([
+    const [hotmartRes, manualRes, digitalRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
         .select("product_id, purchased_at, raw_payload, status")
-        .eq("status", "approved")
+        .in("status", ["approved", "pending"])
         .gte("purchased_at", fromDate.toISOString())
         .lte("purchased_at", toDate.toISOString()),
       supabase
@@ -215,75 +217,91 @@ serve(async (req) => {
         .in("status", ["approved", "verified", "completed"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
+      supabase.from("digital_products").select("sku, name"),
     ]);
-    const shopifyRes = { data: [] as any[] };
+
+    // Build name → SKU map so manual_payments (which store `name`) get grouped correctly
+    const nameToSku = new Map<string, string>();
+    const skuToName = new Map<string, string>();
+    for (const p of (digitalRes.data ?? []) as any[]) {
+      if (p.sku && p.name) {
+        nameToSku.set(p.name.trim().toLowerCase(), p.sku);
+        skuToName.set(p.sku, p.name);
+      }
+    }
 
     type PurchaseSource = "hotmart" | "store";
-    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource };
+    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
     const realPurchases: RealPurchase[] = [];
+    let hotmartPendingCount = 0;
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
-      // Skip test/sandbox transactions
+      // Skip test/sandbox transactions and garbage product ids
       if (/test|sandbox/i.test(txn)) continue;
+      const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
+      if (!rawPid || rawPid === "0") continue;
       const price = h.raw_payload?.data?.purchase?.price ?? {};
       const currency = price.currency_code || price.currency_value || "";
       const usd = currency === "USD" ? Number(price.value || 0) : 0;
       const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
         || h.raw_payload?.data?.buyer?.address?.country
         || "??";
+      const isPending = h.status === "pending";
+      if (isPending) hotmartPendingCount++;
       realPurchases.push({
         at: h.purchased_at,
-        productId: h.product_id || String(h.raw_payload?.data?.product?.id ?? "hotmart"),
+        productId: rawPid,
         country: buyerCountry,
-        usd,
+        usd: isPending ? 0 : usd,
         source: "hotmart",
+        pending: isPending,
       });
     }
     for (const m of (manualRes.data ?? []) as any[]) {
       const items = Array.isArray(m.items) ? m.items : [];
-      const firstSku = items[0]?.sku || items[0]?.product_id || "manual";
+      const first = items[0] || {};
+      const nameKey = String(first.name || "").trim().toLowerCase();
+      const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
       realPurchases.push({
         at: m.verified_at || m.created_at,
         productId: firstSku,
         country: m.buyer_country || "??",
         usd: Number(m.amount_usd || 0),
         source: "store",
+        pending: false,
       });
     }
+
 
     for (const p of realPurchases) {
       const k = bucketKey(p.at);
       const b = ensure(k);
-      b.purchases++;
-      b.revenue += p.usd;
-      totals.purchases++;
-      totals.revenue += p.usd;
+      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
 
-      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0 };
-      pAgg.purchases++;
-      pAgg.revenue += p.usd;
-      if (p.source === "hotmart") pAgg.hotmart++; else pAgg.store++;
-      byProductAgg.set(p.productId, pAgg);
+      if (p.pending) {
+        // Pending Hotmart: track separately, do NOT count as purchase/revenue
+        pAgg.pending++;
+      } else {
+        b.purchases++;
+        b.revenue += p.usd;
+        totals.purchases++;
+        totals.revenue += p.usd;
+        pAgg.purchases++;
+        pAgg.revenue += p.usd;
+        if (p.source === "hotmart") pAgg.hotmart++; else pAgg.store++;
 
-      const cAgg = byCountryAgg.get(p.country) || { sessions: new Set<string>(), purchases: 0, revenue: 0 };
-      cAgg.purchases++;
-      cAgg.revenue += p.usd;
-      byCountryAgg.set(p.country, cAgg);
-    }
-
-    // Lookup product names from digital_products (SKU → name)
-    const skuSet = Array.from(byProductAgg.keys()).filter((k) => k && k !== "sin_producto");
-    const nameMap = new Map<string, string>();
-    if (skuSet.length) {
-      const { data: prods } = await supabase
-        .from("digital_products")
-        .select("sku, name")
-        .in("sku", skuSet);
-      for (const p of (prods ?? []) as any[]) {
-        if (p.sku && p.name) nameMap.set(p.sku, p.name);
+        const cAgg = byCountryAgg.get(p.country) || { sessions: new Set<string>(), purchases: 0, revenue: 0 };
+        cAgg.purchases++;
+        cAgg.revenue += p.usd;
+        byCountryAgg.set(p.country, cAgg);
       }
+      byProductAgg.set(p.productId, pAgg);
     }
+
+    // Product names: use the same digital_products fetch from earlier
+    const nameMap = skuToName;
+
 
 
     // Fill missing buckets so the chart renders zeros
@@ -338,11 +356,16 @@ serve(async (req) => {
       : 0;
 
     const byProduct = Array.from(byProductAgg.entries())
+      .filter(([pid, v]) =>
+        pid && pid !== "sin_producto" && pid !== "0" && pid !== "manual" &&
+        (v.views + v.carts + v.purchases + v.pending) > 0,
+      )
       .map(([product_id, v]) => {
         const source =
           v.hotmart && v.store ? "mixto" :
           v.hotmart ? "hotmart" :
           v.store ? "store" :
+          v.pending ? "hotmart" :
           "—";
         return {
           product_id,
@@ -350,6 +373,7 @@ serve(async (req) => {
           source,
           hotmart_purchases: v.hotmart,
           store_purchases: v.store,
+          pending: v.pending,
           views: v.views,
           carts: v.carts,
           purchases: v.purchases,
@@ -357,8 +381,9 @@ serve(async (req) => {
           conversion: v.views ? Number(((v.purchases / v.views) * 100).toFixed(2)) : 0,
         };
       })
-      .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases)
+      .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.pending - a.pending)
       .slice(0, 30);
+
 
 
     const byCountry = Array.from(byCountryAgg.entries())
@@ -385,7 +410,9 @@ serve(async (req) => {
           purchaseSessions: totals.purchaseSessions.size,
           checkoutSessions: totals.checkoutSessions.size,
           cartSessions: totals.cartSessions.size,
+          hotmartPending: hotmartPendingCount,
         },
+
         conversion: {
           globalPct: Number(globalConversion.toFixed(2)),
           viewToCartPct: Number(cartRate.toFixed(2)),

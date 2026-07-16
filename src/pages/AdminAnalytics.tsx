@@ -363,6 +363,7 @@ const AdminAnalytics = () => {
                         <th className="text-right px-2">Vistas</th>
                         <th className="text-right px-2">Carrito</th>
                         <th className="text-right px-2">Compras</th>
+                        <th className="text-right px-2">Pendientes</th>
                         <th className="text-right px-2">Conv.</th>
                         <th className="text-right pl-2">Ingresos</th>
                       </tr>
@@ -370,7 +371,7 @@ const AdminAnalytics = () => {
                     <tbody>
                       {data.byProduct.length === 0 && (
                         <tr>
-                          <td colSpan={7} className="py-6 text-center text-muted-foreground">
+                          <td colSpan={8} className="py-6 text-center text-muted-foreground">
                             Sin datos en este rango
                           </td>
                         </tr>
@@ -401,12 +402,22 @@ const AdminAnalytics = () => {
                             <td className="text-right px-2 tabular-nums">{p.views}</td>
                             <td className="text-right px-2 tabular-nums">{p.carts}</td>
                             <td className="text-right px-2 tabular-nums font-semibold">{p.purchases}</td>
+                            <td className="text-right px-2 tabular-nums">
+                              {p.pending > 0 ? (
+                                <span className="inline-block text-[11px] px-2 py-0.5 rounded-full border bg-yellow-500/15 text-yellow-700 border-yellow-500/30">
+                                  {p.pending}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">0</span>
+                              )}
+                            </td>
                             <td className="text-right px-2 tabular-nums">{p.conversion}%</td>
                             <td className="text-right pl-2 tabular-nums">{money(p.revenue)}</td>
                           </tr>
                         );
                       })}
                     </tbody>
+
 
                   </table>
                 </div>

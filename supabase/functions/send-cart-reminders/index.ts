@@ -11,14 +11,20 @@ import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { sendEmail } from "../_shared/brevo.ts";
 
 const corsHeaders = adminCorsHeaders;
-const STEPS = [1, 7, 15, 30] as const;
+// Steps are measured in HOURS. 3h, 24h (1d), 168h (7d), 360h (15d), 720h (30d).
+const STEPS = [3, 24, 168, 360, 720] as const;
 type Step = typeof STEPS[number];
 
 const SUBJECTS_ES: Record<Step, string> = {
-  1: "⏰ Tu carrito te está esperando — recupéralo hoy",
-  7: "¿Aún interesado? Tu carrito sigue disponible",
-  15: "Última semana para recuperar tu carrito con descuento",
-  30: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
+  3: "👀 ¿Olvidaste algo? Tu carrito sigue esperándote",
+  24: "⏰ Tu carrito te está esperando — recupéralo hoy",
+  168: "¿Aún interesado? Tu carrito sigue disponible",
+  360: "Última semana para recuperar tu carrito con descuento",
+  720: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
+};
+
+const STEP_LABEL: Record<Step, string> = {
+  3: "3 h", 24: "24 h", 168: "Día 7", 360: "Día 15", 720: "Día 30",
 };
 
 function buildHtml(opts: {
@@ -36,10 +42,11 @@ function buildHtml(opts: {
     ? "Retomarás la compra desde donde la dejaste en Hotmart (pago 100% seguro)."
     : "Retomarás el checkout en nuestra tienda con los productos que dejaste.";
   const stepMsg: Record<Step, string> = {
-    1: "Vimos que ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
-    7: "Ha pasado una semana desde que iniciaste tu compra. Tu carrito sigue guardado.",
-    15: "Vamos a liberar tu carrito pronto. Aprovecha ahora — te dejamos el enlace directo.",
-    30: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
+    3: "Notamos que hace unas horas comenzaste tu compra y no la terminaste. Tu carrito sigue reservado — retómalo en 1 clic.",
+    24: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
+    168: "Ha pasado una semana desde que iniciaste tu compra. Tu carrito sigue guardado.",
+    360: "Vamos a liberar tu carrito pronto. Aprovecha ahora — te dejamos el enlace directo.",
+    720: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
 
   return `<!DOCTYPE html>

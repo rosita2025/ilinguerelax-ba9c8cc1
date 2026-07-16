@@ -575,6 +575,34 @@ const AdminAnalytics = () => {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Leyenda: qué significa cada fuente */}
+                  <div className="mt-4 pt-3 border-t border-border/60 grid gap-2 sm:grid-cols-2 text-[11px] text-muted-foreground">
+                    <div>
+                      <span className="inline-block px-2 py-0.5 rounded border bg-orange-500/15 text-orange-600 border-orange-500/30 font-medium mr-1">Referral externo</span>
+                      Visitantes que llegaron desde otro sitio web (blogs, foros, Hotmart, WhatsApp Web, links compartidos, etc.).
+                    </div>
+                    <div>
+                      <span className="inline-block px-2 py-0.5 rounded border bg-muted text-foreground border-border font-medium mr-1">Directo / pixel propio</span>
+                      Escribieron la URL directamente, abrieron un marcador, o vinieron desde apps que no envían referrer (WhatsApp/Instagram móvil, email cliente, etc.).
+                    </div>
+                    <div>
+                      <span className="inline-block px-2 py-0.5 rounded border bg-emerald-500/15 text-emerald-600 border-emerald-500/30 font-medium mr-1">Google orgánico</span>
+                      Búsquedas gratuitas en Google que te posicionaste con SEO (sin pagar anuncios).
+                    </div>
+                    <div>
+                      <span className="inline-block px-2 py-0.5 rounded border bg-blue-500/15 text-blue-600 border-blue-500/30 font-medium mr-1">Pixel Meta (FB/IG)</span>
+                      Clics desde Facebook o Instagram (posts orgánicos, stories o anuncios pagados detectados por el pixel).
+                    </div>
+                    <div>
+                      <span className="inline-block px-2 py-0.5 rounded border bg-yellow-500/15 text-yellow-700 border-yellow-500/30 font-medium mr-1">Google Ads</span>
+                      Clics desde anuncios pagados de Google (Search, Display o YouTube Ads).
+                    </div>
+                    <div>
+                      <span className="inline-block px-2 py-0.5 rounded border bg-purple-500/15 text-purple-600 border-purple-500/30 font-medium mr-1">Email / Newsletter</span>
+                      Clics desde correos que enviaste (Brevo, Resend, campañas de bienvenida o carrito abandonado).
+                    </div>
+                  </div>
                 </Card>
               )}
 

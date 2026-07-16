@@ -12,17 +12,8 @@ import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
 
-// Extrae USD real desde commissions[source=PRODUCER, currency=USD] del payload Hotmart
-const extractHotmartProducerUsd = (rawPayload: any): number | null => {
-  const commissions = rawPayload?.data?.purchase?.commissions;
-  if (!Array.isArray(commissions)) return null;
-  const producer = commissions.find((c: any) =>
-    String(c?.source || "").toUpperCase() === "PRODUCER" &&
-    String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
-  );
-  const v = Number(producer?.value);
-  return v > 0 ? v : null;
-};
+
+
 
 interface OrderRow {
   id: string;

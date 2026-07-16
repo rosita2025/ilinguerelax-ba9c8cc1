@@ -463,8 +463,30 @@ const AdminEmailTest = () => {
 
           <DeliveryRetryPanel />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+            <Card className="p-3 md:p-4">
+              <div className="text-[11px] md:text-xs text-muted-foreground">Compras aprobadas</div>
+              <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1">{summary.approvedCount}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">de {summary.totalCount} pedidos</div>
+            </Card>
+            <Card className="p-3 md:p-4">
+              <div className="text-[11px] md:text-xs text-muted-foreground">Ingresos aprobados (USD)</div>
+              <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1 text-emerald-700">${summary.approvedUsd.toFixed(2)}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">sincronizado con Analíticas</div>
+            </Card>
+            <Card className="p-3 md:p-4">
+              <div className="text-[11px] md:text-xs text-muted-foreground">Pendientes</div>
+              <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1 text-amber-700">{summary.pendingCount}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">pagos por confirmar</div>
+            </Card>
+            <Card className="p-3 md:p-4">
+              <div className="text-[11px] md:text-xs text-muted-foreground">Monto pendiente (USD)</div>
+              <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1 text-amber-700">${summary.pendingUsd.toFixed(2)}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">estimado por FX</div>
+            </Card>
+          </div>
 
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card
                 key={s}

@@ -1,10 +1,7 @@
 // Extract native USD amount from a Hotmart raw_payload.
-// SIN comisiones PRODUCER, SIN conversión FX. Solo USD nativo del payload:
-//   1) purchase.original_offer_price (USD).value  -> "offer"
-//   2) purchase.price (USD).value                 -> "price"
-//   3) null                                       -> "none"
+// SOLO commissions[source=PRODUCER, currency=USD]. Sin offer, sin price, sin FX.
 
-export type HotmartUsdSource = "offer" | "price" | "none";
+export type HotmartUsdSource = "producer" | "none";
 
 export interface HotmartUsdResult {
   amount: number | null;
@@ -13,18 +10,13 @@ export interface HotmartUsdResult {
 
 export function extractHotmartUsd(rawPayload: any): HotmartUsdResult {
   const purchase = rawPayload?.data?.purchase ?? {};
-
-  const offer = purchase.original_offer_price ?? {};
-  const offerIsUsd = String(offer.currency_value || offer.currency_code || "").toUpperCase() === "USD";
-  if (offerIsUsd && Number(offer.value) > 0) {
-    return { amount: Number(offer.value), source: "offer" };
+  const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
+  const producer = commissions.find((c: any) =>
+    String(c?.source || "").toUpperCase() === "PRODUCER" &&
+    String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
+  );
+  if (producer && Number(producer.value) > 0) {
+    return { amount: Number(producer.value), source: "producer" };
   }
-
-  const price = purchase.price ?? {};
-  const priceIsUsd = String(price.currency_value || price.currency_code || "").toUpperCase() === "USD";
-  if (priceIsUsd && Number(price.value) > 0) {
-    return { amount: Number(price.value), source: "price" };
-  }
-
   return { amount: null, source: "none" };
 }

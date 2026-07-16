@@ -288,18 +288,18 @@ serve(async (req) => {
       const currency = String(price.currency_code || price.currency_value || "USD").toUpperCase();
       const amount = Number(price.value || 0);
 
-      // Usar USD nativo del payload SIN comisiones PRODUCER y SIN conversión FX:
-      // 1) original_offer_price USD  2) purchase.price USD  3) 0
+      // SOLO commissions[PRODUCER, USD]. Sin offer, sin price, sin FX.
       let usdAmount = 0;
       const usdCurrency = "USD";
-      const originalOffer = purchase.original_offer_price ?? {};
-      const originalIsUsd = String(originalOffer.currency_value || originalOffer.currency_code || "").toUpperCase() === "USD";
-      const priceIsUsd = currency === "USD";
-      if (originalIsUsd && Number(originalOffer.value) > 0) {
-        usdAmount = Number(originalOffer.value);
-      } else if (priceIsUsd && amount > 0) {
-        usdAmount = amount;
+      const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
+      const producerComm = commissions.find((c: any) =>
+        String(c?.source || "").toUpperCase() === "PRODUCER" &&
+        String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
+      );
+      if (producerComm && Number(producerComm.value) > 0) {
+        usdAmount = Number(producerComm.value);
       }
+
 
 
 

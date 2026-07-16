@@ -180,16 +180,31 @@ export const StickyBuyBar = ({
     // without making the button feel sluggish.
     setClickLock(true);
     setTimeout(() => setClickLock(false), 1200);
-    // Fire AddToCart so the funnel counts the same user going from ViewContent
-    // → AddToCart → InitiateCheckout even when the sticky bar skips the cart.
-    try {
-      trackHotmartEvent("AddToCart", {
-        content_name: productName,
-        content_type: "product",
-        value: parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
-        currency: currencyCode,
-      });
-    } catch {}
+    // Only fire the pixel AddToCart when the sticky bar takes the user to our
+    // OWN checkout (/checkout or /checkouts/:slug). If it navigates to Hotmart
+    // (or any external URL), we do NOT fire — Hotmart has its own Pixel
+    // 24959578143733255 embedded in its checkout and firing here would
+    // duplicate the event.
+    const goesToInternalCheckout = (() => {
+      if (onBuyClick) return true; // internal handlers always land on our checkout store
+      if (!buyUrl) return false;
+      try {
+        const url = new URL(buyUrl, window.location.origin);
+        if (url.origin !== window.location.origin) return false; // external (Hotmart etc.)
+        const p = url.pathname.toLowerCase();
+        return p.startsWith("/checkout") || p.startsWith("/checkouts");
+      } catch { return false; }
+    })();
+    if (goesToInternalCheckout) {
+      try {
+        trackHotmartEvent("AddToCart", {
+          content_name: productName,
+          content_type: "product",
+          value: parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
+          currency: currencyCode,
+        });
+      } catch {}
+    }
     if (onBuyClick) {
       onBuyClick();
     } else if (buyUrl) {

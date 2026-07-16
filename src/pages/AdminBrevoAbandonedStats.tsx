@@ -153,7 +153,7 @@ const AdminBrevoAbandonedStats = () => {
         if (!cancelled && !res.error && res.data?.config) setReminderCfg({
           send_hour: res.data.config.send_hour,
           timezone: res.data.config.timezone,
-          enabled_steps: res.data.config.enabled_steps || [1, 7, 15, 30],
+          enabled_steps: res.data.config.enabled_steps || [3, 24, 168, 360, 720],
           paused: !!res.data.config.paused,
           updated_at: res.data.config.updated_at,
         });
@@ -351,9 +351,15 @@ const AdminBrevoAbandonedStats = () => {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs">Pasos activos (días)</Label>
+                <Label className="text-xs">Pasos activos</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {[1, 7, 15, 30].map((s) => {
+                  {[
+                    { v: 3, label: "3 h" },
+                    { v: 24, label: "24 h" },
+                    { v: 168, label: "Día 7" },
+                    { v: 360, label: "Día 15" },
+                    { v: 720, label: "Día 30" },
+                  ].map(({ v: s, label }) => {
                     const active = reminderCfg.enabled_steps.includes(s);
                     return (
                       <button
@@ -369,11 +375,12 @@ const AdminBrevoAbandonedStats = () => {
                           active ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border"
                         }`}
                       >
-                        Día {s}
+                        {label}
                       </button>
                     );
                   })}
                 </div>
+                <p className="text-[11px] text-muted-foreground mt-2">3h y 24h se envían automáticamente en cuanto se cumplen; Día 7/15/30 respetan la hora configurada.</p>
               </div>
               <div>
                 <Label className="text-xs">Pausar envíos automáticos</Label>

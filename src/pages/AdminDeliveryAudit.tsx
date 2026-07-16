@@ -54,6 +54,25 @@ const AdminDeliveryAudit = () => {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [changesByRow, setChangesByRow] = useState<Record<string, Array<{ id: string; sku: string; action: string; changed_fields: Record<string, { from: unknown; to: unknown } | unknown>; created_at: string }>>>({});
+  const [changesLoading, setChangesLoading] = useState<Record<string, boolean>>({});
+
+  const loadChanges = async (row: AuditRow) => {
+    const skus = Array.from(new Set([...(row.resolved_skus || []), ...((row.items || []).map((i) => i.sku))])).filter(Boolean);
+    if (!skus.length) return;
+    setChangesLoading((s) => ({ ...s, [row.id]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "history", skus, since: row.created_at },
+      });
+      if (error) throw error;
+      setChangesByRow((s) => ({ ...s, [row.id]: (data?.changes || []) }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setChangesLoading((s) => ({ ...s, [row.id]: false }));
+    }
+  };
 
   const load = async () => {
     setLoading(true);

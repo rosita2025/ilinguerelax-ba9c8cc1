@@ -140,6 +140,8 @@ const AdminEmailTest = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [liveOn, setLiveOn] = useState(false);
   const [retrying, setRetrying] = useState<Set<string>>(new Set());
+  const [pageSize, setPageSize] = useState<number>(20);
+  const [page, setPage] = useState<number>(1);
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);

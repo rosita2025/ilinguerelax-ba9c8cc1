@@ -1,6 +1,7 @@
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
+import { extractHotmartUsd } from "../_shared/hotmartUsd.ts";
 
 const corsHeaders = adminCorsHeaders;
 
@@ -69,7 +70,8 @@ Deno.serve(async (req) => {
       product: string | null;
       converted: boolean | null;
       payload: unknown;
-      payload: unknown;
+      usd_amount: number | null;
+      usd_source: "producer" | "offer" | "price" | "none";
       brevo: BrevoInfo | null;
     };
 
@@ -84,6 +86,7 @@ Deno.serve(async (req) => {
         : st === "chargeback" ? "chargeback"
         : st === "cancelled" || st === "canceled" ? "cancelled"
         : "unknown";
+      const usd = extractHotmartUsd(r.raw_payload);
       return {
         id: r.id,
         source: "purchase",
@@ -95,6 +98,8 @@ Deno.serve(async (req) => {
         product: r.product_code ?? r.product_id ?? null,
         converted: null,
         payload: r.raw_payload,
+        usd_amount: usd.amount,
+        usd_source: usd.source,
       };
     });
 
@@ -109,6 +114,8 @@ Deno.serve(async (req) => {
       product: r.product_type ?? null,
       converted: r.converted ?? r.is_completed ?? null,
       payload: r,
+      usd_amount: null,
+      usd_source: "none",
     }));
 
 
@@ -238,14 +245,19 @@ Deno.serve(async (req) => {
     // Summary counts (last 7 days).
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const summary = { approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 };
+    const usdSummary = { approved_usd: 0, pending_usd: 0 };
     for (const r of [...purchasesFull, ...abandonedFull]) {
       if (r.received_at >= since && r.mapped_status in summary) {
         (summary as any)[r.mapped_status]++;
+        if (r.usd_amount && r.usd_amount > 0) {
+          if (r.mapped_status === "approved") usdSummary.approved_usd += r.usd_amount;
+          else if (r.mapped_status === "pending") usdSummary.pending_usd += r.usd_amount;
+        }
       }
     }
 
 
-    return new Response(JSON.stringify({ rows, summary, synced: syncedCount, syncTargets: syncTargets.size }), {
+    return new Response(JSON.stringify({ rows, summary, usdSummary, synced: syncedCount, syncTargets: syncTargets.size }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

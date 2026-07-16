@@ -162,14 +162,19 @@ export const Languages = () => {
 
   const c = content[language];
 
-  // Merge static products with admin (DB) products, dedup by slug. Admin wins.
+  // Merge static products with admin (DB) products, dedup by slug.
+  // Static entry keeps rich metadata (discount, features), but admin's cover
+  // image always overrides so /admin/productos updates propagate to homepage.
   const merged: Product[] = useMemo(() => {
     const map = new Map<string, Product>();
     products.forEach((p) => map.set(p.slug, p));
     adminItems.forEach((p) => {
       const existing = map.get(p.slug);
-      // Prefer static entry's rich metadata (image, discount, features) but pull in new DB-only products.
-      if (!existing) map.set(p.slug, p);
+      if (!existing) {
+        map.set(p.slug, p);
+      } else if (p.image && p.image !== "/placeholder.svg") {
+        map.set(p.slug, { ...existing, image: p.image });
+      }
     });
     return Array.from(map.values());
   }, [adminItems]);

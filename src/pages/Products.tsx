@@ -42,8 +42,15 @@ const Products = () => {
   const products = useMemo<Product[]>(() => {
     const existing = new Set(staticProducts.map((p) => p.id));
     const staticSlugs = new Set(staticProducts.map((p) => p.slug));
+    const dbBySlug = new Map(dbProducts.map((p) => [p.slug, p] as const));
+    // Static products keep their rich metadata, but admin's cover image wins
+    // so edits made in /admin/productos show up here immediately.
+    const merged = staticProducts.map((p) => {
+      const db = dbBySlug.get(p.slug);
+      return db && db.image && db.image !== "/placeholder.svg" ? { ...p, image: db.image } : p;
+    });
     const extra = dbProducts.filter((p) => !existing.has(p.id) && !staticSlugs.has(p.slug));
-    return [...staticProducts, ...extra];
+    return [...merged, ...extra];
   }, [dbProducts]);
 
 

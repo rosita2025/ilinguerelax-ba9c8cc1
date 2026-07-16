@@ -170,7 +170,7 @@ serve(async (req) => {
       const pKey = r.product_id || "sin_producto";
       let pAgg = byProductAgg.get(pKey);
       if (!pAgg) {
-        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
+        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
         byProductAgg.set(pKey, pAgg);
       }
 
@@ -280,7 +280,7 @@ serve(async (req) => {
     for (const p of realPurchases) {
       const k = bucketKey(p.at);
       const b = ensure(k);
-      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
+      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
 
       if (p.pending) {
         // Pending Hotmart: track separately, do NOT count as purchase/revenue

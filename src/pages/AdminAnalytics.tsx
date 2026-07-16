@@ -373,7 +373,58 @@ const AdminAnalytics = () => {
               {/* Product table */}
               <Card className="p-4">
                 <h2 className="font-semibold mb-3">Top productos</h2>
-                <div className="overflow-x-auto">
+
+                {/* Mobile cards */}
+                <div className="md:hidden space-y-2">
+                  {data.byProduct.length === 0 && (
+                    <div className="py-6 text-center text-muted-foreground text-sm">Sin datos en este rango</div>
+                  )}
+                  {data.byProduct.map((p: any) => {
+                    const src = p.source as string | undefined;
+                    const badge =
+                      src === "hotmart"
+                        ? { label: "Hotmart", cls: "bg-orange-500/15 text-orange-600 border-orange-500/30" }
+                        : src === "store"
+                        ? { label: "Mi tienda", cls: "bg-primary/15 text-primary border-primary/30" }
+                        : src === "mixto"
+                        ? { label: `H${p.hotmart_purchases}·T${p.store_purchases}`, cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" }
+                        : { label: "Sin venta", cls: "bg-muted text-muted-foreground border-border" };
+                    return (
+                      <div key={p.product_id} className="border border-border/60 rounded-lg p-3 bg-card">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-sm truncate">{p.name || p.product_id}</div>
+                            {p.name && (
+                              <div className="text-[10px] text-muted-foreground truncate">SKU: {p.product_id}</div>
+                            )}
+                          </div>
+                          <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${badge.cls}`}>
+                            {badge.label}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-[11px]">
+                          <div><div className="text-muted-foreground">Vistas</div><div className="font-semibold tabular-nums">{p.views}</div></div>
+                          <div><div className="text-muted-foreground">Carrito</div><div className="font-semibold tabular-nums">{p.carts}</div></div>
+                          <div><div className="text-muted-foreground">Compras</div><div className="font-semibold tabular-nums">{p.purchases}</div></div>
+                          <div>
+                            <div className="text-muted-foreground">Pendientes</div>
+                            <div className="font-semibold tabular-nums">
+                              {p.pending}
+                              {(p.hotmart_pending || p.store_pending) ? (
+                                <span className="ml-1 opacity-70 font-normal">({p.hotmart_pending ?? 0}H·{p.store_pending ?? 0}T)</span>
+                              ) : null}
+                            </div>
+                          </div>
+                          <div><div className="text-muted-foreground">Conv.</div><div className="font-semibold tabular-nums">{p.conversion}%</div></div>
+                          <div><div className="text-muted-foreground">Ingresos</div><div className="font-semibold tabular-nums">{money(p.revenue)}</div></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="text-xs text-muted-foreground border-b">
                       <tr>
@@ -444,11 +495,10 @@ const AdminAnalytics = () => {
                         );
                       })}
                     </tbody>
-
-
                   </table>
                 </div>
               </Card>
+
 
               {/* Country table */}
               <Card className="p-4">

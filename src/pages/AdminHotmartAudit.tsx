@@ -261,21 +261,6 @@ const AdminHotmartAudit = () => {
                           <td className="px-3 py-2 truncate max-w-[180px]">{row.email ?? "—"}</td>
                           <td className="px-3 py-2 truncate max-w-[200px] text-xs">{row.product ?? "—"}</td>
                           <td className="px-3 py-2 font-mono text-xs">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</td>
-                          <td className="px-3 py-2 text-xs">
-                            {row.amount_usd != null ? (
-                              <span title={row.usd_source ? USD_SOURCE_LABEL[row.usd_source] : ""} className="font-mono font-semibold">
-                                {fmtUsd(row.amount_usd)}
-                              </span>
-                            ) : row.source === "abandoned" ? (
-                              <span className="text-muted-foreground">—</span>
-                            ) : row.local_amount && row.local_currency ? (
-                              <span className="text-muted-foreground font-mono" title="Sin USD nativo en payload">
-                                {row.local_currency} {row.local_amount.toFixed(2)}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </td>
                           <td className="px-3 py-2"><BrevoBadge info={row.brevo} /></td>
                         </tr>
                         {isOpen && (

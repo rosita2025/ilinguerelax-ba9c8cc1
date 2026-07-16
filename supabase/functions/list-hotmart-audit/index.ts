@@ -114,6 +114,8 @@ Deno.serve(async (req) => {
       product: r.product_type ?? null,
       converted: r.converted ?? r.is_completed ?? null,
       payload: r,
+      usd_amount: null,
+      usd_source: "none",
     }));
 
 

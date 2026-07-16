@@ -8,8 +8,14 @@ import PhoneInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 import "react-phone-number-input/style.css";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function normalizeEmail(raw: string) {
+  const email = (raw || "").trim().toLowerCase();
+  return email.endsWith("@gmail") ? `${email}.com` : email;
+}
 
 export function isBuyerValid(buyer: { fullName: string; email: string }) {
   return buyer.fullName.trim().length >= 3 && EMAIL_RE.test(buyer.email.trim());
@@ -58,8 +64,28 @@ export function BuyerInfoForm() {
   }, [buyer.email, buyer.fullName, buyer.phone]);
 
   const region = useRegionTier();
-  const { language } = useI18n();
+  const { language, countryCode } = useI18n();
+  const items = useCheckoutPruebaStore((s) => s.items);
   const t = getCheckoutUI(language);
+
+  // Estilo Shopify: en cuanto el visitante escriba un correo válido y salga
+  // del campo (nombre / correo / teléfono), sincronizamos el carrito
+  // abandonado + Brevo inmediatamente, sin esperar a que elija método de
+  // pago. Cubre casos de señal débil, celular apagado, olvido, etc.
+  const fireAbandonedCapture = () => {
+    const email = normalizeEmail(buyer.email);
+    if (!EMAIL_RE.test(email)) return;
+    trackAbandonedCheckoutNow({
+      email,
+      name: buyer.fullName,
+      phone: buyer.phone,
+      productType: items?.[0]?.id,
+      language,
+      country: countryCode || "",
+      items,
+    }).catch(() => { /* silencioso */ });
+  };
+
   const valid = isBuyerValid(buyer);
   const [showErrors, setShowErrors] = useState(false);
   const [shake, setShake] = useState(false);
@@ -135,6 +161,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.fullName}
               onChange={(e) => setBuyer({ fullName: e.target.value })}
+              onBlur={fireAbandonedCapture}
               placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
               className={cn(
@@ -164,6 +191,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.email}
               onChange={(e) => setBuyer({ email: e.target.value.trim() })}
+              onBlur={fireAbandonedCapture}
               placeholder={t.emailPlaceholder}
               aria-invalid={showEmailError}
               className={cn(
@@ -194,6 +222,7 @@ export function BuyerInfoForm() {
               defaultCountry={(region.country as any) || "PE"}
               value={buyer.phone ?? ""}
               onChange={(v) => setBuyer({ phone: v ?? "" })}
+              onBlur={fireAbandonedCapture}
               placeholder="999 999 999"
               className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/40"
             />

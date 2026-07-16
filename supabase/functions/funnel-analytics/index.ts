@@ -277,35 +277,31 @@ serve(async (req) => {
     for (const p of realPurchases) {
       const k = bucketKey(p.at);
       const b = ensure(k);
-      b.purchases++;
-      b.revenue += p.usd;
-      totals.purchases++;
-      totals.revenue += p.usd;
+      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
 
-      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0 };
-      pAgg.purchases++;
-      pAgg.revenue += p.usd;
-      if (p.source === "hotmart") pAgg.hotmart++; else pAgg.store++;
-      byProductAgg.set(p.productId, pAgg);
+      if (p.pending) {
+        // Pending Hotmart: track separately, do NOT count as purchase/revenue
+        pAgg.pending++;
+      } else {
+        b.purchases++;
+        b.revenue += p.usd;
+        totals.purchases++;
+        totals.revenue += p.usd;
+        pAgg.purchases++;
+        pAgg.revenue += p.usd;
+        if (p.source === "hotmart") pAgg.hotmart++; else pAgg.store++;
 
-      const cAgg = byCountryAgg.get(p.country) || { sessions: new Set<string>(), purchases: 0, revenue: 0 };
-      cAgg.purchases++;
-      cAgg.revenue += p.usd;
-      byCountryAgg.set(p.country, cAgg);
-    }
-
-    // Lookup product names from digital_products (SKU → name)
-    const skuSet = Array.from(byProductAgg.keys()).filter((k) => k && k !== "sin_producto");
-    const nameMap = new Map<string, string>();
-    if (skuSet.length) {
-      const { data: prods } = await supabase
-        .from("digital_products")
-        .select("sku, name")
-        .in("sku", skuSet);
-      for (const p of (prods ?? []) as any[]) {
-        if (p.sku && p.name) nameMap.set(p.sku, p.name);
+        const cAgg = byCountryAgg.get(p.country) || { sessions: new Set<string>(), purchases: 0, revenue: 0 };
+        cAgg.purchases++;
+        cAgg.revenue += p.usd;
+        byCountryAgg.set(p.country, cAgg);
       }
+      byProductAgg.set(p.productId, pAgg);
     }
+
+    // Product names: use the same digital_products fetch from earlier
+    const nameMap = skuToName;
+
 
 
     // Fill missing buckets so the chart renders zeros

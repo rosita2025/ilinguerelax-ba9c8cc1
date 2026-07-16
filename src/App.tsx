@@ -267,6 +267,7 @@ const App = () => (
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
                   <Route path="/admin/orders" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/hotmart-audit" element={<AdminGate><AdminHotmartAudit /></AdminGate>} />
+                  <Route path="/admin/purchases-status" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />
                   <Route path="/admin/delivery-audit" element={<AdminGate><AdminDeliveryAudit /></AdminGate>} />
                   <Route path="/admin/brevo-abandoned" element={<AdminGate><AdminBrevoAbandoned /></AdminGate>} />
                   <Route path="/admin/brevo-abandoned-stats" element={<AdminGate><AdminBrevoAbandonedStats /></AdminGate>} />

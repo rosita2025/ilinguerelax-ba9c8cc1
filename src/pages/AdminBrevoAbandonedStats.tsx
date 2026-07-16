@@ -6,7 +6,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, ShoppingCart, Store, AlertTriangle, Globe } from "lucide-react";
+import { RefreshCw, ShoppingCart, Store, AlertTriangle, Globe, Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from "recharts";
 
@@ -35,6 +38,22 @@ const AdminBrevoAbandonedStats = () => {
   const [country, setCountry] = useState<string>("all");
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [planCap, setPlanCap] = useState<number>(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_plan_cap") : null;
+    return saved ? Number(saved) : 10000;
+  });
+  const [seqSteps, setSeqSteps] = useState<number>(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_seq_steps") : null;
+    return saved ? Number(saved) : 6;
+  });
+  const [extraMonthly, setExtraMonthly] = useState<number>(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_extra_monthly") : null;
+    return saved ? Number(saved) : 945;
+  });
+
+  useEffect(() => { window.localStorage.setItem("brevo_plan_cap", String(planCap)); }, [planCap]);
+  useEffect(() => { window.localStorage.setItem("brevo_seq_steps", String(seqSteps)); }, [seqSteps]);
+  useEffect(() => { window.localStorage.setItem("brevo_extra_monthly", String(extraMonthly)); }, [extraMonthly]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -55,6 +74,14 @@ const AdminBrevoAbandonedStats = () => {
   const totals = data?.totals ?? { total: 0, hotmart: 0, tienda: 0, errors: 0 };
   const pctHot = totals.total ? Math.round((totals.hotmart / totals.total) * 100) : 0;
   const pctTie = totals.total ? Math.round((totals.tienda / totals.total) * 100) : 0;
+
+  // Proyección de consumo mensual de emails de Brevo
+  const abandonsPerDay = data && data.windowDays > 0 ? totals.total / data.windowDays : 0;
+  const projectedRecovery = Math.round(abandonsPerDay * 30 * seqSteps);
+  const projectedTotal = projectedRecovery + extraMonthly;
+  const usagePct = planCap > 0 ? Math.min(100, Math.round((projectedTotal / planCap) * 100)) : 0;
+  const usageTone = usagePct >= 90 ? "bg-red-500" : usagePct >= 70 ? "bg-amber-500" : "bg-emerald-500";
+  const remaining = Math.max(0, planCap - projectedTotal);
 
   return (
     <>
@@ -99,6 +126,53 @@ const AdminBrevoAbandonedStats = () => {
             <KPI label={`Tienda (${pctTie}%)`} value={totals.tienda} icon={<Store className="w-5 h-5 text-white" />} tone="bg-teal-600" />
             <KPI label="Errores de envío" value={totals.errors} icon={<AlertTriangle className="w-5 h-5 text-white" />} tone="bg-red-500" />
           </section>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="w-4 h-4 text-primary" />
+              <h2 className="font-semibold">Proyección de consumo mensual · Brevo</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <Label className="text-xs">Límite del plan (emails/mes)</Label>
+                <Input type="number" min={100} step={100} value={planCap} onChange={(e) => setPlanCap(Number(e.target.value) || 0)} />
+              </div>
+              <div>
+                <Label className="text-xs">Correos por secuencia de recuperación</Label>
+                <Input type="number" min={1} max={12} value={seqSteps} onChange={(e) => setSeqSteps(Number(e.target.value) || 0)} />
+              </div>
+              <div>
+                <Label className="text-xs">Otros envíos/mes (newsletter, campañas)</Label>
+                <Input type="number" min={0} step={50} value={extraMonthly} onChange={(e) => setExtraMonthly(Number(e.target.value) || 0)} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  ~{abandonsPerDay.toFixed(1)} abandonos/día × 30 × {seqSteps} correos = <strong className="text-foreground">{projectedRecovery.toLocaleString()}</strong> recuperación
+                  {" + "}<strong className="text-foreground">{extraMonthly.toLocaleString()}</strong> otros
+                </span>
+                <span className="font-semibold">{projectedTotal.toLocaleString()} / {planCap.toLocaleString()}</span>
+              </div>
+              <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
+                <div className={`h-full ${usageTone} transition-all`} style={{ width: `${usagePct}%` }} />
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{usagePct}% usado</span>
+                <span>{remaining.toLocaleString()} emails disponibles</span>
+              </div>
+              {usagePct >= 90 && (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-2 rounded">
+                  <AlertTriangle className="w-4 h-4" /> Estás cerca del límite. Considera subir de plan o reducir la frecuencia de la secuencia.
+                </div>
+              )}
+              {usagePct >= 70 && usagePct < 90 && (
+                <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 dark:bg-amber-950/30 p-2 rounded">
+                  <AlertTriangle className="w-4 h-4" /> Consumo alto. Revisa segmentación para no gastar emails en clientes ya convertidos.
+                </div>
+              )}
+            </div>
+          </Card>
 
           <Card className="p-4">
             <h2 className="font-semibold mb-3">Tendencia diaria</h2>

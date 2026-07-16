@@ -208,6 +208,30 @@ const AdminBrevoAbandonedStats = () => {
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Actualizar
               </Button>
+              <Button
+                variant="default"
+                className="w-full md:w-auto"
+                onClick={async () => {
+                  const t = toast.loading("Enviando recordatorios...");
+                  try {
+                    const res = await adminInvoke<{ ok: boolean; results: Record<string, { candidates: number; sent: number; skipped: number; errors: number }> }>(
+                      "send-cart-reminders",
+                      { body: { adminKey } },
+                    );
+                    if (res.error) throw res.error;
+                    const r = res.data?.results || {};
+                    const total = Object.values(r).reduce((s, v) => s + v.sent, 0);
+                    toast.success(`Recordatorios enviados: ${total}`, {
+                      id: t,
+                      description: Object.entries(r).map(([k, v]) => `${k}: ${v.sent}/${v.candidates} (skip ${v.skipped}, err ${v.errors})`).join(" · "),
+                    });
+                  } catch (e) {
+                    toast.error("Fallo al enviar recordatorios", { id: t, description: (e as Error).message });
+                  }
+                }}
+              >
+                <Mail className="w-4 h-4 mr-2" /> Enviar recordatorios 1/7/15/30
+              </Button>
               {preset === "custom" && (
                 <div className="col-span-2 md:col-span-1 flex items-center gap-2 w-full md:w-auto">
                   <Input type="date" value={customFrom} max={customTo} onChange={(e) => setCustomFrom(e.target.value)} className="flex-1 md:w-[150px]" />

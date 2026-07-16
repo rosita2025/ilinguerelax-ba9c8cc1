@@ -69,7 +69,7 @@ serve(async (req) => {
     for (let i = 0; i < 100; i++) {
       const { data, error } = await supabase
         .from("funnel_events")
-        .select("event_name, product_id, value, session_id, page_path, country, is_bot, created_at")
+        .select("event_name, product_id, value, session_id, page_path, country, referrer, is_bot, created_at")
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString())
         .order("created_at", { ascending: true })

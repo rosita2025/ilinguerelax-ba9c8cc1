@@ -128,6 +128,7 @@ const HotmartSuccess = () => {
       <SEO
         title="¡Gracias Por Tu Compra! - Inglés Relax"
         description="Tu pedido ha sido confirmado. ¡Revisa tu email para acceder a tus libros Inglés Relax!"
+        noIndex
       />
       <Navbar />
 

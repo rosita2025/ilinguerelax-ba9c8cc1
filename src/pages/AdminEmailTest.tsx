@@ -279,6 +279,33 @@ const AdminEmailTest = () => {
         perSource[src]++;
       });
 
+      (hotmartRes.data ?? []).forEach((r: any) => {
+        const email = (r.email || "").toLowerCase();
+        const d = digitalByOrder.get(String(r.transaction_code || "").toLowerCase()) || (email ? digitalByEmail.get(email) : null) || null;
+        const producerUsd = extractHotmartProducerUsd(r.raw_payload);
+        const buyerName = r.raw_payload?.data?.buyer?.name || "—";
+        const productName = r.raw_payload?.data?.product?.name || r.product_code || "—";
+        const isApproved = String(r.status || "").toLowerCase() === "approved";
+        const amountStr = producerUsd != null
+          ? `USD ${producerUsd.toFixed(2)}`
+          : isApproved ? "——" : "Pendiente";
+        merged.push({
+          id: `h-${r.id}`,
+          source: "hotmart",
+          created_at: r.created_at,
+          order_ref: r.transaction_code || "—",
+          customer: buyerName,
+          email: r.email || "—",
+          products: productName,
+          productLines: [{ name: productName, role: "producto" }],
+          amount: amountStr,
+          status: r.status || "—",
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+        });
+        perSource.hotmart++;
+      });
+
+
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
       setCounts(perSource);

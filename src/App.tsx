@@ -33,11 +33,6 @@ const ProductSpanish1000Verbs = lazy(() => import("./pages/ProductSpanish1000Ver
 const ProductSpanish500Questions = lazy(() => import("./pages/ProductSpanish500Questions"));
 const Product1000Verbos = lazy(() => import("./pages/Product1000Verbos"));
 const Product500Preguntas = lazy(() => import("./pages/Product500Preguntas"));
-const ProductGerman5000 = lazy(() => import("./pages/ProductGerman5000"));
-const ProductPortuguese5000 = lazy(() => import("./pages/ProductPortuguese5000"));
-const ProductItalian5000 = lazy(() => import("./pages/ProductItalian5000"));
-const ProductFrench5000 = lazy(() => import("./pages/ProductFrench5000"));
-const ProductDutch5000 = lazy(() => import("./pages/ProductDutch5000"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
@@ -228,11 +223,6 @@ const App = () => (
                   <Route path="/products/500-questions-in-spanish-with-english-pronunciation" element={<ProductSpanish500Questions />} />
                   <Route path="/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion" element={<Product1000Verbos />} />
                   <Route path="/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes" element={<Product500Preguntas />} />
-                  <Route path="/products/5-000-palabras-en-aleman-con-pronunciacion-para-hispanohablantes" element={<ProductGerman5000 />} />
-                  <Route path="/products/5-000-palabras-en-portugues-con-pronunciacion-para-hispanohablantes" element={<ProductPortuguese5000 />} />
-                  <Route path="/products/5-000-palabras-en-italiano-con-pronunciacion-para-hispanohablantes" element={<ProductItalian5000 />} />
-                  <Route path="/products/5-000-palabras-en-frances-con-pronunciacion-para-hispanohablantes" element={<ProductFrench5000 />} />
-                  <Route path="/products/5-000-palabras-en-neerlandes-con-pronunciacion-para-hispanohablantes" element={<ProductDutch5000 />} />
                   
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
                  <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreanoRelax />} />

@@ -64,6 +64,7 @@ const T: Record<Lang, {
   stepsTitle: (multi: boolean) => string;
   step1: string; step2: string; step3: string; step4: string;
   downloadBtn: string;
+  bonusBtn: string;
   keyLabel: string;
   bonusesTitle: string;
   bonusFallback: (n: number) => string;
@@ -71,6 +72,8 @@ const T: Record<Lang, {
   categoryLabel: string;
   pending: string;
   tip: string;
+  checklistTitle: string;
+  mainLabel: string;
 }> = {
   es: {
     subject: (ref, multi) => `Gracias por tu compra${ref ? ` — ${ref}` : ""} · enlaces de descarga${multi ? " (incluye producto adicional)" : ""}`,
@@ -84,6 +87,7 @@ const T: Record<Lang, {
     step3: `Si el producto pide una <strong>clave de acceso</strong>, cópiala del email.`,
     step4: `Repite con el <strong>producto adicional</strong> — cada uno tiene su propio enlace y clave.`,
     downloadBtn: `⬇ Descargar / Ver en Drive`,
+    bonusBtn: `⬇ Descargar bono`,
     keyLabel: `Clave de acceso`,
     bonusesTitle: `🎁 Bonos incluidos`,
     bonusFallback: (n) => `Bono #${n}`,
@@ -91,6 +95,8 @@ const T: Record<Lang, {
     categoryLabel: `Categoría`,
     pending: `Te enviaremos el enlace en unos minutos.`,
     tip: `💡 <strong>Consejo:</strong> guarda los PDFs en tu teléfono o computadora para tenerlos siempre disponibles, incluso sin internet.`,
+    checklistTitle: `✅ Tu compra incluye:`,
+    mainLabel: `Producto principal`,
   },
   en: {
     subject: (ref, multi) => `Thanks for your purchase${ref ? ` — ${ref}` : ""} · download links${multi ? " (includes bonus product)" : ""}`,
@@ -104,6 +110,7 @@ const T: Record<Lang, {
     step3: `If the product asks for an <strong>access key</strong>, copy it from this email.`,
     step4: `Repeat for the <strong>extra product</strong> — each one has its own link and key.`,
     downloadBtn: `⬇ Download / Open in Drive`,
+    bonusBtn: `⬇ Download bonus`,
     keyLabel: `Access key`,
     bonusesTitle: `🎁 Bonuses included`,
     bonusFallback: (n) => `Bonus #${n}`,
@@ -111,6 +118,8 @@ const T: Record<Lang, {
     categoryLabel: `Category`,
     pending: `We'll send you the link within a few minutes.`,
     tip: `💡 <strong>Tip:</strong> save the PDFs to your phone or computer so you can use them anytime, even offline.`,
+    checklistTitle: `✅ Your order includes:`,
+    mainLabel: `Main product`,
   },
   fr: {
     subject: (ref, multi) => `Merci pour votre achat${ref ? ` — ${ref}` : ""} · liens de téléchargement${multi ? " (produit bonus inclus)" : ""}`,
@@ -124,6 +133,7 @@ const T: Record<Lang, {
     step3: `Si le produit demande une <strong>clé d'accès</strong>, copiez-la depuis cet e-mail.`,
     step4: `Répétez pour le <strong>produit supplémentaire</strong> — chacun a son propre lien et clé.`,
     downloadBtn: `⬇ Télécharger / Ouvrir dans Drive`,
+    bonusBtn: `⬇ Télécharger le bonus`,
     keyLabel: `Clé d'accès`,
     bonusesTitle: `🎁 Bonus inclus`,
     bonusFallback: (n) => `Bonus n°${n}`,
@@ -131,6 +141,8 @@ const T: Record<Lang, {
     categoryLabel: `Catégorie`,
     pending: `Nous vous enverrons le lien dans quelques minutes.`,
     tip: `💡 <strong>Astuce :</strong> enregistrez les PDF sur votre téléphone ou ordinateur pour les avoir toujours à portée de main, même hors ligne.`,
+    checklistTitle: `✅ Votre commande inclut :`,
+    mainLabel: `Produit principal`,
   },
   pt: {
     subject: (ref, multi) => `Obrigado pela sua compra${ref ? ` — ${ref}` : ""} · links de download${multi ? " (inclui produto bônus)" : ""}`,
@@ -144,6 +156,7 @@ const T: Record<Lang, {
     step3: `Se o produto pedir uma <strong>chave de acesso</strong>, copie-a deste e-mail.`,
     step4: `Repita com o <strong>produto adicional</strong> — cada um tem seu próprio link e chave.`,
     downloadBtn: `⬇ Baixar / Abrir no Drive`,
+    bonusBtn: `⬇ Baixar bônus`,
     keyLabel: `Chave de acesso`,
     bonusesTitle: `🎁 Bônus incluídos`,
     bonusFallback: (n) => `Bônus #${n}`,
@@ -151,6 +164,8 @@ const T: Record<Lang, {
     categoryLabel: `Categoria`,
     pending: `Enviaremos o link em alguns minutos.`,
     tip: `💡 <strong>Dica:</strong> salve os PDFs no seu telefone ou computador para tê-los sempre à mão, mesmo sem internet.`,
+    checklistTitle: `✅ Seu pedido inclui:`,
+    mainLabel: `Produto principal`,
   },
 };
 
@@ -377,14 +392,23 @@ serve(async (req) => {
       const keyLine = p.access_key
         ? `<div style="margin-top:10px;font-size:13px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>`
         : "";
+      const productTitle = p.name || prettifySlug(p.sku);
+      const checklistItems = [
+        `<li style="margin:4px 0;"><span style="color:#16a34a;font-weight:bold;">✓</span> <strong>${escapeHtml(t.mainLabel)}:</strong> ${escapeHtml(productTitle)}</li>`,
+        ...bonusList.map((b, i) => `<li style="margin:4px 0;"><span style="color:#16a34a;font-weight:bold;">✓</span> 🎁 <strong>${escapeHtml(t.bonusesTitle.replace(/^🎁\s*/, "").replace(/s?$/i, ""))}:</strong> ${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}</li>`),
+      ].join("");
+      const checklistHtml = `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;margin-top:12px;font-size:13px;color:#14532d;">
+        <div style="font-weight:bold;margin-bottom:6px;">${escapeHtml(t.checklistTitle)}</div>
+        <ul style="margin:0;padding-left:6px;list-style:none;">${checklistItems}</ul>
+      </div>`;
       const bonusHtml = bonusList.length
         ? `<div style="margin-top:14px;padding-top:14px;border-top:1px dashed ${BRAND.border};">
-            <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${t.bonusesTitle}</div>
+            <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">${t.bonusesTitle}</div>
             ${bonusList.map((b, i) => `
-              <div style="margin:6px 0;font-size:13px;color:#374151;">
-                <strong>${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}:</strong>
-                <a href="${escapeHtml(b.drive_url)}" style="color:${BRAND.primary};text-decoration:underline;">${escapeHtml(t.downloadBtn.replace(/^⬇\s*/, ""))}</a>
-                ${b.access_key ? ` · ${escapeHtml(t.keyLabel)}: <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code>` : ""}
+              <div style="margin:10px 0;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;">
+                <div style="font-size:14px;font-weight:bold;color:#78350f;margin-bottom:8px;">🎁 ${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}</div>
+                <a href="${escapeHtml(b.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-size:13px;">${escapeHtml(t.bonusBtn)}</a>
+                ${b.access_key ? `<div style="margin-top:8px;font-size:12px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code></div>` : ""}
               </div>`).join("")}
           </div>`
         : `<div style="margin-top:12px;font-size:12px;color:${BRAND.muted};font-style:italic;">${escapeHtml(t.noBonuses)}</div>`;
@@ -393,11 +417,12 @@ serve(async (req) => {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
             ${p.cover_image_url ? `<td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover_image_url)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>` : ""}
             <td valign="top">
-              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name || prettifySlug(p.sku))}</div>
+              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(productTitle)}</div>
               ${priceLine}
               ${catLine}
             </td>
           </tr></table>
+          ${checklistHtml}
           ${mainBtn}
           ${keyLine}
           ${bonusHtml}

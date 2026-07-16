@@ -271,7 +271,7 @@ const AdminHotmartAudit = () => {
                 <tbody>
                   {rows.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="text-center py-10 text-muted-foreground">
+                      <td colSpan={10} className="text-center py-10 text-muted-foreground">
                         {loading ? "Cargando…" : "Aún no hay eventos registrados con estos filtros."}
                       </td>
                     </tr>

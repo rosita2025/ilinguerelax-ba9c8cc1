@@ -165,10 +165,16 @@ export const Languages = () => {
   // Merge static products with admin (DB) products, dedup by slug.
   // Static entry keeps rich metadata (discount, features), but admin's cover
   // image always overrides so /admin/productos updates propagate to homepage.
+  // IDs excluded from homepage (Muy Pronto placeholders that should not display)
+  const HIDDEN_IDS = new Set(["german-5000", "italian-5000", "french-5000", "dutch-5000", "portuguese-5000"]);
   const merged: Product[] = useMemo(() => {
     const map = new Map<string, Product>();
-    products.forEach((p) => map.set(p.slug, p));
+    products.forEach((p) => {
+      if (HIDDEN_IDS.has(p.id)) return;
+      map.set(p.slug, p);
+    });
     adminItems.forEach((p) => {
+      if (HIDDEN_IDS.has(p.id)) return;
       const existing = map.get(p.slug);
       if (!existing) {
         map.set(p.slug, p);

@@ -235,20 +235,17 @@ Deno.serve(async (req) => {
     }
     rows = rows.slice(0, take);
 
-    // Summary counts + USD totals (last 7 days). Same USD source as /admin/analytics.
+    // Summary counts (last 7 days).
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const summary = { approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 };
-    const usd_totals = { approved_usd: 0, pending_usd: 0 };
     for (const r of [...purchasesFull, ...abandonedFull]) {
       if (r.received_at >= since && r.mapped_status in summary) {
         (summary as any)[r.mapped_status]++;
-        if (r.mapped_status === "approved" && r.amount_usd) usd_totals.approved_usd += Number(r.amount_usd);
-        if (r.mapped_status === "pending" && r.amount_usd) usd_totals.pending_usd += Number(r.amount_usd);
       }
     }
 
 
-    return new Response(JSON.stringify({ rows, summary, usd_totals, synced: syncedCount, syncTargets: syncTargets.size }), {
+    return new Response(JSON.stringify({ rows, summary, synced: syncedCount, syncTargets: syncTargets.size }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

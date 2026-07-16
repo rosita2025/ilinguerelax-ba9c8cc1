@@ -32,6 +32,16 @@ interface SegmentReport {
   matrix: Array<{ origen: string; segmento: string; total: number; ok: number; error: number }>;
 }
 
+interface BrevoRealResponse {
+  range: { from: string; to: string };
+  account: { emailsLeft: number | null; planType: string | null; planEndDate: string | null; error: string | null };
+  stats: {
+    requests: number; delivered: number; opens: number; uniqueOpens: number;
+    clicks: number; uniqueClicks: number; hardBounces: number; softBounces: number;
+    spamReports: number; blocked: number; unsubscribed: number; error: string | null;
+  };
+}
+
 const SEGMENT_LABELS: Record<string, string> = {
   abandoned_cart: "Carrito abandonado",
   purchase: "Compra",

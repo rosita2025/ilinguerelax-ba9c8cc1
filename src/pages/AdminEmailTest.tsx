@@ -10,7 +10,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send } from "lucide-react";
 import { toast } from "sonner";
 
-type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
+type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital" | "hotmart";
+
+// Extrae USD real desde commissions[source=PRODUCER, currency=USD] del payload Hotmart
+const extractHotmartProducerUsd = (rawPayload: any): number | null => {
+  const commissions = rawPayload?.data?.purchase?.commissions;
+  if (!Array.isArray(commissions)) return null;
+  const producer = commissions.find((c: any) =>
+    String(c?.source || "").toUpperCase() === "PRODUCER" &&
+    String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
+  );
+  const v = Number(producer?.value);
+  return v > 0 ? v : null;
+};
 
 interface OrderRow {
   id: string;
@@ -62,6 +74,7 @@ const sourceLabel: Record<Source, string> = {
   paypal: "PayPal",
   mercadopago: "Mercado Pago",
   digital: "Digital",
+  hotmart: "Hotmart",
 };
 
 const sourceColor: Record<Source, string> = {
@@ -70,6 +83,7 @@ const sourceColor: Record<Source, string> = {
   paypal: "bg-sky-100 text-sky-800",
   mercadopago: "bg-cyan-100 text-cyan-800",
   digital: "bg-blue-100 text-blue-800",
+  hotmart: "bg-orange-100 text-orange-800",
 };
 
 const providerToSource = (p?: string | null): Source => {
@@ -151,6 +165,7 @@ const AdminEmailTest = () => {
       const manualRes = { data: (data as any)?.manual ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
       const funnelRes = { data: (data as any)?.funnel ?? [] };
+      const hotmartRes = { data: (data as any)?.hotmart ?? [] };
       const productMap = new Map<string, ProductMeta>();
       ((data as any)?.products ?? []).forEach((p: any) => {
         const bonusCount = bonusCountFrom(p);
@@ -174,7 +189,7 @@ const AdminEmailTest = () => {
       });
 
       const merged: OrderRow[] = [];
-      const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
+      const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0, hotmart: 0 };
 
       (manualRes.data ?? []).forEach((r: any) => {
         const d = digitalByOrder.get((r.order_number || "").toLowerCase()) || digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
@@ -264,6 +279,33 @@ const AdminEmailTest = () => {
         perSource[src]++;
       });
 
+      (hotmartRes.data ?? []).forEach((r: any) => {
+        const email = (r.email || "").toLowerCase();
+        const d = digitalByOrder.get(String(r.transaction_code || "").toLowerCase()) || (email ? digitalByEmail.get(email) : null) || null;
+        const producerUsd = extractHotmartProducerUsd(r.raw_payload);
+        const buyerName = r.raw_payload?.data?.buyer?.name || "—";
+        const productName = r.raw_payload?.data?.product?.name || r.product_code || "—";
+        const isApproved = String(r.status || "").toLowerCase() === "approved";
+        const amountStr = producerUsd != null
+          ? `USD ${producerUsd.toFixed(2)}`
+          : isApproved ? "——" : "Pendiente";
+        merged.push({
+          id: `h-${r.id}`,
+          source: "hotmart",
+          created_at: r.created_at,
+          order_ref: r.transaction_code || "—",
+          customer: buyerName,
+          email: r.email || "—",
+          products: productName,
+          productLines: [{ name: productName, role: "producto" }],
+          amount: amountStr,
+          status: r.status || "—",
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+        });
+        perSource.hotmart++;
+      });
+
+
       merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       setRows(merged);
       setCounts(perSource);
@@ -289,6 +331,7 @@ const AdminEmailTest = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "email_send_log" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "funnel_events" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "hotmart_purchases" }, () => { setLiveOn(true); scheduleReload(); })
       .subscribe((status) => setLiveOn(status === "SUBSCRIBED"));
 
     // Focus / visibility → refresh inmediato (por si el usuario vuelve tras un webhook tardío)
@@ -456,7 +499,7 @@ const AdminEmailTest = () => {
 
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
-            {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
+            {(["manual", "stripe", "paypal", "mercadopago", "digital", "hotmart"] as Source[]).map((s) => (
               <Card
                 key={s}
                 className={`p-3 md:p-4 cursor-pointer transition active:scale-95 ${sourceFilter === s ? "ring-2 ring-primary" : ""}`}

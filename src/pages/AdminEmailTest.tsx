@@ -523,8 +523,20 @@ const AdminEmailTest = () => {
                 Problemas ({problemCount})
               </Button>
             </div>
-            <div className="text-xs text-muted-foreground w-full md:w-auto md:ml-auto text-right">
-              Mostrando {pagedRows.length} de {visibleRows.length} (total {rows.length})
+            <div className="flex items-center gap-2 w-full md:w-auto md:ml-auto">
+              <label className="text-xs text-muted-foreground whitespace-nowrap">Por página:</label>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="h-9 rounded-md border bg-background px-2 text-xs"
+              >
+                {[5, 10, 20, 50, 100].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+              <span className="text-xs text-muted-foreground ml-auto md:ml-2 whitespace-nowrap">
+                {pagedRows.length}/{visibleRows.length} · total {rows.length}
+              </span>
             </div>
           </Card>
 

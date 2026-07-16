@@ -652,6 +652,15 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 100);
 
+    const bySource = Array.from(bySourceAgg.entries())
+      .map(([source, v]) => ({ source, sessions: v.sessions.size, pageviews: v.pageviews }))
+      .sort((a, b) => b.sessions - a.sessions);
+
+    const byUrl = Array.from(byUrlAgg.entries())
+      .map(([url, v]) => ({ url, sessions: v.sessions.size, pageviews: v.pageviews }))
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 30);
+
 
     return new Response(
       JSON.stringify({

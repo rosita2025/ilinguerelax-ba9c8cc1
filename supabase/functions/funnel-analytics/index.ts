@@ -281,6 +281,7 @@ serve(async (req) => {
           b.viewContent++;
           totals.viewContent++;
           pAgg.views++;
+          pcAgg.views++;
           break;
         case "AddToCart":
           if (!totals.cartSessions.has(sid)) {
@@ -289,6 +290,7 @@ serve(async (req) => {
             totals.cartSessions.add(sid);
           }
           pAgg.carts++;
+          pcAgg.carts++;
           break;
         case "InitiateCheckout":
         case "BeginCheckout": {
@@ -300,7 +302,9 @@ serve(async (req) => {
             b.addToCart++;
             totals.addToCart++;
             pAgg.carts++;
+            pcAgg.carts++;
           }
+
           if (!totals.checkoutSessions.has(sid)) {
             b.checkout++;
             totals.checkout++;

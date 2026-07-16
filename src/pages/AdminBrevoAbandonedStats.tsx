@@ -142,6 +142,51 @@ const AdminBrevoAbandonedStats = () => {
 
   useEffect(() => { void load(); }, [load]);
 
+  // Load reminder config once
+  useEffect(() => {
+    if (!adminKey) return;
+    let cancelled = false;
+    (async () => {
+      setReminderCfgLoading(true);
+      try {
+        const res = await adminInvoke<{ config: ReminderCfg }>("send-cart-reminders", { body: { adminKey, action: "get_config" } });
+        if (!cancelled && !res.error && res.data?.config) setReminderCfg({
+          send_hour: res.data.config.send_hour,
+          timezone: res.data.config.timezone,
+          enabled_steps: res.data.config.enabled_steps || [1, 7, 15, 30],
+          paused: !!res.data.config.paused,
+          updated_at: res.data.config.updated_at,
+        });
+      } finally { if (!cancelled) setReminderCfgLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [adminKey]);
+
+  const saveReminderCfg = useCallback(async () => {
+    setReminderCfgSaving(true);
+    const t = toast.loading("Guardando configuración...");
+    try {
+      const res = await adminInvoke<{ config: ReminderCfg }>("send-cart-reminders", {
+        body: {
+          adminKey,
+          action: "set_config",
+          config: {
+            send_hour: reminderCfg.send_hour,
+            timezone: reminderCfg.timezone,
+            enabled_steps: reminderCfg.enabled_steps,
+            paused: reminderCfg.paused,
+          },
+        },
+      });
+      if (res.error) throw res.error;
+      if (res.data?.config) setReminderCfg({ ...reminderCfg, ...res.data.config });
+      toast.success("Configuración guardada", { id: t });
+    } catch (e) {
+      toast.error("No se pudo guardar", { id: t, description: (e as Error).message });
+    } finally { setReminderCfgSaving(false); }
+  }, [adminKey, reminderCfg]);
+
+
   useEffect(() => {
     window.localStorage.setItem("brevo_auto_refresh", autoRefresh);
     if (autoRefresh === "off") return;

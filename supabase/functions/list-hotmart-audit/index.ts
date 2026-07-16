@@ -68,8 +68,37 @@ Deno.serve(async (req) => {
       transaction: string | null;
       product: string | null;
       converted: boolean | null;
+      amount_usd: number | null;
+      usd_source: "producer_commission" | "original_offer_price" | "price_usd" | "unavailable" | null;
+      local_amount: number | null;
+      local_currency: string | null;
       payload: unknown;
       brevo: BrevoInfo | null;
+    };
+
+    // Same USD extraction logic as funnel-analytics: prefer Hotmart-native USD.
+    const extractHotmartUsd = (payload: any) => {
+      const purchase = payload?.data?.purchase ?? {};
+      const price = purchase.price ?? {};
+      const localCurrency = String(price.currency_code || price.currency_value || "").toUpperCase() || null;
+      const localAmount = Number(price.value ?? 0) || null;
+      const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
+      const producerComm = commissions.find((c: any) =>
+        String(c?.source || "").toUpperCase() === "PRODUCER" &&
+        String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
+      );
+      const originalOffer = purchase.original_offer_price ?? {};
+      const originalIsUsd = String(originalOffer.currency_value || originalOffer.currency_code || "").toUpperCase() === "USD";
+      if (producerComm && Number(producerComm.value) > 0) {
+        return { amount_usd: Number(producerComm.value), usd_source: "producer_commission" as const, localAmount, localCurrency };
+      }
+      if (originalIsUsd && Number(originalOffer.value) > 0) {
+        return { amount_usd: Number(originalOffer.value), usd_source: "original_offer_price" as const, localAmount, localCurrency };
+      }
+      if (localCurrency === "USD" && Number(localAmount) > 0) {
+        return { amount_usd: Number(localAmount), usd_source: "price_usd" as const, localAmount, localCurrency };
+      }
+      return { amount_usd: null, usd_source: "unavailable" as const, localAmount, localCurrency };
     };
 
     const purchases: Omit<Row, "brevo">[] = (hRes.data ?? []).map((r: any) => {
@@ -83,6 +112,7 @@ Deno.serve(async (req) => {
         : st === "chargeback" ? "chargeback"
         : st === "cancelled" || st === "canceled" ? "cancelled"
         : "unknown";
+      const usd = extractHotmartUsd(r.raw_payload);
       return {
         id: r.id,
         source: "purchase",
@@ -93,6 +123,10 @@ Deno.serve(async (req) => {
         transaction: r.transaction_code ?? null,
         product: r.product_code ?? r.product_id ?? null,
         converted: null,
+        amount_usd: usd.amount_usd,
+        usd_source: usd.usd_source,
+        local_amount: usd.localAmount,
+        local_currency: usd.localCurrency,
         payload: r.raw_payload,
       };
     });

@@ -187,6 +187,13 @@ const AdminProductEdit = () => {
   const save = async (opts: { force?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });
+    if (duplicateSku) {
+      return toast({
+        title: "⚠️ SKU duplicado",
+        description: `Ya existe el producto "${duplicateSku.name}" con el SKU "${duplicateSku.sku}". Cambia el SKU para evitar romper el envío digital.`,
+        variant: "destructive",
+      });
+    }
     if (!opts.force && orphanCountries.length > 0) {
       const list = orphanCountries.map((c) => `${COUNTRY_INFO[c]?.flag ?? ""} ${c}`).join(", ");
       const ok = window.confirm(

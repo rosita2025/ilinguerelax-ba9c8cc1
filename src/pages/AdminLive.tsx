@@ -160,33 +160,33 @@ const AdminLive = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background p-4 md:p-8">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-                <Globe className="w-7 h-7 text-primary" /> Plataforma en vivo
+      <main className="min-h-dvh bg-background p-3 md:p-8">
+        <div className="max-w-6xl mx-auto space-y-4 md:space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 md:gap-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg md:text-3xl font-bold flex items-center gap-2">
+                <Globe className="w-5 h-5 md:w-7 md:h-7 text-primary shrink-0" /> Plataforma en vivo
               </h1>
-              <p className="text-sm text-muted-foreground">
-                Datos reales · humanos (bots excluidos) · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · actualizado {timeAgo(data.generatedAt)} atrás
+              <p className="text-[11px] md:text-sm text-muted-foreground leading-snug mt-0.5">
+                Humanos · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · {timeAgo(data.generatedAt)} atrás
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary/10 border border-primary/20">
+            <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-primary/10 border border-primary/20">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                 </span>
-                <Users className="w-4 h-4 text-primary" />
-                <span className="text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
-                <span className="text-xs text-muted-foreground">en vivo</span>
+                <Users className="w-3.5 h-3.5 text-primary" />
+                <span className="text-base md:text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
+                <span className="text-[10px] md:text-xs text-muted-foreground">en vivo</span>
               </div>
               <div className="inline-flex rounded-md border bg-background overflow-hidden">
                 {([1, 5, 15, 60] as const).map((m) => (
                   <button
                     key={m}
                     onClick={() => setWindowMin(m)}
-                    className={`px-3 h-9 text-sm transition-colors ${
+                    className={`px-2.5 md:px-3 h-8 md:h-9 text-xs md:text-sm transition-colors ${
                       windowMin === m
                         ? "bg-primary text-primary-foreground font-semibold"
                         : "text-muted-foreground hover:bg-muted"
@@ -201,7 +201,7 @@ const AdminLive = () => {
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-2 md:gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
             {[
               { label: "Visitantes", value: data.total.toLocaleString(), sub: "ahora mismo", icon: Users },
               { label: "Vistas producto", value: (data.productViews || 0).toLocaleString(), sub: "ViewContent", icon: Eye },
@@ -209,18 +209,19 @@ const AdminLive = () => {
               { label: "Compras", value: (data.purchases || 0).toLocaleString(), sub: `${data.purchaseSessions || 0} sesiones`, icon: ShoppingBag },
               { label: "Ingresos", value: money(data.revenue || 0), sub: "rastreados", icon: Activity },
             ].map(({ label, value, sub, icon: Icon }) => (
-              <Card key={label} className="p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs text-muted-foreground">{label}</div>
-                    <div className="text-2xl font-bold tabular-nums mt-1">{value}</div>
-                    <div className="text-xs text-muted-foreground mt-1">{sub}</div>
+              <Card key={label} className="p-3 md:p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[10px] md:text-xs text-muted-foreground truncate">{label}</div>
+                    <div className="text-lg md:text-2xl font-bold tabular-nums mt-0.5 md:mt-1">{value}</div>
+                    <div className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1 truncate">{sub}</div>
                   </div>
-                  <Icon className="w-5 h-5 text-primary" />
+                  <Icon className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
                 </div>
               </Card>
             ))}
           </div>
+
 
           <div className="grid gap-4 lg:grid-cols-[1.45fr_0.75fr]">
             <Card className="p-2 md:p-4 overflow-hidden">

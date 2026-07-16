@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, Mail, ShieldCheck, Bug, GitCompare, TrendingUp } from "lucide-react";
+import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, Mail, ShieldCheck, GitCompare, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
 
@@ -10,7 +10,6 @@ const tabs = [
   { to: "/admin/reviews", label: "Reseñas", icon: Star },
   
   { to: "/admin/hotmart-audit", label: "Hotmart", icon: ShieldCheck },
-  { to: "/admin/debug", label: "Debug", icon: Bug },
   { to: "/admin/ga4-compare", label: "GA4 vs Pixel", icon: GitCompare },
   { to: "/admin/seo", label: "SEO", icon: Search },
 ];

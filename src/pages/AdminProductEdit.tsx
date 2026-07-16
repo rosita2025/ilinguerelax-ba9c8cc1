@@ -101,7 +101,10 @@ const AdminProductEdit = () => {
         setAllProducts(list);
         if (!isNew) {
           const found = list.find((p) => p.sku === sku);
-          if (found) setProduct(found);
+          if (found) {
+            setProduct(found);
+            setOriginalDriveUrl((found.drive_url ?? "").trim());
+          }
           const ups: UpsellRow[] = (data?.upsells ?? [])
             .filter((u: { product_sku: string }) => u.product_sku === sku)
             .map((u: UpsellRow) => ({ upsell_sku: u.upsell_sku, discount_pct: u.discount_pct, sort_order: u.sort_order }));

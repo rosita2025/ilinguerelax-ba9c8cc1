@@ -230,11 +230,22 @@ serve(async (req) => {
           pAgg.carts++;
           break;
         case "InitiateCheckout":
-        case "BeginCheckout":
+        case "BeginCheckout": {
           b.checkout++;
           totals.checkout++;
           totals.checkoutSessions.add(sid);
+          const src = classifyTrafficSource(r.referrer);
+          const country = r.country || "??";
+          const key = `${country}::${src}`;
+          let sAgg = checkoutBySrcAgg.get(key);
+          if (!sAgg) {
+            sAgg = { country, source: src, sessions: new Set<string>() };
+            checkoutBySrcAgg.set(key, sAgg);
+          }
+          sAgg.sessions.add(sid);
           break;
+        }
+
         // Purchase events from the pixel are IGNORED — real purchases come
         // from Hotmart webhooks, Shopify orders, and verified manual payments.
       }

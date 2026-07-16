@@ -81,6 +81,93 @@ const fmtExact = (iso: string) => {
   } catch { return iso; }
 };
 
+const REASON_LABEL: Record<string, { label: string; color: string }> = {
+  initial:        { label: "Primer registro",  color: "bg-blue-100 text-blue-800" },
+  email_change:   { label: "Cambió email",      color: "bg-purple-100 text-purple-800" },
+  cart_change:    { label: "Cambió carrito",    color: "bg-amber-100 text-amber-800" },
+  country_change: { label: "Cambió país",       color: "bg-cyan-100 text-cyan-800" },
+  data_change:    { label: "Editó datos",       color: "bg-slate-100 text-slate-800" },
+  manual:         { label: "Manual",             color: "bg-emerald-100 text-emerald-800" },
+  unknown:        { label: "Desconocido",        color: "bg-muted text-foreground" },
+};
+
+interface DuplicateCluster {
+  key: string;
+  email: string;
+  product: string;
+  count: number;
+  firstAt: string;
+  lastAt: string;
+  spanSec: number;
+  reasons: Array<{ reason: string; at: string }>;
+}
+
+function DuplicatesPanel({ rows }: { rows: AuditRow[] }) {
+  const abandoned = rows.filter((r) => r.source === "abandoned" && r.email);
+  const map = new Map<string, DuplicateCluster>();
+  for (const r of abandoned) {
+    const key = `${r.email}::${r.product || "?"}`;
+    const reason = String((r.brevo?.attributes as Record<string, unknown> | undefined)?.TRIGGER_REASON || "unknown");
+    const c = map.get(key);
+    if (c) {
+      c.count += 1;
+      c.reasons.push({ reason, at: r.received_at });
+      if (r.received_at < c.firstAt) c.firstAt = r.received_at;
+      if (r.received_at > c.lastAt) c.lastAt = r.received_at;
+    } else {
+      map.set(key, {
+        key, email: r.email!, product: r.product || "?",
+        count: 1, firstAt: r.received_at, lastAt: r.received_at, spanSec: 0,
+        reasons: [{ reason, at: r.received_at }],
+      });
+    }
+  }
+  const clusters = Array.from(map.values())
+    .filter((c) => c.count > 1)
+    .map((c) => ({ ...c, spanSec: Math.round((new Date(c.lastAt).getTime() - new Date(c.firstAt).getTime()) / 1000) }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20);
+
+  if (clusters.length === 0) return null;
+
+  return (
+    <Card className="p-4 border-fuchsia-200">
+      <div className="flex items-center gap-2 mb-3">
+        <ShoppingCart className="w-4 h-4 text-fuchsia-700" />
+        <h2 className="font-semibold text-sm">Duplicados por cliente ({clusters.length})</h2>
+        <span className="text-xs text-muted-foreground">
+          Mismo email + producto registrados varias veces. Motivo detectado por el tracker.
+        </span>
+      </div>
+      <div className="space-y-3">
+        {clusters.map((c) => (
+          <div key={c.key} className="rounded-md border bg-muted/30 p-3">
+            <div className="flex flex-wrap items-center gap-2 justify-between mb-2">
+              <div className="text-sm font-medium truncate max-w-full">{c.email}</div>
+              <Badge className="bg-fuchsia-100 text-fuchsia-800">{c.count}× en {c.spanSec}s</Badge>
+            </div>
+            <div className="text-xs text-muted-foreground mb-2 truncate">{c.product}</div>
+            <div className="flex flex-wrap gap-1.5">
+              {c.reasons
+                .slice()
+                .sort((a, b) => a.at.localeCompare(b.at))
+                .map((r, i) => {
+                  const meta = REASON_LABEL[r.reason] || REASON_LABEL.unknown;
+                  return (
+                    <Badge key={i} className={`${meta.color} font-normal text-[10px]`}>
+                      {meta.label} · {new Date(r.at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                    </Badge>
+                  );
+                })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+
 const AdminHotmartAudit = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<AuditRow[]>([]);

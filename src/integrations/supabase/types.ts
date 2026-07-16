@@ -227,6 +227,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_reminder_config: {
+        Row: {
+          enabled_steps: number[]
+          id: number
+          paused: boolean
+          send_hour: number
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          enabled_steps?: number[]
+          id?: number
+          paused?: boolean
+          send_hour?: number
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          enabled_steps?: number[]
+          id?: number
+          paused?: boolean
+          send_hour?: number
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cart_reminder_sends: {
         Row: {
           cart_url: string | null

@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, ShoppingCart, Store, AlertTriangle, Globe, Mail } from "lucide-react";
+import { RefreshCw, ShoppingCart, Store, AlertTriangle, Globe, Mail, Clock, Save } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
@@ -97,6 +98,12 @@ const AdminBrevoAbandonedStats = () => {
     return saved ? Number(saved) : 945;
   });
 
+  // Reminder schedule config (server-side, in cart_reminder_config table)
+  interface ReminderCfg { send_hour: number; timezone: string; enabled_steps: number[]; paused: boolean; updated_at?: string | null }
+  const [reminderCfg, setReminderCfg] = useState<ReminderCfg>({ send_hour: 10, timezone: "America/Lima", enabled_steps: [1, 7, 15, 30], paused: false });
+  const [reminderCfgLoading, setReminderCfgLoading] = useState(false);
+  const [reminderCfgSaving, setReminderCfgSaving] = useState(false);
+
   useEffect(() => { window.localStorage.setItem("brevo_plan_cap", String(planCap)); }, [planCap]);
   useEffect(() => { window.localStorage.setItem("brevo_seq_steps", String(seqSteps)); }, [seqSteps]);
   useEffect(() => { window.localStorage.setItem("brevo_extra_monthly", String(extraMonthly)); }, [extraMonthly]);
@@ -134,6 +141,51 @@ const AdminBrevoAbandonedStats = () => {
   }, [adminKey, days, country, preset, customFrom, customTo, today]);
 
   useEffect(() => { void load(); }, [load]);
+
+  // Load reminder config once
+  useEffect(() => {
+    if (!adminKey) return;
+    let cancelled = false;
+    (async () => {
+      setReminderCfgLoading(true);
+      try {
+        const res = await adminInvoke<{ config: ReminderCfg }>("send-cart-reminders", { body: { adminKey, action: "get_config" } });
+        if (!cancelled && !res.error && res.data?.config) setReminderCfg({
+          send_hour: res.data.config.send_hour,
+          timezone: res.data.config.timezone,
+          enabled_steps: res.data.config.enabled_steps || [1, 7, 15, 30],
+          paused: !!res.data.config.paused,
+          updated_at: res.data.config.updated_at,
+        });
+      } finally { if (!cancelled) setReminderCfgLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [adminKey]);
+
+  const saveReminderCfg = useCallback(async () => {
+    setReminderCfgSaving(true);
+    const t = toast.loading("Guardando configuración...");
+    try {
+      const res = await adminInvoke<{ config: ReminderCfg }>("send-cart-reminders", {
+        body: {
+          adminKey,
+          action: "set_config",
+          config: {
+            send_hour: reminderCfg.send_hour,
+            timezone: reminderCfg.timezone,
+            enabled_steps: reminderCfg.enabled_steps,
+            paused: reminderCfg.paused,
+          },
+        },
+      });
+      if (res.error) throw res.error;
+      if (res.data?.config) setReminderCfg({ ...reminderCfg, ...res.data.config });
+      toast.success("Configuración guardada", { id: t });
+    } catch (e) {
+      toast.error("No se pudo guardar", { id: t, description: (e as Error).message });
+    } finally { setReminderCfgSaving(false); }
+  }, [adminKey, reminderCfg]);
+
 
   useEffect(() => {
     window.localStorage.setItem("brevo_auto_refresh", autoRefresh);
@@ -245,6 +297,106 @@ const AdminBrevoAbandonedStats = () => {
               )}
             </div>
           </header>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="w-4 h-4 text-primary" />
+              <h3 className="font-semibold">Horario de envío de recordatorios</h3>
+              {reminderCfg.paused && <Badge variant="destructive">Pausado</Badge>}
+              {reminderCfg.updated_at && (
+                <span className="text-xs text-muted-foreground ml-auto">
+                  Actualizado {new Date(reminderCfg.updated_at).toLocaleString()}
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              El cron corre cada hora y envía sólo cuando la hora local (según zona horaria) coincide con la hora configurada. Los envíos manuales ignoran esta restricción.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div>
+                <Label className="text-xs">Hora de envío</Label>
+                <Select
+                  value={String(reminderCfg.send_hour)}
+                  onValueChange={(v) => setReminderCfg({ ...reminderCfg, send_hour: Number(v) })}
+                  disabled={reminderCfgLoading}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 24 }).map((_, h) => (
+                      <SelectItem key={h} value={String(h)}>{String(h).padStart(2, "0")}:00</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Zona horaria</Label>
+                <Select
+                  value={reminderCfg.timezone}
+                  onValueChange={(v) => setReminderCfg({ ...reminderCfg, timezone: v })}
+                  disabled={reminderCfgLoading}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="America/Lima">America/Lima (PET)</SelectItem>
+                    <SelectItem value="America/Mexico_City">America/Mexico_City (CST)</SelectItem>
+                    <SelectItem value="America/Bogota">America/Bogota (COT)</SelectItem>
+                    <SelectItem value="America/Buenos_Aires">America/Buenos_Aires (ART)</SelectItem>
+                    <SelectItem value="America/Santiago">America/Santiago (CLT)</SelectItem>
+                    <SelectItem value="America/Caracas">America/Caracas (VET)</SelectItem>
+                    <SelectItem value="America/New_York">America/New_York (ET)</SelectItem>
+                    <SelectItem value="America/Los_Angeles">America/Los_Angeles (PT)</SelectItem>
+                    <SelectItem value="Europe/Madrid">Europe/Madrid (CET)</SelectItem>
+                    <SelectItem value="UTC">UTC</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Pasos activos (días)</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {[1, 7, 15, 30].map((s) => {
+                    const active = reminderCfg.enabled_steps.includes(s);
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setReminderCfg({
+                          ...reminderCfg,
+                          enabled_steps: active
+                            ? reminderCfg.enabled_steps.filter((x) => x !== s)
+                            : [...reminderCfg.enabled_steps, s].sort((a, b) => a - b),
+                        })}
+                        className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
+                          active ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border"
+                        }`}
+                      >
+                        Día {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs">Pausar envíos automáticos</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  <Switch
+                    checked={reminderCfg.paused}
+                    onCheckedChange={(v) => setReminderCfg({ ...reminderCfg, paused: !!v })}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {reminderCfg.paused ? "Cron detenido" : "Cron activo"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button onClick={saveReminderCfg} disabled={reminderCfgSaving || reminderCfgLoading}>
+                <Save className="w-4 h-4 mr-2" />
+                {reminderCfgSaving ? "Guardando..." : "Guardar configuración"}
+              </Button>
+            </div>
+          </Card>
+
+
 
 
 

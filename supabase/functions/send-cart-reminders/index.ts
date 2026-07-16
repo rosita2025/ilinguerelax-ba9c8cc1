@@ -102,10 +102,14 @@ Deno.serve(async (req) => {
     let adminKey: string | undefined;
     let dryRun = false;
     let onlySteps: Step[] = [...STEPS];
+    let action: "run" | "get_config" | "set_config" = "run";
+    let configPatch: { send_hour?: number; timezone?: string; paused?: boolean; enabled_steps?: number[] } | undefined;
     if (req.method === "POST") {
       const b = await req.json().catch(() => ({}));
       adminKey = b.adminKey;
       dryRun = !!b.dryRun;
+      if (b.action === "get_config" || b.action === "set_config") action = b.action;
+      if (b.config) configPatch = b.config;
       if (Array.isArray(b.steps) && b.steps.length) {
         onlySteps = b.steps.filter((s: number): s is Step => STEPS.includes(s as Step));
       }
@@ -124,6 +128,73 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    // Load config (single-row id=1)
+    const { data: cfgRow } = await admin
+      .from("cart_reminder_config")
+      .select("send_hour, timezone, enabled_steps, paused, updated_at")
+      .eq("id", 1)
+      .maybeSingle();
+    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [1, 7, 15, 30], paused: false, updated_at: null };
+
+    // Handle config endpoints (admin-only)
+    if (action === "get_config") {
+      return new Response(JSON.stringify({ ok: true, config: cfg }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (action === "set_config") {
+      const patch: Record<string, unknown> = {};
+      if (typeof configPatch?.send_hour === "number" && configPatch.send_hour >= 0 && configPatch.send_hour <= 23) {
+        patch.send_hour = Math.floor(configPatch.send_hour);
+      }
+      if (typeof configPatch?.timezone === "string" && configPatch.timezone.trim()) {
+        // Validate the IANA TZ
+        try { new Intl.DateTimeFormat("en-US", { timeZone: configPatch.timezone }).format(new Date()); patch.timezone = configPatch.timezone.trim(); }
+        catch { return new Response(JSON.stringify({ error: "Invalid timezone" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }); }
+      }
+      if (typeof configPatch?.paused === "boolean") patch.paused = configPatch.paused;
+      if (Array.isArray(configPatch?.enabled_steps)) {
+        patch.enabled_steps = configPatch!.enabled_steps.filter((n) => STEPS.includes(n as Step));
+      }
+      const { data: updated, error: upErr } = await admin
+        .from("cart_reminder_config")
+        .upsert({ id: 1, ...patch })
+        .select()
+        .single();
+      if (upErr) throw upErr;
+      return new Response(JSON.stringify({ ok: true, config: updated }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Cron: skip if paused or current hour in TZ doesn't match send_hour
+    if (isCron) {
+      if (cfg.paused) {
+        return new Response(JSON.stringify({ ok: true, skipped: "paused" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      let currentHour = new Date().getUTCHours();
+      try {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          hour: "2-digit", hour12: false, timeZone: cfg.timezone,
+        }).formatToParts(new Date());
+        const h = parts.find((p) => p.type === "hour")?.value;
+        if (h != null) currentHour = parseInt(h, 10) % 24;
+      } catch { /* fallback to UTC */ }
+      if (currentHour !== cfg.send_hour) {
+        return new Response(JSON.stringify({ ok: true, skipped: `hour ${currentHour} != ${cfg.send_hour} (${cfg.timezone})` }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Honor enabled_steps from config (intersect with request)
+    if (Array.isArray(cfg.enabled_steps) && cfg.enabled_steps.length) {
+      onlySteps = onlySteps.filter((s) => cfg.enabled_steps.includes(s));
+    }
+
 
     const results: Record<string, { candidates: number; sent: number; skipped: number; errors: number }> = {};
 

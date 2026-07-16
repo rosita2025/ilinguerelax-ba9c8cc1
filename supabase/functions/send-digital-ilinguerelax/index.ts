@@ -462,6 +462,10 @@ serve(async (req) => {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("send-digital-ilinguerelax error:", msg);
+    await writeAudit({
+      customer_email: "unknown", requested_skus: [], normalized_skus: [], resolved_skus: [], missing_skus: [],
+      items: [], status: "error", error: msg,
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500, headers: { "Content-Type": "application/json", ...corsHeaders },
     });

@@ -447,6 +447,69 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_delivery_audit: {
+        Row: {
+          country: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string | null
+          error: string | null
+          id: string
+          idempotency_key: string | null
+          items: Json
+          lang: string | null
+          message_id: string | null
+          missing_skus: string[]
+          normalized_skus: string[]
+          order_id: string | null
+          provider: string | null
+          requested_skus: string[]
+          resolved_skus: string[]
+          source: string | null
+          status: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key?: string | null
+          items?: Json
+          lang?: string | null
+          message_id?: string | null
+          missing_skus?: string[]
+          normalized_skus?: string[]
+          order_id?: string | null
+          provider?: string | null
+          requested_skus?: string[]
+          resolved_skus?: string[]
+          source?: string | null
+          status: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key?: string | null
+          items?: Json
+          lang?: string | null
+          message_id?: string | null
+          missing_skus?: string[]
+          normalized_skus?: string[]
+          order_id?: string | null
+          provider?: string | null
+          requested_skus?: string[]
+          resolved_skus?: string[]
+          source?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       digital_delivery_config: {
         Row: {
           enabled: boolean

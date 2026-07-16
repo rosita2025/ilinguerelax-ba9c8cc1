@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -59,6 +59,13 @@ const panels = [
     title: "Hotmart · Auditoría",
     desc: "Eventos recibidos de Hotmart y carritos abandonados con estado mapeado (aprobado/pendiente/rechazado/posventa) y sync a Brevo.",
     color: "text-orange-500",
+  },
+  {
+    to: "/admin/delivery-audit",
+    icon: ShieldCheck,
+    title: "Auditoría · Entrega digital",
+    desc: "Trazabilidad por correo: qué SKU se resolvió, qué Drive se adjuntó (o por qué faltó) para cada envío digital automático.",
+    color: "text-cyan-600",
   },
   {
     to: "/admin/analytics",

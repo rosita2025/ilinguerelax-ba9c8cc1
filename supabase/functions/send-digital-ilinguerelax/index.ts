@@ -393,7 +393,7 @@ serve(async (req) => {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
             ${p.cover_image_url ? `<td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover_image_url)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>` : ""}
             <td valign="top">
-              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name || p.sku)}</div>
+              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name || prettifySlug(p.sku))}</div>
               ${priceLine}
               ${catLine}
             </td>

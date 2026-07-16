@@ -181,12 +181,29 @@ const AdminBrevoAbandonedStats = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={autoRefresh} onValueChange={setAutoRefresh}>
+                <SelectTrigger className="w-[160px]"><SelectValue placeholder="Auto" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="off">Sin auto-refresh</SelectItem>
+                  <SelectItem value="15">Auto · 15 s</SelectItem>
+                  <SelectItem value="30">Auto · 30 s</SelectItem>
+                  <SelectItem value="60">Auto · 1 min</SelectItem>
+                  <SelectItem value="300">Auto · 5 min</SelectItem>
+                  <SelectItem value="900">Auto · 15 min</SelectItem>
+                </SelectContent>
+              </Select>
               <Button variant="outline" onClick={load} disabled={loading}>
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Actualizar
               </Button>
+              {lastUpdated && (
+                <span className="text-xs text-muted-foreground w-full text-right md:w-auto">
+                  Actualizado {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
             </div>
           </header>
+
 
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <KPI label="Total abandonos" value={totals.total} icon={<Globe className="w-5 h-5 text-white" />} tone="bg-slate-700" />

@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { useToast } from "@/hooks/use-toast";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 interface BonusEntry { name?: string; drive_url?: string; access_key?: string }
 interface DeliveryItem {

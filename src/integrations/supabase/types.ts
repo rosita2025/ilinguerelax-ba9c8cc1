@@ -606,6 +606,30 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_product_changes: {
+        Row: {
+          action: string
+          changed_fields: Json
+          created_at: string
+          id: number
+          sku: string
+        }
+        Insert: {
+          action: string
+          changed_fields?: Json
+          created_at?: string
+          id?: number
+          sku: string
+        }
+        Update: {
+          action?: string
+          changed_fields?: Json
+          created_at?: string
+          id?: number
+          sku?: string
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           access_key: string | null

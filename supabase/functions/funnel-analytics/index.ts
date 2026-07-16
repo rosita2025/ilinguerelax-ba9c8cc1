@@ -57,9 +57,11 @@ serve(async (req) => {
       session_id: string | null;
       page_path: string | null;
       country: string | null;
+      referrer: string | null;
       is_bot: boolean;
       created_at: string;
     }> = [];
+
 
     const PAGE = 1000;
     let offset = 0;

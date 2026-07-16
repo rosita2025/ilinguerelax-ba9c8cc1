@@ -288,10 +288,11 @@ serve(async (req) => {
       const currency = String(price.currency_code || price.currency_value || "USD").toUpperCase();
       const amount = Number(price.value || 0);
 
-      // Prefer Hotmart's own USD figures over FX conversion:
-      // 1) commission where source=PRODUCER in USD (net to producer)
-      // 2) original_offer_price in USD (list price)
-      // 3) FX-converted local price as last resort
+      // Prefer Hotmart's own USD figures (bruto de oferta) over FX conversion:
+      // 1) original_offer_price in USD (precio bruto de la oferta, sin descontar comisión)
+      // 2) purchase.price in USD (bruto cobrado)
+      // 3) commission where source=PRODUCER in USD (neto del productor, ya con comisión Hotmart descontada)
+      // 4) FX-converted local price as last resort
       let usdAmount = 0;
       let usdCurrency = "USD";
       const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
@@ -301,14 +302,18 @@ serve(async (req) => {
       );
       const originalOffer = purchase.original_offer_price ?? {};
       const originalIsUsd = String(originalOffer.currency_value || originalOffer.currency_code || "").toUpperCase() === "USD";
-      if (producerComm && Number(producerComm.value) > 0) {
-        usdAmount = Number(producerComm.value);
-      } else if (originalIsUsd && Number(originalOffer.value) > 0) {
+      const priceIsUsd = currency === "USD";
+      if (originalIsUsd && Number(originalOffer.value) > 0) {
         usdAmount = Number(originalOffer.value);
+      } else if (priceIsUsd && amount > 0) {
+        usdAmount = amount;
+      } else if (producerComm && Number(producerComm.value) > 0) {
+        usdAmount = Number(producerComm.value);
       } else {
         usdAmount = toUsd(amount, currency);
         usdCurrency = currency;
       }
+
 
       const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
         || h.raw_payload?.data?.buyer?.address?.country

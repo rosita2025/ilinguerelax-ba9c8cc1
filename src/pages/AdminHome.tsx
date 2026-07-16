@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck, Send } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -66,6 +66,13 @@ const panels = [
     title: "Auditoría · Entrega digital",
     desc: "Trazabilidad por correo: qué SKU se resolvió, qué Drive se adjuntó (o por qué faltó) para cada envío digital automático.",
     color: "text-cyan-600",
+  },
+  {
+    to: "/admin/brevo-abandoned",
+    icon: Send,
+    title: "Brevo · Carritos abandonados",
+    desc: "Payload real enviado a Brevo por cada carrito abandonado (tienda vs Hotmart) con ORIGEN, SEGMENTO, TAGS e IDs de producto.",
+    color: "text-pink-600",
   },
   {
     to: "/admin/analytics",

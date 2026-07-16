@@ -700,6 +700,8 @@ serve(async (req) => {
         byProduct,
         byCountry,
         checkoutsByCountrySource,
+        bySource,
+        byUrl,
 
         fx: {
           base: "USD",

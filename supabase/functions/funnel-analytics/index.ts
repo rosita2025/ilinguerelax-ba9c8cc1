@@ -349,6 +349,42 @@ serve(async (req) => {
       });
     }
 
+    // ---------- Store gateway purchases (Stripe/PayPal/MercadoPago) from funnel_events ----------
+    // Avoid double-counting: manual_payments (Yape/Plin + verified checkouts) already ingested.
+    // Gateway webhooks write Purchase events with provider metadata in referrer JSON.
+    const seenGatewayKeys = new Set<string>();
+    for (const ev of (storeGatewayRes.data ?? []) as any[]) {
+      let meta: any = {};
+      try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
+      const provider = String(meta.provider || "").toLowerCase();
+      if (!["stripe", "paypal", "mercadopago", "mp"].includes(provider)) continue;
+      const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
+      if (/test|sandbox|prueba/i.test(txn)) continue;
+      const dedupeKey = `${provider}:${txn}`;
+      if (seenGatewayKeys.has(dedupeKey)) continue;
+      seenGatewayKeys.add(dedupeKey);
+      const currency = String(ev.currency || "USD").toUpperCase();
+      const rawAmount = Number(ev.value || 0);
+      const usdAmount = currency === "USD" ? rawAmount : toUsd(rawAmount, currency);
+      const status = String(meta.status || "approved").toLowerCase();
+      const isPending = !APPROVED_STORE.has(status) && status !== "approved";
+      const pid = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "store");
+      if (!pid || pid === "0") continue;
+      if (isPending && usdAmount > 0) {
+        storePendingCount++;
+        addPending(currency, "store", rawAmount);
+      }
+      realPurchases.push({
+        at: ev.created_at,
+        productId: pid,
+        country: ev.country || "??",
+        usd: isPending ? 0 : usdAmount,
+        source: "store",
+        pending: isPending,
+      });
+    }
+
+
     const pendingByCurrency = Array.from(pendingByCurrencyAgg.entries()).map(([currency, breakdown]) => {
       const totalAmount = breakdown.reduce((s, x) => s + x.amount, 0);
       const rate = fxRates[currency] ?? null;

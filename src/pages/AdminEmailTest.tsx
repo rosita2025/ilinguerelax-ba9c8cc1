@@ -384,19 +384,8 @@ const AdminEmailTest = () => {
   };
   const problemCount = useMemo(() => rows.filter((r) => !validateRow(r).ok).length, [rows]);
 
-  const parseUsd = (amount: string): number => {
-    const m = amount.match(/USD\s*([0-9]+(?:\.[0-9]+)?)/i);
-    return m ? Number(m[1]) : 0;
-  };
-  const summary = useMemo(() => {
-    let approvedCount = 0, approvedUsd = 0, pendingCount = 0, pendingUsd = 0;
-    for (const r of rows) {
-      const usd = parseUsd(r.amount);
-      if (isPaid(r)) { approvedCount++; approvedUsd += usd; }
-      else { pendingCount++; pendingUsd += usd; }
-    }
-    return { approvedCount, approvedUsd, pendingCount, pendingUsd, totalCount: rows.length };
-  }, [rows]);
+
+
 
   const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));

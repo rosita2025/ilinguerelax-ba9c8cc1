@@ -165,6 +165,7 @@ const AdminEmailTest = () => {
       const manualRes = { data: (data as any)?.manual ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
       const funnelRes = { data: (data as any)?.funnel ?? [] };
+      const hotmartRes = { data: (data as any)?.hotmart ?? [] };
       const productMap = new Map<string, ProductMeta>();
       ((data as any)?.products ?? []).forEach((p: any) => {
         const bonusCount = bonusCountFrom(p);
@@ -188,7 +189,7 @@ const AdminEmailTest = () => {
       });
 
       const merged: OrderRow[] = [];
-      const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
+      const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0, hotmart: 0 };
 
       (manualRes.data ?? []).forEach((r: any) => {
         const d = digitalByOrder.get((r.order_number || "").toLowerCase()) || digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;

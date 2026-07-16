@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import AdminNav from "@/components/admin/AdminNav";
 import DeliveryRetryPanel from "@/components/admin/DeliveryRetryPanel";
 import { useAdminKey } from "@/components/admin/AdminGate";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send } from "lucide-react";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send, FileSearch } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
@@ -142,6 +143,7 @@ const AdminEmailTest = () => {
   const [retrying, setRetrying] = useState<Set<string>>(new Set());
   const [pageSize, setPageSize] = useState<number>(20);
   const [page, setPage] = useState<number>(1);
+  const [auditAlert, setAuditAlert] = useState<{ errors: number; partial: number; last?: string } | null>(null);
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);
@@ -440,6 +442,31 @@ const AdminEmailTest = () => {
 
   useEffect(() => { setPage(1); }, [query, sourceFilter, onlyProblems, pageSize]);
 
+  useEffect(() => {
+    let alive = true;
+    const loadAudit = async () => {
+      try {
+        const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data } = await supabase
+          .from("digital_delivery_audit")
+          .select("status, created_at")
+          .gte("created_at", since)
+          .in("status", ["error", "partial"])
+          .order("created_at", { ascending: false });
+        if (!alive) return;
+        const rows = data || [];
+        setAuditAlert({
+          errors: rows.filter((r: any) => r.status === "error").length,
+          partial: rows.filter((r: any) => r.status === "partial").length,
+          last: rows[0]?.created_at,
+        });
+      } catch {}
+    };
+    loadAudit();
+    const t = setInterval(loadAudit, 60000);
+    return () => { alive = false; clearInterval(t); };
+  }, []);
+
 
 
 
@@ -473,7 +500,51 @@ const AdminEmailTest = () => {
             </div>
           </header>
 
+          {(() => {
+            const totalIssues = (auditAlert?.errors ?? 0) + (auditAlert?.partial ?? 0);
+            const hasIssues = totalIssues > 0;
+            return (
+              <Card
+                className={`p-3 md:p-4 flex items-start gap-3 border-l-4 ${
+                  hasIssues
+                    ? "border-l-destructive bg-destructive/5"
+                    : "border-l-primary/60 bg-primary/5"
+                }`}
+              >
+                <div className={`mt-0.5 shrink-0 rounded-full p-2 ${hasIssues ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                  {hasIssues ? <AlertTriangle className="w-4 h-4" /> : <FileSearch className="w-4 h-4" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm md:text-base font-semibold">
+                    {hasIssues
+                      ? `⚠️ ${totalIssues} envío${totalIssues === 1 ? "" : "s"} digital${totalIssues === 1 ? "" : "es"} con problemas (últimos 7 días)`
+                      : "Auditoría de envío digital · sin incidencias en 7 días"}
+                  </div>
+                  <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
+                    {hasIssues ? (
+                      <>
+                        {auditAlert?.errors ? `${auditAlert.errors} con error` : null}
+                        {auditAlert?.errors && auditAlert?.partial ? " · " : null}
+                        {auditAlert?.partial ? `${auditAlert.partial} parcial (falta Drive de algún SKU)` : null}
+                        . Cada envío queda registrado con SKU exacto → archivo Drive adjuntado. Al crear un producto nuevo en <b>/admin/products/:sku</b> con su Drive + bonos + upsell, el sistema envía automáticamente el material correcto según el SKU (nunca por palabras genéricas).
+                      </>
+                    ) : (
+                      <>Cada compra registra el SKU exacto y el Drive adjuntado. Cuando crees un producto nuevo en <b>/admin/products/:sku</b> con su Drive + bonos + upsell, el envío automático usa ese SKU exacto.</>
+                    )}
+                  </p>
+                </div>
+                <Button asChild size="sm" variant={hasIssues ? "destructive" : "outline"} className="shrink-0 h-8">
+                  <Link to="/admin/delivery-audit">
+                    <FileSearch className="w-3.5 h-3.5 mr-1.5" />
+                    Ver auditoría
+                  </Link>
+                </Button>
+              </Card>
+            );
+          })()}
+
           <DeliveryRetryPanel />
+
 
 
 

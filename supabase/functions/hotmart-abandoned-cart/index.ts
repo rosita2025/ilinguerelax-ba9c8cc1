@@ -134,6 +134,16 @@ serve(async (req) => {
       const url = (product as { slug?: string } | null)?.slug
         ? `${site}/checkouts/${(product as { slug?: string }).slug}`
         : `${site}/products/${productSku}`;
+      // País: solo desde el payload de Hotmart (nunca inventar)
+      const rawCountry = String(
+        body.data?.buyer?.address?.country_iso ||
+        body.data?.buyer?.address?.country ||
+        body.data?.buyer?.country ||
+        body.buyer?.address?.country_iso ||
+        body.buyer?.country ||
+        ""
+      ).trim();
+      const countryReason = rawCountry ? undefined : "hotmart_payload_incomplete";
       await pushAbandonedCartToBrevo({
         email: buyerEmail.toLowerCase(),
         name: buyerName,
@@ -144,6 +154,8 @@ serve(async (req) => {
         couponCode: "NEW10",
         couponPercent: 10,
         language,
+        country: rawCountry,
+        countryReason,
         source: "hotmart",
       });
     } catch (e) {

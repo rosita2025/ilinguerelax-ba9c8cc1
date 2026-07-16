@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Search, ExternalLink } from "lucide-react";
+import { RefreshCw, Search, ExternalLink, History } from "lucide-react";
 
 interface AuditItem {
   sku: string;

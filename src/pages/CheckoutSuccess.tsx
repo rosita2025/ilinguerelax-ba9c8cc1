@@ -122,23 +122,23 @@ export default function CheckoutSuccess() {
   };
 
   // Global Meta Pixel: fire Purchase once per order (dedupe via sessionStorage).
+  // Uses trackHotmartEvent so it goes to Pixel 24959578143733255 (browser)
+  // + Meta CAPI (server) + funnel_events (internal analytics).
   useEffect(() => {
     if (!isVerifiedBuyer) return;
     const key = `fbq-purchase:${orderNumber}`;
     if (sessionStorage.getItem(key)) return;
     try {
-      const w = window as unknown as { fbq?: (...a: unknown[]) => void };
-      if (typeof w.fbq === "function") {
-        w.fbq("track", "Purchase", {
-          value: Number(total.toFixed(2)),
-          currency: "USD",
-          content_ids: items.map((i) => i.id),
-          content_type: "product",
-          num_items: items.reduce((n, i) => n + (i.quantity || 1), 0),
-          order_id: orderNumber,
-        });
-        sessionStorage.setItem(key, "1");
-      }
+      trackHotmartEvent("Purchase", {
+        value: Number(total.toFixed(2)),
+        currency: "USD",
+        content_ids: items.map((i) => i.id),
+        content_type: "product",
+        content_name: items.map((i) => i.name).join(" + "),
+        num_items: items.reduce((n, i) => n + (i.quantity || 1), 0),
+        order_id: orderNumber,
+      });
+      sessionStorage.setItem(key, "1");
     } catch { /* ignore */ }
   }, [isVerifiedBuyer, orderNumber, total, items]);
 

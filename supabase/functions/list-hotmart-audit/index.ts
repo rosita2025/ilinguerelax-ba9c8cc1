@@ -1,6 +1,7 @@
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
+import { extractHotmartUsd } from "../_shared/hotmartUsd.ts";
 
 const corsHeaders = adminCorsHeaders;
 

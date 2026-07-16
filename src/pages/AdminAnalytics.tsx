@@ -359,6 +359,7 @@ const AdminAnalytics = () => {
                     <thead className="text-xs text-muted-foreground border-b">
                       <tr>
                         <th className="text-left py-2 pr-3">Producto</th>
+                        <th className="text-left px-2">Origen</th>
                         <th className="text-right px-2">Vistas</th>
                         <th className="text-right px-2">Carrito</th>
                         <th className="text-right px-2">Compras</th>
@@ -369,22 +370,44 @@ const AdminAnalytics = () => {
                     <tbody>
                       {data.byProduct.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="py-6 text-center text-muted-foreground">
+                          <td colSpan={7} className="py-6 text-center text-muted-foreground">
                             Sin datos en este rango
                           </td>
                         </tr>
                       )}
-                      {data.byProduct.map((p) => (
-                        <tr key={p.product_id} className="border-b border-border/40 hover:bg-muted/40">
-                          <td className="py-2 pr-3 truncate max-w-xs">{p.product_id}</td>
-                          <td className="text-right px-2 tabular-nums">{p.views}</td>
-                          <td className="text-right px-2 tabular-nums">{p.carts}</td>
-                          <td className="text-right px-2 tabular-nums font-semibold">{p.purchases}</td>
-                          <td className="text-right px-2 tabular-nums">{p.conversion}%</td>
-                          <td className="text-right pl-2 tabular-nums">{money(p.revenue)}</td>
-                        </tr>
-                      ))}
+                      {data.byProduct.map((p: any) => {
+                        const src = p.source as string | undefined;
+                        const badge =
+                          src === "hotmart"
+                            ? { label: "Hotmart", cls: "bg-orange-500/15 text-orange-600 border-orange-500/30" }
+                            : src === "store"
+                            ? { label: "Mi tienda", cls: "bg-primary/15 text-primary border-primary/30" }
+                            : src === "mixto"
+                            ? { label: `Hotmart ${p.hotmart_purchases} · Tienda ${p.store_purchases}`, cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" }
+                            : { label: "Sin venta", cls: "bg-muted text-muted-foreground border-border" };
+                        return (
+                          <tr key={p.product_id} className="border-b border-border/40 hover:bg-muted/40">
+                            <td className="py-2 pr-3 max-w-xs">
+                              <div className="truncate font-medium">{p.name || p.product_id}</div>
+                              {p.name && (
+                                <div className="text-[11px] text-muted-foreground truncate">SKU: {p.product_id}</div>
+                              )}
+                            </td>
+                            <td className="px-2">
+                              <span className={`inline-block text-[11px] px-2 py-0.5 rounded-full border ${badge.cls}`}>
+                                {badge.label}
+                              </span>
+                            </td>
+                            <td className="text-right px-2 tabular-nums">{p.views}</td>
+                            <td className="text-right px-2 tabular-nums">{p.carts}</td>
+                            <td className="text-right px-2 tabular-nums font-semibold">{p.purchases}</td>
+                            <td className="text-right px-2 tabular-nums">{p.conversion}%</td>
+                            <td className="text-right pl-2 tabular-nums">{money(p.revenue)}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
+
                   </table>
                 </div>
               </Card>

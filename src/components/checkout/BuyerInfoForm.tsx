@@ -191,6 +191,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.email}
               onChange={(e) => setBuyer({ email: e.target.value.trim() })}
+              onBlur={fireAbandonedCapture}
               placeholder={t.emailPlaceholder}
               aria-invalid={showEmailError}
               className={cn(

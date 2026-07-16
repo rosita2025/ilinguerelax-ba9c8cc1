@@ -204,7 +204,7 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, manualRes, digitalRes] = await Promise.all([
+    const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
         .select("product_id, purchased_at, raw_payload, status")
@@ -218,6 +218,12 @@ serve(async (req) => {
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
       supabase.from("digital_products").select("sku, name"),
+      supabase
+        .from("funnel_events")
+        .select("id, created_at, product_id, value, currency, country, session_id, referrer")
+        .in("event_name", ["Purchase", "purchase"])
+        .gte("created_at", fromDate.toISOString())
+        .lte("created_at", toDate.toISOString()),
     ]);
     const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 
@@ -342,6 +348,42 @@ serve(async (req) => {
         pending: isPending,
       });
     }
+
+    // ---------- Store gateway purchases (Stripe/PayPal/MercadoPago) from funnel_events ----------
+    // Avoid double-counting: manual_payments (Yape/Plin + verified checkouts) already ingested.
+    // Gateway webhooks write Purchase events with provider metadata in referrer JSON.
+    const seenGatewayKeys = new Set<string>();
+    for (const ev of (storeGatewayRes.data ?? []) as any[]) {
+      let meta: any = {};
+      try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
+      const provider = String(meta.provider || "").toLowerCase();
+      if (!["stripe", "paypal", "mercadopago", "mp"].includes(provider)) continue;
+      const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
+      if (/test|sandbox|prueba/i.test(txn)) continue;
+      const dedupeKey = `${provider}:${txn}`;
+      if (seenGatewayKeys.has(dedupeKey)) continue;
+      seenGatewayKeys.add(dedupeKey);
+      const currency = String(ev.currency || "USD").toUpperCase();
+      const rawAmount = Number(ev.value || 0);
+      const usdAmount = currency === "USD" ? rawAmount : toUsd(rawAmount, currency);
+      const status = String(meta.status || "approved").toLowerCase();
+      const isPending = !APPROVED_STORE.has(status) && status !== "approved";
+      const pid = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "store");
+      if (!pid || pid === "0") continue;
+      if (isPending && usdAmount > 0) {
+        storePendingCount++;
+        addPending(currency, "store", rawAmount);
+      }
+      realPurchases.push({
+        at: ev.created_at,
+        productId: pid,
+        country: ev.country || "??",
+        usd: isPending ? 0 : usdAmount,
+        source: "store",
+        pending: isPending,
+      });
+    }
+
 
     const pendingByCurrency = Array.from(pendingByCurrencyAgg.entries()).map(([currency, breakdown]) => {
       const totalAmount = breakdown.reduce((s, x) => s + x.amount, 0);

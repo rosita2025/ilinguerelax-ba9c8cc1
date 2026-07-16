@@ -221,7 +221,7 @@ const AdminHotmartAudit = () => {
             </Card>
           </div>
 
-
+          <DuplicatesPanel rows={rows} />
 
 
           <Card className="p-4">

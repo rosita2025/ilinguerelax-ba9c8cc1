@@ -110,6 +110,7 @@ const T: Record<Lang, {
     step3: `If the product asks for an <strong>access key</strong>, copy it from this email.`,
     step4: `Repeat for the <strong>extra product</strong> — each one has its own link and key.`,
     downloadBtn: `⬇ Download / Open in Drive`,
+    bonusBtn: `⬇ Download bonus`,
     keyLabel: `Access key`,
     bonusesTitle: `🎁 Bonuses included`,
     bonusFallback: (n) => `Bonus #${n}`,
@@ -117,6 +118,8 @@ const T: Record<Lang, {
     categoryLabel: `Category`,
     pending: `We'll send you the link within a few minutes.`,
     tip: `💡 <strong>Tip:</strong> save the PDFs to your phone or computer so you can use them anytime, even offline.`,
+    checklistTitle: `✅ Your order includes:`,
+    mainLabel: `Main product`,
   },
   fr: {
     subject: (ref, multi) => `Merci pour votre achat${ref ? ` — ${ref}` : ""} · liens de téléchargement${multi ? " (produit bonus inclus)" : ""}`,

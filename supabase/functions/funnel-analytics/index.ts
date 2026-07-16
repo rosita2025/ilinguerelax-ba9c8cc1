@@ -505,9 +505,11 @@ serve(async (req) => {
         if (p.source === "hotmart") pAgg.hotmartPending++; else pAgg.storePending++;
       
       } else {
-        // Purchase count already handled by the Purchase-event pass above
-        // (deduped per session). Here we only accumulate revenue and
-        // per-product/per-country/per-bucket revenue breakdowns.
+        // Authoritative purchase counters. Aligns totals with
+        // /admin/orders and /admin/hotmart-audit (approved only,
+        // tests excluded, gateway sandbox filtered).
+        b.purchases++;
+        totals.purchases++;
         b.revenue += p.usd;
         totals.revenue += p.usd;
         pAgg.purchases++;

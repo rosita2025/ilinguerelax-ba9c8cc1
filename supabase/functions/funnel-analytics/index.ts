@@ -417,6 +417,8 @@ serve(async (req) => {
           checkoutSessions: totals.checkoutSessions.size,
           cartSessions: totals.cartSessions.size,
           hotmartPending: hotmartPendingCount,
+          storePending: storePendingCount,
+          pending: hotmartPendingCount + storePendingCount,
         },
 
         conversion: {

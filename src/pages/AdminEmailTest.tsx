@@ -140,6 +140,8 @@ const AdminEmailTest = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [liveOn, setLiveOn] = useState(false);
   const [retrying, setRetrying] = useState<Set<string>>(new Set());
+  const [pageSize, setPageSize] = useState<number>(20);
+  const [page, setPage] = useState<number>(1);
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);
@@ -429,6 +431,17 @@ const AdminEmailTest = () => {
     return list;
   }, [rows, query, sourceFilter, sortKey, sortDir, onlyProblems]);
 
+  const totalPages = Math.max(1, Math.ceil(visibleRows.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRows = useMemo(
+    () => visibleRows.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [visibleRows, currentPage, pageSize],
+  );
+
+  useEffect(() => { setPage(1); }, [query, sourceFilter, onlyProblems, pageSize]);
+
+
+
 
   return (
     <>
@@ -510,8 +523,20 @@ const AdminEmailTest = () => {
                 Problemas ({problemCount})
               </Button>
             </div>
-            <div className="text-xs text-muted-foreground w-full md:w-auto md:ml-auto text-right">
-              {visibleRows.length} de {rows.length} pedidos
+            <div className="flex items-center gap-2 w-full md:w-auto md:ml-auto">
+              <label className="text-xs text-muted-foreground whitespace-nowrap">Por página:</label>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="h-9 rounded-md border bg-background px-2 text-xs"
+              >
+                {[5, 10, 20, 50, 100].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+              <span className="text-xs text-muted-foreground ml-auto md:ml-2 whitespace-nowrap">
+                {pagedRows.length}/{visibleRows.length} · total {rows.length}
+              </span>
             </div>
           </Card>
 
@@ -519,7 +544,7 @@ const AdminEmailTest = () => {
           <Card className="p-4 md:p-6">
             {/* Mobile card list */}
             <div className="md:hidden space-y-3">
-              {visibleRows.map((r) => {
+              {pagedRows.map((r) => {
                 const pSku = principalSkuOf(r);
                 const uSku = upsellSkusOf(r);
                 const v = validateRow(r);
@@ -621,7 +646,7 @@ const AdminEmailTest = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleRows.map((r) => {
+                  {pagedRows.map((r) => {
                     const pSku = principalSkuOf(r);
                     const uSku = upsellSkusOf(r);
                     const v = validateRow(r);
@@ -705,6 +730,20 @@ const AdminEmailTest = () => {
                 </tbody>
               </table>
             </div>
+
+            {visibleRows.length > pageSize && (
+              <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t flex-wrap">
+                <div className="text-xs text-muted-foreground">
+                  Página {currentPage} de {totalPages}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(1)} disabled={currentPage === 1}>« Inicio</Button>
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Anterior</Button>
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente ›</Button>
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Final »</Button>
+                </div>
+              </div>
+            )}
           </Card>
 
         </div>

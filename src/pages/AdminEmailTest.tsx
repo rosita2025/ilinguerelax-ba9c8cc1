@@ -442,6 +442,31 @@ const AdminEmailTest = () => {
 
   useEffect(() => { setPage(1); }, [query, sourceFilter, onlyProblems, pageSize]);
 
+  useEffect(() => {
+    let alive = true;
+    const loadAudit = async () => {
+      try {
+        const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data } = await supabase
+          .from("digital_delivery_audit")
+          .select("status, created_at")
+          .gte("created_at", since)
+          .in("status", ["error", "partial"])
+          .order("created_at", { ascending: false });
+        if (!alive) return;
+        const rows = data || [];
+        setAuditAlert({
+          errors: rows.filter((r: any) => r.status === "error").length,
+          partial: rows.filter((r: any) => r.status === "partial").length,
+          last: rows[0]?.created_at,
+        });
+      } catch {}
+    };
+    loadAudit();
+    const t = setInterval(loadAudit, 60000);
+    return () => { alive = false; clearInterval(t); };
+  }, []);
+
 
 
 

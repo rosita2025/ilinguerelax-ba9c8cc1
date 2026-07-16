@@ -85,6 +85,9 @@ const AdminProductEdit = () => {
   const [upsells, setUpsells] = useState<UpsellRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  // Snapshot del drive_url original al cargar → usado para exigir confirmación
+  // cuando el admin lo cambia (evita pegar el link de otro producto por error).
+  const [originalDriveUrl, setOriginalDriveUrl] = useState<string>("");
 
   useEffect(() => {
     (async () => {

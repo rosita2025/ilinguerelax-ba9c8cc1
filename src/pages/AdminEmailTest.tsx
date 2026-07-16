@@ -83,7 +83,7 @@ const sourceColor: Record<Source, string> = {
   paypal: "bg-sky-100 text-sky-800",
   mercadopago: "bg-cyan-100 text-cyan-800",
   digital: "bg-blue-100 text-blue-800",
-  hotmart: "bg-orange-100 text-orange-800",
+  
 };
 
 const providerToSource = (p?: string | null): Source => {

@@ -110,16 +110,29 @@ const AdminBrevoAbandonedStats = () => {
               <p className="text-sm text-muted-foreground">Tendencia diaria por origen (Hotmart vs Tienda) y desglose por país.</p>
             </div>
             <div className="flex flex-wrap gap-2 items-center">
-              <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
-                <SelectTrigger className="w-[140px]"><SelectValue placeholder="Rango" /></SelectTrigger>
+              <Select value={preset} onValueChange={(v) => {
+                setPreset(v);
+                if (v !== "today" && v !== "yesterday" && v !== "custom") setDays(Number(v));
+              }}>
+                <SelectTrigger className="w-[170px]"><SelectValue placeholder="Rango" /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="today">Hoy</SelectItem>
+                  <SelectItem value="yesterday">Ayer</SelectItem>
                   <SelectItem value="7">Últimos 7 días</SelectItem>
-                  <SelectItem value="14">Últimos 14 días</SelectItem>
+                  <SelectItem value="15">Últimos 15 días</SelectItem>
                   <SelectItem value="30">Últimos 30 días</SelectItem>
                   <SelectItem value="60">Últimos 60 días</SelectItem>
                   <SelectItem value="90">Últimos 90 días</SelectItem>
+                  <SelectItem value="custom">Personalizado…</SelectItem>
                 </SelectContent>
               </Select>
+              {preset === "custom" && (
+                <>
+                  <Input type="date" value={customFrom} max={customTo} onChange={(e) => setCustomFrom(e.target.value)} className="w-[150px]" />
+                  <span className="text-muted-foreground text-sm">→</span>
+                  <Input type="date" value={customTo} min={customFrom} max={today} onChange={(e) => setCustomTo(e.target.value)} className="w-[150px]" />
+                </>
+              )}
               <Select value={country} onValueChange={setCountry}>
                 <SelectTrigger className="w-[180px]"><SelectValue placeholder="País" /></SelectTrigger>
                 <SelectContent>

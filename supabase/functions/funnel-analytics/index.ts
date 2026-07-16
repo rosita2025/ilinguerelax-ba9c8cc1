@@ -283,23 +283,46 @@ serve(async (req) => {
       if (/test|sandbox/i.test(txn)) continue;
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;
-      const price = h.raw_payload?.data?.purchase?.price ?? {};
+      const purchase = h.raw_payload?.data?.purchase ?? {};
+      const price = purchase.price ?? {};
       const currency = String(price.currency_code || price.currency_value || "USD").toUpperCase();
       const amount = Number(price.value || 0);
-      const usd = toUsd(amount, currency);
+
+      // Prefer Hotmart's own USD figures over FX conversion:
+      // 1) commission where source=PRODUCER in USD (net to producer)
+      // 2) original_offer_price in USD (list price)
+      // 3) FX-converted local price as last resort
+      let usdAmount = 0;
+      let usdCurrency = "USD";
+      const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
+      const producerComm = commissions.find((c: any) =>
+        String(c?.source || "").toUpperCase() === "PRODUCER" &&
+        String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
+      );
+      const originalOffer = purchase.original_offer_price ?? {};
+      const originalIsUsd = String(originalOffer.currency_value || originalOffer.currency_code || "").toUpperCase() === "USD";
+      if (producerComm && Number(producerComm.value) > 0) {
+        usdAmount = Number(producerComm.value);
+      } else if (originalIsUsd && Number(originalOffer.value) > 0) {
+        usdAmount = Number(originalOffer.value);
+      } else {
+        usdAmount = toUsd(amount, currency);
+        usdCurrency = currency;
+      }
+
       const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
         || h.raw_payload?.data?.buyer?.address?.country
         || "??";
       const isPending = h.status === "pending";
       if (isPending) {
         hotmartPendingCount++;
-        if (amount > 0) addPending(currency, "hotmart", amount);
+        if (usdAmount > 0) addPending(usdCurrency, "hotmart", usdAmount);
       }
       realPurchases.push({
         at: h.purchased_at,
         productId: rawPid,
         country: buyerCountry,
-        usd: isPending ? 0 : usd,
+        usd: isPending ? 0 : usdAmount,
         source: "hotmart",
         pending: isPending,
       });

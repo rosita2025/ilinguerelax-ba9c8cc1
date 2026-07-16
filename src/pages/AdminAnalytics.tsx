@@ -563,6 +563,8 @@ const AdminAnalytics = () => {
                     <div className="md:hidden space-y-2">
                       {data.byProductCountry.slice(0, 50).map((r, i) => {
                         const info = getCountryInfo(r.country);
+                        const countryName = info?.name || r.country || "Desconocido";
+                        const countryFlag = info?.flag || "🌐";
                         return (
                           <div key={`${r.product_id}-${r.country}-${i}`} className="border border-border/60 rounded-lg p-3 bg-card">
                             <div className="flex items-start justify-between gap-2 mb-2">
@@ -575,7 +577,7 @@ const AdminAnalytics = () => {
                                 {r.name || r.product_id}
                               </a>
                               <span className="shrink-0 text-[11px] px-2 py-0.5 rounded-full border bg-muted">
-                                {info.flag} {info.name}
+                                {countryFlag} {countryName}
                               </span>
                             </div>
                             <div className="grid grid-cols-3 gap-2 text-[11px]">
@@ -607,6 +609,8 @@ const AdminAnalytics = () => {
                         <tbody>
                           {data.byProductCountry.slice(0, 100).map((r, i) => {
                             const info = getCountryInfo(r.country);
+                            const countryName = info?.name || r.country || "Desconocido";
+                            const countryFlag = info?.flag || "🌐";
                             return (
                               <tr key={`${r.product_id}-${r.country}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
                                 <td className="py-2 pr-3 max-w-xs">
@@ -619,7 +623,7 @@ const AdminAnalytics = () => {
                                     {r.name || r.product_id}
                                   </a>
                                 </td>
-                                <td className="px-2 whitespace-nowrap">{info.flag} {info.name}</td>
+                                <td className="px-2 whitespace-nowrap">{countryFlag} {countryName}</td>
                                 <td className="text-right px-2 tabular-nums">{r.sessions}</td>
                                 <td className="text-right px-2 tabular-nums">{r.views}</td>
                                 <td className="text-right px-2 tabular-nums">{r.carts}</td>

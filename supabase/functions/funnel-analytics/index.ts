@@ -356,11 +356,16 @@ serve(async (req) => {
       : 0;
 
     const byProduct = Array.from(byProductAgg.entries())
+      .filter(([pid, v]) =>
+        pid && pid !== "sin_producto" && pid !== "0" && pid !== "manual" &&
+        (v.views + v.carts + v.purchases + v.pending) > 0,
+      )
       .map(([product_id, v]) => {
         const source =
           v.hotmart && v.store ? "mixto" :
           v.hotmart ? "hotmart" :
           v.store ? "store" :
+          v.pending ? "hotmart" :
           "—";
         return {
           product_id,
@@ -368,6 +373,7 @@ serve(async (req) => {
           source,
           hotmart_purchases: v.hotmart,
           store_purchases: v.store,
+          pending: v.pending,
           views: v.views,
           carts: v.carts,
           purchases: v.purchases,
@@ -375,8 +381,9 @@ serve(async (req) => {
           conversion: v.views ? Number(((v.purchases / v.views) * 100).toFixed(2)) : 0,
         };
       })
-      .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases)
+      .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.pending - a.pending)
       .slice(0, 30);
+
 
 
     const byCountry = Array.from(byCountryAgg.entries())

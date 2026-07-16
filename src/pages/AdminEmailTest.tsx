@@ -331,6 +331,7 @@ const AdminEmailTest = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "email_send_log" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "funnel_events" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => { setLiveOn(true); scheduleReload(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "hotmart_purchases" }, () => { setLiveOn(true); scheduleReload(); })
       .subscribe((status) => setLiveOn(status === "SUBSCRIBED"));
 
     // Focus / visibility → refresh inmediato (por si el usuario vuelve tras un webhook tardío)

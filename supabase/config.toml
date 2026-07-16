@@ -45,3 +45,9 @@ project_id = "opyitzdvvurdyyyzkwwv"
     verify_jwt = false
   [functions.manage-delivery-retry]
     verify_jwt = false
+  [functions.hotmart-purchase-webhook]
+    verify_jwt = false
+  [functions.hotmart-abandoned-cart]
+    verify_jwt = false
+  [functions.hotmart-purchase-pixel]
+    verify_jwt = false

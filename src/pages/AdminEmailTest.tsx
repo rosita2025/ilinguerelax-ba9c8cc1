@@ -730,6 +730,20 @@ const AdminEmailTest = () => {
                 </tbody>
               </table>
             </div>
+
+            {visibleRows.length > pageSize && (
+              <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t flex-wrap">
+                <div className="text-xs text-muted-foreground">
+                  Página {currentPage} de {totalPages}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(1)} disabled={currentPage === 1}>« Inicio</Button>
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Anterior</Button>
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente ›</Button>
+                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Final »</Button>
+                </div>
+              </div>
+            )}
           </Card>
 
         </div>

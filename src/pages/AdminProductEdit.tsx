@@ -41,7 +41,7 @@ interface Product {
   excluded_countries: string[];
   store_excluded_countries: string[];
   hotmart_excluded_countries: string[];
-  
+  sku_aliases: string[];
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -70,7 +70,7 @@ const EMPTY: Product = {
   excluded_countries: [],
   store_excluded_countries: [],
   hotmart_excluded_countries: [],
-  
+  sku_aliases: [],
 };
 
 const AdminProductEdit = () => {
@@ -305,6 +305,25 @@ const AdminProductEdit = () => {
                 <Label>Orden</Label>
                 <Input type="number" value={product.sort_order} onChange={(e) => update("sort_order", Number(e.target.value))} />
               </div>
+            </div>
+            <div>
+              <Label>Alias cortos del checkout (opcional)</Label>
+              <Input
+                value={(product.sku_aliases ?? []).join(", ")}
+                onChange={(e) =>
+                  update(
+                    "sku_aliases",
+                    e.target.value
+                      .split(/[,\s]+/)
+                      .map((s) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"))
+                      .filter(Boolean),
+                  )
+                }
+                placeholder="ej: 1000-palabras-italiano, upsell-1000-italiano"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Separa por comas. Reemplaza los aliases hardcodeados en <code>_shared/digitalSku.ts</code>: ya no necesitas pedirme agregarlos.
+              </p>
             </div>
             <div>
               <Label>Nombre</Label>

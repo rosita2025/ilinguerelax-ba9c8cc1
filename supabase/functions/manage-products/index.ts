@@ -150,7 +150,28 @@ Deno.serve(async (req) => {
         hotmart_excluded_countries: Array.isArray(p.hotmart_excluded_countries)
           ? p.hotmart_excluded_countries.map((c) => (c ?? "").toString().trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c))
           : [],
+        sku_aliases: Array.isArray((p as unknown as { sku_aliases?: unknown[] }).sku_aliases)
+          ? Array.from(new Set(
+              ((p as unknown as { sku_aliases: unknown[] }).sku_aliases)
+                .map((a) => String(a ?? "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"))
+                .filter((a) => a && a !== p.sku)
+            ))
+          : [],
       };
+
+      // Duplicate-alias guard: if any alias is already used by a different product, reject.
+      if (row.sku_aliases.length) {
+        const { data: clash } = await admin
+          .from("digital_products")
+          .select("sku,sku_aliases")
+          .overlaps("sku_aliases", row.sku_aliases)
+          .neq("sku", p.sku);
+        if (clash && clash.length) {
+          const conflicts = (clash as { sku: string; sku_aliases: string[] }[])
+            .flatMap((r) => r.sku_aliases.filter((a) => row.sku_aliases.includes(a)).map((a) => `${a} → ${r.sku}`));
+          return json({ error: `Alias duplicado: ${conflicts.join(", ")}. Cada alias solo puede pertenecer a un producto.` }, 400);
+        }
+      }
 
       const { error: upErr } = await admin
         .from("digital_products")

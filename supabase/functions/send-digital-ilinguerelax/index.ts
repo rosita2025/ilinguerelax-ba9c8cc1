@@ -223,7 +223,37 @@ serve(async (req) => {
     const body: Body = await req.json();
     const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey, force } = body;
     const requestedSkus = Array.isArray(skus) ? skus.map((s) => String(s || "")).filter(Boolean) : [];
-    const normalizedSkus = normalizeSkus(requestedSkus);
+    let normalizedSkus = normalizeSkus(requestedSkus);
+    // DB alias resolution: if any requested/normalized SKU is actually a short alias
+    // configured in digital_products.sku_aliases, swap it for the canonical SKU.
+    // This lets admins register aliases from /admin/productos/:sku without touching code.
+    try {
+      const candidates = Array.from(new Set([...requestedSkus, ...normalizedSkus].map((s) => s.toLowerCase())));
+      if (candidates.length) {
+        const { data: aliasRows } = await supabase
+          .from("digital_products")
+          .select("sku,sku_aliases")
+          .overlaps("sku_aliases", candidates);
+        if (aliasRows?.length) {
+          const aliasMap = new Map<string, string>();
+          for (const r of aliasRows as { sku: string; sku_aliases: string[] }[]) {
+            for (const a of r.sku_aliases || []) aliasMap.set(a.toLowerCase(), r.sku);
+          }
+          if (aliasMap.size) {
+            const expanded = new Set<string>();
+            for (const s of normalizedSkus) expanded.add(aliasMap.get(s.toLowerCase()) || s);
+            // Also translate raw requested SKUs that normalizeSkus left untouched.
+            for (const s of requestedSkus) {
+              const hit = aliasMap.get(s.toLowerCase());
+              if (hit) expanded.add(hit);
+            }
+            normalizedSkus = Array.from(expanded);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("[digital-sku] alias lookup failed", e);
+    }
     if (!customerEmail || normalizedSkus.length === 0) {
       await writeAudit({
         customer_email: customerEmail || "unknown", customer_name: customerName || null,

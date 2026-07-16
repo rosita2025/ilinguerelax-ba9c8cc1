@@ -18,6 +18,7 @@ import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape";
@@ -299,9 +300,26 @@ export function PaymentMethodsGroup() {
     }
   }, [cartSignature, selected]);
 
+  const captureAbandonedCheckout = useCallback(async (paymentMethod?: string, force = false) => {
+    const s = useCheckoutPruebaStore.getState();
+    if (!isBuyerValid(s.buyer)) return false;
+    return trackAbandonedCheckoutNow({
+      email: s.buyer.email.trim().toLowerCase(),
+      name: s.buyer.fullName.trim(),
+      phone: s.buyer.phone ?? "",
+      productType: s.items[0]?.id || "checkout",
+      language,
+      country: (region.country || localStorage.getItem("ilr_country") || "").toUpperCase().slice(0, 2),
+      items: s.items,
+      paymentMethod,
+      force,
+    });
+  }, [language, region.country]);
+
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
     if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
+    await captureAbandonedCheckout(selected || "stripe", true);
     setStripeLoading(true);
     setStripeError(null);
     const parts = s.buyer.fullName.trim().split(/\s+/);
@@ -362,7 +380,7 @@ export function PaymentMethodsGroup() {
     // Depend only on region.tier/country — buyer/items are read fresh from
     // the store inside the callback, so the reference stays stable across
     // typing and avoids remounting the EmbeddedCheckoutProvider (blank screen).
-  }, [region.tier, region.country, selected, language, t.completeYourData, t.errorPayment]);
+  }, [region.tier, region.country, selected, language, t.completeYourData, t.errorPayment, captureAbandonedCheckout]);
 
   // Memoize the options object per cart signature. A new object reference on
   // every render forces Stripe to remount the iframe → blank/duplicated form.
@@ -385,6 +403,7 @@ export function PaymentMethodsGroup() {
     redirectingRef.current = true;
     setMpLoading(paymentType);
     try {
+      await captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
@@ -443,17 +462,19 @@ export function PaymentMethodsGroup() {
 
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
+    void captureAbandonedCheckout(m, true);
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!valid) { requestBuyerInfo(); return; }
     if (!selected) {
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
+    await captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }

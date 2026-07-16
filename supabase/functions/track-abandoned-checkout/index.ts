@@ -23,14 +23,14 @@ const FALLBACK_COUNTRY_TO_LANG: Record<string, string> = {
 let mapCache: { at: number; data: Record<string, string> } | null = null;
 type CountryMapClient = {
   from: (table: "country_language_map") => {
-    select: (columns: string) => Promise<{ data: Array<{ country_code: string; language: string }> | null; error: unknown }>;
+    select: (columns: string) => PromiseLike<{ data: Array<{ country_code: string; language: string }> | null; error: unknown }>;
   };
 };
 
-async function loadCountryLangMap(sb: CountryMapClient): Promise<Record<string,string>> {
+async function loadCountryLangMap(sb: unknown): Promise<Record<string,string>> {
   if (mapCache && Date.now() - mapCache.at < 10 * 60 * 1000) return mapCache.data;
   try {
-    const { data, error } = await sb.from("country_language_map").select("country_code, language");
+    const { data, error } = await (sb as CountryMapClient).from("country_language_map").select("country_code, language");
     if (error || !data) throw error;
     const map: Record<string, string> = {};
     for (const row of data as Array<{ country_code: string; language: string }>) {

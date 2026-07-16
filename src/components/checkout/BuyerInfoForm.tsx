@@ -161,6 +161,7 @@ export function BuyerInfoForm() {
               required
               value={buyer.fullName}
               onChange={(e) => setBuyer({ fullName: e.target.value })}
+              onBlur={fireAbandonedCapture}
               placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
               className={cn(

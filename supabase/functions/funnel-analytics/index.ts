@@ -214,11 +214,12 @@ serve(async (req) => {
       supabase
         .from("manual_payments")
         .select("items, amount_usd, buyer_country, created_at, status, verified_at")
-        .in("status", ["approved", "verified", "completed"])
+        .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
       supabase.from("digital_products").select("sku, name"),
     ]);
+    const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 
     // Build name → SKU map so manual_payments (which store `name`) get grouped correctly
     const nameToSku = new Map<string, string>();

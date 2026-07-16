@@ -22,6 +22,7 @@ interface Args {
   country?: string;         // ISO-2, e.g. PE, US, FR
   source?: string;          // "checkout" | "hotmart" | ...
   productCategory?: string; // categoría/tipo de oferta explícita (opcional)
+  paymentMethod?: string;   // stripe | paypal | yape_plin | mercadopago_transfer | ...
 }
 
 import { logBrevoSync } from "./brevoLog.ts";
@@ -38,21 +39,21 @@ function splitName(full?: string): { first?: string; last?: string } {
   return { first: parts[0], last: parts.slice(1).join(" ") };
 }
 
-export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
+export async function pushAbandonedCartToBrevo(a: Args): Promise<boolean> {
   const email = (a.email || "").trim().toLowerCase();
-  if (!email) return;
+  if (!email) return false;
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
   const LIST_ID_RAW = Deno.env.get("BREVO_ABANDONED_CART_LIST_ID");
   if (!LOVABLE_API_KEY || !BREVO_API_KEY) {
     console.warn("[brevo-abandoned] Missing LOVABLE_API_KEY or BREVO_API_KEY — skipping");
-    return;
+    return false;
   }
   const listId = LIST_ID_RAW ? Number(LIST_ID_RAW) : NaN;
   if (!Number.isFinite(listId)) {
     console.warn("[brevo-abandoned] BREVO_ABANDONED_CART_LIST_ID not set — skipping");
-    return;
+    return false;
   }
 
   const { first, last } = splitName(a.name);
@@ -117,6 +118,14 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
     });
   }
   if (a.source) attributes.ABANDONED_SOURCE = a.source;
+  const paymentMethod = (a.paymentMethod || "").trim().toLowerCase().slice(0, 40);
+  if (paymentMethod) {
+    attributes.ABANDONED_PAYMENT_METHOD = paymentMethod;
+    attributes.PAYMENT_METHOD_SELECTED = paymentMethod;
+  } else {
+    attributes.ABANDONED_PAYMENT_METHOD = "not_selected";
+    attributes.PAYMENT_METHOD_SELECTED = "not_selected";
+  }
   attributes.ORIGEN = origin;
   attributes.ORIGEN_STATUS = originStatus;
   // IDs de canal para saber en Brevo qué producto/plataforma abandonó
@@ -258,22 +267,24 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<void> {
         if (res.ok) {
           console.log(`[brevo-abandoned] queued ${email} · ${a.productSku} (without phone)`);
           await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes: retryPayload.attributes as Record<string, unknown>, response: "queued (without phone)" });
-          return;
+          return true;
         }
         const retryBody = await res.text();
         console.error(`[brevo-abandoned] upsert retry failed [${res.status}]: ${retryBody}`);
         await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes: retryPayload.attributes as Record<string, unknown>, error: retryBody });
-        return;
+        return false;
       }
       console.error(`[brevo-abandoned] upsert failed [${res.status}]: ${body}`);
       await logBrevoSync({ ...baseLog, status: "failed", http_status: res.status, attributes, error: body });
-      return;
+      return false;
     }
     console.log(`[brevo-abandoned] queued ${email} · ${a.productSku}`);
     await logBrevoSync({ ...baseLog, status: "success", http_status: res.status, attributes, response: "queued" });
+    return true;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[brevo-abandoned] network error:", msg);
     await logBrevoSync({ ...baseLog, status: "failed", attributes, error: `network: ${msg}` });
+    return false;
   }
 }

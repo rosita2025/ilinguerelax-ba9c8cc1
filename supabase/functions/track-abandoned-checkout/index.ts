@@ -10,6 +10,11 @@ const corsHeaders = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function normalizeEmail(raw: unknown) {
+  const email = String(raw || "").trim().toLowerCase();
+  return email.endsWith("@gmail") ? `${email}.com` : email;
+}
+
 // Fallback estático (usado si la tabla country_language_map no responde).
 const FALLBACK_COUNTRY_TO_LANG: Record<string, string> = {
   PE:"es",MX:"es",AR:"es",CL:"es",CO:"es",VE:"es",EC:"es",BO:"es",PY:"es",UY:"es",
@@ -21,10 +26,16 @@ const FALLBACK_COUNTRY_TO_LANG: Record<string, string> = {
 
 // Cache en memoria del mapa configurable (10 min).
 let mapCache: { at: number; data: Record<string, string> } | null = null;
-async function loadCountryLangMap(sb: ReturnType<typeof createClient>): Promise<Record<string,string>> {
+type CountryMapClient = {
+  from: (table: "country_language_map") => {
+    select: (columns: string) => PromiseLike<{ data: Array<{ country_code: string; language: string }> | null; error: unknown }>;
+  };
+};
+
+async function loadCountryLangMap(sb: unknown): Promise<Record<string,string>> {
   if (mapCache && Date.now() - mapCache.at < 10 * 60 * 1000) return mapCache.data;
   try {
-    const { data, error } = await sb.from("country_language_map").select("country_code, language");
+    const { data, error } = await (sb as CountryMapClient).from("country_language_map").select("country_code, language");
     if (error || !data) throw error;
     const map: Record<string, string> = {};
     for (const row of data as Array<{ country_code: string; language: string }>) {
@@ -57,12 +68,13 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const email = String(body.email || "").trim().toLowerCase();
+    const email = normalizeEmail(body.email);
     const name = String(body.name || "Cliente").trim() || "Cliente";
     const phone = String(body.phone || "").trim();
     const rawProductType = String(body.product_type || body.slug || "checkout").slice(0, 180);
     const productType = normalizeSku(rawProductType) || rawProductType;
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
+    const paymentMethod = String(body.payment_method || "not_selected").trim().toLowerCase().slice(0, 40);
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")
@@ -124,14 +136,21 @@ Deno.serve(async (req) => {
     }
 
     // Central contacts
+    let brevoSynced = false;
     try {
-      await supabase.from("email_contacts").insert({
+      await supabase.from("email_contacts").upsert({
         email,
         name,
         source: "abandoned_cart",
         language,
         product_type: productType,
-      });
+        metadata: {
+          phone,
+          payment_method: paymentMethod,
+          updated_from: "track-abandoned-checkout",
+        },
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "email,source" });
     } catch (_) { /* dedupe conflict ignored */ }
 
     // Push to Brevo — the Brevo Automation workflow sends Day 1/7/15/30 emails.
@@ -154,7 +173,7 @@ Deno.serve(async (req) => {
       const checkoutSku = (product as { sku?: string } | null)?.sku || productType;
       const baseUrl = `${site}/checkouts/${checkoutSku}`;
       const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
-      await pushAbandonedCartToBrevo({
+      brevoSynced = await pushAbandonedCartToBrevo({
         email,
         name,
         phone,
@@ -167,12 +186,13 @@ Deno.serve(async (req) => {
         language,
         country,
         source: "checkout",
+        paymentMethod,
       });
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, brevoSynced }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

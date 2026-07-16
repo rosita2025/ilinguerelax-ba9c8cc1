@@ -19,13 +19,19 @@ export interface BrevoLogEntry {
   error?: string;
 }
 
-let cached: ReturnType<typeof createClient> | null = null;
+type BrevoLogClient = {
+  from: (table: "brevo_sync_logs") => {
+    insert: (row: Record<string, unknown>) => Promise<unknown>;
+  };
+};
+
+let cached: BrevoLogClient | null = null;
 function client() {
   if (cached) return cached;
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) return null;
-  cached = createClient(url, key, { auth: { persistSession: false } });
+  cached = createClient(url, key, { auth: { persistSession: false } }) as unknown as BrevoLogClient;
   return cached;
 }
 

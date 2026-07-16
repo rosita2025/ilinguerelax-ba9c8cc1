@@ -24,6 +24,7 @@ interface Args {
   source?: string;          // "checkout" | "hotmart" | ...
   productCategory?: string; // categoría/tipo de oferta explícita (opcional)
   paymentMethod?: string;   // stripe | paypal | yape_plin | mercadopago_transfer | ...
+  triggerReason?: string;   // initial | email_change | cart_change | country_change | data_change | manual
 }
 
 import { logBrevoSync } from "./brevoLog.ts";

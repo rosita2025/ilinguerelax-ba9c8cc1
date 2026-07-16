@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { adminKey, days, country } = await req.json().catch(() => ({}));
+    const { adminKey, days, country, from, to } = await req.json().catch(() => ({}));
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expected || adminKey !== expected) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -22,16 +22,34 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const windowDays = Math.min(Math.max(Number(days) || 30, 1), 180);
-    const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
+    // Rango: personalizado (from/to en YYYY-MM-DD) o por días
+    let sinceDate: Date;
+    let untilDate: Date;
+    if (from && to) {
+      sinceDate = new Date(`${from}T00:00:00.000Z`);
+      untilDate = new Date(`${to}T23:59:59.999Z`);
+      if (isNaN(sinceDate.getTime()) || isNaN(untilDate.getTime()) || sinceDate > untilDate) {
+        return new Response(JSON.stringify({ error: "Invalid date range" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+      const windowDays = Math.min(Math.max(Number(days) || 30, 1), 180);
+      untilDate = new Date();
+      sinceDate = new Date(Date.now() - windowDays * 86400000);
+    }
+    const windowDays = Math.max(1, Math.ceil((untilDate.getTime() - sinceDate.getTime()) / 86400000));
+    const since = sinceDate.toISOString();
+    const until = untilDate.toISOString();
 
     const { data, error } = await admin
       .from("brevo_sync_logs")
       .select("created_at, event_type, origin, status, http_status, attributes")
       .in("event_type", ["hotmart_abandoned", "tienda_abandoned"])
       .gte("created_at", since)
+      .lte("created_at", until)
       .order("created_at", { ascending: false })
-      .limit(5000);
+      .limit(10000);
     if (error) throw error;
 
     const rows = data ?? [];
@@ -47,10 +65,12 @@ Deno.serve(async (req) => {
       ? rows.filter((r) => getCC(r.attributes as Record<string, unknown>) === countryFilter)
       : rows;
 
-    // Series por día
+    // Series por día en el rango
     const dayMap = new Map<string, { day: string; hotmart: number; tienda: number }>();
-    for (let i = windowDays - 1; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const startDay = new Date(sinceDate); startDay.setUTCHours(0, 0, 0, 0);
+    const endDay = new Date(untilDate); endDay.setUTCHours(0, 0, 0, 0);
+    for (let t = startDay.getTime(); t <= endDay.getTime(); t += 86400000) {
+      const d = new Date(t).toISOString().slice(0, 10);
       dayMap.set(d, { day: d, hotmart: 0, tienda: 0 });
     }
     let totalHotmart = 0, totalTienda = 0, totalErrors = 0;

@@ -66,6 +66,7 @@ const T: Record<Lang, {
   downloadBtn: string;
   keyLabel: string;
   bonusesTitle: string;
+  bonusFallback: (n: number) => string;
   noBonuses: string;
   categoryLabel: string;
   pending: string;

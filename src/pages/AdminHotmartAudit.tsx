@@ -297,6 +297,10 @@ const AdminHotmartAudit = () => {
                           <td className="px-3 py-2 truncate max-w-[180px]">{row.email ?? "—"}</td>
                           <td className="px-3 py-2 truncate max-w-[200px] text-xs">{row.product ?? "—"}</td>
                           <td className="px-3 py-2 font-mono text-xs">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</td>
+                          <td className="px-3 py-2 text-right whitespace-nowrap">
+                            <div className="font-mono text-xs font-semibold">{fmtUsd(row.usd_amount)}</div>
+                            <div className="text-[10px] text-muted-foreground">{USD_SOURCE_LABEL[row.usd_source]}</div>
+                          </td>
                           <td className="px-3 py-2"><BrevoBadge info={row.brevo} /></td>
                         </tr>
                         {isOpen && (

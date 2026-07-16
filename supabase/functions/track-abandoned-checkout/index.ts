@@ -127,13 +127,19 @@ Deno.serve(async (req) => {
     // Central contacts
     let brevoSynced = false;
     try {
-      await supabase.from("email_contacts").insert({
+      await supabase.from("email_contacts").upsert({
         email,
         name,
         source: "abandoned_cart",
         language,
         product_type: productType,
-      });
+        metadata: {
+          phone,
+          payment_method: paymentMethod,
+          updated_from: "track-abandoned-checkout",
+        },
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "email,source" });
     } catch (_) { /* dedupe conflict ignored */ }
 
     // Push to Brevo — the Brevo Automation workflow sends Day 1/7/15/30 emails.

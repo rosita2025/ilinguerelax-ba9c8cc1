@@ -31,10 +31,6 @@ interface AuditRow {
   transaction: string | null;
   product: string | null;
   converted: boolean | null;
-  amount_usd: number | null;
-  usd_source: "producer_commission" | "original_offer_price" | "price_usd" | "unavailable" | null;
-  local_amount: number | null;
-  local_currency: string | null;
   payload: unknown;
   brevo: BrevoInfo | null;
 }
@@ -44,17 +40,7 @@ interface Summary {
   approved: number; pending: number; refused: number; refunded: number; chargeback: number; cancelled: number; abandoned: number;
 }
 
-interface UsdTotals { approved_usd: number; pending_usd: number; }
 
-const USD_SOURCE_LABEL: Record<string, string> = {
-  producer_commission: "commission PRODUCER USD",
-  original_offer_price: "original_offer_price USD",
-  price_usd: "price USD",
-  unavailable: "sin USD nativo",
-};
-
-const fmtUsd = (n: number | null | undefined) =>
-  typeof n === "number" && Number.isFinite(n) ? `$${n.toFixed(2)}` : "—";
 
 const STATUS_META: Record<MappedStatus, { label: string; color: string; icon: any }> = {
   approved:   { label: "Aprobado",   color: "bg-emerald-100 text-emerald-800", icon: CheckCircle2 },
@@ -82,7 +68,6 @@ const AdminHotmartAudit = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<AuditRow[]>([]);
   const [summary, setSummary] = useState<Summary>({ approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 });
-  const [usdTotals, setUsdTotals] = useState<UsdTotals>({ approved_usd: 0, pending_usd: 0 });
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [status, setStatus] = useState<string>("all");
@@ -110,14 +95,13 @@ const AdminHotmartAudit = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; usd_totals?: UsdTotals }>(
+      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary }>(
         "list-hotmart-audit",
         { body: { adminKey, status, search, limit: 300 } },
       );
       if (error) throw error;
       setRows(data?.rows ?? []);
       if (data?.summary) setSummary(data.summary);
-      if (data?.usd_totals) setUsdTotals(data.usd_totals);
     } catch (e) {
       toast.error("No se pudo cargar la auditoría de Hotmart", { description: (e as Error).message });
     } finally { setLoading(false); }
@@ -126,14 +110,13 @@ const AdminHotmartAudit = () => {
   const forceBrevoSync = useCallback(async () => {
     setSyncing(true);
     try {
-      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; usd_totals?: UsdTotals; synced: number; syncTargets: number }>(
+      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; synced: number; syncTargets: number }>(
         "list-hotmart-audit",
         { body: { adminKey, status, search, limit: 300, forceSync: true } },
       );
       if (error) throw error;
       setRows(data?.rows ?? []);
       if (data?.summary) setSummary(data.summary);
-      if (data?.usd_totals) setUsdTotals(data.usd_totals);
       const synced = data?.synced ?? 0;
       const targets = data?.syncTargets ?? 0;
       if (targets === 0) {
@@ -205,18 +188,6 @@ const AdminHotmartAudit = () => {
             })}
           </div>
 
-          <div className="grid gap-2 grid-cols-2">
-            <Card className="p-3 border-emerald-200">
-              <div className="text-[11px] text-muted-foreground">Ingresos aprobados USD · 7d</div>
-              <div className="text-xl font-semibold text-emerald-700 mt-1">{fmtUsd(usdTotals.approved_usd)}</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">Sin conversión FX — USD nativo Hotmart</div>
-            </Card>
-            <Card className="p-3 border-amber-200">
-              <div className="text-[11px] text-muted-foreground">Monto pendiente USD · 7d</div>
-              <div className="text-xl font-semibold text-amber-700 mt-1">{fmtUsd(usdTotals.pending_usd)}</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">commission PRODUCER → original_offer_price → price USD</div>
-            </Card>
-          </div>
 
           <Card className="p-4">
             <div className="grid gap-3 md:grid-cols-3">
@@ -258,7 +229,6 @@ const AdminHotmartAudit = () => {
                     <th className="px-3 py-2 text-left">Email</th>
                     <th className="px-3 py-2 text-left">Producto</th>
                     <th className="px-3 py-2 text-left">Transacción</th>
-                    <th className="px-3 py-2 text-left">USD</th>
                     <th className="px-3 py-2 text-left">Brevo</th>
                   </tr>
                 </thead>
@@ -291,21 +261,6 @@ const AdminHotmartAudit = () => {
                           <td className="px-3 py-2 truncate max-w-[180px]">{row.email ?? "—"}</td>
                           <td className="px-3 py-2 truncate max-w-[200px] text-xs">{row.product ?? "—"}</td>
                           <td className="px-3 py-2 font-mono text-xs">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</td>
-                          <td className="px-3 py-2 text-xs">
-                            {row.amount_usd != null ? (
-                              <span title={row.usd_source ? USD_SOURCE_LABEL[row.usd_source] : ""} className="font-mono font-semibold">
-                                {fmtUsd(row.amount_usd)}
-                              </span>
-                            ) : row.source === "abandoned" ? (
-                              <span className="text-muted-foreground">—</span>
-                            ) : row.local_amount && row.local_currency ? (
-                              <span className="text-muted-foreground font-mono" title="Sin USD nativo en payload">
-                                {row.local_currency} {row.local_amount.toFixed(2)}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </td>
                           <td className="px-3 py-2"><BrevoBadge info={row.brevo} /></td>
                         </tr>
                         {isOpen && (
@@ -364,11 +319,6 @@ const AdminHotmartAudit = () => {
                         <span className="font-mono text-muted-foreground truncate">{row.event_raw}</span>
                         <span className="font-mono">{row.transaction ?? (row.source === "abandoned" ? "(carrito)" : "—")}</span>
                       </div>
-                      {row.amount_usd != null && (
-                        <div className="mt-1 text-[11px] font-mono font-semibold text-emerald-700" title={row.usd_source ? USD_SOURCE_LABEL[row.usd_source] : ""}>
-                          {fmtUsd(row.amount_usd)} USD
-                        </div>
-                      )}
                       <div className="mt-2"><BrevoBadge info={row.brevo} /></div>
                     </button>
                     {isOpen && (

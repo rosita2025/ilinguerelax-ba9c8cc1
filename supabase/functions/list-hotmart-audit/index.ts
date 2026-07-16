@@ -68,37 +68,9 @@ Deno.serve(async (req) => {
       transaction: string | null;
       product: string | null;
       converted: boolean | null;
-      amount_usd: number | null;
-      usd_source: "producer_commission" | "original_offer_price" | "price_usd" | "unavailable" | null;
-      local_amount: number | null;
-      local_currency: string | null;
+      payload: unknown;
       payload: unknown;
       brevo: BrevoInfo | null;
-    };
-
-    // Same USD extraction logic as funnel-analytics: prefer Hotmart-native USD.
-    const extractHotmartUsd = (payload: any) => {
-      const purchase = payload?.data?.purchase ?? {};
-      const price = purchase.price ?? {};
-      const localCurrency = String(price.currency_code || price.currency_value || "").toUpperCase() || null;
-      const localAmount = Number(price.value ?? 0) || null;
-      const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
-      const producerComm = commissions.find((c: any) =>
-        String(c?.source || "").toUpperCase() === "PRODUCER" &&
-        String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
-      );
-      const originalOffer = purchase.original_offer_price ?? {};
-      const originalIsUsd = String(originalOffer.currency_value || originalOffer.currency_code || "").toUpperCase() === "USD";
-      if (producerComm && Number(producerComm.value) > 0) {
-        return { amount_usd: Number(producerComm.value), usd_source: "producer_commission" as const, localAmount, localCurrency };
-      }
-      if (originalIsUsd && Number(originalOffer.value) > 0) {
-        return { amount_usd: Number(originalOffer.value), usd_source: "original_offer_price" as const, localAmount, localCurrency };
-      }
-      if (localCurrency === "USD" && Number(localAmount) > 0) {
-        return { amount_usd: Number(localAmount), usd_source: "price_usd" as const, localAmount, localCurrency };
-      }
-      return { amount_usd: null, usd_source: "unavailable" as const, localAmount, localCurrency };
     };
 
     const purchases: Omit<Row, "brevo">[] = (hRes.data ?? []).map((r: any) => {
@@ -112,7 +84,6 @@ Deno.serve(async (req) => {
         : st === "chargeback" ? "chargeback"
         : st === "cancelled" || st === "canceled" ? "cancelled"
         : "unknown";
-      const usd = extractHotmartUsd(r.raw_payload);
       return {
         id: r.id,
         source: "purchase",
@@ -123,10 +94,6 @@ Deno.serve(async (req) => {
         transaction: r.transaction_code ?? null,
         product: r.product_code ?? r.product_id ?? null,
         converted: null,
-        amount_usd: usd.amount_usd,
-        usd_source: usd.usd_source,
-        local_amount: usd.localAmount,
-        local_currency: usd.localCurrency,
         payload: r.raw_payload,
       };
     });
@@ -141,12 +108,9 @@ Deno.serve(async (req) => {
       transaction: null,
       product: r.product_type ?? null,
       converted: r.converted ?? r.is_completed ?? null,
-      amount_usd: null,
-      usd_source: null,
-      local_amount: null,
-      local_currency: null,
       payload: r,
     }));
+
 
     // Fetch latest Brevo sync log per email
     const emails = Array.from(new Set(
@@ -271,20 +235,17 @@ Deno.serve(async (req) => {
     }
     rows = rows.slice(0, take);
 
-    // Summary counts + USD totals (last 7 days). Same USD source as /admin/analytics.
+    // Summary counts (last 7 days).
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const summary = { approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 };
-    const usd_totals = { approved_usd: 0, pending_usd: 0 };
     for (const r of [...purchasesFull, ...abandonedFull]) {
       if (r.received_at >= since && r.mapped_status in summary) {
         (summary as any)[r.mapped_status]++;
-        if (r.mapped_status === "approved" && r.amount_usd) usd_totals.approved_usd += Number(r.amount_usd);
-        if (r.mapped_status === "pending" && r.amount_usd) usd_totals.pending_usd += Number(r.amount_usd);
       }
     }
 
 
-    return new Response(JSON.stringify({ rows, summary, usd_totals, synced: syncedCount, syncTargets: syncTargets.size }), {
+    return new Response(JSON.stringify({ rows, summary, synced: syncedCount, syncTargets: syncTargets.size }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

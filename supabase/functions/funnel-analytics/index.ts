@@ -204,11 +204,11 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, manualRes] = await Promise.all([
+    const [hotmartRes, manualRes, digitalRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
         .select("product_id, purchased_at, raw_payload, status")
-        .eq("status", "approved")
+        .in("status", ["approved", "pending"])
         .gte("purchased_at", fromDate.toISOString())
         .lte("purchased_at", toDate.toISOString()),
       supabase
@@ -217,42 +217,62 @@ serve(async (req) => {
         .in("status", ["approved", "verified", "completed"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
+      supabase.from("digital_products").select("sku, name"),
     ]);
-    const shopifyRes = { data: [] as any[] };
+
+    // Build name → SKU map so manual_payments (which store `name`) get grouped correctly
+    const nameToSku = new Map<string, string>();
+    const skuToName = new Map<string, string>();
+    for (const p of (digitalRes.data ?? []) as any[]) {
+      if (p.sku && p.name) {
+        nameToSku.set(p.name.trim().toLowerCase(), p.sku);
+        skuToName.set(p.sku, p.name);
+      }
+    }
 
     type PurchaseSource = "hotmart" | "store";
-    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource };
+    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
     const realPurchases: RealPurchase[] = [];
+    let hotmartPendingCount = 0;
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
-      // Skip test/sandbox transactions
+      // Skip test/sandbox transactions and garbage product ids
       if (/test|sandbox/i.test(txn)) continue;
+      const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
+      if (!rawPid || rawPid === "0") continue;
       const price = h.raw_payload?.data?.purchase?.price ?? {};
       const currency = price.currency_code || price.currency_value || "";
       const usd = currency === "USD" ? Number(price.value || 0) : 0;
       const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
         || h.raw_payload?.data?.buyer?.address?.country
         || "??";
+      const isPending = h.status === "pending";
+      if (isPending) hotmartPendingCount++;
       realPurchases.push({
         at: h.purchased_at,
-        productId: h.product_id || String(h.raw_payload?.data?.product?.id ?? "hotmart"),
+        productId: rawPid,
         country: buyerCountry,
-        usd,
+        usd: isPending ? 0 : usd,
         source: "hotmart",
+        pending: isPending,
       });
     }
     for (const m of (manualRes.data ?? []) as any[]) {
       const items = Array.isArray(m.items) ? m.items : [];
-      const firstSku = items[0]?.sku || items[0]?.product_id || "manual";
+      const first = items[0] || {};
+      const nameKey = String(first.name || "").trim().toLowerCase();
+      const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
       realPurchases.push({
         at: m.verified_at || m.created_at,
         productId: firstSku,
         country: m.buyer_country || "??",
         usd: Number(m.amount_usd || 0),
         source: "store",
+        pending: false,
       });
     }
+
 
     for (const p of realPurchases) {
       const k = bucketKey(p.at);

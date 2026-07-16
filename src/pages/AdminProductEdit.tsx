@@ -308,21 +308,52 @@ const AdminProductEdit = () => {
             </div>
             <div>
               <Label>Alias cortos del checkout (opcional)</Label>
-              <Input
-                value={(product.sku_aliases ?? []).join(", ")}
-                onChange={(e) =>
-                  update(
-                    "sku_aliases",
-                    e.target.value
-                      .split(/[,\s]+/)
-                      .map((s) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"))
-                      .filter(Boolean),
-                  )
-                }
-                placeholder="ej: 1000-palabras-italiano, upsell-1000-italiano"
-              />
+              <div className="flex gap-2">
+                <Input
+                  value={(product.sku_aliases ?? []).join(", ")}
+                  onChange={(e) =>
+                    update(
+                      "sku_aliases",
+                      e.target.value
+                        .split(/[,\s]+/)
+                        .map((s) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"))
+                        .filter(Boolean),
+                    )
+                  }
+                  placeholder="ej: 1000-palabras-italiano, upsell-1000-italiano"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const norm = (s: string) =>
+                      s
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .replace(/[^a-z0-9\s-]/g, "")
+                        .trim()
+                        .replace(/\s+/g, "-");
+                    const base = norm(product.name || product.sku || "");
+                    // Extract meaningful tokens (drop common stopwords/units)
+                    const stop = new Set(["de","del","la","el","los","las","con","para","aprender","esenciales","esencial","en","y","a","por","un","una","the","of","to","and","for"]);
+                    const tokens = base.split("-").filter((t) => t && !stop.has(t));
+                    // Prefer: <number?> + last significant word (usually the language)
+                    const numTok = tokens.find((t) => /^\d[\d.]*$/.test(t.replace(/\./g, "")));
+                    const lang = [...tokens].reverse().find((t) => !/^\d/.test(t)) || tokens[tokens.length - 1] || "";
+                    const short = [numTok, lang].filter(Boolean).join("-") || base.split("-").slice(0, 3).join("-");
+                    const generated = [short, `upsell-${short}`].filter((a) => a && a !== product.sku);
+                    const existing = new Set((product.sku_aliases ?? []).map((a) => a.toLowerCase()));
+                    for (const g of generated) existing.add(g);
+                    update("sku_aliases", Array.from(existing));
+                    toast({ title: "Aliases generados", description: generated.join(", ") });
+                  }}
+                >
+                  Auto
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground mt-1">
-                IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Separa por comas. Reemplaza los aliases hardcodeados en <code>_shared/digitalSku.ts</code>: ya no necesitas pedirme agregarlos.
+                IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Separa por comas. Pulsa <strong>Auto</strong> para generar un alias corto a partir del nombre (ej. "1,000 Palabras Italiano" → <code>1000-italiano</code> + <code>upsell-1000-italiano</code>).
               </p>
             </div>
             <div>

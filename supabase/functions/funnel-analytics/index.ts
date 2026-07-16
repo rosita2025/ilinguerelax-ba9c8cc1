@@ -11,6 +11,37 @@ const corsHeaders = {
 const isAdminPath = (p: string | null) =>
   !!p && (p.startsWith("/admin") || p.startsWith("/checkouts/"));
 
+// Classify a referrer string into a traffic source bucket for the funnel table.
+// Only meaningful for real browser events (PageView / InitiateCheckout / etc.);
+// gateway-injected Purchase events pack JSON into referrer and are excluded upstream.
+type TrafficSource =
+  | "pixel_meta"      // Facebook / Instagram (fbclid or fb/ig referrer)
+  | "google_organic"  // google.* without gclid/utm=cpc
+  | "google_ads"      // gclid or utm_medium=cpc/ppc from google
+  | "otro_organico"   // bing/yahoo/duckduckgo/ecosia
+  | "email"           // utm_source=email / mailchimp / brevo / newsletter
+  | "referral"        // any other external site
+  | "directo";        // no referrer at all
+function classifyTrafficSource(referrer: string | null): TrafficSource {
+  const raw = (referrer || "").trim().toLowerCase();
+  if (!raw) return "directo";
+  // fbclid or fb/ig hostnames
+  if (raw.includes("fbclid=") || /(?:^|[\/.@])(facebook|instagram|fb|m\.facebook|l\.facebook|lm\.facebook|fb\.watch)\b/.test(raw)) {
+    return "pixel_meta";
+  }
+  // Email tools
+  if (/utm_source=(email|newsletter|brevo|mailchimp|resend|sendinblue)/.test(raw) || raw.includes("mailto:") || raw.includes("brevo.com") || raw.includes("sendinblue")) {
+    return "email";
+  }
+  // Google ads vs organic
+  if (raw.includes("gclid=") || /utm_medium=(cpc|ppc|paid)/.test(raw)) return "google_ads";
+  if (/(?:^|[\/.@])google\./.test(raw) || raw.includes("google.com")) return "google_organic";
+  if (/(?:^|[\/.@])(bing|yahoo|duckduckgo|ecosia|yandex|baidu)\./.test(raw)) return "otro_organico";
+  return "referral";
+}
+
+
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -57,9 +88,11 @@ serve(async (req) => {
       session_id: string | null;
       page_path: string | null;
       country: string | null;
+      referrer: string | null;
       is_bot: boolean;
       created_at: string;
     }> = [];
+
 
     const PAGE = 1000;
     let offset = 0;
@@ -67,7 +100,7 @@ serve(async (req) => {
     for (let i = 0; i < 100; i++) {
       const { data, error } = await supabase
         .from("funnel_events")
-        .select("event_name, product_id, value, session_id, page_path, country, is_bot, created_at")
+        .select("event_name, product_id, value, session_id, page_path, country, referrer, is_bot, created_at")
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString())
         .order("created_at", { ascending: true })
@@ -149,6 +182,10 @@ serve(async (req) => {
       { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
+    // Checkouts (InitiateCheckout / BeginCheckout) segmented by country + traffic source.
+    // Unique sessions per (country, source) pair.
+    const checkoutBySrcAgg = new Map<string, { country: string; source: TrafficSource; sessions: Set<string> }>();
+
 
 
 
@@ -193,11 +230,22 @@ serve(async (req) => {
           pAgg.carts++;
           break;
         case "InitiateCheckout":
-        case "BeginCheckout":
+        case "BeginCheckout": {
           b.checkout++;
           totals.checkout++;
           totals.checkoutSessions.add(sid);
+          const src = classifyTrafficSource(r.referrer);
+          const country = r.country || "??";
+          const key = `${country}::${src}`;
+          let sAgg = checkoutBySrcAgg.get(key);
+          if (!sAgg) {
+            sAgg = { country, source: src, sessions: new Set<string>() };
+            checkoutBySrcAgg.set(key, sAgg);
+          }
+          sAgg.sessions.add(sid);
           break;
+        }
+
         // Purchase events from the pixel are IGNORED — real purchases come
         // from Hotmart webhooks, Shopify orders, and verified manual payments.
       }
@@ -529,6 +577,12 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 30);
 
+    const checkoutsByCountrySource = Array.from(checkoutBySrcAgg.values())
+      .map((v) => ({ country: v.country, source: v.source, sessions: v.sessions.size }))
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 100);
+
+
     return new Response(
       JSON.stringify({
         range: { from: fromDate.toISOString(), to: toDate.toISOString(), granularity: gran },
@@ -566,6 +620,8 @@ serve(async (req) => {
         series,
         byProduct,
         byCountry,
+        checkoutsByCountrySource,
+
         fx: {
           base: "USD",
           source: fxSource,

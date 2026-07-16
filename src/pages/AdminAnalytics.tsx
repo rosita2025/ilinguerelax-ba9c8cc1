@@ -68,6 +68,8 @@ interface AnalyticsData {
     conversion: number;
   }>;
   byCountry: Array<{ country: string; sessions: number; purchases: number; revenue: number }>;
+  checkoutsByCountrySource?: Array<{ country: string; source: string; sessions: number }>;
+
   fx?: {
     base: string;
     source: string;
@@ -478,6 +480,55 @@ const AdminAnalytics = () => {
                   </table>
                 </div>
               </Card>
+
+              {/* Checkouts iniciados por país y fuente de tráfico */}
+              {data.checkoutsByCountrySource && data.checkoutsByCountrySource.length > 0 && (
+                <Card className="p-4">
+                  <h2 className="font-semibold mb-1">Checkouts iniciados · país + fuente</h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Sesiones únicas que llegaron a <span className="font-mono">/checkout</span> segmentadas por país y origen del visitante (detectado desde el <span className="font-mono">referrer</span> capturado por tu pixel propio).
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="text-xs text-muted-foreground border-b">
+                        <tr>
+                          <th className="text-left py-2 pr-3">País</th>
+                          <th className="text-left px-2">Fuente</th>
+                          <th className="text-right pl-2">Sesiones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.checkoutsByCountrySource.map((row, i) => {
+                          const info = getCountryInfo(row.country);
+                          const labelMap: Record<string, { label: string; cls: string }> = {
+                            pixel_meta:     { label: "Pixel Meta (FB/IG)", cls: "bg-blue-500/15 text-blue-600 border-blue-500/30" },
+                            google_ads:     { label: "Google Ads",         cls: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30" },
+                            google_organic: { label: "Google orgánico",    cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
+                            otro_organico:  { label: "Otro buscador",      cls: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" },
+                            email:          { label: "Email / Newsletter", cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" },
+                            referral:       { label: "Referral externo",   cls: "bg-orange-500/15 text-orange-600 border-orange-500/30" },
+                            directo:        { label: "Directo / pixel propio", cls: "bg-muted text-foreground border-border" },
+                          };
+                          const s = labelMap[row.source] || labelMap.directo;
+                          return (
+                            <tr key={`${row.country}-${row.source}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
+                              <td className="py-2 pr-3">
+                                <span className="mr-2">{info?.flag || "🌐"}</span>
+                                {info?.name || row.country}
+                              </td>
+                              <td className="px-2">
+                                <span className={cn("inline-block text-[11px] px-2 py-0.5 rounded border", s.cls)}>{s.label}</span>
+                              </td>
+                              <td className="text-right pl-2 tabular-nums font-semibold">{row.sessions}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              )}
+
 
             </>
           )}

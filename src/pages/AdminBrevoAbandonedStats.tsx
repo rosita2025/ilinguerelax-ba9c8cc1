@@ -61,6 +61,7 @@ const AdminBrevoAbandonedStats = () => {
   const [country, setCountry] = useState<string>("all");
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [report, setReport] = useState<SegmentReport | null>(null);
   const [planCap, setPlanCap] = useState<number>(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_plan_cap") : null;
     return saved ? Number(saved) : 10000;

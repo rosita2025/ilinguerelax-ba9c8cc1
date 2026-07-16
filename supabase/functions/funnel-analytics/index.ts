@@ -187,6 +187,11 @@ serve(async (req) => {
       { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
+    // Product × Country breakdown: sessions/views/carts/purchases/revenue per (product_id, country)
+    const byProductCountryAgg = new Map<
+      string,
+      { product_id: string; country: string; sessions: Set<string>; views: number; carts: number; purchases: number; revenue: number }
+    >();
     // Checkouts (InitiateCheckout / BeginCheckout) segmented by country + traffic source.
     // Unique sessions per (country, source) pair.
     const checkoutBySrcAgg = new Map<string, { country: string; source: TrafficSource; sessions: Set<string> }>();
@@ -194,6 +199,7 @@ serve(async (req) => {
     const bySourceAgg = new Map<TrafficSource, { sessions: Set<string>; pageviews: number }>();
     // Sessions per URL / page path (top landing/most-visited URLs of the store)
     const byUrlAgg = new Map<string, { sessions: Set<string>; pageviews: number }>();
+
 
     const sessionState = new Map<string, { lastSeen: number; index: number }>();
     const sessionKeyFor = (r: { session_id: string | null; created_at: string }) => {

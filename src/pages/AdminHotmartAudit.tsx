@@ -95,14 +95,13 @@ const AdminHotmartAudit = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary; usd_totals?: UsdTotals }>(
+      const { data, error } = await adminInvoke<{ rows: AuditRow[]; summary: Summary }>(
         "list-hotmart-audit",
         { body: { adminKey, status, search, limit: 300 } },
       );
       if (error) throw error;
       setRows(data?.rows ?? []);
       if (data?.summary) setSummary(data.summary);
-      if (data?.usd_totals) setUsdTotals(data.usd_totals);
     } catch (e) {
       toast.error("No se pudo cargar la auditoría de Hotmart", { description: (e as Error).message });
     } finally { setLoading(false); }

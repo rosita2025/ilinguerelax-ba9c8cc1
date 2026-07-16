@@ -9,12 +9,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+type BonusRow = { name?: string | null; drive_url?: string | null; access_key?: string | null };
+
 type ProductRow = {
   sku: string;
   name: string;
   drive_url: string | null;
   access_key: string | null;
-  bonuses: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
+  bonuses: BonusRow[] | null;
   bonus_name: string | null;
   bonus_drive_url: string | null;
   bonus_access_key: string | null;
@@ -78,7 +80,7 @@ async function resolveMaterials(
         accessKey: hit.access_key ?? undefined,
       });
       // Bonos múltiples desde el array `bonuses`; fallback a columnas legacy.
-      const bonusList: Array<{ name?: string; drive_url?: string; access_key?: string }> = Array.isArray(hit.bonuses) && hit.bonuses.length
+      const bonusList: BonusRow[] = Array.isArray(hit.bonuses) && hit.bonuses.length
         ? hit.bonuses
         : (hit.bonus_drive_url ? [{ name: hit.bonus_name, drive_url: hit.bonus_drive_url, access_key: hit.bonus_access_key }] : []);
       bonusList.forEach((b, idx) => {

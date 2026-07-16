@@ -75,6 +75,14 @@ const AdminBrevoAbandonedStats = () => {
   const pctHot = totals.total ? Math.round((totals.hotmart / totals.total) * 100) : 0;
   const pctTie = totals.total ? Math.round((totals.tienda / totals.total) * 100) : 0;
 
+  // Proyección de consumo mensual de emails de Brevo
+  const abandonsPerDay = data && data.windowDays > 0 ? totals.total / data.windowDays : 0;
+  const projectedRecovery = Math.round(abandonsPerDay * 30 * seqSteps);
+  const projectedTotal = projectedRecovery + extraMonthly;
+  const usagePct = planCap > 0 ? Math.min(100, Math.round((projectedTotal / planCap) * 100)) : 0;
+  const usageTone = usagePct >= 90 ? "bg-red-500" : usagePct >= 70 ? "bg-amber-500" : "bg-emerald-500";
+  const remaining = Math.max(0, planCap - projectedTotal);
+
   return (
     <>
       <AdminNav />

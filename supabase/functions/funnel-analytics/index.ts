@@ -146,7 +146,7 @@ serve(async (req) => {
 
     const byProductAgg = new Map<
       string,
-      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number }
+      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
 
@@ -170,7 +170,7 @@ serve(async (req) => {
       const pKey = r.product_id || "sin_producto";
       let pAgg = byProductAgg.get(pKey);
       if (!pAgg) {
-        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
+        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
         byProductAgg.set(pKey, pAgg);
       }
 
@@ -214,11 +214,12 @@ serve(async (req) => {
       supabase
         .from("manual_payments")
         .select("items, amount_usd, buyer_country, created_at, status, verified_at")
-        .in("status", ["approved", "verified", "completed"])
+        .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
       supabase.from("digital_products").select("sku, name"),
     ]);
+    const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 
     // Build name → SKU map so manual_payments (which store `name`) get grouped correctly
     const nameToSku = new Map<string, string>();
@@ -234,10 +235,10 @@ serve(async (req) => {
     type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
     const realPurchases: RealPurchase[] = [];
     let hotmartPendingCount = 0;
+    let storePendingCount = 0;
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
-      // Skip test/sandbox transactions and garbage product ids
       if (/test|sandbox/i.test(txn)) continue;
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;
@@ -263,13 +264,15 @@ serve(async (req) => {
       const first = items[0] || {};
       const nameKey = String(first.name || "").trim().toLowerCase();
       const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
+      const isPending = !APPROVED_STORE.has(String(m.status || "").toLowerCase());
+      if (isPending) storePendingCount++;
       realPurchases.push({
         at: m.verified_at || m.created_at,
         productId: firstSku,
         country: m.buyer_country || "??",
-        usd: Number(m.amount_usd || 0),
+        usd: isPending ? 0 : Number(m.amount_usd || 0),
         source: "store",
-        pending: false,
+        pending: isPending,
       });
     }
 
@@ -277,11 +280,12 @@ serve(async (req) => {
     for (const p of realPurchases) {
       const k = bucketKey(p.at);
       const b = ensure(k);
-      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0 };
+      const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
 
       if (p.pending) {
-        // Pending Hotmart: track separately, do NOT count as purchase/revenue
         pAgg.pending++;
+        if (p.source === "hotmart") pAgg.hotmartPending++; else pAgg.storePending++;
+      
       } else {
         b.purchases++;
         b.revenue += p.usd;
@@ -374,6 +378,8 @@ serve(async (req) => {
           hotmart_purchases: v.hotmart,
           store_purchases: v.store,
           pending: v.pending,
+          hotmart_pending: v.hotmartPending,
+          store_pending: v.storePending,
           views: v.views,
           carts: v.carts,
           purchases: v.purchases,
@@ -411,6 +417,8 @@ serve(async (req) => {
           checkoutSessions: totals.checkoutSessions.size,
           cartSessions: totals.cartSessions.size,
           hotmartPending: hotmartPendingCount,
+          storePending: storePendingCount,
+          pending: hotmartPendingCount + storePendingCount,
         },
 
         conversion: {

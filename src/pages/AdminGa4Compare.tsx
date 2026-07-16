@@ -93,23 +93,24 @@ export default function AdminGa4Compare() {
       <Helmet><title>GA4 vs Interno · Admin · iLingue Relax</title></Helmet>
       <AdminNav />
       <main className="min-h-dvh bg-background">
-        <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-          <header className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-2xl font-bold">Comparativa GA4 vs Pixel Interno</h1>
-              <p className="text-sm text-muted-foreground max-w-2xl">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
+          <header className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold leading-tight">Comparativa GA4 vs Pixel Interno</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mt-1">
                 Compara conteos reales de GA4 (Realtime) contra nuestros propios eventos (<code>funnel_events</code>).
                 Diferencias grandes suelen indicar adblockers, ITP de Safari, filtros de red o extensiones de privacidad.
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">
               {[15, 30, 60, 120].map((m) => (
-                <Button key={m} size="sm" variant={windowMinutes === m ? "default" : "outline"} onClick={() => setWindowMinutes(m)}>
-                  {m < 60 ? `${m} min` : `${m / 60} h`}
+                <Button key={m} size="sm" className="h-8 px-2 text-xs flex-1 sm:flex-none" variant={windowMinutes === m ? "default" : "outline"} onClick={() => setWindowMinutes(m)}>
+                  {m < 60 ? `${m}m` : `${m / 60}h`}
                 </Button>
               ))}
-              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-                <RefreshCw className={cn("w-4 h-4 mr-1", loading && "animate-spin")} /> Actualizar
+              <Button size="sm" className="h-8 px-2 text-xs" variant="outline" onClick={load} disabled={loading}>
+                <RefreshCw className={cn("w-3.5 h-3.5 sm:mr-1", loading && "animate-spin")} />
+                <span className="hidden sm:inline">Actualizar</span>
               </Button>
             </div>
           </header>
@@ -143,11 +144,11 @@ export default function AdminGa4Compare() {
               </div>
 
               <Tabs defaultValue="pages" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="pages">Por página</TabsTrigger>
-                  <TabsTrigger value="countries">Por país</TabsTrigger>
-                  <TabsTrigger value="sources">Fuentes</TabsTrigger>
-                  <TabsTrigger value="events">Eventos</TabsTrigger>
+                <TabsList className="w-full grid grid-cols-4 h-auto">
+                  <TabsTrigger value="pages" className="text-xs sm:text-sm px-1">Páginas</TabsTrigger>
+                  <TabsTrigger value="countries" className="text-xs sm:text-sm px-1">Países</TabsTrigger>
+                  <TabsTrigger value="sources" className="text-xs sm:text-sm px-1">Fuentes</TabsTrigger>
+                  <TabsTrigger value="events" className="text-xs sm:text-sm px-1">Eventos</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="pages" className="mt-4">
@@ -253,20 +254,20 @@ function ComparisonTable({ header, rows }: { header: string; rows: Array<{ key: 
           <tbody>
             {rows.map((r) => (
               <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
-                <td className="py-2 pr-3 font-medium truncate max-w-[240px]" title={r.label}>{r.label}</td>
-                <td className="text-right px-3 tabular-nums">{r.ga4}</td>
-                <td className="text-right px-3 tabular-nums">{r.internal}</td>
-                <td className={cn("text-right px-3 tabular-nums font-medium",
+                <td className="py-2 pr-2 font-medium truncate max-w-[120px] sm:max-w-[240px] text-xs sm:text-sm" title={r.label}>{r.label}</td>
+                <td className="text-right px-1 sm:px-3 tabular-nums text-xs sm:text-sm">{r.ga4}</td>
+                <td className="text-right px-1 sm:px-3 tabular-nums text-xs sm:text-sm">{r.internal}</td>
+                <td className={cn("text-right px-1 sm:px-3 tabular-nums font-medium text-xs sm:text-sm",
                   r.diff > 0 ? "text-green-600" : r.diff < 0 ? "text-red-600" : "text-muted-foreground")}>
                   {r.diff > 0 ? "+" : ""}{r.diff}
                 </td>
-                <td className="pl-3 py-2">
-                  <div className="flex items-start gap-2">
-                    <Badge variant="outline" className={cn("gap-1", SEVERITY_STYLES[r.severity])}>
+                <td className="pl-1 sm:pl-3 py-2">
+                  <div className="flex flex-col sm:flex-row items-start gap-1 sm:gap-2">
+                    <Badge variant="outline" className={cn("gap-1 text-[10px] sm:text-xs shrink-0", SEVERITY_STYLES[r.severity])}>
                       {SEVERITY_ICON[r.severity]}
                       {r.severity === "ok" ? "OK" : r.severity === "warn" ? "Warn" : "Alta"}
                     </Badge>
-                    <span className="text-xs text-muted-foreground">{r.cause}</span>
+                    <span className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2 sm:line-clamp-none">{r.cause}</span>
                   </div>
                 </td>
               </tr>

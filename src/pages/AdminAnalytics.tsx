@@ -68,6 +68,21 @@ interface AnalyticsData {
     conversion: number;
   }>;
   byCountry: Array<{ country: string; sessions: number; purchases: number; revenue: number }>;
+  fx?: {
+    base: string;
+    source: string;
+    fetchedAt: string;
+    computedAt: string;
+    rates: Record<string, number>;
+    pendingByCurrency: Array<{
+      currency: string;
+      rate: number | null;
+      rateInverse: number | null;
+      amount: number;
+      usdEquivalent: number;
+      breakdown: Array<{ source: "hotmart" | "store"; count: number; amount: number; usdEquivalent: number }>;
+    }>;
+  };
   generatedAt: string;
 }
 

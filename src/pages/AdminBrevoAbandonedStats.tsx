@@ -98,6 +98,12 @@ const AdminBrevoAbandonedStats = () => {
     return saved ? Number(saved) : 945;
   });
 
+  // Reminder schedule config (server-side, in cart_reminder_config table)
+  interface ReminderCfg { send_hour: number; timezone: string; enabled_steps: number[]; paused: boolean; updated_at?: string | null }
+  const [reminderCfg, setReminderCfg] = useState<ReminderCfg>({ send_hour: 10, timezone: "America/Lima", enabled_steps: [1, 7, 15, 30], paused: false });
+  const [reminderCfgLoading, setReminderCfgLoading] = useState(false);
+  const [reminderCfgSaving, setReminderCfgSaving] = useState(false);
+
   useEffect(() => { window.localStorage.setItem("brevo_plan_cap", String(planCap)); }, [planCap]);
   useEffect(() => { window.localStorage.setItem("brevo_seq_steps", String(seqSteps)); }, [seqSteps]);
   useEffect(() => { window.localStorage.setItem("brevo_extra_monthly", String(extraMonthly)); }, [extraMonthly]);

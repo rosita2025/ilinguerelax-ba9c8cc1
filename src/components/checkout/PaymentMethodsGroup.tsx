@@ -7,7 +7,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
-import { useCheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
+import { useCheckoutMethodsConfig, type FamilyKey } from "@/hooks/useCheckoutMethodsConfig";
 
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
@@ -687,7 +687,7 @@ export function PaymentMethodsGroup() {
   const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
-    const i = methodsConfig.familyOrder.indexOf(fam as any);
+    const i = methodsConfig.familyOrder.indexOf(fam as FamilyKey);
     return i === -1 ? 99 : i;
   };
   const orderedByAdmin = [...filteredByAdmin].sort((a, b) => orderIndex(a.id) - orderIndex(b.id));

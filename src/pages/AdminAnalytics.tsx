@@ -61,6 +61,13 @@ interface AnalyticsData {
   }>;
   byProduct: Array<{
     product_id: string;
+    name?: string | null;
+    source?: string;
+    hotmart_purchases?: number;
+    store_purchases?: number;
+    pending?: number;
+    hotmart_pending?: number;
+    store_pending?: number;
     views: number;
     carts: number;
     purchases: number;
@@ -140,15 +147,28 @@ const money = (n: number) =>
   `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
 const toArray = <T,>(value: T[] | null | undefined): T[] => (Array.isArray(value) ? value : []);
+const toText = (value: unknown, fallback = "") => {
+  if (typeof value === "string") return value.trim() || fallback;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return fallback;
+};
 const toNumber = (value: unknown) => {
   const n = Number(value ?? 0);
   return Number.isFinite(n) ? n : 0;
 };
-const countryDisplay = (code: string | null | undefined) => {
-  const info = getCountryInfo(code);
+const safeDateLabel = (bucket: string, granularity: Granularity) => {
+  const date = new Date(bucket);
+  if (Number.isNaN(date.getTime())) return bucket || "—";
+  return granularity === "hour"
+    ? format(date, "HH:mm", { locale: es })
+    : format(date, "d MMM", { locale: es });
+};
+const countryDisplay = (code: unknown) => {
+  const text = toText(code, "Desconocido");
+  const info = getCountryInfo(text);
   return {
     flag: info?.flag || "🌐",
-    name: info?.name || code || "Desconocido",
+    name: info?.name || text,
   };
 };
 
@@ -188,9 +208,8 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
     },
-    series: toArray(value?.series).map((s) => ({
-      ...s,
-      bucket: s?.bucket || fallbackRange.from.toISOString(),
+    series: toArray(value?.series).slice(0, 500).map((s) => ({
+      bucket: toText(s?.bucket, fallbackRange.from.toISOString()),
       sessions: toNumber(s?.sessions),
       pageviews: toNumber(s?.pageviews),
       viewContent: toNumber(s?.viewContent),
@@ -199,43 +218,49 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       purchases: toNumber(s?.purchases),
       revenue: toNumber(s?.revenue),
     })),
-    byProduct: toArray(value?.byProduct).map((p) => ({
-      ...p,
-      product_id: p?.product_id || "producto-desconocido",
+    byProduct: toArray(value?.byProduct).slice(0, 100).map((p) => ({
+      product_id: toText(p?.product_id, "producto-desconocido"),
+      name: toText(p?.name, "") || null,
+      source: toText(p?.source, "—"),
+      hotmart_purchases: toNumber(p?.hotmart_purchases),
+      store_purchases: toNumber(p?.store_purchases),
+      pending: toNumber(p?.pending),
+      hotmart_pending: toNumber(p?.hotmart_pending),
+      store_pending: toNumber(p?.store_pending),
       views: toNumber(p?.views),
       carts: toNumber(p?.carts),
       purchases: toNumber(p?.purchases),
       revenue: toNumber(p?.revenue),
       conversion: toNumber(p?.conversion),
     })),
-    byCountry: toArray(value?.byCountry).map((c) => ({
-      country: c?.country || "Desconocido",
+    byCountry: toArray(value?.byCountry).slice(0, 100).map((c) => ({
+      country: toText(c?.country, "Desconocido"),
       sessions: toNumber(c?.sessions),
       purchases: toNumber(c?.purchases),
       revenue: toNumber(c?.revenue),
     })),
-    byProductCountry: toArray(value?.byProductCountry).map((r) => ({
-      product_id: r?.product_id || "producto-desconocido",
-      name: r?.name ?? null,
-      country: r?.country || "Desconocido",
+    byProductCountry: toArray(value?.byProductCountry).slice(0, 150).map((r) => ({
+      product_id: toText(r?.product_id, "producto-desconocido"),
+      name: toText(r?.name, "") || null,
+      country: toText(r?.country, "Desconocido"),
       sessions: toNumber(r?.sessions),
       views: toNumber(r?.views),
       carts: toNumber(r?.carts),
       purchases: toNumber(r?.purchases),
       revenue: toNumber(r?.revenue),
     })),
-    checkoutsByCountrySource: toArray(value?.checkoutsByCountrySource).map((r) => ({
-      country: r?.country || "Desconocido",
-      source: r?.source || "directo",
+    checkoutsByCountrySource: toArray(value?.checkoutsByCountrySource).slice(0, 100).map((r) => ({
+      country: toText(r?.country, "Desconocido"),
+      source: toText(r?.source, "directo"),
       sessions: toNumber(r?.sessions),
     })),
-    bySource: toArray(value?.bySource).map((r) => ({
-      source: r?.source || "directo",
+    bySource: toArray(value?.bySource).slice(0, 30).map((r) => ({
+      source: toText(r?.source, "directo"),
       sessions: toNumber(r?.sessions),
       pageviews: toNumber(r?.pageviews),
     })),
-    byUrl: toArray(value?.byUrl).map((r) => ({
-      url: r?.url || "/",
+    byUrl: toArray(value?.byUrl).slice(0, 30).map((r) => ({
+      url: toText(r?.url, "/"),
       sessions: toNumber(r?.sessions),
       pageviews: toNumber(r?.pageviews),
     })),
@@ -249,8 +274,9 @@ const AdminAnalytics = () => {
   const [preset, setPreset] = useState<PresetKey>("today");
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [data, setData] = useState<AnalyticsData>(() => normalizeAnalyticsData(null, rangeForPreset("today", {})));
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const range = useMemo(
     () => rangeForPreset(preset, { from: customFrom, to: customTo }),
@@ -259,8 +285,9 @@ const AdminAnalytics = () => {
 
   const load = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
-      const { data: res, error } = await supabase.functions.invoke("funnel-analytics", {
+      const invokePromise = supabase.functions.invoke("funnel-analytics", {
         body: {
           adminKey,
           from: range.from.toISOString(),
@@ -268,14 +295,24 @@ const AdminAnalytics = () => {
           granularity: range.granularity,
         },
       });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error("La analítica tardó demasiado. Mostrando panel seguro.")), 12000);
+      });
+      const { data: res, error } = await Promise.race([invokePromise, timeoutPromise]);
       if (error) throw error;
       if ((res as { error?: string })?.error) {
-        toast.error((res as { error: string }).error);
+        const msg = (res as { error: string }).error;
+        setLoadError(msg);
+        toast.error(msg);
+        setData(normalizeAnalyticsData(null, range));
         return;
       }
       setData(normalizeAnalyticsData(res as Partial<AnalyticsData>, range));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error al cargar analíticas");
+      const msg = e instanceof Error ? e.message : "Error al cargar analíticas";
+      setLoadError(msg);
+      setData(normalizeAnalyticsData(null, range));
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -300,13 +337,9 @@ const AdminAnalytics = () => {
 
 
   const seriesData = useMemo(() => {
-    if (!data) return [];
     return data.series.map((s) => ({
       ...s,
-      label:
-        data.range.granularity === "hour"
-          ? format(new Date(s.bucket), "HH:mm", { locale: es })
-          : format(new Date(s.bucket), "d MMM", { locale: es }),
+      label: safeDateLabel(s.bucket, data.range.granularity),
     }));
   }, [data]);
 
@@ -326,6 +359,12 @@ const AdminAnalytics = () => {
             </div>
             {loading && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />}
           </div>
+
+          {loadError && (
+            <Card className="p-3 border-destructive/30 bg-destructive/5 text-sm text-destructive">
+              No se pudo cargar completo ahora: {loadError}. El panel queda abierto con valores seguros; intenta de nuevo en unos segundos.
+            </Card>
+          )}
 
           {/* Preset selector */}
           <Card className="p-4 flex flex-wrap items-center gap-2">
@@ -385,7 +424,7 @@ const AdminAnalytics = () => {
             </div>
           </Card>
 
-          {!data ? (
+          {loading && data.series.length === 0 && data.totals.sessions === 0 ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {Array.from({ length: 4 }).map((_, i) => (

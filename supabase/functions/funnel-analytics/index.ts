@@ -569,9 +569,20 @@ serve(async (req) => {
         cAgg.purchases++;
         cAgg.revenue += p.usd;
         byCountryAgg.set(p.country, cAgg);
+
+        // Product × Country purchase attribution
+        const pcKey = `${p.productId}::${p.country || "??"}`;
+        let pcAgg = byProductCountryAgg.get(pcKey);
+        if (!pcAgg) {
+          pcAgg = { product_id: p.productId, country: p.country || "??", sessions: new Set(), views: 0, carts: 0, purchases: 0, revenue: 0 };
+          byProductCountryAgg.set(pcKey, pcAgg);
+        }
+        pcAgg.purchases++;
+        pcAgg.revenue += p.usd;
       }
       byProductAgg.set(p.productId, pAgg);
     }
+
 
     // Product names: use the same digital_products fetch from earlier
     const nameMap = skuToName;

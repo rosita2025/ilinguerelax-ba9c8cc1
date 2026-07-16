@@ -289,6 +289,17 @@ const AdminProductEdit = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Al renombrar cambia también la URL pública del producto.</p>
+                {duplicateSku && (
+                  <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                    <div className="font-semibold text-destructive">⚠️ SKU duplicado</div>
+                    <div className="text-destructive/90 mt-1">
+                      Ya existe el producto <strong>"{duplicateSku.name}"</strong> con el SKU <code className="font-mono">{duplicateSku.sku}</code>.
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Guardar con un SKU repetido rompe el envío digital automático (el sistema resuelve por SKU exacto y mezclaría materiales). Cambia el SKU antes de guardar.
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <Label>Orden</Label>

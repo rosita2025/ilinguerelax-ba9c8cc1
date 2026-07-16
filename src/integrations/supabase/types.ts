@@ -227,6 +227,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_reminder_sends: {
+        Row: {
+          cart_url: string | null
+          email: string
+          error: string | null
+          id: string
+          origin: string
+          product_sku: string
+          sent_at: string
+          status: string
+          step: number
+        }
+        Insert: {
+          cart_url?: string | null
+          email: string
+          error?: string | null
+          id?: string
+          origin: string
+          product_sku: string
+          sent_at?: string
+          status?: string
+          step: number
+        }
+        Update: {
+          cart_url?: string | null
+          email?: string
+          error?: string | null
+          id?: string
+          origin?: string
+          product_sku?: string
+          sent_at?: string
+          status?: string
+          step?: number
+        }
+        Relationships: []
+      }
       checkout_method_suppressions: {
         Row: {
           method_key: string

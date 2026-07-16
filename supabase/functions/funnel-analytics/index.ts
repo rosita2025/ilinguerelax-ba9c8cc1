@@ -231,11 +231,52 @@ serve(async (req) => {
       }
     }
 
+    // ---------- FX rates (USD base) ----------
+    // Public, no-key endpoint. Cached in-memory per invocation.
+    let fxRates: Record<string, number> = { USD: 1 };
+    let fxFetchedAt = new Date().toISOString();
+    let fxSource = "open.er-api.com";
+    try {
+      const fxRes = await fetch("https://open.er-api.com/v6/latest/USD", {
+        headers: { "accept": "application/json" },
+      });
+      if (fxRes.ok) {
+        const fxJson = await fxRes.json();
+        if (fxJson?.rates && typeof fxJson.rates === "object") {
+          fxRates = { ...fxJson.rates, USD: 1 };
+          if (fxJson.time_last_update_utc) {
+            fxFetchedAt = new Date(fxJson.time_last_update_utc).toISOString();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("FX fetch failed, revenue conversions will be 0 for non-USD", e);
+    }
+    const toUsd = (amount: number, currency: string): number => {
+      if (!amount || !currency) return 0;
+      const cur = currency.toUpperCase();
+      if (cur === "USD") return amount;
+      const rate = fxRates[cur];
+      if (!rate || rate <= 0) return 0;
+      return amount / rate; // rates are "USD -> CUR", so USD = amount / rate
+    };
+
     type PurchaseSource = "hotmart" | "store";
     type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
     const realPurchases: RealPurchase[] = [];
     let hotmartPendingCount = 0;
     let storePendingCount = 0;
+
+    // Aggregate pending amounts per currency for the FX transparency card
+    const pendingByCurrencyAgg = new Map<string, { source: PurchaseSource; amount: number; count: number }[]>();
+    const addPending = (currency: string, source: PurchaseSource, amount: number) => {
+      const cur = (currency || "USD").toUpperCase();
+      const list = pendingByCurrencyAgg.get(cur) ?? [];
+      const existing = list.find((x) => x.source === source);
+      if (existing) { existing.amount += amount; existing.count += 1; }
+      else list.push({ source, amount, count: 1 });
+      pendingByCurrencyAgg.set(cur, list);
+    };
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
@@ -243,13 +284,17 @@ serve(async (req) => {
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;
       const price = h.raw_payload?.data?.purchase?.price ?? {};
-      const currency = price.currency_code || price.currency_value || "";
-      const usd = currency === "USD" ? Number(price.value || 0) : 0;
+      const currency = String(price.currency_code || price.currency_value || "USD").toUpperCase();
+      const amount = Number(price.value || 0);
+      const usd = toUsd(amount, currency);
       const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
         || h.raw_payload?.data?.buyer?.address?.country
         || "??";
       const isPending = h.status === "pending";
-      if (isPending) hotmartPendingCount++;
+      if (isPending) {
+        hotmartPendingCount++;
+        if (amount > 0) addPending(currency, "hotmart", amount);
+      }
       realPurchases.push({
         at: h.purchased_at,
         productId: rawPid,
@@ -265,7 +310,12 @@ serve(async (req) => {
       const nameKey = String(first.name || "").trim().toLowerCase();
       const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
       const isPending = !APPROVED_STORE.has(String(m.status || "").toLowerCase());
-      if (isPending) storePendingCount++;
+      if (isPending) {
+        storePendingCount++;
+        // manual_payments already store amount_usd (USD-normalized)
+        const amt = Number(m.amount_usd || 0);
+        if (amt > 0) addPending("USD", "store", amt);
+      }
       realPurchases.push({
         at: m.verified_at || m.created_at,
         productId: firstSku,
@@ -275,6 +325,24 @@ serve(async (req) => {
         pending: isPending,
       });
     }
+
+    const pendingByCurrency = Array.from(pendingByCurrencyAgg.entries()).map(([currency, breakdown]) => {
+      const totalAmount = breakdown.reduce((s, x) => s + x.amount, 0);
+      const rate = fxRates[currency] ?? null;
+      return {
+        currency,
+        rate,                         // 1 USD = <rate> <currency>
+        rateInverse: rate ? 1 / rate : null, // 1 <currency> = <rateInverse> USD
+        amount: Number(totalAmount.toFixed(2)),
+        usdEquivalent: Number(toUsd(totalAmount, currency).toFixed(2)),
+        breakdown: breakdown.map((b) => ({
+          source: b.source,
+          count: b.count,
+          amount: Number(b.amount.toFixed(2)),
+          usdEquivalent: Number(toUsd(b.amount, currency).toFixed(2)),
+        })),
+      };
+    }).sort((a, b) => b.usdEquivalent - a.usdEquivalent);
 
 
     for (const p of realPurchases) {

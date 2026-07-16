@@ -10,31 +10,37 @@ interface Props {
   sku?: string;
 }
 
-// Convert any image to WebP via canvas (max 1600px wide, quality 0.85)
-async function toWebP(file: File, maxW = 1600, quality = 0.85): Promise<Blob> {
-  const dataUrl = await new Promise<string>((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result as string);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-  const img = await new Promise<HTMLImageElement>((res, rej) => {
-    const i = new Image();
-    i.onload = () => res(i);
-    i.onerror = rej;
-    i.src = dataUrl;
-  });
-  const scale = Math.min(1, maxW / img.width);
-  const w = Math.round(img.width * scale);
-  const h = Math.round(img.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(img, 0, 0, w, h);
-  return await new Promise<Blob>((res, rej) =>
-    canvas.toBlob((b) => (b ? res(b) : rej(new Error("WebP encode failed"))), "image/webp", quality)
-  );
+// Convert any image to WebP via canvas (max 1600px wide, quality 0.85).
+// Returns null if the browser can't decode/encode (e.g. HEIC, corrupt, or WebP unsupported).
+async function toWebP(file: File, maxW = 1600, quality = 0.85): Promise<Blob | null> {
+  try {
+    const dataUrl = await new Promise<string>((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.onerror = () => rej(new Error("No se pudo leer el archivo"));
+      r.readAsDataURL(file);
+    });
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("Formato no soportado por el navegador (¿HEIC?)"));
+      i.src = dataUrl;
+    });
+    const scale = Math.min(1, maxW / img.width);
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, w, h);
+    return await new Promise<Blob | null>((res) =>
+      canvas.toBlob((b) => res(b), "image/webp", quality)
+    );
+  } catch {
+    return null;
+  }
 }
 
 export default function ProductImageUploader({ value, onChange, sku }: Props) {
@@ -43,24 +49,36 @@ export default function ProductImageUploader({ value, onChange, sku }: Props) {
   const { toast } = useToast();
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      toast({ title: "Solo imágenes", variant: "destructive" });
+    if (file.size > 15 * 1024 * 1024) {
+      toast({ title: "Imagen demasiado grande", description: "Máximo 15 MB", variant: "destructive" });
       return;
     }
     setUploading(true);
     try {
+      // Try WebP conversion; if it fails (HEIC, unsupported), upload the original file as-is so el admin nunca se queda bloqueado.
       const webp = await toWebP(file);
-      const slug = (sku || "producto").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
-      const path = `${slug}/${Date.now()}.webp`;
+      const useOriginal = !webp;
+      const blob: Blob = webp ?? file;
+      const extFromType = (blob.type.split("/")[1] || "").split(";")[0];
+      const extFromName = (file.name.split(".").pop() || "").toLowerCase();
+      const ext = (useOriginal ? (extFromName || extFromType || "jpg") : "webp").replace(/[^a-z0-9]/gi, "") || "jpg";
+      const slugRaw = (sku || "producto").replace(/[^a-z0-9-]/gi, "-").toLowerCase().replace(/-+/g, "-").replace(/^-|-$/g, "");
+      const slug = slugRaw || "producto";
+      const path = `${slug}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
       const { error } = await supabase.storage
         .from("product-images")
-        .upload(path, webp, { contentType: "image/webp", upsert: false });
+        .upload(path, blob, { contentType: blob.type || `image/${ext}`, upsert: false });
       if (error) throw error;
       const { data } = supabase.storage.from("product-images").getPublicUrl(path);
       onChange(data.publicUrl);
-      toast({ title: "Imagen subida", description: `${(webp.size / 1024).toFixed(0)} KB WebP` });
-    } catch (e: any) {
-      toast({ title: "Error al subir", description: e?.message, variant: "destructive" });
+      toast({
+        title: useOriginal ? "Imagen subida (original)" : "Imagen subida",
+        description: `${(blob.size / 1024).toFixed(0)} KB${useOriginal ? "" : " WebP"}`,
+      });
+    } catch (e) {
+      const msg = (e as Error)?.message || "Error desconocido";
+      toast({ title: "Error al subir", description: msg, variant: "destructive" });
+      console.error("[ProductImageUploader] upload failed:", e);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";

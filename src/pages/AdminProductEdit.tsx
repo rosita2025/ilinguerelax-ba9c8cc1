@@ -356,6 +356,66 @@ const AdminProductEdit = () => {
                 IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Separa por comas. Pulsa <strong>Auto</strong> para generar un alias corto a partir del nombre (ej. "1,000 Palabras Italiano" → <code>1000-italiano</code> + <code>upsell-1000-italiano</code>).
               </p>
             </div>
+
+            {/* Mapa de aliases + destinos: auditoría en un solo vistazo */}
+            <div className="rounded-md border bg-muted/30 p-3">
+              <div className="text-sm font-semibold mb-2">🔍 Mapeo de aliases y destino de envío</div>
+              {(() => {
+                const others = allProducts.filter((p) => p.sku !== product.sku);
+                const aliasIndex = new Map<string, string>(); // alias → sku
+                for (const p of others) for (const a of p.sku_aliases ?? []) aliasIndex.set(a.toLowerCase(), p.sku);
+                const skuIndex = new Map(allProducts.map((p) => [p.sku, p]));
+                const rows: { alias: string; target: string; drive: string | null; conflict?: string; kind: "self" | "upsell" }[] = [];
+                // Aliases del producto actual → apuntan a sí mismo
+                for (const a of product.sku_aliases ?? []) {
+                  const conflict = aliasIndex.get(a.toLowerCase());
+                  rows.push({ alias: a, target: product.sku || "(sin SKU)", drive: product.drive_url, conflict, kind: "self" });
+                }
+                // Upsells configurados → destino = SKU real del upsell
+                for (const u of upsells) {
+                  const dest = skuIndex.get(u.upsell_sku);
+                  rows.push({
+                    alias: `upsell → ${u.upsell_sku}`,
+                    target: u.upsell_sku,
+                    drive: dest?.drive_url ?? null,
+                    conflict: dest ? undefined : "SKU no existe",
+                    kind: "upsell",
+                  });
+                }
+                if (!rows.length) {
+                  return <div className="text-xs text-muted-foreground">Aún no hay aliases ni upsells. Añade aliases arriba o upsells más abajo.</div>;
+                }
+                return (
+                  <div className="space-y-1.5">
+                    {rows.map((r, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono">
+                        <span className={r.kind === "upsell" ? "text-blue-600" : "text-emerald-600"}>
+                          {r.kind === "upsell" ? "🎁" : "→"}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div>
+                            <span className="font-semibold">{r.alias}</span>
+                            <span className="text-muted-foreground"> → </span>
+                            <span>{r.target}</span>
+                          </div>
+                          <div className="text-[10px] text-muted-foreground truncate">
+                            {r.drive ? (r.drive.includes("drive.google") ? `✅ Drive: ${r.drive.slice(0, 60)}…` : `⚠️ No es Drive: ${r.drive.slice(0, 60)}…`) : "❌ Sin Drive URL"}
+                          </div>
+                          {r.conflict && (
+                            <div className="text-[10px] text-destructive font-semibold">
+                              ⚠️ {r.conflict.startsWith("SKU") ? r.conflict : `Alias duplicado: ya usado por "${r.conflict}"`}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+              <p className="text-[10px] text-muted-foreground mt-2">
+                Muestra a qué SKU real se resuelve cada alias del checkout y qué Drive se enviará. Los upsells enlazan al Drive del producto destino (no duplican material).
+              </p>
+            </div>
             <div>
               <Label>Nombre</Label>
               <Input value={product.name} onChange={(e) => update("name", e.target.value)} />

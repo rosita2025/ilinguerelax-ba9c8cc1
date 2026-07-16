@@ -167,8 +167,21 @@ const AdminAnalytics = () => {
 
   useEffect(() => {
     void load();
+    // Auto-refresh every 60s so KPIs stay live without manual reload
+    const iv = setInterval(() => {
+      if (document.visibilityState === "visible") void load();
+    }, 60000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") void load();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVis);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey, preset, customFrom, customTo]);
+
 
   const seriesData = useMemo(() => {
     if (!data) return [];

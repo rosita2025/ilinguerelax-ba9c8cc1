@@ -169,9 +169,10 @@ serve(async (req) => {
       const pKey = r.product_id || "sin_producto";
       let pAgg = byProductAgg.get(pKey);
       if (!pAgg) {
-        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0 };
+        pAgg = { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0 };
         byProductAgg.set(pKey, pAgg);
       }
+
 
       switch (r.event_name) {
         case "PageView":

@@ -15,8 +15,10 @@ type TrackAbandonedCheckoutInput = {
   country?: string;
   items?: PruebaItem[];
   paymentMethod?: string;
+  triggerReason?: string;
   force?: boolean;
 };
+
 
 function alreadySent(email: string, slug: string) {
   try {

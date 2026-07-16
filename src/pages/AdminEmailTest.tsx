@@ -634,7 +634,7 @@ const AdminEmailTest = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleRows.map((r) => {
+                  {pagedRows.map((r) => {
                     const pSku = principalSkuOf(r);
                     const uSku = upsellSkusOf(r);
                     const v = validateRow(r);

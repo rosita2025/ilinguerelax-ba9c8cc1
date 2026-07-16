@@ -74,7 +74,8 @@ const AdminBrevoAbandonedStats = () => {
   const [report, setReport] = useState<SegmentReport | null>(null);
   const [brevoReal, setBrevoReal] = useState<BrevoRealResponse | null>(null);
   const [autoRefresh, setAutoRefresh] = useState<string>(() => {
-    return (typeof window !== "undefined" && window.localStorage.getItem("brevo_auto_refresh")) || "60";
+    // Default OFF para no gastar Cloud (cada refresh dispara 3 edge functions).
+    return (typeof window !== "undefined" && window.localStorage.getItem("brevo_auto_refresh")) || "off";
   });
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [countryPage, setCountryPage] = useState(1);
@@ -196,12 +197,10 @@ const AdminBrevoAbandonedStats = () => {
               <Select value={autoRefresh} onValueChange={setAutoRefresh}>
                 <SelectTrigger className="w-full md:w-[160px]"><SelectValue placeholder="Auto" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="off">Sin auto-refresh</SelectItem>
-                  <SelectItem value="15">Auto · 15 s</SelectItem>
-                  <SelectItem value="30">Auto · 30 s</SelectItem>
-                  <SelectItem value="60">Auto · 1 min</SelectItem>
+                  <SelectItem value="off">Sin auto-refresh (recomendado)</SelectItem>
                   <SelectItem value="300">Auto · 5 min</SelectItem>
                   <SelectItem value="900">Auto · 15 min</SelectItem>
+                  <SelectItem value="1800">Auto · 30 min</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" onClick={load} disabled={loading} className="w-full md:w-auto">

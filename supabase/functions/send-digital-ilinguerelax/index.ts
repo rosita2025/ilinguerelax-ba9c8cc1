@@ -66,6 +66,7 @@ const T: Record<Lang, {
   downloadBtn: string;
   keyLabel: string;
   bonusesTitle: string;
+  bonusFallback: (n: number) => string;
   noBonuses: string;
   categoryLabel: string;
   pending: string;
@@ -85,6 +86,7 @@ const T: Record<Lang, {
     downloadBtn: `⬇ Descargar / Ver en Drive`,
     keyLabel: `Clave de acceso`,
     bonusesTitle: `🎁 Bonos incluidos`,
+    bonusFallback: (n) => `Bono #${n}`,
     noBonuses: `Sin bonos adicionales para este producto.`,
     categoryLabel: `Categoría`,
     pending: `Te enviaremos el enlace en unos minutos.`,
@@ -104,6 +106,7 @@ const T: Record<Lang, {
     downloadBtn: `⬇ Download / Open in Drive`,
     keyLabel: `Access key`,
     bonusesTitle: `🎁 Bonuses included`,
+    bonusFallback: (n) => `Bonus #${n}`,
     noBonuses: `No extra bonuses for this product.`,
     categoryLabel: `Category`,
     pending: `We'll send you the link within a few minutes.`,
@@ -123,6 +126,7 @@ const T: Record<Lang, {
     downloadBtn: `⬇ Télécharger / Ouvrir dans Drive`,
     keyLabel: `Clé d'accès`,
     bonusesTitle: `🎁 Bonus inclus`,
+    bonusFallback: (n) => `Bonus n°${n}`,
     noBonuses: `Aucun bonus supplémentaire pour ce produit.`,
     categoryLabel: `Catégorie`,
     pending: `Nous vous enverrons le lien dans quelques minutes.`,
@@ -142,6 +146,7 @@ const T: Record<Lang, {
     downloadBtn: `⬇ Baixar / Abrir no Drive`,
     keyLabel: `Chave de acesso`,
     bonusesTitle: `🎁 Bônus incluídos`,
+    bonusFallback: (n) => `Bônus #${n}`,
     noBonuses: `Sem bônus adicionais para este produto.`,
     categoryLabel: `Categoria`,
     pending: `Enviaremos o link em alguns minutos.`,
@@ -160,6 +165,34 @@ function langName(code: string | null, lang: Lang): string {
   if (!code) return "";
   const c = code.toLowerCase().slice(0, 2);
   return LANG_NAME[lang][c] || code;
+}
+
+// Fallback bonito para nombres vacíos: convierte SKU/slug en título legible.
+// Ej: "1-000-palabras-esenciales-para-aprender-coreano" → "1,000 Palabras Esenciales Para Aprender Coreano"
+function prettifySlug(slug: string): string {
+  if (!slug) return "";
+  // "1-000" → "1,000" (miles), luego separa por guiones
+  const withThousands = slug.replace(/(\d+)-(\d{3})(?=-|$)/g, "$1,$2");
+  return withThousands
+    .split("-")
+    .filter(Boolean)
+    .map((w) => (/^\d/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(" ");
+}
+
+// Extrae un nombre razonable para un bono cuando falta `name`:
+// 1) usa el name si existe, 2) intenta el filename del URL de Drive, 3) fallback localizado.
+function bonusDisplayName(b: { name?: string | null; drive_url?: string | null }, index: number, fallback: (n: number) => string): string {
+  const raw = (b.name || "").trim();
+  if (raw) return raw;
+  try {
+    const u = new URL(b.drive_url || "");
+    const seg = u.pathname.split("/").filter(Boolean);
+    // /file/d/{id}/view → no útil; probamos query title
+    const title = u.searchParams.get("title") || seg[seg.length - 1] || "";
+    if (title && !/^[A-Za-z0-9_-]{20,}$/.test(title) && title !== "view") return prettifySlug(title);
+  } catch (_) { /* ignore */ }
+  return fallback(index + 1);
 }
 
 async function detectLangFromIP(ip: string): Promise<{ country?: string; lang?: Lang }> {
@@ -349,7 +382,7 @@ serve(async (req) => {
             <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${t.bonusesTitle}</div>
             ${bonusList.map((b, i) => `
               <div style="margin:6px 0;font-size:13px;color:#374151;">
-                <strong>${escapeHtml(b.name || `Bonus ${i + 1}`)}:</strong>
+                <strong>${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}:</strong>
                 <a href="${escapeHtml(b.drive_url)}" style="color:${BRAND.primary};text-decoration:underline;">${escapeHtml(t.downloadBtn.replace(/^⬇\s*/, ""))}</a>
                 ${b.access_key ? ` · ${escapeHtml(t.keyLabel)}: <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code>` : ""}
               </div>`).join("")}
@@ -360,7 +393,7 @@ serve(async (req) => {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
             ${p.cover_image_url ? `<td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover_image_url)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>` : ""}
             <td valign="top">
-              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name || p.sku)}</div>
+              <div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name || prettifySlug(p.sku))}</div>
               ${priceLine}
               ${catLine}
             </td>

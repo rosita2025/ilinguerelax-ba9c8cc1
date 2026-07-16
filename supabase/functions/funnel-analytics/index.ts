@@ -526,7 +526,7 @@ serve(async (req) => {
 
     // Conversion metrics
     const sessions = totals.sessions.size;
-    const cartRate = totals.viewContent ? (totals.addToCart / totals.viewContent) * 100 : 0;
+    const cartRate = sessions ? (totals.addToCart / sessions) * 100 : 0;
     const checkoutRate = totals.addToCart ? (totals.checkout / totals.addToCart) * 100 : 0;
     const purchaseRate = totals.checkout ? (totals.purchases / totals.checkout) * 100 : 0;
     const globalConversion = sessions ? (totals.purchases / sessions) * 100 : 0;

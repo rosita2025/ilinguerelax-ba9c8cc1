@@ -146,6 +146,7 @@ const T: Record<Lang, {
     downloadBtn: `⬇ Baixar / Abrir no Drive`,
     keyLabel: `Chave de acesso`,
     bonusesTitle: `🎁 Bônus incluídos`,
+    bonusFallback: (n) => `Bônus #${n}`,
     noBonuses: `Sem bônus adicionais para este produto.`,
     categoryLabel: `Categoria`,
     pending: `Enviaremos o link em alguns minutos.`,

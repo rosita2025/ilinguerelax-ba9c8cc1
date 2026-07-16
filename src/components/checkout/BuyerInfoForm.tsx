@@ -222,6 +222,7 @@ export function BuyerInfoForm() {
               defaultCountry={(region.country as any) || "PE"}
               value={buyer.phone ?? ""}
               onChange={(v) => setBuyer({ phone: v ?? "" })}
+              onBlur={fireAbandonedCapture}
               placeholder="999 999 999"
               className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/40"
             />

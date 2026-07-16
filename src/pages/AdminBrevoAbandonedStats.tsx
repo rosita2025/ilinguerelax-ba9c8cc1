@@ -66,6 +66,12 @@ const AdminBrevoAbandonedStats = () => {
     return (typeof window !== "undefined" && window.localStorage.getItem("brevo_auto_refresh")) || "60";
   });
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [countryPage, setCountryPage] = useState(1);
+  const [countryPageSize, setCountryPageSize] = useState(10);
+  const [countryFilter, setCountryFilter] = useState("");
+  const [matrixPage, setMatrixPage] = useState(1);
+  const [matrixPageSize, setMatrixPageSize] = useState(10);
+  const [matrixFilter, setMatrixFilter] = useState("");
   const [planCap, setPlanCap] = useState<number>(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem("brevo_plan_cap") : null;
     return saved ? Number(saved) : 10000;

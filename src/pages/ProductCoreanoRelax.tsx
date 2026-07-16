@@ -95,7 +95,8 @@ const ProductCoreanoRelax = () => {
 
   const handleBuyHotmart = () => {
     if (!pricingReady) return;
-    trackInitiate();
+    // Skip Meta Pixel: Hotmart embeds the same pixel id at its checkout,
+    // firing here would double-count InitiateCheckout.
     window.open(tier.hotmartUrl || HOTMART_URL_LATAM, "_blank", "noopener,noreferrer");
   };
 

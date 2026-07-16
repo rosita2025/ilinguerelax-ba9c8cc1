@@ -133,6 +133,7 @@ const T: Record<Lang, {
     step3: `Si le produit demande une <strong>clé d'accès</strong>, copiez-la depuis cet e-mail.`,
     step4: `Répétez pour le <strong>produit supplémentaire</strong> — chacun a son propre lien et clé.`,
     downloadBtn: `⬇ Télécharger / Ouvrir dans Drive`,
+    bonusBtn: `⬇ Télécharger le bonus`,
     keyLabel: `Clé d'accès`,
     bonusesTitle: `🎁 Bonus inclus`,
     bonusFallback: (n) => `Bonus n°${n}`,
@@ -140,6 +141,8 @@ const T: Record<Lang, {
     categoryLabel: `Catégorie`,
     pending: `Nous vous enverrons le lien dans quelques minutes.`,
     tip: `💡 <strong>Astuce :</strong> enregistrez les PDF sur votre téléphone ou ordinateur pour les avoir toujours à portée de main, même hors ligne.`,
+    checklistTitle: `✅ Votre commande inclut :`,
+    mainLabel: `Produit principal`,
   },
   pt: {
     subject: (ref, multi) => `Obrigado pela sua compra${ref ? ` — ${ref}` : ""} · links de download${multi ? " (inclui produto bônus)" : ""}`,

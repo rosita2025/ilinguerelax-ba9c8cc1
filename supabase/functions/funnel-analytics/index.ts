@@ -378,6 +378,8 @@ serve(async (req) => {
           hotmart_purchases: v.hotmart,
           store_purchases: v.store,
           pending: v.pending,
+          hotmart_pending: v.hotmartPending,
+          store_pending: v.storePending,
           views: v.views,
           carts: v.carts,
           purchases: v.purchases,

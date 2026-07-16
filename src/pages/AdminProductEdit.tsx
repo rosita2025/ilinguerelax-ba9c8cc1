@@ -297,6 +297,13 @@ const AdminProductEdit = () => {
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Guardar con un SKU repetido rompe el envío digital automático (el sistema resuelve por SKU exacto y mezclaría materiales). Cambia el SKU antes de guardar.
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div>
+                <Label>Orden</Label>
+                <Input type="number" value={product.sort_order} onChange={(e) => update("sort_order", Number(e.target.value))} />
               </div>
             </div>
             <div>
@@ -317,12 +324,6 @@ const AdminProductEdit = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Separa por comas. Reemplaza los aliases hardcodeados en <code>_shared/digitalSku.ts</code>: ya no necesitas pedirme agregarlos.
               </p>
-                )}
-              </div>
-              <div>
-                <Label>Orden</Label>
-                <Input type="number" value={product.sort_order} onChange={(e) => update("sort_order", Number(e.target.value))} />
-              </div>
             </div>
             <div>
               <Label>Nombre</Label>

@@ -281,7 +281,7 @@ const AdminBrevoAbandonedStats = () => {
                   }
                 }}
               >
-                <Mail className="w-4 h-4 mr-2" /> Enviar recordatorios 1/7/15/30
+                <Mail className="w-4 h-4 mr-2" /> Enviar recordatorios 3h/24h/7d/15d/30d
               </Button>
               {preset === "custom" && (
                 <div className="col-span-2 md:col-span-1 flex items-center gap-2 w-full md:w-auto">

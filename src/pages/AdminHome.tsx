@@ -75,6 +75,13 @@ const panels = [
     color: "text-pink-600",
   },
   {
+    to: "/admin/brevo-abandoned-stats",
+    icon: LineChart,
+    title: "Brevo · Dashboard abandonos",
+    desc: "Tendencia diaria de abandonos Hotmart vs Tienda con filtro por COUNTRY_CODE y desglose por país.",
+    color: "text-fuchsia-600",
+  },
+  {
     to: "/admin/analytics",
     icon: LineChart,
     title: "Analíticas · Funnel",

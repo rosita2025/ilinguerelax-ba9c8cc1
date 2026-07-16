@@ -146,9 +146,10 @@ serve(async (req) => {
 
     const byProductAgg = new Map<
       string,
-      { views: number; carts: number; purchases: number; revenue: number }
+      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
+
 
     for (const r of filtered) {
       const k = bucketKey(r.created_at);

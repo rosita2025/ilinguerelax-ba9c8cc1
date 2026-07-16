@@ -156,7 +156,7 @@ const AdminEmailTest = () => {
       const manualRes = { data: (data as any)?.manual ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
       const funnelRes = { data: (data as any)?.funnel ?? [] };
-      const hotmartRes = { data: (data as any)?.hotmart ?? [] };
+      
       const productMap = new Map<string, ProductMeta>();
       ((data as any)?.products ?? []).forEach((p: any) => {
         const bonusCount = bonusCountFrom(p);

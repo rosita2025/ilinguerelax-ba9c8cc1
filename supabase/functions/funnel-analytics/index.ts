@@ -187,6 +187,11 @@ serve(async (req) => {
       { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
+    // Product × Country breakdown: sessions/views/carts/purchases/revenue per (product_id, country)
+    const byProductCountryAgg = new Map<
+      string,
+      { product_id: string; country: string; sessions: Set<string>; views: number; carts: number; purchases: number; revenue: number }
+    >();
     // Checkouts (InitiateCheckout / BeginCheckout) segmented by country + traffic source.
     // Unique sessions per (country, source) pair.
     const checkoutBySrcAgg = new Map<string, { country: string; source: TrafficSource; sessions: Set<string> }>();
@@ -194,6 +199,7 @@ serve(async (req) => {
     const bySourceAgg = new Map<TrafficSource, { sessions: Set<string>; pageviews: number }>();
     // Sessions per URL / page path (top landing/most-visited URLs of the store)
     const byUrlAgg = new Map<string, { sessions: Set<string>; pageviews: number }>();
+
 
     const sessionState = new Map<string, { lastSeen: number; index: number }>();
     const sessionKeyFor = (r: { session_id: string | null; created_at: string }) => {
@@ -254,6 +260,16 @@ serve(async (req) => {
         byProductAgg.set(pKey, pAgg);
       }
 
+      // Product × Country aggregation (session dedup per pair)
+      const pcKey = `${pKey}::${cKey}`;
+      let pcAgg = byProductCountryAgg.get(pcKey);
+      if (!pcAgg) {
+        pcAgg = { product_id: pKey, country: cKey, sessions: new Set(), views: 0, carts: 0, purchases: 0, revenue: 0 };
+        byProductCountryAgg.set(pcKey, pcAgg);
+      }
+      pcAgg.sessions.add(sid);
+
+
 
 
       switch (r.event_name) {
@@ -265,6 +281,7 @@ serve(async (req) => {
           b.viewContent++;
           totals.viewContent++;
           pAgg.views++;
+          pcAgg.views++;
           break;
         case "AddToCart":
           if (!totals.cartSessions.has(sid)) {
@@ -273,6 +290,7 @@ serve(async (req) => {
             totals.cartSessions.add(sid);
           }
           pAgg.carts++;
+          pcAgg.carts++;
           break;
         case "InitiateCheckout":
         case "BeginCheckout": {
@@ -284,7 +302,9 @@ serve(async (req) => {
             b.addToCart++;
             totals.addToCart++;
             pAgg.carts++;
+            pcAgg.carts++;
           }
+
           if (!totals.checkoutSessions.has(sid)) {
             b.checkout++;
             totals.checkout++;
@@ -549,9 +569,20 @@ serve(async (req) => {
         cAgg.purchases++;
         cAgg.revenue += p.usd;
         byCountryAgg.set(p.country, cAgg);
+
+        // Product × Country purchase attribution
+        const pcKey = `${p.productId}::${p.country || "??"}`;
+        let pcAgg = byProductCountryAgg.get(pcKey);
+        if (!pcAgg) {
+          pcAgg = { product_id: p.productId, country: p.country || "??", sessions: new Set(), views: 0, carts: 0, purchases: 0, revenue: 0 };
+          byProductCountryAgg.set(pcKey, pcAgg);
+        }
+        pcAgg.purchases++;
+        pcAgg.revenue += p.usd;
       }
       byProductAgg.set(p.productId, pAgg);
     }
+
 
     // Product names: use the same digital_products fetch from earlier
     const nameMap = skuToName;
@@ -666,6 +697,24 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 30);
 
+    // Product × Country breakdown, filtered to products with real activity
+    const validProductIds = new Set(byProduct.map((p) => p.product_id));
+    const byProductCountry = Array.from(byProductCountryAgg.values())
+      .filter((v) => validProductIds.has(v.product_id) && (v.sessions.size + v.views + v.carts + v.purchases) > 0)
+      .map((v) => ({
+        product_id: v.product_id,
+        name: nameMap.get(v.product_id) || null,
+        country: v.country,
+        sessions: v.sessions.size,
+        views: v.views,
+        carts: v.carts,
+        purchases: v.purchases,
+        revenue: Number(v.revenue.toFixed(2)),
+      }))
+      .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions)
+      .slice(0, 200);
+
+
 
     return new Response(
       JSON.stringify({
@@ -703,10 +752,12 @@ serve(async (req) => {
         },
         series,
         byProduct,
+        byProductCountry,
         byCountry,
         checkoutsByCountrySource,
         bySource,
         byUrl,
+
 
         fx: {
           base: "USD",

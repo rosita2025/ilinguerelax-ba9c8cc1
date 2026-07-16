@@ -207,6 +207,7 @@ Deno.serve(async (req) => {
           countryReason,
           source: "checkout",
           paymentMethod,
+          triggerReason,
         });
       }
     } catch (e) {

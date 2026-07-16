@@ -204,7 +204,7 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, manualRes, digitalRes] = await Promise.all([
+    const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
         .select("product_id, purchased_at, raw_payload, status")
@@ -218,6 +218,12 @@ serve(async (req) => {
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
       supabase.from("digital_products").select("sku, name"),
+      supabase
+        .from("funnel_events")
+        .select("id, created_at, product_id, value, currency, country, session_id, referrer")
+        .in("event_name", ["Purchase", "purchase"])
+        .gte("created_at", fromDate.toISOString())
+        .lte("created_at", toDate.toISOString()),
     ]);
     const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 

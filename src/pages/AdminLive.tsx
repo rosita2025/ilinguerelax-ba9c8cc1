@@ -291,7 +291,7 @@ const AdminLive = () => {
             </Card>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-4">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="p-4">
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <Globe className="w-4 h-4" /> Por país

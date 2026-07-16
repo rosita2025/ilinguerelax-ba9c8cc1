@@ -32,6 +32,8 @@ interface AuditRow {
   product: string | null;
   converted: boolean | null;
   payload: unknown;
+  usd_amount: number | null;
+  usd_source: "producer" | "offer" | "price" | "none";
   brevo: BrevoInfo | null;
 }
 
@@ -39,6 +41,21 @@ interface AuditRow {
 interface Summary {
   approved: number; pending: number; refused: number; refunded: number; chargeback: number; cancelled: number; abandoned: number;
 }
+
+interface UsdSummary {
+  approved_usd: number;
+  pending_usd: number;
+}
+
+const USD_SOURCE_LABEL: Record<AuditRow["usd_source"], string> = {
+  producer: "Producer",
+  offer: "Offer",
+  price: "Price",
+  none: "—",
+};
+
+const fmtUsd = (n: number | null) =>
+  n == null ? "—" : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
 
 

@@ -197,12 +197,10 @@ const AdminBrevoAbandonedStats = () => {
               <Select value={autoRefresh} onValueChange={setAutoRefresh}>
                 <SelectTrigger className="w-full md:w-[160px]"><SelectValue placeholder="Auto" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="off">Sin auto-refresh</SelectItem>
-                  <SelectItem value="15">Auto · 15 s</SelectItem>
-                  <SelectItem value="30">Auto · 30 s</SelectItem>
-                  <SelectItem value="60">Auto · 1 min</SelectItem>
+                  <SelectItem value="off">Sin auto-refresh (recomendado)</SelectItem>
                   <SelectItem value="300">Auto · 5 min</SelectItem>
                   <SelectItem value="900">Auto · 15 min</SelectItem>
+                  <SelectItem value="1800">Auto · 30 min</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" onClick={load} disabled={loading} className="w-full md:w-auto">

@@ -219,6 +219,26 @@ serve(async (req) => {
       b.sessions.add(sid);
       totals.sessions.add(sid);
 
+      // Traffic source aggregation (per session, based on referrer of first event seen)
+      const src = classifyTrafficSource(r.referrer);
+      let srcAgg = bySourceAgg.get(src);
+      if (!srcAgg) {
+        srcAgg = { sessions: new Set(), pageviews: 0 };
+        bySourceAgg.set(src, srcAgg);
+      }
+      srcAgg.sessions.add(sid);
+      if (r.event_name === "PageView") srcAgg.pageviews++;
+
+      // URL / page path aggregation
+      const url = (r.page_path || "/").split("?")[0] || "/";
+      let uAgg = byUrlAgg.get(url);
+      if (!uAgg) {
+        uAgg = { sessions: new Set(), pageviews: 0 };
+        byUrlAgg.set(url, uAgg);
+      }
+      uAgg.sessions.add(sid);
+      if (r.event_name === "PageView") uAgg.pageviews++;
+
       const cKey = r.country || "??";
       let cAgg = byCountryAgg.get(cKey);
       if (!cAgg) {

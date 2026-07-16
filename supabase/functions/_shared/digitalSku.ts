@@ -32,6 +32,11 @@ const SKU_ALIASES: Record<string, string> = {
   "coreano-100-mapas": "100-mapas-mentales-para-aprender-coreano-hangul-c1",
   "100-mapas-coreano": "100-mapas-mentales-para-aprender-coreano-hangul-c1",
 
+  // 1,000 palabras esenciales coreano (Hangul)
+  "1000-palabras-coreano": "1-000-palabras-esenciales-para-aprender-coreano",
+  "coreano-1000-palabras": "1-000-palabras-esenciales-para-aprender-coreano",
+  "palabras-coreano": "1-000-palabras-esenciales-para-aprender-coreano",
+
   // Versión en español (para angloparlantes)
   "500-questions-spanish": "500-questions-in-spanish-with-english-pronunciation",
   "1000-verbs-spanish": "1-000-verbs-in-spanish-past-present-future-with-english-pronunciation",

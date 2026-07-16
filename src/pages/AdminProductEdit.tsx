@@ -139,6 +139,18 @@ const AdminProductEdit = () => {
     [allProducts, product.sku, upsells]
   );
 
+  // ⚠️ Duplicate SKU guard: bloquea crear/renombrar a un SKU ya existente para
+  // evitar romper el envío digital por SKU (el matcher resuelve por SKU exacto).
+  const duplicateSku = useMemo(() => {
+    const trimmed = product.sku.trim().toLowerCase();
+    if (!trimmed) return null;
+    // Al editar, el SKU actual (parámetro de URL) es el propio → no cuenta.
+    const conflict = allProducts.find(
+      (p) => p.sku.toLowerCase() === trimmed && (isNew || p.sku !== sku),
+    );
+    return conflict ?? null;
+  }, [product.sku, allProducts, isNew, sku]);
+
   const update = <K extends keyof Product>(k: K, v: Product[K]) => setProduct((p) => ({ ...p, [k]: v }));
 
   // Países sin ningún canal disponible: ni Tienda (activa y no excluye) ni Hotmart (con enlace y no excluye)

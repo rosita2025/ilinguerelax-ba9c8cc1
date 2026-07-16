@@ -64,8 +64,28 @@ export function BuyerInfoForm() {
   }, [buyer.email, buyer.fullName, buyer.phone]);
 
   const region = useRegionTier();
-  const { language } = useI18n();
+  const { language, countryCode } = useI18n();
+  const items = useCheckoutPruebaStore((s) => s.items);
   const t = getCheckoutUI(language);
+
+  // Estilo Shopify: en cuanto el visitante escriba un correo válido y salga
+  // del campo (nombre / correo / teléfono), sincronizamos el carrito
+  // abandonado + Brevo inmediatamente, sin esperar a que elija método de
+  // pago. Cubre casos de señal débil, celular apagado, olvido, etc.
+  const fireAbandonedCapture = () => {
+    const email = normalizeEmail(buyer.email);
+    if (!EMAIL_RE.test(email)) return;
+    trackAbandonedCheckoutNow({
+      email,
+      name: buyer.fullName,
+      phone: buyer.phone,
+      productType: items?.[0]?.id,
+      language,
+      country: countryCode || "",
+      items,
+    }).catch(() => { /* silencioso */ });
+  };
+
   const valid = isBuyerValid(buyer);
   const [showErrors, setShowErrors] = useState(false);
   const [shake, setShake] = useState(false);

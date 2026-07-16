@@ -11,14 +11,20 @@ import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { sendEmail } from "../_shared/brevo.ts";
 
 const corsHeaders = adminCorsHeaders;
-const STEPS = [1, 7, 15, 30] as const;
+// Steps are measured in HOURS. 3h, 24h (1d), 168h (7d), 360h (15d), 720h (30d).
+const STEPS = [3, 24, 168, 360, 720] as const;
 type Step = typeof STEPS[number];
 
 const SUBJECTS_ES: Record<Step, string> = {
-  1: "⏰ Tu carrito te está esperando — recupéralo hoy",
-  7: "¿Aún interesado? Tu carrito sigue disponible",
-  15: "Última semana para recuperar tu carrito con descuento",
-  30: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
+  3: "👀 ¿Olvidaste algo? Tu carrito sigue esperándote",
+  24: "⏰ Tu carrito te está esperando — recupéralo hoy",
+  168: "¿Aún interesado? Tu carrito sigue disponible",
+  360: "Última semana para recuperar tu carrito con descuento",
+  720: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
+};
+
+const STEP_LABEL: Record<Step, string> = {
+  3: "3 h", 24: "24 h", 168: "Día 7", 360: "Día 15", 720: "Día 30",
 };
 
 function buildHtml(opts: {
@@ -36,10 +42,11 @@ function buildHtml(opts: {
     ? "Retomarás la compra desde donde la dejaste en Hotmart (pago 100% seguro)."
     : "Retomarás el checkout en nuestra tienda con los productos que dejaste.";
   const stepMsg: Record<Step, string> = {
-    1: "Vimos que ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
-    7: "Ha pasado una semana desde que iniciaste tu compra. Tu carrito sigue guardado.",
-    15: "Vamos a liberar tu carrito pronto. Aprovecha ahora — te dejamos el enlace directo.",
-    30: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
+    3: "Notamos que hace unas horas comenzaste tu compra y no la terminaste. Tu carrito sigue reservado — retómalo en 1 clic.",
+    24: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
+    168: "Ha pasado una semana desde que iniciaste tu compra. Tu carrito sigue guardado.",
+    360: "Vamos a liberar tu carrito pronto. Aprovecha ahora — te dejamos el enlace directo.",
+    720: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
 
   return `<!DOCTYPE html>
@@ -49,7 +56,7 @@ function buildHtml(opts: {
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.08)">
         <tr><td style="padding:28px 28px 8px">
           <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:${opts.origin === "hotmart" ? "#fff7ed" : "#f0fdfa"};color:${opts.origin === "hotmart" ? "#c2410c" : "#0f766e"};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">
-            ${opts.origin === "hotmart" ? "Hotmart" : "Tienda iLingue Relax"} · Día ${opts.step}
+            ${opts.origin === "hotmart" ? "Hotmart" : "Tienda iLingue Relax"} · ${STEP_LABEL[opts.step]}
           </div>
           <h1 style="margin:12px 0 4px;font-size:22px;line-height:1.3">${greeting} 👋</h1>
           <p style="margin:0 0 12px;color:#475569">${stepMsg[opts.step]}</p>
@@ -77,11 +84,14 @@ function buildHtml(opts: {
 </body></html>`;
 }
 
-function computeWindow(step: Step) {
-  // Look at records created between (step days ago -12h) and (step days ago +12h)
-  const target = Date.now() - step * 86400000;
-  const from = new Date(target - 12 * 3600000).toISOString();
-  const to = new Date(target + 12 * 3600000).toISOString();
+function computeWindow(stepHours: Step) {
+  // Look at records created around (now - stepHours). Tight window for short
+  // steps (<24h) so they only match the current hour; wider ±12h window for
+  // multi-day steps so the daily send covers rows created earlier that day.
+  const target = Date.now() - stepHours * 3600000;
+  const halfWindow = stepHours < 24 ? 0.5 * 3600000 : 12 * 3600000;
+  const from = new Date(target - halfWindow).toISOString();
+  const to = new Date(target + halfWindow).toISOString();
   return { from, to };
 }
 
@@ -135,7 +145,7 @@ Deno.serve(async (req) => {
       .select("send_hour, timezone, enabled_steps, paused, updated_at")
       .eq("id", 1)
       .maybeSingle();
-    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [1, 7, 15, 30], paused: false, updated_at: null };
+    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [3, 24, 168, 360, 720], paused: false, updated_at: null };
 
     // Handle config endpoints (admin-only)
     if (action === "get_config") {
@@ -168,7 +178,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Cron: skip if paused or current hour in TZ doesn't match send_hour
+    // Cron: skip if paused. For DAILY steps (>=24h) also gate on send_hour;
+    // short steps (3h, etc.) fire every hour so recovery reaches the user fast.
+    let allowDailySteps = true;
     if (isCron) {
       if (cfg.paused) {
         return new Response(JSON.stringify({ ok: true, skipped: "paused" }), {
@@ -183,16 +195,21 @@ Deno.serve(async (req) => {
         const h = parts.find((p) => p.type === "hour")?.value;
         if (h != null) currentHour = parseInt(h, 10) % 24;
       } catch { /* fallback to UTC */ }
-      if (currentHour !== cfg.send_hour) {
-        return new Response(JSON.stringify({ ok: true, skipped: `hour ${currentHour} != ${cfg.send_hour} (${cfg.timezone})` }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      allowDailySteps = currentHour === cfg.send_hour;
     }
 
     // Honor enabled_steps from config (intersect with request)
     if (Array.isArray(cfg.enabled_steps) && cfg.enabled_steps.length) {
       onlySteps = onlySteps.filter((s) => cfg.enabled_steps.includes(s));
+    }
+    // Daily-only steps (>=24h) are skipped in cron when not at send_hour
+    if (isCron && !allowDailySteps) {
+      onlySteps = onlySteps.filter((s) => s < 24);
+      if (onlySteps.length === 0) {
+        return new Response(JSON.stringify({ ok: true, skipped: `daily steps wait for hour ${cfg.send_hour} (${cfg.timezone})` }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
 

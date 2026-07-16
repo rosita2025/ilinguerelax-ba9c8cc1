@@ -62,6 +62,18 @@ Deno.serve(async (req) => {
     // Map Hotmart events → estado interno + estado Brevo (mapeo EXPLÍCITO por evento oficial)
     const evUpper = (event || "").toString().toUpperCase().trim();
 
+    // PURCHASE_COMPLETE es el fin del periodo de reembolso (~30 días) de una
+    // venta ya contada como PURCHASE_APPROVED — NO es una compra nueva.
+    // Ignorar por completo para evitar duplicar ventas en /admin/analytics
+    // y /admin/hotmart-audit. El usuario también lo desactivó en el panel
+    // de Hotmart; este guard es defensa en profundidad.
+    if (evUpper === "PURCHASE_COMPLETE") {
+      console.log("[hotmart] PURCHASE_COMPLETE ignorado (duplicado de PURCHASE_APPROVED)");
+      return new Response(JSON.stringify({ ok: true, ignored: "PURCHASE_COMPLETE" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Mapa oficial de eventos Hotmart:
     //  APROBADAS: PURCHASE_APPROVED, PURCHASE_COMPLETE
     //  PENDIENTES: PURCHASE_BILLET_PRINTED, PURCHASE_DELAYED, PURCHASE_OUT_OF_SHOPPING_CART, PURCHASE_PROTEST (bajo revisión)

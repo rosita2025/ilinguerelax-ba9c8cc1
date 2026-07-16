@@ -1,0 +1,1 @@
+DELETE FROM public.hotmart_purchases WHERE raw_payload->>'event' = 'PURCHASE_COMPLETE';

@@ -397,6 +397,11 @@ serve(async (req) => {
     };
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
+      // Defensive: PURCHASE_COMPLETE es el fin del periodo de reembolso de una
+      // venta ya contada como PURCHASE_APPROVED. Nunca debe sumar como compra
+      // nueva. Ignorar aunque el webhook lo haya insertado por error.
+      const eventName = String(h.raw_payload?.event || h.raw_payload?.data?.event || "").toUpperCase();
+      if (eventName === "PURCHASE_COMPLETE") continue;
       const txn = String(h.transaction_code ?? h.raw_payload?.data?.purchase?.transaction ?? h.raw_payload?.transaction ?? "");
       if (/test|sandbox/i.test(txn)) continue;
       const buyerEmail = String(h.email ?? h.raw_payload?.data?.buyer?.email ?? h.raw_payload?.data?.purchase?.buyer?.email ?? "").toLowerCase();

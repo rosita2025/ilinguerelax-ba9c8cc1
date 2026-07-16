@@ -290,7 +290,7 @@ const AdminAnalytics = () => {
               {/* KPI cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Kpi icon={<TrendingUp className="w-4 h-4" />} label="Sesiones" value={data.totals.sessions.toLocaleString()} sub={`${data.totals.pageviews.toLocaleString()} vistas`} />
-                <Kpi icon={<ShoppingCart className="w-4 h-4" />} label="Agregar al carrito" value={data.totals.addToCart.toLocaleString()} sub={`${data.conversion.viewToCartPct}% de vistas`} />
+                <Kpi icon={<ShoppingCart className="w-4 h-4" />} label="Agregar al carrito" value={data.totals.addToCart.toLocaleString()} sub={`${data.conversion.viewToCartPct}% de sesiones`} />
                 <Kpi icon={<CreditCard className="w-4 h-4" />} label="Checkouts iniciados" value={data.totals.checkout.toLocaleString()} sub={`${data.conversion.cartToCheckoutPct}% del carrito`} />
                 <Kpi icon={<DollarSign className="w-4 h-4" />} label="Compras" value={data.totals.purchases.toLocaleString()} sub={money(data.totals.revenue)} highlight />
               </div>

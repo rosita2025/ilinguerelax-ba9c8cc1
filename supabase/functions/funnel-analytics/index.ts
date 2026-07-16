@@ -338,16 +338,28 @@ serve(async (req) => {
       : 0;
 
     const byProduct = Array.from(byProductAgg.entries())
-      .map(([product_id, v]) => ({
-        product_id,
-        views: v.views,
-        carts: v.carts,
-        purchases: v.purchases,
-        revenue: Number(v.revenue.toFixed(2)),
-        conversion: v.views ? Number(((v.purchases / v.views) * 100).toFixed(2)) : 0,
-      }))
+      .map(([product_id, v]) => {
+        const source =
+          v.hotmart && v.store ? "mixto" :
+          v.hotmart ? "hotmart" :
+          v.store ? "store" :
+          "—";
+        return {
+          product_id,
+          name: nameMap.get(product_id) || null,
+          source,
+          hotmart_purchases: v.hotmart,
+          store_purchases: v.store,
+          views: v.views,
+          carts: v.carts,
+          purchases: v.purchases,
+          revenue: Number(v.revenue.toFixed(2)),
+          conversion: v.views ? Number(((v.purchases / v.views) * 100).toFixed(2)) : 0,
+        };
+      })
       .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases)
       .slice(0, 30);
+
 
     const byCountry = Array.from(byCountryAgg.entries())
       .map(([country, v]) => ({

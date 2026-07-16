@@ -34,7 +34,11 @@ const KPI = ({ label, value, icon, tone }: { label: string; value: number | stri
 
 const AdminBrevoAbandonedStats = () => {
   const { adminKey } = useAdminKey();
+  const today = new Date().toISOString().slice(0, 10);
+  const [preset, setPreset] = useState<string>("30");
   const [days, setDays] = useState<number>(30);
+  const [customFrom, setCustomFrom] = useState<string>(today);
+  const [customTo, setCustomTo] = useState<string>(today);
   const [country, setCountry] = useState<string>("all");
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,15 +62,27 @@ const AdminBrevoAbandonedStats = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: res, error } = await adminInvoke<StatsResponse>("stats-brevo-abandoned", {
-        body: { adminKey, days, country: country === "all" ? null : country },
-      });
+      const body: Record<string, unknown> = {
+        adminKey,
+        country: country === "all" ? null : country,
+      };
+      if (preset === "today") {
+        body.from = today; body.to = today;
+      } else if (preset === "yesterday") {
+        const y = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        body.from = y; body.to = y;
+      } else if (preset === "custom") {
+        body.from = customFrom; body.to = customTo;
+      } else {
+        body.days = days;
+      }
+      const { data: res, error } = await adminInvoke<StatsResponse>("stats-brevo-abandoned", { body });
       if (error) throw error;
       setData(res ?? null);
     } catch (e) {
       toast.error("No se pudieron cargar las estadísticas", { description: (e as Error).message });
     } finally { setLoading(false); }
-  }, [adminKey, days, country]);
+  }, [adminKey, days, country, preset, customFrom, customTo, today]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -94,16 +110,29 @@ const AdminBrevoAbandonedStats = () => {
               <p className="text-sm text-muted-foreground">Tendencia diaria por origen (Hotmart vs Tienda) y desglose por país.</p>
             </div>
             <div className="flex flex-wrap gap-2 items-center">
-              <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
-                <SelectTrigger className="w-[140px]"><SelectValue placeholder="Rango" /></SelectTrigger>
+              <Select value={preset} onValueChange={(v) => {
+                setPreset(v);
+                if (v !== "today" && v !== "yesterday" && v !== "custom") setDays(Number(v));
+              }}>
+                <SelectTrigger className="w-[170px]"><SelectValue placeholder="Rango" /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="today">Hoy</SelectItem>
+                  <SelectItem value="yesterday">Ayer</SelectItem>
                   <SelectItem value="7">Últimos 7 días</SelectItem>
-                  <SelectItem value="14">Últimos 14 días</SelectItem>
+                  <SelectItem value="15">Últimos 15 días</SelectItem>
                   <SelectItem value="30">Últimos 30 días</SelectItem>
                   <SelectItem value="60">Últimos 60 días</SelectItem>
                   <SelectItem value="90">Últimos 90 días</SelectItem>
+                  <SelectItem value="custom">Personalizado…</SelectItem>
                 </SelectContent>
               </Select>
+              {preset === "custom" && (
+                <>
+                  <Input type="date" value={customFrom} max={customTo} onChange={(e) => setCustomFrom(e.target.value)} className="w-[150px]" />
+                  <span className="text-muted-foreground text-sm">→</span>
+                  <Input type="date" value={customTo} min={customFrom} max={today} onChange={(e) => setCustomTo(e.target.value)} className="w-[150px]" />
+                </>
+              )}
               <Select value={country} onValueChange={setCountry}>
                 <SelectTrigger className="w-[180px]"><SelectValue placeholder="País" /></SelectTrigger>
                 <SelectContent>

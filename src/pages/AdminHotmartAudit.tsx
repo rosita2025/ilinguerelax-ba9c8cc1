@@ -305,7 +305,7 @@ const AdminHotmartAudit = () => {
                         </tr>
                         {isOpen && (
                           <tr key={row.id + "-detail"} className="border-t bg-muted/20">
-                            <td colSpan={9} className="px-6 py-4 space-y-3">
+                            <td colSpan={10} className="px-6 py-4 space-y-3">
                               <div className="text-xs text-muted-foreground">
                                 Fuente: <span className="font-mono">{row.source === "purchase" ? "hotmart_purchases" : "abandoned_carts"}</span>
                                 {row.converted !== null && (

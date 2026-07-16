@@ -64,6 +64,7 @@ const T: Record<Lang, {
   stepsTitle: (multi: boolean) => string;
   step1: string; step2: string; step3: string; step4: string;
   downloadBtn: string;
+  bonusBtn: string;
   keyLabel: string;
   bonusesTitle: string;
   bonusFallback: (n: number) => string;
@@ -71,6 +72,8 @@ const T: Record<Lang, {
   categoryLabel: string;
   pending: string;
   tip: string;
+  checklistTitle: string;
+  mainLabel: string;
 }> = {
   es: {
     subject: (ref, multi) => `Gracias por tu compra${ref ? ` — ${ref}` : ""} · enlaces de descarga${multi ? " (incluye producto adicional)" : ""}`,

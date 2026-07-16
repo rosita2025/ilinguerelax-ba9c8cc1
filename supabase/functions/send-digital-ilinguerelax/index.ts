@@ -382,7 +382,7 @@ serve(async (req) => {
             <div style="font-size:11px;font-weight:bold;color:#166534;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${t.bonusesTitle}</div>
             ${bonusList.map((b, i) => `
               <div style="margin:6px 0;font-size:13px;color:#374151;">
-                <strong>${escapeHtml(b.name || `Bonus ${i + 1}`)}:</strong>
+                <strong>${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}:</strong>
                 <a href="${escapeHtml(b.drive_url)}" style="color:${BRAND.primary};text-decoration:underline;">${escapeHtml(t.downloadBtn.replace(/^⬇\s*/, ""))}</a>
                 ${b.access_key ? ` · ${escapeHtml(t.keyLabel)}: <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code>` : ""}
               </div>`).join("")}

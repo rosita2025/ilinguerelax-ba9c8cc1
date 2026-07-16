@@ -404,8 +404,16 @@ const AdminAnalytics = () => {
                             <td className="text-right px-2 tabular-nums font-semibold">{p.purchases}</td>
                             <td className="text-right px-2 tabular-nums">
                               {p.pending > 0 ? (
-                                <span className="inline-block text-[11px] px-2 py-0.5 rounded-full border bg-yellow-500/15 text-yellow-700 border-yellow-500/30">
+                                <span
+                                  title={`Hotmart: ${p.hotmart_pending ?? 0} · Tienda: ${p.store_pending ?? 0}`}
+                                  className="inline-block text-[11px] px-2 py-0.5 rounded-full border bg-yellow-500/15 text-yellow-700 border-yellow-500/30"
+                                >
                                   {p.pending}
+                                  {(p.hotmart_pending || p.store_pending) ? (
+                                    <span className="ml-1 opacity-70">
+                                      ({p.hotmart_pending ?? 0}H·{p.store_pending ?? 0}T)
+                                    </span>
+                                  ) : null}
                                 </span>
                               ) : (
                                 <span className="text-muted-foreground">0</span>

@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send } from "lucide-react";
 import { toast } from "sonner";
 
-type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital" | "hotmart";
+type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
 
 // Extrae USD real desde commissions[source=PRODUCER, currency=USD] del payload Hotmart
 const extractHotmartProducerUsd = (rawPayload: any): number | null => {

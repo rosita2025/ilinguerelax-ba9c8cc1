@@ -189,7 +189,14 @@ const AdminEmailTest = () => {
           email: r.buyer_email,
           products,
           productLines: buildProductLines(skus, products, productMap),
-          amount: `${r.currency_local || "USD"} ${Number(r.amount_local ?? r.amount_usd ?? 0).toFixed(2)}`,
+          amount: (() => {
+            const usd = Number(r.amount_usd ?? 0);
+            const local = Number(r.amount_local ?? 0);
+            const curLocal = (r.currency_local || "").toUpperCase();
+            const usdStr = usd > 0 ? `USD ${usd.toFixed(2)}` : "";
+            const localStr = local > 0 && curLocal && curLocal !== "USD" ? `${curLocal} ${local.toFixed(2)}` : "";
+            return [usdStr, localStr].filter(Boolean).join(" · ") || `USD ${Number(r.amount_usd ?? r.amount_local ?? 0).toFixed(2)}`;
+          })(),
           status: r.status || "pending",
           delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
         });

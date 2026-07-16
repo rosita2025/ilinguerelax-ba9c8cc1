@@ -410,7 +410,9 @@ serve(async (req) => {
           purchaseSessions: totals.purchaseSessions.size,
           checkoutSessions: totals.checkoutSessions.size,
           cartSessions: totals.cartSessions.size,
+          hotmartPending: hotmartPendingCount,
         },
+
         conversion: {
           globalPct: Number(globalConversion.toFixed(2)),
           viewToCartPct: Number(cartRate.toFixed(2)),

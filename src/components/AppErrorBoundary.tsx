@@ -12,20 +12,21 @@ interface Props {
 interface State {
   hasError: boolean;
   countdown: number;
+  retryCount: number;
 }
 
 export class AppErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false, countdown: 5 };
+  state: State = { hasError: false, countdown: 5, retryCount: 0 };
   private timer: ReturnType<typeof setInterval> | null = null;
 
-  static getDerivedStateFromError(): State {
+  static getDerivedStateFromError(): Partial<State> {
     return { hasError: true, countdown: 5 };
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
       this.clearTimer();
-      this.setState({ hasError: false, countdown: 5 });
+      this.setState({ hasError: false, countdown: 5, retryCount: 0 });
     }
     if (this.state.hasError && !prevState.hasError) {
       this.startTimer();
@@ -42,7 +43,9 @@ export class AppErrorBoundary extends Component<Props, State> {
       this.setState((s) => {
         if (s.countdown <= 1) {
           this.clearTimer();
-          window.location.reload();
+          if (s.retryCount < 2) {
+            return { hasError: false, countdown: 5, retryCount: s.retryCount + 1 };
+          }
           return { ...s, countdown: 0 };
         }
         return { ...s, countdown: s.countdown - 1 };
@@ -85,11 +88,11 @@ export class AppErrorBoundary extends Component<Props, State> {
           </div>
           <div className="grid gap-2">
             <Button
-              onClick={() => window.location.reload()}
+              onClick={() => this.setState({ hasError: false, countdown: 5, retryCount: 0 })}
               size="lg"
               className="w-full gap-2 text-base font-semibold"
             >
-              <RefreshCw className="h-5 w-5" /> Recargar ahora
+              <RefreshCw className="h-5 w-5" /> Intentar de nuevo
             </Button>
             <Button asChild variant="outline" className="w-full gap-2">
               <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">

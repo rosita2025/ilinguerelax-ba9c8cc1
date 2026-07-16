@@ -139,6 +139,111 @@ const rangeForPreset = (p: PresetKey, custom: { from?: Date; to?: Date }) => {
 const money = (n: number) =>
   `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
+const toArray = <T,>(value: T[] | null | undefined): T[] => (Array.isArray(value) ? value : []);
+const toNumber = (value: unknown) => {
+  const n = Number(value ?? 0);
+  return Number.isFinite(n) ? n : 0;
+};
+const countryDisplay = (code: string | null | undefined) => {
+  const info = getCountryInfo(code);
+  return {
+    flag: info?.flag || "🌐",
+    name: info?.name || code || "Desconocido",
+  };
+};
+
+const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined, fallbackRange: ReturnType<typeof rangeForPreset>): AnalyticsData => {
+  const totals = value?.totals ?? ({} as AnalyticsData["totals"]);
+  const conversion = value?.conversion ?? ({} as AnalyticsData["conversion"]);
+  const abandoned = value?.abandoned ?? ({} as AnalyticsData["abandoned"]);
+
+  return {
+    range: value?.range ?? {
+      from: fallbackRange.from.toISOString(),
+      to: fallbackRange.to.toISOString(),
+      granularity: fallbackRange.granularity,
+    },
+    totals: {
+      sessions: toNumber(totals.sessions),
+      pageviews: toNumber(totals.pageviews),
+      viewContent: toNumber(totals.viewContent),
+      addToCart: toNumber(totals.addToCart),
+      checkout: toNumber(totals.checkout),
+      purchases: toNumber(totals.purchases),
+      revenue: toNumber(totals.revenue),
+      purchaseSessions: toNumber(totals.purchaseSessions),
+      checkoutSessions: toNumber(totals.checkoutSessions),
+      cartSessions: toNumber(totals.cartSessions),
+    },
+    conversion: {
+      globalPct: toNumber(conversion.globalPct),
+      viewToCartPct: toNumber(conversion.viewToCartPct),
+      cartToCheckoutPct: toNumber(conversion.cartToCheckoutPct),
+      checkoutToPurchasePct: toNumber(conversion.checkoutToPurchasePct),
+      abandonedCheckoutPct: toNumber(conversion.abandonedCheckoutPct),
+    },
+    abandoned: {
+      total: toNumber(abandoned.total),
+      recovered: toNumber(abandoned.recovered),
+      openValue: toNumber(abandoned.openValue),
+      recoveryRatePct: toNumber(abandoned.recoveryRatePct),
+    },
+    series: toArray(value?.series).map((s) => ({
+      ...s,
+      bucket: s?.bucket || fallbackRange.from.toISOString(),
+      sessions: toNumber(s?.sessions),
+      pageviews: toNumber(s?.pageviews),
+      viewContent: toNumber(s?.viewContent),
+      addToCart: toNumber(s?.addToCart),
+      checkout: toNumber(s?.checkout),
+      purchases: toNumber(s?.purchases),
+      revenue: toNumber(s?.revenue),
+    })),
+    byProduct: toArray(value?.byProduct).map((p) => ({
+      ...p,
+      product_id: p?.product_id || "producto-desconocido",
+      views: toNumber(p?.views),
+      carts: toNumber(p?.carts),
+      purchases: toNumber(p?.purchases),
+      revenue: toNumber(p?.revenue),
+      conversion: toNumber(p?.conversion),
+    })),
+    byCountry: toArray(value?.byCountry).map((c) => ({
+      country: c?.country || "Desconocido",
+      sessions: toNumber(c?.sessions),
+      purchases: toNumber(c?.purchases),
+      revenue: toNumber(c?.revenue),
+    })),
+    byProductCountry: toArray(value?.byProductCountry).map((r) => ({
+      product_id: r?.product_id || "producto-desconocido",
+      name: r?.name ?? null,
+      country: r?.country || "Desconocido",
+      sessions: toNumber(r?.sessions),
+      views: toNumber(r?.views),
+      carts: toNumber(r?.carts),
+      purchases: toNumber(r?.purchases),
+      revenue: toNumber(r?.revenue),
+    })),
+    checkoutsByCountrySource: toArray(value?.checkoutsByCountrySource).map((r) => ({
+      country: r?.country || "Desconocido",
+      source: r?.source || "directo",
+      sessions: toNumber(r?.sessions),
+    })),
+    bySource: toArray(value?.bySource).map((r) => ({
+      source: r?.source || "directo",
+      sessions: toNumber(r?.sessions),
+      pageviews: toNumber(r?.pageviews),
+    })),
+    byUrl: toArray(value?.byUrl).map((r) => ({
+      url: r?.url || "/",
+      sessions: toNumber(r?.sessions),
+      pageviews: toNumber(r?.pageviews),
+    })),
+    fx: value?.fx,
+    generatedAt: value?.generatedAt || new Date().toISOString(),
+  };
+};
+
 const AdminAnalytics = () => {
   const { adminKey } = useAdminKey();
   const [preset, setPreset] = useState<PresetKey>("today");
@@ -168,7 +273,7 @@ const AdminAnalytics = () => {
         toast.error((res as { error: string }).error);
         return;
       }
-      setData(res as AnalyticsData);
+      setData(normalizeAnalyticsData(res as Partial<AnalyticsData>, range));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al cargar analíticas");
     } finally {
@@ -562,9 +667,7 @@ const AdminAnalytics = () => {
                     {/* Mobile cards */}
                     <div className="md:hidden space-y-2">
                       {data.byProductCountry.slice(0, 50).map((r, i) => {
-                        const info = getCountryInfo(r.country);
-                        const countryName = info?.name || r.country || "Desconocido";
-                        const countryFlag = info?.flag || "🌐";
+                        const { flag: countryFlag, name: countryName } = countryDisplay(r.country);
                         return (
                           <div key={`${r.product_id}-${r.country}-${i}`} className="border border-border/60 rounded-lg p-3 bg-card">
                             <div className="flex items-start justify-between gap-2 mb-2">
@@ -608,9 +711,7 @@ const AdminAnalytics = () => {
                         </thead>
                         <tbody>
                           {data.byProductCountry.slice(0, 100).map((r, i) => {
-                            const info = getCountryInfo(r.country);
-                            const countryName = info?.name || r.country || "Desconocido";
-                            const countryFlag = info?.flag || "🌐";
+                            const { flag: countryFlag, name: countryName } = countryDisplay(r.country);
                             return (
                               <tr key={`${r.product_id}-${r.country}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
                                 <td className="py-2 pr-3 max-w-xs">
@@ -658,12 +759,12 @@ const AdminAnalytics = () => {
                     </thead>
                     <tbody>
                       {data.byCountry.map((c) => {
-                        const info = getCountryInfo(c.country);
+                        const info = countryDisplay(c.country);
                         return (
                           <tr key={c.country} className="border-b border-border/40 hover:bg-muted/40">
                             <td className="py-2 pr-3">
-                              <span className="mr-2">{info?.flag || "🌐"}</span>
-                              {info?.name || c.country}
+                              <span className="mr-2">{info.flag}</span>
+                              {info.name}
                             </td>
                             <td className="text-right px-2 tabular-nums">{c.sessions}</td>
                             <td className="text-right px-2 tabular-nums">{c.purchases}</td>
@@ -694,7 +795,7 @@ const AdminAnalytics = () => {
                       </thead>
                       <tbody>
                         {data.checkoutsByCountrySource.map((row, i) => {
-                          const info = getCountryInfo(row.country);
+                          const info = countryDisplay(row.country);
                           const labelMap: Record<string, { label: string; cls: string }> = {
                             pixel_meta:     { label: "Pixel Meta (FB/IG)", cls: "bg-blue-500/15 text-blue-600 border-blue-500/30" },
                             google_ads:     { label: "Google Ads",         cls: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30" },
@@ -708,8 +809,8 @@ const AdminAnalytics = () => {
                           return (
                             <tr key={`${row.country}-${row.source}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
                               <td className="py-2 pr-3">
-                                <span className="mr-2">{info?.flag || "🌐"}</span>
-                                {info?.name || row.country}
+                                <span className="mr-2">{info.flag}</span>
+                                {info.name}
                               </td>
                               <td className="px-2">
                                 <span className={cn("inline-block text-[11px] px-2 py-0.5 rounded border", s.cls)}>{s.label}</span>

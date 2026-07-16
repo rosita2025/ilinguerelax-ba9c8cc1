@@ -86,6 +86,7 @@ Deno.serve(async (req) => {
         : st === "chargeback" ? "chargeback"
         : st === "cancelled" || st === "canceled" ? "cancelled"
         : "unknown";
+      const usd = extractHotmartUsd(r.raw_payload);
       return {
         id: r.id,
         source: "purchase",
@@ -97,6 +98,8 @@ Deno.serve(async (req) => {
         product: r.product_code ?? r.product_id ?? null,
         converted: null,
         payload: r.raw_payload,
+        usd_amount: usd.amount,
+        usd_source: usd.source,
       };
     });
 

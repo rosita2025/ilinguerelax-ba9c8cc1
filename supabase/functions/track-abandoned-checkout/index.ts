@@ -155,46 +155,63 @@ Deno.serve(async (req) => {
 
     // Push to Brevo — the Brevo Automation workflow sends Day 1/7/15/30 emails.
     try {
-      const { data: product } = await supabase
-        .from("digital_products")
-        .select("name, price_usd, sku")
-        .eq("sku", productType)
+      // Dedupe: si ya sincronizamos este email+SKU con Brevo en los últimos 30 min,
+      // saltamos para evitar 4-5 registros seguidos del mismo cliente editando el form.
+      const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { data: recent } = await supabase
+        .from("brevo_sync_logs")
+        .select("id")
+        .eq("email", email)
+        .eq("product_sku", productType)
+        .eq("event_type", "tienda_abandoned")
+        .eq("status", "success")
+        .gte("created_at", thirtyMinAgo)
+        .limit(1)
         .maybeSingle();
-      const site = "https://ilinguerelax.com";
-      // Payload de recuperación estilo Shopify: al hacer clic en el email,
-      // /checkouts/:slug hidrata carrito + datos del cliente automáticamente.
-      const recoverPayload = {
-        v: 1,
-        b: { n: name, e: email, p: phone },
-        c: cart,
-      };
-      const recoverB64 = btoa(unescape(encodeURIComponent(JSON.stringify(recoverPayload))))
-        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-      const checkoutSku = (product as { sku?: string } | null)?.sku || productType;
-      const baseUrl = `${site}/checkouts/${checkoutSku}`;
-      const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
-      const countryReason = !country
-        ? (body.country_source === "ip" ? "ip_lookup_failed" : "ip_unavailable")
-        : (/^[A-Z]{2}$/.test(country) ? undefined : "invalid_format");
-      brevoSynced = await pushAbandonedCartToBrevo({
-        email,
-        name,
-        phone,
-        productSku: productType,
-        productName: (product as { name?: string } | null)?.name,
-        productUrl: url,
-        priceUsd: (product as { price_usd?: number } | null)?.price_usd ?? undefined,
-        couponCode: "NEW10",
-        couponPercent: 10,
-        language,
-        country,
-        countryReason,
-        source: "checkout",
-        paymentMethod,
-      });
+
+      if (recent) {
+        console.log(`[dedupe] skipping Brevo push (recent sync <30min) for ${email} / ${productType}`);
+      } else {
+        const { data: product } = await supabase
+          .from("digital_products")
+          .select("name, price_usd, sku")
+          .eq("sku", productType)
+          .maybeSingle();
+        const site = "https://ilinguerelax.com";
+        const recoverPayload = {
+          v: 1,
+          b: { n: name, e: email, p: phone },
+          c: cart,
+        };
+        const recoverB64 = btoa(unescape(encodeURIComponent(JSON.stringify(recoverPayload))))
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        const checkoutSku = (product as { sku?: string } | null)?.sku || productType;
+        const baseUrl = `${site}/checkouts/${checkoutSku}`;
+        const url = `${baseUrl}?r=${recoverB64}&lang=${language}`;
+        const countryReason = !country
+          ? (body.country_source === "ip" ? "ip_lookup_failed" : "ip_unavailable")
+          : (/^[A-Z]{2}$/.test(country) ? undefined : "invalid_format");
+        brevoSynced = await pushAbandonedCartToBrevo({
+          email,
+          name,
+          phone,
+          productSku: productType,
+          productName: (product as { name?: string } | null)?.name,
+          productUrl: url,
+          priceUsd: (product as { price_usd?: number } | null)?.price_usd ?? undefined,
+          couponCode: "NEW10",
+          couponPercent: 10,
+          language,
+          country,
+          countryReason,
+          source: "checkout",
+          paymentMethod,
+        });
+      }
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
     }
+
 
     return new Response(JSON.stringify({ ok: true, brevoSynced }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

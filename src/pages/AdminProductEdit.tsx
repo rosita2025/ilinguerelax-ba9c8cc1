@@ -139,6 +139,18 @@ const AdminProductEdit = () => {
     [allProducts, product.sku, upsells]
   );
 
+  // ⚠️ Duplicate SKU guard: bloquea crear/renombrar a un SKU ya existente para
+  // evitar romper el envío digital por SKU (el matcher resuelve por SKU exacto).
+  const duplicateSku = useMemo(() => {
+    const trimmed = product.sku.trim().toLowerCase();
+    if (!trimmed) return null;
+    // Al editar, el SKU actual (parámetro de URL) es el propio → no cuenta.
+    const conflict = allProducts.find(
+      (p) => p.sku.toLowerCase() === trimmed && (isNew || p.sku !== sku),
+    );
+    return conflict ?? null;
+  }, [product.sku, allProducts, isNew, sku]);
+
   const update = <K extends keyof Product>(k: K, v: Product[K]) => setProduct((p) => ({ ...p, [k]: v }));
 
   // Países sin ningún canal disponible: ni Tienda (activa y no excluye) ni Hotmart (con enlace y no excluye)
@@ -175,6 +187,13 @@ const AdminProductEdit = () => {
   const save = async (opts: { force?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });
+    if (duplicateSku) {
+      return toast({
+        title: "⚠️ SKU duplicado",
+        description: `Ya existe el producto "${duplicateSku.name}" con el SKU "${duplicateSku.sku}". Cambia el SKU para evitar romper el envío digital.`,
+        variant: "destructive",
+      });
+    }
     if (!opts.force && orphanCountries.length > 0) {
       const list = orphanCountries.map((c) => `${COUNTRY_INFO[c]?.flag ?? ""} ${c}`).join(", ");
       const ok = window.confirm(
@@ -270,6 +289,17 @@ const AdminProductEdit = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Al renombrar cambia también la URL pública del producto.</p>
+                {duplicateSku && (
+                  <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                    <div className="font-semibold text-destructive">⚠️ SKU duplicado</div>
+                    <div className="text-destructive/90 mt-1">
+                      Ya existe el producto <strong>"{duplicateSku.name}"</strong> con el SKU <code className="font-mono">{duplicateSku.sku}</code>.
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Guardar con un SKU repetido rompe el envío digital automático (el sistema resuelve por SKU exacto y mezclaría materiales). Cambia el SKU antes de guardar.
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <Label>Orden</Label>

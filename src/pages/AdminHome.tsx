@@ -68,6 +68,13 @@ const panels = [
     color: "text-cyan-600",
   },
   {
+    to: "/admin/brevo-abandoned",
+    icon: Send,
+    title: "Brevo · Carritos abandonados",
+    desc: "Payload real enviado a Brevo por cada carrito abandonado (tienda vs Hotmart) con ORIGEN, SEGMENTO, TAGS e IDs de producto.",
+    color: "text-pink-600",
+  },
+  {
     to: "/admin/analytics",
     icon: LineChart,
     title: "Analíticas · Funnel",

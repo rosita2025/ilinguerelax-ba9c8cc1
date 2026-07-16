@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
     const productType = normalizeSku(rawProductType) || rawProductType;
     const country = String(body.country || "").trim().toUpperCase().slice(0, 2);
     const paymentMethod = String(body.payment_method || "not_selected").trim().toLowerCase().slice(0, 40);
+    const triggerReason = String(body.trigger_reason || "unknown").trim().toLowerCase().slice(0, 40);
     const cart = Array.isArray(body.cart)
       ? (body.cart as Array<{ id?: string; q?: number }>)
           .filter((c) => c && typeof c.id === "string")

@@ -178,7 +178,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Cron: skip if paused or current hour in TZ doesn't match send_hour
+    // Cron: skip if paused. For DAILY steps (>=24h) also gate on send_hour;
+    // short steps (3h, etc.) fire every hour so recovery reaches the user fast.
+    let allowDailySteps = true;
     if (isCron) {
       if (cfg.paused) {
         return new Response(JSON.stringify({ ok: true, skipped: "paused" }), {
@@ -193,16 +195,21 @@ Deno.serve(async (req) => {
         const h = parts.find((p) => p.type === "hour")?.value;
         if (h != null) currentHour = parseInt(h, 10) % 24;
       } catch { /* fallback to UTC */ }
-      if (currentHour !== cfg.send_hour) {
-        return new Response(JSON.stringify({ ok: true, skipped: `hour ${currentHour} != ${cfg.send_hour} (${cfg.timezone})` }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      allowDailySteps = currentHour === cfg.send_hour;
     }
 
     // Honor enabled_steps from config (intersect with request)
     if (Array.isArray(cfg.enabled_steps) && cfg.enabled_steps.length) {
       onlySteps = onlySteps.filter((s) => cfg.enabled_steps.includes(s));
+    }
+    // Daily-only steps (>=24h) are skipped in cron when not at send_hour
+    if (isCron && !allowDailySteps) {
+      onlySteps = onlySteps.filter((s) => s < 24);
+      if (onlySteps.length === 0) {
+        return new Response(JSON.stringify({ ok: true, skipped: `daily steps wait for hour ${cfg.send_hour} (${cfg.timezone})` }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
 

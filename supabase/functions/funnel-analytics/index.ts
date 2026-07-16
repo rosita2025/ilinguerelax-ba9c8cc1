@@ -235,10 +235,10 @@ serve(async (req) => {
     type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
     const realPurchases: RealPurchase[] = [];
     let hotmartPendingCount = 0;
+    let storePendingCount = 0;
 
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
-      // Skip test/sandbox transactions and garbage product ids
       if (/test|sandbox/i.test(txn)) continue;
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;
@@ -264,13 +264,15 @@ serve(async (req) => {
       const first = items[0] || {};
       const nameKey = String(first.name || "").trim().toLowerCase();
       const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
+      const isPending = !APPROVED_STORE.has(String(m.status || "").toLowerCase());
+      if (isPending) storePendingCount++;
       realPurchases.push({
         at: m.verified_at || m.created_at,
         productId: firstSku,
         country: m.buyer_country || "??",
-        usd: Number(m.amount_usd || 0),
+        usd: isPending ? 0 : Number(m.amount_usd || 0),
         source: "store",
-        pending: false,
+        pending: isPending,
       });
     }
 

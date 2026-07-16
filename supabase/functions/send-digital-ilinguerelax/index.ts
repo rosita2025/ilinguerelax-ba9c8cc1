@@ -209,20 +209,32 @@ async function resolveLang(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const source = req.headers.get("x-delivery-source") || "send-digital-ilinguerelax";
+  async function writeAudit(row: Record<string, unknown>) {
+    try { await supabase.from("digital_delivery_audit").insert({ source, ...row }); }
+    catch (e) { console.error("[audit] insert failed", e); }
+  }
+
   try {
     const body: Body = await req.json();
     const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey, force } = body;
-    const normalizedSkus = normalizeSkus(Array.isArray(skus) ? skus : []);
+    const requestedSkus = Array.isArray(skus) ? skus.map((s) => String(s || "")).filter(Boolean) : [];
+    const normalizedSkus = normalizeSkus(requestedSkus);
     if (!customerEmail || normalizedSkus.length === 0) {
+      await writeAudit({
+        customer_email: customerEmail || "unknown", customer_name: customerName || null,
+        order_id: orderId || null, requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+        resolved_skus: [], missing_skus: normalizedSkus, items: [],
+        status: "error", error: "customerEmail and skus required", provider: provider || null,
+      });
       return new Response(JSON.stringify({ error: "customerEmail and skus required" }), {
         status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
 
     const idemKey = idempotencyKey
       || `digital:${(orderId || customerEmail).toLowerCase()}:${[...normalizedSkus].sort().join(",")}`;
@@ -234,6 +246,13 @@ serve(async (req) => {
         .eq("idempotency_key", idemKey)
         .maybeSingle();
       if (existing) {
+        await writeAudit({
+          customer_email: customerEmail, customer_name: customerName || null,
+          order_id: orderId || null, idempotency_key: idemKey,
+          requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+          resolved_skus: [], missing_skus: [], items: [],
+          status: "duplicate", provider: provider || null,
+        });
         return new Response(JSON.stringify({ success: true, duplicate: true, sentAt: existing.created_at }), {
           status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
         });
@@ -247,8 +266,18 @@ serve(async (req) => {
     if (error) throw error;
 
     const products = (data ?? []) as Product[];
+    const resolvedSkus = products.map((p) => p.sku);
+    const missingSkus = normalizedSkus.filter((s) => !resolvedSkus.includes(s));
     if (products.length === 0) {
-      return new Response(JSON.stringify({ success: false, error: "no products found" }), {
+      await writeAudit({
+        customer_email: customerEmail, customer_name: customerName || null,
+        order_id: orderId || null, idempotency_key: idemKey,
+        requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+        resolved_skus: [], missing_skus: missingSkus,
+        items: missingSkus.map((s) => ({ sku: s, reason: "not_found_in_digital_products" })),
+        status: "no_products", error: "no products found", provider: provider || null,
+      });
+      return new Response(JSON.stringify({ success: false, error: "no products found", missingSkus }), {
         status: 404, headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }

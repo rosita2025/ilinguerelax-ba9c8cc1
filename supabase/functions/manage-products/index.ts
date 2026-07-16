@@ -297,7 +297,21 @@ Deno.serve(async (req) => {
       return json({ success: true });
     }
 
+    if (action === "history") {
+      const sku = String((body as { sku?: string }).sku || "").trim();
+      if (!sku) return json({ error: "SKU requerido" }, 400);
+      const { data, error } = await admin
+        .from("digital_product_changes")
+        .select("id, action, changed_fields, created_at")
+        .eq("sku", sku)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return json({ changes: data ?? [] });
+    }
+
     return json({ error: "Invalid action" }, 400);
+
   } catch (e) {
     console.error("[manage-products]", e);
     return json({ error: (e as Error).message }, 500);

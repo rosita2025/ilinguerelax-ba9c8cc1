@@ -7,6 +7,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { useCardPrice } from "@/hooks/useCardPrice";
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { cn } from "@/lib/utils";
+import { ProductCoverImage } from "@/components/ProductCoverImage";
 
 type LangKey = "english" | "spanish" | "portuguese" | "korean" | "soon";
 type FormatKey = "digital" | "physical";
@@ -347,7 +348,7 @@ export const Languages = () => {
               {/* Product Image - Clickable */}
               <Link to={getProductLink(product)}>
                 <div className={cn("aspect-[4/3] bg-gradient-to-br p-6 flex items-center justify-center cursor-pointer", styles.bg)}>
-                  <img
+                  <ProductCoverImage
                     src={product.image}
                     alt={product.title}
                     loading="lazy"

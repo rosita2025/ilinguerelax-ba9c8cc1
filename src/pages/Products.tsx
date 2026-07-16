@@ -10,6 +10,7 @@ import { products as staticProducts, getProductLink, type Product } from "@/data
 import { useDigitalProducts } from "@/hooks/useDigitalProducts";
 import { useCardPrice } from "@/hooks/useCardPrice";
 import { cn } from "@/lib/utils";
+import { ProductCoverImage } from "@/components/ProductCoverImage";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
 import type { LangCode } from "@/data/products";
@@ -370,13 +371,13 @@ const Products = () => {
 
                 {/* Product Image Area */}
                 <div className="relative h-72 bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center p-8">
-                  <img
+                  <ProductCoverImage
                     src={product.image}
                     alt={`${product.title} — ${product.country} · Portada del libro digital · iLingue Relax`}
                     title={product.title}
                     loading="lazy"
-                    width="400"
-                    height="400"
+                    width={400}
+                    height={400}
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

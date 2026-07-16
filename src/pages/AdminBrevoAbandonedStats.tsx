@@ -34,7 +34,11 @@ const KPI = ({ label, value, icon, tone }: { label: string; value: number | stri
 
 const AdminBrevoAbandonedStats = () => {
   const { adminKey } = useAdminKey();
+  const today = new Date().toISOString().slice(0, 10);
+  const [preset, setPreset] = useState<string>("30");
   const [days, setDays] = useState<number>(30);
+  const [customFrom, setCustomFrom] = useState<string>(today);
+  const [customTo, setCustomTo] = useState<string>(today);
   const [country, setCountry] = useState<string>("all");
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);

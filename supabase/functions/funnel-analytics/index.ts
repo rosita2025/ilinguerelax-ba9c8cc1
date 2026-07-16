@@ -697,6 +697,24 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 30);
 
+    // Product × Country breakdown, filtered to products with real activity
+    const validProductIds = new Set(byProduct.map((p) => p.product_id));
+    const byProductCountry = Array.from(byProductCountryAgg.values())
+      .filter((v) => validProductIds.has(v.product_id) && (v.sessions.size + v.views + v.carts + v.purchases) > 0)
+      .map((v) => ({
+        product_id: v.product_id,
+        name: nameMap.get(v.product_id) || null,
+        country: v.country,
+        sessions: v.sessions.size,
+        views: v.views,
+        carts: v.carts,
+        purchases: v.purchases,
+        revenue: Number(v.revenue.toFixed(2)),
+      }))
+      .sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions)
+      .slice(0, 200);
+
+
 
     return new Response(
       JSON.stringify({

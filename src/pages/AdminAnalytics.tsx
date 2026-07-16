@@ -406,10 +406,22 @@ const AdminAnalytics = () => {
                       <div key={p.product_id} className="border border-border/60 rounded-lg p-3 bg-card">
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium text-sm truncate">{p.name || p.product_id}</div>
-                            {p.name && (
-                              <div className="text-[10px] text-muted-foreground truncate">SKU: {p.product_id}</div>
-                            )}
+                            <a
+                              href={`/products/${p.product_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-sm truncate block text-primary hover:underline"
+                            >
+                              {p.name || p.product_id}
+                            </a>
+                            <a
+                              href={`/products/${p.product_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] text-muted-foreground truncate block hover:underline"
+                            >
+                              /products/{p.product_id}
+                            </a>
                           </div>
                           <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${badge.cls}`}>
                             {badge.label}
@@ -434,6 +446,7 @@ const AdminAnalytics = () => {
                       </div>
                     );
                   })}
+
                 </div>
 
                 {/* Desktop table */}
@@ -472,11 +485,24 @@ const AdminAnalytics = () => {
                         return (
                           <tr key={p.product_id} className="border-b border-border/40 hover:bg-muted/40">
                             <td className="py-2 pr-3 max-w-xs">
-                              <div className="truncate font-medium">{p.name || p.product_id}</div>
-                              {p.name && (
-                                <div className="text-[11px] text-muted-foreground truncate">SKU: {p.product_id}</div>
-                              )}
+                              <a
+                                href={`/products/${p.product_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="truncate font-medium block text-primary hover:underline"
+                              >
+                                {p.name || p.product_id}
+                              </a>
+                              <a
+                                href={`/products/${p.product_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-muted-foreground truncate block hover:underline"
+                              >
+                                /products/{p.product_id}
+                              </a>
                             </td>
+
                             <td className="px-2">
                               <span className={`inline-block text-[11px] px-2 py-0.5 rounded-full border ${badge.cls}`}>
                                 {badge.label}

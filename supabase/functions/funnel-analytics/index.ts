@@ -280,14 +280,12 @@ serve(async (req) => {
 
         case "Purchase":
         case "purchase": {
-          // Count Purchase events (from Hotmart webhook + client pixel) into the
-          // funnel graph so `checkout → compra` reflects actual conversions.
-          // Dedup per session so 6 hotmart-webhook duplicates count as 1.
-          if (!totals.purchaseSessions.has(sid)) {
-            totals.purchaseSessions.add(sid);
-            b.purchases++;
-            totals.purchases++;
-          }
+          // Purchase counts come from the authoritative sources below
+          // (hotmart_purchases[status=approved] + manual_payments[verified]
+          // + verified gateway webhooks). Funnel_events Purchase rows may
+          // include pending, refunded or test transactions, so we ignore
+          // them here to keep the counter aligned with /admin/orders and
+          // /admin/hotmart-audit.
           break;
         }
       }
@@ -377,6 +375,8 @@ serve(async (req) => {
     for (const h of (hotmartRes.data ?? []) as any[]) {
       const txn = String(h.raw_payload?.data?.purchase?.transaction ?? "");
       if (/test|sandbox/i.test(txn)) continue;
+      const buyerEmail = String(h.raw_payload?.data?.buyer?.email ?? h.email ?? "").toLowerCase();
+      if (/test|example\.com|postman|hotmart\.com\.br/.test(buyerEmail)) continue;
       const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
       if (!rawPid || rawPid === "0") continue;
       const purchase = h.raw_payload?.data?.purchase ?? {};
@@ -505,9 +505,11 @@ serve(async (req) => {
         if (p.source === "hotmart") pAgg.hotmartPending++; else pAgg.storePending++;
       
       } else {
-        // Purchase count already handled by the Purchase-event pass above
-        // (deduped per session). Here we only accumulate revenue and
-        // per-product/per-country/per-bucket revenue breakdowns.
+        // Authoritative purchase counters. Aligns totals with
+        // /admin/orders and /admin/hotmart-audit (approved only,
+        // tests excluded, gateway sandbox filtered).
+        b.purchases++;
+        totals.purchases++;
         b.revenue += p.usd;
         totals.revenue += p.usd;
         pAgg.purchases++;

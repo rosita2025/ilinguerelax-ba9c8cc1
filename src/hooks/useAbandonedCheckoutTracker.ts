@@ -70,8 +70,10 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
       country: input.country || "",
       cart: cartFromItems(input.items),
       payment_method: input.paymentMethod || undefined,
+      trigger_reason: input.triggerReason || "manual",
     },
   });
+
 
   if (error || data?.ok !== true) {
     console.warn("abandoned-cart track failed", error || data);

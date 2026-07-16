@@ -246,8 +246,18 @@ serve(async (req) => {
           break;
         }
 
-        // Purchase events from the pixel are IGNORED — real purchases come
-        // from Hotmart webhooks, Shopify orders, and verified manual payments.
+        case "Purchase":
+        case "purchase": {
+          // Count Purchase events (from Hotmart webhook + client pixel) into the
+          // funnel graph so `checkout → compra` reflects actual conversions.
+          // Dedup per session so 6 hotmart-webhook duplicates count as 1.
+          if (!totals.purchaseSessions.has(sid)) {
+            totals.purchaseSessions.add(sid);
+            b.purchases++;
+            totals.purchases++;
+          }
+          break;
+        }
       }
     }
 
@@ -431,6 +441,7 @@ serve(async (req) => {
         pending: isPending,
       });
     }
+    console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 
 
     const pendingByCurrency = Array.from(pendingByCurrencyAgg.entries()).map(([currency, breakdown]) => {
@@ -462,9 +473,10 @@ serve(async (req) => {
         if (p.source === "hotmart") pAgg.hotmartPending++; else pAgg.storePending++;
       
       } else {
-        b.purchases++;
+        // Purchase count already handled by the Purchase-event pass above
+        // (deduped per session). Here we only accumulate revenue and
+        // per-product/per-country/per-bucket revenue breakdowns.
         b.revenue += p.usd;
-        totals.purchases++;
         totals.revenue += p.usd;
         pAgg.purchases++;
         pAgg.revenue += p.usd;

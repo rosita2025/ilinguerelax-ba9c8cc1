@@ -41,8 +41,14 @@ const LearnCategory = () => {
   const products = useMemo<Product[]>(() => {
     const existing = new Set(staticProducts.map((p) => p.id));
     const staticSlugs = new Set(staticProducts.map((p) => p.slug));
+    const dbBySlug = new Map(dbProducts.map((p) => [p.slug, p] as const));
+    // Admin's cover image wins over the static one so /admin/productos edits propagate.
+    const merged = staticProducts.map((p) => {
+      const db = dbBySlug.get(p.slug);
+      return db && db.image && db.image !== "/placeholder.svg" ? { ...p, image: db.image } : p;
+    });
     const extra = dbProducts.filter((p) => !existing.has(p.id) && !staticSlugs.has(p.slug));
-    return [...staticProducts, ...extra].filter(
+    return [...merged, ...extra].filter(
       (p) => p.learnerLanguage === from && p.targetLanguage === to,
     );
   }, [dbProducts, from, to]);

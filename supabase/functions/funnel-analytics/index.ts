@@ -246,8 +246,18 @@ serve(async (req) => {
           break;
         }
 
-        // Purchase events from the pixel are IGNORED — real purchases come
-        // from Hotmart webhooks, Shopify orders, and verified manual payments.
+        case "Purchase":
+        case "purchase": {
+          // Count Purchase events (from Hotmart webhook + client pixel) into the
+          // funnel graph so `checkout → compra` reflects actual conversions.
+          // Dedup per session so 6 hotmart-webhook duplicates count as 1.
+          if (!totals.purchaseSessions.has(sid)) {
+            totals.purchaseSessions.add(sid);
+            b.purchases++;
+            totals.purchases++;
+          }
+          break;
+        }
       }
     }
 

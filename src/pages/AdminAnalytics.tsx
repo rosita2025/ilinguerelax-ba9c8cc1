@@ -68,9 +68,20 @@ interface AnalyticsData {
     conversion: number;
   }>;
   byCountry: Array<{ country: string; sessions: number; purchases: number; revenue: number }>;
+  byProductCountry?: Array<{
+    product_id: string;
+    name: string | null;
+    country: string;
+    sessions: number;
+    views: number;
+    carts: number;
+    purchases: number;
+    revenue: number;
+  }>;
   checkoutsByCountrySource?: Array<{ country: string; source: string; sessions: number }>;
   bySource?: Array<{ source: string; sessions: number; pageviews: number }>;
   byUrl?: Array<{ url: string; sessions: number; pageviews: number }>;
+
 
   fx?: {
     base: string;

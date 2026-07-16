@@ -31,10 +31,6 @@ interface AuditRow {
   transaction: string | null;
   product: string | null;
   converted: boolean | null;
-  amount_usd: number | null;
-  usd_source: "producer_commission" | "original_offer_price" | "price_usd" | "unavailable" | null;
-  local_amount: number | null;
-  local_currency: string | null;
   payload: unknown;
   brevo: BrevoInfo | null;
 }
@@ -44,17 +40,7 @@ interface Summary {
   approved: number; pending: number; refused: number; refunded: number; chargeback: number; cancelled: number; abandoned: number;
 }
 
-interface UsdTotals { approved_usd: number; pending_usd: number; }
 
-const USD_SOURCE_LABEL: Record<string, string> = {
-  producer_commission: "commission PRODUCER USD",
-  original_offer_price: "original_offer_price USD",
-  price_usd: "price USD",
-  unavailable: "sin USD nativo",
-};
-
-const fmtUsd = (n: number | null | undefined) =>
-  typeof n === "number" && Number.isFinite(n) ? `$${n.toFixed(2)}` : "—";
 
 const STATUS_META: Record<MappedStatus, { label: string; color: string; icon: any }> = {
   approved:   { label: "Aprobado",   color: "bg-emerald-100 text-emerald-800", icon: CheckCircle2 },

@@ -182,6 +182,10 @@ serve(async (req) => {
       { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
+    // Checkouts (InitiateCheckout / BeginCheckout) segmented by country + traffic source.
+    // Unique sessions per (country, source) pair.
+    const checkoutBySrcAgg = new Map<string, { country: string; source: TrafficSource; sessions: Set<string> }>();
+
 
 
 

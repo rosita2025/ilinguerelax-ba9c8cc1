@@ -531,6 +531,91 @@ const AdminAnalytics = () => {
                 </Card>
               )}
 
+              {/* Traffic source totals (iLingue Relax store) */}
+              {data.bySource && data.bySource.length > 0 && (
+                <Card className="p-4">
+                  <h2 className="font-semibold mb-1">Fuente de tráfico · iLingue Relax</h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Sesiones únicas segmentadas por origen del visitante (detectado desde el <span className="font-mono">referrer</span> capturado por tu pixel propio).
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="text-xs text-muted-foreground border-b">
+                        <tr>
+                          <th className="text-left py-2 pr-3">Fuente</th>
+                          <th className="text-right px-2">Sesiones</th>
+                          <th className="text-right px-2">% del total</th>
+                          <th className="text-right pl-2">Vistas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.bySource.map((row, i) => {
+                          const labelMap: Record<string, { label: string; cls: string }> = {
+                            pixel_meta:     { label: "Pixel Meta (FB/IG)", cls: "bg-blue-500/15 text-blue-600 border-blue-500/30" },
+                            google_ads:     { label: "Google Ads",         cls: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30" },
+                            google_organic: { label: "Google orgánico",    cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
+                            otro_organico:  { label: "Otro buscador",      cls: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" },
+                            email:          { label: "Email / Newsletter", cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" },
+                            referral:       { label: "Referral externo",   cls: "bg-orange-500/15 text-orange-600 border-orange-500/30" },
+                            directo:        { label: "Directo / pixel propio", cls: "bg-muted text-foreground border-border" },
+                          };
+                          const s = labelMap[row.source] || labelMap.directo;
+                          const pct = data.totals.sessions > 0 ? ((row.sessions / data.totals.sessions) * 100).toFixed(1) : "0.0";
+                          return (
+                            <tr key={`${row.source}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
+                              <td className="py-2 pr-3">
+                                <span className={cn("inline-block text-[11px] px-2 py-0.5 rounded border", s.cls)}>{s.label}</span>
+                              </td>
+                              <td className="text-right px-2 tabular-nums font-semibold">{row.sessions}</td>
+                              <td className="text-right px-2 tabular-nums text-muted-foreground">{pct}%</td>
+                              <td className="text-right pl-2 tabular-nums text-muted-foreground">{row.pageviews}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              )}
+
+              {/* Top URLs / pages of the store */}
+              {data.byUrl && data.byUrl.length > 0 && (
+                <Card className="p-4">
+                  <h2 className="font-semibold mb-1">URLs más visitadas · iLingue Relax</h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Top 30 páginas por sesiones únicas dentro de la tienda.
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="text-xs text-muted-foreground border-b">
+                        <tr>
+                          <th className="text-left py-2 pr-3">URL</th>
+                          <th className="text-right px-2">Sesiones</th>
+                          <th className="text-right pl-2">Vistas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.byUrl.map((row, i) => (
+                          <tr key={`${row.url}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
+                            <td className="py-2 pr-3">
+                              <a
+                                href={`https://ilinguerelax.com${row.url}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono text-xs text-primary hover:underline break-all"
+                              >
+                                {row.url}
+                              </a>
+                            </td>
+                            <td className="text-right px-2 tabular-nums font-semibold">{row.sessions}</td>
+                            <td className="text-right pl-2 tabular-nums text-muted-foreground">{row.pageviews}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              )}
 
             </>
           )}

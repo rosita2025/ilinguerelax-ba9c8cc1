@@ -20,6 +20,7 @@ interface Args {
   couponAmount?: number;    // monto absoluto (misma moneda que priceUsd)
   language?: string;        // es|en|fr|pt
   country?: string;         // ISO-2, e.g. PE, US, FR
+  countryReason?: string;   // motivo cuando country falta (ip_unavailable, hotmart_payload_incomplete, etc.)
   source?: string;          // "checkout" | "hotmart" | ...
   productCategory?: string; // categoría/tipo de oferta explícita (opcional)
   paymentMethod?: string;   // stripe | paypal | yape_plin | mercadopago_transfer | ...

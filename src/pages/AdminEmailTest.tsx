@@ -74,7 +74,7 @@ const sourceLabel: Record<Source, string> = {
   paypal: "PayPal",
   mercadopago: "Mercado Pago",
   digital: "Digital",
-  hotmart: "Hotmart",
+  
 };
 
 const sourceColor: Record<Source, string> = {

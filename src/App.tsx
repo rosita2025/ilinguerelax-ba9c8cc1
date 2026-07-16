@@ -274,7 +274,7 @@ const App = () => (
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
                   <Route path="/admin/orders" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/hotmart-audit" element={<AdminGate><AdminHotmartAudit /></AdminGate>} />
-                  <Route path="/admin/debug" element={<AdminGate><AdminDebug /></AdminGate>} />
+                  
                   <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />
                   <Route path="/admin/analytics" element={<AdminGate><AdminAnalytics /></AdminGate>} />
                   

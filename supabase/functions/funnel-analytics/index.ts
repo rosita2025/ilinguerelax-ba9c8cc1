@@ -146,7 +146,7 @@ serve(async (req) => {
 
     const byProductAgg = new Map<
       string,
-      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number }
+      { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }
     >();
     const byCountryAgg = new Map<string, { sessions: Set<string>; purchases: number; revenue: number }>();
 

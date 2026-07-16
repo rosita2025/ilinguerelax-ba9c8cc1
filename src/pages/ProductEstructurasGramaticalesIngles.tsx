@@ -120,15 +120,8 @@ const testimonials = [
 ];
 
 const goToCheckout = () => {
-  trackHotmartEvent("InitiateCheckout", {
-    content_name: "Estructuras Gramaticales de Inglés A1-C1",
-    content_category: "Digital Book",
-    content_ids: ["product-estructuras-gramaticales"],
-    content_type: "product",
-    value: 12,
-    currency: "USD",
-    num_items: 1,
-  });
+  // Skip Meta Pixel: Hotmart embeds the same pixel id at its checkout,
+  // firing here would double-count InitiateCheckout.
   window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
 };
 

@@ -185,11 +185,7 @@ const ProductSpanish5000 = () => {
     if (checkoutLockRef.current) return;
     checkoutLockRef.current = true;
     try {
-      trackHotmartEvent("InitiateCheckout", {
-        content_name: "Spanish 5000 Physical (Amazon)",
-        value: 33,
-        currency: "USD",
-      });
+      // Skip Meta Pixel: Amazon is external, our pixel does not need this event.
       window.open(AMAZON_PHYSICAL_URL, "_blank", "noopener,noreferrer");
     } finally {
       checkoutLockRef.current = false;

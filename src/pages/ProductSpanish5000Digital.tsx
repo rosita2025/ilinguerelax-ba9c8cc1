@@ -185,16 +185,18 @@ const ProductSpanish5000Digital = () => {
     if (lockRef.current) return;
     lockRef.current = true;
     setIsRedirecting(true);
-    trackHotmartEvent("InitiateCheckout", {
-      content_name: "Spanish Relax - 5,000 Words (Digital)",
-      content_category: "Digital Book",
-      content_ids: ["product-spanish-5000-digital"],
-      content_type: "product",
-      value: currentPrice,
-      currency: "USD",
-      num_items: 1,
-    });
     if (useTiendaOnly) {
+      // Fire Meta Pixel only for our own /checkouts page. Hotmart embeds the
+      // same pixel id, so firing here for Hotmart routes would double-count.
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Spanish Relax - 5,000 Words (Digital)",
+        content_category: "Digital Book",
+        content_ids: ["product-spanish-5000-digital"],
+        content_type: "product",
+        value: currentPrice,
+        currency: "USD",
+        num_items: 1,
+      });
       addItem(buildCartItem());
       navigate(TIENDA_PATH_SP5K);
     } else {

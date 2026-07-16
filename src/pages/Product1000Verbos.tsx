@@ -73,16 +73,19 @@ const Product1000Verbos = () => {
 
   const handleBuy = () => {
     if (!pricingReady) return;
-    trackHotmartEvent("InitiateCheckout", {
-      content_name: "Inglés Relax - 1,000 Verbos Esenciales",
-      content_category: "Digital Book",
-      content_ids: ["product-1000-verbos"],
-      content_type: "product",
-      value: currentPrice,
-      currency: "USD",
-      num_items: 1,
-    });
     if (isPeru) {
+      // Meta Pixel fires ONLY when we take the user to our own /checkouts page.
+      // If we send them to Hotmart, Hotmart's page fires the same pixel id
+      // (24959578143733255) and we would double-count InitiateCheckout.
+      trackHotmartEvent("InitiateCheckout", {
+        content_name: "Inglés Relax - 1,000 Verbos Esenciales",
+        content_category: "Digital Book",
+        content_ids: ["product-1000-verbos"],
+        content_type: "product",
+        value: currentPrice,
+        currency: "USD",
+        num_items: 1,
+      });
       addItem({ ...cartItem, quantity: 1 });
       toast.success("Producto agregado al carrito");
       navigate("/checkouts/1000-verbos");

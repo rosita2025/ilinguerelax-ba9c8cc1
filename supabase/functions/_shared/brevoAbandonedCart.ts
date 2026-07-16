@@ -86,6 +86,12 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<boolean> {
   }
   attributes.COUNTRY_STATUS = country.status;
   if (country.status !== "ok" && country.raw) attributes.COUNTRY_RAW = country.raw.slice(0, 64);
+  // Motivo explícito de por qué falta el país (nunca inventamos, solo registramos)
+  if (country.status !== "ok") {
+    const reason = (a.countryReason || (country.status === "invalid" ? "invalid_format" : "unknown_source")).toString().slice(0, 64);
+    attributes.COUNTRY_MISSING_REASON = reason;
+    attributes.PAIS_MOTIVO = reason;
+  }
   // Validación estricta de ORIGEN: solo 'hotmart' o 'tienda'.
   // Fuentes conocidas de tienda propia: checkout, stripe, paypal, mercadopago, yape, plin, manual, web.
   const rawSource = (a.source ?? "").toString().trim().toLowerCase();

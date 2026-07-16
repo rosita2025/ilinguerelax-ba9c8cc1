@@ -260,6 +260,16 @@ serve(async (req) => {
         byProductAgg.set(pKey, pAgg);
       }
 
+      // Product × Country aggregation (session dedup per pair)
+      const pcKey = `${pKey}::${cKey}`;
+      let pcAgg = byProductCountryAgg.get(pcKey);
+      if (!pcAgg) {
+        pcAgg = { product_id: pKey, country: cKey, sessions: new Set(), views: 0, carts: 0, purchases: 0, revenue: 0 };
+        byProductCountryAgg.set(pcKey, pcAgg);
+      }
+      pcAgg.sessions.add(sid);
+
+
 
 
       switch (r.event_name) {

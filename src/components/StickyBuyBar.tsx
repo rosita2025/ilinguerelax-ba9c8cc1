@@ -180,6 +180,16 @@ export const StickyBuyBar = ({
     // without making the button feel sluggish.
     setClickLock(true);
     setTimeout(() => setClickLock(false), 1200);
+    // Fire AddToCart so the funnel counts the same user going from ViewContent
+    // → AddToCart → InitiateCheckout even when the sticky bar skips the cart.
+    try {
+      trackHotmartEvent("AddToCart", {
+        content_name: productName,
+        content_type: "product",
+        value: parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
+        currency: currencyCode,
+      });
+    } catch {}
     if (onBuyClick) {
       onBuyClick();
     } else if (buyUrl) {

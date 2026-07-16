@@ -32,6 +32,16 @@ interface SegmentReport {
   matrix: Array<{ origen: string; segmento: string; total: number; ok: number; error: number }>;
 }
 
+interface BrevoRealResponse {
+  range: { from: string; to: string };
+  account: { emailsLeft: number | null; planType: string | null; planEndDate: string | null; error: string | null };
+  stats: {
+    requests: number; delivered: number; opens: number; uniqueOpens: number;
+    clicks: number; uniqueClicks: number; hardBounces: number; softBounces: number;
+    spamReports: number; blocked: number; unsubscribed: number; error: string | null;
+  };
+}
+
 const SEGMENT_LABELS: Record<string, string> = {
   abandoned_cart: "Carrito abandonado",
   purchase: "Compra",
@@ -62,6 +72,7 @@ const AdminBrevoAbandonedStats = () => {
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<SegmentReport | null>(null);
+  const [brevoReal, setBrevoReal] = useState<BrevoRealResponse | null>(null);
   const [autoRefresh, setAutoRefresh] = useState<string>(() => {
     return (typeof window !== "undefined" && window.localStorage.getItem("brevo_auto_refresh")) || "60";
   });
@@ -106,13 +117,15 @@ const AdminBrevoAbandonedStats = () => {
       } else {
         body.days = days;
       }
-      const [statsRes, reportRes] = await Promise.all([
+      const [statsRes, reportRes, brevoRes] = await Promise.all([
         adminInvoke<StatsResponse>("stats-brevo-abandoned", { body }),
         adminInvoke<SegmentReport>("report-brevo-segments", { body: { ...body, country: undefined } }),
+        adminInvoke<BrevoRealResponse>("brevo-account-stats", { body: { ...body, country: undefined } }),
       ]);
       if (statsRes.error) throw statsRes.error;
       setData(statsRes.data ?? null);
       if (!reportRes.error) setReport(reportRes.data ?? null);
+      if (!brevoRes.error) setBrevoReal(brevoRes.data ?? null);
       setLastUpdated(new Date());
     } catch (e) {
       toast.error("No se pudieron cargar las estadísticas", { description: (e as Error).message });
@@ -218,6 +231,88 @@ const AdminBrevoAbandonedStats = () => {
             <KPI label={`Tienda (${pctTie}%)`} value={totals.tienda} icon={<Store className="w-5 h-5 text-white" />} tone="bg-teal-600" />
             <KPI label="Errores de envío" value={totals.errors} icon={<AlertTriangle className="w-5 h-5 text-white" />} tone="bg-red-500" />
           </section>
+
+          <Card className="p-4">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-primary" />
+                <h2 className="font-semibold">Brevo (datos reales)</h2>
+                <Badge variant="outline" className="text-[10px]">API oficial</Badge>
+              </div>
+              {brevoReal && (
+                <span className="text-xs text-muted-foreground">
+                  {brevoReal.range.from} → {brevoReal.range.to}
+                </span>
+              )}
+            </div>
+            {brevoReal?.stats.error || brevoReal?.account.error ? (
+              <div className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-2 rounded">
+                Error Brevo: {brevoReal.stats.error || brevoReal.account.error}
+              </div>
+            ) : brevoReal ? (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Enviados (rango)</div>
+                    <div className="text-2xl font-semibold">{brevoReal.stats.requests.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Entregados</div>
+                    <div className="text-2xl font-semibold text-emerald-600">{brevoReal.stats.delivered.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Aperturas únicas</div>
+                    <div className="text-2xl font-semibold">{brevoReal.stats.uniqueOpens.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Clics únicos</div>
+                    <div className="text-2xl font-semibold">{brevoReal.stats.uniqueClicks.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Rebotes duros</div>
+                    <div className="text-2xl font-semibold text-red-600">{brevoReal.stats.hardBounces.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Rebotes suaves</div>
+                    <div className="text-2xl font-semibold text-amber-600">{brevoReal.stats.softBounces.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Spam / Bloqueos</div>
+                    <div className="text-2xl font-semibold">{(brevoReal.stats.spamReports + brevoReal.stats.blocked).toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="text-[10px] uppercase text-muted-foreground">Bajas</div>
+                    <div className="text-2xl font-semibold">{brevoReal.stats.unsubscribed.toLocaleString()}</div>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-3 text-sm border-t pt-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Créditos restantes</div>
+                    <div className="font-semibold text-lg">
+                      {brevoReal.account.emailsLeft != null ? brevoReal.account.emailsLeft.toLocaleString() : "—"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Plan</div>
+                    <div className="font-semibold">{brevoReal.account.planType ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Vence</div>
+                    <div className="font-semibold">{brevoReal.account.planEndDate ?? "—"}</div>
+                  </div>
+                </div>
+                <div className="mt-3 p-2 rounded bg-amber-50 dark:bg-amber-950/20 text-xs text-amber-800 dark:text-amber-200">
+                  Comparativa: nuestro dashboard registra <strong>{totals.total.toLocaleString()}</strong> abandonos sincronizados.
+                  Brevo reporta <strong>{brevoReal.stats.requests.toLocaleString()}</strong> emails enviados totales
+                  (incluye newsletter, secuencias, transaccionales — no solo abandonos).
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-muted-foreground">Cargando datos reales de Brevo…</div>
+            )}
+          </Card>
+
+
 
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-3">

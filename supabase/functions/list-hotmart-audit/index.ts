@@ -245,14 +245,19 @@ Deno.serve(async (req) => {
     // Summary counts (last 7 days).
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const summary = { approved: 0, pending: 0, refused: 0, refunded: 0, chargeback: 0, cancelled: 0, abandoned: 0 };
+    const usdSummary = { approved_usd: 0, pending_usd: 0 };
     for (const r of [...purchasesFull, ...abandonedFull]) {
       if (r.received_at >= since && r.mapped_status in summary) {
         (summary as any)[r.mapped_status]++;
+        if (r.usd_amount && r.usd_amount > 0) {
+          if (r.mapped_status === "approved") usdSummary.approved_usd += r.usd_amount;
+          else if (r.mapped_status === "pending") usdSummary.pending_usd += r.usd_amount;
+        }
       }
     }
 
 
-    return new Response(JSON.stringify({ rows, summary, synced: syncedCount, syncTargets: syncTargets.size }), {
+    return new Response(JSON.stringify({ rows, summary, usdSummary, synced: syncedCount, syncTargets: syncTargets.size }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

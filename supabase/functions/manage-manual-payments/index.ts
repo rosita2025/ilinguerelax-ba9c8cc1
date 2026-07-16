@@ -34,17 +34,23 @@ async function resolveMaterials(
     const nameHint = (it?.name || "").toString().toLowerCase();
     if (!skuHint && !nameHint) continue;
 
-    const hit = products.find((p: any) => {
-      if (skuHint && p.sku.toLowerCase() === skuHint) return true;
-      if (nameHint) {
-        const skuTokens = p.sku.split("-").filter((t: string) => t.length >= 4);
-        if (skuTokens.some((t: string) => nameHint.includes(t))) return true;
+    // 1) Prioridad absoluta: match por SKU exacto (evita colisiones por palabras
+    //    genéricas como "hispanohablantes" o "pronunciacion" en varios productos).
+    let hit = skuHint
+      ? products.find((p: any) => p.sku.toLowerCase() === skuHint)
+      : undefined;
+
+    // 2) Fallback: match por nombre solo cuando NO había SKU o no se encontró exacto.
+    //    Requerimos coincidencia del prefijo del nombre (primeras palabras), no de
+    //    tokens sueltos, para no cruzar productos distintos.
+    if (!hit && nameHint) {
+      hit = products.find((p: any) => {
         const productNameLc = p.name.toLowerCase();
-        const first3 = productNameLc.split(/[\s,]+/).slice(0, 3).join(" ");
-        if (first3 && nameHint.includes(first3.substring(0, Math.min(15, first3.length)))) return true;
-      }
-      return false;
-    });
+        const first3 = productNameLc.split(/[\s,|]+/).slice(0, 3).join(" ");
+        const prefix = first3.substring(0, Math.min(20, first3.length));
+        return prefix.length >= 8 && nameHint.includes(prefix);
+      });
+    }
 
     if (hit && hit.drive_url && !seen.has(hit.sku)) {
       seen.add(hit.sku);

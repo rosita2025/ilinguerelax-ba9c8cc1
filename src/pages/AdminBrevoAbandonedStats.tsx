@@ -107,12 +107,23 @@ const AdminBrevoAbandonedStats = () => {
       if (statsRes.error) throw statsRes.error;
       setData(statsRes.data ?? null);
       if (!reportRes.error) setReport(reportRes.data ?? null);
+      setLastUpdated(new Date());
     } catch (e) {
       toast.error("No se pudieron cargar las estadísticas", { description: (e as Error).message });
     } finally { setLoading(false); }
   }, [adminKey, days, country, preset, customFrom, customTo, today]);
 
   useEffect(() => { void load(); }, [load]);
+
+  useEffect(() => {
+    window.localStorage.setItem("brevo_auto_refresh", autoRefresh);
+    if (autoRefresh === "off") return;
+    const ms = Number(autoRefresh) * 1000;
+    if (!ms) return;
+    const id = window.setInterval(() => { void load(); }, ms);
+    return () => window.clearInterval(id);
+  }, [autoRefresh, load]);
+
 
   const countryOptions = useMemo(() => data?.availableCountries ?? [], [data]);
   const totals = data?.totals ?? { total: 0, hotmart: 0, tienda: 0, errors: 0 };

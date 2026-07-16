@@ -296,7 +296,7 @@ const AdminLive = () => {
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <Globe className="w-4 h-4" /> Por país
               </h2>
-              <div className="space-y-2 max-h-[420px] overflow-y-auto">
+              <div className="space-y-2 max-h-[280px] md:max-h-[420px] overflow-y-auto">
                 {countries.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-6">Sin visitas en esta ventana.</p>
                 )}
@@ -325,7 +325,7 @@ const AdminLive = () => {
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <Eye className="w-4 h-4" /> Páginas activas
               </h2>
-              <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
+              <div className="space-y-2 max-h-[280px] md:max-h-[420px] overflow-y-auto text-sm">
                 {topPages.map(([path, n]) => (
                   <div key={path} className="flex justify-between border-b last:border-0 pb-1 gap-3">
                     <span className="truncate" title={path}>{path}</span>
@@ -342,7 +342,7 @@ const AdminLive = () => {
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <ShoppingBag className="w-4 h-4" /> Productos en vivo
               </h2>
-              <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
+              <div className="space-y-2 max-h-[280px] md:max-h-[420px] overflow-y-auto text-sm">
                 {topProducts.map(([product, n]) => (
                   <div key={product} className="flex justify-between border-b last:border-0 pb-1 gap-3">
                     <span className="truncate" title={product}>{product}</span>
@@ -359,7 +359,7 @@ const AdminLive = () => {
               <h2 className="font-semibold mb-3 flex items-center gap-2">
                 <Activity className="w-4 h-4" /> Canal
               </h2>
-              <div className="space-y-2 max-h-[420px] overflow-y-auto text-sm">
+              <div className="space-y-2 max-h-[280px] md:max-h-[420px] overflow-y-auto text-sm">
                 {topChannels.slice(0, 8).map(([source, n]) => (
                   <div key={source} className="flex justify-between border-b last:border-0 pb-1 gap-3">
                     <span className="truncate" title={source}>{source}</span>

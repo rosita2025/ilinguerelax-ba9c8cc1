@@ -42,11 +42,11 @@ const SEGMENT_LABELS: Record<string, string> = {
 const ORIGIN_COLORS: Record<string, string> = { hotmart: "#f97316", tienda: "#0d9488", otro: "#64748b" };
 
 const KPI = ({ label, value, icon, tone }: { label: string; value: number | string; icon: React.ReactNode; tone: string }) => (
-  <Card className="p-4 flex items-center gap-4">
-    <div className={`h-11 w-11 rounded-lg flex items-center justify-center ${tone}`}>{icon}</div>
-    <div>
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="text-2xl font-semibold">{value}</div>
+  <Card className="p-3 md:p-4 flex items-center gap-3 md:gap-4">
+    <div className={`h-9 w-9 md:h-11 md:w-11 rounded-lg flex items-center justify-center shrink-0 ${tone}`}>{icon}</div>
+    <div className="min-w-0">
+      <div className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground truncate">{label}</div>
+      <div className="text-lg md:text-2xl font-semibold">{value}</div>
     </div>
   </Card>
 );
@@ -147,19 +147,19 @@ const AdminBrevoAbandonedStats = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-8 px-4">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <header className="flex flex-wrap items-end justify-between gap-3">
+      <main className="min-h-dvh bg-background py-4 md:py-8 px-3 md:px-4">
+        <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
+          <header className="space-y-3">
             <div>
-              <h1 className="text-2xl font-semibold">Brevo · Carritos abandonados (Dashboard)</h1>
-              <p className="text-sm text-muted-foreground">Tendencia diaria por origen (Hotmart vs Tienda) y desglose por país.</p>
+              <h1 className="text-xl md:text-2xl font-semibold leading-tight">Brevo · Carritos abandonados</h1>
+              <p className="text-xs md:text-sm text-muted-foreground">Tendencia diaria por origen y desglose por país.</p>
             </div>
-            <div className="flex flex-wrap gap-2 items-center">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:items-center">
               <Select value={preset} onValueChange={(v) => {
                 setPreset(v);
                 if (v !== "today" && v !== "yesterday" && v !== "custom") setDays(Number(v));
               }}>
-                <SelectTrigger className="w-[170px]"><SelectValue placeholder="Rango" /></SelectTrigger>
+                <SelectTrigger className="w-full md:w-[170px]"><SelectValue placeholder="Rango" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="today">Hoy</SelectItem>
                   <SelectItem value="yesterday">Ayer</SelectItem>
@@ -171,15 +171,8 @@ const AdminBrevoAbandonedStats = () => {
                   <SelectItem value="custom">Personalizado…</SelectItem>
                 </SelectContent>
               </Select>
-              {preset === "custom" && (
-                <>
-                  <Input type="date" value={customFrom} max={customTo} onChange={(e) => setCustomFrom(e.target.value)} className="w-[150px]" />
-                  <span className="text-muted-foreground text-sm">→</span>
-                  <Input type="date" value={customTo} min={customFrom} max={today} onChange={(e) => setCustomTo(e.target.value)} className="w-[150px]" />
-                </>
-              )}
               <Select value={country} onValueChange={setCountry}>
-                <SelectTrigger className="w-[180px]"><SelectValue placeholder="País" /></SelectTrigger>
+                <SelectTrigger className="w-full md:w-[180px]"><SelectValue placeholder="País" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos los países</SelectItem>
                   {countryOptions.map((c) => (
@@ -188,7 +181,7 @@ const AdminBrevoAbandonedStats = () => {
                 </SelectContent>
               </Select>
               <Select value={autoRefresh} onValueChange={setAutoRefresh}>
-                <SelectTrigger className="w-[160px]"><SelectValue placeholder="Auto" /></SelectTrigger>
+                <SelectTrigger className="w-full md:w-[160px]"><SelectValue placeholder="Auto" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="off">Sin auto-refresh</SelectItem>
                   <SelectItem value="15">Auto · 15 s</SelectItem>
@@ -198,17 +191,25 @@ const AdminBrevoAbandonedStats = () => {
                   <SelectItem value="900">Auto · 15 min</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" onClick={load} disabled={loading}>
+              <Button variant="outline" onClick={load} disabled={loading} className="w-full md:w-auto">
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Actualizar
               </Button>
+              {preset === "custom" && (
+                <div className="col-span-2 md:col-span-1 flex items-center gap-2 w-full md:w-auto">
+                  <Input type="date" value={customFrom} max={customTo} onChange={(e) => setCustomFrom(e.target.value)} className="flex-1 md:w-[150px]" />
+                  <span className="text-muted-foreground text-sm">→</span>
+                  <Input type="date" value={customTo} min={customFrom} max={today} onChange={(e) => setCustomTo(e.target.value)} className="flex-1 md:w-[150px]" />
+                </div>
+              )}
               {lastUpdated && (
-                <span className="text-xs text-muted-foreground w-full text-right md:w-auto">
+                <span className="col-span-2 md:col-span-1 text-xs text-muted-foreground md:ml-auto">
                   Actualizado {lastUpdated.toLocaleTimeString()}
                 </span>
               )}
             </div>
           </header>
+
 
 
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">

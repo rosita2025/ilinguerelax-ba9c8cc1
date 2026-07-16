@@ -302,27 +302,63 @@ const AdminBrevoAbandonedStats = () => {
                   </ResponsiveContainer>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="text-left text-muted-foreground border-b">
-                      <tr><th className="py-2">País</th><th>Hotmart</th><th>Tienda</th><th>Total</th></tr>
-                    </thead>
-                    <tbody>
-                      {(data?.byCountry ?? []).map((c) => (
-                        <tr key={c.code} className="border-b last:border-0">
-                          <td className="py-2">
-                            {c.code === "??" ? <Badge variant="outline">Sin país</Badge> : <span className="font-mono">{c.code}</span>}
-                          </td>
-                          <td>{c.hotmart}</td>
-                          <td>{c.tienda}</td>
-                          <td className="font-semibold">{c.total}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {(() => {
+                    const all = data?.byCountry ?? [];
+                    const filtered = countryFilter
+                      ? all.filter((c) => c.code.toLowerCase().includes(countryFilter.toLowerCase()))
+                      : all;
+                    const totalPages = Math.max(1, Math.ceil(filtered.length / countryPageSize));
+                    const page = Math.min(countryPage, totalPages);
+                    const start = (page - 1) * countryPageSize;
+                    const rows = filtered.slice(start, start + countryPageSize);
+                    return (
+                      <>
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <Input placeholder="Filtrar país…" value={countryFilter}
+                            onChange={(e) => { setCountryFilter(e.target.value); setCountryPage(1); }}
+                            className="w-[180px] h-8" />
+                          <Select value={String(countryPageSize)} onValueChange={(v) => { setCountryPageSize(Number(v)); setCountryPage(1); }}>
+                            <SelectTrigger className="w-[110px] h-8"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10 / pág</SelectItem>
+                              <SelectItem value="15">15 / pág</SelectItem>
+                              <SelectItem value="25">25 / pág</SelectItem>
+                              <SelectItem value="50">50 / pág</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-xs text-muted-foreground ml-auto">
+                            {filtered.length} países · pág {page}/{totalPages}
+                          </span>
+                        </div>
+                        <table className="w-full text-sm">
+                          <thead className="text-left text-muted-foreground border-b">
+                            <tr><th className="py-2">País</th><th>Hotmart</th><th>Tienda</th><th>Total</th></tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((c) => (
+                              <tr key={c.code} className="border-b last:border-0">
+                                <td className="py-2">
+                                  {c.code === "??" ? <Badge variant="outline">Sin país</Badge> : <span className="font-mono">{c.code}</span>}
+                                </td>
+                                <td>{c.hotmart}</td>
+                                <td>{c.tienda}</td>
+                                <td className="font-semibold">{c.total}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="flex justify-end gap-2 mt-2">
+                          <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setCountryPage(page - 1)}>Anterior</Button>
+                          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setCountryPage(page + 1)}>Siguiente</Button>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </>
             )}
           </Card>
+
 
           {report && (
             <Card className="p-4">

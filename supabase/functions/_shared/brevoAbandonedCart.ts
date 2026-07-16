@@ -24,6 +24,7 @@ interface Args {
   source?: string;          // "checkout" | "hotmart" | ...
   productCategory?: string; // categoría/tipo de oferta explícita (opcional)
   paymentMethod?: string;   // stripe | paypal | yape_plin | mercadopago_transfer | ...
+  triggerReason?: string;   // initial | email_change | cart_change | country_change | data_change | manual
 }
 
 import { logBrevoSync } from "./brevoLog.ts";
@@ -135,6 +136,9 @@ export async function pushAbandonedCartToBrevo(a: Args): Promise<boolean> {
   }
   attributes.ORIGEN = origin;
   attributes.ORIGEN_STATUS = originStatus;
+  const triggerReason = (a.triggerReason || "unknown").trim().toLowerCase().slice(0, 40);
+  attributes.TRIGGER_REASON = triggerReason;
+  attributes.MOTIVO_ABANDONO = triggerReason;
   // IDs de canal para saber en Brevo qué producto/plataforma abandonó
   if (origin === "hotmart") {
     attributes.HOTMART_PRODUCT_ID = a.productSku;

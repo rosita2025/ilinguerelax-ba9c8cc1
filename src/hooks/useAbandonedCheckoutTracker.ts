@@ -15,8 +15,10 @@ type TrackAbandonedCheckoutInput = {
   country?: string;
   items?: PruebaItem[];
   paymentMethod?: string;
+  triggerReason?: string;
   force?: boolean;
 };
+
 
 function alreadySent(email: string, slug: string) {
   try {
@@ -68,8 +70,10 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
       country: input.country || "",
       cart: cartFromItems(input.items),
       payment_method: input.paymentMethod || undefined,
+      trigger_reason: input.triggerReason || "manual",
     },
   });
+
 
   if (error || data?.ok !== true) {
     console.warn("abandoned-cart track failed", error || data);
@@ -91,21 +95,34 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
   const { language, countryCode } = useI18n();
   const timer = useRef<number | null>(null);
   const trackedRef = useRef<string>("");
+  const prevRef = useRef<{ email: string; cart: string; country: string; payment: string } | null>(null);
 
   useEffect(() => {
     const email = normalizeEmail(buyer.email);
     const name = buyer.fullName.trim() || "Cliente";
     const phone = (buyer.phone || "").trim();
 
-    // Fire as soon as we have a valid email — name is optional (Shopify behavior).
-    // This ensures we capture people who type email but never complete name/payment.
     if (!EMAIL_RE.test(email)) return;
 
     const slugKey = slug || productName || "checkout";
     const cart = cartFromItems(items);
-    const fingerprint = `${email}::${slugKey}::${language}::${JSON.stringify(cart)}`;
+    const cartStr = JSON.stringify(cart);
+    const fingerprint = `${email}::${slugKey}::${language}::${cartStr}`;
     if (trackedRef.current === fingerprint) return;
     if (alreadySent(email, slugKey)) return;
+
+    // Detect trigger reason based on what changed vs prev snapshot
+    const prev = prevRef.current;
+    let triggerReason = "initial";
+    if (prev) {
+      if (prev.email !== email) triggerReason = "email_change";
+      else if (prev.cart !== cartStr) triggerReason = "cart_change";
+      else if (prev.country !== (countryCode || "")) triggerReason = "country_change";
+      else triggerReason = "data_change";
+    } else if (trackedRef.current === "") {
+      // Component mounted; if localStorage had a prior send that expired -> reload
+      triggerReason = "initial";
+    }
 
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(async () => {
@@ -118,8 +135,12 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
           language,
           country: countryCode || "",
           items,
+          triggerReason,
         });
-        if (ok) trackedRef.current = fingerprint;
+        if (ok) {
+          trackedRef.current = fingerprint;
+          prevRef.current = { email, cart: cartStr, country: countryCode || "", payment: "" };
+        }
       } catch (err) {
         console.warn("abandoned-cart track failed", err);
       }
@@ -130,3 +151,4 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
     };
   }, [buyer.email, buyer.fullName, buyer.phone, items, slug, productName, language, countryCode]);
 }
+

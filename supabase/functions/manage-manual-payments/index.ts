@@ -189,19 +189,10 @@ Deno.serve(async (req) => {
       // Disparar emails y sincronizaciones en paralelo, sin bloquear la respuesta
       // (EdgeRuntime.waitUntil los mantiene vivos tras el 200). Antes tardaba
       // 3-5s porque se ejecutaban en secuencia con await.
+      // Solo enviamos el correo de entrega digital. El "Gracias por tu compra"
+      // ya se envió al crear el pedido (customer-manual-pending: "Recibimos tu
+      // pedido"), así que evitamos duplicar correos al verificar el pago.
       const bg = Promise.allSettled([
-        sendTemplate(admin, "thank-you", order.buyer_email, `manual-thanks-${order.order_number}`, {
-          orderNumber: order.order_number,
-          customerName: order.buyer_name,
-          customerEmail: order.buyer_email,
-          customerPhone: order.buyer_phone,
-          customerCountry: order.buyer_country,
-          productName: productNames,
-          amount: Number(order.amount_local ?? order.amount_usd),
-          currency: order.currency_local || "USD",
-          provider: order.method || "yape_plin",
-          orderDate: order.created_at,
-        }),
         sendTemplate(admin, "material-delivery", order.buyer_email, `manual-material-${order.order_number}`, {
           customerName: order.buyer_name,
           orderNumber: order.order_number,

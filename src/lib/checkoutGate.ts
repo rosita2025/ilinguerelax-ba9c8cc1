@@ -6,10 +6,19 @@
  *  - Traen un token firmado en la URL (?t=...).
  *  - Vienen con Referer de una página propia (product / cart / home).
  * Cualquier otro acceso directo (bot, crawler, link filtrado) es rechazado.
+ *
+ * Además incluye rate limiting por dispositivo y detección de bots.
  */
 
 const KEY = "ilr_checkout_auth";
+const RATE_KEY = "ilr_checkout_rate";
+const BAN_KEY = "ilr_checkout_ban";
 const TTL_MS = 60 * 60 * 1000; // 1h ventana de compra
+
+// Rate limit: máximo N accesos al checkout por ventana.
+const RATE_WINDOW_MS = 10 * 60 * 1000; // 10 min
+const RATE_MAX_HITS = 15; // 15 aperturas / 10 min por dispositivo
+const BAN_MS = 30 * 60 * 1000; // 30 min de cooldown tras exceder
 
 const RESERVED = new Set([
   "return",
@@ -20,6 +29,16 @@ const RESERVED = new Set([
   "prueba-1",
 ]);
 
+// User agents de bots conocidos y navegadores headless.
+const BOT_UA_RE = /(bot|crawl|spider|slurp|bingpreview|facebookexternalhit|whatsapp|telegrambot|discordbot|slackbot|linkedinbot|twitterbot|headlesschrome|phantomjs|puppeteer|playwright|selenium|scrapy|python-requests|curl\/|wget\/|axios\/|okhttp\/|go-http-client|java\/)/i;
+
+export type GateReason =
+  | "ok"
+  | "bot"
+  | "rate_limited"
+  | "banned"
+  | "unauthorized";
+
 export function authorizeCheckout(slug?: string | null) {
   try {
     sessionStorage.setItem(
@@ -29,42 +48,132 @@ export function authorizeCheckout(slug?: string | null) {
   } catch { /* ignore */ }
 }
 
-export function isCheckoutAuthorized(): boolean {
-  // 1) Token de sesión (marcado por click / navigate).
+function isBotEnvironment(): boolean {
+  try {
+    const ua = navigator.userAgent || "";
+    if (BOT_UA_RE.test(ua)) return true;
+    // Signals típicas de headless / automation.
+    const nav = navigator as Navigator & { webdriver?: boolean; languages?: readonly string[] };
+    if (nav.webdriver === true) return true;
+    if (!nav.languages || nav.languages.length === 0) return true;
+    // Chrome real siempre expone window.chrome; headless suele no.
+    if (/Chrome\//.test(ua) && !(window as unknown as { chrome?: unknown }).chrome) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function readRate(): { hits: number[]; } {
+  try {
+    const raw = localStorage.getItem(RATE_KEY);
+    if (!raw) return { hits: [] };
+    const parsed = JSON.parse(raw) as { hits?: number[] };
+    return { hits: Array.isArray(parsed?.hits) ? parsed.hits : [] };
+  } catch {
+    return { hits: [] };
+  }
+}
+
+function writeRate(hits: number[]) {
+  try {
+    localStorage.setItem(RATE_KEY, JSON.stringify({ hits }));
+  } catch { /* ignore */ }
+}
+
+function isBanned(): boolean {
+  try {
+    const raw = localStorage.getItem(BAN_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as { until?: number };
+    if (parsed?.until && parsed.until > Date.now()) return true;
+    localStorage.removeItem(BAN_KEY);
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function applyBan() {
+  try {
+    localStorage.setItem(BAN_KEY, JSON.stringify({ until: Date.now() + BAN_MS }));
+    localStorage.removeItem(RATE_KEY);
+  } catch { /* ignore */ }
+}
+
+/**
+ * Registra un hit al checkout y devuelve si el dispositivo excedió el límite.
+ * Aplica un ban temporal cuando se supera para bloquear scraping repetido.
+ */
+export function recordCheckoutHit(): { limited: boolean } {
+  const now = Date.now();
+  const { hits } = readRate();
+  const recent = hits.filter((t) => now - t < RATE_WINDOW_MS);
+  recent.push(now);
+  writeRate(recent);
+  if (recent.length > RATE_MAX_HITS) {
+    applyBan();
+    return { limited: true };
+  }
+  return { limited: false };
+}
+
+/**
+ * Decide si el visitante puede abrir el checkout. Devuelve una razón para
+ * poder mostrar mensajes / logs distintos en la UI.
+ */
+export function evaluateCheckoutGate(): GateReason {
+  if (isBotEnvironment()) return "bot";
+  if (isBanned()) return "banned";
+
+  // Autorización explícita (click / navigate / referer / token).
+  let authorized = false;
   try {
     const raw = sessionStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as { ts?: number };
-      if (parsed?.ts && Date.now() - parsed.ts < TTL_MS) return true;
+      if (parsed?.ts && Date.now() - parsed.ts < TTL_MS) authorized = true;
     }
   } catch { /* ignore */ }
 
-  // 2) Enlace de recuperación (email de carrito abandonado) o token firmado.
-  try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("r") || params.get("t")) return true;
-  } catch { /* ignore */ }
+  if (!authorized) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("r") || params.get("t")) authorized = true;
+    } catch { /* ignore */ }
+  }
 
-  // 3) Referer interno (producto / carrito / home).
-  try {
-    const ref = document.referrer;
-    if (ref) {
-      const u = new URL(ref);
-      if (u.origin === window.location.origin) {
-        const p = u.pathname;
-        if (
-          p === "/" ||
-          p.startsWith("/products") ||
-          p.startsWith("/cart") ||
-          p.startsWith("/checkouts")
-        ) {
-          return true;
+  if (!authorized) {
+    try {
+      const ref = document.referrer;
+      if (ref) {
+        const u = new URL(ref);
+        if (u.origin === window.location.origin) {
+          const p = u.pathname;
+          if (
+            p === "/" ||
+            p.startsWith("/products") ||
+            p.startsWith("/cart") ||
+            p.startsWith("/checkouts")
+          ) {
+            authorized = true;
+          }
         }
       }
-    }
-  } catch { /* ignore */ }
+    } catch { /* ignore */ }
+  }
 
-  return false;
+  if (!authorized) return "unauthorized";
+
+  const { limited } = recordCheckoutHit();
+  if (limited) return "rate_limited";
+
+  return "ok";
+}
+
+// Compatibilidad con el llamador anterior.
+export function isCheckoutAuthorized(): boolean {
+  return evaluateCheckoutGate() === "ok";
 }
 
 /**
@@ -89,7 +198,6 @@ export function installCheckoutGate() {
     } catch { /* ignore */ }
   };
 
-  // Anchor clicks (<Link>, <a href="/checkouts/...">).
   document.addEventListener(
     "click",
     (ev) => {
@@ -100,7 +208,6 @@ export function installCheckoutGate() {
     true,
   );
 
-  // SPA nav programática (navigate() → pushState/replaceState).
   const wrap = (name: "pushState" | "replaceState") => {
     const orig = history[name];
     history[name] = function (...args: unknown[]) {

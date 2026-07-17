@@ -615,6 +615,7 @@ export function PaymentMethodsGroup() {
           productName: s.items.map((i) => i.name).join(" + "),
           amount: penTotals ? penTotals.total : (local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd)),
           currency: penTotals ? "PEN" : (local.currency || "USD"),
+          amountUsd: Number(totalUsd),
           method: "Yape/Plin",
           orderDate: new Date().toISOString(),
         },

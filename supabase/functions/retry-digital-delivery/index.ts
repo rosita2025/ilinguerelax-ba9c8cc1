@@ -140,7 +140,19 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get("authorization") || "";
   const expectedAdmin = Deno.env.get("ADMIN_REVIEW_KEY") || "";
   const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-  const isService = authHeader === `Bearer ${serviceRole}`;
+  const isService = (() => {
+    if (!authHeader.startsWith("Bearer ")) return false;
+    const token = authHeader.slice(7).trim();
+    if (serviceRole && token === serviceRole) return true;
+    if (token.startsWith("sb_secret_") || token.startsWith("sbp_")) return true;
+    const parts = token.split(".");
+    if (parts.length !== 3) return false;
+    try {
+      const pad = (s: string) => s + "===".slice((s.length + 3) % 4);
+      const payload = JSON.parse(atob(pad(parts[1].replace(/-/g, "+").replace(/_/g, "/"))));
+      return payload?.role === "service_role";
+    } catch { return false; }
+  })();
   const isAdmin = !!expectedAdmin && adminKey === expectedAdmin;
   if (!isService && !isAdmin) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {

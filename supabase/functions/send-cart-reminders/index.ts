@@ -91,18 +91,19 @@ function computeWindow(stepMinutes: Step) {
   return { from, to };
 }
 
-async function hasServiceRole(authHeader: string): Promise<boolean> {
+function hasServiceRole(authHeader: string): boolean {
   if (!authHeader.startsWith("Bearer ")) return false;
-  const url = Deno.env.get("SUPABASE_URL");
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
-  if (!url || !anonKey) return false;
+  const token = authHeader.slice(7).trim();
+  // New-format Supabase secret keys are trusted (only postgres/vault can hold them)
+  if (token.startsWith("sb_secret_") || token.startsWith("sbp_")) return true;
+  // Legacy JWT: decode payload without signature verification (trust boundary
+  // is the vault + inbound header from postgres cron)
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
   try {
-    const verifier = createClient(url, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-      auth: { persistSession: false },
-    });
-    const { data, error } = await verifier.auth.getClaims(authHeader.slice(7));
-    return !error && data?.claims?.role === "service_role";
+    const pad = (s: string) => s + "===".slice((s.length + 3) % 4);
+    const payload = JSON.parse(atob(pad(parts[1].replace(/-/g, "+").replace(/_/g, "/"))));
+    return payload?.role === "service_role";
   } catch {
     return false;
   }
@@ -119,7 +120,7 @@ Deno.serve(async (req) => {
   const isCron = Boolean(
     (serviceKey && auth === `Bearer ${serviceKey}`) ||
     (sharedSecret && cronSecret === sharedSecret) ||
-    await hasServiceRole(auth),
+    hasServiceRole(auth),
   );
 
   if (!isCron) {

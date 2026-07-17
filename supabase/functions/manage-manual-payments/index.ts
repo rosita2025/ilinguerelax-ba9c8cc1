@@ -31,41 +31,50 @@ async function resolveMaterials(
   if (!items.length) return { materials: [], missing: [] };
   const { data: products } = await admin
     .from("digital_products")
-    .select("sku, name, drive_url, access_key, bonuses, bonus_name, bonus_drive_url, bonus_access_key")
+    .select("sku, name, drive_url, access_key, bonuses, bonus_name, bonus_drive_url, bonus_access_key, sku_aliases")
     .eq("active", true);
   if (!products) return { materials: [], missing: items.map((i) => i?.sku || i?.name || "producto sin identificar") };
-  const rows = products as ProductRow[];
+  const rows = products as (ProductRow & { sku_aliases?: string[] | null })[];
+
+  // Normaliza para comparar nombres sin puntuación/acentos y con espacios
+  // colapsados. Antes fallaba con "Patrones Especiales, Alfabeto…" porque la
+  // coma rompía el match por prefijo ("patrones especiales " vs "patrones especiales,").
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
 
   const out: Array<{ productName: string; downloadUrl: string; accessKey?: string }> = [];
   const missing: string[] = [];
   const seen = new Set<string>();
 
   for (const it of items) {
-    // Normalize catalog-id aliases (e.g. "coreano-100-mapas") to the real
-    // digital_products.sku before matching. Without this, Yape/Plin buyers
-    // don't receive materials when the cart uses catalog IDs.
     const rawSku = (it?.sku || "").toString().toLowerCase();
     const skuHint = (normalizeSku(rawSku) || rawSku).toLowerCase();
-    const nameHint = (it?.name || "").toString().toLowerCase();
+    const nameHint = norm(it?.name || "");
     if (!skuHint && !nameHint) continue;
 
-    // 1) Prioridad absoluta: match por SKU exacto (evita colisiones por palabras
-    //    genéricas como "hispanohablantes" o "pronunciacion" en varios productos).
+    // 1) SKU exacto
     let hit = skuHint
       ? rows.find((p) => p.sku.toLowerCase() === skuHint)
       : undefined;
 
-    // 2) Fallback: match por nombre solo cuando NO había SKU o no se encontró exacto.
-    //    Requerimos coincidencia del prefijo del nombre (primeras palabras), no de
-    //    tokens sueltos, para no cruzar productos distintos.
+    // 2) SKU dentro de sku_aliases
+    if (!hit && skuHint) {
+      hit = rows.find((p) => (p.sku_aliases || []).some((a) => (a || "").toLowerCase() === skuHint));
+    }
+
+    // 3) Nombre normalizado: prefijo de 3 palabras (>=8 chars) sin puntuación.
     if (!hit && nameHint) {
       hit = rows.find((p) => {
-        const productNameLc = p.name.toLowerCase();
-        const first3 = productNameLc.split(/[\s,|]+/).slice(0, 3).join(" ");
-        const prefix = first3.substring(0, Math.min(20, first3.length));
-        return prefix.length >= 8 && nameHint.includes(prefix);
+        const prodNorm = norm(p.name);
+        const prefix = prodNorm.split(" ").slice(0, 3).join(" ");
+        return prefix.length >= 8 && nameHint.startsWith(prefix);
       });
     }
+
 
     if (!hit || !hit.drive_url) {
       missing.push(skuHint || nameHint || "producto sin identificar");

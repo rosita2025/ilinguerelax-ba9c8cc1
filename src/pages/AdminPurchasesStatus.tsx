@@ -140,7 +140,7 @@ const AdminPurchasesStatus = () => {
           <div>
             <h1 className="text-lg sm:text-xl font-bold">Estado de compras · Todas las pasarelas</h1>
             <p className="text-xs text-muted-foreground">
-              Hotmart · Mercado Pago · PayPal · Yape/Plin. Muestra por qué quedó bloqueado y qué paso falló.
+              Hotmart · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>

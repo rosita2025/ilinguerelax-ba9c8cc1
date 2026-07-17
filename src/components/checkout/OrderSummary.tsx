@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin } from "lucide-react";
+import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";

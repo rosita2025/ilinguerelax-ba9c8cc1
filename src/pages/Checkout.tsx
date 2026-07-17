@@ -473,9 +473,6 @@ export default function Checkout() {
   }
 
 
-  if (!gateChecked) {
-    return <div className="min-h-screen bg-background" />;
-  }
 
   return (
     <div className="min-h-screen bg-background">

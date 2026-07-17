@@ -33,6 +33,40 @@ const AdminManualPayments = () => {
   const [orders, setOrders] = useState<ManualPayment[]>([]);
   const [filter, setFilter] = useState<Filter>("pending");
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<{ email: string; name: string; phone: string; country: string }>({ email: "", name: "", phone: "", country: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const startEdit = (o: ManualPayment) => {
+    setEditingId(o.id);
+    setEditData({ email: o.buyer_email || "", name: o.buyer_name || "", phone: o.buyer_phone || "", country: o.buyer_country || "" });
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+    setSavingEdit(true);
+    try {
+      const { error } = await adminInvoke("manage-manual-payments", {
+        body: {
+          action: "update_buyer",
+          orderId: editingId,
+          adminKey,
+          buyerEmail: editData.email,
+          buyerName: editData.name,
+          buyerPhone: editData.phone,
+          buyerCountry: editData.country,
+        },
+      });
+      if (error) throw error;
+      toast({ title: "✏️ Datos actualizados" });
+      setEditingId(null);
+      fetchOrders();
+    } catch (e) {
+      toast({ title: "Error al guardar", description: (e as Error).message, variant: "destructive" });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   const fetchOrders = async () => {
     setLoading(true);

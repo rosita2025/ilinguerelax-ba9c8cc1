@@ -95,6 +95,23 @@ function computeWindow(stepHours: Step) {
   return { from, to };
 }
 
+async function hasServiceRole(authHeader: string): Promise<boolean> {
+  if (!authHeader.startsWith("Bearer ")) return false;
+  const url = Deno.env.get("SUPABASE_URL");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!url || !anonKey) return false;
+  try {
+    const verifier = createClient(url, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false },
+    });
+    const { data, error } = await verifier.auth.getClaims(authHeader.slice(7));
+    return !error && data?.claims?.role === "service_role";
+  } catch {
+    return false;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -105,7 +122,8 @@ Deno.serve(async (req) => {
   const sharedSecret = Deno.env.get("CRON_SHARED_SECRET") || "";
   const isCron = Boolean(
     (serviceKey && auth === `Bearer ${serviceKey}`) ||
-    (sharedSecret && cronSecret === sharedSecret),
+    (sharedSecret && cronSecret === sharedSecret) ||
+    await hasServiceRole(auth),
   );
 
   if (!isCron) {

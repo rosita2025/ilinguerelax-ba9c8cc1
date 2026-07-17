@@ -7,6 +7,7 @@ export interface BinancePayConfig {
   holder_name: string;
   qr_url: string;
   network: string;
+  pay_id: string;
   active: boolean;
 }
 
@@ -16,6 +17,7 @@ const FALLBACK: BinancePayConfig = {
   holder_name: "iLingue Relax",
   qr_url: "https://cdn.phototourl.com/free/2026-07-17-19c64084-faa9-41f1-a1cb-5010d297c0be.jpg",
   network: "Binance Pay (Pay ID)",
+  pay_id: "389090038",
   active: true,
 };
 
@@ -27,7 +29,7 @@ async function loadAll(): Promise<BinancePayConfig[]> {
   if (cache && Date.now() - cacheAt < TTL_MS) return cache;
   const { data, error } = await supabase
     .from("binance_pay_configs")
-    .select("region_code,address,holder_name,qr_url,network,active")
+    .select("region_code,address,holder_name,qr_url,network,pay_id,active")
     .eq("active", true);
   if (error || !data) return cache ?? [FALLBACK];
   cache = data as BinancePayConfig[];

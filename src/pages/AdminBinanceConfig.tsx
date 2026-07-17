@@ -19,6 +19,7 @@ type BinanceConfig = {
   holder_name: string;
   qr_url: string;
   network: string;
+  pay_id?: string | null;
   notes?: string | null;
   active: boolean;
 };
@@ -29,6 +30,7 @@ const EMPTY: BinanceConfig = {
   holder_name: "",
   qr_url: "",
   network: "Binance Pay (Pay ID)",
+  pay_id: "",
   notes: "",
   active: true,
 };
@@ -199,11 +201,19 @@ function ConfigCard({
           />
         </div>
         <div>
-          <Label className="text-xs">Dirección / Pay ID</Label>
+          <Label className="text-xs">Dirección / Wallet</Label>
           <Input
             value={local.address}
             onChange={(e) => set({ address: e.target.value })}
             placeholder="TPAw…"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Binance Pay ID</Label>
+          <Input
+            value={local.pay_id ?? ""}
+            onChange={(e) => set({ pay_id: e.target.value })}
+            placeholder="389090038"
           />
         </div>
         <div className="sm:col-span-2">

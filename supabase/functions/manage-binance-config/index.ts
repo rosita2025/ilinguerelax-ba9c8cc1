@@ -47,6 +47,7 @@ Deno.serve(async (req) => {
         holder_name: String(c.holder_name || "").trim(),
         qr_url: String(c.qr_url || "").trim(),
         network: String(c.network || "Binance Pay (Pay ID)").trim(),
+        pay_id: c.pay_id ? String(c.pay_id).trim() : null,
         notes: c.notes ? String(c.notes) : null,
         active: c.active !== false,
       };

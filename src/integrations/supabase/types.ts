@@ -113,6 +113,7 @@ export type Database = {
           id: string
           network: string
           notes: string | null
+          pay_id: string | null
           qr_url: string
           region_code: string
           updated_at: string
@@ -125,6 +126,7 @@ export type Database = {
           id?: string
           network?: string
           notes?: string | null
+          pay_id?: string | null
           qr_url: string
           region_code: string
           updated_at?: string
@@ -137,6 +139,7 @@ export type Database = {
           id?: string
           network?: string
           notes?: string | null
+          pay_id?: string | null
           qr_url?: string
           region_code?: string
           updated_at?: string

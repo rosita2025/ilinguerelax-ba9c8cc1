@@ -60,13 +60,20 @@ export default function CheckoutPendienteManual() {
             <MessageCircle className="w-4 h-4" /> Paso importante
           </p>
           <p className="text-amber-900/90 dark:text-amber-100/90">
-            Por favor envíanos tu <strong>captura de pago</strong> (Yape o Plin) por WhatsApp
-            para agilizar la verificación y recibir tu producto lo antes posible.
+            Por favor envíanos tu <strong>captura de pago</strong> (Yape, Plin o Binance Pay) por WhatsApp
+            junto con tu <strong>número de orden</strong>{orderNumber ? ` (${orderNumber})` : ""} para agilizar la verificación
+            y recibir tu producto lo antes posible.
           </p>
         </div>
 
         <a
-          href={WHATSAPP_URL}
+          href={
+            orderNumber
+              ? `https://wa.me/12512724704?text=${encodeURIComponent(
+                  `Hola, adjunto mi comprobante de pago (Yape/Plin/Binance) de la orden ${orderNumber}.`
+                )}`
+              : WHATSAPP_URL
+          }
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 w-full justify-center bg-[#25D366] hover:bg-[#20b358] text-white font-semibold py-3 rounded-xl transition-colors"

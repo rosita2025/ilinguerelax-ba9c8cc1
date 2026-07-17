@@ -9,6 +9,7 @@
 // returns 404 "no products found" when the SKU doesn't exist.
 const SKU_ALIASES: Record<string, string> = {
   // Patrones Especiales (inglés)
+  "patrones-ingles": "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
   "patrones-especiales-ingles": "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
   "upsell-patrones-ingles": "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
   "prueba-patrones-es": "patrones-especiales-alfabeto-combinaciones-secretas-ingles",

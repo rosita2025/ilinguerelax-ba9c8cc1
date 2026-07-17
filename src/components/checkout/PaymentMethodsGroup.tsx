@@ -1026,9 +1026,16 @@ export function PaymentMethodsGroup() {
                     <BankBadge label="Yape" bg="#742282" color="#ffffff" />
                     <BankBadge label="Plin" bg="#00BFB3" color="#ffffff" />
                   </div>
+                ) : m.id === "binance" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Binance" bg="#F0B90B" color="#0A0A0A" />
+                    <BankBadge label="USDT" bg="#26A17B" color="#ffffff" />
+                    <BankBadge label="Pay ID" bg="#1F2937" color="#ffffff" />
+                  </div>
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}
+
 
               </div>
               <div className={cn(

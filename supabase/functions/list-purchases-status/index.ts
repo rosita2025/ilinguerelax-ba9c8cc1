@@ -208,30 +208,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ─── Manual (Yape/Plin) ───────────────────────────────────────────
-    if (!provider || provider === "manual") {
-      const { data } = await admin
-        .from("manual_payments")
-        .select("id, order_number, buyer_email, buyer_name, amount_usd, amount_local, currency_local, method, items, status, notes, created_at, verified_at")
-        .order("created_at", { ascending: false })
-        .limit(take);
-      for (const r of data ?? []) {
-        const mapped_status = mapManual(r.status);
-        const items = Array.isArray(r.items) ? r.items : [];
-        const product = items.map((it: any) => it.name || it.sku).filter(Boolean).join(", ");
-        rows.push({
-          id: `man-${r.id}`, provider: "manual", received_at: r.created_at,
-          email: r.buyer_email, amount: r.amount_usd, currency: "USD",
-          product: product || null, transaction: r.order_number,
-          raw_status: r.status,
-          mapped_status,
-          failure_reason: mapped_status === "refused" ? (r.notes || "Rechazado manualmente") :
-                          mapped_status === "cancelled" ? (r.notes || "Cancelado") : null,
-          failed_step: mapped_status === "pending" ? "Esperando verificación del voucher (Yape/Plin)" : null,
-          payload: r,
-        });
-      }
-    }
+    // ─── Manual (Yape/Plin/Binance) se gestionan en /admin/manual-payments ─
+    // Excluidos de este dashboard para evitar duplicación.
 
     // ─── Filter + sort ────────────────────────────────────────────────
     let filtered = rows;

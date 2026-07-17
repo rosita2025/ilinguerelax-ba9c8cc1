@@ -186,45 +186,49 @@ Deno.serve(async (req) => {
         .eq("id", orderId);
       if (updErr) throw updErr;
 
-      // Enviar 1) gracias por tu compra y 2) entrega de materiales
-      await sendTemplate(admin, "thank-you", order.buyer_email, `manual-thanks-${order.order_number}`, {
-        orderNumber: order.order_number,
-        customerName: order.buyer_name,
-        customerEmail: order.buyer_email,
-        customerPhone: order.buyer_phone,
-        customerCountry: order.buyer_country,
-        productName: productNames,
-        amount: Number(order.amount_local ?? order.amount_usd),
-        currency: order.currency_local || "USD",
-        provider: "yape_plin",
-        orderDate: order.created_at,
-      });
-
-      await sendTemplate(admin, "material-delivery", order.buyer_email, `manual-material-${order.order_number}`, {
-        customerName: order.buyer_name,
-        orderNumber: order.order_number,
-        materials,
-      });
-
-      await upsertBrevoContact({
-        email: order.buyer_email,
-        name: order.buyer_name,
-        phone: order.buyer_phone,
-        country: order.buyer_country,
-        productName: productNames,
-        skus: items.map((i: any) => i?.sku).filter(Boolean),
-        amount: Number(order.amount_local ?? order.amount_usd),
-        currency: order.currency_local || "USD",
-        orderNumber: order.order_number,
-        provider: "yape_plin",
-      });
-
-      await markAbandonedCartConverted(order.buyer_email);
+      // Disparar emails y sincronizaciones en paralelo, sin bloquear la respuesta
+      // (EdgeRuntime.waitUntil los mantiene vivos tras el 200). Antes tardaba
+      // 3-5s porque se ejecutaban en secuencia con await.
+      const bg = Promise.allSettled([
+        sendTemplate(admin, "thank-you", order.buyer_email, `manual-thanks-${order.order_number}`, {
+          orderNumber: order.order_number,
+          customerName: order.buyer_name,
+          customerEmail: order.buyer_email,
+          customerPhone: order.buyer_phone,
+          customerCountry: order.buyer_country,
+          productName: productNames,
+          amount: Number(order.amount_local ?? order.amount_usd),
+          currency: order.currency_local || "USD",
+          provider: "yape_plin",
+          orderDate: order.created_at,
+        }),
+        sendTemplate(admin, "material-delivery", order.buyer_email, `manual-material-${order.order_number}`, {
+          customerName: order.buyer_name,
+          orderNumber: order.order_number,
+          materials,
+        }),
+        upsertBrevoContact({
+          email: order.buyer_email,
+          name: order.buyer_name,
+          phone: order.buyer_phone,
+          country: order.buyer_country,
+          productName: productNames,
+          skus: items.map((i: any) => i?.sku).filter(Boolean),
+          amount: Number(order.amount_local ?? order.amount_usd),
+          currency: order.currency_local || "USD",
+          orderNumber: order.order_number,
+          provider: "yape_plin",
+        }),
+        markAbandonedCartConverted(order.buyer_email),
+      ]);
+      // @ts-expect-error EdgeRuntime is available in Supabase Deno runtime
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) EdgeRuntime.waitUntil(bg);
 
       return new Response(JSON.stringify({ success: true, materialsSent: materials.length }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     if (action === "reject" && orderId) {
       const { error } = await admin

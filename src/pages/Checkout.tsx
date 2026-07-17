@@ -463,13 +463,8 @@ export default function Checkout() {
 
 
 
-      <div className="lg:hidden sticky top-[52px] sm:top-[56px] z-20 bg-background/95 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
-          <SectionErrorBoundary name="order-summary-mobile" extra={{ slug: catalogItem?.id }}>
-            <OrderSummary collapsible mainProductId={catalogItem?.id} />
-          </SectionErrorBoundary>
-        </div>
-      </div>
+      <MobileOrderSummarySticky slug={catalogItem?.id} />
+
 
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">

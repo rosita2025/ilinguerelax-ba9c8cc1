@@ -52,20 +52,32 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     else setCouponInput("");
   };
 
+  const itemCount = items.reduce((n, i) => n + (i.quantity || 1), 0);
+
   return (
-    <div className="bg-muted/30 lg:bg-muted/50 rounded-xl border">
+    <div className="bg-muted/30 lg:bg-muted/50 rounded-xl border overflow-hidden">
       {collapsible && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between p-4 lg:hidden"
+          className="w-full flex items-center justify-between px-4 py-3 lg:hidden bg-primary/5 hover:bg-primary/10 transition-colors border-b"
+          aria-expanded={expanded}
         >
-          <span className="flex items-center gap-2 text-sm font-medium">
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {expanded ? t.hideSummary : t.showSummary}
+          <span className="flex items-center gap-2.5 text-sm font-medium">
+            <span className="relative">
+              <ShoppingBag className="w-5 h-5 text-primary" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </span>
+            <span>{expanded ? t.hideSummary : t.showSummary}</span>
+            {expanded ? <ChevronUp className="w-4 h-4 opacity-60" /> : <ChevronDown className="w-4 h-4 opacity-60" />}
           </span>
-          <span className="text-lg font-bold">{fmtMoney(total, localTotal, penTotals?.total)}</span>
+          <span className="text-base font-bold">{fmtMoney(total, localTotal, penTotals?.total)}</span>
         </button>
       )}
+
 
       <div className={cn("p-5 space-y-4", collapsible && !expanded && "hidden lg:block")}>
         <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>

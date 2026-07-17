@@ -55,6 +55,63 @@ const AdminSEO = () => {
   const [semrush, setSemrush] = useState<SemrushReport | null>(null);
   const [smLoading, setSmLoading] = useState(false);
 
+  // Blog generator state
+  const [genTopic, setGenTopic] = useState("");
+  const [genKeyword, setGenKeyword] = useState("");
+  const [genCategory, setGenCategory] = useState("Aprendizaje");
+  const [genLoading, setGenLoading] = useState(false);
+  const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
+
+  const loadGenPosts = async () => {
+    const { data } = await supabase
+      .from("generated_blog_posts")
+      .select("id,slug,title,category,created_at,published")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setGenPosts(data ?? []);
+  };
+
+  const generatePost = async () => {
+    if (!genTopic.trim()) {
+      toast.error("Escribe un tema o título aproximado");
+      return;
+    }
+    setGenLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-blog-post", {
+        body: {
+          adminKey,
+          topic: genTopic.trim(),
+          keyword: genKeyword.trim() || undefined,
+          category: genCategory,
+          publish: true,
+        },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      toast.success("Post generado y publicado en /blog");
+      setGenTopic("");
+      setGenKeyword("");
+      void loadGenPosts();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al generar el post");
+    } finally {
+      setGenLoading(false);
+    }
+  };
+
+  const deleteGenPost = async (id: string) => {
+    if (!confirm("¿Eliminar este post generado?")) return;
+    const { error } = await supabase.from("generated_blog_posts").delete().eq("id", id);
+    if (error) {
+      toast.error("No se pudo eliminar (permisos)");
+      return;
+    }
+    toast.success("Post eliminado");
+    void loadGenPosts();
+  };
+
+
   const loadGsc = async (d = days) => {
     setLoading(true);
     try {

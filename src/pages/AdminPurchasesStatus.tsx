@@ -177,7 +177,7 @@ const AdminPurchasesStatus = () => {
                 <option value="hotmart">Hotmart</option>
                 <option value="mercadopago">Mercado Pago</option>
                 <option value="paypal">PayPal</option>
-                <option value="manual">Yape / Plin</option>
+                
               </select>
             </div>
             <div>

@@ -1253,9 +1253,26 @@ export function PaymentMethodsGroup() {
                   />
                 </div>
 
+                {binanceCfg.pay_id && (
+                  <div className="rounded-lg bg-[#F0B90B]/10 border border-[#F0B90B]/40 p-3 space-y-1 text-center">
+                    <p className="text-[11px] uppercase tracking-wider text-neutral-500">Binance Pay ID</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(binanceCfg.pay_id).catch(() => {});
+                        toast.success(t.copied);
+                      }}
+                      className="w-full inline-flex items-center justify-center gap-2 text-xl font-mono font-bold text-[#a37800] dark:text-[#F0B90B] hover:opacity-80 transition"
+                    >
+                      <span>{binanceCfg.pay_id}</span>
+                      <Copy className="w-4 h-4 shrink-0" />
+                    </button>
+                  </div>
+                )}
+
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
                   <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">
-                    {language === "en" ? "Pay ID / Address" : language === "pt" ? "Pay ID / Endereço" : language === "fr" ? "Pay ID / Adresse" : "Pay ID / Dirección"}
+                    {language === "en" ? "Wallet address" : language === "pt" ? "Endereço da carteira" : language === "fr" ? "Adresse du portefeuille" : "Dirección de wallet"}
                   </p>
                   <button
                     type="button"
@@ -1267,6 +1284,7 @@ export function PaymentMethodsGroup() {
                   </button>
                   <p className="text-[11px] text-neutral-500 text-center">{copiedBinance ? t.copied : (language === "en" ? "Tap to copy" : language === "pt" ? "Toque para copiar" : language === "fr" ? "Touchez pour copier" : "Toca para copiar")}</p>
                 </div>
+
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
                   <p className="text-xs text-neutral-500">{t.amountToPay}</p>

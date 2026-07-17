@@ -44,8 +44,12 @@ const Email = ({
   productName,
   amount,
   currency,
+  amountUsd,
   method,
   orderDate,
+  binancePayId,
+  binanceAddress,
+  binanceNetwork,
 }: Props) => (
   <Html lang="es" dir="ltr">
     <Head />

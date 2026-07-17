@@ -106,6 +106,28 @@ const Email = ({
           </Row>
         </Section>
 
+        {(binancePayId || binanceAddress) && (
+          <Section style={binanceBox}>
+            <Text style={binanceTitle}>🔐 Datos de Binance Pay (por si pierdes la captura)</Text>
+            {binancePayId && (
+              <Text style={binanceLine}><strong>Pay ID:</strong> {binancePayId}</Text>
+            )}
+            {binanceAddress && (
+              <Text style={binanceLine}><strong>Dirección:</strong> {binanceAddress}</Text>
+            )}
+            {binanceNetwork && (
+              <Text style={binanceLine}><strong>Red:</strong> {binanceNetwork}</Text>
+            )}
+            {amountUsd != null && (
+              <Text style={binanceLine}><strong>Monto:</strong> USD ${Number(amountUsd).toFixed(2)}</Text>
+            )}
+            <Text style={binanceHint}>
+              Puedes usar tu Pay ID o hash de la transacción como referencia al escribirnos.
+            </Text>
+          </Section>
+        )}
+
+
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>
           <Text style={nextLine}>1️⃣ Rosa verifica tu pago (máximo 24 h).</Text>

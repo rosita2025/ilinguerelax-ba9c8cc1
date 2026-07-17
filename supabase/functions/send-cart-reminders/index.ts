@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
       .select("send_hour, timezone, enabled_steps, paused, updated_at")
       .eq("id", 1)
       .maybeSingle();
-    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [3, 24, 168, 360, 720], paused: false, updated_at: null };
+    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [30, 1440, 7200], paused: false, updated_at: null };
 
     // Handle config endpoints (admin-only)
     if (action === "get_config") {

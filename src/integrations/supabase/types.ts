@@ -104,6 +104,45 @@ export type Database = {
         }
         Relationships: []
       }
+      binance_pay_configs: {
+        Row: {
+          active: boolean
+          address: string
+          created_at: string
+          holder_name: string
+          id: string
+          network: string
+          notes: string | null
+          qr_url: string
+          region_code: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address: string
+          created_at?: string
+          holder_name: string
+          id?: string
+          network?: string
+          notes?: string | null
+          qr_url: string
+          region_code: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: string
+          created_at?: string
+          holder_name?: string
+          id?: string
+          network?: string
+          notes?: string | null
+          qr_url?: string
+          region_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bot_filters: {
         Row: {
           created_at: string

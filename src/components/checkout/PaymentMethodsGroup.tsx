@@ -8,6 +8,7 @@ import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useCheckoutMethodsConfig, type FamilyKey } from "@/hooks/useCheckoutMethodsConfig";
+import { useBinancePayConfig } from "@/hooks/useBinancePayConfig";
 
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
@@ -75,10 +76,8 @@ const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
-const BINANCE_ADDRESS = "TPAwV7vFhuoYbwzEzmDuN229DwFUBCKH TF";
-const BINANCE_NAME = "iLingue Relax";
-const BINANCE_QR_URL = "https://cdn.phototourl.com/free/2026-07-17-19c64084-faa9-41f1-a1cb-5010d297c0be.jpg";
-const BINANCE_NETWORK = "Binance Pay (Pay ID)";
+// Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.
+// See admin panel at /admin/binance-config.
 
 
 type MethodBadge = { label: string; bg: string; color: string };
@@ -636,7 +635,7 @@ export function PaymentMethodsGroup() {
 
   const copyBinance = async () => {
     try {
-      await navigator.clipboard.writeText(BINANCE_ADDRESS);
+      await navigator.clipboard.writeText(binanceCfg.address);
       setCopiedBinance(true);
       setTimeout(() => setCopiedBinance(false), 1800);
     } catch { /* noop */ }
@@ -653,7 +652,7 @@ export function PaymentMethodsGroup() {
       `👤 Nombre: ${s.buyer.fullName.trim()}\n` +
       `📧 Email: ${s.buyer.email.trim()}\n` +
       `💰 Monto: ${amountText} (USD $${totalUsd})\n` +
-      `🔗 Red: ${BINANCE_NETWORK}\n\n` +
+      `🔗 Red: ${binanceCfg.network}\n\n` +
       `Productos:\n${productList}\n\n` +
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
@@ -739,6 +738,7 @@ export function PaymentMethodsGroup() {
 
   const isUsa = country === "US";
   const methodsConfig = useCheckoutMethodsConfig(country);
+  const binanceCfg = useBinancePayConfig(methodsConfig.regionCode);
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
@@ -1240,13 +1240,13 @@ export function PaymentMethodsGroup() {
                   <p className="text-xs uppercase tracking-wider text-neutral-500">
                     {language === "en" ? "Send payment to" : language === "pt" ? "Enviar pagamento para" : language === "fr" ? "Envoyer le paiement à" : "Envía el pago a"}
                   </p>
-                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{BINANCE_NAME}</p>
-                  <p className="text-[11px] text-neutral-500">{BINANCE_NETWORK}</p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{binanceCfg.holder_name}</p>
+                  <p className="text-[11px] text-neutral-500">{binanceCfg.network}</p>
                 </div>
 
                 <div className="flex justify-center">
                   <img
-                    src={BINANCE_QR_URL}
+                    src={binanceCfg.qr_url}
                     alt="Binance Pay QR"
                     className="w-48 h-48 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2"
                     loading="lazy"
@@ -1262,7 +1262,7 @@ export function PaymentMethodsGroup() {
                     onClick={copyBinance}
                     className="w-full inline-flex items-center justify-center gap-2 text-sm font-mono font-semibold text-primary hover:opacity-80 transition break-all px-2"
                   >
-                    <span className="break-all">{BINANCE_ADDRESS}</span>
+                    <span className="break-all">{binanceCfg.address}</span>
                     {copiedBinance ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
                   </button>
                   <p className="text-[11px] text-neutral-500 text-center">{copiedBinance ? t.copied : (language === "en" ? "Tap to copy" : language === "pt" ? "Toque para copiar" : language === "fr" ? "Touchez pour copier" : "Toca para copiar")}</p>

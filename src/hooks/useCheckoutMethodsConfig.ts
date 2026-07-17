@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Fallback: si no hay región configurada o falla la consulta, TODAS quedan
  * habilitadas para no romper el checkout existente.
  */
-export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
@@ -25,19 +25,21 @@ export interface CheckoutMethodsConfig {
   transfer: boolean;
   cash: boolean;
   yape: boolean;
+  binance: boolean;
   /** Orden de las familias según el sort_order más bajo en la región activa. */
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance"];
 
 const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: true, transfer: true, cash: true, yape: true,
+  stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: true, transfer: true, cash: true, yape: true, binance: true,
 };
 
 const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: true, stripeAch: true, stripeCashApp: true, stripeKlarna: true, paypal: true, transfer: false, cash: false, yape: false,
+  stripe: true, stripeAch: true, stripeCashApp: true, stripeKlarna: true, paypal: true, transfer: false, cash: false, yape: false, binance: true,
 };
+
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }
 interface MethodRow { region_code: string; method_key: string; enabled: boolean; sort_order: number | null }

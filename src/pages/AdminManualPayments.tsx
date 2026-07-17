@@ -224,6 +224,11 @@ const AdminManualPayments = () => {
                 )}
 
                 <div className="flex flex-wrap gap-2 justify-end pt-1">
+                  {editingId !== o.id && (
+                    <Button size="sm" variant="secondary" onClick={() => startEdit(o)}>
+                      <Pencil className="w-4 h-4 mr-1" /> Editar datos
+                    </Button>
+                  )}
                   {o.status !== "verified" && (
                     <Button size="sm" onClick={() => runAction("verify", o.id)}>
                       <CheckCircle2 className="w-4 h-4 mr-1" /> Verificar

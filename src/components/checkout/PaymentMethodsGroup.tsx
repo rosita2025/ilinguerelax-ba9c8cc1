@@ -1227,6 +1227,78 @@ export function PaymentMethodsGroup() {
               </div>
             )}
 
+            {m.id === "binance" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="text-center space-y-1">
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">
+                    {language === "en" ? "Send payment to" : language === "pt" ? "Enviar pagamento para" : language === "fr" ? "Envoyer le paiement à" : "Envía el pago a"}
+                  </p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{BINANCE_NAME}</p>
+                  <p className="text-[11px] text-neutral-500">{BINANCE_NETWORK}</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <img
+                    src={BINANCE_QR_URL}
+                    alt="Binance Pay QR"
+                    className="w-48 h-48 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
+                  <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">
+                    {language === "en" ? "Pay ID / Address" : language === "pt" ? "Pay ID / Endereço" : language === "fr" ? "Pay ID / Adresse" : "Pay ID / Dirección"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={copyBinance}
+                    className="w-full inline-flex items-center justify-center gap-2 text-sm font-mono font-semibold text-primary hover:opacity-80 transition break-all px-2"
+                  >
+                    <span className="break-all">{BINANCE_ADDRESS}</span>
+                    {copiedBinance ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
+                  </button>
+                  <p className="text-[11px] text-neutral-500 text-center">{copiedBinance ? t.copied : (language === "en" ? "Tap to copy" : language === "pt" ? "Toque para copiar" : language === "fr" ? "Touchez pour copier" : "Toca para copiar")}</p>
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
+                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{local.loading ? `USD $${totalUsd}` : local.formatted}</p>
+                  {!local.isUsd && !local.loading && (
+                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
+                  )}
+                </div>
+
+                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
+                  <li>{language === "en" ? "Open your Binance app and go to Pay / Send." : language === "pt" ? "Abra o app Binance e vá em Pay / Enviar." : language === "fr" ? "Ouvre l'app Binance et va dans Pay / Envoyer." : "Abre tu app Binance y ve a Pay / Enviar."}</li>
+                  <li>{language === "en" ? `Scan the QR or paste the Pay ID and send USD $${totalUsd} in USDT.` : language === "pt" ? `Escaneie o QR ou cole o Pay ID e envie USD $${totalUsd} em USDT.` : language === "fr" ? `Scanne le QR ou colle le Pay ID et envoie USD $${totalUsd} en USDT.` : `Escanea el QR o pega el Pay ID y envía USD $${totalUsd} en USDT.`}</li>
+                  <li>{language === "en" ? "Save the transaction screenshot." : language === "pt" ? "Salve a captura da transação." : language === "fr" ? "Sauvegarde la capture de la transaction." : "Guarda la captura de la transacción."}</li>
+                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
+                </ol>
+
+                <button
+                  type="button"
+                  onClick={handleBinancePaid}
+                  className="w-full bg-[#F0B90B] hover:bg-[#d9a409] text-neutral-900 font-semibold py-3 rounded-xl transition-colors"
+                >
+                  {t.alreadyPaid}
+                </button>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
+                </a>
+
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
+              </div>
+            )}
+
+
+
             {m.id === "paypal" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">

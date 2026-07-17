@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
+import { isCheckoutAuthorized, authorizeCheckout } from "@/lib/checkoutGate";
 
 function MobileOrderSummarySticky({ slug }: { slug?: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -44,6 +45,7 @@ function MobileOrderSummarySticky({ slug }: { slug?: string }) {
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
+  const navigate = useNavigate();
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
@@ -55,6 +57,22 @@ export default function Checkout() {
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
+
+  // Anti-fraude: /checkouts/:slug es una URL privada. Solo se permite si el
+  // visitante llegó desde una CTA propia, un enlace de recuperación de carrito
+  // o un token firmado. Cualquier acceso directo (bot, crawler, link filtrado)
+  // se redirige al producto público.
+  const [gateChecked, setGateChecked] = useState(false);
+  useEffect(() => {
+    if (!slug) return;
+    if (isCheckoutAuthorized()) {
+      authorizeCheckout(slug); // renueva ventana de 1h
+      setGateChecked(true);
+      return;
+    }
+    navigate(`/products/${slug}`, { replace: true });
+  }, [slug, navigate]);
+
 
   // Prewarm: cargar stripe.js y despertar el edge function `create-checkout-prueba`
   // en cuanto se abre /checkouts, para que al mostrar el iframe ya esté caliente
@@ -422,8 +440,13 @@ export default function Checkout() {
   }
 
 
+  if (!gateChecked) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
+
       <Helmet>
         <title>{`Checkout · iLingue Relax · ${isPeru ? "PE" : "GLOBAL"}`}</title>
         <meta name="robots" content="noindex, nofollow" />

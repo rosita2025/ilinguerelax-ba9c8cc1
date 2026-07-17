@@ -180,24 +180,26 @@ async function sendStripePurchaseEmails(params: {
   couponAmount?: number;
 }) {
   const { adminClient, customerEmail, customerName, customerPhone, customerCountry, purchase, orderNumber, paymentKey, skus, couponCode, couponPercent, couponAmount } = params;
-  await sendThankYouEmail({
-    customerEmail,
-    customerName,
-    customerPhone,
-    customerCountry,
-    productName: purchase.content_name,
-    skus,
-    amount: purchase.value,
-    currency: purchase.currency,
-    provider: "stripe",
-    orderNumber,
-    idempotencyKey: `stripe:${paymentKey}`,
-    couponCode,
-    couponPercent,
-    couponAmount,
-  });
-
+  // Evitar duplicados: si hay entrega digital, el correo "Materiales" ya
+  // funciona como confirmación de compra. Solo enviamos "Gracias por tu compra"
+  // cuando NO hay SKUs digitales (p.ej. compra 100% física).
   if (skus.length === 0) {
+    await sendThankYouEmail({
+      customerEmail,
+      customerName,
+      customerPhone,
+      customerCountry,
+      productName: purchase.content_name,
+      skus,
+      amount: purchase.value,
+      currency: purchase.currency,
+      provider: "stripe",
+      orderNumber,
+      idempotencyKey: `stripe:${paymentKey}`,
+      couponCode,
+      couponPercent,
+      couponAmount,
+    });
     console.log("[stripe-webhook] no skus in metadata; skipping digital delivery", { paymentKey });
     return;
   }

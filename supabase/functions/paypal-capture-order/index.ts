@@ -108,17 +108,22 @@ Deno.serve(async (req) => {
       const customerEmail = checkoutEmail || payerEmail;
       const customerCountry = checkoutCountry || payerCountry || undefined;
       const productName = pu?.description || pu?.items?.[0]?.name || "Pedido ILINGUE RELAX";
-      await sendThankYouEmail({
-        customerEmail,
-        customerName: payerName,
-        customerCountry,
-        productName,
-        amount: capturedAmount ? Number(capturedAmount) : undefined,
-        currency: capturedCurrency ?? "USD",
-        provider: "paypal",
-        orderNumber: captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : undefined,
-        idempotencyKey: captureId || orderId,
-      });
+      // Solo enviamos "Gracias por tu compra" cuando NO hay entrega digital.
+      // Si hay SKUs, el correo de materiales ya sirve como confirmación y
+      // evitamos gastar cuota de Brevo con dos correos casi idénticos.
+      if (skus.length === 0) {
+        await sendThankYouEmail({
+          customerEmail,
+          customerName: payerName,
+          customerCountry,
+          productName,
+          amount: capturedAmount ? Number(capturedAmount) : undefined,
+          currency: capturedCurrency ?? "USD",
+          provider: "paypal",
+          orderNumber: captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : undefined,
+          idempotencyKey: captureId || orderId,
+        });
+      }
       if (skus.length > 0) {
         const digitalClient = createClient(
           Deno.env.get("SUPABASE_URL")!,

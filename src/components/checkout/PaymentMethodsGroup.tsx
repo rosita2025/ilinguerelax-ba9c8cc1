@@ -1260,7 +1260,7 @@ export function PaymentMethodsGroup() {
                       type="button"
                       onClick={() => {
                         navigator.clipboard.writeText(binanceCfg.pay_id).catch(() => {});
-                        toast.success(t.copied);
+                        toast({ description: t.copied });
                       }}
                       className="w-full inline-flex items-center justify-center gap-2 text-xl font-mono font-bold text-[#a37800] dark:text-[#F0B90B] hover:opacity-80 transition"
                     >

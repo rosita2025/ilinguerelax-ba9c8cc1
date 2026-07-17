@@ -255,6 +255,32 @@ const AdminPurchasesStatus = () => {
                         <span className="text-muted-foreground">Estado raw:</span>{" "}
                         <code className="bg-muted px-1 rounded">{r.raw_status}</code>
                       </div>
+
+                      {editing === r.id ? (
+                        <div className="rounded-md border p-2 space-y-2 bg-muted/30">
+                          <label className="block text-[11px] font-medium">Corregir correo del cliente</label>
+                          <Input value={emailDraft} onChange={(e) => setEmailDraft(e.target.value)}
+                            placeholder="nuevo@correo.com" className="h-8 text-xs" />
+                          <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                            <input type="checkbox" checked={resendOnSave}
+                              onChange={(e) => setResendOnSave(e.target.checked)} />
+                            Reenviar material digital al nuevo correo (si la compra está aprobada)
+                          </label>
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => saveEdit(r.id)} disabled={saving} className="h-7 text-xs">
+                              <Send className="w-3 h-3 mr-1" />{saving ? "Guardando…" : "Guardar"}
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={cancelEdit} disabled={saving} className="h-7 text-xs">
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
+                          <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
+                        </Button>
+                      )}
+
                       <details>
                         <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                           Ver payload completo

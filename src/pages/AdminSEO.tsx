@@ -390,8 +390,99 @@ const AdminSEO = () => {
               </div>
             )}
           </Card>
+
+          <Card className="p-4 space-y-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Generador de posts SEO para el blog</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              La IA redacta un artículo con H1, H2, H3, listas y menciones sutiles a tus productos.
+              Se publica automáticamente en <code>/blog/[slug]</code>.
+            </p>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-1 md:col-span-2">
+                <Label>Tema / título aproximado</Label>
+                <Textarea
+                  value={genTopic}
+                  onChange={(e) => setGenTopic(e.target.value)}
+                  placeholder="Ej: Cómo aprender inglés con pronunciación en español desde cero"
+                  rows={2}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Keyword principal (SEO)</Label>
+                <Input
+                  value={genKeyword}
+                  onChange={(e) => setGenKeyword(e.target.value)}
+                  placeholder="aprender ingles con pronunciacion"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Categoría</Label>
+                <Input
+                  value={genCategory}
+                  onChange={(e) => setGenCategory(e.target.value)}
+                  placeholder="Aprendizaje, Vocabulario, Fonética…"
+                />
+              </div>
+            </div>
+
+            <Button onClick={generatePost} disabled={genLoading}>
+              {genLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+              Generar y publicar
+            </Button>
+
+            {genPosts.length > 0 && (
+              <div className="pt-2">
+                <h3 className="text-sm font-semibold mb-2">Últimos posts generados</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-left text-xs uppercase text-muted-foreground border-b">
+                      <tr>
+                        <th className="py-2 pr-2">Título</th>
+                        <th className="py-2 px-2">Categoría</th>
+                        <th className="py-2 px-2">Fecha</th>
+                        <th className="py-2 pl-2">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {genPosts.map((p) => (
+                        <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30">
+                          <td className="py-2 pr-2 max-w-[320px] truncate">
+                            <a
+                              href={`/blog/${p.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-primary inline-flex items-center gap-1"
+                            >
+                              <span className="truncate">{p.title}</span>
+                              <ExternalLink className="w-3 h-3 shrink-0" />
+                            </a>
+                          </td>
+                          <td className="py-2 px-2">{p.category}</td>
+                          <td className="py-2 px-2 text-xs text-muted-foreground">
+                            {new Date(p.created_at).toLocaleDateString("es-ES")}
+                          </td>
+                          <td className="py-2 pl-2">
+                            {p.published ? (
+                              <span className="text-primary text-xs">Publicado</span>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">Borrador</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </Card>
         </div>
       </main>
+
     </>
   );
 };

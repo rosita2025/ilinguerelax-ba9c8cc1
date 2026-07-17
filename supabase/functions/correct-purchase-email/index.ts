@@ -150,8 +150,12 @@ Deno.serve(async (req) => {
 
     // Audit
     await admin.from("digital_delivery_audit").insert({
-      source: provider, source_ref: id, action: "email_corrected",
-      details: { previous_email: previousEmail, new_email: email, row_id: rowId },
+      source: `email_correction/${provider}`,
+      customer_email: email,
+      order_id: rowId,
+      status: "email_corrected",
+      provider,
+      items: [{ previous_email: previousEmail, new_email: email }],
     }).then(() => null).catch(() => null);
 
     let delivery: { ok: boolean; status: number; body?: string } | null = null;

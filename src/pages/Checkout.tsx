@@ -83,7 +83,6 @@ export default function Checkout() {
         return;
       }
       authorizeCheckout(slug); // renueva ventana de 1h
-      if (!cancelled) setGateChecked(true);
       // Server-side rate limit por IP en segundo plano (fail-open).
       try {
         const { data } = await supabase.functions.invoke("checkout-gate-check", {

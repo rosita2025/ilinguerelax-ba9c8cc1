@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck, Send } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck, Send, Shield } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 const panels = [
@@ -108,6 +108,13 @@ const panels = [
     title: "GA4 · Comparativa",
     desc: "Compara datos internos vs Google Analytics 4: usuarios, sesiones, eventos y fuentes de tráfico para detectar desviaciones.",
     color: "text-rose-500",
+  },
+  {
+    to: "/admin/checkout-abuse",
+    icon: Shield,
+    title: "Anti-abuso · Checkout",
+    desc: "IPs bloqueadas por rate limit, top IPs con más aperturas del checkout en 24 h y desbloqueo manual.",
+    color: "text-red-500",
   },
 ];
 

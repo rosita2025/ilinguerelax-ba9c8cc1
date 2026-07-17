@@ -20,8 +20,12 @@ interface Props {
   productName?: string
   amount?: number
   currency?: string
+  amountUsd?: number
   method?: string
   orderDate?: string
+  binancePayId?: string
+  binanceAddress?: string
+  binanceNetwork?: string
 }
 
 const fmtMoney = (amount?: number, currency?: string) => {

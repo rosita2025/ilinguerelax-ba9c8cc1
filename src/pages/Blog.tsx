@@ -8,11 +8,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useGeneratedBlogPosts } from "@/hooks/useGeneratedBlogPosts";
 
 const Blog = () => {
   const categories = getAllCategories();
+  const { posts: generatedPosts } = useGeneratedBlogPosts();
   const featuredPost = blogPosts[0];
-  const otherPosts = blogPosts.slice(1);
+  const otherPosts = [...generatedPosts, ...blogPosts.slice(1)];
+
 
   const blogSchema = {
     "@context": "https://schema.org",

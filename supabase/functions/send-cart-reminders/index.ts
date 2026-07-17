@@ -289,7 +289,7 @@ Deno.serve(async (req) => {
         const name = (attrs.NOMBRE as string | undefined)
           || (r.attributes as any)?.first_name
           || undefined;
-        const coupon = (attrs.ABANDONED_COUPON as string | undefined) || (step === 30 ? "NEW10" : undefined);
+        const coupon = (attrs.ABANDONED_COUPON as string | undefined) || (step === 7200 ? "NEW10" : undefined);
 
         const html = buildHtml({
           name,

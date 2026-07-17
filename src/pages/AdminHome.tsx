@@ -40,6 +40,20 @@ const panels = [
     color: "text-fuchsia-500",
   },
   {
+    to: "/admin/binance-config",
+    icon: Wallet,
+    title: "Binance Pay · Configuración",
+    desc: "Edita el Pay ID, wallet, titular y QR de Binance por región (DEFAULT, PE, US, GLOBAL) sin tocar código.",
+    color: "text-yellow-500",
+  },
+  {
+    to: "/admin/purchases-status",
+    icon: CreditCard,
+    title: "Pagos · Estado unificado",
+    desc: "Todas las compras (Hotmart, Mercado Pago, PayPal, Stripe, manuales) con estado, motivo de bloqueo y paso que falló.",
+    color: "text-blue-500",
+  },
+  {
     to: "/admin/productos",
     icon: Package,
     title: "Productos digitales",

@@ -95,6 +95,8 @@ function keyToFamily(key: string): FamilyKey | null {
   if (k.startsWith("stripe_")) return "stripe";
   if (k === "paypal") return "paypal";
   if (k === "yape_plin") return "yape";
+  if (k === "binance_pay") return "binance";
+
   if (k === "mercadopago_transfer") return "transfer";
   if (k === "mercadopago_cash") return "cash";
   return null;

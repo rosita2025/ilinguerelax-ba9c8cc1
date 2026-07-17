@@ -40,11 +40,9 @@ function buildHtml(opts: {
     ? "Retomarás la compra desde donde la dejaste en Hotmart (pago 100% seguro)."
     : "Retomarás el checkout en nuestra tienda con los productos que dejaste.";
   const stepMsg: Record<Step, string> = {
-    3: "Notamos que hace unas horas comenzaste tu compra y no la terminaste. Tu carrito sigue reservado — retómalo en 1 clic.",
-    24: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
-    168: "Ha pasado una semana desde que iniciaste tu compra. Tu carrito sigue guardado.",
-    360: "Vamos a liberar tu carrito pronto. Aprovecha ahora — te dejamos el enlace directo.",
-    720: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
+    30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tu carrito sigue reservado — retómalo en 1 clic.",
+    1440: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
+    7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
 
   return `<!DOCTYPE html>

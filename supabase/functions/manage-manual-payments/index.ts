@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { action, orderId, adminKey, notes } = await req.json();
+    const { action, orderId, adminKey, notes, buyerEmail, buyerName, buyerPhone, buyerCountry } = await req.json();
 
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expectedKey || adminKey !== expectedKey) {

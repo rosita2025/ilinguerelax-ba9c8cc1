@@ -217,7 +217,7 @@ Deno.serve(async (req) => {
           amount: Number(order.amount_local ?? order.amount_usd),
           currency: order.currency_local || "USD",
           orderNumber: order.order_number,
-          provider: "yape_plin",
+          provider: order.method || "yape_plin",
         }),
         markAbandonedCartConverted(order.buyer_email),
       ]);

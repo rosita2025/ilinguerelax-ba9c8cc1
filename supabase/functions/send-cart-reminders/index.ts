@@ -197,8 +197,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Cron: skip if paused. For DAILY steps (>=24h) also gate on send_hour;
-    // short steps (3h, etc.) fire every hour so recovery reaches the user fast.
+    // Cron: skip if paused. Daily steps (>=1440 min = 1 día) also gate on
+    // send_hour; the 30-min step fires every 15 min so recovery is fast.
     let allowDailySteps = true;
     if (isCron) {
       if (cfg.paused) {
@@ -221,9 +221,9 @@ Deno.serve(async (req) => {
     if (Array.isArray(cfg.enabled_steps) && cfg.enabled_steps.length) {
       onlySteps = onlySteps.filter((s) => cfg.enabled_steps.includes(s));
     }
-    // Daily-only steps (>=24h) are skipped in cron when not at send_hour
+    // Daily steps (>=1440 min) are skipped in cron when not at send_hour
     if (isCron && !allowDailySteps) {
-      onlySteps = onlySteps.filter((s) => s < 24);
+      onlySteps = onlySteps.filter((s) => s < 1440);
       if (onlySteps.length === 0) {
         return new Response(JSON.stringify({ ok: true, skipped: `daily steps wait for hour ${cfg.send_hour} (${cfg.timezone})` }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },

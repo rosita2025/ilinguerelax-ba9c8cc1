@@ -474,6 +474,15 @@ export function PaymentMethodsGroup() {
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
+    // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
+    // hacia arriba. Reancla la vista sobre el método recién elegido (PayPal,
+    // Binance, Yape…) para que el comprador siga viendo lo que tocó.
+    if (typeof window !== "undefined") {
+      window.setTimeout(() => {
+        const el = document.querySelector<HTMLElement>(`[data-method-row="${m}"]`);
+        el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+    }
   };
 
   const handleBuyNow = async () => {
@@ -949,8 +958,9 @@ export function PaymentMethodsGroup() {
         return (
           <div
             key={rowKey}
+            data-method-row={m.id}
             className={cn(
-              "rounded-xl border overflow-hidden transition-colors",
+              "rounded-xl border overflow-hidden transition-colors scroll-mt-24",
               isSelected
                 ? "border-neutral-400 bg-neutral-100 dark:bg-neutral-800/60"
                 : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40",

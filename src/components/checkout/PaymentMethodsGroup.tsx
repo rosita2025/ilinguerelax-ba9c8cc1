@@ -758,7 +758,21 @@ export function PaymentMethodsGroup() {
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
+    {
+      id: "binance",
+      icon: Wallet,
+      title: language === "en" ? "Binance Pay (USDT · Crypto)"
+        : language === "pt" ? "Binance Pay (USDT · Cripto)"
+        : language === "fr" ? "Binance Pay (USDT · Crypto)"
+        : "Binance Pay (USDT · Cripto)",
+      sub: language === "en" ? "USDT / Binance Pay · 1-24h verification by Supervisor Rosa"
+        : language === "pt" ? "USDT / Binance Pay · Verificação 1-24h pela Supervisora Rosa"
+        : language === "fr" ? "USDT / Binance Pay · Vérification 1-24h par la Superviseure Rosa"
+        : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
+      badge: priceBadge,
+    },
   ];
+
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.
   // Perú conserva sus rails locales (transfer/cash/yape) por defecto; el resto
   // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí

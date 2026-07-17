@@ -298,29 +298,26 @@ Deno.serve(async (req) => {
           const couponPctRaw = Number(payment.metadata?.coupon_percent);
           const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
           const skusForDelivery = getPaymentSkus(payment);
-          // Solo enviamos "Gracias por tu compra" si NO hay entrega digital.
-          // El correo de materiales ya confirma la compra; así no gastamos
-          // cuota de Brevo con dos correos casi iguales.
-          if (skusForDelivery.length === 0) {
-            try {
-              await sendThankYouEmail({
-                customerEmail: payerEmail,
-                customerName,
-                customerPhone: payment.metadata?.customer_phone || undefined,
-                customerCountry: payment.payer?.address?.country_id || undefined,
-                productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
-                skus: skusForDelivery,
-                amount: payment.transaction_amount ?? undefined,
-                currency: payment.currency_id || "PEN",
-                provider: "mercadopago",
-                orderNumber,
-                idempotencyKey: `mp-approved-${payment.id}`,
-                couponCode,
-                couponPercent,
-              });
-            } catch (e) {
-              console.error("MP approved thank-you failed:", e);
-            }
+          // Siempre enviamos "Gracias por tu compra" (con producto y precio).
+          // Si además hay SKUs digitales, luego se dispara la entrega de materiales.
+          try {
+            await sendThankYouEmail({
+              customerEmail: payerEmail,
+              customerName,
+              customerPhone: payment.metadata?.customer_phone || undefined,
+              customerCountry: payment.payer?.address?.country_id || undefined,
+              productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
+              skus: skusForDelivery,
+              amount: payment.transaction_amount ?? undefined,
+              currency: payment.currency_id || "PEN",
+              provider: "mercadopago",
+              orderNumber,
+              idempotencyKey: `mp-approved-${payment.id}`,
+              couponCode,
+              couponPercent,
+            });
+          } catch (e) {
+            console.error("MP approved thank-you failed:", e);
           }
           try {
             const skus = getPaymentSkus(payment);

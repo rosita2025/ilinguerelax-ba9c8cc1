@@ -141,8 +141,10 @@ const AdminSEO = () => {
   useEffect(() => {
     void loadGsc(days);
     void loadSemrush();
+    void loadGenPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
+
 
   const applyPreset = (d: number) => {
     setDays(d);

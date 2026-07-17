@@ -949,8 +949,9 @@ export function PaymentMethodsGroup() {
         return (
           <div
             key={rowKey}
+            data-method-row={m.id}
             className={cn(
-              "rounded-xl border overflow-hidden transition-colors",
+              "rounded-xl border overflow-hidden transition-colors scroll-mt-24",
               isSelected
                 ? "border-neutral-400 bg-neutral-100 dark:bg-neutral-800/60"
                 : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40",

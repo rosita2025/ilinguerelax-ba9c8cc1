@@ -57,8 +57,18 @@ const fmtDate = (iso?: string) => {
   }
 }
 
-const providerLabel = (p?: string) =>
-  p === 'stripe' ? 'Tarjeta (Stripe)' : p === 'paypal' ? 'PayPal' : p === 'mercadopago' ? 'Mercado Pago' : (p || '—')
+const providerLabel = (p?: string) => {
+  const k = (p || '').toLowerCase().replace(/[-\s]/g, '_')
+  if (k === 'stripe') return 'Tarjeta (Stripe)'
+  if (k === 'paypal') return 'PayPal'
+  if (k === 'mercadopago') return 'Mercado Pago'
+  if (k === 'yape') return 'Yape'
+  if (k === 'plin') return 'Plin'
+  if (k === 'yape_plin') return 'Yape / Plin'
+  if (k === 'binance' || k === 'binance_pay') return 'Binance Pay'
+  if (k === 'manual') return 'Pago manual'
+  return p || '—'
+}
 
 const badge = (kind?: string) => {
   if (kind === 'upsell') return { label: 'ADICIONAL', bg: '#fef3c7', color: '#92400e' }

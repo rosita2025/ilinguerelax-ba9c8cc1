@@ -48,7 +48,14 @@ const AdminManualPayments = () => {
     }
   };
 
-  useEffect(() => { void fetchOrders(); /* eslint-disable-next-line */ }, [adminKey]);
+  useEffect(() => {
+    void fetchOrders();
+    const iv = setInterval(() => { void fetchOrders(); }, 20000);
+    const onVis = () => { if (document.visibilityState === "visible") void fetchOrders(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(iv); document.removeEventListener("visibilitychange", onVis); };
+    /* eslint-disable-next-line */
+  }, [adminKey]);
 
   const runAction = async (action: "verify" | "reject" | "reset", orderId: string) => {
     try {

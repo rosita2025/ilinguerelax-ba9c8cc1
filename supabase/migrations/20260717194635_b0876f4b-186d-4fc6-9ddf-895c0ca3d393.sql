@@ -1,0 +1,2 @@
+ALTER TABLE public.binance_pay_configs ADD COLUMN IF NOT EXISTS pay_id TEXT;
+UPDATE public.binance_pay_configs SET pay_id = '389090038' WHERE region_code = 'DEFAULT' AND (pay_id IS NULL OR pay_id = '');

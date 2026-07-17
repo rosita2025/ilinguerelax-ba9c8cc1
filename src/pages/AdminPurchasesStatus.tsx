@@ -63,6 +63,40 @@ const AdminPurchasesStatus = () => {
   const [mapped, setMapped] = useState<Mapped | "all">("all");
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [editing, setEditing] = useState<string | null>(null);
+  const [emailDraft, setEmailDraft] = useState("");
+  const [resendOnSave, setResendOnSave] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = (id: string, current: string | null) => {
+    setEditing(id); setEmailDraft(current ?? ""); setResendOnSave(true);
+  };
+  const cancelEdit = () => { setEditing(null); setEmailDraft(""); };
+  const saveEdit = async (id: string) => {
+    const email = emailDraft.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Correo inválido"); return;
+    }
+    setSaving(true);
+    try {
+      const { data, error } = await adminInvoke("correct-purchase-email", {
+        body: { adminKey, rowId: id, newEmail: email, resend: resendOnSave },
+      });
+      if (error) throw error;
+      const d = data as any;
+      toast.success("Correo actualizado", {
+        description: d?.resend
+          ? (d?.delivery?.ok ? "Material digital reenviado al nuevo correo." : "Correo cambiado, pero el reenvío falló.")
+          : d?.canResend ? "Correo cambiado (sin reenvío)." : "Correo cambiado (esta compra no soporta reenvío automático).",
+      });
+      cancelEdit();
+      load();
+    } catch (e) {
+      toast.error("Error", { description: (e as Error).message });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!adminKey) return;

@@ -109,6 +109,13 @@ const panels = [
     desc: "Compara datos internos vs Google Analytics 4: usuarios, sesiones, eventos y fuentes de tráfico para detectar desviaciones.",
     color: "text-rose-500",
   },
+  {
+    to: "/admin/checkout-abuse",
+    icon: Shield,
+    title: "Anti-abuso · Checkout",
+    desc: "IPs bloqueadas por rate limit, top IPs con más aperturas del checkout en 24 h y desbloqueo manual.",
+    color: "text-red-500",
+  },
 ];
 
 const AdminHome = () => {

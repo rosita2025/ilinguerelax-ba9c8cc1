@@ -19,6 +19,7 @@ type BinanceConfig = {
   holder_name: string;
   qr_url: string;
   network: string;
+  pay_id?: string | null;
   notes?: string | null;
   active: boolean;
 };
@@ -29,6 +30,7 @@ const EMPTY: BinanceConfig = {
   holder_name: "",
   qr_url: "",
   network: "Binance Pay (Pay ID)",
+  pay_id: "",
   notes: "",
   active: true,
 };

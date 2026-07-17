@@ -130,11 +130,9 @@ const ProductDynamic = () => {
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
-    return (
-      <div className="min-h-dvh flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Cargando producto…</div>
-      </div>
-    );
+    // Sin pantalla de carga: evitamos el flash "Cargando producto…" al
+    // navegar desde la home. Renderizamos nada mientras llega el catálogo.
+    return <div className="min-h-dvh bg-background" />;
   }
 
   const isPEN = local.country === "PE" && product.price_pen != null;

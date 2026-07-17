@@ -793,6 +793,8 @@ export function PaymentMethodsGroup() {
         if (m.id === "transfer") return methodsConfig.transfer;
         if (m.id === "cash") return methodsConfig.cash;
         if (m.id === "yape") return methodsConfig.yape;
+        if (m.id === "binance") return methodsConfig.binance;
+
         return true;
       })
     : allMethods;

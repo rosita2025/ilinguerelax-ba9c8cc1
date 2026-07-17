@@ -252,6 +252,32 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "update_buyer" && orderId) {
+      const patch: Record<string, unknown> = {};
+      if (typeof buyerEmail === "string") {
+        const em = buyerEmail.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+          return new Response(JSON.stringify({ error: "invalid_email" }), {
+            status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        patch.buyer_email = em;
+      }
+      if (typeof buyerName === "string") patch.buyer_name = buyerName.trim();
+      if (typeof buyerPhone === "string") patch.buyer_phone = buyerPhone.trim() || null;
+      if (typeof buyerCountry === "string") patch.buyer_country = buyerCountry.trim() || null;
+      if (Object.keys(patch).length === 0) {
+        return new Response(JSON.stringify({ error: "no_changes" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await admin.from("manual_payments").update(patch).eq("id", orderId);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Invalid action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -23,7 +23,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
-import { isCheckoutAuthorized, authorizeCheckout } from "@/lib/checkoutGate";
+import { isCheckoutAuthorized, authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
 
 function MobileOrderSummarySticky({ slug }: { slug?: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -65,13 +65,25 @@ export default function Checkout() {
   const [gateChecked, setGateChecked] = useState(false);
   useEffect(() => {
     if (!slug) return;
-    if (isCheckoutAuthorized()) {
+    const reason = evaluateCheckoutGate();
+    if (reason === "ok") {
       authorizeCheckout(slug); // renueva ventana de 1h
       setGateChecked(true);
       return;
     }
+    if (reason === "rate_limited" || reason === "banned") {
+      toast.error("Demasiados intentos. Intenta de nuevo en unos minutos.");
+      navigate(`/products/${slug}`, { replace: true });
+      return;
+    }
+    if (reason === "bot") {
+      // Bot / headless: redirige silenciosamente sin dar pistas.
+      navigate("/", { replace: true });
+      return;
+    }
     navigate(`/products/${slug}`, { replace: true });
   }, [slug, navigate]);
+
 
 
   // Prewarm: cargar stripe.js y despertar el edge function `create-checkout-prueba`

@@ -16,9 +16,12 @@ interface OrderSummaryProps {
   locked?: boolean;
   /** Main product id — its remove/trash button is hidden so it cannot be deleted. */
   mainProductId?: string;
+  /** Notified when the mobile collapsible expands/collapses (for sticky wrapper). */
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
-export function OrderSummary({ collapsible = false, locked = false, mainProductId }: OrderSummaryProps) {
+export function OrderSummary({ collapsible = false, locked = false, mainProductId, onExpandedChange }: OrderSummaryProps) {
+
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
     useCheckoutPruebaStore();
   const region = useRegionTier();

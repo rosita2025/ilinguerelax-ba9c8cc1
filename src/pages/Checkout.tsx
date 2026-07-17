@@ -62,7 +62,11 @@ export default function Checkout() {
   // visitante llegó desde una CTA propia, un enlace de recuperación de carrito
   // o un token firmado. Cualquier acceso directo (bot, crawler, link filtrado)
   // se redirige al producto público.
-  const [gateChecked, setGateChecked] = useState(false);
+  // Evaluación síncrona del gate: si el cliente ya está autorizado, renderizamos
+  // inmediatamente sin pantalla en blanco. El chequeo de rate-limit por IP se
+  // hace en segundo plano (fail-open).
+  const initialReason = typeof window !== "undefined" ? evaluateCheckoutGate() : "ok";
+  const [gateChecked, setGateChecked] = useState(initialReason === "ok");
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
@@ -79,27 +83,23 @@ export default function Checkout() {
         navigate(`/products/${slug}`, { replace: true });
         return;
       }
-      // Server-side rate limit por IP (fail-open si el edge function falla).
+      authorizeCheckout(slug); // renueva ventana de 1h
+      if (!cancelled) setGateChecked(true);
+      // Server-side rate limit por IP en segundo plano (fail-open).
       try {
         const { data } = await supabase.functions.invoke("checkout-gate-check", {
           body: { slug },
         });
         const res = data as { allowed?: boolean; reason?: string } | null;
-        if (res && res.allowed === false) {
-          if (!cancelled) {
-            toast.error(
-              res.reason === "banned"
-                ? "Acceso bloqueado temporalmente por actividad sospechosa."
-                : "Demasiados intentos desde tu red. Intenta más tarde.",
-            );
-            navigate(`/products/${slug}`, { replace: true });
-          }
-          return;
+        if (res && res.allowed === false && !cancelled) {
+          toast.error(
+            res.reason === "banned"
+              ? "Acceso bloqueado temporalmente por actividad sospechosa."
+              : "Demasiados intentos desde tu red. Intenta más tarde.",
+          );
+          navigate(`/products/${slug}`, { replace: true });
         }
       } catch { /* fail-open */ }
-      if (cancelled) return;
-      authorizeCheckout(slug); // renueva ventana de 1h
-      setGateChecked(true);
     })();
     return () => { cancelled = true; };
   }, [slug, navigate]);

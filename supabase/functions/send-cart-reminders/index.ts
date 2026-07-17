@@ -95,13 +95,36 @@ function computeWindow(stepHours: Step) {
   return { from, to };
 }
 
+async function hasServiceRole(authHeader: string): Promise<boolean> {
+  if (!authHeader.startsWith("Bearer ")) return false;
+  const url = Deno.env.get("SUPABASE_URL");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!url || !anonKey) return false;
+  try {
+    const verifier = createClient(url, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false },
+    });
+    const { data, error } = await verifier.auth.getClaims(authHeader.slice(7));
+    return !error && data?.claims?.role === "service_role";
+  } catch {
+    return false;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Allow either service-role (cron) OR admin CSRF+key
+  // Allow service-role/shared-secret cron calls, otherwise require admin guards.
   const auth = req.headers.get("authorization") || "";
+  const cronSecret = req.headers.get("x-cron-secret") || "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-  const isCron = serviceKey && auth === `Bearer ${serviceKey}`;
+  const sharedSecret = Deno.env.get("CRON_SHARED_SECRET") || "";
+  const isCron = Boolean(
+    (serviceKey && auth === `Bearer ${serviceKey}`) ||
+    (sharedSecret && cronSecret === sharedSecret) ||
+    await hasServiceRole(auth),
+  );
 
   if (!isCron) {
     const csrfBlock = await assertAdminCsrf(req);

@@ -118,9 +118,6 @@ const Email = ({
             {binanceNetwork && (
               <Text style={binanceLine}><strong>Red:</strong> {binanceNetwork}</Text>
             )}
-            {amountUsd != null && (
-              <Text style={binanceLine}><strong>Monto:</strong> USD ${Number(amountUsd).toFixed(2)}</Text>
-            )}
             <Text style={binanceHint}>
               Puedes usar tu Pay ID o hash de la transacción como referencia al escribirnos.
             </Text>

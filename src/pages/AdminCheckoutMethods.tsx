@@ -125,7 +125,9 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },
+  { key: "binance_pay", label: "Binance Pay (USDT)", note: "Cripto manual · global · Verificación 1-24h", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
 ];
+
 
 const CHECKOUT_METHOD_KEYS = new Set(CHECKOUT_METHODS.map(m => m.key));
 

@@ -21,10 +21,11 @@ import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
+
 
 const visaLogo = "/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg";
 const mastercardLogo = "/__l5e/assets-v1/94d65183-1752-495e-ac5b-70ec4cba62b2/mastercard.svg";
@@ -73,6 +74,12 @@ function BankBadge({ label, bg, color }: { label: string; bg: string; color: str
 const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
+
+const BINANCE_ADDRESS = "TPAwV7vFhuoYbwzEzmDuN229DwFUBCKH TF";
+const BINANCE_NAME = "iLingue Relax";
+const BINANCE_QR_URL = "https://cdn.phototourl.com/free/2026-07-17-19c64084-faa9-41f1-a1cb-5010d297c0be.jpg";
+const BINANCE_NETWORK = "Binance Pay (Pay ID)";
+
 
 type MethodBadge = { label: string; bg: string; color: string };
 type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
@@ -269,6 +276,8 @@ export function PaymentMethodsGroup() {
   const [stripeElapsed, setStripeElapsed] = useState(0);
   const [stripeAutoRetried, setStripeAutoRetried] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedBinance, setCopiedBinance] = useState(false);
+
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
   const stripeContainerRef = useRef<HTMLDivElement | null>(null);
@@ -625,6 +634,97 @@ export function PaymentMethodsGroup() {
     } catch { /* noop */ }
   };
 
+  const copyBinance = async () => {
+    try {
+      await navigator.clipboard.writeText(BINANCE_ADDRESS);
+      setCopiedBinance(true);
+      setTimeout(() => setCopiedBinance(false), 1800);
+    } catch { /* noop */ }
+  };
+
+  const handleBinancePaid = async () => {
+    const s = useCheckoutPruebaStore.getState();
+    const orderNumber = `ILR-BN-${Math.floor(1000 + Math.random() * 9000)}`;
+    const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
+    const productList = s.items.map((i) => `• ${i.name} x${i.quantity}`).join("\n");
+    const msg =
+      `Hola! 👋 Acabo de pagar por Binance Pay.\n\n` +
+      `📦 Orden: ${orderNumber}\n` +
+      `👤 Nombre: ${s.buyer.fullName.trim()}\n` +
+      `📧 Email: ${s.buyer.email.trim()}\n` +
+      `💰 Monto: ${amountText} (USD $${totalUsd})\n` +
+      `🔗 Red: ${BINANCE_NETWORK}\n\n` +
+      `Productos:\n${productList}\n\n` +
+      `Adjunto captura del pago. Gracias!`;
+    const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
+
+    try {
+      await supabase.from("manual_payments").insert({
+        order_number: orderNumber,
+        buyer_name: s.buyer.fullName.trim(),
+        buyer_email: s.buyer.email.trim().toLowerCase(),
+        buyer_phone: s.buyer.phone ?? null,
+        buyer_country: (region.country || "").toUpperCase() || null,
+        amount_usd: Number(totalUsd),
+        amount_local: local.loading ? null : Number(local.amount ?? totalUsd),
+        currency_local: local.currency || "USD",
+        method: "binance_pay",
+        items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+        status: "pending",
+      });
+    } catch (e) {
+      console.warn("[manual_payments] binance insert failed", e);
+    }
+
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-manual-pending",
+        idempotencyKey: `manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim(),
+          customerEmail: s.buyer.email.trim().toLowerCase(),
+          customerPhone: s.buyer.phone ?? "",
+          customerCountry: (region.country || "").toUpperCase(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "USD",
+          method: "Binance Pay",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[admin-manual-pending] binance notify failed", err));
+
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "customer-manual-pending",
+        recipientEmail: s.buyer.email.trim().toLowerCase(),
+        idempotencyKey: `customer-manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "USD",
+          method: "Binance Pay",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
+
+    supabase.from("email_contacts").upsert({
+      email: s.buyer.email.trim().toLowerCase(),
+      name: s.buyer.fullName.trim(),
+      source: "checkout-prueba-1",
+      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
+    }, { onConflict: "email,source" }).then(() => {});
+
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+    navigate(`/checkouts/pendiente-manual?order=${orderNumber}`);
+  };
+
+
+
   // Métodos locales de Perú (Mercado Pago transferencias/efectivo + Yape/Plin manual)
   // SOLO se muestran cuando el visitante está en Perú. Fuera de Perú, únicamente Stripe.
   const isPeru = (region.country || "").toUpperCase() === "PE";
@@ -658,7 +758,21 @@ export function PaymentMethodsGroup() {
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
+    {
+      id: "binance",
+      icon: Wallet,
+      title: language === "en" ? "Binance Pay (USDT · Crypto)"
+        : language === "pt" ? "Binance Pay (USDT · Cripto)"
+        : language === "fr" ? "Binance Pay (USDT · Crypto)"
+        : "Binance Pay (USDT · Cripto)",
+      sub: language === "en" ? "USDT / Binance Pay · 1-24h verification by Supervisor Rosa"
+        : language === "pt" ? "USDT / Binance Pay · Verificação 1-24h pela Supervisora Rosa"
+        : language === "fr" ? "USDT / Binance Pay · Vérification 1-24h par la Superviseure Rosa"
+        : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
+      badge: priceBadge,
+    },
   ];
+
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.
   // Perú conserva sus rails locales (transfer/cash/yape) por defecto; el resto
   // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí
@@ -679,6 +793,8 @@ export function PaymentMethodsGroup() {
         if (m.id === "transfer") return methodsConfig.transfer;
         if (m.id === "cash") return methodsConfig.cash;
         if (m.id === "yape") return methodsConfig.yape;
+        if (m.id === "binance") return methodsConfig.binance;
+
         return true;
       })
     : allMethods;
@@ -698,7 +814,7 @@ export function PaymentMethodsGroup() {
     ? orderedByAdmin.filter((m) => m.id !== "paypal")
     : methodsConfig.loaded && methodsConfig.regionCode
       ? orderedByAdmin
-      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal");
+      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance");
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 
@@ -910,9 +1026,16 @@ export function PaymentMethodsGroup() {
                     <BankBadge label="Yape" bg="#742282" color="#ffffff" />
                     <BankBadge label="Plin" bg="#00BFB3" color="#ffffff" />
                   </div>
+                ) : m.id === "binance" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Binance" bg="#F0B90B" color="#0A0A0A" />
+                    <BankBadge label="USDT" bg="#26A17B" color="#ffffff" />
+                    <BankBadge label="Pay ID" bg="#1F2937" color="#ffffff" />
+                  </div>
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}
+
 
               </div>
               <div className={cn(
@@ -1111,6 +1234,78 @@ export function PaymentMethodsGroup() {
               </div>
             )}
 
+            {m.id === "binance" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="text-center space-y-1">
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">
+                    {language === "en" ? "Send payment to" : language === "pt" ? "Enviar pagamento para" : language === "fr" ? "Envoyer le paiement à" : "Envía el pago a"}
+                  </p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{BINANCE_NAME}</p>
+                  <p className="text-[11px] text-neutral-500">{BINANCE_NETWORK}</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <img
+                    src={BINANCE_QR_URL}
+                    alt="Binance Pay QR"
+                    className="w-48 h-48 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
+                  <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">
+                    {language === "en" ? "Pay ID / Address" : language === "pt" ? "Pay ID / Endereço" : language === "fr" ? "Pay ID / Adresse" : "Pay ID / Dirección"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={copyBinance}
+                    className="w-full inline-flex items-center justify-center gap-2 text-sm font-mono font-semibold text-primary hover:opacity-80 transition break-all px-2"
+                  >
+                    <span className="break-all">{BINANCE_ADDRESS}</span>
+                    {copiedBinance ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
+                  </button>
+                  <p className="text-[11px] text-neutral-500 text-center">{copiedBinance ? t.copied : (language === "en" ? "Tap to copy" : language === "pt" ? "Toque para copiar" : language === "fr" ? "Touchez pour copier" : "Toca para copiar")}</p>
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
+                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{local.loading ? `USD $${totalUsd}` : local.formatted}</p>
+                  {!local.isUsd && !local.loading && (
+                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
+                  )}
+                </div>
+
+                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
+                  <li>{language === "en" ? "Open your Binance app and go to Pay / Send." : language === "pt" ? "Abra o app Binance e vá em Pay / Enviar." : language === "fr" ? "Ouvre l'app Binance et va dans Pay / Envoyer." : "Abre tu app Binance y ve a Pay / Enviar."}</li>
+                  <li>{language === "en" ? `Scan the QR or paste the Pay ID and send USD $${totalUsd} in USDT.` : language === "pt" ? `Escaneie o QR ou cole o Pay ID e envie USD $${totalUsd} em USDT.` : language === "fr" ? `Scanne le QR ou colle le Pay ID et envoie USD $${totalUsd} en USDT.` : `Escanea el QR o pega el Pay ID y envía USD $${totalUsd} en USDT.`}</li>
+                  <li>{language === "en" ? "Save the transaction screenshot." : language === "pt" ? "Salve a captura da transação." : language === "fr" ? "Sauvegarde la capture de la transaction." : "Guarda la captura de la transacción."}</li>
+                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
+                </ol>
+
+                <button
+                  type="button"
+                  onClick={handleBinancePaid}
+                  className="w-full bg-[#F0B90B] hover:bg-[#d9a409] text-neutral-900 font-semibold py-3 rounded-xl transition-colors"
+                >
+                  {t.alreadyPaid}
+                </button>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
+                </a>
+
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
+              </div>
+            )}
+
+
+
             {m.id === "paypal" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
@@ -1170,7 +1365,7 @@ export function PaymentMethodsGroup() {
         </p>
       )}
 
-      {selected !== "yape" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

@@ -88,10 +88,11 @@ const AdminManualPayments = () => {
         <div className="max-w-5xl mx-auto">
           <header className="mb-6">
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-              <Wallet className="w-7 h-7 text-primary" /> Pagos manuales (Yape / Plin)
+              <Wallet className="w-7 h-7 text-primary" /> Pagos manuales (Yape / Plin / Binance)
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Órdenes creadas cuando el cliente pulsa "Ya pagué" en el checkout. Verifica el pago en Yape/Plin y marca como <strong>Verificada</strong>.
+              Órdenes creadas cuando el cliente pulsa "Ya pagué" en el checkout. Verifica el pago en Yape/Plin o Binance Pay y marca como <strong>Verificada</strong>.
+
             </p>
           </header>
 

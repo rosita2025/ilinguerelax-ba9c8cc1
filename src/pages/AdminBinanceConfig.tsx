@@ -201,11 +201,19 @@ function ConfigCard({
           />
         </div>
         <div>
-          <Label className="text-xs">Dirección / Pay ID</Label>
+          <Label className="text-xs">Dirección / Wallet</Label>
           <Input
             value={local.address}
             onChange={(e) => set({ address: e.target.value })}
             placeholder="TPAw…"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Binance Pay ID</Label>
+          <Input
+            value={local.pay_id ?? ""}
+            onChange={(e) => set({ pay_id: e.target.value })}
+            placeholder="389090038"
           />
         </div>
         <div className="sm:col-span-2">

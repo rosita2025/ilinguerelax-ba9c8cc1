@@ -44,6 +44,7 @@ function MobileOrderSummarySticky({ slug }: { slug?: string }) {
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
+  const navigate = useNavigate();
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
@@ -55,6 +56,22 @@ export default function Checkout() {
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const isPeru = (region.country || "").toUpperCase() === "PE";
+
+  // Anti-fraude: /checkouts/:slug es una URL privada. Solo se permite si el
+  // visitante llegó desde una CTA propia, un enlace de recuperación de carrito
+  // o un token firmado. Cualquier acceso directo (bot, crawler, link filtrado)
+  // se redirige al producto público.
+  const [gateChecked, setGateChecked] = useState(false);
+  useEffect(() => {
+    if (!slug) return;
+    if (isCheckoutAuthorized()) {
+      authorizeCheckout(slug); // renueva ventana de 1h
+      setGateChecked(true);
+      return;
+    }
+    navigate(`/products/${slug}`, { replace: true });
+  }, [slug, navigate]);
+
 
   // Prewarm: cargar stripe.js y despertar el edge function `create-checkout-prueba`
   // en cuanto se abre /checkouts, para que al mostrar el iframe ya esté caliente

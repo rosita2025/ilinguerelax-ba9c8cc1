@@ -11,20 +11,18 @@ import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { sendEmail } from "../_shared/brevo.ts";
 
 const corsHeaders = adminCorsHeaders;
-// Steps are measured in HOURS. 3h, 24h (1d), 168h (7d), 360h (15d), 720h (30d).
-const STEPS = [3, 24, 168, 360, 720] as const;
+// Steps are measured in MINUTES. 30 min, 1440 min (1 día), 7200 min (5 días).
+const STEPS = [30, 1440, 7200] as const;
 type Step = typeof STEPS[number];
 
 const SUBJECTS_ES: Record<Step, string> = {
-  3: "👀 ¿Olvidaste algo? Tu carrito sigue esperándote",
-  24: "⏰ Tu carrito te está esperando — recupéralo hoy",
-  168: "¿Aún interesado? Tu carrito sigue disponible",
-  360: "Última semana para recuperar tu carrito con descuento",
-  720: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
+  30: "👀 ¿Olvidaste algo? Tu carrito sigue esperándote",
+  1440: "⏰ Tu carrito te está esperando — recupéralo hoy",
+  7200: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
 };
 
 const STEP_LABEL: Record<Step, string> = {
-  3: "3 h", 24: "24 h", 168: "Día 7", 360: "Día 15", 720: "Día 30",
+  30: "30 min", 1440: "Día 1", 7200: "Día 5",
 };
 
 function buildHtml(opts: {

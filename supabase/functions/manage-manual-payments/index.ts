@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
           productName: productNames,
           amount: Number(order.amount_local ?? order.amount_usd),
           currency: order.currency_local || "USD",
-          provider: "yape_plin",
+          provider: order.method || "yape_plin",
           orderDate: order.created_at,
         }),
         sendTemplate(admin, "material-delivery", order.buyer_email, `manual-material-${order.order_number}`, {
@@ -217,7 +217,7 @@ Deno.serve(async (req) => {
           amount: Number(order.amount_local ?? order.amount_usd),
           currency: order.currency_local || "USD",
           orderNumber: order.order_number,
-          provider: "yape_plin",
+          provider: order.method || "yape_plin",
         }),
         markAbandonedCartConverted(order.buyer_email),
       ]);

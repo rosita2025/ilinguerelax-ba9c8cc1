@@ -1,54 +1,69 @@
-## Objetivo
+## Integración KunfuPay (LATAM: OXXO, SPEI, Nequi, PSE, Pix)
 
-Que los 10 productos activos en `/admin/products` usen el mismo flujo de compra regional (Perú/VE/CU/NI/Global → checkout interno, LATAM → Hotmart) tanto en botón principal como en Sticky Bar, y que todos tengan entrada válida en `/checkouts/:slug` con precio nativo PEN + precios por región.
+### Contexto de la API
+- Base: `https://api.kunfupay.com`
+- Auth: header `X-API-Key: kfp_live_<id>.<secret>`
+- Moneda: **EUR** (KunfuPay convierte a moneda local en el checkout hosted)
+- Flujo: crear producto → crear payment-link → redirigir al `paymentUrl` hosted → recibir webhook firmado (HMAC SHA256)
 
-## Alcance (10 productos activos)
+### Métodos de pago disponibles vía KunfuPay
+- 🇲🇽 México: OXXO, SPEI
+- 🇨🇴 Colombia: Nequi, PSE
+- 🇧🇷 Brasil: Pix
 
-| # | SKU admin | Página | Slug checkout |
-|---|---|---|---|
-| 1 | patrones-especiales-alfabeto-combinaciones-secretas-ingles | ProductPatronesEspeciales | patrones-ingles ✓ |
-| 2 | 1-000-verbos-esenciales-en-ingles-... | Product1000Verbos | 1000-verbos ✓ |
-| 3 | 5-000-palabras-en-ingles-... | Product5000 | 5000-palabras ✓ |
-| 4 | 8-000-palabras-en-ingles-... | Product8000 | 8000-palabras ✓ |
-| 5 | 500-preguntas-en-ingles-... | Product500Preguntas | 500-preguntas ✓ |
-| 6 | 100-mapas-mentales-...-coreano | ProductCoreanoRelax | coreano-100-mapas ✓ |
-| 7 | 5-000-spanish-words-... | ProductSpanish5000Digital | 5000-spanish-words ✓ |
-| 8 | 500-questions-in-spanish-... | ProductSpanish500Questions | **falta** → `500-questions-spanish` |
-| 9 | 1-000-verbs-in-spanish-... | ProductSpanish1000Verbs | **falta** → `1000-verbs-spanish` |
-| 10 | 1-000-palabras-en-ingles-...-hispano | (sin página dedicada, usa ProductDynamic) | **falta** → `1000-palabras-hispano` |
+En países fuera de esa lista no se ofrece KunfuPay (sigue Stripe/PayPal/MP).
 
-## Cambios
+### Secrets a solicitar
+- `KUNFUPAY_API_KEY` (formato `kfp_live_...` o `kfp_test_...`)
+- `KUNFUPAY_WEBHOOK_SECRET` (para verificar HMAC del webhook)
 
-### 1. Ampliar `src/config/checkoutCatalog.ts`
-Agregar los 3 slugs faltantes con `price`, `pricePen`, `regionPrices` (latam/global/tienda) y `adminSku` sacados de `digital_products`. Actualizar los 7 existentes para que `pricePen` y `regionPrices.tienda` coincidan exactamente con el admin (Perú S/28.90 para coreano, etc.).
+### Cambios de base de datos
+Tabla `kunfupay_orders`:
+- `order_id` (nuestro, ILR-KFP-XXXX)
+- `kunfupay_product_id`, `kunfupay_sale_id`, `kunfupay_payment_link_id`
+- `external_reference`, `payment_url`
+- `customer_email`, `customer_name`, `customer_country`
+- `amount_eur`, `items` (jsonb con SKUs)
+- `status` (`created` | `completed` | `failed` | `expired`)
+- `raw_webhook` (jsonb última carga)
+- GRANTs + RLS solo service_role
 
-### 2. Nuevo hook `useRegionalBuyUrl(adminSku, hotmartUrlOverride?)`
-Centraliza la lógica que hoy vive dentro de `Product5000.tsx`:
-- Perú → `/checkouts/<slug>` (interno, misma pestaña)
-- VE/CU/NI/Global → `/checkouts/<slug>` (interno, misma pestaña)
-- LATAM (MX/CO/CL/AR/…) → URL Hotmart (nueva pestaña)
-- Devuelve `{ url, target, label, isInternal, tier, country }` con textos i18n (ES/EN/FR/PT)
+### Edge Functions
+1. **`kunfupay-create-order`** (POST)
+   - Recibe `{ items, customer, country }`
+   - Crea/reutiliza producto en KunfuPay (idempotency por SKU-hash)
+   - Crea payment-link con `Idempotency-Key = order_id`, `successUrl`, `failureUrl`
+   - Guarda registro en `kunfupay_orders` con status `created`
+   - Envía correo "Recibimos tu pedido" (pendiente)
+   - Devuelve `{ paymentUrl, orderId }`
 
-Resuelve el slug leyendo `CHECKOUT_CATALOG` (mapa inverso adminSku → slug).
+2. **`kunfupay-webhook`** (POST público, sin JWT)
+   - Verifica firma HMAC SHA256 (`sha256=<hex>`)
+   - Deduplica por `payment.id + eventType`
+   - En `productPayment.completed`: marca `completed`, dispara **Gracias por tu compra** + **Materiales digitales** + notificación admin (mismo patrón que Stripe/PayPal — no se saltan correos)
+   - En `failed` / `expired`: actualiza estado, sin correo extra
 
-### 3. Actualizar CTA principal + StickyBuyBar en cada página
-Sustituir el bloque manual de `useCountryTierRouting + TIENDA_CHECKOUT_x + HOTMART_x` por el hook nuevo en los 9 archivos con página propia. `ProductDynamic.tsx` recibe el mismo tratamiento para cubrir el producto 10.
+### Integración en el frontend
+- `PaymentMethodsGroup.tsx`: agregar tarjetas condicionales por país detectado (MX → OXXO/SPEI, CO → Nequi/PSE, BR → Pix). Un único botón "Pagar con KunfuPay" por método (todos van al mismo hosted checkout; KunfuPay filtra el método por país).
+- Al elegir → invoke `kunfupay-create-order` → `window.location.href = paymentUrl`
+- Página `CheckoutKunfupaySuccess.tsx` y `CheckoutKunfupayFailure.tsx` para el retorno del hosted checkout.
 
-### 4. Sanidad del catálogo
-Agregar test-lite en dev (`useEffect` en `AdminProducts.tsx`) que loguea `console.warn` si un `digital_products.active=true` no tiene entrada en `CHECKOUT_CATALOG` — así los nuevos productos futuros se detectan solos.
+### Admin
+- Añadir KunfuPay a `list-purchases-status` (proveedor `kunfupay`) para que aparezca en `/admin/purchases-status`.
+- Filtro por proveedor incluye "KunfuPay".
 
-## Fuera de alcance
-- Configurar upsells (ya se hace en `/admin/products` → tabla `product_upsells`)
-- Cambios visuales de cada página producto
-- Nuevos productos que aún no existen en admin
+### Anti-duplicados de correos (misma regla que ya validamos)
+- Manual: 3 correos (pendiente + gracias + materiales)
+- Stripe / PayPal / MP tarjeta / **KunfuPay**: 2 correos (gracias + materiales)
+- MP efectivo/transfer: 3 correos (pendiente + gracias + materiales)
 
-## Detalles técnicos
+### Nota sobre moneda
+Todos los importes se envían a KunfuPay en **EUR**. Se convierten desde USD del producto usando tasa fija configurable (arranco con `USD → EUR = 0.92`). El comprador ve el monto en su moneda local dentro del checkout hosted de KunfuPay.
 
-- Detección de país: reutilizar `useRegionTier` (ya IP+manual override).
-- LATAM sin `hotmartUrl` en admin → fallback al checkout interno USD (evita "botón muerto").
-- Sticky bar y CTA principal comparten la misma URL/label para consistencia.
-- Todo el trabajo es frontend; sin migraciones ni cambios en edge functions.
-
-## Verificación al final
-- `tsgo --noEmit`
-- Playwright rápido: cambiar `ilr_country_manual` a PE, MX y US, y confirmar que en cada producto el botón cambia de texto y destino.
+### Orden de ejecución
+1. Pedir `KUNFUPAY_API_KEY` y `KUNFUPAY_WEBHOOK_SECRET` con `add_secret`
+2. Migración `kunfupay_orders`
+3. Edge functions `kunfupay-create-order` y `kunfupay-webhook`
+4. UI en `PaymentMethodsGroup.tsx` + páginas de retorno
+5. Integración en admin
+6. Configurar URL del webhook en el dashboard de KunfuPay (te la paso al terminar)

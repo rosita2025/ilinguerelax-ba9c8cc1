@@ -75,6 +75,12 @@ const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
+const BINANCE_ADDRESS = "TPAwV7vFhuoYbwzEzmDuN229DwFUBCKH TF";
+const BINANCE_NAME = "iLingue Relax";
+const BINANCE_QR_URL = "https://cdn.phototourl.com/free/2026-07-17-19c64084-faa9-41f1-a1cb-5010d297c0be.jpg";
+const BINANCE_NETWORK = "Binance Pay (Pay ID)";
+
+
 type MethodBadge = { label: string; bg: string; color: string };
 type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
 

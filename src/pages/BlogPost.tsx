@@ -1,10 +1,12 @@
+import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, BookOpen, Tag } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
-import { getBlogPostBySlug, getRelatedPosts, blogPosts } from "@/data/blogPosts";
+import { getBlogPostBySlug, getRelatedPosts, blogPosts, type BlogPost as BlogPostType } from "@/data/blogPosts";
+import { fetchGeneratedBlogPostBySlug } from "@/hooks/useGeneratedBlogPosts";
 import { getProductById } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +17,30 @@ import { useCardPrice } from "@/hooks/useCardPrice";
 const BlogPost = () => {
   const cardPrice = useCardPrice();
   const { slug } = useParams<{ slug: string }>();
-  const post = slug ? getBlogPostBySlug(slug) : null;
-  
+  const staticPost = slug ? getBlogPostBySlug(slug) : null;
+  const [post, setPost] = useState<BlogPostType | null>(staticPost ?? null);
+  const [loading, setLoading] = useState(!staticPost);
+
+  useEffect(() => {
+    if (staticPost || !slug) return;
+    let cancelled = false;
+    (async () => {
+      const remote = await fetchGeneratedBlogPostBySlug(slug);
+      if (!cancelled) {
+        setPost(remote);
+        setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, staticPost]);
+
+  if (loading) return null;
   if (!post) {
     return <Navigate to="/blog" replace />;
   }
+
 
   const relatedPosts = getRelatedPosts(post.slug, 3);
   const relatedProducts = post.relatedProducts

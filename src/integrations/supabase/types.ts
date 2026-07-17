@@ -1107,6 +1107,57 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_blog_posts: {
+        Row: {
+          author: string
+          category: string
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          image: string
+          keyword: string | null
+          published: boolean
+          read_time: string
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          category?: string
+          content: string
+          created_at?: string
+          excerpt: string
+          id?: string
+          image?: string
+          keyword?: string | null
+          published?: boolean
+          read_time?: string
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          image?: string
+          keyword?: string | null
+          published?: boolean
+          read_time?: string
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hotmart_purchases: {
         Row: {
           created_at: string

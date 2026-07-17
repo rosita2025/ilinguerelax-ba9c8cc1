@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, Mail, ShieldCheck, GitCompare, TrendingUp, CreditCard, Wallet } from "lucide-react";
+import { BarChart3, Star, Search, LayoutDashboard, LogOut, Globe, Mail, ShieldCheck, GitCompare, TrendingUp, CreditCard, Wallet, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
 
@@ -11,6 +11,7 @@ const tabs = [
   { to: "/admin/purchases-status", label: "Pagos", icon: CreditCard },
   { to: "/admin/binance-config", label: "Binance", icon: Wallet },
   { to: "/admin/hotmart-audit", label: "Hotmart", icon: ShieldCheck },
+  { to: "/admin/checkout-abuse", label: "Anti-abuso", icon: Shield },
   { to: "/admin/ga4-compare", label: "GA4 vs Pixel", icon: GitCompare },
   { to: "/admin/seo", label: "SEO", icon: Search },
 ];

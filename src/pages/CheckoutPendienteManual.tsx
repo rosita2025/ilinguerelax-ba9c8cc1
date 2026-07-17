@@ -60,8 +60,9 @@ export default function CheckoutPendienteManual() {
             <MessageCircle className="w-4 h-4" /> Paso importante
           </p>
           <p className="text-amber-900/90 dark:text-amber-100/90">
-            Por favor envíanos tu <strong>captura de pago</strong> (Yape o Plin) por WhatsApp
-            para agilizar la verificación y recibir tu producto lo antes posible.
+            Por favor envíanos tu <strong>captura de pago</strong> (Yape, Plin o Binance Pay) por WhatsApp
+            junto con tu <strong>número de orden</strong>{orderNumber ? ` (${orderNumber})` : ""} para agilizar la verificación
+            y recibir tu producto lo antes posible.
           </p>
         </div>
 

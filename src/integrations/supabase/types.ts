@@ -332,6 +332,36 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_ip_bans: {
+        Row: {
+          banned_until: string
+          created_at: string
+          hits: number
+          ip: string
+          reason: string
+          ua: string | null
+          updated_at: string
+        }
+        Insert: {
+          banned_until: string
+          created_at?: string
+          hits?: number
+          ip: string
+          reason?: string
+          ua?: string | null
+          updated_at?: string
+        }
+        Update: {
+          banned_until?: string
+          created_at?: string
+          hits?: number
+          ip?: string
+          reason?: string
+          ua?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       checkout_method_suppressions: {
         Row: {
           method_key: string
@@ -404,6 +434,30 @@ export type Database = {
             referencedColumns: ["code"]
           },
         ]
+      }
+      checkout_rate_hits: {
+        Row: {
+          created_at: string
+          id: number
+          ip: string
+          slug: string | null
+          ua: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ip: string
+          slug?: string | null
+          ua?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ip?: string
+          slug?: string | null
+          ua?: string | null
+        }
+        Relationships: []
       }
       checkout_regions: {
         Row: {

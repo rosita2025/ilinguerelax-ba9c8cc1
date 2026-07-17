@@ -1358,7 +1358,7 @@ export function PaymentMethodsGroup() {
         </p>
       )}
 
-      {selected !== "yape" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

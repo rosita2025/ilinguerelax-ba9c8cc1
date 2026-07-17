@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   RefreshCw, Search, CheckCircle2, Clock, XCircle, Ban, AlertOctagon,
-  ChevronDown, ChevronRight, CreditCard, ShoppingBag, Wallet, Banknote,
+  ChevronDown, ChevronRight, CreditCard, ShoppingBag, Wallet, Banknote, Pencil, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 

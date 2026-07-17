@@ -67,7 +67,13 @@ export default function CheckoutPendienteManual() {
         </div>
 
         <a
-          href={WHATSAPP_URL}
+          href={
+            orderNumber
+              ? `https://wa.me/12512724704?text=${encodeURIComponent(
+                  `Hola, adjunto mi comprobante de pago (Yape/Plin/Binance) de la orden ${orderNumber}.`
+                )}`
+              : WHATSAPP_URL
+          }
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 w-full justify-center bg-[#25D366] hover:bg-[#20b358] text-white font-semibold py-3 rounded-xl transition-colors"

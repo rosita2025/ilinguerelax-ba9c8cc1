@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   RefreshCw, Search, CheckCircle2, Clock, XCircle, Ban, AlertOctagon,
-  ChevronDown, ChevronRight, CreditCard, ShoppingBag, Wallet, Banknote,
+  ChevronDown, ChevronRight, CreditCard, ShoppingBag, Wallet, Banknote, Pencil, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -63,6 +63,40 @@ const AdminPurchasesStatus = () => {
   const [mapped, setMapped] = useState<Mapped | "all">("all");
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [editing, setEditing] = useState<string | null>(null);
+  const [emailDraft, setEmailDraft] = useState("");
+  const [resendOnSave, setResendOnSave] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = (id: string, current: string | null) => {
+    setEditing(id); setEmailDraft(current ?? ""); setResendOnSave(true);
+  };
+  const cancelEdit = () => { setEditing(null); setEmailDraft(""); };
+  const saveEdit = async (id: string) => {
+    const email = emailDraft.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Correo inválido"); return;
+    }
+    setSaving(true);
+    try {
+      const { data, error } = await adminInvoke("correct-purchase-email", {
+        body: { adminKey, rowId: id, newEmail: email, resend: resendOnSave },
+      });
+      if (error) throw error;
+      const d = data as any;
+      toast.success("Correo actualizado", {
+        description: d?.resend
+          ? (d?.delivery?.ok ? "Material digital reenviado al nuevo correo." : "Correo cambiado, pero el reenvío falló.")
+          : d?.canResend ? "Correo cambiado (sin reenvío)." : "Correo cambiado (esta compra no soporta reenvío automático).",
+      });
+      cancelEdit();
+      load();
+    } catch (e) {
+      toast.error("Error", { description: (e as Error).message });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!adminKey) return;
@@ -221,6 +255,32 @@ const AdminPurchasesStatus = () => {
                         <span className="text-muted-foreground">Estado raw:</span>{" "}
                         <code className="bg-muted px-1 rounded">{r.raw_status}</code>
                       </div>
+
+                      {editing === r.id ? (
+                        <div className="rounded-md border p-2 space-y-2 bg-muted/30">
+                          <label className="block text-[11px] font-medium">Corregir correo del cliente</label>
+                          <Input value={emailDraft} onChange={(e) => setEmailDraft(e.target.value)}
+                            placeholder="nuevo@correo.com" className="h-8 text-xs" />
+                          <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                            <input type="checkbox" checked={resendOnSave}
+                              onChange={(e) => setResendOnSave(e.target.checked)} />
+                            Reenviar material digital al nuevo correo (si la compra está aprobada)
+                          </label>
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => saveEdit(r.id)} disabled={saving} className="h-7 text-xs">
+                              <Send className="w-3 h-3 mr-1" />{saving ? "Guardando…" : "Guardar"}
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={cancelEdit} disabled={saving} className="h-7 text-xs">
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
+                          <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
+                        </Button>
+                      )}
+
                       <details>
                         <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                           Ver payload completo

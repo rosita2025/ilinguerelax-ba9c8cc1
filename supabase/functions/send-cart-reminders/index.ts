@@ -80,12 +80,12 @@ function buildHtml(opts: {
 </body></html>`;
 }
 
-function computeWindow(stepHours: Step) {
-  // Look at records created around (now - stepHours). Tight window for short
-  // steps (<24h) so they only match the current hour; wider ±12h window for
-  // multi-day steps so the daily send covers rows created earlier that day.
-  const target = Date.now() - stepHours * 3600000;
-  const halfWindow = stepHours < 24 ? 0.5 * 3600000 : 12 * 3600000;
+function computeWindow(stepMinutes: Step) {
+  // Look at records created around (now - stepMinutes). Tight window for the
+  // 30-min step (matches ±15 min so the every-15-min cron covers it), wider
+  // ±12h window for daily steps so they catch rows created earlier that day.
+  const target = Date.now() - stepMinutes * 60000;
+  const halfWindow = stepMinutes < 60 ? 15 * 60000 : 12 * 3600000;
   const from = new Date(target - halfWindow).toISOString();
   const to = new Date(target + halfWindow).toISOString();
   return { from, to };

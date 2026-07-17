@@ -98,10 +98,15 @@ function computeWindow(stepHours: Step) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Allow either service-role (cron) OR admin CSRF+key
+  // Allow service-role/shared-secret cron calls, otherwise require admin guards.
   const auth = req.headers.get("authorization") || "";
+  const cronSecret = req.headers.get("x-cron-secret") || "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-  const isCron = serviceKey && auth === `Bearer ${serviceKey}`;
+  const sharedSecret = Deno.env.get("CRON_SHARED_SECRET") || "";
+  const isCron = Boolean(
+    (serviceKey && auth === `Bearer ${serviceKey}`) ||
+    (sharedSecret && cronSecret === sharedSecret),
+  );
 
   if (!isCron) {
     const csrfBlock = await assertAdminCsrf(req);

@@ -1,7 +1,7 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
-import { markAbandonedCartConverted } from "../_shared/thankYouEmail.ts";
+import { markAbandonedCartConverted, sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSku } from "../_shared/digitalSku.ts";
 
 const corsHeaders = {

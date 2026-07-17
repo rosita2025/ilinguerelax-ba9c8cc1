@@ -629,7 +629,15 @@ export function PaymentMethodsGroup() {
     }, { onConflict: "email,source" }).then(() => {});
 
     window.open(waUrl, "_blank", "noopener,noreferrer");
-    navigate(`/checkouts/pendiente-manual?order=${orderNumber}`);
+    const q = new URLSearchParams({
+      order: orderNumber,
+      name: s.buyer.fullName.trim(),
+      email: s.buyer.email.trim(),
+      amount: amountText,
+      method: "Yape/Plin",
+      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+    }).toString();
+    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
 
@@ -728,7 +736,15 @@ export function PaymentMethodsGroup() {
     }, { onConflict: "email,source" }).then(() => {});
 
     window.open(waUrl, "_blank", "noopener,noreferrer");
-    navigate(`/checkouts/pendiente-manual?order=${orderNumber}`);
+    const q = new URLSearchParams({
+      order: orderNumber,
+      name: s.buyer.fullName.trim(),
+      email: s.buyer.email.trim(),
+      amount: `${amountText} (USD $${totalUsd})`,
+      method: "Binance Pay",
+      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+    }).toString();
+    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
 

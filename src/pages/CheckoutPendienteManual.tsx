@@ -4,11 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 
-const WHATSAPP_URL = "https://wa.link/unpa9n";
+const WHATSAPP_FALLBACK = "https://wa.link/unpa9n";
 
 export default function CheckoutPendienteManual() {
   const [params] = useSearchParams();
   const orderNumber = params.get("order") || "";
+  const name = params.get("name") || "";
+  const email = params.get("email") || "";
+  const amount = params.get("amount") || "";
+  const method = params.get("method") || "Yape/Plin/Binance";
+  const products = params.get("products") || "";
   const [copied, setCopied] = useState(false);
 
   const copyOrder = async () => {
@@ -18,6 +23,20 @@ export default function CheckoutPendienteManual() {
       setTimeout(() => setCopied(false), 1800);
     } catch { /* noop */ }
   };
+
+  const waMessage =
+    `Hola! 👋 Acabo de pagar por ${method}.\n\n` +
+    (orderNumber ? `📦 Orden: ${orderNumber}\n` : "") +
+    (name ? `👤 Nombre: ${name}\n` : "") +
+    (email ? `📧 Email: ${email}\n` : "") +
+    (amount ? `💰 Monto: ${amount}\n` : "") +
+    (method ? `💳 Método: ${method}\n` : "") +
+    (products ? `\n🛒 Productos:\n${products.split(" | ").map((p) => `• ${p}`).join("\n")}\n` : "") +
+    `\nAdjunto captura del pago. Gracias!`;
+
+  const waUrl = orderNumber || name || amount
+    ? `https://wa.me/12512724704?text=${encodeURIComponent(waMessage)}`
+    : WHATSAPP_FALLBACK;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
@@ -48,32 +67,33 @@ export default function CheckoutPendienteManual() {
           </div>
         )}
 
+        {(name || amount || method) && (
+          <div className="rounded-xl border bg-card p-4 text-left text-sm space-y-1">
+            {name && <p><span className="text-muted-foreground">Nombre:</span> <strong>{name}</strong></p>}
+            {email && <p><span className="text-muted-foreground">Email:</span> {email}</p>}
+            {amount && <p><span className="text-muted-foreground">Monto:</span> <strong>{amount}</strong></p>}
+            {method && <p><span className="text-muted-foreground">Método:</span> {method}</p>}
+          </div>
+        )}
+
         <p className="text-muted-foreground">
           Nuestra <strong>Supervisora Rosa</strong> revisará tu pago desde Perú en las próximas
           <strong> 1 a 24 horas</strong>. Apenas lo confirmemos, te enviaremos tu material digital
           por correo electrónico.
         </p>
 
-
         <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-left text-sm space-y-2">
           <p className="font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-2">
             <MessageCircle className="w-4 h-4" /> Paso importante
           </p>
           <p className="text-amber-900/90 dark:text-amber-100/90">
-            Por favor envíanos tu <strong>captura de pago</strong> (Yape, Plin o Binance Pay) por WhatsApp
-            junto con tu <strong>número de orden</strong>{orderNumber ? ` (${orderNumber})` : ""} para agilizar la verificación
-            y recibir tu producto lo antes posible.
+            Por favor envíanos tu <strong>captura de pago</strong> (Yape, Plin o Binance Pay) por WhatsApp.
+            Ya incluimos tus datos y número de orden en el mensaje — solo adjunta la captura.
           </p>
         </div>
 
         <a
-          href={
-            orderNumber
-              ? `https://wa.me/12512724704?text=${encodeURIComponent(
-                  `Hola, adjunto mi comprobante de pago (Yape/Plin/Binance) de la orden ${orderNumber}.`
-                )}`
-              : WHATSAPP_URL
-          }
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 w-full justify-center bg-[#25D366] hover:bg-[#20b358] text-white font-semibold py-3 rounded-xl transition-colors"

@@ -20,8 +20,12 @@ interface Props {
   productName?: string
   amount?: number
   currency?: string
+  amountUsd?: number
   method?: string
   orderDate?: string
+  binancePayId?: string
+  binanceAddress?: string
+  binanceNetwork?: string
 }
 
 const fmtMoney = (amount?: number, currency?: string) => {
@@ -40,8 +44,12 @@ const Email = ({
   productName,
   amount,
   currency,
+  amountUsd,
   method,
   orderDate,
+  binancePayId,
+  binanceAddress,
+  binanceNetwork,
 }: Props) => (
   <Html lang="es" dir="ltr">
     <Head />
@@ -77,7 +85,12 @@ const Email = ({
           <Hr style={hr} />
           <Row>
             <Column><Text style={label}>Monto pagado</Text></Column>
-            <Column align="right"><Text style={amountVal}>{fmtMoney(amount, currency)}</Text></Column>
+            <Column align="right">
+              <Text style={amountVal}>{fmtMoney(amount, currency)}</Text>
+              {amountUsd != null && (currency || '').toUpperCase() !== 'USD' && (
+                <Text style={usdSub}>≈ USD ${Number(amountUsd).toFixed(2)}</Text>
+              )}
+            </Column>
           </Row>
           <Row>
             <Column><Text style={label}>Método</Text></Column>
@@ -92,6 +105,28 @@ const Email = ({
             </Column>
           </Row>
         </Section>
+
+        {(binancePayId || binanceAddress) && (
+          <Section style={binanceBox}>
+            <Text style={binanceTitle}>🔐 Datos de Binance Pay (por si pierdes la captura)</Text>
+            {binancePayId && (
+              <Text style={binanceLine}><strong>Pay ID:</strong> {binancePayId}</Text>
+            )}
+            {binanceAddress && (
+              <Text style={binanceLine}><strong>Dirección:</strong> {binanceAddress}</Text>
+            )}
+            {binanceNetwork && (
+              <Text style={binanceLine}><strong>Red:</strong> {binanceNetwork}</Text>
+            )}
+            {amountUsd != null && (
+              <Text style={binanceLine}><strong>Monto:</strong> USD ${Number(amountUsd).toFixed(2)}</Text>
+            )}
+            <Text style={binanceHint}>
+              Puedes usar tu Pay ID o hash de la transacción como referencia al escribirnos.
+            </Text>
+          </Section>
+        )}
+
 
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>
@@ -141,3 +176,8 @@ const nextBox = { backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borde
 const nextTitle = { margin: '0 0 8px', fontSize: '14px', color: '#92400e', fontWeight: 'bold' as const }
 const nextLine = { margin: '4px 0', fontSize: '13px', color: '#78350f', lineHeight: '1.5' }
 const footer = { textAlign: 'center' as const, color: '#9ca3af', fontSize: '12px', margin: '8px 0 0' }
+const usdSub = { margin: '2px 0 0', fontSize: '12px', color: '#6b7280', fontWeight: 'normal' as const }
+const binanceBox = { backgroundColor: '#fefce8', border: '1px solid #eab308', borderRadius: '12px', padding: '16px 20px', marginBottom: '16px' }
+const binanceTitle = { margin: '0 0 8px', fontSize: '14px', color: '#854d0e', fontWeight: 'bold' as const }
+const binanceLine = { margin: '4px 0', fontSize: '13px', color: '#713f12', lineHeight: '1.5', wordBreak: 'break-all' as const }
+const binanceHint = { margin: '8px 0 0', fontSize: '12px', color: '#a16207', fontStyle: 'italic' as const }

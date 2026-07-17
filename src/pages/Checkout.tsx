@@ -23,7 +23,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
-import { isCheckoutAuthorized, authorizeCheckout } from "@/lib/checkoutGate";
+import { isCheckoutAuthorized, authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
 
 function MobileOrderSummarySticky({ slug }: { slug?: string }) {
   const [expanded, setExpanded] = useState(false);

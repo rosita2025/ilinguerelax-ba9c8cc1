@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
+
 
 interface GscRow {
   key: string;

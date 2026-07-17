@@ -61,7 +61,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     <div className="bg-muted/30 lg:bg-muted/50 rounded-xl border overflow-hidden">
       {collapsible && (
         <button
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => {
+            const next = !expanded;
+            setExpanded(next);
+            onExpandedChange?.(next);
+          }}
           className="w-full flex items-center justify-between px-4 py-3 lg:hidden bg-primary/5 hover:bg-primary/10 transition-colors border-b"
           aria-expanded={expanded}
         >
@@ -82,7 +86,14 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
       )}
 
 
-      <div className={cn("p-5 space-y-4", collapsible && !expanded && "hidden lg:block")}>
+      <div
+        className={cn(
+          "p-5 space-y-4",
+          collapsible && !expanded && "hidden lg:block",
+          collapsible && expanded && "lg:max-h-none max-h-[calc(100vh-160px)] overflow-y-auto",
+        )}
+      >
+
         <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
 
         {/* Badge de región oculto al cliente (solo se aplica el precio por IP internamente) */}

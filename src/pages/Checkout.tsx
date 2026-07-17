@@ -65,8 +65,7 @@ export default function Checkout() {
   // Evaluación síncrona del gate: si el cliente ya está autorizado, renderizamos
   // inmediatamente sin pantalla en blanco. El chequeo de rate-limit por IP se
   // hace en segundo plano (fail-open).
-  const initialReason = typeof window !== "undefined" ? evaluateCheckoutGate() : "ok";
-  const [gateChecked, setGateChecked] = useState(initialReason === "ok");
+  // (sin estado de gate: renderizamos siempre y redirigimos en background si no cumple)
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;

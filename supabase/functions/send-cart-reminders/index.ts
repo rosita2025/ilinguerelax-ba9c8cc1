@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
   const isCron = Boolean(
     (serviceKey && auth === `Bearer ${serviceKey}`) ||
     (sharedSecret && cronSecret === sharedSecret) ||
-    await hasServiceRole(auth),
+    hasServiceRole(auth),
   );
 
   if (!isCron) {

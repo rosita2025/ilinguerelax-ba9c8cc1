@@ -8,6 +8,7 @@ import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useCheckoutMethodsConfig, type FamilyKey } from "@/hooks/useCheckoutMethodsConfig";
+import { useBinancePayConfig } from "@/hooks/useBinancePayConfig";
 
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
@@ -75,10 +76,8 @@ const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
-const BINANCE_ADDRESS = "TPAwV7vFhuoYbwzEzmDuN229DwFUBCKH TF";
-const BINANCE_NAME = "iLingue Relax";
-const BINANCE_QR_URL = "https://cdn.phototourl.com/free/2026-07-17-19c64084-faa9-41f1-a1cb-5010d297c0be.jpg";
-const BINANCE_NETWORK = "Binance Pay (Pay ID)";
+// Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.
+// See admin panel at /admin/binance-config.
 
 
 type MethodBadge = { label: string; bg: string; color: string };

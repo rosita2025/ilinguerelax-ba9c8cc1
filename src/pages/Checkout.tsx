@@ -23,6 +23,24 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 
+function MobileOrderSummarySticky({ slug }: { slug?: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div
+      className={cn(
+        "lg:hidden z-20 bg-background/95 backdrop-blur border-b",
+        expanded ? "relative" : "sticky top-[44px] sm:top-[52px]",
+      )}
+    >
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
+        <SectionErrorBoundary name="order-summary-mobile" extra={{ slug }}>
+          <OrderSummary collapsible mainProductId={slug} onExpandedChange={setExpanded} />
+        </SectionErrorBoundary>
+      </div>
+    </div>
+  );
+}
+
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
   const clear = useCheckoutPruebaStore((s) => s.clear);

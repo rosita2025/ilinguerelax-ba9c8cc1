@@ -825,8 +825,15 @@ export function PaymentMethodsGroup() {
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
     if (!isPeru && stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
-      if (!selected || !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setSelected("card"); setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`); }
-      if (valid && stripePromise && !showStripe) setShowStripe(true);
+      // Solo autoseleccionar Stripe si el comprador NO ha elegido ya otro
+      // método explícitamente (ej: PayPal, Binance). Antes forzaba "card"
+      // en cada render y borraba la selección de PayPal al hacer click.
+      if (!selected) {
+        setSelected("card");
+        setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
+      }
+      const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
+      if (isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
 

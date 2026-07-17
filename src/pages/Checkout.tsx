@@ -22,6 +22,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
+import { cn } from "@/lib/utils";
+
+function MobileOrderSummarySticky({ slug }: { slug?: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div
+      className={cn(
+        "lg:hidden z-20 bg-background/95 backdrop-blur border-b",
+        expanded ? "relative" : "sticky top-[44px] sm:top-[52px]",
+      )}
+    >
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
+        <SectionErrorBoundary name="order-summary-mobile" extra={{ slug }}>
+          <OrderSummary collapsible mainProductId={slug} onExpandedChange={setExpanded} />
+        </SectionErrorBoundary>
+      </div>
+    </div>
+  );
+}
 
 export default function Checkout() {
   const { slug } = useParams<{ slug?: string }>();
@@ -463,13 +482,8 @@ export default function Checkout() {
 
 
 
-      <div className="lg:hidden sticky top-[52px] sm:top-[56px] z-20 bg-background/95 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
-          <SectionErrorBoundary name="order-summary-mobile" extra={{ slug: catalogItem?.id }}>
-            <OrderSummary collapsible mainProductId={catalogItem?.id} />
-          </SectionErrorBoundary>
-        </div>
-      </div>
+      <MobileOrderSummarySticky slug={catalogItem?.id} />
+
 
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">

@@ -440,8 +440,13 @@ export default function Checkout() {
   }
 
 
+  if (!gateChecked) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
+
       <Helmet>
         <title>{`Checkout · iLingue Relax · ${isPeru ? "PE" : "GLOBAL"}`}</title>
         <meta name="robots" content="noindex, nofollow" />

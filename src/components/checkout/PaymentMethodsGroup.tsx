@@ -634,6 +634,97 @@ export function PaymentMethodsGroup() {
     } catch { /* noop */ }
   };
 
+  const copyBinance = async () => {
+    try {
+      await navigator.clipboard.writeText(BINANCE_ADDRESS);
+      setCopiedBinance(true);
+      setTimeout(() => setCopiedBinance(false), 1800);
+    } catch { /* noop */ }
+  };
+
+  const handleBinancePaid = async () => {
+    const s = useCheckoutPruebaStore.getState();
+    const orderNumber = `ILR-BN-${Math.floor(1000 + Math.random() * 9000)}`;
+    const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
+    const productList = s.items.map((i) => `• ${i.name} x${i.quantity}`).join("\n");
+    const msg =
+      `Hola! 👋 Acabo de pagar por Binance Pay.\n\n` +
+      `📦 Orden: ${orderNumber}\n` +
+      `👤 Nombre: ${s.buyer.fullName.trim()}\n` +
+      `📧 Email: ${s.buyer.email.trim()}\n` +
+      `💰 Monto: ${amountText} (USD $${totalUsd})\n` +
+      `🔗 Red: ${BINANCE_NETWORK}\n\n` +
+      `Productos:\n${productList}\n\n` +
+      `Adjunto captura del pago. Gracias!`;
+    const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
+
+    try {
+      await supabase.from("manual_payments").insert({
+        order_number: orderNumber,
+        buyer_name: s.buyer.fullName.trim(),
+        buyer_email: s.buyer.email.trim().toLowerCase(),
+        buyer_phone: s.buyer.phone ?? null,
+        buyer_country: (region.country || "").toUpperCase() || null,
+        amount_usd: Number(totalUsd),
+        amount_local: local.loading ? null : Number(local.amount ?? totalUsd),
+        currency_local: local.currency || "USD",
+        method: "binance_pay",
+        items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+        status: "pending",
+      });
+    } catch (e) {
+      console.warn("[manual_payments] binance insert failed", e);
+    }
+
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-manual-pending",
+        idempotencyKey: `manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim(),
+          customerEmail: s.buyer.email.trim().toLowerCase(),
+          customerPhone: s.buyer.phone ?? "",
+          customerCountry: (region.country || "").toUpperCase(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "USD",
+          method: "Binance Pay",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[admin-manual-pending] binance notify failed", err));
+
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "customer-manual-pending",
+        recipientEmail: s.buyer.email.trim().toLowerCase(),
+        idempotencyKey: `customer-manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "USD",
+          method: "Binance Pay",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
+
+    supabase.from("email_contacts").upsert({
+      email: s.buyer.email.trim().toLowerCase(),
+      name: s.buyer.fullName.trim(),
+      source: "checkout-prueba-1",
+      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
+    }, { onConflict: "email,source" }).then(() => {});
+
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+    navigate(`/checkouts/pendiente-manual?order=${orderNumber}`);
+  };
+
+
+
   // Métodos locales de Perú (Mercado Pago transferencias/efectivo + Yape/Plin manual)
   // SOLO se muestran cuando el visitante está en Perú. Fuera de Perú, únicamente Stripe.
   const isPeru = (region.country || "").toUpperCase() === "PE";

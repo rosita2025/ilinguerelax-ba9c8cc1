@@ -175,18 +175,35 @@ const AdminManualPayments = () => {
                         {new Date(o.created_at).toLocaleString("es-PE")}
                       </span>
                     </div>
-                    <div className="font-semibold">{o.buyer_name}</div>
-                    <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
-                      <span className="inline-flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{o.buyer_email}</span>
-                      {o.buyer_phone && (
-                        <a href={`https://wa.me/${o.buyer_phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-primary">
-                          <Phone className="w-3.5 h-3.5" />{o.buyer_phone}
-                        </a>
-                      )}
-                      {o.buyer_country && (
-                        <span className="inline-flex items-center gap-1"><Globe className="w-3.5 h-3.5" />{o.buyer_country}</span>
-                      )}
-                    </div>
+                    {editingId === o.id ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1 max-w-lg">
+                        <Input value={editData.name} onChange={(e) => setEditData((d) => ({ ...d, name: e.target.value }))} placeholder="Nombre" />
+                        <Input type="email" value={editData.email} onChange={(e) => setEditData((d) => ({ ...d, email: e.target.value }))} placeholder="Correo" />
+                        <Input value={editData.phone} onChange={(e) => setEditData((d) => ({ ...d, phone: e.target.value }))} placeholder="Teléfono" />
+                        <Input value={editData.country} onChange={(e) => setEditData((d) => ({ ...d, country: e.target.value }))} placeholder="País" />
+                        <div className="flex gap-2 sm:col-span-2">
+                          <Button size="sm" onClick={saveEdit} disabled={savingEdit}>
+                            <Save className="w-4 h-4 mr-1" /> {savingEdit ? "Guardando…" : "Guardar"}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>Cancelar</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="font-semibold">{o.buyer_name}</div>
+                        <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
+                          <span className="inline-flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{o.buyer_email}</span>
+                          {o.buyer_phone && (
+                            <a href={`https://wa.me/${o.buyer_phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-primary">
+                              <Phone className="w-3.5 h-3.5" />{o.buyer_phone}
+                            </a>
+                          )}
+                          {o.buyer_country && (
+                            <span className="inline-flex items-center gap-1"><Globe className="w-3.5 h-3.5" />{o.buyer_country}</span>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-bold">

@@ -65,24 +65,45 @@ export default function Checkout() {
   const [gateChecked, setGateChecked] = useState(false);
   useEffect(() => {
     if (!slug) return;
-    const reason = evaluateCheckoutGate();
-    if (reason === "ok") {
+    let cancelled = false;
+    (async () => {
+      const reason = evaluateCheckoutGate();
+      if (reason === "bot") {
+        navigate("/", { replace: true });
+        return;
+      }
+      if (reason !== "ok") {
+        if (reason === "rate_limited" || reason === "banned") {
+          toast.error("Demasiados intentos. Intenta de nuevo en unos minutos.");
+        }
+        navigate(`/products/${slug}`, { replace: true });
+        return;
+      }
+      // Server-side rate limit por IP (fail-open si el edge function falla).
+      try {
+        const { data } = await supabase.functions.invoke("checkout-gate-check", {
+          body: { slug },
+        });
+        const res = data as { allowed?: boolean; reason?: string } | null;
+        if (res && res.allowed === false) {
+          if (!cancelled) {
+            toast.error(
+              res.reason === "banned"
+                ? "Acceso bloqueado temporalmente por actividad sospechosa."
+                : "Demasiados intentos desde tu red. Intenta más tarde.",
+            );
+            navigate(`/products/${slug}`, { replace: true });
+          }
+          return;
+        }
+      } catch { /* fail-open */ }
+      if (cancelled) return;
       authorizeCheckout(slug); // renueva ventana de 1h
       setGateChecked(true);
-      return;
-    }
-    if (reason === "rate_limited" || reason === "banned") {
-      toast.error("Demasiados intentos. Intenta de nuevo en unos minutos.");
-      navigate(`/products/${slug}`, { replace: true });
-      return;
-    }
-    if (reason === "bot") {
-      // Bot / headless: redirige silenciosamente sin dar pistas.
-      navigate("/", { replace: true });
-      return;
-    }
-    navigate(`/products/${slug}`, { replace: true });
+    })();
+    return () => { cancelled = true; };
   }, [slug, navigate]);
+
 
 
 

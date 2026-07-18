@@ -529,6 +529,14 @@ serve(async (req) => {
         resolved: false,
         updated_at: new Date().toISOString(),
       }, { onConflict: "source,source_ref,reason" });
+      const adminEmail = Deno.env.get("ADMIN_2FA_EMAIL") || BRAND.supportEmail;
+      await resend.emails.send({
+        from: `iLingue Relax <${BRAND.supportEmail}>`,
+        to: [adminEmail],
+        reply_to: BRAND.supportEmail,
+        subject: `ALERTA: falló la entrega digital ${orderId || "sin pedido"}`,
+        html: `<p>La entrega digital no pudo enviarse.</p><p><strong>Pedido:</strong> ${escapeHtml(String(orderId || "sin pedido"))}</p><p><strong>Cliente:</strong> ${escapeHtml(customerEmail)}</p><p>No se realizarán reenvíos automáticos. Revísalo en el administrador.</p>`,
+      }).catch((alertError) => console.error("Admin delivery alert failed", alertError));
       await writeAudit({ ...auditBase, status: "error", error: JSON.stringify(r.error) });
       return new Response(JSON.stringify({ success: false, error: r.error }), {
         status: 502, headers: { "Content-Type": "application/json", ...corsHeaders },

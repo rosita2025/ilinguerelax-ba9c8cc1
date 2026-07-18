@@ -287,6 +287,65 @@ const AdminSEO = () => {
             </div>
           )}
 
+          {report && (() => {
+            const opportunities = report.queries
+              .filter((q) => q.position >= 5 && q.position <= 20 && q.impressions >= 50)
+              .sort((a, b) => b.impressions - a.impressions)
+              .slice(0, 20);
+            return (
+              <Card className="p-4 border-primary/40 bg-primary/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold">Oportunidades rápidas</h2>
+                  <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full ml-2">
+                    {opportunities.length}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Queries en posición <strong>5–20</strong> con <strong>+50 impresiones</strong>. Son las que más fácil suben a top 3 mejorando el post existente (título, H2, contenido).
+                </p>
+                {opportunities.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Sin oportunidades en este rango. Amplía el intervalo de fechas o publica más contenido.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="text-left text-xs uppercase text-muted-foreground border-b">
+                        <tr>
+                          <th className="py-2 pr-2">Query</th>
+                          <th className="py-2 px-2 text-right">Pos.</th>
+                          <th className="py-2 px-2 text-right">Impr.</th>
+                          <th className="py-2 px-2 text-right">Clics</th>
+                          <th className="py-2 px-2 text-right">CTR</th>
+                          <th className="py-2 pl-2 text-right">Potencial</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {opportunities.map((r) => {
+                          // potential = impressions * (0.30 - current ctr), assuming top 3 ≈ 30% CTR
+                          const potentialClicks = Math.max(0, Math.round(r.impressions * (0.30 - r.ctr)));
+                          return (
+                            <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
+                              <td className="py-2 pr-2 max-w-[260px] truncate" title={r.key}>{r.key}</td>
+                              <td className="py-2 px-2 text-right font-medium">{fmtPos(r.position)}</td>
+                              <td className="py-2 px-2 text-right">{r.impressions}</td>
+                              <td className="py-2 px-2 text-right">{r.clicks}</td>
+                              <td className="py-2 px-2 text-right">{fmtPct(r.ctr)}</td>
+                              <td className="py-2 pl-2 text-right text-primary font-semibold">+{potentialClicks}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </Card>
+            );
+          })()}
+
+
+
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-primary" />

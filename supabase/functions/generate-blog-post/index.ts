@@ -225,6 +225,7 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
         keyword: keyword || topic,
         image: parsed.image || "https://ilinguerelax.com/og-image.png",
         published: !!publish,
+        related_products: Array.isArray(relatedProducts) ? relatedProducts.slice(0, 12) : [],
       })
       .select()
       .single();

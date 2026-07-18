@@ -62,7 +62,7 @@ export function useGeneratedBlogPosts() {
 export async function fetchGeneratedBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   const { data } = await supabase
     .from("generated_blog_posts")
-    .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at")
+    .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,related_products")
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();

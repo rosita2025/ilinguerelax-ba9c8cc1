@@ -64,6 +64,12 @@ const AdminSEO = () => {
   const [genCategory, setGenCategory] = useState("Aprendizaje");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [publishNow, setPublishNow] = useState(true);
+
+  const toggleProduct = (id: string) => {
+    setSelectedProducts((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
+  };
 
   const loadGenPosts = async () => {
     const { data } = await supabase
@@ -81,18 +87,23 @@ const AdminSEO = () => {
     }
     setGenLoading(true);
     try {
+      const productCards = products
+        .filter((p) => selectedProducts.includes(p.id))
+        .map((p) => ({ id: p.id, title: p.title, slug: p.slug, description: p.subtitle }));
       const { data, error } = await supabase.functions.invoke("generate-blog-post", {
         body: {
           adminKey,
           topic: genTopic.trim(),
           keyword: genKeyword.trim() || undefined,
           category: genCategory,
-          publish: false,
+          publish: publishNow,
+          relatedProducts: selectedProducts,
+          productCards,
         },
       });
       if (error) throw error;
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
-      toast.success("Borrador generado. Revísalo antes de publicar.");
+      toast.success(publishNow ? "¡Post publicado en el blog!" : "Borrador generado. Revísalo antes de publicar.");
 
       setGenTopic("");
       setGenKeyword("");

@@ -49,7 +49,7 @@ serve(async (req) => {
       keyword,
       category = "Aprendizaje",
       language = "es",
-      publish = true,
+      publish = false,
     } = body as {
       adminKey?: string;
       topic?: string;
@@ -58,6 +58,7 @@ serve(async (req) => {
       language?: string;
       publish?: boolean;
     };
+
 
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expected || adminKey !== expected) {

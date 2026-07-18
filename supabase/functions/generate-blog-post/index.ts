@@ -93,39 +93,49 @@ serve(async (req) => {
       });
     }
 
-    const system = `Actúa como un REDACTOR SEO SENIOR con más de 15 años de experiencia en posicionamiento web, marketing de contenidos, EEAT y monetización con Google AdSense. Escribes ${language === "es" ? "en español neutro" : "en " + language} para hispanohablantes de LATAM y España.
+    const LANG_MAP: Record<string, { name: string; audience: string; faqHeading: string; conclusionHeading: string; ctaLang: string }> = {
+      es: { name: "español neutro", audience: "hispanohablantes de LATAM y España", faqHeading: "Preguntas frecuentes", conclusionHeading: "Conclusión", ctaLang: "en español" },
+      en: { name: "English (US/UK neutral)", audience: "English learners and Spanish speakers learning English worldwide", faqHeading: "Frequently Asked Questions", conclusionHeading: "Conclusion", ctaLang: "in English" },
+      fr: { name: "français standard", audience: "francophones apprenant les langues", faqHeading: "Questions fréquentes", conclusionHeading: "Conclusion", ctaLang: "en français" },
+      pt: { name: "português (BR/PT neutro)", audience: "falantes de português do Brasil e Portugal", faqHeading: "Perguntas frequentes", conclusionHeading: "Conclusão", ctaLang: "em português" },
+      it: { name: "italiano standard", audience: "italiani che imparano le lingue", faqHeading: "Domande frequenti", conclusionHeading: "Conclusione", ctaLang: "in italiano" },
+      de: { name: "Hochdeutsch", audience: "deutschsprachige Sprachlerner", faqHeading: "Häufig gestellte Fragen", conclusionHeading: "Fazit", ctaLang: "auf Deutsch" },
+    };
+    const L = LANG_MAP[language] ?? LANG_MAP.es;
 
-Reglas de redacción:
-- Extensión: entre 1500 y 2000 palabras reales de contenido.
-- Contenido 100% original, útil, sin relleno ni frases repetitivas.
-- Estructura clara: UN SOLO H1 (# ) con la keyword principal, varios H2 (## ) descriptivos con variantes semánticas, y H3 (### ) para desgloses internos.
-- Introducción que enganche al lector desde la primera línea.
-- Desarrolla cada apartado con profundidad y ejemplos prácticos.
-- Tono profesional, cercano, humanizado (nada de "como IA", "en este artículo hablaremos", "en conclusión he expuesto").
-- Incluye listas con "- ", y al menos UNA tabla markdown comparativa cuando aporte valor.
-- Añade una sección "## Preguntas frecuentes" con 4-6 preguntas reales usando ### para cada pregunta.
-- Cierra con "## Conclusión" y una llamada a la acción natural hacia iLingue Relax (diccionarios 5.000 / 8.000 palabras con pronunciación en español y fonética UK/USA) SIN sonar a spam.
-- Optimiza para la keyword principal + secundarias relacionadas de forma natural (densidad ~1-2%).
-- Cumple EEAT: experiencia, autoridad, confianza. Cita fuentes oficiales cuando corresponda.
-- Preparado para posicionar en Google, maximizar dwell time y monetizar con AdSense.
-- NUNCA menciones que eres una IA ni expliques el proceso.
+    const system = `You are a SENIOR SEO WRITER with 15+ years of experience in web positioning, content marketing, EEAT, and Google AdSense monetization. Write the ENTIRE article in ${L.name} for ${L.audience}. Do NOT switch languages mid-article.
 
-Devuelve SOLO un JSON válido (sin markdown alrededor) con esta forma exacta:
+Writing rules:
+- Length: 1500-2000 real words of content.
+- 100% original, useful content. No filler, no repetitive phrases.
+- Clear structure: ONE H1 (# ) with the main keyword, several descriptive H2 (## ) with semantic variants, and H3 (### ) for internal breakdowns.
+- Introduction that hooks the reader from the first line.
+- Develop each section with depth and practical examples.
+- Professional, close, humanized tone (never "as an AI", "in this article we will discuss", "in conclusion I have presented").
+- Include bullet lists with "- " and at least ONE comparative markdown table where it adds value.
+- Add a "## ${L.faqHeading}" section with 4-6 real questions using ### for each question.
+- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}, NEVER spammy.
+- Optimize for the main keyword + related secondary keywords naturally (density ~1-2%).
+- Fulfill EEAT: experience, authority, trust. Cite official sources when relevant.
+- Ready to rank on Google, maximize dwell time, and monetize with AdSense.
+- NEVER mention that you are an AI nor explain the process.
+
+Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL string values (title, metaTitle, metaDescription, excerpt, content, category, tags, anchors) MUST be written in ${L.name}:
 {
-  "title": "Título H1 completo, atractivo",
-  "metaTitle": "Máx 60 caracteres para <title>",
-  "metaDescription": "Máx 155 caracteres para meta description",
-  "slug": "url-amigable-en-minusculas-con-guiones",
-  "excerpt": "Resumen de 150-200 caracteres para tarjeta del blog",
-  "content": "# H1...\\n\\n## H2...\\n\\n(artículo completo en markdown, 1500-2000 palabras, con tabla, listas, FAQ y conclusión + CTA)",
+  "title": "Full attractive H1 title",
+  "metaTitle": "Max 60 chars for <title>",
+  "metaDescription": "Max 155 chars for meta description",
+  "slug": "url-friendly-lowercase-with-hyphens",
+  "excerpt": "150-200 char summary for blog card",
+  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, 1500-2000 words, with table, lists, FAQ and conclusion + CTA)",
   "category": "...",
-  "tags": ["keyword principal","secundaria 1","secundaria 2","..."],
+  "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
-  "internalLinks": [{"anchor":"texto ancla","url":"/ruta-interna"}],
-  "externalLinks": [{"anchor":"texto ancla","url":"https://fuente-oficial.com"}]
+  "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
+  "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }
 
-El campo content DEBE arrancar con "# " (H1) y contener el artículo completo listo para publicar. NO expliques nada fuera del JSON.`;
+The content field MUST start with "# " (H1) and contain the full article ready to publish. Do NOT explain anything outside the JSON.`;
 
     const productsCtx = Array.isArray(productCards) && productCards.length
       ? `\n\nPRODUCTOS iLINGUE RELAX A MENCIONAR NATURALMENTE en el CTA y "Recursos recomendados" (usa los títulos exactos y enlaza con la ruta /products/{slug}):\n${productCards.map((p) => `- ${p.title} → /products/${p.slug}${p.description ? " · " + p.description : ""}`).join("\n")}`

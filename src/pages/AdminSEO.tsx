@@ -62,6 +62,7 @@ const AdminSEO = () => {
   const [genTopic, setGenTopic] = useState("");
   const [genKeyword, setGenKeyword] = useState("");
   const [genCategory, setGenCategory] = useState("Aprendizaje");
+  const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -96,6 +97,7 @@ const AdminSEO = () => {
           topic: genTopic.trim(),
           keyword: genKeyword.trim() || undefined,
           category: genCategory,
+          language: genLanguage,
           publish: publishNow,
           relatedProducts: selectedProducts,
           productCards,
@@ -500,6 +502,21 @@ const AdminSEO = () => {
                   onChange={(e) => setGenCategory(e.target.value)}
                   placeholder="Aprendizaje, Vocabulario, Fonética…"
                 />
+              </div>
+              <div className="space-y-1">
+                <Label>Idioma del artículo</Label>
+                <select
+                  value={genLanguage}
+                  onChange={(e) => setGenLanguage(e.target.value as typeof genLanguage)}
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                >
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="pt">🇵🇹 Português</option>
+                  <option value="it">🇮🇹 Italiano</option>
+                  <option value="de">🇩🇪 Deutsch</option>
+                </select>
               </div>
             </div>
 

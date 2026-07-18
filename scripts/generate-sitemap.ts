@@ -93,19 +93,61 @@ const hardcodedProductSlugs: string[] = [
 // Blog posts (static data file)
 // --------------------------------------------------------------------------
 async function getBlogEntries(): Promise<SitemapEntry[]> {
+  const entries: SitemapEntry[] = [];
+
+  // Static blog data
   try {
     const mod = await import("../src/data/blogPosts");
     const posts: Array<{ slug: string; date?: string }> = (mod as any).blogPosts ?? [];
-    return posts.map((p) => ({
-      path: `/blog/${p.slug}`,
-      lastmod: p.date ?? TODAY,
-      changefreq: "monthly" as const,
-      priority: "0.7",
-    }));
+    for (const p of posts) {
+      entries.push({
+        path: `/blog/${p.slug}`,
+        lastmod: p.date ?? TODAY,
+        changefreq: "monthly",
+        priority: "0.7",
+      });
+    }
   } catch (err) {
     console.warn("[sitemap] Could not import blogPosts:", (err as Error).message);
-    return [];
   }
+
+  // AI-generated posts from Supabase (published only)
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if (url && key) {
+    try {
+      const supabase = createClient(url, key);
+      const { data, error } = await supabase
+        .from("generated_blog_posts")
+        .select("slug, updated_at, created_at, published")
+        .eq("published", true);
+      if (error) {
+        console.warn("[sitemap] generated_blog_posts error:", error.message);
+      } else {
+        for (const r of data ?? []) {
+          const row = r as { slug: string; updated_at?: string; created_at?: string };
+          if (!row.slug) continue;
+          const lm = (row.updated_at ?? row.created_at ?? TODAY).slice(0, 10);
+          entries.push({
+            path: `/blog/${row.slug}`,
+            lastmod: lm,
+            changefreq: "monthly",
+            priority: "0.7",
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("[sitemap] generated_blog_posts fetch failed:", (err as Error).message);
+    }
+  }
+
+  // Dedupe by path (static wins order-wise, but keep most recent lastmod)
+  const bySlug = new Map<string, SitemapEntry>();
+  for (const e of entries) {
+    const prev = bySlug.get(e.path);
+    if (!prev || (e.lastmod ?? "") > (prev.lastmod ?? "")) bySlug.set(e.path, e);
+  }
+  return Array.from(bySlug.values());
 }
 
 // --------------------------------------------------------------------------

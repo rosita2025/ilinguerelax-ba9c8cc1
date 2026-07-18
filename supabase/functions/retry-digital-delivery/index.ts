@@ -6,7 +6,7 @@
 //    scan_window_hours, enabled).
 //  - Retries every `digital_email_sends` row whose latest event is NOT one of
 //    (delivered/sent/opened/clicked) after `retry_after_minutes`, up to
-//    `max_attempts`, by re-invoking `send-digital-ilinguerelax` with force=true.
+//    `max_attempts`, by re-invoking `send-digital-ilinguerelax`.
 //  - Scans recent verified `manual_payments` / approved `hotmart_purchases`
 //    that have NO matching `digital_email_sends` row and either:
 //       * triggers a retry when SKUs can be resolved from stored items, or
@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
     const config = await loadConfig(admin);
-    if (!config.enabled && !body?.force) {
+    if (!config.enabled) {
       return new Response(JSON.stringify({ skipped: true, reason: "disabled" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -229,7 +229,6 @@ Deno.serve(async (req) => {
         currency: row.currency,
         provider: row.provider,
         idempotencyKey: row.idempotency_key,
-        force: true,
       });
 
       await admin.from("digital_email_sends").update({
@@ -282,7 +281,7 @@ Deno.serve(async (req) => {
         amount: mp.amount_usd,
         currency: "USD",
         provider: "manual_payment",
-        force: true,
+        idempotencyKey: `digital:${String(mp.order_number || mp.id).toLowerCase()}:${[...skus].sort().join(",")}`,
       });
       report.retried++;
       report.details.push({ manual_id: mp.id, ok: result.ok, status: result.status });

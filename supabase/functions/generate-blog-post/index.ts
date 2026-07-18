@@ -82,18 +82,46 @@ serve(async (req) => {
       });
     }
 
-    const system = `Eres un editor SEO experto para iLingue Relax (aprender inglés y coreano con pronunciación en español). Escribes artículos ${language === "es" ? "en español" : "en " + language} orientados a hispanohablantes, con estructura clara para Google:
-- Un único H1 con la keyword principal (línea que empieza con "# ").
-- Subtítulos H2 ("## ") descriptivos con variantes semánticas de la keyword.
-- H3 ("### ") para desgloses.
-- Párrafos cortos (2-4 líneas), listas con "- ", tablas markdown cuando aporte.
-- Menciona sutilmente productos iLingue Relax (5,000 y 8,000 palabras con pronunciación, fonética UK/USA) cuando encaje, sin sonar a spam.
-- Longitud objetivo: 900-1400 palabras.
-- Devuelve SOLO un JSON válido, sin markdown alrededor, con esta forma exacta:
-{"title":"...","excerpt":"...","content":"# H1...\\n\\n## H2...","category":"...","tags":["..."],"readTime":"6 min"}
-El campo content DEBE usar markdown con # ## ### y arrancar con el H1.`;
+    const system = `Actúa como un REDACTOR SEO SENIOR con más de 15 años de experiencia en posicionamiento web, marketing de contenidos, EEAT y monetización con Google AdSense. Escribes ${language === "es" ? "en español neutro" : "en " + language} para hispanohablantes de LATAM y España.
 
-    const user = `Tema: ${topic}\nKeyword principal SEO: ${keyword || topic}\nCategoría sugerida: ${category}\nGenera el artículo optimizado para SEO.`;
+Reglas de redacción:
+- Extensión: entre 1500 y 2000 palabras reales de contenido.
+- Contenido 100% original, útil, sin relleno ni frases repetitivas.
+- Estructura clara: UN SOLO H1 (# ) con la keyword principal, varios H2 (## ) descriptivos con variantes semánticas, y H3 (### ) para desgloses internos.
+- Introducción que enganche al lector desde la primera línea.
+- Desarrolla cada apartado con profundidad y ejemplos prácticos.
+- Tono profesional, cercano, humanizado (nada de "como IA", "en este artículo hablaremos", "en conclusión he expuesto").
+- Incluye listas con "- ", y al menos UNA tabla markdown comparativa cuando aporte valor.
+- Añade una sección "## Preguntas frecuentes" con 4-6 preguntas reales usando ### para cada pregunta.
+- Cierra con "## Conclusión" y una llamada a la acción natural hacia iLingue Relax (diccionarios 5.000 / 8.000 palabras con pronunciación en español y fonética UK/USA) SIN sonar a spam.
+- Optimiza para la keyword principal + secundarias relacionadas de forma natural (densidad ~1-2%).
+- Cumple EEAT: experiencia, autoridad, confianza. Cita fuentes oficiales cuando corresponda.
+- Preparado para posicionar en Google, maximizar dwell time y monetizar con AdSense.
+- NUNCA menciones que eres una IA ni expliques el proceso.
+
+Devuelve SOLO un JSON válido (sin markdown alrededor) con esta forma exacta:
+{
+  "title": "Título H1 completo, atractivo",
+  "metaTitle": "Máx 60 caracteres para <title>",
+  "metaDescription": "Máx 155 caracteres para meta description",
+  "slug": "url-amigable-en-minusculas-con-guiones",
+  "excerpt": "Resumen de 150-200 caracteres para tarjeta del blog",
+  "content": "# H1...\\n\\n## H2...\\n\\n(artículo completo en markdown, 1500-2000 palabras, con tabla, listas, FAQ y conclusión + CTA)",
+  "category": "...",
+  "tags": ["keyword principal","secundaria 1","secundaria 2","..."],
+  "readTime": "8 min",
+  "internalLinks": [{"anchor":"texto ancla","url":"/ruta-interna"}],
+  "externalLinks": [{"anchor":"texto ancla","url":"https://fuente-oficial.com"}]
+}
+
+El campo content DEBE arrancar con "# " (H1) y contener el artículo completo listo para publicar. NO expliques nada fuera del JSON.`;
+
+    const user = `📝 Título del artículo: ${topic}
+Keyword principal SEO: ${keyword || topic}
+Categoría sugerida: ${category}
+
+Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
+
 
     const aiRes = await fetch(AI_URL, {
       method: "POST",

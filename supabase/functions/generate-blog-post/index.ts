@@ -183,8 +183,22 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       content = `# ${parsed.title}\n\n${content}`;
     }
 
-    const slug = slugify(parsed.title);
-    const excerpt = (parsed.excerpt || content.replace(/^#.*$/m, "").trim().slice(0, 180)).slice(0, 240);
+    // Append internal + external link suggestions at the bottom for the editor
+    const iLinks = Array.isArray(parsed.internalLinks) ? parsed.internalLinks.slice(0, 8) : [];
+    const eLinks = Array.isArray(parsed.externalLinks) ? parsed.externalLinks.slice(0, 6) : [];
+    if (iLinks.length || eLinks.length) {
+      content += `\n\n---\n\n<!-- SUGERENCIAS SEO PARA EL EDITOR -->\n`;
+      if (iLinks.length) {
+        content += `\n**Enlaces internos sugeridos:**\n${iLinks.map((l) => `- [${l.anchor}](${l.url})`).join("\n")}\n`;
+      }
+      if (eLinks.length) {
+        content += `\n**Enlaces externos sugeridos:**\n${eLinks.map((l) => `- [${l.anchor}](${l.url})`).join("\n")}\n`;
+      }
+    }
+
+    const slug = (parsed.slug ? slugify(parsed.slug) : "") || slugify(parsed.title);
+    const excerpt = (parsed.metaDescription || parsed.excerpt || content.replace(/^#.*$/m, "").trim().slice(0, 180)).slice(0, 240);
+
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

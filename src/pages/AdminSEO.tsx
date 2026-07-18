@@ -62,6 +62,7 @@ const AdminSEO = () => {
   const [genTopic, setGenTopic] = useState("");
   const [genKeyword, setGenKeyword] = useState("");
   const [genCategory, setGenCategory] = useState("Aprendizaje");
+  const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);

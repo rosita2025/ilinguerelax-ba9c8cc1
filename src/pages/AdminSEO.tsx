@@ -4,11 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
+import { products } from "@/data/products";
 
 
 interface GscRow {
@@ -61,6 +64,12 @@ const AdminSEO = () => {
   const [genCategory, setGenCategory] = useState("Aprendizaje");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [publishNow, setPublishNow] = useState(true);
+
+  const toggleProduct = (id: string) => {
+    setSelectedProducts((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
+  };
 
   const loadGenPosts = async () => {
     const { data } = await supabase
@@ -78,18 +87,23 @@ const AdminSEO = () => {
     }
     setGenLoading(true);
     try {
+      const productCards = products
+        .filter((p) => selectedProducts.includes(p.id))
+        .map((p) => ({ id: p.id, title: p.title, slug: p.slug, description: p.subtitle }));
       const { data, error } = await supabase.functions.invoke("generate-blog-post", {
         body: {
           adminKey,
           topic: genTopic.trim(),
           keyword: genKeyword.trim() || undefined,
           category: genCategory,
-          publish: false,
+          publish: publishNow,
+          relatedProducts: selectedProducts,
+          productCards,
         },
       });
       if (error) throw error;
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
-      toast.success("Borrador generado. Revísalo antes de publicar.");
+      toast.success(publishNow ? "¡Post publicado en el blog!" : "Borrador generado. Revísalo antes de publicar.");
 
       setGenTopic("");
       setGenKeyword("");
@@ -489,9 +503,59 @@ const AdminSEO = () => {
               </div>
             </div>
 
-            <Button onClick={generatePost} disabled={genLoading}>
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Tarjetas de productos a incluir en el post</Label>
+                <div className="flex items-center gap-2 text-xs">
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                    onClick={() => setSelectedProducts(products.map((p) => p.id))}
+                  >Seleccionar todos</button>
+                  <span className="text-muted-foreground">·</span>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:underline"
+                    onClick={() => setSelectedProducts([])}
+                  >Ninguno</button>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Se mostrarán como "Recursos recomendados" al final del artículo y la IA los mencionará de forma natural en el CTA.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto rounded border p-2 bg-muted/20">
+                {products.map((p) => {
+                  const checked = selectedProducts.includes(p.id);
+                  return (
+                    <label
+                      key={p.id}
+                      className={`flex items-start gap-2 p-2 rounded cursor-pointer border transition ${checked ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted/40"}`}
+                    >
+                      <Checkbox checked={checked} onCheckedChange={() => toggleProduct(p.id)} className="mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{p.flag} {p.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{p.subtitle}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">{selectedProducts.length} producto(s) seleccionado(s)</p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2 border-t">
+              <Switch id="publish-now" checked={publishNow} onCheckedChange={setPublishNow} />
+              <Label htmlFor="publish-now" className="text-sm cursor-pointer">
+                Publicar directamente en el blog
+                <span className="block text-[11px] text-muted-foreground font-normal">
+                  {publishNow ? "El post será visible al instante en /blog" : "Se guardará como borrador (published: false)"}
+                </span>
+              </Label>
+            </div>
+
+            <Button onClick={generatePost} disabled={genLoading} className="w-full sm:w-auto">
               {genLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-              Generar y publicar
+              {publishNow ? "Generar y publicar" : "Generar borrador"}
             </Button>
 
             {genPosts.length > 0 && (

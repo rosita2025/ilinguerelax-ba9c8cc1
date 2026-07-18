@@ -14,6 +14,7 @@ interface Row {
   tags: string[] | null;
   read_time: string;
   created_at: string;
+  related_products: string[] | null;
 }
 
 function toBlogPost(r: Row): BlogPost {
@@ -29,7 +30,7 @@ function toBlogPost(r: Row): BlogPost {
     readTime: r.read_time,
     category: r.category,
     tags: r.tags ?? [],
-    relatedProducts: [],
+    relatedProducts: r.related_products ?? [],
   };
 }
 
@@ -42,7 +43,7 @@ export function useGeneratedBlogPosts() {
     (async () => {
       const { data } = await supabase
         .from("generated_blog_posts")
-        .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at")
+        .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,related_products")
         .eq("published", true)
         .order("created_at", { ascending: false });
       if (!cancelled) {
@@ -61,7 +62,7 @@ export function useGeneratedBlogPosts() {
 export async function fetchGeneratedBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   const { data } = await supabase
     .from("generated_blog_posts")
-    .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at")
+    .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,related_products")
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();

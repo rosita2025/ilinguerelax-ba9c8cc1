@@ -302,6 +302,7 @@ const App = () => (
               </CartSyncWrapper>
             </RouteErrorBoundary>
           </BrowserRouter>
+          </LivePricesProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </I18nProvider>

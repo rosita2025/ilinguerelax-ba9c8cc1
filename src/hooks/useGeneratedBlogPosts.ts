@@ -43,7 +43,7 @@ export function useGeneratedBlogPosts() {
     (async () => {
       const { data } = await supabase
         .from("generated_blog_posts")
-        .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at")
+        .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,related_products")
         .eq("published", true)
         .order("created_at", { ascending: false });
       if (!cancelled) {

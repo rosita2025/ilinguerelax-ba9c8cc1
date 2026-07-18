@@ -503,6 +503,21 @@ const AdminSEO = () => {
                   placeholder="Aprendizaje, Vocabulario, Fonética…"
                 />
               </div>
+              <div className="space-y-1">
+                <Label>Idioma del artículo</Label>
+                <select
+                  value={genLanguage}
+                  onChange={(e) => setGenLanguage(e.target.value as typeof genLanguage)}
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                >
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="pt">🇵🇹 Português</option>
+                  <option value="it">🇮🇹 Italiano</option>
+                  <option value="de">🇩🇪 Deutsch</option>
+                </select>
+              </div>
             </div>
 
             <div className="space-y-2 pt-2 border-t">

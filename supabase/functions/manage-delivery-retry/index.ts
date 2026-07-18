@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
         },
-        body: JSON.stringify({ force: true }),
+        body: JSON.stringify({}),
       });
       runReport = await res.json().catch(() => ({ ok: res.ok }));
     }

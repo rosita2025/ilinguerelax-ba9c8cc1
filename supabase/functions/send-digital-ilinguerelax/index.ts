@@ -21,7 +21,6 @@ interface Body {
   currency?: string;
   provider?: string;
   idempotencyKey?: string;
-  force?: boolean;
   lang?: string;
 }
 
@@ -269,7 +268,7 @@ serve(async (req) => {
 
   try {
     const body: Body = await req.json();
-    const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey, force } = body;
+    const { customerEmail, customerName, customerPhone, customerCountry, orderId, skus, amount, currency, provider, idempotencyKey } = body;
     const requestedSkus = Array.isArray(skus) ? skus.map((s) => String(s || "")).filter(Boolean) : [];
     let normalizedSkus = normalizeSkus(requestedSkus);
     // DB alias resolution: if any requested/normalized SKU is actually a short alias
@@ -317,24 +316,22 @@ serve(async (req) => {
     const idemKey = idempotencyKey
       || `digital:${(orderId || customerEmail).toLowerCase()}:${[...normalizedSkus].sort().join(",")}`;
 
-    if (!force) {
-      const { data: existing } = await supabase
-        .from("digital_email_sends")
-        .select("id, created_at")
-        .eq("idempotency_key", idemKey)
-        .maybeSingle();
-      if (existing) {
-        await writeAudit({
-          customer_email: customerEmail, customer_name: customerName || null,
-          order_id: orderId || null, idempotency_key: idemKey,
-          requested_skus: requestedSkus, normalized_skus: normalizedSkus,
-          resolved_skus: [], missing_skus: [], items: [],
-          status: "duplicate", provider: provider || null,
-        });
-        return new Response(JSON.stringify({ success: true, duplicate: true, sentAt: existing.created_at }), {
-          status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
+    const { data: existing } = await supabase
+      .from("digital_email_sends")
+      .select("id, created_at")
+      .eq("idempotency_key", idemKey)
+      .maybeSingle();
+    if (existing) {
+      await writeAudit({
+        customer_email: customerEmail, customer_name: customerName || null,
+        order_id: orderId || null, idempotency_key: idemKey,
+        requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+        resolved_skus: [], missing_skus: [], items: [],
+        status: "duplicate", provider: provider || null,
+      });
+      return new Response(JSON.stringify({ success: true, duplicate: true, sentAt: existing.created_at }), {
+        status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
     }
 
     const { data, error } = await supabase
@@ -358,6 +355,39 @@ serve(async (req) => {
       return new Response(JSON.stringify({ success: false, error: "no products found", missingSkus }), {
         status: 404, headers: { "Content-Type": "application/json", ...corsHeaders },
       });
+    }
+
+    // Reserve this purchase before contacting the email provider. The UNIQUE
+    // idempotency key makes this atomic, so concurrent webhooks cannot both send.
+    const { error: claimError } = await supabase.from("digital_email_sends").insert({
+      idempotency_key: idemKey,
+      order_id: orderId || null,
+      customer_email: customerEmail,
+      customer_name: customerName || null,
+      customer_phone: customerPhone || null,
+      customer_country: customerCountry || null,
+      amount: typeof amount === "number" ? amount : (amount ? Number(amount) : null),
+      currency: currency || null,
+      skus: normalizedSkus,
+      provider: provider || null,
+      status: "processing",
+      last_event: "processing",
+      last_event_at: new Date().toISOString(),
+    });
+    if (claimError) {
+      if (claimError.code === "23505") {
+        await writeAudit({
+          customer_email: customerEmail, customer_name: customerName || null,
+          order_id: orderId || null, idempotency_key: idemKey,
+          requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+          resolved_skus: [], missing_skus: [], items: [],
+          status: "duplicate", provider: provider || null,
+        });
+        return new Response(JSON.stringify({ success: true, duplicate: true }), {
+          status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+      throw claimError;
     }
 
     // Detect language from body → country → IP
@@ -487,6 +517,18 @@ serve(async (req) => {
 
     if (r.error) {
       console.error("send-digital-ilinguerelax failed", r.error);
+      await supabase.from("digital_email_sends").update({
+        status: "failed", last_event: "failed", last_event_at: new Date().toISOString(),
+      }).eq("idempotency_key", idemKey);
+      await supabase.from("digital_delivery_alerts").upsert({
+        source: String(provider || "digital_delivery"),
+        source_ref: String(orderId || idemKey),
+        customer_email: customerEmail,
+        reason: "send_failed",
+        details: { idempotency_key: idemKey, error: r.error },
+        resolved: false,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "source,source_ref,reason" });
       await writeAudit({ ...auditBase, status: "error", error: JSON.stringify(r.error) });
       return new Response(JSON.stringify({ success: false, error: r.error }), {
         status: 502, headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -496,22 +538,13 @@ serve(async (req) => {
     const messageId = r.data?.messageId || r.data?.id || null;
     await supabase
       .from("digital_email_sends")
-      .upsert({
-        idempotency_key: idemKey,
-        order_id: orderId || null,
-        customer_email: customerEmail,
-        customer_name: customerName || null,
-        customer_phone: customerPhone || null,
-        customer_country: customerCountry || resolvedCountry || null,
-        amount: typeof amount === "number" ? amount : (amount ? Number(amount) : null),
-        currency: currency || null,
-        skus: normalizedSkus,
+      .update({
         message_id: messageId,
         provider: provider || r.data?.provider || null,
         status: "sent",
         last_event: "sent",
         last_event_at: new Date().toISOString(),
-      }, { onConflict: "idempotency_key" });
+      }).eq("idempotency_key", idemKey);
 
     await writeAudit({
       ...auditBase,

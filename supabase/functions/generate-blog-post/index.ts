@@ -126,9 +126,13 @@ Devuelve SOLO un JSON válido (sin markdown alrededor) con esta forma exacta:
 
 El campo content DEBE arrancar con "# " (H1) y contener el artículo completo listo para publicar. NO expliques nada fuera del JSON.`;
 
+    const productsCtx = Array.isArray(productCards) && productCards.length
+      ? `\n\nPRODUCTOS iLINGUE RELAX A MENCIONAR NATURALMENTE en el CTA y "Recursos recomendados" (usa los títulos exactos y enlaza con la ruta /products/{slug}):\n${productCards.map((p) => `- ${p.title} → /products/${p.slug}${p.description ? " · " + p.description : ""}`).join("\n")}`
+      : "";
+
     const user = `📝 Título del artículo: ${topic}
 Keyword principal SEO: ${keyword || topic}
-Categoría sugerida: ${category}
+Categoría sugerida: ${category}${productsCtx}
 
 Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
 

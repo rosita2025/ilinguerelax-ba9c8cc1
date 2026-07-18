@@ -27,13 +27,19 @@ function slugify(input: string): string {
 
 interface GenPayload {
   title?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  slug?: string;
   excerpt?: string;
   content?: string;
   category?: string;
   tags?: string[];
   readTime?: string;
   image?: string;
+  internalLinks?: Array<{ anchor: string; url: string }>;
+  externalLinks?: Array<{ anchor: string; url: string }>;
 }
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });

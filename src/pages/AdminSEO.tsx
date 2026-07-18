@@ -84,12 +84,13 @@ const AdminSEO = () => {
           topic: genTopic.trim(),
           keyword: genKeyword.trim() || undefined,
           category: genCategory,
-          publish: true,
+          publish: false,
         },
       });
       if (error) throw error;
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
-      toast.success("Post generado y publicado en /blog");
+      toast.success("Borrador generado. Revísalo antes de publicar.");
+
       setGenTopic("");
       setGenKeyword("");
       void loadGenPosts();

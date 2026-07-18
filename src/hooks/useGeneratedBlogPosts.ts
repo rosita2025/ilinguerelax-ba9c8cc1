@@ -14,6 +14,7 @@ interface Row {
   tags: string[] | null;
   read_time: string;
   created_at: string;
+  related_products: string[] | null;
 }
 
 function toBlogPost(r: Row): BlogPost {
@@ -29,7 +30,7 @@ function toBlogPost(r: Row): BlogPost {
     readTime: r.read_time,
     category: r.category,
     tags: r.tags ?? [],
-    relatedProducts: [],
+    relatedProducts: r.related_products ?? [],
   };
 }
 

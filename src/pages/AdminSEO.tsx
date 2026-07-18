@@ -109,7 +109,7 @@ const AdminSEO = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("gsc-report", {
-        body: { adminKey, days: d, limit: 25 },
+        body: { adminKey, days: d, limit: 100 },
       });
       if (error) throw error;
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);

@@ -11,6 +11,7 @@ import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
+import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";

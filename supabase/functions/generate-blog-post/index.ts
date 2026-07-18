@@ -242,6 +242,17 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       throw dbErr;
     }
 
+
+    // On publish, notify search engines immediately (IndexNow + sitemap ping).
+    // Failures are swallowed inside the helpers — never block the response.
+    if (publish) {
+      const postUrl = `https://ilinguerelax.com/blog/${slug}`;
+      await Promise.allSettled([
+        pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
+        pingSitemap(),
+      ]);
+    }
+
     return new Response(JSON.stringify({ post: inserted }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

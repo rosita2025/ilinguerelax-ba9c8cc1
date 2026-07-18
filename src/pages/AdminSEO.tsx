@@ -97,6 +97,7 @@ const AdminSEO = () => {
           topic: genTopic.trim(),
           keyword: genKeyword.trim() || undefined,
           category: genCategory,
+          language: genLanguage,
           publish: publishNow,
           relatedProducts: selectedProducts,
           productCards,

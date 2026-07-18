@@ -193,9 +193,10 @@ const App = () => (
     <I18nProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+          <LivePricesProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
             <RouteErrorBoundary>
               <CartSyncWrapper>
                 <RouteTracker />

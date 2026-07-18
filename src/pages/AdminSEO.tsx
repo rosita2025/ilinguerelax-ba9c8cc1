@@ -503,9 +503,59 @@ const AdminSEO = () => {
               </div>
             </div>
 
-            <Button onClick={generatePost} disabled={genLoading}>
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Tarjetas de productos a incluir en el post</Label>
+                <div className="flex items-center gap-2 text-xs">
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                    onClick={() => setSelectedProducts(products.map((p) => p.id))}
+                  >Seleccionar todos</button>
+                  <span className="text-muted-foreground">·</span>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:underline"
+                    onClick={() => setSelectedProducts([])}
+                  >Ninguno</button>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Se mostrarán como "Recursos recomendados" al final del artículo y la IA los mencionará de forma natural en el CTA.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto rounded border p-2 bg-muted/20">
+                {products.map((p) => {
+                  const checked = selectedProducts.includes(p.id);
+                  return (
+                    <label
+                      key={p.id}
+                      className={`flex items-start gap-2 p-2 rounded cursor-pointer border transition ${checked ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted/40"}`}
+                    >
+                      <Checkbox checked={checked} onCheckedChange={() => toggleProduct(p.id)} className="mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{p.flag} {p.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{p.subtitle}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">{selectedProducts.length} producto(s) seleccionado(s)</p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2 border-t">
+              <Switch id="publish-now" checked={publishNow} onCheckedChange={setPublishNow} />
+              <Label htmlFor="publish-now" className="text-sm cursor-pointer">
+                Publicar directamente en el blog
+                <span className="block text-[11px] text-muted-foreground font-normal">
+                  {publishNow ? "El post será visible al instante en /blog" : "Se guardará como borrador (published: false)"}
+                </span>
+              </Label>
+            </div>
+
+            <Button onClick={generatePost} disabled={genLoading} className="w-full sm:w-auto">
               {genLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-              Generar y publicar
+              {publishNow ? "Generar y publicar" : "Generar borrador"}
             </Button>
 
             {genPosts.length > 0 && (

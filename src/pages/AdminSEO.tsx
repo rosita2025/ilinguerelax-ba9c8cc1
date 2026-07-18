@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles } from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";

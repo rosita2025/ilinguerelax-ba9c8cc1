@@ -56,6 +56,8 @@ serve(async (req) => {
       category = "Aprendizaje",
       language = "es",
       publish = false,
+      relatedProducts = [],
+      productCards = [],
     } = body as {
       adminKey?: string;
       topic?: string;
@@ -63,6 +65,8 @@ serve(async (req) => {
       category?: string;
       language?: string;
       publish?: boolean;
+      relatedProducts?: string[];
+      productCards?: Array<{ id: string; title: string; slug: string; description?: string }>;
     };
 
 

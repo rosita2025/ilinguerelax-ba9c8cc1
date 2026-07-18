@@ -11,6 +11,7 @@ import { useCartCatalogValidator } from "@/hooks/useCartCatalogValidator";
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
+import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -193,9 +194,10 @@ const App = () => (
     <I18nProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+          <LivePricesProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
             <RouteErrorBoundary>
               <CartSyncWrapper>
                 <RouteTracker />
@@ -300,6 +302,7 @@ const App = () => (
               </CartSyncWrapper>
             </RouteErrorBoundary>
           </BrowserRouter>
+          </LivePricesProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </I18nProvider>

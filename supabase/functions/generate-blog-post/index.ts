@@ -4,6 +4,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { pingIndexNow, pingSitemap } from "../_shared/indexnow.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

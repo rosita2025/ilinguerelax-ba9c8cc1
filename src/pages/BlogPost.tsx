@@ -323,14 +323,14 @@ const BlogPost = () => {
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-lg font-bold text-primary">
-                              {cardPrice.format(product.id, product.price)}
+                              {cardPrice.format(product.slug, product.price)}
                             </span>
                             {product.originalPrice && (
                               <span className="text-sm text-muted-foreground line-through">
-                                {cardPrice.format(product.id, product.originalPrice)}
+                                {cardPrice.format(product.slug, product.originalPrice)}
                               </span>
                             )}
-                            <span className="text-xs text-primary/70 font-semibold">{cardPrice.currencyLabel(product.id)}</span>
+                            <span className="text-xs text-primary/70 font-semibold">{cardPrice.currencyLabel(product.slug)}</span>
                             <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
                           </div>
                         </div>

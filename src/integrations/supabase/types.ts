@@ -1119,6 +1119,7 @@ export type Database = {
           keyword: string | null
           published: boolean
           read_time: string
+          related_products: string[]
           slug: string
           tags: string[]
           title: string
@@ -1135,6 +1136,7 @@ export type Database = {
           keyword?: string | null
           published?: boolean
           read_time?: string
+          related_products?: string[]
           slug: string
           tags?: string[]
           title: string
@@ -1151,6 +1153,7 @@ export type Database = {
           keyword?: string | null
           published?: boolean
           read_time?: string
+          related_products?: string[]
           slug?: string
           tags?: string[]
           title?: string

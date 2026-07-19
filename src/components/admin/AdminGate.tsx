@@ -113,7 +113,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
 
   const logout = () => {
-    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+    clearAdminKey();
     resetAdminCsrfToken();
     resetAdmin2FAToken();
     setAdminKey("");

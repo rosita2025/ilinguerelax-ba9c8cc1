@@ -141,7 +141,7 @@ serve(async (req) => {
     const filters = await loadFilters(supabase);
     const sid = typeof body.session_id === "string" ? body.session_id : null;
 
-    let botReason: string | null = classifyBot(ua, sid, referer, filters);
+    let botReason: string | null = classifyBot(ua, sid, referer, filters, req.headers, ip);
     if (!botReason && ip && filters.ips.has(ip)) botReason = "bot_ip";
 
     const country = await resolveCountry(ip, body.country || null);

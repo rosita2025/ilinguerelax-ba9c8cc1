@@ -683,14 +683,34 @@ const AdminSEO = () => {
                               )}
                             </td>
                             <td className="py-2 pl-2">
-                              <span className={`text-xs font-medium ${badgeClass}`} title={idx?.coverageState || ""}>
-                                {label}
-                              </span>
-                              {idx?.coverageState && idx.coverageState !== "—" && (
-                                <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">
-                                  {idx.coverageState}
+                              <div className="flex items-start gap-2">
+                                <div className="min-w-0">
+                                  <span className={`text-xs font-medium ${badgeClass}`} title={idx?.coverageState || ""}>
+                                    {label}
+                                  </span>
+                                  {idx?.coverageState && idx.coverageState !== "—" && (
+                                    <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+                                      {idx.coverageState}
+                                    </div>
+                                  )}
+                                  {idx?.checkedAt && (
+                                    <div className="text-[10px] text-muted-foreground">
+                                      Verificado {new Date(idx.checkedAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                    </div>
+                                  )}
                                 </div>
-                              )}
+                                <button
+                                  type="button"
+                                  onClick={() => checkIndexing([p.slug])}
+                                  disabled={rowLoading === p.slug}
+                                  className="text-muted-foreground hover:text-primary transition-colors mt-0.5"
+                                  title="Volver a verificar en Google"
+                                >
+                                  {rowLoading === p.slug
+                                    ? <Loader2 className="w-3 h-3 animate-spin" />
+                                    : <RefreshCw className="w-3 h-3" />}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );

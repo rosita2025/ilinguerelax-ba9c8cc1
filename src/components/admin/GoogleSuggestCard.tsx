@@ -65,10 +65,13 @@ const GoogleSuggestCard = () => {
   const maxGlobalScore = globalTop[0]?.score || 1;
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-3 md:p-4 space-y-4">
       <div className="flex items-center gap-2">
-        <Search className="w-5 h-5 text-primary" />
-        <h2 className="text-xl font-semibold">Explorador Google Suggest (agrupado por idioma / región)</h2>
+        <Search className="w-5 h-5 text-primary shrink-0" />
+        <h2 className="text-base md:text-xl font-semibold leading-tight">
+          <span className="md:hidden">Google Suggest (por región)</span>
+          <span className="hidden md:inline">Explorador Google Suggest (agrupado por idioma / región)</span>
+        </h2>
       </div>
       <p className="text-xs text-muted-foreground">
         Escribe una semilla y el sistema la traduce a cada mercado antes de consultar Google. Ranking ponderado por{" "}

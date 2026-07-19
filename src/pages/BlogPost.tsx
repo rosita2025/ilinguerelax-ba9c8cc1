@@ -204,10 +204,12 @@ const BlogPost = () => {
     }
   };
 
-  // Find current post index for navigation
-  const currentIndex = blogPosts.findIndex(p => p.slug === post.slug);
-  const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
-  const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
+  // Find current post index for navigation across static + generated posts
+  const navList = uniqueBySlug;
+  const currentIndex = navList.findIndex(p => p.slug === post.slug);
+  const prevPost = currentIndex > 0 ? navList[currentIndex - 1] : null;
+  const nextPost = currentIndex >= 0 && currentIndex < navList.length - 1 ? navList[currentIndex + 1] : null;
+
 
   return (
     <>

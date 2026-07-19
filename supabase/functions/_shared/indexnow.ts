@@ -19,30 +19,43 @@
 const INDEXNOW_KEY = "ilr7k3n9x2q8w5m4v6b1p0d3s7z4h2y8";
 const HOST = "ilinguerelax.com";
 const KEY_LOCATION = `https://${HOST}/ilinguerelax-indexnow-key.txt`;
-const ENDPOINT = "https://api.indexnow.org/indexnow";
+// IndexNow accepts submissions at any participating engine's endpoint and
+// syndicates them across the network. We hit multiple explicitly so a single
+// engine outage doesn't drop the submission.
+const ENDPOINTS = [
+  { name: "indexnow", url: "https://api.indexnow.org/indexnow" },
+  { name: "bing",     url: "https://www.bing.com/indexnow" },
+  { name: "yandex",   url: "https://yandex.com/indexnow" },
+  { name: "seznam",   url: "https://search.seznam.cz/indexnow" },
+  { name: "naver",    url: "https://searchadvisor.naver.com/indexnow" },
+];
 
 export async function pingIndexNow(urls: string[]): Promise<void> {
   const clean = Array.from(new Set(urls.filter(Boolean)));
   if (clean.length === 0) return;
 
-  try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify({
-        host: HOST,
-        key: INDEXNOW_KEY,
-        keyLocation: KEY_LOCATION,
-        urlList: clean.slice(0, 10_000), // hard cap per IndexNow spec
-      }),
-    });
-    // 200, 202 = accepted. Anything else we log but never throw.
-    if (!(res.status === 200 || res.status === 202)) {
-      console.warn("[indexnow] non-success:", res.status, await res.text().catch(() => ""));
-    }
-  } catch (err) {
-    console.warn("[indexnow] fetch failed:", (err as Error).message);
-  }
+  const body = JSON.stringify({
+    host: HOST,
+    key: INDEXNOW_KEY,
+    keyLocation: KEY_LOCATION,
+    urlList: clean.slice(0, 10_000), // hard cap per IndexNow spec
+  });
+
+  await Promise.allSettled(
+    ENDPOINTS.map(async ({ name, url }) => {
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body,
+        });
+        const ok = res.status === 200 || res.status === 202;
+        console.log(`[indexnow:${name}]`, res.status, ok ? "OK" : await res.text().catch(() => ""));
+      } catch (err) {
+        console.warn(`[indexnow:${name}] fetch failed:`, (err as Error).message);
+      }
+    })
+  );
 }
 
 export function productUrl(sku: string): string {

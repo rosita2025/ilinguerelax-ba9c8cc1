@@ -5,11 +5,11 @@
 // - Skips: already-purchased product SKU, active abandoned cart (72h),
 //   suppression/opt-out, and any email sent to this address in last 24h.
 
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { sendEmail } from '../_shared/brevo.ts';
 import { getPurchasedSkus } from '../_shared/purchasedSkus.ts';
 import { getDripCopy, type DripLang, type DripStepKey } from '../_shared/dripTemplates.ts';
+import { adminCorsHeaders, assertAdminCsrf } from '../_shared/adminCsrf.ts';
 
 const FROM = 'iLingue Relax <hola@ilinguerelax.com>';
 const REPLY_TO = 'hola@ilinguerelax.com';
@@ -18,7 +18,7 @@ const DAILY_THROTTLE_HOURS = 24;
 const ABANDONED_CART_HOLD_HOURS = 72;
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: adminCorsHeaders });
 
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -31,6 +31,9 @@ Deno.serve(async (req) => {
     try { body = await req.json(); } catch (_) { body = null; }
     const mode = body?.mode as 'test' | 'resend' | undefined;
     if (mode === 'test' || mode === 'resend') {
+      const adminBlock = await assertAdminCsrf(req);
+      if (adminBlock) return adminBlock;
+
       const email = String(body?.email || '').trim().toLowerCase();
       const stepKey = String(body?.template_key || '') as DripStepKey;
       const stepNum = Number(body?.step ?? 0);
@@ -213,7 +216,7 @@ Deno.serve(async (req) => {
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
-    status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status, headers: { ...adminCorsHeaders, 'Content-Type': 'application/json' },
   });
 }
 

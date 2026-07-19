@@ -971,44 +971,6 @@ const AdminAnalytics = () => {
                 </Card>
               )}
 
-              {/* Top URLs / pages of the store */}
-              {data.byUrl && data.byUrl.length > 0 && (
-                <Card className="p-4">
-                  <h2 className="font-semibold mb-1">URLs más visitadas · iLingue Relax</h2>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Top 30 páginas por sesiones únicas dentro de la tienda.
-                  </p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="text-xs text-muted-foreground border-b">
-                        <tr>
-                          <th className="text-left py-2 pr-3">URL</th>
-                          <th className="text-right px-2">Sesiones</th>
-                          <th className="text-right pl-2">Vistas</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.byUrl.map((row, i) => (
-                          <tr key={`${row.url}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
-                            <td className="py-2 pr-3">
-                              <a
-                                href={`https://ilinguerelax.com${row.url}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-mono text-xs text-primary hover:underline break-all"
-                              >
-                                {row.url}
-                              </a>
-                            </td>
-                            <td className="text-right px-2 tabular-nums font-semibold">{row.sessions}</td>
-                            <td className="text-right pl-2 tabular-nums text-muted-foreground">{row.pageviews}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </Card>
-              )}
 
             </>
           )}

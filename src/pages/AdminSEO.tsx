@@ -95,6 +95,7 @@ const AdminSEO = () => {
   const [rowLoading, setRowLoading] = useState<string | null>(null);
   const [requestLoading, setRequestLoading] = useState<string | null>(null);
   const [copyPost, setCopyPost] = useState<{ slug: string; title: string } | null>(null);
+  const [bulkUrls, setBulkUrls] = useState<Array<{ slug: string; title: string; url: string }> | null>(null);
 
 
   const GSC_RESOURCE = "sc-domain:ilinguerelax.com";

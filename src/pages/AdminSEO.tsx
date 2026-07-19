@@ -931,6 +931,30 @@ const AdminSEO = () => {
                   ))}
                 </div>
 
+                {/* Leyenda de estados */}
+                <div className="mb-3 p-2.5 rounded-md bg-muted/40 border border-border/60 text-[11px] leading-snug space-y-1.5">
+                  <div className="font-semibold text-foreground mb-1">¿Qué significa cada estado?</div>
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">Pendiente</span>
+                    <span className="text-muted-foreground">Aún no consultado en Google. Pulsa "Verificar Google".</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 font-medium">Descubierta</span>
+                    <span className="text-muted-foreground">Google la conoce pero aún no la ha rastreado. Pulsa "Solicitar indexación".</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 font-medium">Rastreada s/indexar</span>
+                    <span className="text-muted-foreground">Google la rastreó pero no la indexó todavía. Mejora contenido/enlaces internos.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-700 dark:text-green-400 font-medium">Indexado</span>
+                    <span className="text-muted-foreground">Ya aparece en resultados de Google. ✅</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive font-medium">No indexado</span>
+                    <span className="text-muted-foreground">Excluida por Google (error, duplicado o noindex). Revisa la URL.</span>
+                  </div>
+                </div>
 
                 {/* Mobile: stacked cards */}
                 <div className="md:hidden space-y-3">

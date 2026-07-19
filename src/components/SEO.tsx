@@ -272,7 +272,7 @@ export const SEO = ({
           "@type": "ListItem",
           "position": 2,
           "name": "Productos",
-          "item": "https://ilinguerelax.com/productos"
+          "item": "https://ilinguerelax.com/products"
         },
         {
           "@type": "ListItem",
@@ -281,11 +281,11 @@ export const SEO = ({
           "item": canonicalUrl
         }
       ] : []),
-      ...(canonicalUrl.includes("/productos") && !canonicalUrl.includes("/products/") ? [{
+      ...(canonicalUrl.endsWith("/products") ? [{
         "@type": "ListItem",
         "position": 2,
         "name": "Productos",
-        "item": "https://ilinguerelax.com/productos"
+          "item": "https://ilinguerelax.com/products"
       }] : []),
     ]
   } : null;
@@ -345,27 +345,6 @@ export const SEO = ({
 
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-
-      {/* hreflang — single canonical domain (www.ilinguerelax.com) for all
-          languages. Kept flat to avoid splitting SEO equity across subdomains. */}
-      {canonicalUrl && (() => {
-        let path = "/";
-        try {
-          const u = new URL(canonicalUrl);
-          path = u.pathname + u.search;
-        } catch {
-          path = canonicalUrl.startsWith("/") ? canonicalUrl : "/";
-        }
-        const href = `https://www.ilinguerelax.com${path}`;
-        const langs = ["x-default", "es", "es-ES", "es-MX", "es-PE", "en", "en-US", "fr", "fr-FR", "pt", "pt-BR"];
-        return (
-          <>
-            {langs.map((l) => (
-              <link key={l} rel="alternate" hrefLang={l} href={href} />
-            ))}
-          </>
-        );
-      })()}
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />

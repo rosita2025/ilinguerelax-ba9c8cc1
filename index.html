@@ -74,15 +74,6 @@
 
           <!-- Canonical URL set per-route via react-helmet-async (SEO component) -->
 
-          <!-- Alternate language versions -->
-          <link rel="alternate" hreflang="es" href="https://ilinguerelax.com/" />
-          <link
-            rel="alternate"
-            hreflang="en"
-            href="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation"
-          />
-          <link rel="alternate" hreflang="x-default" href="https://ilinguerelax.com/" />
-
           <!-- Open Graph / Facebook (sitewide fallback only — per-route og:url/title/description set via Helmet) -->
           <meta property="og:type" content="website" />
           <meta property="og:title" content="iLingue Relax | Learn Languages with Books & Ebooks" />
@@ -154,167 +145,6 @@
             }
     </script>
 
-    <!-- Structured Data - Product -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "@id": "https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa#product",
-        "name": "Inglés Relax - 5,000 Palabras con Pronunciación",
-        "description": "Libro digital con 5,000+ palabras en inglés con pronunciación fonética adaptada para hispanohablantes. Incluye acentos UK y USA, 52 capítulos temáticos y 4 bonus gratuitos.",
-        "image": [
-          "https://ilinguerelax.com/product-5000.webp"
-        ],
-        "brand": {
-          "@type": "Brand",
-          "name": "iLingue Relax"
-        },
-        "sku": "ILINGUE-5000",
-        "mpn": "ILINGUE-5000-ES",
-        "gtin13": "",
-        "category": "Libros > Educación > Idiomas > Inglés",
-        "offers": {
-          "@type": "Offer",
-          "url": "https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
-          "priceCurrency": "USD",
-          "price": "10.00",
-          "priceValidUntil": "2026-12-31",
-          "availability": "https://schema.org/InStock",
-          "itemCondition": "https://schema.org/NewCondition",
-          "hasMerchantReturnPolicy": {
-            "@type": "MerchantReturnPolicy",
-            "applicableCountry": "ES",
-            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-            "merchantReturnDays": 7,
-            "returnMethod": "https://schema.org/ReturnByMail",
-            "returnFees": "https://schema.org/FreeReturn"
-          },
-          "shippingDetails": {
-            "@type": "OfferShippingDetails",
-            "shippingRate": {
-              "@type": "MonetaryAmount",
-              "value": "0",
-              "currency": "USD"
-            },
-            "deliveryTime": {
-              "@type": "ShippingDeliveryTime",
-              "handlingTime": {
-                "@type": "QuantitativeValue",
-                "minValue": 0,
-                "maxValue": 0,
-                "unitCode": "d"
-              },
-              "transitTime": {
-                "@type": "QuantitativeValue",
-                "minValue": 0,
-                "maxValue": 0,
-                "unitCode": "d"
-              }
-            }
-          },
-          "seller": {
-            "@type": "Organization",
-            "name": "iLingue Relax"
-          }
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "800",
-          "bestRating": "5",
-          "worstRating": "1"
-        },
-        "review": [
-          {
-            "@type": "Review",
-            "reviewRating": {
-              "@type": "Rating",
-              "ratingValue": "5",
-              "bestRating": "5"
-            },
-            "author": {
-              "@type": "Person",
-              "name": "María García"
-            },
-            "datePublished": "2025-12-15",
-            "reviewBody": "Excelente libro para aprender inglés. La pronunciación adaptada al español me ayudó muchísimo."
-          },
-          {
-            "@type": "Review",
-            "reviewRating": {
-              "@type": "Rating",
-              "ratingValue": "5",
-              "bestRating": "5"
-            },
-            "author": {
-              "@type": "Person",
-              "name": "Carlos Rodríguez"
-            },
-            "datePublished": "2025-11-20",
-            "reviewBody": "Perfecto para hispanohablantes. Los 52 capítulos están muy bien organizados."
-          }
-        ]
-      }
-    </script>
-
-    <!-- Structured Data - FAQ -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "¿Qué es iLingue Relax?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "iLingue Relax es un libro digital para aprender inglés con pronunciación adaptada para hispanohablantes. Incluye más de 5,000 palabras con fonética UK y USA."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿INGLÉS RELAX es un libro físico o digital?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico está previsto para junio de 2026."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Cuál es la garantía de devolución?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Ofrecemos una garantía de devolución de 7 días. Si no estás satisfecho con el producto, te devolvemos el 100% de tu dinero sin preguntas."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Cómo recibo el libro después de comprarlo?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Después de completar tu compra, recibirás un enlace de descarga inmediata por correo electrónico. Podrás acceder al contenido en segundos."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Incluye pronunciación para hispanohablantes?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sí, cada palabra incluye pronunciación fonética especialmente diseñada para hispanohablantes, facilitando el aprendizaje del inglés con acentos UK y USA."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Cuántas palabras incluye el libro?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "El libro incluye más de 5,000 palabras organizadas en 52 capítulos temáticos. También hay una versión premium con 8,000 palabras."
-            }
-          }
-        ]
-      }
-    </script>
-
     <!-- Structured Data - WebSite with SearchAction -->
     <script type="application/ld+json">
       {
@@ -329,34 +159,6 @@
         "publisher": {
           "@id": "https://ilinguerelax.com/#organization"
         }
-      }
-    </script>
-
-    <!-- Structured Data - BreadcrumbList -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Inicio",
-            "item": "https://ilinguerelax.com"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Productos",
-            "item": "https://ilinguerelax.com/productos"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": "5,000 Palabras en Inglés",
-            "item": "https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
-          }
-        ]
       }
     </script>
 
@@ -419,11 +221,6 @@
     
     
     
-    <meta property="og:title" content="Aprende Idiomas con Pronunciación | iLingue Relax">
-  <meta name="twitter:title" content="Aprende Idiomas con Pronunciación | iLingue Relax">
-  <meta property="og:description" content="Libro digital es 5,000+ palabras, pronunciación adaptada para hispanohablantes y fonética UK/USA. Método sin estrés, descarga inmediata. ¡Empieza hoy!">
-  <meta name="twitter:description" content="Libro digital es 5,000+ palabras, pronunciación adaptada para hispanohablantes y fonética UK/USA. Método sin estrés, descarga inmediata. ¡Empieza hoy!">
-  <meta name="twitter:image" content="https://ilinguerelax.com/og-image.png">
 </head>
 
   <body>

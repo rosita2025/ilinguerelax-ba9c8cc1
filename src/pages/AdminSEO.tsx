@@ -1008,18 +1008,8 @@ const AdminSEO = () => {
                               : <RefreshCw className="w-3 h-3 mr-1" />}
                             Google
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 text-xs flex-1"
-                            onClick={() => checkMultiIndex([p.slug])}
-                            disabled={multiRowLoading === p.slug}
-                          >
-                            {multiRowLoading === p.slug
-                              ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                              : <RefreshCw className="w-3 h-3 mr-1" />}
-                            Buscadores
-                          </Button>
+
+
                           {!p.google_index_requested_at && (verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) ? (
                             <Button
                               size="sm"

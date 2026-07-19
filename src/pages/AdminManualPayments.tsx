@@ -94,9 +94,21 @@ const AdminManualPayments = () => {
     const iv = setInterval(() => { void fetchOrders(); }, 20000);
     const onVis = () => { if (document.visibilityState === "visible") void fetchOrders(); };
     document.addEventListener("visibilitychange", onVis);
-    return () => { clearInterval(iv); document.removeEventListener("visibilitychange", onVis); };
+    // Realtime: new manual payments appear instantly at the top (Shopify-style)
+    const channel = supabase
+      .channel("admin-manual-payments")
+      .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => {
+        void fetchOrders();
+      })
+      .subscribe();
+    return () => {
+      clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVis);
+      supabase.removeChannel(channel);
+    };
     /* eslint-disable-next-line */
   }, [adminKey]);
+
 
   const runAction = async (action: "verify" | "reject" | "reset", orderId: string) => {
     try {

@@ -1,5 +1,6 @@
 // Drip newsletter templates — 9 steps, multi-language.
-// Kept intentionally simple: same HTML skeleton, per-step + per-language copy.
+// Product-focused steps render a card grid (image + name + button, no prices)
+// so subscribers see all our best products regardless of native language.
 
 export type DripLang = 'es' | 'en' | 'fr' | 'pt' | 'de' | 'it' | 'nl' | 'ja' | 'ko' | 'zh' | 'ru' | 'ar' | 'hi' | 'tr';
 export const DRIP_LANGS: DripLang[] = ['es','en','fr','pt','de','it','nl','ja','ko','zh','ru','ar','hi','tr'];
@@ -21,11 +22,77 @@ interface Copy {
   ctaText: string;
   ctaUrl: string;
   footer: string;
+  showcase?: 'hispano' | 'english' | 'all'; // when set, render product cards grid
 }
 
-// Compact per-step + per-language copy. Non-Spanish/English fall back to English.
 type Bundle = Partial<Record<DripLang, Copy>>;
 
+// -------- Curated product cards (image + name + slug). No prices. --------
+interface Card { name: string; slug: string; cover: string; }
+
+const CARDS_HISPANO: Card[] = [
+  {
+    name: '5,000 Palabras en Inglés',
+    slug: '5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa',
+    cover: 'https://ilinguerelax.com/assets/oferta-5000-ingles-gramatica-DbJkqSMV.webp',
+  },
+  {
+    name: '1,000 Verbos Esenciales en Inglés',
+    slug: '1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion',
+    cover: 'https://cdn.phototourl.com/free/2026-07-10-a588d91f-0197-46c0-9301-7e532a84faf3.webp',
+  },
+  {
+    name: '500 Preguntas en Inglés',
+    slug: '500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes',
+    cover: 'https://cdn.phototourl.com/free/2026-07-10-2d0b8766-7c77-4905-9a06-f40fdce6bc90.webp',
+  },
+  {
+    name: 'Patrones Especiales en Inglés',
+    slug: 'patrones-especiales-alfabeto-combinaciones-secretas-ingles',
+    cover: 'https://ilinguerelax.com/images/product-patrones-especiales.webp',
+  },
+  {
+    name: '100 Mapas Mentales para Coreano',
+    slug: '100-mapas-mentales-para-aprender-coreano-hangul-c1',
+    cover: 'https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png',
+  },
+];
+
+const CARDS_ENGLISH: Card[] = [
+  {
+    name: '5,000 Spanish Words',
+    slug: '5-000-spanish-words-with-english-pronunciation-digital',
+    cover: 'https://ilinguerelax.com/assets/spanish-5000-digital-only-CmEswQ2b.webp',
+  },
+  {
+    name: '1,000 Spanish Verbs',
+    slug: '1-000-verbs-in-spanish-past-present-future-with-english-pronunciation',
+    cover: 'https://cdn.phototourl.com/free/2026-07-11-6f5adb93-f1bd-4f93-ab90-23e90dd05a1c.png',
+  },
+  {
+    name: '500 Questions in Spanish',
+    slug: '500-questions-in-spanish-with-english-pronunciation',
+    cover: 'https://ilinguerelax.com/images/product-spanish-500-questions.png',
+  },
+  {
+    name: '100 Mind Maps to Learn Korean',
+    slug: '100-mapas-mentales-para-aprender-coreano-hangul-c1',
+    cover: 'https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png',
+  },
+  {
+    name: '1,000 Essential Words for Korean',
+    slug: '1-000-palabras-esenciales-para-aprender-coreano',
+    cover: 'https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1784178628839-09lsq.webp',
+  },
+];
+
+// Spanish-native languages get hispano cards; everyone else gets english-native cards.
+const HISPANO_LANGS: DripLang[] = ['es', 'pt', 'it'];
+function cardsFor(lang: DripLang): Card[] {
+  return HISPANO_LANGS.includes(lang) ? CARDS_HISPANO : CARDS_ENGLISH;
+}
+
+// ---------------- Per-step + per-language copy ----------------
 const STEPS: Record<DripStepKey, Bundle> = {
   'know-us': {
     es: {
@@ -47,126 +114,152 @@ const STEPS: Record<DripStepKey, Bundle> = {
       footer: 'Quick menu: Home · Products · Blog · Contact',
     },
   },
+
+  // --- CATALOG (day 3): full grid, no prices ---
   'catalog': {
     es: {
-      subject: '📚 Nuestro catálogo completo — inglés, coreano y más',
-      hello: (n) => n ? `${n}, mira esto 👇` : 'Mira esto 👇',
-      intro: 'Estos son nuestros productos digitales más queridos por miles de estudiantes.',
-      body: '1,000 y 5,000 Palabras en Inglés · Patrones Especiales · Coreano 100 Mapas Mentales · y más.',
-      ctaText: 'Explorar catálogo',
+      subject: '📚 Nuestro catálogo — descubre todos nuestros productos',
+      hello: (n) => n ? `${n}, mira nuestro catálogo 👇` : 'Mira nuestro catálogo 👇',
+      intro: 'Estos son los productos digitales más queridos por miles de estudiantes.',
+      body: 'Elige el que más te interese — todos con acceso de por vida.',
+      ctaText: 'Ver catálogo completo',
       ctaUrl: `${BASE}/products`,
       footer: `Cualquier duda: ${HELP_EMAIL}`,
+      showcase: 'all',
     },
     en: {
-      subject: '📚 Full catalog — English, Korean and more',
-      hello: (n) => n ? `${n}, check this out 👇` : 'Check this out 👇',
-      intro: 'These are our most-loved digital products by thousands of students.',
-      body: '1,000 & 5,000 English Words · Special Patterns · Korean 100 Mind Maps · and more.',
-      ctaText: 'Explore catalog',
+      subject: '📚 Our catalog — discover all our products',
+      hello: (n) => n ? `${n}, check our catalog 👇` : 'Check our catalog 👇',
+      intro: 'These are the digital products loved by thousands of students.',
+      body: 'Pick the one you love most — all include lifetime access.',
+      ctaText: 'See full catalog',
       ctaUrl: `${BASE}/products`,
       footer: `Any questions: ${HELP_EMAIL}`,
+      showcase: 'all',
     },
   },
+
+  // --- DAY 7 (was product-1000-en): now a mini showcase, no prices ---
   'product-1000-en': {
     es: {
-      subject: '🚀 1,000 Verbos Esenciales en Inglés — presente, pasado, futuro',
+      subject: '🚀 Elige tu próximo idioma — mira nuestros productos',
       hello: (n) => n ? `Hola ${n} 👋` : 'Hola 👋',
-      intro: 'Domina los 1,000 verbos más usados del inglés con pronunciación y ejemplos reales.',
-      body: 'Ideal si estás empezando o quieres consolidar tu base. Compra única, acceso de por vida.',
-      ctaText: 'Ver 1,000 Verbos',
-      ctaUrl: `${BASE}/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion`,
-      footer: '¿Ya lo tienes? Descubre nuestras 5,000 Palabras.',
+      intro: 'Cada estudiante empieza donde quiere: vocabulario, verbos, preguntas o coreano.',
+      body: 'Mira los productos y elige el que más se adapte a ti:',
+      ctaText: 'Ver todos los productos',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Acceso inmediato y de por vida.',
+      showcase: 'all',
     },
     en: {
-      subject: '🚀 1,000 Essential English Verbs — present, past, future',
+      subject: '🚀 Pick your next language — see our products',
       hello: (n) => n ? `Hi ${n} 👋` : 'Hi 👋',
-      intro: 'Master the 1,000 most-used English verbs with pronunciation and real examples.',
-      body: 'Perfect if you are starting out or want to solidify your base. One-time purchase, lifetime access.',
-      ctaText: 'Get 1,000 Verbs',
-      ctaUrl: `${BASE}/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion`,
-      footer: 'Already have it? Discover our 5,000 Words.',
+      intro: 'Every learner starts somewhere: vocabulary, verbs, questions, or Korean.',
+      body: 'Take a look at our products and pick the one that fits you:',
+      ctaText: 'See all products',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Instant, lifetime access.',
+      showcase: 'all',
     },
   },
+
+  // --- DAY 15 (was product-5000-en): catalog grid, generic ---
   'product-5000-en': {
     es: {
-      subject: '📘 5,000 Palabras en Inglés — vocabulario para hablar de todo',
-      hello: (n) => n ? `${n}, sube tu nivel 📈` : 'Sube tu nivel 📈',
-      intro: 'Con 5,000 palabras podrás entender películas, series y conversaciones reales en inglés.',
-      body: 'Organizado por temas, con pronunciación y traducción bilingüe.',
-      ctaText: 'Ver 5,000 Palabras',
-      ctaUrl: `${BASE}/products/5000-palabras-en-ingles-relax-vocabulario-bilingue-con-pronunciacion`,
+      subject: '📘 Amplía tu vocabulario — descubre nuestros productos',
+      hello: (n) => n ? `${n}, mira nuestro catálogo` : 'Mira nuestro catálogo',
+      intro: 'Vocabulario, verbos, preguntas, patrones y coreano — todo en un solo lugar.',
+      body: 'Estos son nuestros productos más populares:',
+      ctaText: 'Ver catálogo',
+      ctaUrl: `${BASE}/products`,
       footer: 'Método relajado, sin estrés.',
+      showcase: 'all',
     },
     en: {
-      subject: '📘 5,000 English Words — vocabulary to talk about anything',
-      hello: (n) => n ? `${n}, level up 📈` : 'Level up 📈',
-      intro: 'With 5,000 words you will understand movies, series and real English conversations.',
-      body: 'Organized by topic, with pronunciation and bilingual translation.',
-      ctaText: 'Get 5,000 Words',
-      ctaUrl: `${BASE}/products/5000-palabras-en-ingles-relax-vocabulario-bilingue-con-pronunciacion`,
+      subject: '📘 Grow your vocabulary — discover our products',
+      hello: (n) => n ? `${n}, check our catalog` : 'Check our catalog',
+      intro: 'Vocabulary, verbs, questions, patterns and Korean — all in one place.',
+      body: 'These are our most popular products:',
+      ctaText: 'See catalog',
+      ctaUrl: `${BASE}/products`,
       footer: 'Relaxed method, no stress.',
+      showcase: 'all',
     },
   },
+
+  // --- DAY 30 (special offer): keep coupon + show cards ---
   'special-offer': {
     es: {
-      subject: '🎁 Oferta especial solo para ti — 15% extra por 48h',
+      subject: '🎁 Oferta especial 15% extra — elige tu producto',
       hello: (n) => n ? `${n}, esto es para ti 🎁` : 'Esto es para ti 🎁',
       intro: 'Como agradecimiento por seguirnos, aquí tienes un cupón adicional del 15% válido 48 horas.',
-      body: 'Código: FRIEND15',
+      body: 'Código: FRIEND15. Aplica a cualquiera de nuestros productos:',
       ctaText: 'Comprar con descuento',
       ctaUrl: `${BASE}/products`,
-      footer: 'Válido durante 48 horas desde ahora.',
+      footer: 'Válido durante 48 horas.',
+      showcase: 'all',
     },
     en: {
-      subject: '🎁 Special offer just for you — extra 15% for 48h',
+      subject: '🎁 Special 15% extra offer — pick any product',
       hello: (n) => n ? `${n}, this is for you 🎁` : 'This is for you 🎁',
       intro: 'As a thank-you, here is an extra 15% coupon valid for 48 hours.',
-      body: 'Code: FRIEND15',
+      body: 'Code: FRIEND15. Works on any of our products:',
       ctaText: 'Shop with discount',
       ctaUrl: `${BASE}/products`,
-      footer: 'Valid for 48 hours from now.',
+      footer: 'Valid for 48 hours.',
+      showcase: 'all',
     },
   },
+
+  // --- DAY 40 (pain-patterns): now catalog-focused ---
   'pain-patterns': {
     es: {
-      subject: '😩 ¿Sigues sin hablar inglés fluido? Esto te va a ayudar',
-      hello: (n) => n ? `${n}, hablemos claro 💬` : 'Hablemos claro 💬',
-      intro: 'Aprender vocabulario no basta. El inglés tiene patrones que la mayoría de escuelas no enseña.',
-      body: 'Nuestro producto de Patrones Especiales te muestra letras mudas, contracciones y sufijos.',
-      ctaText: 'Ver Patrones Especiales',
-      ctaUrl: `${BASE}/products/patrones-especiales-en-ingles`,
-      footer: 'Un cambio real en tu forma de hablar.',
+      subject: '💡 ¿Buscas resultados reales? Elige tu producto',
+      hello: (n) => n ? `${n}, tenemos algo para ti 💬` : 'Tenemos algo para ti 💬',
+      intro: 'Aprender un idioma no es cuestión de escuelas caras — sino de método y práctica constante.',
+      body: 'Estos son los materiales que están cambiando la forma de aprender:',
+      ctaText: 'Ver productos',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Un cambio real en tu forma de aprender.',
+      showcase: 'all',
     },
     en: {
-      subject: '😩 Still not speaking fluent English? This will help',
-      hello: (n) => n ? `${n}, let us be honest 💬` : 'Let us be honest 💬',
-      intro: 'Learning vocabulary is not enough. English has patterns most schools do not teach.',
-      body: 'Our Special Patterns product shows silent letters, contractions and suffixes.',
-      ctaText: 'Get Special Patterns',
-      ctaUrl: `${BASE}/products/patrones-especiales-en-ingles`,
-      footer: 'A real shift in how you speak.',
+      subject: '💡 Want real results? Pick your product',
+      hello: (n) => n ? `${n}, we have something for you 💬` : 'We have something for you 💬',
+      intro: 'Learning a language is not about expensive schools — it is about method and consistent practice.',
+      body: 'These are the materials changing how students learn:',
+      ctaText: 'See products',
+      ctaUrl: `${BASE}/products`,
+      footer: 'A real shift in how you learn.',
+      showcase: 'all',
     },
   },
+
+  // --- DAY 60 (product-coreano): catalog grid ---
   'product-coreano': {
     es: {
-      subject: '🇰🇷 Aprende coreano con 100 mapas mentales',
-      hello: (n) => n ? `¿Curiosidad por el coreano, ${n}?` : '¿Curiosidad por el coreano?',
-      intro: '100 mapas mentales visuales para aprender coreano desde cero: hangul, familia, escuela, ropa y más.',
-      body: 'Miles de estudiantes ya están aprendiendo con este método visual.',
-      ctaText: 'Ver Coreano 100 Mapas',
-      ctaUrl: `${BASE}/products/coreano-relax-100-mapas-mentales`,
-      footer: 'Con bonos gratis de hangul y guía completa.',
+      subject: '🌏 Idiomas del mundo — inglés, coreano y más',
+      hello: (n) => n ? `${n}, explora nuestros idiomas` : 'Explora nuestros idiomas',
+      intro: 'Miles de estudiantes ya están aprendiendo con nuestro método visual y bilingüe.',
+      body: 'Estos son los productos más queridos:',
+      ctaText: 'Ver todos los productos',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Con bonos gratis en cada compra.',
+      showcase: 'all',
     },
     en: {
-      subject: '🇰🇷 Learn Korean with 100 mind maps',
-      hello: (n) => n ? `Curious about Korean, ${n}?` : 'Curious about Korean?',
-      intro: '100 visual mind maps to learn Korean from scratch: hangul, family, school, clothes and more.',
-      body: 'Thousands of students are already learning with this visual method.',
-      ctaText: 'Get Korean 100 Maps',
-      ctaUrl: `${BASE}/products/coreano-relax-100-mapas-mentales`,
-      footer: 'With free bonuses: hangul and full guide.',
+      subject: '🌏 Languages of the world — English, Korean and more',
+      hello: (n) => n ? `${n}, explore our languages` : 'Explore our languages',
+      intro: 'Thousands of students already learn with our visual, bilingual method.',
+      body: 'These are our most-loved products:',
+      ctaText: 'See all products',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Free bonuses with every purchase.',
+      showcase: 'all',
     },
   },
+
+  // --- DAY 90 (testimonials): keep clean, no cards ---
   'testimonials': {
     es: {
       subject: '⭐ Lo que dicen nuestros estudiantes',
@@ -187,33 +280,79 @@ const STEPS: Record<DripStepKey, Bundle> = {
       footer: 'Join our community.',
     },
   },
+
+  // --- DAY 120 (vip-final): VIP coupon + cards ---
   'vip-final': {
     es: {
-      subject: '💎 Última oportunidad — cupón VIP de bienvenida',
+      subject: '💎 Cupón VIP de bienvenida — elige tu producto',
       hello: (n) => n ? `${n}, gracias por estar aquí 💎` : 'Gracias por estar aquí 💎',
-      intro: 'Después de 120 días con nosotros, queremos darte un último regalo.',
-      body: 'Cupón VIP: VIP20 (20% de descuento, válido 7 días).',
+      intro: 'Después de estos meses con nosotros, queremos darte un último regalo.',
+      body: 'Cupón VIP: VIP20 (20% de descuento, válido 7 días). Elige el producto que quieras:',
       ctaText: 'Usar cupón VIP',
       ctaUrl: `${BASE}/products`,
       footer: 'Gracias por confiar en iLingue Relax.',
+      showcase: 'all',
     },
     en: {
-      subject: '💎 Last chance — VIP welcome coupon',
+      subject: '💎 VIP welcome coupon — pick your product',
       hello: (n) => n ? `${n}, thanks for being here 💎` : 'Thanks for being here 💎',
-      intro: 'After 120 days with us, we want to give you one last gift.',
-      body: 'VIP coupon: VIP20 (20% off, valid 7 days).',
+      intro: 'After these months with us, we want to give you one last gift.',
+      body: 'VIP coupon: VIP20 (20% off, valid 7 days). Choose any product:',
       ctaText: 'Use VIP coupon',
       ctaUrl: `${BASE}/products`,
       footer: 'Thank you for trusting iLingue Relax.',
+      showcase: 'all',
     },
   },
 };
 
+// ---------------- Rendering ----------------
+function renderCards(lang: DripLang): string {
+  const cards = cardsFor(lang);
+  const label = HISPANO_LANGS.includes(lang) ? 'Ver producto' : 'View product';
+  const cellHtml = cards.map((c) => `
+    <td style="width:50%;padding:6px;vertical-align:top;">
+      <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#ffffff;">
+        <a href="${BASE}/products/${c.slug}" style="text-decoration:none;color:inherit;display:block;">
+          <img src="${c.cover}" alt="${c.name.replace(/"/g,'&quot;')}" style="display:block;width:100%;height:150px;object-fit:cover;" />
+          <div style="padding:12px 14px;">
+            <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.35;min-height:38px;">${c.name}</p>
+            <div style="text-align:center;">
+              <span style="display:inline-block;background:#1e6f6f;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;">${label}</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </td>`).join('');
+  // Build 2-per-row table
+  const rows: string[] = [];
+  for (let i = 0; i < cards.length; i += 2) {
+    const pair = cards.slice(i, i + 2)
+      .map((c) => `
+      <td style="width:50%;padding:6px;vertical-align:top;">
+        <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#ffffff;">
+          <a href="${BASE}/products/${c.slug}" style="text-decoration:none;color:inherit;display:block;">
+            <img src="${c.cover}" alt="${c.name.replace(/"/g,'&quot;')}" style="display:block;width:100%;height:150px;object-fit:cover;" />
+            <div style="padding:12px 14px;">
+              <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.35;min-height:38px;">${c.name}</p>
+              <div style="text-align:center;">
+                <span style="display:inline-block;background:#1e6f6f;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;">${label}</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </td>`).join('');
+    const filler = cards.slice(i, i + 2).length < 2 ? '<td style="width:50%;padding:6px;"></td>' : '';
+    rows.push(`<tr>${pair}${filler}</tr>`);
+  }
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:20px 0;">${rows.join('')}</table>`;
+}
+
 export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): { subject: string; html: string; text: string } {
   const bundle = STEPS[step];
-  // Fallback chain: lang → es → en
   const c: Copy = bundle[lang] ?? bundle.es ?? bundle.en!;
   const hello = c.hello(name);
+  const cardsHtml = c.showcase ? renderCards(lang) : '';
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f5f7fa;font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;">
@@ -224,8 +363,9 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
     <div style="padding:32px 28px;line-height:1.6;">
       <p style="font-size:16px;margin:0 0 12px;">${hello}</p>
       <p style="font-size:15px;color:#374151;margin:0 0 16px;">${c.intro}</p>
-      <p style="font-size:15px;color:#374151;margin:0 0 24px;">${c.body}</p>
-      <div style="text-align:center;margin:28px 0;">
+      <p style="font-size:15px;color:#374151;margin:0 0 8px;">${c.body}</p>
+      ${cardsHtml}
+      <div style="text-align:center;margin:24px 0;">
         <a href="${c.ctaUrl}" style="display:inline-block;background:#e85d3c;color:#ffffff;text-decoration:none;padding:14px 34px;border-radius:50px;font-weight:600;font-size:15px;">${c.ctaText}</a>
       </div>
       <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:16px;text-align:center;">
@@ -245,7 +385,10 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
   </div>
 </body></html>`;
 
-  const text = `${hello}\n\n${c.intro}\n\n${c.body}\n\n${c.ctaText}: ${c.ctaUrl}\n\n${c.footer}\n\n${BRAND} · ${HELP_EMAIL}`;
+  const cardsText = c.showcase
+    ? '\n\n' + cardsFor(lang).map((cd) => `- ${cd.name}: ${BASE}/products/${cd.slug}`).join('\n')
+    : '';
+  const text = `${hello}\n\n${c.intro}\n\n${c.body}${cardsText}\n\n${c.ctaText}: ${c.ctaUrl}\n\n${c.footer}\n\n${BRAND} · ${HELP_EMAIL}`;
 
   return { subject: c.subject, html, text };
 }

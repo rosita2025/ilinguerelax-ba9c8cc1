@@ -782,6 +782,25 @@ const AdminSEO = () => {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => {
+                        const pending = genPosts
+                          .filter((p) => indexStatus[p.slug]?.verdict !== "PASS")
+                          .map((p) => p.slug);
+                        if (pending.length === 0) {
+                          toast.info("Todos los posts visibles ya están indexados en Google ✅");
+                          return;
+                        }
+                        void checkIndexing(pending);
+                      }}
+                      disabled={indexLoading}
+                      title="Re-verifica en Google solo los posts que aún no aparecen indexados"
+                    >
+                      {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
+                      Verificar solo pendientes
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => checkMultiIndex()}
                       disabled={multiLoading}
                       title="Verificar Bing, Yandex, DuckDuckGo y Brave"
@@ -789,6 +808,7 @@ const AdminSEO = () => {
                       {multiLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
                       Verificar buscadores
                     </Button>
+
 
                     <Button
                       variant="default"

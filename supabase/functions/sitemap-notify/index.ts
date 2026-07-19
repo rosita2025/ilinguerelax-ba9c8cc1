@@ -19,8 +19,21 @@ Deno.serve(async (req) => {
     );
     const body = await req.json().catch(() => ({}));
     const singleSku: string | undefined = body?.sku;
+    const action: string | undefined = body?.action;
 
-    let skus: string[] = [];
+    // Modo probe: solo devuelve slugs del sitemap publicado (evita CORS del navegador).
+    if (action === "probe") {
+      const sitemapUrl = "https://ilinguerelax.com/sitemaps/sitemap-products-1.xml";
+      const xml = await fetch(sitemapUrl, { cache: "no-store" }).then((r) => r.text());
+      const slugs = Array.from(xml.matchAll(/<loc>[^<]*\/products\/([^<]+)<\/loc>/g)).map(
+        (m) => m[1],
+      );
+      return new Response(
+        JSON.stringify({ ok: true, slugs, count: slugs.length }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     if (singleSku) {
       skus = [singleSku];
     } else {

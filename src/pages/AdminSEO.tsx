@@ -815,10 +815,21 @@ const AdminSEO = () => {
               {publishNow ? "Generar y publicar" : "Generar borrador"}
             </Button>
 
-            {genPosts.length > 0 && (
+            {genPosts.length > 0 && (() => {
+              const filteredPosts = genPosts.filter((p) => {
+                if (postsFilter === "drafts") return !p.published;
+                const v = indexStatus[p.slug]?.verdict;
+                if (postsFilter === "indexed") return v === "PASS";
+                if (postsFilter === "pending") return v !== "PASS";
+                return true;
+              });
+              const totalPages = Math.max(1, Math.ceil(filteredPosts.length / postsPerPage));
+              const page = Math.min(postsPage, totalPages);
+              const paginatedPosts = filteredPosts.slice((page - 1) * postsPerPage, page * postsPerPage);
+              return (
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-                  <h3 className="text-sm font-semibold">Últimos posts generados</h3>
+                  <h3 className="text-sm font-semibold">Últimos posts generados ({filteredPosts.length})</h3>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Button
                       variant="outline"

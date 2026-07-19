@@ -667,11 +667,28 @@ serve(async (req) => {
       ? ((totals.checkout - totals.purchases) / totals.checkout) * 100
       : 0;
 
-    const byProduct = Array.from(byProductAgg.entries())
-      .filter(([pid, v]) =>
-        pid && pid !== "sin_producto" && pid !== "0" && pid !== "manual" &&
-        (v.views + v.carts + v.purchases + v.pending) > 0,
-      )
+    // Collapse duplicate keys (URL slug vs display name vs SKU) into one row per canonical SKU.
+    const mergedByProduct = new Map<string, { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }>();
+    for (const [pid, v] of byProductAgg.entries()) {
+      if (!pid || pid === "sin_producto" || pid === "0" || pid === "manual") continue;
+      if ((v.views + v.carts + v.purchases + v.pending) === 0) continue;
+      const key = canonicalProductKey(pid);
+      const existing = mergedByProduct.get(key);
+      if (!existing) {
+        mergedByProduct.set(key, { ...v });
+      } else {
+        existing.views += v.views;
+        existing.carts += v.carts;
+        existing.purchases += v.purchases;
+        existing.revenue += v.revenue;
+        existing.hotmart += v.hotmart;
+        existing.store += v.store;
+        existing.pending += v.pending;
+        existing.hotmartPending += v.hotmartPending;
+        existing.storePending += v.storePending;
+      }
+    }
+    const byProduct = Array.from(mergedByProduct.entries())
       .map(([product_id, v]) => {
         const source =
           v.hotmart && v.store ? "mixto" :

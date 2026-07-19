@@ -382,6 +382,8 @@ const AdminSEO = () => {
 
           <SitemapHealthCard />
 
+          <IndexingEventsCard />
+
 
           <Card className="p-4 space-y-3">
             <div className="flex flex-wrap gap-2">

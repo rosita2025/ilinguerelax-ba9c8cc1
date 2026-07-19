@@ -180,7 +180,7 @@ export default function AdminBotReport() {
             </Card>
 
             <p className="text-xs text-muted-foreground text-center">
-              Auto-refresh cada 5 min · Última actualización: {new Date(data.generatedAt).toLocaleTimeString()}
+              Auto-refresh cada 60s (pausado si la pestaña está oculta) · Última actualización: {new Date(data.generatedAt).toLocaleTimeString()}
             </p>
           </>
         )}

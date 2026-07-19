@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, Copy, TrendingUp } from "lucide-react";
+import { Loader2, Search, Copy, TrendingUp, FileText } from "lucide-react";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
+import ContentBriefDialog from "@/components/admin/ContentBriefDialog";
 
 interface GroupResult {
   id: string;
@@ -30,6 +31,7 @@ const GoogleSuggestCard = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GroupResult[]>([]);
   const [globalTop, setGlobalTop] = useState<GlobalTop[]>([]);
+  const [briefKeyword, setBriefKeyword] = useState<string | null>(null);
 
   const run = async () => {
     if (!query.trim()) return;
@@ -114,6 +116,9 @@ const GoogleSuggestCard = () => {
                   <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
                     <Copy className="w-3 h-3" />
                   </button>
+                  <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
+                    <FileText className="w-3 h-3" />
+                  </button>
                 </li>
               );
             })}
@@ -170,6 +175,9 @@ const GoogleSuggestCard = () => {
                       <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
                         <Copy className="w-3 h-3" />
                       </button>
+                      <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
+                        <FileText className="w-3 h-3" />
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -178,6 +186,7 @@ const GoogleSuggestCard = () => {
           ))}
         </div>
       )}
+      <ContentBriefDialog keyword={briefKeyword} onClose={() => setBriefKeyword(null)} />
     </Card>
   );
 };

@@ -764,37 +764,30 @@ const AdminSEO = () => {
                     <Button
                       variant="default"
                       size="sm"
-                      onClick={async () => {
-                        const discovered = genPosts.filter((p) => {
+                      onClick={() => {
+                        // Include everything not yet confirmed indexed (PASS). We ignore
+                        // google_index_requested_at because the API call is limited to one
+                        // per URL but Search Console lets the user paste the URL manually
+                        // as many times as needed while it stays "Descubierta".
+                        const pending = filteredPosts.filter((p) => {
                           const v = indexStatus[p.slug]?.verdict;
-                          return !p.google_index_requested_at && (v === "NEUTRAL" || v === "FAIL" || !v);
+                          return v !== "PASS";
                         });
-                        if (discovered.length === 0) {
-                          toast.info("No hay URLs descubiertas o pendientes en la lista visible.");
+                        if (pending.length === 0) {
+                          toast.info("Todas las URLs visibles ya están indexadas.");
                           return;
                         }
-                        setRequestLoading("__bulk__");
-                        try {
-                          const urls = discovered.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
-                          const { data, error } = await supabase.functions.invoke("request-google-indexing", {
-                            body: { adminKey, urls, siteUrl: "https://ilinguerelax.com/" },
-                          });
-                          if (error) throw error;
-                          const result = data as { sent?: number; skipped?: number };
-                          toast.success(`${result.sent ?? urls.length} solicitudes únicas registradas${result.skipped ? `; ${result.skipped} ya estaban solicitadas` : ""}.`);
-                          await loadGenPosts();
-                        } catch (err) {
-                          toast.error(err instanceof Error ? err.message : "Error al solicitar indexación masiva");
-                        } finally {
-                          setRequestLoading(null);
-                        }
+                        setBulkUrls(
+                          pending.map((p) => ({
+                            slug: p.slug,
+                            title: p.title,
+                            url: `https://ilinguerelax.com/blog/${p.slug}`,
+                          })),
+                        );
                       }}
-                      disabled={requestLoading === "__bulk__"}
                     >
-                      {requestLoading === "__bulk__"
-                        ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                        : <Zap className="w-3 h-3 mr-1" />}
-                      Solicitar indexación (descubiertas)
+                      <Zap className="w-3 h-3 mr-1" />
+                      Solicitar indexación ({filteredPosts.filter((p) => indexStatus[p.slug]?.verdict !== "PASS").length})
                     </Button>
                   </div>
                 </div>

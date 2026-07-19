@@ -1032,7 +1032,7 @@ const AdminSEO = () => {
 
                     </thead>
                     <tbody>
-                      {genPosts.map((p) => {
+                      {paginatedPosts.map((p) => {
                         const idx = indexStatus[p.slug];
                         const verdict = idx?.verdict;
                         const badgeClass =

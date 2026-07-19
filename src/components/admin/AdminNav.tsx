@@ -116,6 +116,7 @@ export const AdminNav = () => {
           </NavLink>
 
           <div className="ml-auto flex items-center gap-2">
+          <AdminTrustBadge />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">

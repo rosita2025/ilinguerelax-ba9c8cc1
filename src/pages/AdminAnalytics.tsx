@@ -356,7 +356,7 @@ const ProductCountryGrouped = ({ rows }: { rows: PCRow[] }) => {
                         </tr>
                       );
                     })}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>

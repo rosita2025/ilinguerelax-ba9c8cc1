@@ -19,8 +19,18 @@ const BlogPost = () => {
   const cardPrice = useCardPrice();
   const { slug } = useParams<{ slug: string }>();
   const staticPost = slug ? getBlogPostBySlug(slug) : null;
-  const [post, setPost] = useState<BlogPostType | null>(staticPost ?? null);
+  const [post, setPost] = useState<(BlogPostType & { updatedAt?: string }) | null>(staticPost ?? null);
   const [loading, setLoading] = useState(!staticPost);
+  const [generatedAll, setGeneratedAll] = useState<BlogPostType[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const all = await fetchGeneratedBlogPosts();
+      if (!cancelled) setGeneratedAll(all);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (staticPost || !slug) return;
@@ -42,11 +52,21 @@ const BlogPost = () => {
     return <Navigate to="/blog" replace />;
   }
 
+  // Merge static + generated posts for internal linking (prev/next/related)
+  const allPosts: BlogPostType[] = [...generatedAll, ...blogPosts];
+  const uniqueBySlug = Array.from(new Map(allPosts.map((p) => [p.slug, p])).values());
 
-  const relatedPosts = getRelatedPosts(post.slug, 3);
+  // Related: same category first, otherwise recent, excluding current
+  const related = uniqueBySlug
+    .filter((p) => p.slug !== post.slug)
+    .sort((a, b) => (a.category === post.category ? -1 : 1))
+    .slice(0, 3);
+  const relatedPosts = related.length ? related : getRelatedPosts(post.slug, 3);
+
   const relatedProducts = post.relatedProducts
     .map(id => getProductById(id))
     .filter(Boolean);
+
 
   // Convert markdown-like content to HTML
   const renderContent = (content: string) => {

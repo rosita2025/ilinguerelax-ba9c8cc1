@@ -37,17 +37,24 @@ const LANGUAGES: { hl: string; gl: string; label: string; flag: string; langName
 
 async function fetchSuggestions(query: string, hl: string, gl: string): Promise<string[]> {
   const url = `https://suggestqueries.google.com/complete/search?client=firefox&hl=${hl}&gl=${gl}&q=${encodeURIComponent(query)}`;
-  const res = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; iLingueRelax-SEO/1.0)" },
-  });
-  if (!res.ok) throw new Error(`suggest ${res.status}`);
-  const text = await res.text();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 6000);
   try {
-    const parsed = JSON.parse(text);
-    const list = Array.isArray(parsed) && Array.isArray(parsed[1]) ? parsed[1] : [];
-    return list.filter((s: unknown): s is string => typeof s === "string");
-  } catch {
-    return [];
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; iLingueRelax-SEO/1.0)" },
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error(`suggest ${res.status}`);
+    const text = await res.text();
+    try {
+      const parsed = JSON.parse(text);
+      const list = Array.isArray(parsed) && Array.isArray(parsed[1]) ? parsed[1] : [];
+      return list.filter((s: unknown): s is string => typeof s === "string");
+    } catch {
+      return [];
+    }
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -140,6 +147,9 @@ serve(async (req) => {
         }
       }),
     );
+
+    const okCount = results.filter((r) => !r.error).length;
+    console.log(`google-suggest: ${okCount}/${results.length} markets ok for "${q}"`);
 
     return new Response(
       JSON.stringify({ query: q, results }),

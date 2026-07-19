@@ -75,6 +75,41 @@ const AdminSEO = () => {
   });
   const [indexLoading, setIndexLoading] = useState(false);
   const [rowLoading, setRowLoading] = useState<string | null>(null);
+  const [requestLoading, setRequestLoading] = useState<string | null>(null);
+
+  const GSC_RESOURCE = "sc-domain:ilinguerelax.com";
+  const gscInspectUrl = (url: string) =>
+    `https://search.google.com/search-console/inspect?resource_id=${encodeURIComponent(GSC_RESOURCE)}&url=${encodeURIComponent(url)}`;
+
+  const requestIndexing = async (slug: string) => {
+    const url = `https://ilinguerelax.com/blog/${slug}`;
+    setRequestLoading(slug);
+    // Open the GSC inspection deep link immediately (must happen inside the click
+    // handler or popup blockers will swallow it).
+    const gscTab = window.open(gscInspectUrl(url), "_blank", "noopener,noreferrer");
+    try {
+      const { data, error } = await supabase.functions.invoke("request-google-indexing", {
+        body: { adminKey, urls: [url], siteUrl: "https://ilinguerelax.com/" },
+      });
+      if (error) throw error;
+      const note = (data as { note?: string })?.note;
+      toast.success(
+        note
+          ? "IndexNow + sitemap enviados. Pulsa 'Solicitar indexación' en la pestaña de Google."
+          : "Indexación solicitada. Google la procesará en minutos."
+      );
+      // Re-check status shortly after so the row updates.
+      setTimeout(() => { void checkIndexing([slug]); }, 4000);
+      if (!gscTab) {
+        toast.info("Abre manualmente Search Console — el navegador bloqueó la pestaña nueva.");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al solicitar indexación");
+    } finally {
+      setRequestLoading(null);
+    }
+  };
+
 
   const persistIndex = (next: Record<string, IndexEntry>) => {
     setIndexStatus(next);

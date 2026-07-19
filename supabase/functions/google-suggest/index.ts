@@ -188,37 +188,73 @@ serve(withAdminLogging("google-suggest", async (req) => {
       // Query every country in the group in parallel
       const perCountry = await Promise.all(
         g.countries.map(async (c) => ({
-          country: c.name, gl: c.gl,
+          country: c, // full Country object (includes weight)
           suggestions: await fetchSuggestions(localSeed, g.hl, c.gl),
         })),
       );
-      // Aggregate: keyword frequency across countries = "alto volumen"
-      const freq = new Map<string, { keyword: string; count: number; countries: string[] }>();
+      // Aggregate keyword occurrences with position + country weight.
+      type Agg = {
+        keyword: string;
+        count: number;
+        countries: string[];
+        positions: { country: Country; position: number }[];
+      };
+      const freq = new Map<string, Agg>();
       for (const pc of perCountry) {
-        for (const s of pc.suggestions) {
+        pc.suggestions.forEach((s, idx) => {
           const key = s.toLowerCase().trim();
-          const entry = freq.get(key) ?? { keyword: s, count: 0, countries: [] };
+          const entry = freq.get(key) ?? { keyword: s, count: 0, countries: [], positions: [] };
           entry.count += 1;
-          if (!entry.countries.includes(pc.country)) entry.countries.push(pc.country);
+          if (!entry.countries.includes(pc.country.name)) entry.countries.push(pc.country.name);
+          entry.positions.push({ country: pc.country, position: idx });
           freq.set(key, entry);
-        }
+        });
       }
-      const aggregated = Array.from(freq.values())
-        .sort((a, b) => b.count - a.count || a.keyword.length - b.keyword.length);
-      const totalUnique = aggregated.length;
-      const maxCount = aggregated[0]?.count ?? 1;
+
+      // Compute weighted score and normalize 0-100 per group.
+      const scored = Array.from(freq.values()).map((e) => ({
+        ...e,
+        score: scoreKeyword({ keyword: e.keyword, seed: localSeed, positionsByCountry: e.positions }),
+      }));
+      const maxScore = scored.reduce((m, x) => Math.max(m, x.score), 0) || 1;
+      const ranked = scored
+        .map((x) => ({
+          keyword: x.keyword,
+          count: x.count,
+          countries: x.countries,
+          score: Math.round((x.score / maxScore) * 100), // 0-100 relative
+        }))
+        .sort((a, b) => b.score - a.score || b.count - a.count || a.keyword.length - b.keyword.length);
+
       return {
         id: g.id, label: g.label, flag: g.flag,
         translatedSeed: localSeed,
         countryCount: g.countries.length,
-        popularity: totalUnique, // # unique keywords surfaced
-        maxCount,
-        keywords: aggregated.slice(0, 15),
+        popularity: ranked.reduce((s, r) => s + r.score, 0), // total group weight
+        maxCount: ranked[0]?.count ?? 1,
+        keywords: ranked.slice(0, 15),
       };
     }));
 
+    // Global "Top palabras de alto volumen" — best keywords across ALL groups,
+    // weighted by group popularity so LATAM/US/BR bubble up.
+    const globalMap = new Map<string, { keyword: string; score: number; groups: string[]; countries: string[] }>();
+    for (const g of results) {
+      for (const k of g.keywords) {
+        const key = k.keyword.toLowerCase().trim();
+        const entry = globalMap.get(key) ?? { keyword: k.keyword, score: 0, groups: [], countries: [] };
+        entry.score += k.score; // sum of normalized 0-100 across groups
+        if (!entry.groups.includes(g.label)) entry.groups.push(g.label);
+        for (const c of k.countries) if (!entry.countries.includes(c)) entry.countries.push(c);
+        globalMap.set(key, entry);
+      }
+    }
+    const globalTop = Array.from(globalMap.values())
+      .sort((a, b) => b.score - a.score || b.groups.length - a.groups.length)
+      .slice(0, 20);
+
     return new Response(
-      JSON.stringify({ query: q, results }),
+      JSON.stringify({ query: q, results, globalTop }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
     );
   } catch (err) {

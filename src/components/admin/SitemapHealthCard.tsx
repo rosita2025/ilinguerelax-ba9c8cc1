@@ -92,24 +92,25 @@ const SitemapHealthCard = () => {
               : `${included}/${dbSlugs.length} productos activos incluidos · ${sitemapSlugs.size} URLs totales en /sitemaps/sitemap-products-1.xml`}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <Button size="sm" variant="outline" onClick={load} disabled={loading} className="flex-1 sm:flex-none">
             <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} />
             Revisar
           </Button>
-          <Button size="sm" onClick={() => notifyAll()} disabled={notifying || loading}>
+          <Button size="sm" onClick={() => notifyAll()} disabled={notifying || loading} className="flex-1 sm:flex-none whitespace-normal text-xs sm:text-sm h-auto py-1.5">
             {notifying ? (
-              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+              <Loader2 className="w-4 h-4 mr-1 animate-spin shrink-0" />
             ) : (
-              <RefreshCw className="w-4 h-4 mr-1" />
+              <RefreshCw className="w-4 h-4 mr-1 shrink-0" />
             )}
-            Notificar a Google + IndexNow
+            <span className="sm:hidden">Notificar Google + IndexNow</span>
+            <span className="hidden sm:inline">Notificar a Google + IndexNow</span>
           </Button>
           <a
             href={SITEMAP_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline w-full sm:w-auto justify-center sm:justify-start"
           >
             Ver sitemap <ExternalLink className="w-3 h-3" />
           </a>

@@ -415,6 +415,9 @@ const AdminSEO = () => {
           {report && (
             <div className="grid gap-6 lg:grid-cols-2">
               <Card className="p-4">
+          {report && (
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card className="p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Search className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-semibold">Top Queries</h2>
@@ -424,30 +427,47 @@ const AdminSEO = () => {
                     Aún no hay consultas registradas.
                   </p>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="text-left text-xs uppercase text-muted-foreground border-b">
-                        <tr>
-                          <th className="py-2 pr-2">Query</th>
-                          <th className="py-2 px-2 text-right">Clics</th>
-                          <th className="py-2 px-2 text-right">Impr.</th>
-                          <th className="py-2 px-2 text-right">CTR</th>
-                          <th className="py-2 pl-2 text-right">Pos.</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.queries.map((r) => (
-                          <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
-                            <td className="py-2 pr-2 max-w-[220px] truncate" title={r.key}>{r.key}</td>
-                            <td className="py-2 px-2 text-right font-medium">{r.clicks}</td>
-                            <td className="py-2 px-2 text-right">{r.impressions}</td>
-                            <td className="py-2 px-2 text-right">{fmtPct(r.ctr)}</td>
-                            <td className="py-2 pl-2 text-right">{fmtPos(r.position)}</td>
+                  <>
+                    {/* Mobile card list */}
+                    <div className="md:hidden space-y-2">
+                      {report.queries.map((r) => (
+                        <div key={r.key} className="rounded-md border border-border/60 p-2.5">
+                          <div className="text-sm font-medium break-words leading-snug" title={r.key}>{r.key}</div>
+                          <div className="mt-1.5 grid grid-cols-4 gap-1 text-[11px] text-muted-foreground">
+                            <div><span className="block text-foreground font-semibold">{r.clicks}</span>Clics</div>
+                            <div><span className="block text-foreground font-semibold">{r.impressions}</span>Impr.</div>
+                            <div><span className="block text-foreground font-semibold">{fmtPct(r.ctr)}</span>CTR</div>
+                            <div><span className="block text-foreground font-semibold">{fmtPos(r.position)}</span>Pos.</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Desktop table */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="text-left text-xs uppercase text-muted-foreground border-b">
+                          <tr>
+                            <th className="py-2 pr-2">Query</th>
+                            <th className="py-2 px-2 text-right">Clics</th>
+                            <th className="py-2 px-2 text-right">Impr.</th>
+                            <th className="py-2 px-2 text-right">CTR</th>
+                            <th className="py-2 pl-2 text-right">Pos.</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {report.queries.map((r) => (
+                            <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
+                              <td className="py-2 pr-2 max-w-[220px] truncate" title={r.key}>{r.key}</td>
+                              <td className="py-2 px-2 text-right font-medium">{r.clicks}</td>
+                              <td className="py-2 px-2 text-right">{r.impressions}</td>
+                              <td className="py-2 px-2 text-right">{fmtPct(r.ctr)}</td>
+                              <td className="py-2 pl-2 text-right">{fmtPos(r.position)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </Card>
 
@@ -459,36 +479,57 @@ const AdminSEO = () => {
                 {report.pages.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Sin páginas registradas aún.</p>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="text-left text-xs uppercase text-muted-foreground border-b">
-                        <tr>
-                          <th className="py-2 pr-2">Página</th>
-                          <th className="py-2 px-2 text-right">Clics</th>
-                          <th className="py-2 px-2 text-right">Impr.</th>
-                          <th className="py-2 px-2 text-right">CTR</th>
-                          <th className="py-2 pl-2 text-right">Pos.</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.pages.map((r) => (
-                          <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
-                            <td className="py-2 pr-2 max-w-[260px] truncate">
-                              <a href={r.key} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 hover:text-primary" title={r.key}>
-                                <span className="truncate">{shortPath(r.key)}</span>
-                                <ExternalLink className="w-3 h-3 shrink-0" />
-                              </a>
-                            </td>
-                            <td className="py-2 px-2 text-right font-medium">{r.clicks}</td>
-                            <td className="py-2 px-2 text-right">{r.impressions}</td>
-                            <td className="py-2 px-2 text-right">{fmtPct(r.ctr)}</td>
-                            <td className="py-2 pl-2 text-right">{fmtPos(r.position)}</td>
+                  <>
+                    {/* Mobile card list */}
+                    <div className="md:hidden space-y-2">
+                      {report.pages.map((r) => (
+                        <div key={r.key} className="rounded-md border border-border/60 p-2.5">
+                          <a href={r.key} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-sm font-medium hover:text-primary break-all" title={r.key}>
+                            <span className="break-all">{shortPath(r.key)}</span>
+                            <ExternalLink className="w-3 h-3 shrink-0" />
+                          </a>
+                          <div className="mt-1.5 grid grid-cols-4 gap-1 text-[11px] text-muted-foreground">
+                            <div><span className="block text-foreground font-semibold">{r.clicks}</span>Clics</div>
+                            <div><span className="block text-foreground font-semibold">{r.impressions}</span>Impr.</div>
+                            <div><span className="block text-foreground font-semibold">{fmtPct(r.ctr)}</span>CTR</div>
+                            <div><span className="block text-foreground font-semibold">{fmtPos(r.position)}</span>Pos.</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Desktop table */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="text-left text-xs uppercase text-muted-foreground border-b">
+                          <tr>
+                            <th className="py-2 pr-2">Página</th>
+                            <th className="py-2 px-2 text-right">Clics</th>
+                            <th className="py-2 px-2 text-right">Impr.</th>
+                            <th className="py-2 px-2 text-right">CTR</th>
+                            <th className="py-2 pl-2 text-right">Pos.</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {report.pages.map((r) => (
+                            <tr key={r.key} className="border-b border-border/50 hover:bg-muted/30">
+                              <td className="py-2 pr-2 max-w-[260px] truncate">
+                                <a href={r.key} target="_blank" rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 hover:text-primary" title={r.key}>
+                                  <span className="truncate">{shortPath(r.key)}</span>
+                                  <ExternalLink className="w-3 h-3 shrink-0" />
+                                </a>
+                              </td>
+                              <td className="py-2 px-2 text-right font-medium">{r.clicks}</td>
+                              <td className="py-2 px-2 text-right">{r.impressions}</td>
+                              <td className="py-2 px-2 text-right">{fmtPct(r.ctr)}</td>
+                              <td className="py-2 pl-2 text-right">{fmtPos(r.position)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </Card>
             </div>

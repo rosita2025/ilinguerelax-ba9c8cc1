@@ -261,8 +261,19 @@ Deno.serve(async (req) => {
 
       for (const cart of rows ?? []) {
         const email = (cart.email || "").trim().toLowerCase();
-        const items = Array.isArray(cart.items) ? (cart.items as Array<{ id?: string; q?: number }>) : [];
-        if (!email || items.length === 0) { stat.skipped++; continue; }
+        const rawItems = Array.isArray(cart.items) ? (cart.items as Array<{ id?: string; q?: number }>) : [];
+        if (!email || rawItems.length === 0) { stat.skipped++; continue; }
+
+        // Filter out SKUs the buyer already purchased (manual/hotmart/digital sends).
+        // This is the fix for "cliente compró 1,000 palabras y aun así recibió
+        // recordatorio de 1,000 palabras". If nothing remains, mark cart converted.
+        const purchased = await getPurchasedSkus(admin, email);
+        const items = rawItems.filter((it) => it?.id && !purchased.has(String(it.id).toLowerCase()));
+        if (items.length === 0) {
+          await admin.from("persistent_carts").update({ converted: true }).eq("email", email);
+          stat.skipped++;
+          continue;
+        }
 
         // ATOMIC CLAIM: sentinel row per (email, step) using the existing
         // UNIQUE(email, product_sku, step) constraint. If another cron already

@@ -141,6 +141,17 @@ export const AdminNav = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+            title="Cerrar sesión"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Salir</span>
+          </Button>
+          </div>
         </div>
       </div>
     </nav>

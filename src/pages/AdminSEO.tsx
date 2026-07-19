@@ -859,16 +859,8 @@ const AdminSEO = () => {
                       {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
                       Verificar solo pendientes
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => checkMultiIndex()}
-                      disabled={multiLoading}
-                      title="Verificar Bing, Yandex, DuckDuckGo y Brave"
-                    >
-                      {multiLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
-                      Verificar buscadores
-                    </Button>
+
+
 
 
                     <Button
@@ -1001,21 +993,8 @@ const AdminSEO = () => {
                           <span>·</span>
                           <span>{p.published ? "Publicado" : "Borrador"}</span>
                         </div>
-                        <div className="flex items-center gap-3 flex-wrap text-[11px]">
-                          {(["bing", "yandex", "duckduckgo", "brave"] as EngineName[]).map((eng) => {
-                            const e = multiStatus[p.slug]?.[eng];
-                            const glyph = e?.indexed === true ? "✓" : e?.indexed === false ? "✗" : "—";
-                            const color = e?.indexed === true ? "text-green-600 dark:text-green-400"
-                              : e?.indexed === false ? "text-destructive"
-                              : "text-muted-foreground";
-                            return (
-                              <span key={eng} className="flex items-center gap-1">
-                                <span className="capitalize text-muted-foreground">{eng}</span>
-                                <span className={`font-semibold ${color}`}>{glyph}</span>
-                              </span>
-                            );
-                          })}
-                        </div>
+
+
                         <div className="flex items-center gap-2 pt-1 border-t">
                           <Button
                             variant="outline"
@@ -1029,18 +1008,8 @@ const AdminSEO = () => {
                               : <RefreshCw className="w-3 h-3 mr-1" />}
                             Google
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 text-xs flex-1"
-                            onClick={() => checkMultiIndex([p.slug])}
-                            disabled={multiRowLoading === p.slug}
-                          >
-                            {multiRowLoading === p.slug
-                              ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                              : <RefreshCw className="w-3 h-3 mr-1" />}
-                            Buscadores
-                          </Button>
+
+
                           {!p.google_index_requested_at && (verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) ? (
                             <Button
                               size="sm"
@@ -1071,10 +1040,8 @@ const AdminSEO = () => {
                         <th className="py-2 px-2">Fecha</th>
                         <th className="py-2 px-2">Estado</th>
                         <th className="py-2 px-2">Google</th>
-                        <th className="py-2 px-2 text-center">Bing</th>
-                        <th className="py-2 px-2 text-center">Yandex</th>
-                        <th className="py-2 px-2 text-center">DuckDuckGo</th>
-                        <th className="py-2 pl-2 text-center">Brave</th>
+
+
                       </tr>
 
                     </thead>
@@ -1188,39 +1155,8 @@ const AdminSEO = () => {
                                 )}
                               </div>
                             </td>
-                            {(["bing", "yandex", "duckduckgo", "brave"] as EngineName[]).map((eng, i) => {
-                              const e = multiStatus[p.slug]?.[eng];
-                              const isLast = i === 3;
-                              const glyph = e?.indexed === true ? "✓" : e?.indexed === false ? "✗" : "—";
-                              const color = e?.indexed === true ? "text-green-600 dark:text-green-400"
-                                : e?.indexed === false ? "text-destructive"
-                                : "text-muted-foreground";
-                              const title = e?.note
-                                ? `${eng}: ${e.note}`
-                                : e?.checkedAt
-                                  ? `Verificado ${new Date(e.checkedAt).toLocaleString("es-ES")}`
-                                  : "Sin verificar";
-                              return (
-                                <td key={eng} className={`py-2 px-2 text-center ${isLast ? "pl-2" : ""}`}>
-                                  <div className="flex flex-col items-center gap-0.5">
-                                    <span className={`text-base font-semibold ${color}`} title={title}>{glyph}</span>
-                                    {isLast && (
-                                      <button
-                                        type="button"
-                                        onClick={() => checkMultiIndex([p.slug])}
-                                        disabled={multiRowLoading === p.slug}
-                                        className="text-muted-foreground hover:text-primary transition-colors"
-                                        title="Volver a verificar en Bing, Yandex, DuckDuckGo y Brave"
-                                      >
-                                        {multiRowLoading === p.slug
-                                          ? <Loader2 className="w-3 h-3 animate-spin" />
-                                          : <RefreshCw className="w-3 h-3" />}
-                                      </button>
-                                    )}
-                                  </div>
-                                </td>
-                              );
-                            })}
+
+
 
                           </tr>
                         );

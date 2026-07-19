@@ -329,8 +329,8 @@ const ProductCountryGrouped = ({ rows }: { rows: PCRow[] }) => {
               {filtered.map((g) => {
                 const open = !!expanded[g.product_id];
                 return (
-                  <>
-                    <tr key={g.product_id} className="border-b border-border/40 hover:bg-muted/40 cursor-pointer" onClick={() => setExpanded((s) => ({ ...s, [g.product_id]: !s[g.product_id] }))}>
+                  <Fragment key={g.product_id}>
+                    <tr className="border-b border-border/40 hover:bg-muted/40 cursor-pointer" onClick={() => setExpanded((s) => ({ ...s, [g.product_id]: !s[g.product_id] }))}>
                       <td className="py-2 pr-3 max-w-xs">
                         <span className="mr-1 text-muted-foreground">{open ? "▾" : "▸"}</span>
                         <span className="font-medium">{g.name || g.product_id}</span>

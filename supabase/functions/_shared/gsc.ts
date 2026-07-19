@@ -1,10 +1,7 @@
 /**
- * Google Search Console helpers.
- *
- * Uses the Lovable connector gateway (google_search_console) so tokens
- * refresh automatically. All calls swallow errors — SEO propagation must
- * never block the caller.
+ * Google Search Console helpers + indexing_events logging.
  */
+import { logIndexingEvents, type IndexingEvent } from "./indexingLog.ts";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 const SITE_CANDIDATES = [
@@ -30,28 +27,46 @@ function headers() {
   };
 }
 
-/**
- * Resubmit every sitemap to Google Search Console. Google will re-crawl
- * within hours and discover the new/updated product URLs.
- */
 export async function resubmitSitemapsGSC(): Promise<void> {
   const h = headers();
   if (!h) return;
+  const events: IndexingEvent[] = [];
   const tasks: Promise<unknown>[] = [];
   for (const site of SITE_CANDIDATES) {
     for (const sitemap of SITEMAPS) {
       const url = `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps/${encodeURIComponent(sitemap)}`;
-      tasks.push(fetch(url, { method: "PUT", headers: h }).catch(() => null));
+      tasks.push(
+        fetch(url, { method: "PUT", headers: h })
+          .then((res) => {
+            events.push({
+              url: sitemap,
+              channel: "gsc_sitemap",
+              target: site,
+              status: res.ok ? "sent" : "error",
+              http_status: res.status,
+            });
+          })
+          .catch((err) => {
+            events.push({
+              url: sitemap,
+              channel: "gsc_sitemap",
+              target: site,
+              status: "error",
+              detail: (err as Error).message.slice(0, 240),
+            });
+          })
+      );
     }
   }
   await Promise.allSettled(tasks);
+  await logIndexingEvents(events);
 }
 
-/** Read Google's current URL status. The Inspection API cannot request
- * indexing and does not add the URL to Google's crawl queue. */
+/** Read Google's current URL status via the Inspection API. */
 export async function inspectUrlGSC(inspectionUrl: string): Promise<void> {
   const h = headers();
   if (!h) return;
+  const events: IndexingEvent[] = [];
   for (const site of SITE_CANDIDATES) {
     try {
       const res = await fetch(`${GATEWAY}/v1/urlInspection/index:inspect`, {
@@ -59,9 +74,40 @@ export async function inspectUrlGSC(inspectionUrl: string): Promise<void> {
         headers: h,
         body: JSON.stringify({ inspectionUrl, siteUrl: site }),
       });
-      if (res.ok) return;
-    } catch {
-      /* swallow */
+      if (res.ok) {
+        let verdict = "sent";
+        try {
+          const data = await res.clone().json();
+          const state = data?.inspectionResult?.indexStatusResult?.coverageState as string | undefined;
+          if (state) {
+            const lower = state.toLowerCase();
+            verdict = lower.includes("submitted and indexed") || lower.includes("indexed") ? "validated" : "sent";
+            events.push({
+              url: inspectionUrl,
+              channel: "gsc_inspect",
+              target: site,
+              status: verdict as IndexingEvent["status"],
+              http_status: res.status,
+              detail: state.slice(0, 240),
+            });
+          } else {
+            events.push({ url: inspectionUrl, channel: "gsc_inspect", target: site, status: "sent", http_status: res.status });
+          }
+        } catch {
+          events.push({ url: inspectionUrl, channel: "gsc_inspect", target: site, status: "sent", http_status: res.status });
+        }
+        await logIndexingEvents(events);
+        return;
+      }
+    } catch (err) {
+      events.push({
+        url: inspectionUrl,
+        channel: "gsc_inspect",
+        target: site,
+        status: "error",
+        detail: (err as Error).message.slice(0, 240),
+      });
     }
   }
+  await logIndexingEvents(events);
 }

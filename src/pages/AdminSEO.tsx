@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target } from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
@@ -67,30 +67,46 @@ const AdminSEO = () => {
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
-  const [indexStatus, setIndexStatus] = useState<Record<string, { verdict: string; coverageState: string; lastCrawlTime?: string | null }>>({});
+  type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };
+  const INDEX_CACHE_KEY = "ilr_gsc_index_cache_v1";
+  const [indexStatus, setIndexStatus] = useState<Record<string, IndexEntry>>(() => {
+    try { return JSON.parse(localStorage.getItem(INDEX_CACHE_KEY) || "{}"); } catch { return {}; }
+  });
   const [indexLoading, setIndexLoading] = useState(false);
+  const [rowLoading, setRowLoading] = useState<string | null>(null);
 
-  const checkIndexing = async () => {
-    if (genPosts.length === 0) return;
-    setIndexLoading(true);
+  const persistIndex = (next: Record<string, IndexEntry>) => {
+    setIndexStatus(next);
+    try { localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify(next)); } catch { /* noop */ }
+  };
+
+  const checkIndexing = async (slugsFilter?: string[]) => {
+    const targets = slugsFilter
+      ? genPosts.filter((p) => slugsFilter.includes(p.slug))
+      : genPosts.slice(0, 25);
+    if (targets.length === 0) return;
+    const isSingle = !!slugsFilter && slugsFilter.length === 1;
+    if (isSingle) setRowLoading(slugsFilter![0]); else setIndexLoading(true);
     try {
-      const urls = genPosts.slice(0, 25).map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+      const urls = targets.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
       const { data, error } = await supabase.functions.invoke("gsc-inspect-urls", {
         body: { adminKey, urls },
       });
       if (error) throw error;
       const results = (data as { results?: Array<{ url: string; verdict: string; coverageState: string; lastCrawlTime?: string | null }> })?.results ?? [];
-      const map: Record<string, { verdict: string; coverageState: string; lastCrawlTime?: string | null }> = {};
+      const now = Date.now();
+      const merged: Record<string, IndexEntry> = { ...indexStatus };
       for (const r of results) {
         const slug = r.url.split("/blog/")[1];
-        if (slug) map[slug] = { verdict: r.verdict, coverageState: r.coverageState, lastCrawlTime: r.lastCrawlTime };
+        if (slug) merged[slug] = { verdict: r.verdict, coverageState: r.coverageState, lastCrawlTime: r.lastCrawlTime, checkedAt: now };
       }
-      setIndexStatus(map);
-      toast.success("Estado de indexación actualizado");
+      persistIndex(merged);
+      if (!isSingle) toast.success("Estado de indexación actualizado");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al consultar Google Search Console");
     } finally {
       setIndexLoading(false);
+      setRowLoading(null);
     }
   };
 
@@ -187,6 +203,22 @@ const AdminSEO = () => {
     void loadGenPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
+
+  // Auto-verify indexing for posts without a fresh status (>24h old or never checked).
+  useEffect(() => {
+    if (genPosts.length === 0 || !adminKey) return;
+    const STALE_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const stale = genPosts
+      .slice(0, 25)
+      .filter((p) => {
+        const s = indexStatus[p.slug];
+        return !s || (now - s.checkedAt) > STALE_MS;
+      })
+      .map((p) => p.slug);
+    if (stale.length > 0) void checkIndexing(stale);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [genPosts, adminKey]);
 
 
   const applyPreset = (d: number) => {
@@ -608,7 +640,7 @@ const AdminSEO = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={checkIndexing}
+                    onClick={() => checkIndexing()}
                     disabled={indexLoading}
                   >
                     {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
@@ -667,14 +699,34 @@ const AdminSEO = () => {
                               )}
                             </td>
                             <td className="py-2 pl-2">
-                              <span className={`text-xs font-medium ${badgeClass}`} title={idx?.coverageState || ""}>
-                                {label}
-                              </span>
-                              {idx?.coverageState && idx.coverageState !== "—" && (
-                                <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">
-                                  {idx.coverageState}
+                              <div className="flex items-start gap-2">
+                                <div className="min-w-0">
+                                  <span className={`text-xs font-medium ${badgeClass}`} title={idx?.coverageState || ""}>
+                                    {label}
+                                  </span>
+                                  {idx?.coverageState && idx.coverageState !== "—" && (
+                                    <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+                                      {idx.coverageState}
+                                    </div>
+                                  )}
+                                  {idx?.checkedAt && (
+                                    <div className="text-[10px] text-muted-foreground">
+                                      Verificado {new Date(idx.checkedAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                    </div>
+                                  )}
                                 </div>
-                              )}
+                                <button
+                                  type="button"
+                                  onClick={() => checkIndexing([p.slug])}
+                                  disabled={rowLoading === p.slug}
+                                  className="text-muted-foreground hover:text-primary transition-colors mt-0.5"
+                                  title="Volver a verificar en Google"
+                                >
+                                  {rowLoading === p.slug
+                                    ? <Loader2 className="w-3 h-3 animate-spin" />
+                                    : <RefreshCw className="w-3 h-3" />}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );

@@ -275,6 +275,18 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // DAILY THROTTLE: máximo 1 email de carrito abandonado por cliente
+        // cada 24h, sin importar cuántos steps o productos tenga. Evita que
+        // el mismo comprador reciba 2-3 correos el mismo día.
+        const since24h = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+        const { count: recentCount } = await admin
+          .from("cart_reminder_sends")
+          .select("id", { count: "exact", head: true })
+          .eq("email", email)
+          .eq("status", "sent")
+          .gte("created_at", since24h);
+        if ((recentCount ?? 0) > 0) { stat.skipped++; continue; }
+
         // ATOMIC CLAIM: sentinel row per (email, step) using the existing
         // UNIQUE(email, product_sku, step) constraint. If another cron already
         // claimed this (email, step), the upsert is a no-op and we skip.

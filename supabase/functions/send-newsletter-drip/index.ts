@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
 
       try {
         const res = await sendEmail({
-          from: FROM, to: email, replyTo: REPLY_TO, subject, html, text, provider: 'resend',
+          from: FROM, to: email, replyTo: REPLY_TO, subject, html, text,
         } as any);
         if ((res as any)?.error) throw new Error((res as any).error.message || 'send failed');
 

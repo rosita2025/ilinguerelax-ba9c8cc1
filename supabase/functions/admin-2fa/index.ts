@@ -146,10 +146,12 @@ Deno.serve(async (req) => {
       if (!timingSafeEqual(new TextEncoder().encode(provided), new TextEncoder().encode(codeHash))) {
         return new Response(JSON.stringify({ error: "invalid_code" }), { status: 401, headers: JSON_HEADERS });
       }
-      const sessionExp = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12h
+      const remember = body?.remember === true;
+      const ttlSeconds = remember ? 7 * 24 * 60 * 60 : 12 * 60 * 60; // 7d trusted / 12h
+      const sessionExp = Math.floor(Date.now() / 1000) + ttlSeconds;
       const token = await signAdmin2FAToken({ kind: "session", iat: Math.floor(Date.now() / 1000), exp: sessionExp });
       return new Response(
-        JSON.stringify({ token, expiresAt: sessionExp * 1000 }),
+        JSON.stringify({ token, expiresAt: sessionExp * 1000, remembered: remember }),
         { headers: JSON_HEADERS },
       );
     }

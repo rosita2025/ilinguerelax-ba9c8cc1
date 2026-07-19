@@ -1084,6 +1084,70 @@ const AdminSEO = () => {
               );
             })()}
 
+            {bulkUrls && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 p-0 sm:p-4" role="dialog" aria-modal="true">
+                <div className="w-full sm:max-w-lg rounded-t-lg sm:rounded-lg border bg-background shadow-xl flex flex-col max-h-[85vh]">
+                  <div className="flex items-start justify-between gap-3 p-4 border-b">
+                    <div>
+                      <h3 className="font-semibold">Solicitar indexación ({bulkUrls.length})</h3>
+                      <p className="text-xs text-muted-foreground">Copia cada URL y pégala en Search Console para pedir indexación manual.</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setBulkUrls(null)} aria-label="Cerrar">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="p-3 border-b flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => copyText(bulkUrls.map((u) => u.url).join("\n"), `${bulkUrls.length} URLs copiadas`)}
+                    >
+                      <Copy className="h-3.5 w-3.5 mr-1" /> Copiar todas
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        window.open(
+                          `https://search.google.com/search-console?resource_id=${encodeURIComponent(GSC_RESOURCE)}`,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 mr-1" /> Abrir Search Console
+                    </Button>
+                  </div>
+                  <div className="overflow-y-auto p-3 space-y-2">
+                    {bulkUrls.map((u) => (
+                      <div key={u.slug} className="border rounded-md p-2 space-y-1.5">
+                        <p className="text-xs font-medium line-clamp-2">{u.title}</p>
+                        <p className="text-[11px] font-mono text-muted-foreground break-all">{u.url}</p>
+                        <div className="flex gap-1.5">
+                          <Button size="sm" variant="outline" className="h-7 text-[11px] flex-1" onClick={() => copyText(u.url, "URL copiada")}>
+                            <Copy className="h-3 w-3 mr-1" /> Copiar
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="h-7 text-[11px] flex-1"
+                            onClick={async () => {
+                              await copyText(u.url, "URL copiada — pégala arriba en GSC");
+                              window.open(
+                                `https://search.google.com/search-console?resource_id=${encodeURIComponent(GSC_RESOURCE)}`,
+                                "_blank",
+                                "noopener,noreferrer",
+                              );
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" /> GSC
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {copyPost && (() => {
               const postUrl = `https://ilinguerelax.com/blog/${copyPost.slug}`;
               return (

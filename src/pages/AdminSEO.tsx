@@ -765,6 +765,20 @@ const AdminSEO = () => {
                                     ? <Loader2 className="w-3 h-3 animate-spin" />
                                     : <RefreshCw className="w-3 h-3" />}
                                 </button>
+                                {(verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => requestIndexing(p.slug)}
+                                    disabled={requestLoading === p.slug}
+                                    className="text-amber-600 hover:text-amber-500 dark:text-amber-400 transition-colors mt-0.5"
+                                    title="Solicitar indexación en Google Search Console"
+                                  >
+                                    {requestLoading === p.slug
+                                      ? <Loader2 className="w-3 h-3 animate-spin" />
+                                      : <Zap className="w-3 h-3" />}
+                                  </button>
+                                )}
+
                               </div>
                             </td>
                           </tr>

@@ -41,6 +41,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import AdminPWAMeta from "./AdminPWAMeta";
+import AdminTrustBadge from "./AdminTrustBadge";
 
 type Group = { label: string; items: Array<{ to: string; label: string; icon: any }> };
 
@@ -115,6 +116,7 @@ export const AdminNav = () => {
           </NavLink>
 
           <div className="ml-auto flex items-center gap-2">
+          <AdminTrustBadge />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">

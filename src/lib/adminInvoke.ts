@@ -45,6 +45,20 @@ export function getAdmin2FAToken(): string | null {
   return session ? session.token : null;
 }
 
+export type Admin2FASessionInfo = {
+  active: boolean;
+  persistent: boolean; // true = "Confiar 7 días"
+  expiresAt: number | null;
+};
+
+export function getAdmin2FASessionInfo(): Admin2FASessionInfo {
+  const persisted = readFromStore(localStorage);
+  if (persisted) return { active: true, persistent: true, expiresAt: persisted.exp };
+  const session = readFromStore(sessionStorage);
+  if (session) return { active: true, persistent: false, expiresAt: session.exp };
+  return { active: false, persistent: false, expiresAt: null };
+}
+
 export function setAdmin2FAToken(token: string, expiresAt: number, persist = false) {
   try {
     // Clear both to avoid stale mismatches.

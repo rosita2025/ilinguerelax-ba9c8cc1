@@ -25,6 +25,48 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
+  // ---------- Manual mode: test-send or force-resend a specific step ----------
+  if (req.method === 'POST') {
+    let body: any = null;
+    try { body = await req.json(); } catch (_) { body = null; }
+    const mode = body?.mode as 'test' | 'resend' | undefined;
+    if (mode === 'test' || mode === 'resend') {
+      const email = String(body?.email || '').trim().toLowerCase();
+      const stepKey = String(body?.template_key || '') as DripStepKey;
+      const stepNum = Number(body?.step ?? 0);
+      const lang = normalizeLang(body?.language);
+      const name = body?.name ? String(body.name) : undefined;
+      if (!email || !stepKey) {
+        return json({ ok: false, error: 'email and template_key are required' }, 400);
+      }
+      try {
+        const { subject, html, text } = getDripCopy(stepKey, lang, name);
+        const finalSubject = mode === 'test' ? `[TEST] ${subject}` : subject;
+        const res = await sendEmail({ from: FROM, to: email, replyTo: REPLY_TO, subject: finalSubject, html, text } as any);
+        if ((res as any)?.error) throw new Error((res as any).error.message || 'send failed');
+
+        if (mode === 'resend' && stepNum > 0) {
+          const { data: existing } = await admin
+            .from('newsletter_drip_sends').select('id').ilike('email', email).eq('step', stepNum).maybeSingle();
+          if (existing) {
+            await admin.from('newsletter_drip_sends')
+              .update({ status: 'sent', sent_at: new Date().toISOString(), error: null,
+                        metadata: { template: stepKey, manual_resend: true } })
+              .eq('id', (existing as any).id);
+          } else {
+            await admin.from('newsletter_drip_sends').insert({
+              email, step: stepNum, status: 'sent', sent_at: new Date().toISOString(),
+              metadata: { template: stepKey, manual_resend: true },
+            });
+          }
+        }
+        return json({ ok: true, mode, email, template_key: stepKey, lang });
+      } catch (e: any) {
+        return json({ ok: false, error: String(e?.message || e) }, 500);
+      }
+    }
+  }
+
   const stats = { processed: 0, sent: 0, skipped: 0, failed: 0 };
 
   try {

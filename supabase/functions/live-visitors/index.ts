@@ -125,24 +125,39 @@ const classifyReferrer = (ref: string | null): { source: string; channel: string
         || host.includes("resend") || host.includes("sendgrid") || host.includes("mcusercontent")) {
       return base("Email", "Email");
     }
-    if (host.includes("google")) {
-      // Google email/redirect wrapper (google.com/url?q=...) also counts as redirect
-      return base("Google", "Orgánico / búsqueda");
-    }
-    if (host.includes("bing") || host.includes("yahoo") || host.includes("duckduckgo")) return base(cap(host), "Orgánico / búsqueda");
+    if (host.includes("google")) return base("Google", "Orgánico / búsqueda");
+    if (host.includes("bing")) return base("Bing", "Orgánico / búsqueda");
+    if (host.includes("yahoo")) return base("Yahoo", "Orgánico / búsqueda");
+    if (host.includes("duckduckgo")) return base("DuckDuckGo", "Orgánico / búsqueda");
+    if (host.includes("baidu")) return base("Baidu", "Orgánico / búsqueda");
+    if (host.includes("yandex")) return base("Yandex", "Orgánico / búsqueda");
+    if (host.includes("naver")) return base("Naver", "Orgánico / búsqueda");
+    if (host.includes("daum") || host.includes("kakao")) return base("Daum/Kakao", "Orgánico / búsqueda");
+    if (host.includes("ecosia") || host.includes("qwant") || host.includes("brave")) return base(cap(host.split(".")[0]), "Orgánico / búsqueda");
     if (host.includes("facebook") || host.includes("fb.") || host === "l.facebook.com" || host === "lm.facebook.com") return base("Facebook", "Social");
     if (host.includes("instagram") || host === "l.instagram.com") return base("Instagram", "Social");
+    if (host.includes("messenger")) return base("Messenger", "Social");
     if (host.includes("threads")) return base("Threads", "Social");
     if (host.includes("tiktok")) return base("TikTok", "Social");
     if (host.includes("youtube") || host === "youtu.be") return base("YouTube", "Social");
     if (host.includes("twitter") || host === "t.co" || host.includes("x.com")) return base("Twitter/X", "Social");
+    if (host.includes("linkedin") || host === "lnkd.in") return base("LinkedIn", "Social");
+    if (host.includes("pinterest") || host === "pin.it") return base("Pinterest", "Social");
+    if (host.includes("reddit") || host === "redd.it") return base("Reddit", "Social");
+    if (host.includes("snapchat")) return base("Snapchat", "Social");
+    if (host.includes("weibo")) return base("Weibo", "Social");
+    if (host.includes("wechat") || host.includes("weixin")) return base("WeChat", "Social");
+    if (host.includes("line.me") || host === "line.me") return base("LINE", "Social");
+    if (host.includes("telegram") || host === "t.me") return base("Telegram", "Mensaje directo");
     if (host.includes("whatsapp") || host === "wa.me" || host === "l.wl.co") return base("WhatsApp", "Mensaje directo");
+    if (host.includes("discord")) return base("Discord", "Social");
     if (host.includes("hotmart")) return base("Hotmart", "Pago");
     if (host.includes("paypal")) return base("PayPal", "Pago");
     if (host.includes("stripe")) return base("Stripe", "Pago");
     if (host.includes("mercadopago") || host.includes("mercadolibre")) return base("MercadoPago", "Pago");
     if (host.includes("binance")) return base("Binance", "Pago");
     if (host.includes("amazon")) return base("Amazon", "Marketplace");
+    if (host.includes("shopify") || host.includes("myshopify")) return base("Shopify", "Marketplace");
     if (host.includes("ilinguerelax") || host.includes("lovable")) return base("Interno", "Interno");
     return base(host, "Referido");
   } catch { return { source: "Directo", channel: "Directo / manual", campaign: null }; }

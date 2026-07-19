@@ -123,23 +123,22 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     navigate("/admin", { replace: true });
   };
 
-  // Validate stored session on mount — if 2FA expired or key rotated, boot back.
+  // Validate a stored session on mount. Only erase it after a definitive
+  // invalid response; iOS PWAs can briefly report a network error while waking.
   useEffect(() => {
     if (!adminKey) return;
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase.functions.invoke("manage-reviews", {
-        body: { action: "list", adminKey },
+      const { data, error } = await supabase.functions.invoke("admin-2fa", {
+        body: { action: "validate", adminKey },
       });
       if (cancelled) return;
-      const err = (data as { error?: string; code?: string } | null);
-      if (error || err?.error) {
+      const result = data as { valid?: boolean } | null;
+      if (!error && result?.valid === false) {
         clearAdminKey();
         resetAdmin2FAToken();
         setAdminKey("");
-        if (err?.code === "TWO_FA_REQUIRED") {
-          toast.info("Sesión 2FA expirada. Verifica de nuevo.");
-        }
+        toast.info("Sesión expirada. Verifica de nuevo.");
       }
     })();
     return () => { cancelled = true; };

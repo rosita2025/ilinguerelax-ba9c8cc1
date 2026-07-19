@@ -114,6 +114,13 @@ async function sendViaResend(args: SendArgs): Promise<SendResult> {
 }
 
 export async function sendEmail(args: SendArgs): Promise<SendResult> {
+  // Explicit per-call override wins (used for newsletters to avoid Brevo click tracking).
+  if (args.provider === 'resend') return sendViaResend(args);
+  if (args.provider === 'brevo') {
+    const p = await sendViaBrevo(args);
+    if (!p.error) return p;
+    return sendViaResend(args);
+  }
   // Provider selection: EMAIL_PROVIDER = "brevo" (default) | "resend" | "auto"
   const provider = (Deno.env.get("EMAIL_PROVIDER") ?? "brevo").toLowerCase();
 

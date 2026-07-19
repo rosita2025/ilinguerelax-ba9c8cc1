@@ -21,29 +21,37 @@ const SUBJECTS_ES: Record<Step, string> = {
   7200: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
 };
 
-const STEP_LABEL: Record<Step, string> = {
-  30: "30 min", 1440: "Día 1", 7200: "Día 5",
-};
+interface ProductItem {
+  name: string;
+  ctaUrl: string;
+  origin: "hotmart" | "tienda";
+}
 
 function buildHtml(opts: {
   name?: string;
-  productName?: string;
-  ctaUrl: string;
-  origin: "hotmart" | "tienda";
+  products: ProductItem[];
   step: Step;
   coupon?: string;
 }): string {
   const greeting = opts.name ? `Hola ${opts.name}` : "Hola";
-  const product = opts.productName || "tu producto";
-  const ctaLabel = opts.origin === "hotmart" ? "Retomar compra en Hotmart" : "Recuperar mi carrito";
-  const platformNote = opts.origin === "hotmart"
-    ? "Retomarás la compra desde donde la dejaste en Hotmart (pago 100% seguro)."
-    : "Retomarás el checkout en nuestra tienda con los productos que dejaste.";
   const stepMsg: Record<Step, string> = {
-    30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tu carrito sigue reservado — retómalo en 1 clic.",
+    30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tus productos siguen reservados — retómalos en 1 clic.",
     1440: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
     7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
+
+  const productsHtml = opts.products.map((p) => {
+    const ctaLabel = p.origin === "hotmart" ? "Retomar en Hotmart" : "Recuperar carrito";
+    return `
+      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:600;color:#0f172a">${p.name}</div>
+        <div style="margin-top:10px">
+          <a href="${p.ctaUrl}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:10px;font-size:14px">${ctaLabel} →</a>
+        </div>
+      </div>`;
+  }).join("");
+
+  const plural = opts.products.length > 1;
 
   return `<!DOCTYPE html>
 <html lang="es"><body style="margin:0;padding:0;background:#f6f7fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#0f172a;">
@@ -51,21 +59,12 @@ function buildHtml(opts: {
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.08)">
         <tr><td style="padding:28px 28px 8px">
-          <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:${opts.origin === "hotmart" ? "#fff7ed" : "#f0fdfa"};color:${opts.origin === "hotmart" ? "#c2410c" : "#0f766e"};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">
-            ${opts.origin === "hotmart" ? "Hotmart" : "Tienda iLingue Relax"} · ${STEP_LABEL[opts.step]}
-          </div>
-          <h1 style="margin:12px 0 4px;font-size:22px;line-height:1.3">${greeting} 👋</h1>
-          <p style="margin:0 0 12px;color:#475569">${stepMsg[opts.step]}</p>
+          <h1 style="margin:0 0 8px;font-size:22px;line-height:1.3">${greeting} 👋</h1>
+          <p style="margin:0 0 16px;color:#475569">${stepMsg[opts.step]}</p>
         </td></tr>
-        <tr><td style="padding:8px 28px 4px">
-          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px">
-            <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em">Producto en tu carrito</div>
-            <div style="font-size:16px;font-weight:600;margin-top:4px">${product}</div>
-            <div style="font-size:12px;color:#94a3b8;margin-top:6px">${platformNote}</div>
-          </div>
-        </td></tr>
-        <tr><td align="center" style="padding:20px 28px 8px">
-          <a href="${opts.ctaUrl}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:12px;font-size:15px">${ctaLabel} →</a>
+        <tr><td style="padding:0 28px 4px">
+          <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">${plural ? `${opts.products.length} productos en tu carrito` : "Producto en tu carrito"}</div>
+          ${productsHtml}
         </td></tr>
         ${opts.coupon ? `<tr><td align="center" style="padding:4px 28px 16px">
           <div style="display:inline-block;padding:8px 14px;border:1px dashed #f97316;border-radius:8px;background:#fff7ed;color:#c2410c;font-weight:600;font-size:14px">Código: ${opts.coupon}</div>

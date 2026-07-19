@@ -5,15 +5,18 @@ const corsHeaders = adminCorsHeaders;
 
 // Grouped markets. Countries inside a group share a language & are aggregated
 // (dedup by frequency = "alto volumen" within the group).
+type Country = { gl: string; name: string; weight: number };
 type Group = {
   id: string;
   label: string;
   flag: string;
   langName: string; // for AI translation
   hl: string;
-  countries: { gl: string; name: string }[];
+  countries: Country[];
 };
 
+// Country weight ≈ relative internet-search market size (population × Google share, normalized).
+// Bigger markets contribute more to the "alto volumen" score.
 const GROUPS: Group[] = [
   {
     id: "es-latam",
@@ -22,24 +25,87 @@ const GROUPS: Group[] = [
     langName: "Spanish (Latin America)",
     hl: "es",
     countries: [
-      { gl: "mx", name: "México" }, { gl: "ar", name: "Argentina" },
-      { gl: "co", name: "Colombia" }, { gl: "cl", name: "Chile" },
-      { gl: "pe", name: "Perú" }, { gl: "ve", name: "Venezuela" },
-      { gl: "ec", name: "Ecuador" }, { gl: "uy", name: "Uruguay" },
-      { gl: "py", name: "Paraguay" }, { gl: "bo", name: "Bolivia" },
-      { gl: "cr", name: "Costa Rica" }, { gl: "gt", name: "Guatemala" },
-      { gl: "do", name: "R. Dominicana" }, { gl: "pa", name: "Panamá" },
+      { gl: "mx", name: "México", weight: 13 }, { gl: "ar", name: "Argentina", weight: 4.5 },
+      { gl: "co", name: "Colombia", weight: 5 }, { gl: "cl", name: "Chile", weight: 2 },
+      { gl: "pe", name: "Perú", weight: 3.3 }, { gl: "ve", name: "Venezuela", weight: 2.8 },
+      { gl: "ec", name: "Ecuador", weight: 1.7 }, { gl: "uy", name: "Uruguay", weight: 0.35 },
+      { gl: "py", name: "Paraguay", weight: 0.7 }, { gl: "bo", name: "Bolivia", weight: 1.2 },
+      { gl: "cr", name: "Costa Rica", weight: 0.5 }, { gl: "gt", name: "Guatemala", weight: 1.7 },
+      { gl: "do", name: "R. Dominicana", weight: 1.1 }, { gl: "pa", name: "Panamá", weight: 0.43 },
     ],
   },
-  { id: "es-es", label: "Español (España)", flag: "🇪🇸", langName: "Spanish (Spain)", hl: "es", countries: [{ gl: "es", name: "España" }] },
-  { id: "en-na", label: "English — USA + Canada", flag: "🇺🇸", langName: "English (North America)", hl: "en", countries: [{ gl: "us", name: "USA" }, { gl: "ca", name: "Canada" }] },
-  { id: "en-uk", label: "English (UK)", flag: "🇬🇧", langName: "English (UK)", hl: "en", countries: [{ gl: "gb", name: "UK" }] },
-  { id: "fr-fr", label: "Français (FR)", flag: "🇫🇷", langName: "French", hl: "fr", countries: [{ gl: "fr", name: "Francia" }] },
-  { id: "ko-kr", label: "한국어 (KR)", flag: "🇰🇷", langName: "Korean", hl: "ko", countries: [{ gl: "kr", name: "Corea" }] },
-  { id: "it-it", label: "Italiano (IT)", flag: "🇮🇹", langName: "Italian", hl: "it", countries: [{ gl: "it", name: "Italia" }] },
-  { id: "pt-br", label: "Português (BR)", flag: "🇧🇷", langName: "Portuguese (Brazil)", hl: "pt", countries: [{ gl: "br", name: "Brasil" }] },
-  { id: "sv-se", label: "Svenska (SE)", flag: "🇸🇪", langName: "Swedish", hl: "sv", countries: [{ gl: "se", name: "Suecia" }] },
+  { id: "es-es", label: "Español (España)", flag: "🇪🇸", langName: "Spanish (Spain)", hl: "es", countries: [{ gl: "es", name: "España", weight: 4.7 }] },
+  { id: "en-na", label: "English — USA + Canada", flag: "🇺🇸", langName: "English (North America)", hl: "en", countries: [{ gl: "us", name: "USA", weight: 33 }, { gl: "ca", name: "Canada", weight: 3.8 }] },
+  { id: "en-uk", label: "English (UK)", flag: "🇬🇧", langName: "English (UK)", hl: "en", countries: [{ gl: "gb", name: "UK", weight: 6.7 }] },
+  { id: "fr-fr", label: "Français (FR)", flag: "🇫🇷", langName: "French", hl: "fr", countries: [{ gl: "fr", name: "Francia", weight: 6.5 }] },
+  { id: "ko-kr", label: "한국어 (KR)", flag: "🇰🇷", langName: "Korean", hl: "ko", countries: [{ gl: "kr", name: "Corea", weight: 5.1 }] },
+  { id: "it-it", label: "Italiano (IT)", flag: "🇮🇹", langName: "Italian", hl: "it", countries: [{ gl: "it", name: "Italia", weight: 6 }] },
+  { id: "pt-br", label: "Português (BR)", flag: "🇧🇷", langName: "Portuguese (Brazil)", hl: "pt", countries: [{ gl: "br", name: "Brasil", weight: 21 }] },
+  { id: "sv-se", label: "Svenska (SE)", flag: "🇸🇪", langName: "Swedish", hl: "sv", countries: [{ gl: "se", name: "Suecia", weight: 1 }] },
 ];
+
+// Intent modifiers that mark high-value keywords for content writing.
+// "informational + commercial" bias — great for blog posts targeting SEO.
+const INTENT_TOKENS = [
+  // ES
+  "como", "cómo", "que", "qué", "por que", "por qué", "cual", "cuál", "mejor", "mejores",
+  "gratis", "pdf", "curso", "cursos", "aprender", "libro", "libros", "online", "app",
+  "para principiantes", "principiantes", "rapido", "rápido", "facil", "fácil",
+  "ejercicios", "ejemplos", "guia", "guía", "trucos", "tips",
+  // EN
+  "how", "what", "why", "best", "free", "learn", "course", "book", "online",
+  "for beginners", "beginners", "fast", "easy", "tips", "guide", "examples", "practice",
+  // FR
+  "comment", "meilleur", "gratuit", "apprendre", "cours", "livre", "débutant",
+  // IT
+  "come", "migliore", "gratis", "imparare", "corso", "libro", "principianti",
+  // PT
+  "como", "melhor", "grátis", "aprender", "curso", "livro", "iniciantes",
+  // KO
+  "무료", "배우기", "공부", "책", "강의",
+  // SV
+  "hur", "bäst", "gratis", "lära", "kurs", "bok",
+];
+
+function scoreKeyword(opts: {
+  keyword: string;
+  seed: string;
+  positionsByCountry: { country: Country; position: number }[];
+}): number {
+  const { keyword, seed, positionsByCountry } = opts;
+  const kw = keyword.toLowerCase().trim();
+  const seedTokens = seed.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+
+  // 1) Weighted country presence + position decay (Google returns most-searched first).
+  //    score contribution = countryWeight * (1 / (1 + position))
+  let base = 0;
+  for (const { country, position } of positionsByCountry) {
+    const posDecay = 1 / (1 + position); // pos 0 => 1.0, pos 9 => 0.1
+    base += country.weight * posDecay;
+  }
+
+  // 2) Seed relevance — must contain at least one seed token (else penalize hard)
+  const hasSeedToken = seedTokens.some((t) => kw.includes(t));
+  const seedBoost = hasSeedToken ? 1 : 0.3;
+
+  // 3) Intent modifier boost (commercial/informational)
+  const hasIntent = INTENT_TOKENS.some((t) => kw.includes(t));
+  const intentBoost = hasIntent ? 1.35 : 1;
+
+  // 4) Length shape: 2-6 words = sweet spot; 1 word = too generic; >8 = too long-tail
+  const wordCount = kw.split(/\s+/).length;
+  let lengthMul = 1;
+  if (wordCount <= 1) lengthMul = 0.5;
+  else if (wordCount === 2) lengthMul = 0.9;
+  else if (wordCount <= 6) lengthMul = 1.1;
+  else if (wordCount <= 8) lengthMul = 0.85;
+  else lengthMul = 0.6;
+
+  // 5) Char sanity — kill weird stubs
+  if (kw.length < 4) return 0;
+
+  return base * seedBoost * intentBoost * lengthMul;
+}
 
 async function fetchSuggestions(query: string, hl: string, gl: string): Promise<string[]> {
   const url = `https://suggestqueries.google.com/complete/search?client=firefox&hl=${hl}&gl=${gl}&q=${encodeURIComponent(query)}`;

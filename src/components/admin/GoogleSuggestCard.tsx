@@ -15,7 +15,13 @@ interface GroupResult {
   countryCount: number;
   popularity: number;
   maxCount: number;
-  keywords: { keyword: string; count: number; countries: string[] }[];
+  keywords: { keyword: string; count: number; countries: string[]; score: number }[];
+}
+interface GlobalTop {
+  keyword: string;
+  score: number;
+  groups: string[];
+  countries: string[];
 }
 
 const GoogleSuggestCard = () => {
@@ -23,16 +29,18 @@ const GoogleSuggestCard = () => {
   const [query, setQuery] = useState("aprender coreano");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GroupResult[]>([]);
+  const [globalTop, setGlobalTop] = useState<GlobalTop[]>([]);
 
   const run = async () => {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const { data, error } = await adminInvoke<{ results?: GroupResult[] }>("google-suggest", {
+      const { data, error } = await adminInvoke<{ results?: GroupResult[]; globalTop?: GlobalTop[] }>("google-suggest", {
         body: { adminKey, query, translate: true },
       });
       if (error) throw error;
       setResults(data?.results ?? []);
+      setGlobalTop(data?.globalTop ?? []);
     } catch (e: any) {
       const message = String(e?.message ?? e);
       toast.error(
@@ -50,8 +58,9 @@ const GoogleSuggestCard = () => {
     toast.success("Copiado");
   };
 
-  // Sort groups by popularity (unique keywords surfaced) desc
+  // Sort groups by popularity (sum of scores) desc
   const sorted = [...results].sort((a, b) => b.popularity - a.popularity);
+  const maxGlobalScore = globalTop[0]?.score || 1;
 
   return (
     <Card className="p-4 space-y-4">

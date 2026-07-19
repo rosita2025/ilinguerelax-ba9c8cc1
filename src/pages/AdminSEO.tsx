@@ -69,14 +69,24 @@ const AdminSEO = () => {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
   type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };
+  type EngineName = "bing" | "yandex" | "duckduckgo" | "brave";
+  type EngineEntry = { indexed: boolean | null; note?: string; checkedAt: number };
+  type MultiEntry = Partial<Record<EngineName, EngineEntry>>;
   const INDEX_CACHE_KEY = "ilr_gsc_index_cache_v1";
+  const MULTI_CACHE_KEY = "ilr_multi_index_cache_v1";
   const [indexStatus, setIndexStatus] = useState<Record<string, IndexEntry>>(() => {
     try { return JSON.parse(localStorage.getItem(INDEX_CACHE_KEY) || "{}"); } catch { return {}; }
   });
+  const [multiStatus, setMultiStatus] = useState<Record<string, MultiEntry>>(() => {
+    try { return JSON.parse(localStorage.getItem(MULTI_CACHE_KEY) || "{}"); } catch { return {}; }
+  });
   const [indexLoading, setIndexLoading] = useState(false);
+  const [multiLoading, setMultiLoading] = useState(false);
+  const [multiRowLoading, setMultiRowLoading] = useState<string | null>(null);
   const [rowLoading, setRowLoading] = useState<string | null>(null);
   const [requestLoading, setRequestLoading] = useState<string | null>(null);
   const [copyPost, setCopyPost] = useState<{ slug: string; title: string } | null>(null);
+
 
   const GSC_RESOURCE = "sc-domain:ilinguerelax.com";
   const gscInspectUrl = (url: string) =>

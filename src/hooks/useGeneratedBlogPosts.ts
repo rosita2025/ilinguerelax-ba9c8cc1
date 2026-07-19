@@ -14,10 +14,11 @@ interface Row {
   tags: string[] | null;
   read_time: string;
   created_at: string;
+  updated_at: string;
   related_products: string[] | null;
 }
 
-function toBlogPost(r: Row): BlogPost {
+function toBlogPost(r: Row): BlogPost & { updatedAt?: string } {
   return {
     id: `gen-${r.id}`,
     slug: r.slug,
@@ -31,8 +32,11 @@ function toBlogPost(r: Row): BlogPost {
     category: r.category,
     tags: r.tags ?? [],
     relatedProducts: r.related_products ?? [],
+    updatedAt: r.updated_at,
   };
 }
+
+const COLS = "id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,updated_at,related_products";
 
 export function useGeneratedBlogPosts() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -43,7 +47,7 @@ export function useGeneratedBlogPosts() {
     (async () => {
       const { data } = await supabase
         .from("generated_blog_posts")
-        .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,related_products")
+        .select(COLS)
         .eq("published", true)
         .order("created_at", { ascending: false });
       if (!cancelled) {
@@ -59,12 +63,22 @@ export function useGeneratedBlogPosts() {
   return { posts, loading };
 }
 
-export async function fetchGeneratedBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+export async function fetchGeneratedBlogPostBySlug(slug: string): Promise<(BlogPost & { updatedAt?: string }) | null> {
   const { data } = await supabase
     .from("generated_blog_posts")
-    .select("id,slug,title,excerpt,content,image,author,category,tags,read_time,created_at,related_products")
+    .select(COLS)
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();
   return data ? toBlogPost(data as Row) : null;
 }
+
+export async function fetchGeneratedBlogPosts(): Promise<BlogPost[]> {
+  const { data } = await supabase
+    .from("generated_blog_posts")
+    .select(COLS)
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+  return (data ?? []).map((r) => toBlogPost(r as Row));
+}
+

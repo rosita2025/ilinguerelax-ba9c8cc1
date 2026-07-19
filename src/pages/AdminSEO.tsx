@@ -119,7 +119,7 @@ const AdminSEO = () => {
       await supabase.functions.invoke("request-google-indexing", {
         body: { adminKey, urls: [url], siteUrl: "https://ilinguerelax.com/" },
       });
-      setTimeout(() => { void checkIndexing([slug]); }, 4000);
+        toast.success("Solicitud preparada. Google puede tardar horas o días en actualizar el estado real.", { duration: 7000 });
     } catch { /* background ping failure is not user-facing */ }
     setRequestLoading(null);
   };
@@ -759,11 +759,14 @@ const AdminSEO = () => {
                           verdict === "FAIL" ? "text-destructive" :
                           verdict === "NEUTRAL" ? "text-muted-foreground" :
                           "text-muted-foreground";
+                        const coverage = idx?.coverageState?.toLowerCase() || "";
                         const label =
                           verdict === "PASS" ? "Indexado" :
+                          coverage.includes("crawled") || coverage.includes("rastreada") ? "Rastreada, aún sin indexar" :
+                          coverage.includes("discovered") || coverage.includes("descubierta") ? "Descubierta, aún sin rastrear" :
                           verdict === "PARTIAL" ? "Parcial" :
                           verdict === "FAIL" ? "No indexado" :
-                          verdict === "NEUTRAL" ? "Descubierta" :
+                          verdict === "NEUTRAL" ? "Pendiente de Google" :
                           verdict ? "Desconocido" : "—";
                         return (
                           <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30">

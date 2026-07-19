@@ -146,22 +146,46 @@ export const AdminNav = () => {
                 </div>
               ))}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                onClick={logout}
+                className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+              >
                 <LogOut className="w-4 h-4" />
                 Cerrar sesión
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={logout}
-            className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-            title="Cerrar sesión"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Salir</span>
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                title="Cerrar sesión"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Salir</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Cerrar sesión del panel admin?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tendrás que ingresar tu clave y el código 2FA de nuevo la próxima vez que abras la app.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={logout}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Sí, cerrar sesión
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           </div>
         </div>
       </div>

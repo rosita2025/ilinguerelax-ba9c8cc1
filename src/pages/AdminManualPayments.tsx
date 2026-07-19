@@ -3,8 +3,10 @@ import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe, Pencil, S
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+
 import { useAdminKey } from "@/components/admin/AdminGate";
 
 interface ManualPayment {

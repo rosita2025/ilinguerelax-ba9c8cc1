@@ -15,7 +15,13 @@ interface GroupResult {
   countryCount: number;
   popularity: number;
   maxCount: number;
-  keywords: { keyword: string; count: number; countries: string[] }[];
+  keywords: { keyword: string; count: number; countries: string[]; score: number }[];
+}
+interface GlobalTop {
+  keyword: string;
+  score: number;
+  groups: string[];
+  countries: string[];
 }
 
 const GoogleSuggestCard = () => {
@@ -23,16 +29,18 @@ const GoogleSuggestCard = () => {
   const [query, setQuery] = useState("aprender coreano");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GroupResult[]>([]);
+  const [globalTop, setGlobalTop] = useState<GlobalTop[]>([]);
 
   const run = async () => {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const { data, error } = await adminInvoke<{ results?: GroupResult[] }>("google-suggest", {
+      const { data, error } = await adminInvoke<{ results?: GroupResult[]; globalTop?: GlobalTop[] }>("google-suggest", {
         body: { adminKey, query, translate: true },
       });
       if (error) throw error;
       setResults(data?.results ?? []);
+      setGlobalTop(data?.globalTop ?? []);
     } catch (e: any) {
       const message = String(e?.message ?? e);
       toast.error(
@@ -50,8 +58,9 @@ const GoogleSuggestCard = () => {
     toast.success("Copiado");
   };
 
-  // Sort groups by popularity (unique keywords surfaced) desc
+  // Sort groups by popularity (sum of scores) desc
   const sorted = [...results].sort((a, b) => b.popularity - a.popularity);
+  const maxGlobalScore = globalTop[0]?.score || 1;
 
   return (
     <Card className="p-4 space-y-4">
@@ -60,9 +69,11 @@ const GoogleSuggestCard = () => {
         <h2 className="text-xl font-semibold">Explorador Google Suggest (agrupado por idioma / región)</h2>
       </div>
       <p className="text-xs text-muted-foreground">
-        Escribe una semilla y el sistema la traduce a cada mercado antes de consultar Google. Grupos: <strong>LATAM (14 países juntos)</strong>, España, USA+Canadá, UK, Francia, Corea, Italia, Brasil y Suecia.
-        Dentro de cada grupo las palabras se ordenan por <strong>frecuencia entre países = alto volumen</strong>. El número <TrendingUp className="w-3 h-3 inline" /> <code>3×</code> significa que aparece en 3 países del grupo.
+        Escribe una semilla y el sistema la traduce a cada mercado antes de consultar Google. Ranking ponderado por{" "}
+        <strong>posición en Google + tamaño de mercado + intención (curso, pdf, cómo, mejor…) + longitud útil</strong>.
+        El <TrendingUp className="w-3 h-3 inline" /> es un score 0-100 relativo: mientras más alto, mejor keyword para escribir contenido.
       </p>
+
 
       <div className="flex gap-2">
         <Input
@@ -76,6 +87,40 @@ const GoogleSuggestCard = () => {
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
         </Button>
       </div>
+
+      {globalTop.length > 0 && (
+        <div className="border-2 border-primary/40 rounded-lg p-3 bg-primary/5 space-y-2">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold text-sm">Top palabras de alto volumen (global, ponderado)</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Mejores keywords para escribir contenido AHORA — combinadas de todos los mercados, ordenadas por score real (posición Google × peso país × intención).
+          </p>
+          <ol className="grid gap-1 md:grid-cols-2 text-xs">
+            {globalTop.map((k, i) => {
+              const rel = Math.round((k.score / maxGlobalScore) * 100);
+              return (
+                <li key={i} className="flex items-center gap-2 border-b border-primary/20 pb-1">
+                  <span className="w-6 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                  <div className="w-14 h-2 bg-muted rounded overflow-hidden shrink-0" title={`Score ${rel}/100`}>
+                    <div className="h-full bg-primary" style={{ width: `${rel}%` }} />
+                  </div>
+                  <span className="shrink-0 text-[10px] font-mono text-primary font-bold w-8 text-right">{rel}</span>
+                  <span className="truncate flex-1" title={`${k.groups.length} grupos · ${k.countries.join(", ")}`}>
+                    {k.keyword}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">{k.groups.length}g</span>
+                  <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
+                    <Copy className="w-3 h-3" />
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
+
 
       {sorted.length > 0 && (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -107,9 +152,13 @@ const GoogleSuggestCard = () => {
                   {r.keywords.map((k, i) => (
                     <li key={i} className="flex items-center gap-2 border-b pb-1">
                       <span className="w-5 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                      <div className="w-10 h-1.5 bg-muted rounded overflow-hidden shrink-0" title={`Score ${k.score}/100`}>
+                        <div className="h-full bg-primary" style={{ width: `${k.score}%` }} />
+                      </div>
+                      <span className="shrink-0 text-[10px] font-mono text-primary w-6 text-right">{k.score}</span>
                       {k.count > 1 && (
                         <span
-                          className="shrink-0 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold"
+                          className="shrink-0 px-1 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-bold"
                           title={`Aparece en: ${k.countries.join(", ")}`}
                         >
                           {k.count}×

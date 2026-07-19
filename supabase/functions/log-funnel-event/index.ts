@@ -58,10 +58,30 @@ const loadFilters = async (supabase: ReturnType<typeof createClient>) => {
 };
 
 // Built-in heuristics — catch automation frameworks even without custom filters
-const BUILTIN_BOT_UA = /(bot|crawler|spider|slurp|bingpreview|semrush|ahrefs|mj12|petalbot|yandex|baiduspider|pingdom|uptime|gtmetrix|pagespeed|lighthouse|headlesschrome|phantomjs|puppeteer|playwright|selenium|chrome-lighthouse|wget|curl|python-requests|python-urllib|scrapy|node-fetch|okhttp|axios\/|go-http-client|java\/|libwww|apachebench|masscan|zgrab|nmap|ruby|perl|http_request)/i;
+const BUILTIN_BOT_UA = /(bot|crawler|spider|slurp|bingpreview|semrush|ahrefs|mj12|petalbot|yandex|baiduspider|pingdom|uptime|gtmetrix|pagespeed|lighthouse|headlesschrome|headless|phantomjs|puppeteer|playwright|selenium|chrome-lighthouse|wget|curl|python-requests|python-urllib|scrapy|node-fetch|okhttp|axios\/|go-http-client|java\/|libwww|apachebench|masscan|zgrab|nmap|ruby|perl|http_request|facebookexternalhit|meta-externalagent|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|embedly|preview|monitor|check|scan|fetch|http-client|dataminr|feedfetcher|applebot|duckduckbot|sogou|exabot|archive\.org|screaming|siteauditor|ia_archiver|serpstat)/i;
 
-const classifyBot = (ua: string, sessionId: string | null, referer: string, filters: typeof filtersCache): string | null => {
-  // 1. no session id at all → almost certainly non-browser
+// Datacenter / cloud provider IP ranges (partial — catches common scraper sources)
+const isDatacenterIp = (ip: string | null): boolean => {
+  if (!ip) return false;
+  // AWS, GCP, Azure, DigitalOcean, OVH, Hetzner, Linode common ranges (coarse /8-/12 prefixes)
+  const dc = [
+    /^3\./, /^13\./, /^15\./, /^18\./, /^34\./, /^35\./, /^40\./, /^44\./, /^52\./, /^54\./, /^64\.225\./, /^99\./, /^104\.196\./, /^107\.20\./,
+    /^128\.199\./, /^134\.209\./, /^138\.197\./, /^139\.59\./, /^142\.93\./, /^143\.198\./, /^146\.190\./, /^147\.182\./, /^157\.230\./, /^159\.203\./,
+    /^159\.65\./, /^159\.89\./, /^161\.35\./, /^164\.90\./, /^165\.22\./, /^165\.227\./, /^167\.71\./, /^167\.99\./, /^168\.62\./, /^170\.187\./,
+    /^172\.104\./, /^172\.105\./, /^188\.166\./, /^192\.34\./, /^192\.81\./, /^198\.199\./, /^199\.36\./, /^206\.189\./, /^207\.154\./, /^209\.97\./,
+  ];
+  return dc.some((r) => r.test(ip));
+};
+
+const classifyBot = (
+  ua: string,
+  sessionId: string | null,
+  referer: string,
+  filters: typeof filtersCache,
+  headers: Headers,
+  ip: string | null,
+): string | null => {
+  // 1. no session id → almost certainly non-browser
   if (!sessionId || sessionId.length < 6) return "no_session";
   // 2. missing / trivial user-agent
   if (!ua || ua.length < 15) return "empty_ua";
@@ -70,14 +90,24 @@ const classifyBot = (ua: string, sessionId: string | null, referer: string, filt
   // 4. custom filters (admin-managed)
   if (filters.ua && filters.ua.test(ua)) return "bot_ua_custom";
   if (filters.referrer && filters.referrer.test(referer)) return "bot_referrer";
-  // 5. burst rate — >RATE_MAX_EVENTS events in 60s from same session
+  // 5. real browsers ALWAYS send Accept-Language — scrapers often skip it
+  const acceptLang = headers.get("accept-language") || "";
+  if (!acceptLang || acceptLang.length < 2) return "no_accept_language";
+  // 6. modern browsers send Sec-Fetch-* + Sec-Ch-Ua on Chromium/Edge/Firefox 90+
+  //    Absence of BOTH sec-fetch-site AND sec-ch-ua on a Chrome/Edge UA = scraper mimic
+  const secFetch = headers.get("sec-fetch-site");
+  const secChUa = headers.get("sec-ch-ua");
+  const looksChromium = /Chrome|Edg|OPR/i.test(ua) && !/Firefox/i.test(ua);
+  if (looksChromium && !secFetch && !secChUa) return "no_sec_fetch";
+  // 7. datacenter IP (AWS/GCP/Azure/DO/Linode) → not a real user
+  if (isDatacenterIp(ip)) return "datacenter_ip";
+  // 8. burst rate — >RATE_MAX_EVENTS events in 60s from same session
   const now = Date.now();
   const arr = sessionRate.get(sessionId) || [];
   const recent = arr.filter((t) => now - t < RATE_WINDOW_MS);
   recent.push(now);
   sessionRate.set(sessionId, recent);
   if (recent.length > RATE_MAX_EVENTS) return "burst_rate";
-  // Occasionally prune the map
   if (sessionRate.size > 5000) {
     for (const [k, v] of sessionRate) {
       if (v.every((t) => now - t > RATE_WINDOW_MS)) sessionRate.delete(k);

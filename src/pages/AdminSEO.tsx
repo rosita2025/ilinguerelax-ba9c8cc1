@@ -1040,10 +1040,8 @@ const AdminSEO = () => {
                         <th className="py-2 px-2">Fecha</th>
                         <th className="py-2 px-2">Estado</th>
                         <th className="py-2 px-2">Google</th>
-                        <th className="py-2 px-2 text-center">Bing</th>
-                        <th className="py-2 px-2 text-center">Yandex</th>
-                        <th className="py-2 px-2 text-center">DuckDuckGo</th>
-                        <th className="py-2 pl-2 text-center">Brave</th>
+
+
                       </tr>
 
                     </thead>

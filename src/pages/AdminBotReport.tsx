@@ -61,8 +61,12 @@ export default function AdminBotReport() {
 
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [adminKey]);
   useEffect(() => {
-    const id = setInterval(() => void load(), 5 * 60_000); // refresh 5 min
-    return () => clearInterval(id);
+    // Auto-refresh cada 60s, pausado cuando la pestaña está oculta (ligero para el hosting).
+    const tick = () => { if (!document.hidden) void load(); };
+    const id = setInterval(tick, 60_000);
+    const onVis = () => { if (!document.hidden) void load(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey, pagePath]);
 

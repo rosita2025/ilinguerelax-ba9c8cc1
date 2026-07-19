@@ -368,15 +368,33 @@ serve(async (req) => {
     ]);
     const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 
-    // Build name → SKU map so manual_payments (which store `name`) get grouped correctly
+    // Build name/slug → SKU maps so aggregation collapses duplicate keys
+    // (e.g. URL slug "patrones-especiales-alfabeto..." and display name
+    // "Patrones Especiales, Alfabeto..." must resolve to the same SKU row).
     const nameToSku = new Map<string, string>();
     const skuToName = new Map<string, string>();
+    const slugToSku = new Map<string, string>();
+    const slugify = (s: string) =>
+      s.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     for (const p of (digitalRes.data ?? []) as any[]) {
       if (p.sku && p.name) {
-        nameToSku.set(p.name.trim().toLowerCase(), p.sku);
+        const nameKey = p.name.trim().toLowerCase();
+        nameToSku.set(nameKey, p.sku);
         skuToName.set(p.sku, p.name);
+        slugToSku.set(slugify(p.name), p.sku);
+        slugToSku.set(String(p.sku).toLowerCase(), p.sku);
       }
     }
+    const canonicalProductKey = (raw: string): string => {
+      if (!raw) return raw;
+      const trimmed = String(raw).trim();
+      const lower = trimmed.toLowerCase();
+      return nameToSku.get(lower) || slugToSku.get(lower) || slugToSku.get(slugify(trimmed)) || trimmed;
+    };
+
 
     // ---------- FX rates (USD base) ----------
     // Public, no-key endpoint. Cached in-memory per invocation.
@@ -649,11 +667,28 @@ serve(async (req) => {
       ? ((totals.checkout - totals.purchases) / totals.checkout) * 100
       : 0;
 
-    const byProduct = Array.from(byProductAgg.entries())
-      .filter(([pid, v]) =>
-        pid && pid !== "sin_producto" && pid !== "0" && pid !== "manual" &&
-        (v.views + v.carts + v.purchases + v.pending) > 0,
-      )
+    // Collapse duplicate keys (URL slug vs display name vs SKU) into one row per canonical SKU.
+    const mergedByProduct = new Map<string, { views: number; carts: number; purchases: number; revenue: number; hotmart: number; store: number; pending: number; hotmartPending: number; storePending: number }>();
+    for (const [pid, v] of byProductAgg.entries()) {
+      if (!pid || pid === "sin_producto" || pid === "0" || pid === "manual") continue;
+      if ((v.views + v.carts + v.purchases + v.pending) === 0) continue;
+      const key = canonicalProductKey(pid);
+      const existing = mergedByProduct.get(key);
+      if (!existing) {
+        mergedByProduct.set(key, { ...v });
+      } else {
+        existing.views += v.views;
+        existing.carts += v.carts;
+        existing.purchases += v.purchases;
+        existing.revenue += v.revenue;
+        existing.hotmart += v.hotmart;
+        existing.store += v.store;
+        existing.pending += v.pending;
+        existing.hotmartPending += v.hotmartPending;
+        existing.storePending += v.storePending;
+      }
+    }
+    const byProduct = Array.from(mergedByProduct.entries())
       .map(([product_id, v]) => {
         const source =
           v.hotmart && v.store ? "mixto" :
@@ -706,15 +741,32 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 30);
 
-    // Product × Country breakdown, filtered to products with real activity
+    // Product × Country breakdown, filtered to products with real activity.
+    // Collapse duplicate product keys (slug vs name vs SKU) into one row per (SKU, country).
     const validProductIds = new Set(byProduct.map((p) => p.product_id));
-    const byProductCountry = Array.from(byProductCountryAgg.values())
-      .filter((v) => validProductIds.has(v.product_id) && (v.sessions.size + v.views + v.carts + v.purchases) > 0)
+    const mergedPC = new Map<string, { product_id: string; country: string; sessionsIds: Set<string>; views: number; carts: number; purchases: number; revenue: number }>();
+    for (const v of byProductCountryAgg.values()) {
+      const canon = canonicalProductKey(v.product_id);
+      if (!validProductIds.has(canon)) continue;
+      if ((v.sessions.size + v.views + v.carts + v.purchases) === 0) continue;
+      const k = `${canon}::${v.country}`;
+      let m = mergedPC.get(k);
+      if (!m) {
+        m = { product_id: canon, country: v.country, sessionsIds: new Set(), views: 0, carts: 0, purchases: 0, revenue: 0 };
+        mergedPC.set(k, m);
+      }
+      for (const s of v.sessions) m.sessionsIds.add(s);
+      m.views += v.views;
+      m.carts += v.carts;
+      m.purchases += v.purchases;
+      m.revenue += v.revenue;
+    }
+    const byProductCountry = Array.from(mergedPC.values())
       .map((v) => ({
         product_id: v.product_id,
         name: nameMap.get(v.product_id) || null,
         country: v.country,
-        sessions: v.sessions.size,
+        sessions: v.sessionsIds.size,
         views: v.views,
         carts: v.carts,
         purchases: v.purchases,

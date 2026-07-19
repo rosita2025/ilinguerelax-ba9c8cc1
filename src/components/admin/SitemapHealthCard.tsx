@@ -15,6 +15,20 @@ import { toast } from "sonner";
  */
 const SITEMAP_URL = "https://ilinguerelax.com/sitemaps/sitemap-products-1.xml";
 
+const invokeSitemapNotify = async (body: Record<string, string> = {}) => {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const { data, error } = await supabase.functions.invoke("sitemap-notify", { body });
+    if (!error) return data as { slugs?: string[]; notified?: number };
+
+    lastError = error;
+    if (attempt === 0) await new Promise((resolve) => window.setTimeout(resolve, 800));
+  }
+
+  throw lastError ?? new Error("No se pudo conectar con el servicio de indexación");
+};
+
 const SitemapHealthCard = () => {
   const [loading, setLoading] = useState(true);
   const [notifying, setNotifying] = useState(false);
@@ -27,15 +41,14 @@ const SitemapHealthCard = () => {
     setFetchError(null);
     try {
       const [probeRes, dbRes] = await Promise.all([
-        supabase.functions.invoke("sitemap-notify", { body: { action: "probe" } }),
+        invokeSitemapNotify({ action: "probe" }),
         supabase
           .from("digital_products")
           .select("sku,name,updated_at")
           .eq("active", true)
           .order("updated_at", { ascending: false }),
       ]);
-      if (probeRes.error) throw probeRes.error;
-      const slugs: string[] = (probeRes.data as { slugs?: string[] })?.slugs ?? [];
+      const slugs: string[] = probeRes?.slugs ?? [];
       setSitemapSlugs(new Set(slugs));
       setDbSlugs((dbRes.data ?? []) as { sku: string; name: string; updated_at: string }[]);
     } catch (e) {
@@ -56,17 +69,14 @@ const SitemapHealthCard = () => {
   const notifyAll = async (sku?: string) => {
     setNotifying(true);
     try {
-      const { data, error } = await supabase.functions.invoke("sitemap-notify", {
-        body: sku ? { sku } : {},
-      });
-      if (error) throw error;
+      const data = await invokeSitemapNotify(sku ? { sku } : {});
       toast.success(
         sku
           ? `Producto notificado a Google + IndexNow`
           : `${data?.notified ?? "?"} productos notificados a Google + IndexNow`,
       );
     } catch (e) {
-      toast.error(`Error al notificar: ${(e as Error).message}`);
+      toast.error(`No se pudo notificar. Inténtalo nuevamente: ${(e as Error).message}`);
     } finally {
       setNotifying(false);
     }

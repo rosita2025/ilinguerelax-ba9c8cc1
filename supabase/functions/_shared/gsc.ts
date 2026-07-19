@@ -47,10 +47,8 @@ export async function resubmitSitemapsGSC(): Promise<void> {
   await Promise.allSettled(tasks);
 }
 
-/**
- * Ask Google to inspect a specific URL — this doesn't force indexing but
- * surfaces the URL to Google's crawl queue faster than sitemap discovery.
- */
+/** Read Google's current URL status. The Inspection API cannot request
+ * indexing and does not add the URL to Google's crawl queue. */
 export async function inspectUrlGSC(inspectionUrl: string): Promise<void> {
   const h = headers();
   if (!h) return;

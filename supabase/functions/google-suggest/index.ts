@@ -9,16 +9,30 @@ const corsHeaders = {
 // Each market queries Google Suggest IN ITS OWN LANGUAGE. We translate the
 // user's seed to every target language via Lovable AI before hitting Suggest.
 const LANGUAGES: { hl: string; gl: string; label: string; flag: string; langName: string }[] = [
+  // España + toda LATAM (español)
   { hl: "es", gl: "es", label: "Español (ES)", flag: "🇪🇸", langName: "Spanish (Spain)" },
   { hl: "es", gl: "mx", label: "Español (MX)", flag: "🇲🇽", langName: "Spanish (Mexico)" },
+  { hl: "es", gl: "ar", label: "Español (AR)", flag: "🇦🇷", langName: "Spanish (Argentina)" },
+  { hl: "es", gl: "co", label: "Español (CO)", flag: "🇨🇴", langName: "Spanish (Colombia)" },
+  { hl: "es", gl: "cl", label: "Español (CL)", flag: "🇨🇱", langName: "Spanish (Chile)" },
   { hl: "es", gl: "pe", label: "Español (PE)", flag: "🇵🇪", langName: "Spanish (Peru)" },
+  { hl: "es", gl: "ve", label: "Español (VE)", flag: "🇻🇪", langName: "Spanish (Venezuela)" },
+  { hl: "es", gl: "ec", label: "Español (EC)", flag: "🇪🇨", langName: "Spanish (Ecuador)" },
+  { hl: "es", gl: "uy", label: "Español (UY)", flag: "🇺🇾", langName: "Spanish (Uruguay)" },
+  { hl: "es", gl: "py", label: "Español (PY)", flag: "🇵🇾", langName: "Spanish (Paraguay)" },
+  { hl: "es", gl: "bo", label: "Español (BO)", flag: "🇧🇴", langName: "Spanish (Bolivia)" },
+  { hl: "es", gl: "cr", label: "Español (CR)", flag: "🇨🇷", langName: "Spanish (Costa Rica)" },
+  { hl: "es", gl: "gt", label: "Español (GT)", flag: "🇬🇹", langName: "Spanish (Guatemala)" },
+  { hl: "es", gl: "do", label: "Español (DO)", flag: "🇩🇴", langName: "Spanish (Dominican Republic)" },
+  { hl: "es", gl: "pa", label: "Español (PA)", flag: "🇵🇦", langName: "Spanish (Panama)" },
+  // Otros idiomas objetivo
   { hl: "en", gl: "us", label: "English (US)", flag: "🇺🇸", langName: "English (US)" },
   { hl: "en", gl: "gb", label: "English (UK)", flag: "🇬🇧", langName: "English (UK)" },
   { hl: "fr", gl: "fr", label: "Français (FR)", flag: "🇫🇷", langName: "French" },
   { hl: "ko", gl: "kr", label: "한국어 (KR)", flag: "🇰🇷", langName: "Korean" },
   { hl: "it", gl: "it", label: "Italiano (IT)", flag: "🇮🇹", langName: "Italian" },
   { hl: "pt", gl: "br", label: "Português (BR)", flag: "🇧🇷", langName: "Portuguese (Brazil)" },
-  { hl: "de", gl: "de", label: "Deutsch (DE)", flag: "🇩🇪", langName: "German" },
+  { hl: "sv", gl: "se", label: "Svenska (SE)", flag: "🇸🇪", langName: "Swedish" },
 ];
 
 async function fetchSuggestions(query: string, hl: string, gl: string): Promise<string[]> {

@@ -49,16 +49,34 @@ const GoogleSuggestCard = () => {
   const sorted = [...results].sort((a, b) => b.popularity - a.popularity);
   const maxPop = Math.max(1, ...sorted.map((r) => r.popularity));
 
+  // Aggregate: keywords that appear across multiple markets = high global demand
+  const globalRanking = (() => {
+    const map = new Map<string, { count: number; markets: string[] }>();
+    for (const r of results) {
+      for (const s of r.suggestions) {
+        const key = s.toLowerCase().trim();
+        const entry = map.get(key) ?? { count: 0, markets: [] };
+        entry.count += 1;
+        entry.markets.push(`${r.flag} ${r.label}`);
+        map.set(key, entry);
+      }
+    }
+    return Array.from(map.entries())
+      .map(([kw, v]) => ({ keyword: kw, count: v.count, markets: v.markets }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 25);
+  })();
+
   return (
     <Card className="p-4 space-y-4">
       <div className="flex items-center gap-2">
         <Search className="w-5 h-5 text-primary" />
-        <h2 className="text-xl font-semibold">Explorador Google Suggest (10 idiomas · auto-traducido)</h2>
+        <h2 className="text-xl font-semibold">Explorador Google Suggest (España + LATAM + EN/FR/KR/IT/PT/SE)</h2>
       </div>
       <p className="text-xs text-muted-foreground">
         Escribe una semilla en <strong>tu idioma</strong> (ej: <em>aprender coreano</em>) y el sistema la traduce a cada mercado
-        antes de consultar Google: en US buscará <em>"learn Korean"</em>, en Corea <em>"한국어 배우기"</em>, en Italia <em>"imparare coreano"</em>.
-        La barra <TrendingUp className="w-3 h-3 inline" /> es el <strong>volumen relativo</strong> (nº de autocompletes que devuelve Google — más = más buscado en ese país).
+        antes de consultar Google. Cubre <strong>España + 14 países LATAM</strong> con la misma keyword en español, más EN-US, EN-UK, francés, coreano, italiano, portugués (BR) y sueco.
+        La barra <TrendingUp className="w-3 h-3 inline" /> es el <strong>volumen relativo</strong> por país. El bloque <strong>"Top global"</strong> abajo son long-tails que aparecen en varios países = <strong>alto volumen agregado</strong>.
       </p>
 
       <div className="flex gap-2">
@@ -73,6 +91,29 @@ const GoogleSuggestCard = () => {
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
         </Button>
       </div>
+
+      {globalRanking.length > 0 && (
+        <div className="border rounded-lg p-3 bg-primary/5 space-y-2">
+          <div className="flex items-center gap-2 font-semibold text-sm">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            Top palabras de alto volumen (aparecen en varios países)
+          </div>
+          <ul className="space-y-1 text-xs">
+            {globalRanking.map((k, i) => (
+              <li key={i} className="flex items-center gap-2 border-b pb-1">
+                <span className="w-6 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                <span className="shrink-0 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">
+                  {k.count}×
+                </span>
+                <span className="flex-1 truncate" title={`${k.keyword} — ${k.markets.join(", ")}`}>{k.keyword}</span>
+                <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
+                  <Copy className="w-3 h-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {sorted.length > 0 && (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">

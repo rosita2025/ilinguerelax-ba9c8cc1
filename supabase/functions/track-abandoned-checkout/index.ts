@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
     }
 
 
-    return new Response(JSON.stringify({ ok: true, brevoSynced }), {
+    return new Response(JSON.stringify({ ok: true, brevoSynced, cartToken }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

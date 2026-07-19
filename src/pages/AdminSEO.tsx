@@ -873,7 +873,28 @@ const AdminSEO = () => {
                             </td>
                             <td className="py-2 px-2">{p.category}</td>
                             <td className="py-2 px-2 text-xs text-muted-foreground">
-                              {new Date(p.created_at).toLocaleDateString("es-ES")}
+                              {(() => {
+                                const created = new Date(p.created_at);
+                                const days = Math.floor((Date.now() - created.getTime()) / 86400000);
+                                const hours = Math.floor((Date.now() - created.getTime()) / 3600000);
+                                const ageLabel = days >= 1 ? `hace ${days}d` : `hace ${hours}h`;
+                                const isIndexed = verdict === "PASS";
+                                let eta = "";
+                                let etaColor = "text-muted-foreground";
+                                if (!isIndexed) {
+                                  if (days < 1) { eta = "ETA: 1–7 días"; etaColor = "text-amber-600 dark:text-amber-400"; }
+                                  else if (days < 7) { eta = `ETA: ${7 - days}–${14 - days} días`; etaColor = "text-amber-600 dark:text-amber-400"; }
+                                  else if (days < 14) { eta = "⚠ Retrasado"; etaColor = "text-orange-600 dark:text-orange-400"; }
+                                  else { eta = "⚠ Revisar contenido"; etaColor = "text-destructive"; }
+                                }
+                                return (
+                                  <div className="flex flex-col">
+                                    <span>{created.toLocaleDateString("es-ES")}</span>
+                                    <span className="text-[10px]">{ageLabel}</span>
+                                    {eta && <span className={`text-[10px] font-medium ${etaColor}`}>{eta}</span>}
+                                  </div>
+                                );
+                              })()}
                             </td>
                             <td className="py-2 px-2">
                               {p.published ? (

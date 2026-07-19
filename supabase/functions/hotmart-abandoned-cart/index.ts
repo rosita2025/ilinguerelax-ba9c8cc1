@@ -163,6 +163,7 @@ serve(async (req) => {
         countryReason,
         source: "hotmart",
       });
+      }
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
     }

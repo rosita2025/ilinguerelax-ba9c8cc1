@@ -92,6 +92,29 @@ const GoogleSuggestCard = () => {
         </Button>
       </div>
 
+      {globalRanking.length > 0 && (
+        <div className="border rounded-lg p-3 bg-primary/5 space-y-2">
+          <div className="flex items-center gap-2 font-semibold text-sm">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            Top palabras de alto volumen (aparecen en varios países)
+          </div>
+          <ul className="space-y-1 text-xs">
+            {globalRanking.map((k, i) => (
+              <li key={i} className="flex items-center gap-2 border-b pb-1">
+                <span className="w-6 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                <span className="shrink-0 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">
+                  {k.count}×
+                </span>
+                <span className="flex-1 truncate" title={`${k.keyword} — ${k.markets.join(", ")}`}>{k.keyword}</span>
+                <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
+                  <Copy className="w-3 h-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {sorted.length > 0 && (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {sorted.map((r) => {

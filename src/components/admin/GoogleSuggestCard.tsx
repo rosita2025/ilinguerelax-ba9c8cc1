@@ -102,26 +102,26 @@ const GoogleSuggestCard = () => {
           <p className="text-[11px] text-muted-foreground">
             Mejores keywords para escribir contenido AHORA — combinadas de todos los mercados, ordenadas por score real (posición Google × peso país × intención).
           </p>
-          <ol className="grid gap-1 md:grid-cols-2 text-xs">
+          <ol className="grid gap-1.5 md:gap-1 md:grid-cols-2 text-xs">
             {globalTop.map((k, i) => {
               const rel = Math.round((k.score / maxGlobalScore) * 100);
               return (
-                <li key={i} className="flex items-center gap-2 border-b border-primary/20 pb-1">
-                  <span className="w-6 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                <li key={i} className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-primary/20 pb-1.5">
+                  <span className="w-6 text-[10px] font-mono text-muted-foreground shrink-0">#{i + 1}</span>
                   <div className="w-14 h-2 bg-muted rounded overflow-hidden shrink-0" title={`Score ${rel}/100`}>
                     <div className="h-full bg-primary" style={{ width: `${rel}%` }} />
                   </div>
                   <span className="shrink-0 text-[10px] font-mono text-primary font-bold w-8 text-right">{rel}</span>
-                  <span className="truncate flex-1" title={`${k.groups.length} grupos · ${k.countries.join(", ")}`}>
-                    {k.keyword}
-                  </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">{k.groups.length}g</span>
-                  <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
-                    <Copy className="w-3 h-3" />
+                  <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0 ml-auto" title="Copiar">
+                    <Copy className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
-                    <FileText className="w-3 h-3" />
+                    <FileText className="w-3.5 h-3.5" />
                   </button>
+                  <span className="basis-full text-xs break-words leading-snug" title={`${k.groups.length} grupos · ${k.countries.join(", ")}`}>
+                    {k.keyword}
+                  </span>
                 </li>
               );
             })}

@@ -1263,6 +1263,66 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_drip_config: {
+        Row: {
+          day_offset: number
+          enabled: boolean
+          product_sku: string | null
+          step: number
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          day_offset: number
+          enabled?: boolean
+          product_sku?: string | null
+          step: number
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          day_offset?: number
+          enabled?: boolean
+          product_sku?: string | null
+          step?: number
+          template_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_drip_sends: {
+        Row: {
+          created_at: string
+          email: string
+          error: string | null
+          id: string
+          metadata: Json
+          sent_at: string | null
+          status: string
+          step: number
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          error?: string | null
+          id?: string
+          metadata?: Json
+          sent_at?: string | null
+          status?: string
+          step: number
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          error?: string | null
+          id?: string
+          metadata?: Json
+          sent_at?: string | null
+          status?: string
+          step?: number
+        }
+        Relationships: []
+      }
       paypal_webhook_events: {
         Row: {
           correlation_id: string | null

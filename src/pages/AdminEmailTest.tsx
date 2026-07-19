@@ -543,7 +543,7 @@ const AdminEmailTest = () => {
             );
           })()}
 
-          <DeliveryRetryPanel />
+          
 
 
 

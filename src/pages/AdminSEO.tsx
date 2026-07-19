@@ -95,6 +95,7 @@ const AdminSEO = () => {
   const [rowLoading, setRowLoading] = useState<string | null>(null);
   const [requestLoading, setRequestLoading] = useState<string | null>(null);
   const [copyPost, setCopyPost] = useState<{ slug: string; title: string } | null>(null);
+  const [bulkUrls, setBulkUrls] = useState<Array<{ slug: string; title: string; url: string }> | null>(null);
 
 
   const GSC_RESOURCE = "sc-domain:ilinguerelax.com";
@@ -763,37 +764,30 @@ const AdminSEO = () => {
                     <Button
                       variant="default"
                       size="sm"
-                      onClick={async () => {
-                        const discovered = genPosts.filter((p) => {
+                      onClick={() => {
+                        // Include everything not yet confirmed indexed (PASS). We ignore
+                        // google_index_requested_at because the API call is limited to one
+                        // per URL but Search Console lets the user paste the URL manually
+                        // as many times as needed while it stays "Descubierta".
+                        const pending = filteredPosts.filter((p) => {
                           const v = indexStatus[p.slug]?.verdict;
-                          return !p.google_index_requested_at && (v === "NEUTRAL" || v === "FAIL" || !v);
+                          return v !== "PASS";
                         });
-                        if (discovered.length === 0) {
-                          toast.info("No hay URLs descubiertas o pendientes en la lista visible.");
+                        if (pending.length === 0) {
+                          toast.info("Todas las URLs visibles ya están indexadas.");
                           return;
                         }
-                        setRequestLoading("__bulk__");
-                        try {
-                          const urls = discovered.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
-                          const { data, error } = await supabase.functions.invoke("request-google-indexing", {
-                            body: { adminKey, urls, siteUrl: "https://ilinguerelax.com/" },
-                          });
-                          if (error) throw error;
-                          const result = data as { sent?: number; skipped?: number };
-                          toast.success(`${result.sent ?? urls.length} solicitudes únicas registradas${result.skipped ? `; ${result.skipped} ya estaban solicitadas` : ""}.`);
-                          await loadGenPosts();
-                        } catch (err) {
-                          toast.error(err instanceof Error ? err.message : "Error al solicitar indexación masiva");
-                        } finally {
-                          setRequestLoading(null);
-                        }
+                        setBulkUrls(
+                          pending.map((p) => ({
+                            slug: p.slug,
+                            title: p.title,
+                            url: `https://ilinguerelax.com/blog/${p.slug}`,
+                          })),
+                        );
                       }}
-                      disabled={requestLoading === "__bulk__"}
                     >
-                      {requestLoading === "__bulk__"
-                        ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                        : <Zap className="w-3 h-3 mr-1" />}
-                      Solicitar indexación (descubiertas)
+                      <Zap className="w-3 h-3 mr-1" />
+                      Solicitar indexación ({filteredPosts.filter((p) => indexStatus[p.slug]?.verdict !== "PASS").length})
                     </Button>
                   </div>
                 </div>
@@ -1089,6 +1083,70 @@ const AdminSEO = () => {
               </div>
               );
             })()}
+
+            {bulkUrls && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 p-0 sm:p-4" role="dialog" aria-modal="true">
+                <div className="w-full sm:max-w-lg rounded-t-lg sm:rounded-lg border bg-background shadow-xl flex flex-col max-h-[85vh]">
+                  <div className="flex items-start justify-between gap-3 p-4 border-b">
+                    <div>
+                      <h3 className="font-semibold">Solicitar indexación ({bulkUrls.length})</h3>
+                      <p className="text-xs text-muted-foreground">Copia cada URL y pégala en Search Console para pedir indexación manual.</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setBulkUrls(null)} aria-label="Cerrar">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="p-3 border-b flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => copyText(bulkUrls.map((u) => u.url).join("\n"), `${bulkUrls.length} URLs copiadas`)}
+                    >
+                      <Copy className="h-3.5 w-3.5 mr-1" /> Copiar todas
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        window.open(
+                          `https://search.google.com/search-console?resource_id=${encodeURIComponent(GSC_RESOURCE)}`,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 mr-1" /> Abrir Search Console
+                    </Button>
+                  </div>
+                  <div className="overflow-y-auto p-3 space-y-2">
+                    {bulkUrls.map((u) => (
+                      <div key={u.slug} className="border rounded-md p-2 space-y-1.5">
+                        <p className="text-xs font-medium line-clamp-2">{u.title}</p>
+                        <p className="text-[11px] font-mono text-muted-foreground break-all">{u.url}</p>
+                        <div className="flex gap-1.5">
+                          <Button size="sm" variant="outline" className="h-7 text-[11px] flex-1" onClick={() => copyText(u.url, "URL copiada")}>
+                            <Copy className="h-3 w-3 mr-1" /> Copiar
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="h-7 text-[11px] flex-1"
+                            onClick={async () => {
+                              await copyText(u.url, "URL copiada — pégala arriba en GSC");
+                              window.open(
+                                `https://search.google.com/search-console?resource_id=${encodeURIComponent(GSC_RESOURCE)}`,
+                                "_blank",
+                                "noopener,noreferrer",
+                              );
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" /> GSC
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {copyPost && (() => {
               const postUrl = `https://ilinguerelax.com/blog/${copyPost.slug}`;

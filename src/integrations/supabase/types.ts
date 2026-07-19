@@ -1114,6 +1114,7 @@ export type Database = {
           content: string
           created_at: string
           excerpt: string
+          google_index_requested_at: string | null
           id: string
           image: string
           keyword: string | null
@@ -1131,6 +1132,7 @@ export type Database = {
           content: string
           created_at?: string
           excerpt: string
+          google_index_requested_at?: string | null
           id?: string
           image?: string
           keyword?: string | null
@@ -1148,6 +1150,7 @@ export type Database = {
           content?: string
           created_at?: string
           excerpt?: string
+          google_index_requested_at?: string | null
           id?: string
           image?: string
           keyword?: string | null

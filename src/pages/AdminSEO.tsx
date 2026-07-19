@@ -84,31 +84,32 @@ const AdminSEO = () => {
   const requestIndexing = async (slug: string) => {
     const url = `https://ilinguerelax.com/blog/${slug}`;
     setRequestLoading(slug);
-    // Open the GSC inspection deep link immediately (must happen inside the click
-    // handler or popup blockers will swallow it).
-    const gscTab = window.open(gscInspectUrl(url), "_blank", "noopener,noreferrer");
+    // 1) Copy URL to clipboard so the user can paste it into the GSC top search bar.
     try {
-      const { data, error } = await supabase.functions.invoke("request-google-indexing", {
+      await navigator.clipboard.writeText(url);
+    } catch { /* clipboard may be blocked; toast still guides the user */ }
+    // 2) Open Search Console (property home). The user pastes the URL into the
+    //    top search bar and clicks "Solicitar indexación". Deep-linking to
+    //    /inspect?url=... is unreliable — GSC often ignores the param.
+    const gscTab = window.open(
+      `https://search.google.com/search-console?resource_id=${encodeURIComponent(GSC_RESOURCE)}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+    toast.success(`URL copiada: ${url}. Pégala en la barra superior de Search Console y pulsa "Solicitar indexación".`, { duration: 8000 });
+    if (!gscTab) {
+      toast.info("Abre manualmente Search Console — el navegador bloqueó la pestaña nueva.");
+    }
+    // 3) Fire IndexNow + sitemap ping in background (non-blocking, no error toast).
+    try {
+      await supabase.functions.invoke("request-google-indexing", {
         body: { adminKey, urls: [url], siteUrl: "https://ilinguerelax.com/" },
       });
-      if (error) throw error;
-      const note = (data as { note?: string })?.note;
-      toast.success(
-        note
-          ? "IndexNow + sitemap enviados. Pulsa 'Solicitar indexación' en la pestaña de Google."
-          : "Indexación solicitada. Google la procesará en minutos."
-      );
-      // Re-check status shortly after so the row updates.
       setTimeout(() => { void checkIndexing([slug]); }, 4000);
-      if (!gscTab) {
-        toast.info("Abre manualmente Search Console — el navegador bloqueó la pestaña nueva.");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al solicitar indexación");
-    } finally {
-      setRequestLoading(null);
-    }
+    } catch { /* background ping failure is not user-facing */ }
+    setRequestLoading(null);
   };
+
 
 
   const persistIndex = (next: Record<string, IndexEntry>) => {

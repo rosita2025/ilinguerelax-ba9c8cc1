@@ -77,13 +77,17 @@ const AdminManualPayments = () => {
         body: { action: "list", adminKey },
       });
       if (error) throw error;
-      setOrders(((data as { orders?: ManualPayment[] } | null)?.orders) ?? []);
+      const list = ((data as { orders?: ManualPayment[] } | null)?.orders) ?? [];
+      // Ensure newest orders always appear on top (Shopify-style)
+      list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setOrders(list);
     } catch {
       toast({ title: "Error al cargar órdenes", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     void fetchOrders();

@@ -100,9 +100,14 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     return key && getAdmin2FAToken() ? key : "";
   });
 
-  // Default trust on installed PWA — device is already protected by Face ID / passcode.
+  // Keep admin access for 7 days by default on both desktop and installed PWA.
+  // Without this, desktop used sessionStorage and closing the tab immediately
+  // discarded the login even though only a few minutes had passed.
   const [remember, setRemember] = useState<boolean>(() => {
-    try { return localStorage.getItem(PERSIST_KEY) === "1" || isStandalonePWA(); } catch { return false; }
+    try {
+      const saved = localStorage.getItem(PERSIST_KEY);
+      return saved === null ? true : saved === "1" || isStandalonePWA();
+    } catch { return true; }
   });
   const [stage, setStage] = useState<Stage>("password");
   const [pendingKey, setPendingKey] = useState("");
@@ -362,7 +367,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
                     onChange={(e) => setRemember(e.target.checked)}
                     className="w-4 h-4 accent-primary"
                   />
-                  Confiar en este dispositivo (7 días · Face ID / passcode)
+                  Mantener sesión durante 7 días en este dispositivo
                 </label>
                 <Button type="submit" className="w-full" disabled={loading || otp.length !== 6}>
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verificar y entrar"}

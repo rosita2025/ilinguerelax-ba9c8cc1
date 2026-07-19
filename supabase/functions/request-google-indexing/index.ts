@@ -1,6 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { pingIndexNow, pingSitemap } from '../_shared/indexnow.ts';
+import { logIndexingEvents, type IndexingEvent } from '../_shared/indexingLog.ts';
 
 const ADMIN_REVIEW_KEY = Deno.env.get('ADMIN_REVIEW_KEY') ?? '';
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY') ?? '';
@@ -84,6 +85,20 @@ Deno.serve(async (req) => {
         }
       }
     }
+
+    // Log every requested URL as a gsc_request event so /admin/seo can audit history.
+    const reqEvents: IndexingEvent[] = list.map((url) => {
+      const hit = indexingResults.find((r) => r.url === url);
+      return {
+        url,
+        channel: 'gsc_request',
+        target: 'urlNotifications',
+        status: hit ? (hit.ok ? 'sent' : 'error') : 'pending',
+        http_status: hit?.status,
+        detail: hit?.body?.slice(0, 240),
+      };
+    });
+    await logIndexingEvents(reqEvents);
 
     // 4) If a siteUrl was provided, re-inspect so the admin sees updated verdicts on next load.
     const inspections: Array<{ url: string; verdict?: string; coverageState?: string }> = [];

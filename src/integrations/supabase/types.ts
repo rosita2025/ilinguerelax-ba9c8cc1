@@ -1206,6 +1206,39 @@ export type Database = {
         }
         Relationships: []
       }
+      indexing_events: {
+        Row: {
+          channel: string
+          created_at: string
+          detail: string | null
+          http_status: number | null
+          id: string
+          status: string
+          target: string | null
+          url: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          detail?: string | null
+          http_status?: number | null
+          id?: string
+          status?: string
+          target?: string | null
+          url: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          detail?: string | null
+          http_status?: number | null
+          id?: string
+          status?: string
+          target?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       manual_payments: {
         Row: {
           amount_local: number | null

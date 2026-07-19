@@ -14,6 +14,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { products } from "@/data/products";
 import SitemapHealthCard from "@/components/admin/SitemapHealthCard";
+import IndexingEventsCard from "@/components/admin/IndexingEventsCard";
 import BacklinksCard from "@/components/admin/BacklinksCard";
 import GscKeywordsMultilangCard from "@/components/admin/GscKeywordsMultilangCard";
 import GoogleSuggestCard from "@/components/admin/GoogleSuggestCard";
@@ -380,6 +381,8 @@ const AdminSEO = () => {
           </div>
 
           <SitemapHealthCard />
+
+          <IndexingEventsCard />
 
 
           <Card className="p-4 space-y-3">

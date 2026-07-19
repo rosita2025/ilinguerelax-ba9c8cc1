@@ -7,6 +7,8 @@
 //     → Recomputes the hash from the submitted code and constant-time compares
 //       to the challenge. On match, returns a 12h HMAC-signed session token
 //       that the client must send as `x-admin-2fa` on every admin call.
+//   POST { action: "validate", adminKey }
+//     → Confirms a stored admin key + 2FA token without sending another OTP.
 //
 // The HMAC secret is derived from ADMIN_REVIEW_KEY so rotating the admin key
 // automatically invalidates every outstanding 2FA session.
@@ -106,6 +108,16 @@ Deno.serve(async (req) => {
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expectedKey) {
       return new Response(JSON.stringify({ error: "Server misconfigured" }), { status: 500, headers: JSON_HEADERS });
+    }
+
+    if (action === "validate") {
+      const adminKey = String(body?.adminKey || "");
+      const tokenCheck = await verifyAdmin2FAToken(req.headers.get("x-admin-2fa"));
+      const valid = adminKey === expectedKey && tokenCheck.ok && tokenCheck.payload.kind === "session";
+      // Return a normal response for an invalid stored session so the client can
+      // distinguish it from temporary iOS/network failures and avoid erasing a
+      // trusted-device login during app resume.
+      return new Response(JSON.stringify({ valid }), { headers: JSON_HEADERS });
     }
 
     if (action === "request") {

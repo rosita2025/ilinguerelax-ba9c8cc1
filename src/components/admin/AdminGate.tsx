@@ -96,8 +96,10 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
 
   const [adminKey, setAdminKey] = useState<string>(() => {
     const key = readAdminKey();
+    // Only restore session if we have both the password and a valid 2FA token.
     return key && getAdmin2FAToken() ? key : "";
   });
+
   // Default trust on installed PWA — device is already protected by Face ID / passcode.
   const [remember, setRemember] = useState<boolean>(() => {
     try { return localStorage.getItem(PERSIST_KEY) === "1" || isStandalonePWA(); } catch { return false; }
@@ -129,23 +131,33 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     if (!adminKey) return;
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase.functions.invoke("admin-2fa", {
-        body: { action: "validate", adminKey },
-      });
-      if (cancelled) return;
-      const err = (data as { error?: string; code?: string } | null);
-      if (err?.error) {
-        // Only clear session if it is a definitive authentication failure.
-        // Network errors or other server errors (500) should not wipe the session.
-        if (err.code === "TWO_FA_REQUIRED" || err.error === "Unauthorized" || err.error === "invalid_token") {
+      try {
+        const { data, error } = await supabase.functions.invoke("admin-2fa", {
+          body: { action: "validate", adminKey },
+        });
+        if (cancelled) return;
+
+        // Network or server errors (500, etc) should NOT wipe the session.
+        // We only wipe on definitive 401/403 auth failures.
+        if (error) {
+          console.warn("[AdminGate] Validation call failed (network?):", error);
+          return;
+        }
+
+        const res = data as { valid?: boolean; error?: string; code?: string } | null;
+        if (res?.valid === false || res?.error === "Unauthorized" || res?.code === "TWO_FA_REQUIRED") {
+          console.info("[AdminGate] Session invalid, clearing.");
           clearAdminKey();
           resetAdmin2FAToken();
           setAdminKey("");
-          if (err.code === "TWO_FA_REQUIRED") {
+          if (res?.code === "TWO_FA_REQUIRED") {
             toast.info("Sesión 2FA expirada. Verifica de nuevo.");
           }
         }
+      } catch (e) {
+        console.error("[AdminGate] Unexpected validation error:", e);
       }
+    })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -167,7 +179,6 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     }
     setLoading(true);
     try {
-      // admin-2fa "request" both validates the admin key and emails the OTP.
       const { data, error } = await supabase.functions.invoke("admin-2fa", {
         body: { action: "request", adminKey: input },
       });

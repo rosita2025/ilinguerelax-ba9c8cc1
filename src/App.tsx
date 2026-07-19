@@ -202,6 +202,7 @@ const App = () => (
             <BrowserRouter>
             <RouteErrorBoundary>
               <CartSyncWrapper>
+                <AdminSubdomainGate />
                 <RouteTracker />
                 <ProductViewTracker />
                 <AutoTranslate />

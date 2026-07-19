@@ -362,11 +362,11 @@ const AdminSEO = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-10 px-4">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4">
+        <div className="max-w-6xl mx-auto space-y-4 md:space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">SEO · Google Search Console + Semrush</h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <h1 className="text-xl md:text-3xl font-bold leading-tight">SEO · Google Search Console + Semrush</h1>
+            <p className="text-muted-foreground text-xs md:text-sm mt-1">
               Rendimiento orgánico automático por intervalo de fechas.
             </p>
           </div>

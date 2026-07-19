@@ -424,7 +424,7 @@ const AdminEmailTest = () => {
     const dir = sortDir === "asc" ? 1 : -1;
     list = [...list].sort((a, b) => {
       let av = "", bv = "";
-      if (sortKey === "date") return (a.created_at < b.created_at ? 1 : -1) * dir;
+      if (sortKey === "date") return (a.created_at < b.created_at ? -1 : 1) * dir;
       if (sortKey === "order_ref") { av = a.order_ref; bv = b.order_ref; }
       if (sortKey === "principal_sku") { av = principalSkuOf(a); bv = principalSkuOf(b); }
       if (sortKey === "upsell_sku") { av = upsellSkusOf(a); bv = upsellSkusOf(b); }

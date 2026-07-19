@@ -6,7 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { getBlogPostBySlug, getRelatedPosts, blogPosts, type BlogPost as BlogPostType } from "@/data/blogPosts";
-import { fetchGeneratedBlogPostBySlug } from "@/hooks/useGeneratedBlogPosts";
+import { fetchGeneratedBlogPostBySlug, fetchGeneratedBlogPosts } from "@/hooks/useGeneratedBlogPosts";
+
 import { getProductById } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

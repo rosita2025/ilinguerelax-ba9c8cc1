@@ -88,6 +88,40 @@ const GoogleSuggestCard = () => {
         </Button>
       </div>
 
+      {globalTop.length > 0 && (
+        <div className="border-2 border-primary/40 rounded-lg p-3 bg-primary/5 space-y-2">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold text-sm">Top palabras de alto volumen (global, ponderado)</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Mejores keywords para escribir contenido AHORA — combinadas de todos los mercados, ordenadas por score real (posición Google × peso país × intención).
+          </p>
+          <ol className="grid gap-1 md:grid-cols-2 text-xs">
+            {globalTop.map((k, i) => {
+              const rel = Math.round((k.score / maxGlobalScore) * 100);
+              return (
+                <li key={i} className="flex items-center gap-2 border-b border-primary/20 pb-1">
+                  <span className="w-6 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                  <div className="w-14 h-2 bg-muted rounded overflow-hidden shrink-0" title={`Score ${rel}/100`}>
+                    <div className="h-full bg-primary" style={{ width: `${rel}%` }} />
+                  </div>
+                  <span className="shrink-0 text-[10px] font-mono text-primary font-bold w-8 text-right">{rel}</span>
+                  <span className="truncate flex-1" title={`${k.groups.length} grupos · ${k.countries.join(", ")}`}>
+                    {k.keyword}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">{k.groups.length}g</span>
+                  <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
+                    <Copy className="w-3 h-3" />
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
+
+
       {sorted.length > 0 && (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {sorted.map((r) => (

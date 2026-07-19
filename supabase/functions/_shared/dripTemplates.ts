@@ -360,15 +360,15 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
       <p style="font-size:15px;color:#374151;margin:0 0 8px;">${c.body}</p>
       ${cardsHtml}
       <div style="text-align:center;margin:24px 0;">
-        <a href="${c.ctaUrl}" style="display:inline-block;background:#e85d3c;color:#ffffff;text-decoration:none;padding:14px 34px;border-radius:50px;font-weight:600;font-size:15px;">${c.ctaText}</a>
+        <a href="${c.ctaUrl}" style="display:inline-block;background:#000000;color:#ffffff;text-decoration:none;padding:14px 34px;border-radius:50px;font-weight:600;font-size:15px;letter-spacing:0.02em;">${c.ctaText}</a>
       </div>
       <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:16px;text-align:center;">
         <p style="font-size:13px;color:#6b7280;margin:0 0 8px;">${c.footer}</p>
-        <p style="font-size:12px;color:#9ca3af;margin:8px 0 0;">
-          <a href="${BASE}" style="color:#1e6f6f;text-decoration:none;">Home</a> ·
-          <a href="${BASE}/products" style="color:#1e6f6f;text-decoration:none;">Productos</a> ·
-          <a href="${BASE}/blog" style="color:#1e6f6f;text-decoration:none;">Blog</a> ·
-          <a href="${BASE}/contact" style="color:#1e6f6f;text-decoration:none;">Contacto</a>
+        <p style="font-size:12px;color:#6b7280;margin:8px 0 0;">
+          <a href="${BASE}" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Home</a> ·
+          <a href="${BASE}/products" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Productos</a> ·
+          <a href="${BASE}/blog" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Blog</a> ·
+          <a href="${BASE}/contact" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Contacto</a>
         </p>
         <p style="font-size:11px;color:#9ca3af;margin:12px 0 0;">
           ${BRAND} · <a href="mailto:${HELP_EMAIL}" style="color:#9ca3af;">${HELP_EMAIL}</a><br>

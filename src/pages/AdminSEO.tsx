@@ -909,6 +909,29 @@ const AdminSEO = () => {
                   </div>
                 </div>
 
+                {/* Filtros */}
+                <div className="flex items-center gap-1.5 flex-wrap mb-3 pb-2 border-b">
+                  {([
+                    { id: "all", label: "Todos" },
+                    { id: "pending", label: "No indexados" },
+                    { id: "indexed", label: "Indexados" },
+                    { id: "drafts", label: "Borradores" },
+                  ] as const).map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => { setPostsFilter(f.id); setPostsPage(1); }}
+                      className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${
+                        postsFilter === f.id
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+
                 {/* Mobile: stacked cards */}
                 <div className="md:hidden space-y-3">
                   {paginatedPosts.map((p) => {

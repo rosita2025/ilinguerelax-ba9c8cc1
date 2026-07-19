@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { format, startOfDay, endOfDay, subDays, startOfYear } from "date-fns";
 import { es } from "date-fns/locale";
 import {
@@ -269,103 +269,6 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
   };
 };
 
-type PCRow = { product_id: string; name: string | null; country: string; sessions: number; views: number; carts: number; purchases: number; revenue: number };
-
-const ProductCountryGrouped = ({ rows }: { rows: PCRow[] }) => {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [query, setQuery] = useState("");
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, { product_id: string; name: string | null; sessions: number; views: number; carts: number; purchases: number; revenue: number; countries: PCRow[] }>();
-    for (const r of rows) {
-      const g = map.get(r.product_id) ?? { product_id: r.product_id, name: r.name, sessions: 0, views: 0, carts: 0, purchases: 0, revenue: 0, countries: [] };
-      g.sessions += r.sessions; g.views += r.views; g.carts += r.carts; g.purchases += r.purchases; g.revenue += r.revenue;
-      g.countries.push(r);
-      map.set(r.product_id, g);
-    }
-    const arr = Array.from(map.values());
-    arr.forEach((g) => g.countries.sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions));
-    return arr.sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions);
-  }, [rows]);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return grouped;
-    return grouped.filter((g) => (g.name || "").toLowerCase().includes(q) || g.product_id.toLowerCase().includes(q));
-  }, [grouped, query]);
-
-  return (
-    <Card className="p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
-        <div>
-          <h2 className="font-semibold">Top productos · por país</h2>
-          <p className="text-xs text-muted-foreground">Agrupado por SKU. Toca un producto para desglosar por país.</p>
-        </div>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filtrar producto…"
-          className="text-sm px-3 py-1.5 rounded-md border bg-background w-56"
-        />
-      </div>
-      {filtered.length === 0 ? (
-        <div className="py-6 text-center text-muted-foreground text-sm">Sin datos</div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground border-b">
-              <tr>
-                <th className="text-left py-2 pr-3">Producto</th>
-                <th className="text-right px-2">Países</th>
-                <th className="text-right px-2">Sesiones</th>
-                <th className="text-right px-2">Vistas</th>
-                <th className="text-right px-2">Carrito</th>
-                <th className="text-right px-2">Compras</th>
-                <th className="text-right pl-2">Ingresos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((g) => {
-                const open = !!expanded[g.product_id];
-                return (
-                  <Fragment key={g.product_id}>
-                    <tr className="border-b border-border/40 hover:bg-muted/40 cursor-pointer" onClick={() => setExpanded((s) => ({ ...s, [g.product_id]: !s[g.product_id] }))}>
-                      <td className="py-2 pr-3 max-w-xs">
-                        <span className="mr-1 text-muted-foreground">{open ? "▾" : "▸"}</span>
-                        <span className="font-medium">{g.name || g.product_id}</span>
-                      </td>
-                      <td className="text-right px-2 tabular-nums">{g.countries.length}</td>
-                      <td className="text-right px-2 tabular-nums">{g.sessions}</td>
-                      <td className="text-right px-2 tabular-nums">{g.views}</td>
-                      <td className="text-right px-2 tabular-nums">{g.carts}</td>
-                      <td className="text-right px-2 tabular-nums font-semibold">{g.purchases}</td>
-                      <td className="text-right pl-2 tabular-nums">{money(g.revenue)}</td>
-                    </tr>
-                    {open && g.countries.map((c, i) => {
-                      const info = countryDisplay(c.country);
-                      return (
-                        <tr key={`${g.product_id}-${c.country}-${i}`} className="border-b border-border/30 bg-muted/20 text-xs">
-                          <td className="py-1.5 pr-3 pl-8">{info.flag} {info.name}</td>
-                          <td></td>
-                          <td className="text-right px-2 tabular-nums">{c.sessions}</td>
-                          <td className="text-right px-2 tabular-nums">{c.views}</td>
-                          <td className="text-right px-2 tabular-nums">{c.carts}</td>
-                          <td className="text-right px-2 tabular-nums">{c.purchases}</td>
-                          <td className="text-right pl-2 tabular-nums">{money(c.revenue)}</td>
-                        </tr>
-                      );
-                    })}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Card>
-  );
-};
 
 const AdminAnalytics = () => {
   const { adminKey } = useAdminKey();

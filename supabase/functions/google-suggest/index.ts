@@ -1,10 +1,7 @@
-import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { adminCorsHeaders, assertAdminCsrf, withAdminLogging } from "../_shared/adminCsrf.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa",
-};
+const corsHeaders = adminCorsHeaders;
 
 // Each market queries Google Suggest IN ITS OWN LANGUAGE. We translate the
 // user's seed to every target language via Lovable AI before hitting Suggest.
@@ -94,7 +91,7 @@ Example format: {"Spanish (Spain)":"aprender coreano","English (US)":"learn kore
   }
 }
 
-serve(async (req) => {
+serve(withAdminLogging("google-suggest", async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const csrfBlock = await assertAdminCsrf(req);
@@ -162,4 +159,4 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+}));

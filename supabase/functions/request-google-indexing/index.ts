@@ -86,6 +86,20 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Log every requested URL as a gsc_request event so /admin/seo can audit history.
+    const reqEvents: IndexingEvent[] = list.map((url) => {
+      const hit = indexingResults.find((r) => r.url === url);
+      return {
+        url,
+        channel: 'gsc_request',
+        target: 'urlNotifications',
+        status: hit ? (hit.ok ? 'sent' : 'error') : 'pending',
+        http_status: hit?.status,
+        detail: hit?.body?.slice(0, 240),
+      };
+    });
+    await logIndexingEvents(reqEvents);
+
     // 4) If a siteUrl was provided, re-inspect so the admin sees updated verdicts on next load.
     const inspections: Array<{ url: string; verdict?: string; coverageState?: string }> = [];
     if (siteUrl && LOVABLE_API_KEY && GSC_KEY) {

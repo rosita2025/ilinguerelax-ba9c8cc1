@@ -293,6 +293,7 @@ const App = () => (
                   <Route path="/checkouts/failure" element={<CheckoutFailure />} />
                   <Route path="/checkouts/pending" element={<CheckoutPending />} />
                   <Route path="/checkouts/pendiente-manual" element={<CheckoutPendienteManual />} />
+                  <Route path="/recuperar-carrito" element={<RecoverCart />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* Dynamic product page — catches any /products/:slug not matched above (products created in /admin/productos). */}
                   <Route path="/products/:slug" element={<ProductDynamic />} />

@@ -707,91 +707,9 @@ const AdminAnalytics = () => {
                 </div>
               </Card>
 
-              {/* Top productos por país */}
-              <Card className="p-4">
-                <h2 className="font-semibold mb-1">Top productos · por país</h2>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Actividad de cada producto segmentada por país del visitante (sesiones únicas, vistas, carrito, compras e ingresos USD).
-                </p>
-                {(!data.byProductCountry || data.byProductCountry.length === 0) ? (
-                  <div className="py-6 text-center text-muted-foreground text-sm">Sin datos en este rango</div>
-                ) : (
-                  <>
-                    {/* Mobile cards */}
-                    <div className="md:hidden space-y-2">
-                      {data.byProductCountry.slice(0, 50).map((r, i) => {
-                        const { flag: countryFlag, name: countryName } = countryDisplay(r.country);
-                        return (
-                          <div key={`${r.product_id}-${r.country}-${i}`} className="border border-border/60 rounded-lg p-3 bg-card">
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                              <a
-                                href={`/products/${r.product_id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium text-sm text-primary hover:underline truncate min-w-0 flex-1"
-                              >
-                                {r.name || r.product_id}
-                              </a>
-                              <span className="shrink-0 text-[11px] px-2 py-0.5 rounded-full border bg-muted">
-                                {countryFlag} {countryName}
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-2 text-[11px]">
-                              <div><div className="text-muted-foreground">Sesiones</div><div className="font-semibold tabular-nums">{r.sessions}</div></div>
-                              <div><div className="text-muted-foreground">Vistas</div><div className="font-semibold tabular-nums">{r.views}</div></div>
-                              <div><div className="text-muted-foreground">Carrito</div><div className="font-semibold tabular-nums">{r.carts}</div></div>
-                              <div><div className="text-muted-foreground">Compras</div><div className="font-semibold tabular-nums">{r.purchases}</div></div>
-                              <div className="col-span-2"><div className="text-muted-foreground">Ingresos</div><div className="font-semibold tabular-nums">{money(r.revenue)}</div></div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+              {/* Top productos por país (agrupado por SKU, expandible) */}
+              <ProductCountryGrouped rows={data.byProductCountry || []} />
 
-                    {/* Desktop table */}
-                    <div className="hidden md:block overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="text-xs text-muted-foreground border-b">
-                          <tr>
-                            <th className="text-left py-2 pr-3">Producto</th>
-                            <th className="text-left px-2">País</th>
-                            <th className="text-right px-2">Sesiones</th>
-                            <th className="text-right px-2">Vistas</th>
-                            <th className="text-right px-2">Carrito</th>
-                            <th className="text-right px-2">Compras</th>
-                            <th className="text-right pl-2">Ingresos</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data.byProductCountry.slice(0, 100).map((r, i) => {
-                            const { flag: countryFlag, name: countryName } = countryDisplay(r.country);
-                            return (
-                              <tr key={`${r.product_id}-${r.country}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
-                                <td className="py-2 pr-3 max-w-xs">
-                                  <a
-                                    href={`/products/${r.product_id}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="truncate font-medium block text-primary hover:underline"
-                                  >
-                                    {r.name || r.product_id}
-                                  </a>
-                                </td>
-                                <td className="px-2 whitespace-nowrap">{countryFlag} {countryName}</td>
-                                <td className="text-right px-2 tabular-nums">{r.sessions}</td>
-                                <td className="text-right px-2 tabular-nums">{r.views}</td>
-                                <td className="text-right px-2 tabular-nums">{r.carts}</td>
-                                <td className="text-right px-2 tabular-nums font-semibold">{r.purchases}</td>
-                                <td className="text-right pl-2 tabular-nums">{money(r.revenue)}</td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </>
-                )}
-              </Card>
 
 
 

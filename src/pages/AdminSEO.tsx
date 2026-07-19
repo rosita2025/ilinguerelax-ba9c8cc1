@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw } from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
@@ -75,6 +75,41 @@ const AdminSEO = () => {
   });
   const [indexLoading, setIndexLoading] = useState(false);
   const [rowLoading, setRowLoading] = useState<string | null>(null);
+  const [requestLoading, setRequestLoading] = useState<string | null>(null);
+
+  const GSC_RESOURCE = "sc-domain:ilinguerelax.com";
+  const gscInspectUrl = (url: string) =>
+    `https://search.google.com/search-console/inspect?resource_id=${encodeURIComponent(GSC_RESOURCE)}&url=${encodeURIComponent(url)}`;
+
+  const requestIndexing = async (slug: string) => {
+    const url = `https://ilinguerelax.com/blog/${slug}`;
+    setRequestLoading(slug);
+    // Open the GSC inspection deep link immediately (must happen inside the click
+    // handler or popup blockers will swallow it).
+    const gscTab = window.open(gscInspectUrl(url), "_blank", "noopener,noreferrer");
+    try {
+      const { data, error } = await supabase.functions.invoke("request-google-indexing", {
+        body: { adminKey, urls: [url], siteUrl: "https://ilinguerelax.com/" },
+      });
+      if (error) throw error;
+      const note = (data as { note?: string })?.note;
+      toast.success(
+        note
+          ? "IndexNow + sitemap enviados. Pulsa 'Solicitar indexación' en la pestaña de Google."
+          : "Indexación solicitada. Google la procesará en minutos."
+      );
+      // Re-check status shortly after so the row updates.
+      setTimeout(() => { void checkIndexing([slug]); }, 4000);
+      if (!gscTab) {
+        toast.info("Abre manualmente Search Console — el navegador bloqueó la pestaña nueva.");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al solicitar indexación");
+    } finally {
+      setRequestLoading(null);
+    }
+  };
+
 
   const persistIndex = (next: Record<string, IndexEntry>) => {
     setIndexStatus(next);
@@ -641,16 +676,53 @@ const AdminSEO = () => {
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
                   <h3 className="text-sm font-semibold">Últimos posts generados</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => checkIndexing()}
-                    disabled={indexLoading}
-                  >
-                    {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
-                    Verificar indexación en Google
-                  </Button>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => checkIndexing()}
+                      disabled={indexLoading}
+                    >
+                      {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
+                      Verificar indexación
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={async () => {
+                        const discovered = genPosts.filter((p) => {
+                          const v = indexStatus[p.slug]?.verdict;
+                          return v === "NEUTRAL" || v === "FAIL" || !v;
+                        });
+                        if (discovered.length === 0) {
+                          toast.info("No hay URLs descubiertas o pendientes en la lista visible.");
+                          return;
+                        }
+                        setRequestLoading("__bulk__");
+                        try {
+                          const urls = discovered.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+                          const { data, error } = await supabase.functions.invoke("request-google-indexing", {
+                            body: { adminKey, urls, siteUrl: "https://ilinguerelax.com/" },
+                          });
+                          if (error) throw error;
+                          const note = (data as { note?: string })?.note;
+                          toast.success(`${urls.length} URLs enviadas a IndexNow + sitemap${note ? ". Solicita indexación manual en GSC para cada una." : ""}.`);
+                        } catch (err) {
+                          toast.error(err instanceof Error ? err.message : "Error al solicitar indexación masiva");
+                        } finally {
+                          setRequestLoading(null);
+                        }
+                      }}
+                      disabled={requestLoading === "__bulk__"}
+                    >
+                      {requestLoading === "__bulk__"
+                        ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                        : <Zap className="w-3 h-3 mr-1" />}
+                      Solicitar indexación (descubiertas)
+                    </Button>
+                  </div>
                 </div>
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="text-left text-xs uppercase text-muted-foreground border-b">
@@ -730,6 +802,20 @@ const AdminSEO = () => {
                                     ? <Loader2 className="w-3 h-3 animate-spin" />
                                     : <RefreshCw className="w-3 h-3" />}
                                 </button>
+                                {(verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => requestIndexing(p.slug)}
+                                    disabled={requestLoading === p.slug}
+                                    className="text-amber-600 hover:text-amber-500 dark:text-amber-400 transition-colors mt-0.5"
+                                    title="Solicitar indexación en Google Search Console"
+                                  >
+                                    {requestLoading === p.slug
+                                      ? <Loader2 className="w-3 h-3 animate-spin" />
+                                      : <Zap className="w-3 h-3" />}
+                                  </button>
+                                )}
+
                               </div>
                             </td>
                           </tr>

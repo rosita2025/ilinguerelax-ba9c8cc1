@@ -218,8 +218,11 @@ Deno.serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
+      const alreadyOwned = (await getPurchasedSkus(supabase, email)).has(String(productType).toLowerCase());
       if (recent) {
         console.log(`[dedupe] skipping Brevo push (recent sync <30min) for ${email} / ${productType}`);
+      } else if (alreadyOwned) {
+        console.log(`[skip] ${email} already purchased ${productType} — no Brevo abandoned push`);
       } else {
         const { data: product } = await supabase
           .from("digital_products")

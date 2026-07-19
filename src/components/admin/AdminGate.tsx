@@ -134,7 +134,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
       if (cancelled) return;
       const err = (data as { error?: string; code?: string } | null);
       if (error || err?.error) {
-        try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+        clearAdminKey();
         resetAdmin2FAToken();
         setAdminKey("");
         if (err?.code === "TWO_FA_REQUIRED") {

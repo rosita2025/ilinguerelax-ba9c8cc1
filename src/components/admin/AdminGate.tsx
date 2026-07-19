@@ -133,14 +133,19 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         body: { action: "validate", adminKey },
       });
       if (cancelled) return;
-      const result = data as { valid?: boolean } | null;
-      if (!error && result?.valid === false) {
-        clearAdminKey();
-        resetAdmin2FAToken();
-        setAdminKey("");
-        toast.info("Sesión expirada. Verifica de nuevo.");
+      const err = (data as { error?: string; code?: string } | null);
+      if (err?.error) {
+        // Only clear session if it is a definitive authentication failure.
+        // Network errors or other server errors (500) should not wipe the session.
+        if (err.code === "TWO_FA_REQUIRED" || err.error === "Unauthorized" || err.error === "invalid_token") {
+          clearAdminKey();
+          resetAdmin2FAToken();
+          setAdminKey("");
+          if (err.code === "TWO_FA_REQUIRED") {
+            toast.info("Sesión 2FA expirada. Verifica de nuevo.");
+          }
+        }
       }
-    })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

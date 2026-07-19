@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
       );
     }
 
+    let skus: string[] = [];
     if (singleSku) {
       skus = [singleSku];
     } else {

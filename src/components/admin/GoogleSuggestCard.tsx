@@ -69,9 +69,11 @@ const GoogleSuggestCard = () => {
         <h2 className="text-xl font-semibold">Explorador Google Suggest (agrupado por idioma / región)</h2>
       </div>
       <p className="text-xs text-muted-foreground">
-        Escribe una semilla y el sistema la traduce a cada mercado antes de consultar Google. Grupos: <strong>LATAM (14 países juntos)</strong>, España, USA+Canadá, UK, Francia, Corea, Italia, Brasil y Suecia.
-        Dentro de cada grupo las palabras se ordenan por <strong>frecuencia entre países = alto volumen</strong>. El número <TrendingUp className="w-3 h-3 inline" /> <code>3×</code> significa que aparece en 3 países del grupo.
+        Escribe una semilla y el sistema la traduce a cada mercado antes de consultar Google. Ranking ponderado por{" "}
+        <strong>posición en Google + tamaño de mercado + intención (curso, pdf, cómo, mejor…) + longitud útil</strong>.
+        El <TrendingUp className="w-3 h-3 inline" /> es un score 0-100 relativo: mientras más alto, mejor keyword para escribir contenido.
       </p>
+
 
       <div className="flex gap-2">
         <Input

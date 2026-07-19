@@ -676,16 +676,53 @@ const AdminSEO = () => {
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
                   <h3 className="text-sm font-semibold">Últimos posts generados</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => checkIndexing()}
-                    disabled={indexLoading}
-                  >
-                    {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
-                    Verificar indexación en Google
-                  </Button>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => checkIndexing()}
+                      disabled={indexLoading}
+                    >
+                      {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
+                      Verificar indexación
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={async () => {
+                        const discovered = genPosts.filter((p) => {
+                          const v = indexStatus[p.slug]?.verdict;
+                          return v === "NEUTRAL" || v === "FAIL" || !v;
+                        });
+                        if (discovered.length === 0) {
+                          toast.info("No hay URLs descubiertas o pendientes en la lista visible.");
+                          return;
+                        }
+                        setRequestLoading("__bulk__");
+                        try {
+                          const urls = discovered.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+                          const { data, error } = await supabase.functions.invoke("request-google-indexing", {
+                            body: { adminKey, urls, siteUrl: "https://ilinguerelax.com/" },
+                          });
+                          if (error) throw error;
+                          const note = (data as { note?: string })?.note;
+                          toast.success(`${urls.length} URLs enviadas a IndexNow + sitemap${note ? ". Solicita indexación manual en GSC para cada una." : ""}.`);
+                        } catch (err) {
+                          toast.error(err instanceof Error ? err.message : "Error al solicitar indexación masiva");
+                        } finally {
+                          setRequestLoading(null);
+                        }
+                      }}
+                      disabled={requestLoading === "__bulk__"}
+                    >
+                      {requestLoading === "__bulk__"
+                        ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                        : <Zap className="w-3 h-3 mr-1" />}
+                      Solicitar indexación (descubiertas)
+                    </Button>
+                  </div>
                 </div>
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="text-left text-xs uppercase text-muted-foreground border-b">

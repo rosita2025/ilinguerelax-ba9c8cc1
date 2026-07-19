@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search, Copy, TrendingUp } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAdminKey } from "@/components/admin/AdminGate";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
 
 interface LangResult {
@@ -28,13 +28,18 @@ const GoogleSuggestCard = () => {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("google-suggest", {
+      const { data, error } = await adminInvoke<{ results?: LangResult[] }>("google-suggest", {
         body: { adminKey, query, translate: true },
       });
       if (error) throw error;
       setResults(data?.results ?? []);
     } catch (e: any) {
-      toast.error(`Error: ${e.message ?? e}`);
+      const message = String(e?.message ?? e);
+      toast.error(
+        message.includes("Failed to send")
+          ? "No se pudo conectar. Recarga /admin/seo e inténtalo otra vez."
+          : `Error: ${message}`,
+      );
     } finally {
       setLoading(false);
     }

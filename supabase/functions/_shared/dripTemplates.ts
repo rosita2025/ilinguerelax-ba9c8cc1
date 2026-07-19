@@ -310,21 +310,6 @@ const STEPS: Record<DripStepKey, Bundle> = {
 function renderCards(lang: DripLang): string {
   const cards = cardsFor(lang);
   const label = HISPANO_LANGS.includes(lang) ? 'Ver producto' : 'View product';
-  const cellHtml = cards.map((c) => `
-    <td style="width:50%;padding:6px;vertical-align:top;">
-      <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#ffffff;">
-        <a href="${BASE}/products/${c.slug}" style="text-decoration:none;color:inherit;display:block;">
-          <img src="${c.cover}" alt="${c.name.replace(/"/g,'&quot;')}" style="display:block;width:100%;height:150px;object-fit:cover;" />
-          <div style="padding:12px 14px;">
-            <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.35;min-height:38px;">${c.name}</p>
-            <div style="text-align:center;">
-              <span style="display:inline-block;background:#1e6f6f;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;">${label}</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </td>`).join('');
-  // Build 2-per-row table
   const rows: string[] = [];
   for (let i = 0; i < cards.length; i += 2) {
     const pair = cards.slice(i, i + 2)
@@ -336,7 +321,7 @@ function renderCards(lang: DripLang): string {
             <div style="padding:12px 14px;">
               <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.35;min-height:38px;">${c.name}</p>
               <div style="text-align:center;">
-                <span style="display:inline-block;background:#1e6f6f;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;">${label}</span>
+                <span style="display:inline-block;background:#000000;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:0.02em;">${label}</span>
               </div>
             </div>
           </a>

@@ -358,7 +358,7 @@ serve(async (req) => {
         .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
-      supabase.from("digital_products").select("sku, name"),
+      supabase.from("digital_products").select("sku, name, sku_aliases"),
       supabase
         .from("funnel_events")
         .select("id, created_at, product_id, value, currency, country, session_id, referrer")

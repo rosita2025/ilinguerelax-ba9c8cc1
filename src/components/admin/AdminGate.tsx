@@ -16,12 +16,47 @@ import {
 import { toast } from "sonner";
 
 const STORAGE_KEY = "ilr_admin_key";
+const PERSIST_KEY = "ilr_admin_persist"; // "1" when trusted device
 const ATTEMPTS_KEY = "ilr_admin_attempts";
 const LOCK_KEY = "ilr_admin_lock_until";
 const OTP_ATTEMPTS_KEY = "ilr_admin_otp_attempts";
 const MAX_ATTEMPTS = 5;
 const MAX_OTP_ATTEMPTS = 5;
 const LOCK_MS = 5 * 60 * 1000;
+
+function isStandalonePWA(): boolean {
+  try {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      // iOS Safari
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window.navigator as any).standalone === true
+    );
+  } catch { return false; }
+}
+
+function readAdminKey(): string {
+  try {
+    return localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY) || "";
+  } catch { return ""; }
+}
+function writeAdminKey(key: string, persist: boolean) {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(PERSIST_KEY);
+    const store = persist ? localStorage : sessionStorage;
+    store.setItem(STORAGE_KEY, key);
+    if (persist) localStorage.setItem(PERSIST_KEY, "1");
+  } catch { /* noop */ }
+}
+function clearAdminKey() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(PERSIST_KEY);
+  } catch { /* noop */ }
+}
 
 // Install once: any call to /functions/v1/* gets CSRF + 2FA headers.
 let fetchPatched = false;

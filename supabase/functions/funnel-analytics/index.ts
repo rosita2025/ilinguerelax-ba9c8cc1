@@ -368,15 +368,33 @@ serve(async (req) => {
     ]);
     const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 
-    // Build name → SKU map so manual_payments (which store `name`) get grouped correctly
+    // Build name/slug → SKU maps so aggregation collapses duplicate keys
+    // (e.g. URL slug "patrones-especiales-alfabeto..." and display name
+    // "Patrones Especiales, Alfabeto..." must resolve to the same SKU row).
     const nameToSku = new Map<string, string>();
     const skuToName = new Map<string, string>();
+    const slugToSku = new Map<string, string>();
+    const slugify = (s: string) =>
+      s.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     for (const p of (digitalRes.data ?? []) as any[]) {
       if (p.sku && p.name) {
-        nameToSku.set(p.name.trim().toLowerCase(), p.sku);
+        const nameKey = p.name.trim().toLowerCase();
+        nameToSku.set(nameKey, p.sku);
         skuToName.set(p.sku, p.name);
+        slugToSku.set(slugify(p.name), p.sku);
+        slugToSku.set(String(p.sku).toLowerCase(), p.sku);
       }
     }
+    const canonicalProductKey = (raw: string): string => {
+      if (!raw) return raw;
+      const trimmed = String(raw).trim();
+      const lower = trimmed.toLowerCase();
+      return nameToSku.get(lower) || slugToSku.get(lower) || slugToSku.get(slugify(trimmed)) || trimmed;
+    };
+
 
     // ---------- FX rates (USD base) ----------
     // Public, no-key endpoint. Cached in-memory per invocation.

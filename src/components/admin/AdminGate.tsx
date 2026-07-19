@@ -158,7 +158,9 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         console.error("[AdminGate] Unexpected validation error:", e);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

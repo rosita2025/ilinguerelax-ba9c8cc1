@@ -112,6 +112,7 @@ const FAQPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
+        <h1 className="sr-only">Preguntas frecuentes de iLingue Relax</h1>
         <FAQ
           items={faqItems}
           title="Preguntas Frecuentes"

@@ -247,7 +247,9 @@ async function main() {
   const productSlugs = Array.from(new Set([...hardcodedProductSlugs, ...dbSlugs]));
   const productEntries: SitemapEntry[] = productSlugs.map((slug) => ({
     path: `/products/${slug}`,
-    lastmod: lastmodBySlug.get(slug) ?? TODAY,
+    // Only publish a lastmod when it comes from a real database update.
+    // Inventing today's date on every build makes crawlers distrust the signal.
+    lastmod: lastmodBySlug.get(slug),
     changefreq: "weekly",
     priority: "0.85",
   }));

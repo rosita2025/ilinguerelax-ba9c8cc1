@@ -95,11 +95,12 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
   getAdminCsrfToken();
 
   const [adminKey, setAdminKey] = useState<string>(() => {
-    try {
-      const key = sessionStorage.getItem(STORAGE_KEY) || "";
-      // Only consider logged-in if we also have a valid 2FA token.
-      return key && getAdmin2FAToken() ? key : "";
-    } catch { return ""; }
+    const key = readAdminKey();
+    return key && getAdmin2FAToken() ? key : "";
+  });
+  // Default trust on installed PWA — device is already protected by Face ID / passcode.
+  const [remember, setRemember] = useState<boolean>(() => {
+    try { return localStorage.getItem(PERSIST_KEY) === "1" || isStandalonePWA(); } catch { return false; }
   });
   const [stage, setStage] = useState<Stage>("password");
   const [pendingKey, setPendingKey] = useState("");

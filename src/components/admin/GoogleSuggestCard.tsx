@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, Copy, TrendingUp } from "lucide-react";
+import { Loader2, Search, Copy, TrendingUp, FileText } from "lucide-react";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
+import ContentBriefDialog from "@/components/admin/ContentBriefDialog";
 
 interface GroupResult {
   id: string;

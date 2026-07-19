@@ -145,6 +145,10 @@ serve(async (req) => {
         ""
       ).trim();
       const countryReason = rawCountry ? undefined : "hotmart_payload_incomplete";
+      const alreadyOwned = (await getPurchasedSkus(supabase, buyerEmail)).has(String(productSku).toLowerCase());
+      if (alreadyOwned) {
+        console.log(`[skip] ${buyerEmail} already purchased ${productSku} — no Hotmart abandoned push`);
+      } else {
       await pushAbandonedCartToBrevo({
         email: buyerEmail.toLowerCase(),
         name: buyerName,

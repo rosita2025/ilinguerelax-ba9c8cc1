@@ -1,69 +1,59 @@
-## Integración KunfuPay (LATAM: OXXO, SPEI, Nequi, PSE, Pix)
+# Carrito persistente y checkout unificado
 
-### Contexto de la API
-- Base: `https://api.kunfupay.com`
-- Auth: header `X-API-Key: kfp_live_<id>.<secret>`
-- Moneda: **EUR** (KunfuPay convierte a moneda local en el checkout hosted)
-- Flujo: crear producto → crear payment-link → redirigir al `paymentUrl` hosted → recibir webhook firmado (HMAC SHA256)
+## Problema
 
-### Métodos de pago disponibles vía KunfuPay
-- 🇲🇽 México: OXXO, SPEI
-- 🇨🇴 Colombia: Nequi, PSE
-- 🇧🇷 Brasil: Pix
+Hoy cada producto genera su propio flujo aislado:
+- Cliente entra a Producto A → agrega → cierra web.
+- Vuelve horas después, entra a Producto B → agrega → va a checkout → **solo ve B** (perdió A).
+- Los emails de recuperación llegan separados por SKU (a veces 2–3 correos el mismo día).
+- Los upsells se ofrecen solo en el momento, no se recuperan luego.
 
-En países fuera de esa lista no se ofrece KunfuPay (sigue Stripe/PayPal/MP).
+El cliente termina abriendo checkout varias veces, se confunde, y no compra.
 
-### Secrets a solicitar
-- `KUNFUPAY_API_KEY` (formato `kfp_live_...` o `kfp_test_...`)
-- `KUNFUPAY_WEBHOOK_SECRET` (para verificar HMAC del webhook)
+## Objetivo
 
-### Cambios de base de datos
-Tabla `kunfupay_orders`:
-- `order_id` (nuestro, ILR-KFP-XXXX)
-- `kunfupay_product_id`, `kunfupay_sale_id`, `kunfupay_payment_link_id`
-- `external_reference`, `payment_url`
-- `customer_email`, `customer_name`, `customer_country`
-- `amount_eur`, `items` (jsonb con SKUs)
-- `status` (`created` | `completed` | `failed` | `expired`)
-- `raw_webhook` (jsonb última carga)
-- GRANTs + RLS solo service_role
+Un único carrito acumulativo por cliente que:
+1. Persista entre sesiones y dispositivos (no se pierde al cerrar la web).
+2. Combine automáticamente productos agregados en distintos momentos.
+3. Ofrezca los upsells pendientes dentro del mismo checkout.
+4. Envíe **un solo email** de recuperación con **todos los productos acumulados**.
 
-### Edge Functions
-1. **`kunfupay-create-order`** (POST)
-   - Recibe `{ items, customer, country }`
-   - Crea/reutiliza producto en KunfuPay (idempotency por SKU-hash)
-   - Crea payment-link con `Idempotency-Key = order_id`, `successUrl`, `failureUrl`
-   - Guarda registro en `kunfupay_orders` con status `created`
-   - Envía correo "Recibimos tu pedido" (pendiente)
-   - Devuelve `{ paymentUrl, orderId }`
+## Cómo va a funcionar
 
-2. **`kunfupay-webhook`** (POST público, sin JWT)
-   - Verifica firma HMAC SHA256 (`sha256=<hex>`)
-   - Deduplica por `payment.id + eventType`
-   - En `productPayment.completed`: marca `completed`, dispara **Gracias por tu compra** + **Materiales digitales** + notificación admin (mismo patrón que Stripe/PayPal — no se saltan correos)
-   - En `failed` / `expired`: actualiza estado, sin correo extra
+### 1. Identidad del carrito
+- Cada visitante recibe un `cart_token` (cookie de 30 días, persistente).
+- Si el cliente escribe su email en cualquier punto (checkout, popup, newsletter), asociamos el `cart_token` a ese email.
+- Al volver desde un email de recuperación, el link incluye el token → recuperamos el carrito completo.
 
-### Integración en el frontend
-- `PaymentMethodsGroup.tsx`: agregar tarjetas condicionales por país detectado (MX → OXXO/SPEI, CO → Nequi/PSE, BR → Pix). Un único botón "Pagar con KunfuPay" por método (todos van al mismo hosted checkout; KunfuPay filtra el método por país).
-- Al elegir → invoke `kunfupay-create-order` → `window.location.href = paymentUrl`
-- Página `CheckoutKunfupaySuccess.tsx` y `CheckoutKunfupayFailure.tsx` para el retorno del hosted checkout.
+### 2. Tabla `persistent_carts` en la base
+Guarda: `cart_token`, `email` (opcional), `items` (array de {sku, qty, price, added_at}), `upsells_declined` (array), `last_activity`, `country`, `currency`.
 
-### Admin
-- Añadir KunfuPay a `list-purchases-status` (proveedor `kunfupay`) para que aparezca en `/admin/purchases-status`.
-- Filtro por proveedor incluye "KunfuPay".
+### 3. Comportamiento en el frontend
+- `CartDrawer` y `Checkout` leen del carrito persistente en lugar de solo estado local.
+- Al agregar producto: merge con lo existente (no reemplazar).
+- Al entrar a `/checkout`: muestra TODOS los items acumulados + panel de upsells sugeridos (los que aplican a cualquier producto del carrito y aún no fueron rechazados).
 
-### Anti-duplicados de correos (misma regla que ya validamos)
-- Manual: 3 correos (pendiente + gracias + materiales)
-- Stripe / PayPal / MP tarjeta / **KunfuPay**: 2 correos (gracias + materiales)
-- MP efectivo/transfer: 3 correos (pendiente + gracias + materiales)
+### 4. Emails de recuperación consolidados
+- El cron `send-cart-reminders` ya agrupa por email — se ajusta para leer de `persistent_carts` en vez de `abandoned_carts` sueltos.
+- Un solo correo a los 30 min / 24h / 5 días con la lista completa de productos + botón "Retomar mi carrito" que restaura el `cart_token`.
+- Deduplicación atómica ya existente se mantiene.
 
-### Nota sobre moneda
-Todos los importes se envían a KunfuPay en **EUR**. Se convierten desde USD del producto usando tasa fija configurable (arranco con `USD → EUR = 0.92`). El comprador ve el monto en su moneda local dentro del checkout hosted de KunfuPay.
+### 5. Limpieza
+- Si el cliente completa la compra → carrito se vacía automáticamente.
+- Si pasan 30 días sin actividad → se archiva.
 
-### Orden de ejecución
-1. Pedir `KUNFUPAY_API_KEY` y `KUNFUPAY_WEBHOOK_SECRET` con `add_secret`
-2. Migración `kunfupay_orders`
-3. Edge functions `kunfupay-create-order` y `kunfupay-webhook`
-4. UI en `PaymentMethodsGroup.tsx` + páginas de retorno
-5. Integración en admin
-6. Configurar URL del webhook en el dashboard de KunfuPay (te la paso al terminar)
+## Detalles técnicos
+
+- Nueva tabla `public.persistent_carts` con RLS (lectura por token, escritura por edge function).
+- Nuevo edge function `cart-sync` (GET/POST) para leer y actualizar carrito por token.
+- Modificar `CartDrawer.tsx`, `Checkout.tsx`, `UpsellPanel.tsx` para usar el hook `usePersistentCart()`.
+- Modificar `send-cart-reminders` para leer de `persistent_carts` agrupado, no de `abandoned_carts` por SKU.
+- Migrar carritos actuales de `abandoned_carts` al nuevo modelo (mantener tabla vieja como histórico).
+
+## Fuera de alcance
+
+- No cambia el flujo de pago (Stripe/PayPal/MP/Binance siguen igual).
+- No cambia diseño de emails, solo el contenido agrupado.
+- No toca entrega digital ni Hotmart.
+
+¿Apruebas para implementar?

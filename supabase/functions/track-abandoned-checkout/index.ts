@@ -136,6 +136,44 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Persistent cart per email: accumulates ALL SKUs the buyer added across
+    // sessions/devices so reminder emails and recovery links reflect the
+    // full cart, not just the last product.
+    let cartToken: string | null = null;
+    try {
+      const { data: existingCart } = await supabase
+        .from("persistent_carts")
+        .select("items")
+        .eq("email", email)
+        .maybeSingle();
+      const merged = new Map<string, { id: string; q: number }>();
+      const prev = Array.isArray(existingCart?.items) ? (existingCart!.items as Array<{ id?: unknown; q?: unknown }>) : [];
+      for (const it of prev) {
+        if (it?.id) merged.set(String(it.id), { id: String(it.id), q: Math.max(1, Number(it.q) || 1) });
+      }
+      for (const it of cart) {
+        merged.set(it.id, { id: it.id, q: Math.max(merged.get(it.id)?.q ?? 0, Number(it.q) || 1) });
+      }
+      // Include the current product in case the client didn't send a cart[] yet
+      if (productType && !merged.has(productType)) merged.set(productType, { id: productType, q: 1 });
+
+      const { data: cartRow } = await supabase
+        .from("persistent_carts")
+        .upsert({
+          email,
+          items: [...merged.values()].slice(0, 30),
+          buyer: { name, phone },
+          country: country || null,
+          language,
+          last_activity: new Date().toISOString(),
+        }, { onConflict: "email" })
+        .select("cart_token")
+        .single();
+      cartToken = cartRow?.cart_token ?? null;
+    } catch (e) {
+      console.warn("persistent_carts upsert failed:", e instanceof Error ? e.message : String(e));
+    }
+
     // Central contacts
     let brevoSynced = false;
     try {
@@ -215,7 +253,7 @@ Deno.serve(async (req) => {
     }
 
 
-    return new Response(JSON.stringify({ ok: true, brevoSynced }), {
+    return new Response(JSON.stringify({ ok: true, brevoSynced, cartToken }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

@@ -32,6 +32,7 @@ function buildHtml(opts: {
   products: ProductItem[];
   step: Step;
   coupon?: string;
+  primaryCta?: string;
 }): string {
   const greeting = opts.name ? `Hola ${opts.name}` : "Hola";
   const stepMsg: Record<Step, string> = {
@@ -40,18 +41,19 @@ function buildHtml(opts: {
     7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
 
-  const productsHtml = opts.products.map((p) => {
-    const ctaLabel = p.origin === "hotmart" ? "Retomar en Hotmart" : "Recuperar carrito";
-    return `
-      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:600;color:#0f172a">${p.name}</div>
-        <div style="margin-top:10px">
-          <a href="${p.ctaUrl}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:10px;font-size:14px">${ctaLabel} →</a>
-        </div>
-      </div>`;
-  }).join("");
+  const productsHtml = opts.products.map((p) => `
+      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+        <div style="font-size:15px;font-weight:600;color:#0f172a">${p.name}</div>
+      </div>`).join("");
 
   const plural = opts.products.length > 1;
+  const bigCta = opts.primaryCta
+    ? `<div style="text-align:center;margin:18px 0 6px">
+         <a href="${opts.primaryCta}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:12px;font-size:16px">
+           ${plural ? "Retomar todos mis productos →" : "Retomar mi carrito →"}
+         </a>
+       </div>`
+    : "";
 
   return `<!DOCTYPE html>
 <html lang="es"><body style="margin:0;padding:0;background:#f6f7fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#0f172a;">
@@ -65,6 +67,7 @@ function buildHtml(opts: {
         <tr><td style="padding:0 28px 4px">
           <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">${plural ? `${opts.products.length} productos en tu carrito` : "Producto en tu carrito"}</div>
           ${productsHtml}
+          ${bigCta}
         </td></tr>
         ${opts.coupon ? `<tr><td align="center" style="padding:4px 28px 16px">
           <div style="display:inline-block;padding:8px 14px;border:1px dashed #f97316;border-radius:8px;background:#fff7ed;color:#c2410c;font-weight:600;font-size:14px">Código: ${opts.coupon}</div>
@@ -234,83 +237,81 @@ Deno.serve(async (req) => {
 
     const results: Record<string, { candidates: number; sent: number; skipped: number; errors: number }> = {};
 
+    const SITE = "https://ilinguerelax.com";
+
     for (const step of onlySteps) {
       const { from, to } = computeWindow(step);
+      // Query persistent_carts (one row per email = ALL abandoned SKUs) instead
+      // of brevo_sync_logs (one row per SKU). This guarantees ONE email per
+      // (email, step) listing every product the buyer accumulated across
+      // sessions/devices — not 2 or 3 separate emails per product.
       const { data: rows, error } = await admin
-        .from("brevo_sync_logs")
-        .select("id, created_at, event_type, origin, email, product_name, product_sku, attributes")
-        .in("event_type", ["hotmart_abandoned", "tienda_abandoned"])
-        .eq("status", "success")
-        .gte("created_at", from)
-        .lte("created_at", to)
-        .order("created_at", { ascending: false })
+        .from("persistent_carts")
+        .select("email, items, buyer, language, cart_token, last_activity, converted")
+        .eq("converted", false)
+        .gte("last_activity", from)
+        .lte("last_activity", to)
+        .order("last_activity", { ascending: false })
         .limit(500);
       if (error) throw error;
 
       const stat = { candidates: (rows ?? []).length, sent: 0, skipped: 0, errors: 0 };
       results[`day${step}`] = stat;
 
-      // Group rows by email; each email gets ONE consolidated reminder listing
-      // all products the user abandoned in this window.
-      type Row = NonNullable<typeof rows>[number];
-      const byEmail = new Map<string, Row[]>();
-      for (const r of rows ?? []) {
-        const email = (r.email || "").trim().toLowerCase();
-        const sku = r.product_sku || "";
-        if (!email || !sku) continue;
-        const list = byEmail.get(email) ?? [];
-        // Dedupe by SKU inside the group (latest wins, rows already desc)
-        if (!list.some((x) => (x.product_sku || "") === sku)) list.push(r);
-        byEmail.set(email, list);
-      }
+      for (const cart of rows ?? []) {
+        const email = (cart.email || "").trim().toLowerCase();
+        const items = Array.isArray(cart.items) ? (cart.items as Array<{ id?: string; q?: number }>) : [];
+        if (!email || items.length === 0) { stat.skipped++; continue; }
 
-      for (const [email, group] of byEmail) {
-        // ATOMIC CLAIM: try to insert one 'pending' row per (email, sku, step).
-        // The UNIQUE(email, product_sku, step) constraint blocks duplicates,
-        // so if another cron run already claimed the same SKU we don't send
-        // it again. Only SKUs we successfully claimed are sent in this run.
-        const claimRows = group.map((r) => ({
-          email,
-          product_sku: r.product_sku || "",
-          origin: (r.origin === "hotmart" || r.event_type === "hotmart_abandoned") ? "hotmart" : "tienda",
-          step,
-          status: "pending",
-        }));
+        // ATOMIC CLAIM: sentinel row per (email, step) using the existing
+        // UNIQUE(email, product_sku, step) constraint. If another cron already
+        // claimed this (email, step), the upsert is a no-op and we skip.
         const { data: claimed } = await admin
           .from("cart_reminder_sends")
-          .upsert(claimRows, { onConflict: "email,product_sku,step", ignoreDuplicates: true })
-          .select("id, product_sku");
-        const claimedSkus = new Set((claimed ?? []).map((x) => x.product_sku));
-        const pending = group.filter((r) => claimedSkus.has(r.product_sku || ""));
-        if (pending.length === 0) { stat.skipped++; continue; }
+          .upsert([{
+            email,
+            product_sku: "__CART__",
+            origin: "tienda",
+            step,
+            status: "pending",
+          }], { onConflict: "email,product_sku,step", ignoreDuplicates: true })
+          .select("id");
+        if (!claimed || claimed.length === 0) { stat.skipped++; continue; }
 
-        // Build product list for the claimed SKUs only
-        const products: ProductItem[] = pending.map((r) => {
-          const attrs = (r.attributes || {}) as Record<string, unknown>;
-          const sku = r.product_sku || "";
-          const origin: "hotmart" | "tienda" =
-            r.origin === "hotmart" || r.event_type === "hotmart_abandoned" ? "hotmart" : "tienda";
-          let ctaUrl = String(attrs.ABANDONED_CART_URL || attrs.PRODUCT_URL || "").trim();
-          if (!ctaUrl) {
-            ctaUrl = origin === "hotmart"
-              ? `https://pay.hotmart.com/${sku}`
-              : `https://ilinguerelax.com/checkouts/${encodeURIComponent(sku)}?recover=${encodeURIComponent(email)}`;
-          } else if (origin === "tienda" && !/[?&]recover=/.test(ctaUrl)) {
-            ctaUrl += (ctaUrl.includes("?") ? "&" : "?") + `recover=${encodeURIComponent(email)}`;
-          }
-          return { name: r.product_name || "Producto", ctaUrl, origin };
+        // Resolve product names for a nicer email body.
+        const skus = items.map((it) => String(it.id)).filter(Boolean).slice(0, 20);
+        const { data: products } = await admin
+          .from("digital_products")
+          .select("sku, name, hotmart_url")
+          .in("sku", skus);
+        const bySku = new Map<string, { name: string; hotmart_url?: string | null }>();
+        for (const p of products ?? []) {
+          bySku.set(p.sku, { name: p.name, hotmart_url: (p as { hotmart_url?: string | null }).hotmart_url });
+        }
+
+        const cartToken = cart.cart_token as string | undefined;
+        const recoverUrl = cartToken
+          ? `${SITE}/recuperar-carrito?t=${encodeURIComponent(cartToken)}`
+          : `${SITE}/checkouts/${encodeURIComponent(skus[0] || "")}?recover=${encodeURIComponent(email)}`;
+
+        const products_list: ProductItem[] = skus.map((sku) => {
+          const info = bySku.get(sku);
+          const hotmart = info?.hotmart_url || "";
+          return {
+            name: info?.name || sku,
+            // Single recovery link for ALL products; per-product Hotmart still available for legacy.
+            ctaUrl: hotmart || recoverUrl,
+            origin: hotmart ? "hotmart" : "tienda",
+          };
         });
 
         if (dryRun) { stat.sent++; continue; }
 
-        const firstAttrs = (pending[0].attributes || {}) as Record<string, unknown>;
-        const name = (firstAttrs.NOMBRE as string | undefined)
-          || (firstAttrs as any)?.first_name
-          || undefined;
-        const coupon = (firstAttrs.ABANDONED_COUPON as string | undefined)
-          || (step === 7200 ? "NEW10" : undefined);
+        const buyer = (cart.buyer || {}) as { name?: string };
+        const name = buyer.name || undefined;
+        const coupon = step === 7200 ? "NEW10" : undefined;
 
-        const html = buildHtml({ name, products, step, coupon });
+        const html = buildHtml({ name, products: products_list, step, coupon, primaryCta: recoverUrl });
 
         const sendRes = await sendEmail({
           to: email,
@@ -319,16 +320,14 @@ Deno.serve(async (req) => {
           replyTo: "hola@ilinguerelax.com",
         });
 
-        // Finalize the claim rows: mark sent/failed. Never insert new rows here.
-        const skus = pending.map((r) => r.product_sku || "");
         await admin
           .from("cart_reminder_sends")
           .update({
             status: sendRes.error ? "failed" : "sent",
             error: sendRes.error ? (sendRes.error.message?.slice(0, 500) || null) : null,
-            cart_url: products[0]?.ctaUrl || null,
+            cart_url: recoverUrl,
           })
-          .eq("email", email).eq("step", step).in("product_sku", skus);
+          .eq("email", email).eq("step", step).eq("product_sku", "__CART__");
 
         if (sendRes.error) stat.errors++; else stat.sent++;
       }

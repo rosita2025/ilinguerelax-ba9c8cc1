@@ -277,6 +277,7 @@ const AdminAnalytics = () => {
   const [data, setData] = useState<AnalyticsData>(() => normalizeAnalyticsData(null, rangeForPreset("today", {})));
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const range = useMemo(
     () => rangeForPreset(preset, { from: customFrom, to: customTo }),
@@ -293,6 +294,7 @@ const AdminAnalytics = () => {
           from: range.from.toISOString(),
           to: range.to.toISOString(),
           granularity: range.granularity,
+          includeBots: false,
         },
       });
       const timeoutPromise = new Promise<never>((_, reject) => {

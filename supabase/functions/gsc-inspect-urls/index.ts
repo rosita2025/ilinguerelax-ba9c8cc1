@@ -10,8 +10,18 @@ const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 const SITE_CANDIDATES = [
   "sc-domain:ilinguerelax.com",
   "https://ilinguerelax.com/",
-  "https://www.ilinguerelax.com/",
 ];
+
+function canonicalizeUrl(rawUrl: string): string {
+  try {
+    const url = new URL(rawUrl);
+    if (url.hostname === "www.ilinguerelax.com") url.hostname = "ilinguerelax.com";
+    url.hash = "";
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return rawUrl;
+  }
+}
 
 interface InspectResult {
   url: string;
@@ -23,19 +33,20 @@ interface InspectResult {
 }
 
 async function inspect(url: string, headers: Record<string, string>): Promise<InspectResult> {
+  const canonicalUrl = canonicalizeUrl(url);
   let lastErr = "";
   for (const site of SITE_CANDIDATES) {
     try {
       const res = await fetch(`${GATEWAY}/v1/urlInspection/index:inspect`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ inspectionUrl: url, siteUrl: site }),
+        body: JSON.stringify({ inspectionUrl: canonicalUrl, siteUrl: site }),
       });
       if (res.ok) {
         const json = await res.json();
         const r = json?.inspectionResult?.indexStatusResult ?? {};
         return {
-          url,
+          url: canonicalUrl,
           verdict: r.verdict ?? "UNKNOWN",
           coverageState: r.coverageState ?? "—",
           indexingState: r.indexingState ?? "—",
@@ -47,7 +58,7 @@ async function inspect(url: string, headers: Record<string, string>): Promise<In
       lastErr = String((e as Error).message);
     }
   }
-  return { url, verdict: "UNKNOWN", coverageState: "—", indexingState: "—", error: lastErr };
+  return { url: canonicalUrl, verdict: "UNKNOWN", coverageState: "—", indexingState: "—", error: lastErr };
 }
 
 serve(async (req) => {

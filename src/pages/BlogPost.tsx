@@ -127,19 +127,19 @@ const BlogPost = () => {
     "author": {
       "@type": "Organization",
       "name": post.author,
-      "url": "https://ilinguerelax.lovable.app"
+      "url": "https://ilinguerelax.com"
     },
     "publisher": {
       "@type": "Organization",
       "name": "iLingue Relax",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://ilinguerelax.lovable.app/og-image.png"
+        "url": "https://ilinguerelax.com/og-image.png"
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://ilinguerelax.lovable.app/blog/${post.slug}`
+      "@id": `https://ilinguerelax.com/blog/${post.slug}`
     }
   };
 
@@ -151,19 +151,19 @@ const BlogPost = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Inicio",
-        "item": "https://ilinguerelax.lovable.app"
+        "item": "https://ilinguerelax.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://ilinguerelax.lovable.app/blog"
+        "item": "https://ilinguerelax.com/blog"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.title,
-        "item": `https://ilinguerelax.lovable.app/blog/${post.slug}`
+        "item": `https://ilinguerelax.com/blog/${post.slug}`
       }
     ]
   };

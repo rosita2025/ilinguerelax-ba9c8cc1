@@ -250,55 +250,58 @@ Deno.serve(async (req) => {
       const stat = { candidates: (rows ?? []).length, sent: 0, skipped: 0, errors: 0 };
       results[`day${step}`] = stat;
 
-      // Deduplicate: keep latest row per (email, sku)
-      const seen = new Map<string, typeof rows[number]>();
+      // Group rows by email; each email gets ONE consolidated reminder listing
+      // all products the user abandoned in this window.
+      type Row = NonNullable<typeof rows>[number];
+      const byEmail = new Map<string, Row[]>();
       for (const r of rows ?? []) {
-        const key = `${(r.email || "").toLowerCase()}::${r.product_sku || ""}`;
-        if (!seen.has(key)) seen.set(key, r);
-      }
-
-      for (const r of seen.values()) {
         const email = (r.email || "").trim().toLowerCase();
         const sku = r.product_sku || "";
-        if (!email || !sku) { stat.skipped++; continue; }
-        const attrs = (r.attributes || {}) as Record<string, unknown>;
-        const origin: "hotmart" | "tienda" = r.origin === "hotmart" || r.event_type === "hotmart_abandoned" ? "hotmart" : "tienda";
+        if (!email || !sku) continue;
+        const list = byEmail.get(email) ?? [];
+        // Dedupe by SKU inside the group (latest wins, rows already desc)
+        if (!list.some((x) => (x.product_sku || "") === sku)) list.push(r);
+        byEmail.set(email, list);
+      }
 
-        // Build recovery URL
-        let ctaUrl = String(attrs.ABANDONED_CART_URL || attrs.PRODUCT_URL || "").trim();
-        if (!ctaUrl) {
-          if (origin === "hotmart") {
-            ctaUrl = `https://pay.hotmart.com/${sku}`;
-          } else {
-            ctaUrl = `https://ilinguerelax.com/checkouts/${encodeURIComponent(sku)}?recover=${encodeURIComponent(email)}`;
-          }
-        } else if (origin === "tienda" && !/[?&]recover=/.test(ctaUrl)) {
-          ctaUrl += (ctaUrl.includes("?") ? "&" : "?") + `recover=${encodeURIComponent(email)}`;
-        }
-
-        // Check if already sent
-        const { data: existing } = await admin
+      for (const [email, group] of byEmail) {
+        // Filter out SKUs already sent at this step
+        const { data: alreadySent } = await admin
           .from("cart_reminder_sends")
-          .select("id")
-          .eq("email", email).eq("product_sku", sku).eq("step", step)
-          .maybeSingle();
-        if (existing) { stat.skipped++; continue; }
+          .select("product_sku")
+          .eq("email", email).eq("step", step)
+          .in("product_sku", group.map((r) => r.product_sku || ""));
+        const sentSkus = new Set((alreadySent ?? []).map((x) => x.product_sku));
+        const pending = group.filter((r) => !sentSkus.has(r.product_sku || ""));
+        if (pending.length === 0) { stat.skipped++; continue; }
+
+        // Build product list
+        const products: ProductItem[] = pending.map((r) => {
+          const attrs = (r.attributes || {}) as Record<string, unknown>;
+          const sku = r.product_sku || "";
+          const origin: "hotmart" | "tienda" =
+            r.origin === "hotmart" || r.event_type === "hotmart_abandoned" ? "hotmart" : "tienda";
+          let ctaUrl = String(attrs.ABANDONED_CART_URL || attrs.PRODUCT_URL || "").trim();
+          if (!ctaUrl) {
+            ctaUrl = origin === "hotmart"
+              ? `https://pay.hotmart.com/${sku}`
+              : `https://ilinguerelax.com/checkouts/${encodeURIComponent(sku)}?recover=${encodeURIComponent(email)}`;
+          } else if (origin === "tienda" && !/[?&]recover=/.test(ctaUrl)) {
+            ctaUrl += (ctaUrl.includes("?") ? "&" : "?") + `recover=${encodeURIComponent(email)}`;
+          }
+          return { name: r.product_name || "Producto", ctaUrl, origin };
+        });
 
         if (dryRun) { stat.sent++; continue; }
 
-        const name = (attrs.NOMBRE as string | undefined)
-          || (r.attributes as any)?.first_name
+        const firstAttrs = (pending[0].attributes || {}) as Record<string, unknown>;
+        const name = (firstAttrs.NOMBRE as string | undefined)
+          || (firstAttrs as any)?.first_name
           || undefined;
-        const coupon = (attrs.ABANDONED_COUPON as string | undefined) || (step === 7200 ? "NEW10" : undefined);
+        const coupon = (firstAttrs.ABANDONED_COUPON as string | undefined)
+          || (step === 7200 ? "NEW10" : undefined);
 
-        const html = buildHtml({
-          name,
-          productName: r.product_name || undefined,
-          ctaUrl,
-          origin,
-          step,
-          coupon,
-        });
+        const html = buildHtml({ name, products, step, coupon });
 
         const sendRes = await sendEmail({
           to: email,
@@ -307,22 +310,22 @@ Deno.serve(async (req) => {
           replyTo: "hola@ilinguerelax.com",
         });
 
-        if (sendRes.error) {
-          stat.errors++;
-          await admin.from("cart_reminder_sends").insert({
-            email, product_sku: sku, origin, step,
-            cart_url: ctaUrl, status: "failed",
-            error: sendRes.error.message?.slice(0, 500) || null,
-          });
-        } else {
-          stat.sent++;
-          await admin.from("cart_reminder_sends").insert({
-            email, product_sku: sku, origin, step,
-            cart_url: ctaUrl, status: "sent",
-          });
-        }
+        // Record ONE row per SKU so future runs skip them all
+        const rowsToInsert = pending.map((r) => ({
+          email,
+          product_sku: r.product_sku || "",
+          origin: (r.origin === "hotmart" || r.event_type === "hotmart_abandoned") ? "hotmart" : "tienda",
+          step,
+          cart_url: products.find((_, i) => pending[i].product_sku === r.product_sku)?.ctaUrl || null,
+          status: sendRes.error ? "failed" : "sent",
+          error: sendRes.error ? (sendRes.error.message?.slice(0, 500) || null) : null,
+        }));
+        await admin.from("cart_reminder_sends").insert(rowsToInsert);
+
+        if (sendRes.error) stat.errors++; else stat.sent++;
       }
     }
+
 
     return new Response(JSON.stringify({ ok: true, dryRun, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

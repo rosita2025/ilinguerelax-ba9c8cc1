@@ -31,6 +31,7 @@ const GoogleSuggestCard = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GroupResult[]>([]);
   const [globalTop, setGlobalTop] = useState<GlobalTop[]>([]);
+  const [briefKeyword, setBriefKeyword] = useState<string | null>(null);
 
   const run = async () => {
     if (!query.trim()) return;

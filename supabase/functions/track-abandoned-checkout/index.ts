@@ -204,23 +204,25 @@ Deno.serve(async (req) => {
 
     // Push to Brevo — the Brevo Automation workflow sends Day 1/7/15/30 emails.
     try {
-      // Dedupe: si ya sincronizamos este email+SKU con Brevo en los últimos 30 min,
-      // saltamos para evitar 4-5 registros seguidos del mismo cliente editando el form.
-      const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      // Dedupe GLOBAL por email: 1 sola sincronización a Brevo cada 24h
+      // (sin importar el SKU). Antes empujábamos por producto → Brevo mandaba
+      // 2-3 emails al día si el cliente veía 2-3 productos distintos.
+      // Ahora nuestro cron interno (send-cart-reminders) consolida todos los
+      // productos en 1 solo email; Brevo actúa sólo como backup.
+      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { data: recent } = await supabase
         .from("brevo_sync_logs")
         .select("id")
         .eq("email", email)
-        .eq("product_sku", productType)
         .eq("event_type", "tienda_abandoned")
         .eq("status", "success")
-        .gte("created_at", thirtyMinAgo)
+        .gte("created_at", dayAgo)
         .limit(1)
         .maybeSingle();
 
       const alreadyOwned = (await getPurchasedSkus(supabase, email)).has(String(productType).toLowerCase());
       if (recent) {
-        console.log(`[dedupe] skipping Brevo push (recent sync <30min) for ${email} / ${productType}`);
+        console.log(`[dedupe] skipping Brevo push (already pushed <24h) for ${email}`);
       } else if (alreadyOwned) {
         console.log(`[skip] ${email} already purchased ${productType} — no Brevo abandoned push`);
       } else {

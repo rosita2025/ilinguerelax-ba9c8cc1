@@ -32,6 +32,7 @@ function buildHtml(opts: {
   products: ProductItem[];
   step: Step;
   coupon?: string;
+  primaryCta?: string;
 }): string {
   const greeting = opts.name ? `Hola ${opts.name}` : "Hola";
   const stepMsg: Record<Step, string> = {
@@ -40,18 +41,19 @@ function buildHtml(opts: {
     7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
 
-  const productsHtml = opts.products.map((p) => {
-    const ctaLabel = p.origin === "hotmart" ? "Retomar en Hotmart" : "Recuperar carrito";
-    return `
-      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:600;color:#0f172a">${p.name}</div>
-        <div style="margin-top:10px">
-          <a href="${p.ctaUrl}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:10px;font-size:14px">${ctaLabel} →</a>
-        </div>
-      </div>`;
-  }).join("");
+  const productsHtml = opts.products.map((p) => `
+      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+        <div style="font-size:15px;font-weight:600;color:#0f172a">${p.name}</div>
+      </div>`).join("");
 
   const plural = opts.products.length > 1;
+  const bigCta = opts.primaryCta
+    ? `<div style="text-align:center;margin:18px 0 6px">
+         <a href="${opts.primaryCta}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:12px;font-size:16px">
+           ${plural ? "Retomar todos mis productos →" : "Retomar mi carrito →"}
+         </a>
+       </div>`
+    : "";
 
   return `<!DOCTYPE html>
 <html lang="es"><body style="margin:0;padding:0;background:#f6f7fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#0f172a;">
@@ -65,6 +67,7 @@ function buildHtml(opts: {
         <tr><td style="padding:0 28px 4px">
           <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">${plural ? `${opts.products.length} productos en tu carrito` : "Producto en tu carrito"}</div>
           ${productsHtml}
+          ${bigCta}
         </td></tr>
         ${opts.coupon ? `<tr><td align="center" style="padding:4px 28px 16px">
           <div style="display:inline-block;padding:8px 14px;border:1px dashed #f97316;border-radius:8px;background:#fff7ed;color:#c2410c;font-weight:600;font-size:14px">Código: ${opts.coupon}</div>

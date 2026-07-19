@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { pushAbandonedCartToBrevo } from "../_shared/brevoAbandonedCart.ts";
 import { normalizeSku } from "../_shared/digitalSku.ts";
+import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

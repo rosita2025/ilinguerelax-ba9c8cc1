@@ -152,9 +152,13 @@ const GoogleSuggestCard = () => {
                   {r.keywords.map((k, i) => (
                     <li key={i} className="flex items-center gap-2 border-b pb-1">
                       <span className="w-5 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                      <div className="w-10 h-1.5 bg-muted rounded overflow-hidden shrink-0" title={`Score ${k.score}/100`}>
+                        <div className="h-full bg-primary" style={{ width: `${k.score}%` }} />
+                      </div>
+                      <span className="shrink-0 text-[10px] font-mono text-primary w-6 text-right">{k.score}</span>
                       {k.count > 1 && (
                         <span
-                          className="shrink-0 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold"
+                          className="shrink-0 px-1 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-bold"
                           title={`Aparece en: ${k.countries.join(", ")}`}
                         >
                           {k.count}×

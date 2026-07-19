@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { pushAbandonedCartToBrevo } from "../_shared/brevoAbandonedCart.ts";
 import { normalizeSku } from "../_shared/digitalSku.ts";
+import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -138,9 +139,11 @@ Deno.serve(async (req) => {
 
     // Persistent cart per email: accumulates ALL SKUs the buyer added across
     // sessions/devices so reminder emails and recovery links reflect the
-    // full cart, not just the last product.
+    // full cart, not just the last product. Purchased SKUs are excluded so
+    // buyers never see abandoned-cart reminders for products they already own.
     let cartToken: string | null = null;
     try {
+      const purchased = await getPurchasedSkus(supabase, email);
       const { data: existingCart } = await supabase
         .from("persistent_carts")
         .select("items")
@@ -157,15 +160,22 @@ Deno.serve(async (req) => {
       // Include the current product in case the client didn't send a cart[] yet
       if (productType && !merged.has(productType)) merged.set(productType, { id: productType, q: 1 });
 
+      // Strip already-purchased SKUs (case-insensitive).
+      for (const key of [...merged.keys()]) {
+        if (purchased.has(key.toLowerCase())) merged.delete(key);
+      }
+
+      const remaining = [...merged.values()].slice(0, 30);
       const { data: cartRow } = await supabase
         .from("persistent_carts")
         .upsert({
           email,
-          items: [...merged.values()].slice(0, 30),
+          items: remaining,
           buyer: { name, phone },
           country: country || null,
           language,
           last_activity: new Date().toISOString(),
+          converted: remaining.length === 0,
         }, { onConflict: "email" })
         .select("cart_token")
         .single();

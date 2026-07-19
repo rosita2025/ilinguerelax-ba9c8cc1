@@ -9,6 +9,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { sendEmail } from "../_shared/brevo.ts";
+import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 
 const corsHeaders = adminCorsHeaders;
 // Steps are measured in MINUTES. 30 min, 1440 min (1 día), 7200 min (5 días).
@@ -260,8 +261,19 @@ Deno.serve(async (req) => {
 
       for (const cart of rows ?? []) {
         const email = (cart.email || "").trim().toLowerCase();
-        const items = Array.isArray(cart.items) ? (cart.items as Array<{ id?: string; q?: number }>) : [];
-        if (!email || items.length === 0) { stat.skipped++; continue; }
+        const rawItems = Array.isArray(cart.items) ? (cart.items as Array<{ id?: string; q?: number }>) : [];
+        if (!email || rawItems.length === 0) { stat.skipped++; continue; }
+
+        // Filter out SKUs the buyer already purchased (manual/hotmart/digital sends).
+        // This is the fix for "cliente compró 1,000 palabras y aun así recibió
+        // recordatorio de 1,000 palabras". If nothing remains, mark cart converted.
+        const purchased = await getPurchasedSkus(admin, email);
+        const items = rawItems.filter((it) => it?.id && !purchased.has(String(it.id).toLowerCase()));
+        if (items.length === 0) {
+          await admin.from("persistent_carts").update({ converted: true }).eq("email", email);
+          stat.skipped++;
+          continue;
+        }
 
         // ATOMIC CLAIM: sentinel row per (email, step) using the existing
         // UNIQUE(email, product_sku, step) constraint. If another cron already

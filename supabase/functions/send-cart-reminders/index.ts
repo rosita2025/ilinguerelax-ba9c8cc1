@@ -265,17 +265,26 @@ Deno.serve(async (req) => {
       }
 
       for (const [email, group] of byEmail) {
-        // Filter out SKUs already sent at this step
-        const { data: alreadySent } = await admin
+        // ATOMIC CLAIM: try to insert one 'pending' row per (email, sku, step).
+        // The UNIQUE(email, product_sku, step) constraint blocks duplicates,
+        // so if another cron run already claimed the same SKU we don't send
+        // it again. Only SKUs we successfully claimed are sent in this run.
+        const claimRows = group.map((r) => ({
+          email,
+          product_sku: r.product_sku || "",
+          origin: (r.origin === "hotmart" || r.event_type === "hotmart_abandoned") ? "hotmart" : "tienda",
+          step,
+          status: "pending",
+        }));
+        const { data: claimed } = await admin
           .from("cart_reminder_sends")
-          .select("product_sku")
-          .eq("email", email).eq("step", step)
-          .in("product_sku", group.map((r) => r.product_sku || ""));
-        const sentSkus = new Set((alreadySent ?? []).map((x) => x.product_sku));
-        const pending = group.filter((r) => !sentSkus.has(r.product_sku || ""));
+          .upsert(claimRows, { onConflict: "email,product_sku,step", ignoreDuplicates: true })
+          .select("id, product_sku");
+        const claimedSkus = new Set((claimed ?? []).map((x) => x.product_sku));
+        const pending = group.filter((r) => claimedSkus.has(r.product_sku || ""));
         if (pending.length === 0) { stat.skipped++; continue; }
 
-        // Build product list
+        // Build product list for the claimed SKUs only
         const products: ProductItem[] = pending.map((r) => {
           const attrs = (r.attributes || {}) as Record<string, unknown>;
           const sku = r.product_sku || "";
@@ -310,17 +319,16 @@ Deno.serve(async (req) => {
           replyTo: "hola@ilinguerelax.com",
         });
 
-        // Record ONE row per SKU so future runs skip them all
-        const rowsToInsert = pending.map((r) => ({
-          email,
-          product_sku: r.product_sku || "",
-          origin: (r.origin === "hotmart" || r.event_type === "hotmart_abandoned") ? "hotmart" : "tienda",
-          step,
-          cart_url: products.find((_, i) => pending[i].product_sku === r.product_sku)?.ctaUrl || null,
-          status: sendRes.error ? "failed" : "sent",
-          error: sendRes.error ? (sendRes.error.message?.slice(0, 500) || null) : null,
-        }));
-        await admin.from("cart_reminder_sends").insert(rowsToInsert);
+        // Finalize the claim rows: mark sent/failed. Never insert new rows here.
+        const skus = pending.map((r) => r.product_sku || "");
+        await admin
+          .from("cart_reminder_sends")
+          .update({
+            status: sendRes.error ? "failed" : "sent",
+            error: sendRes.error ? (sendRes.error.message?.slice(0, 500) || null) : null,
+            cart_url: products[0]?.ctaUrl || null,
+          })
+          .eq("email", email).eq("step", step).in("product_sku", skus);
 
         if (sendRes.error) stat.errors++; else stat.sent++;
       }

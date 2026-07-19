@@ -65,10 +65,13 @@ const GoogleSuggestCard = () => {
   const maxGlobalScore = globalTop[0]?.score || 1;
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-3 md:p-4 space-y-4">
       <div className="flex items-center gap-2">
-        <Search className="w-5 h-5 text-primary" />
-        <h2 className="text-xl font-semibold">Explorador Google Suggest (agrupado por idioma / región)</h2>
+        <Search className="w-5 h-5 text-primary shrink-0" />
+        <h2 className="text-base md:text-xl font-semibold leading-tight">
+          <span className="md:hidden">Google Suggest (por región)</span>
+          <span className="hidden md:inline">Explorador Google Suggest (agrupado por idioma / región)</span>
+        </h2>
       </div>
       <p className="text-xs text-muted-foreground">
         Escribe una semilla y el sistema la traduce a cada mercado antes de consultar Google. Ranking ponderado por{" "}
@@ -99,26 +102,26 @@ const GoogleSuggestCard = () => {
           <p className="text-[11px] text-muted-foreground">
             Mejores keywords para escribir contenido AHORA — combinadas de todos los mercados, ordenadas por score real (posición Google × peso país × intención).
           </p>
-          <ol className="grid gap-1 md:grid-cols-2 text-xs">
+          <ol className="grid gap-1.5 md:gap-1 md:grid-cols-2 text-xs">
             {globalTop.map((k, i) => {
               const rel = Math.round((k.score / maxGlobalScore) * 100);
               return (
-                <li key={i} className="flex items-center gap-2 border-b border-primary/20 pb-1">
-                  <span className="w-6 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                <li key={i} className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-primary/20 pb-1.5">
+                  <span className="w-6 text-[10px] font-mono text-muted-foreground shrink-0">#{i + 1}</span>
                   <div className="w-14 h-2 bg-muted rounded overflow-hidden shrink-0" title={`Score ${rel}/100`}>
                     <div className="h-full bg-primary" style={{ width: `${rel}%` }} />
                   </div>
                   <span className="shrink-0 text-[10px] font-mono text-primary font-bold w-8 text-right">{rel}</span>
-                  <span className="truncate flex-1" title={`${k.groups.length} grupos · ${k.countries.join(", ")}`}>
-                    {k.keyword}
-                  </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">{k.groups.length}g</span>
-                  <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
-                    <Copy className="w-3 h-3" />
+                  <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0 ml-auto" title="Copiar">
+                    <Copy className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
-                    <FileText className="w-3 h-3" />
+                    <FileText className="w-3.5 h-3.5" />
                   </button>
+                  <span className="basis-full text-xs break-words leading-snug" title={`${k.groups.length} grupos · ${k.countries.join(", ")}`}>
+                    {k.keyword}
+                  </span>
                 </li>
               );
             })}
@@ -133,16 +136,16 @@ const GoogleSuggestCard = () => {
             <div key={r.id} className="border rounded-lg p-3 space-y-2">
               <div className="space-y-1">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 font-medium text-sm">
-                    <span className="text-lg">{r.flag}</span>
-                    <span>{r.label}</span>
+                  <div className="flex items-center gap-2 font-medium text-sm min-w-0">
+                    <span className="text-lg shrink-0">{r.flag}</span>
+                    <span className="truncate">{r.label}</span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-[10px] text-muted-foreground shrink-0">
                     {r.countryCount} {r.countryCount === 1 ? "país" : "países"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                  <span className="truncate italic" title={r.translatedSeed}>
+                  <span className="truncate italic min-w-0" title={r.translatedSeed}>
                     🔎 "{r.translatedSeed}"
                   </span>
                   <button onClick={() => copy(r.translatedSeed)} className="hover:text-primary shrink-0" title="Copiar semilla">
@@ -153,10 +156,10 @@ const GoogleSuggestCard = () => {
               {r.keywords.length === 0 ? (
                 <p className="text-xs text-muted-foreground">Sin sugerencias.</p>
               ) : (
-                <ul className="space-y-1 text-xs">
+                <ul className="space-y-1.5 text-xs">
                   {r.keywords.map((k, i) => (
-                    <li key={i} className="flex items-center gap-2 border-b pb-1">
-                      <span className="w-5 text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                    <li key={i} className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b pb-1.5">
+                      <span className="w-5 text-[10px] font-mono text-muted-foreground shrink-0">#{i + 1}</span>
                       <div className="w-10 h-1.5 bg-muted rounded overflow-hidden shrink-0" title={`Score ${k.score}/100`}>
                         <div className="h-full bg-primary" style={{ width: `${k.score}%` }} />
                       </div>
@@ -169,15 +172,15 @@ const GoogleSuggestCard = () => {
                           {k.count}×
                         </span>
                       )}
-                      <span className="truncate flex-1" title={`${k.keyword} — ${k.countries.join(", ")}`}>
-                        {k.keyword}
-                      </span>
-                      <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
-                        <Copy className="w-3 h-3" />
+                      <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0 ml-auto" title="Copiar">
+                        <Copy className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
-                        <FileText className="w-3 h-3" />
+                        <FileText className="w-3.5 h-3.5" />
                       </button>
+                      <span className="basis-full text-xs break-words leading-snug" title={`${k.keyword} — ${k.countries.join(", ")}`}>
+                        {k.keyword}
+                      </span>
                     </li>
                   ))}
                 </ul>

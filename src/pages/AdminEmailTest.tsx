@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminNav from "@/components/admin/AdminNav";
-import DeliveryRetryPanel from "@/components/admin/DeliveryRetryPanel";
+
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -543,7 +543,7 @@ const AdminEmailTest = () => {
             );
           })()}
 
-          <DeliveryRetryPanel />
+          
 
 
 

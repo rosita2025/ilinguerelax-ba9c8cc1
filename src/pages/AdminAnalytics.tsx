@@ -277,6 +277,7 @@ const AdminAnalytics = () => {
   const [data, setData] = useState<AnalyticsData>(() => normalizeAnalyticsData(null, rangeForPreset("today", {})));
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const range = useMemo(
     () => rangeForPreset(preset, { from: customFrom, to: customTo }),
@@ -293,6 +294,7 @@ const AdminAnalytics = () => {
           from: range.from.toISOString(),
           to: range.to.toISOString(),
           granularity: range.granularity,
+          includeBots: false,
         },
       });
       const timeoutPromise = new Promise<never>((_, reject) => {
@@ -308,6 +310,7 @@ const AdminAnalytics = () => {
         return;
       }
       setData(normalizeAnalyticsData(res as Partial<AnalyticsData>, range));
+      setLastUpdated(new Date());
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Error al cargar analíticas";
       setLoadError(msg);
@@ -357,7 +360,18 @@ const AdminAnalytics = () => {
                 Visitas · carrito · checkout · compras · conversión · humanos (bots excluidos)
               </p>
             </div>
-            {loading && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] px-2 py-1 rounded-full border bg-emerald-500/10 border-emerald-500/30 text-emerald-700 font-medium">
+                Solo humanos · bots excluidos
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                Auto 60s{lastUpdated ? ` · ${format(lastUpdated, "HH:mm:ss", { locale: es })}` : ""}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading} className="gap-1">
+                <Loader2 className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+                Actualizar
+              </Button>
+            </div>
           </div>
 
           {loadError && (

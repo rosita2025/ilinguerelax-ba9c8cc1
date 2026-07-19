@@ -415,9 +415,6 @@ const AdminSEO = () => {
           {report && (
             <div className="grid gap-6 lg:grid-cols-2">
               <Card className="p-4">
-          {report && (
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card className="p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Search className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-semibold">Top Queries</h2>

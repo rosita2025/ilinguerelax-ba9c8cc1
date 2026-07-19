@@ -116,6 +116,9 @@ const GoogleSuggestCard = () => {
                   <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
                     <Copy className="w-3 h-3" />
                   </button>
+                  <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
+                    <FileText className="w-3 h-3" />
+                  </button>
                 </li>
               );
             })}
@@ -172,6 +175,9 @@ const GoogleSuggestCard = () => {
                       <button onClick={() => copy(k.keyword)} className="text-muted-foreground hover:text-primary shrink-0" title="Copiar">
                         <Copy className="w-3 h-3" />
                       </button>
+                      <button onClick={() => setBriefKeyword(k.keyword)} className="text-primary hover:opacity-70 shrink-0" title="Generar brief SEO">
+                        <FileText className="w-3 h-3" />
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -180,6 +186,7 @@ const GoogleSuggestCard = () => {
           ))}
         </div>
       )}
+      <ContentBriefDialog keyword={briefKeyword} onClose={() => setBriefKeyword(null)} />
     </Card>
   );
 };

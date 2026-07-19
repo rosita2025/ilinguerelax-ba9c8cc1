@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw, Zap } from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw, Zap, Copy, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
@@ -76,31 +76,45 @@ const AdminSEO = () => {
   const [indexLoading, setIndexLoading] = useState(false);
   const [rowLoading, setRowLoading] = useState<string | null>(null);
   const [requestLoading, setRequestLoading] = useState<string | null>(null);
+  const [copyPost, setCopyPost] = useState<{ slug: string; title: string } | null>(null);
 
   const GSC_RESOURCE = "sc-domain:ilinguerelax.com";
   const gscInspectUrl = (url: string) =>
     `https://search.google.com/search-console/inspect?resource_id=${encodeURIComponent(GSC_RESOURCE)}&url=${encodeURIComponent(url)}`;
 
+  const copyText = async (text: string, message: string) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+      toast.success(message);
+    } catch {
+      toast.error("No se pudo copiar. Mantén presionado el texto y selecciona Copiar.");
+    }
+  };
+
   const requestIndexing = async (slug: string) => {
     const url = `https://ilinguerelax.com/blog/${slug}`;
     setRequestLoading(slug);
-    // 1) Copy URL to clipboard so the user can paste it into the GSC top search bar.
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch { /* clipboard may be blocked; toast still guides the user */ }
-    // 2) Open Search Console (property home). The user pastes the URL into the
-    //    top search bar and clicks "Solicitar indexación". Deep-linking to
-    //    /inspect?url=... is unreliable — GSC often ignores the param.
     const gscTab = window.open(
       `https://search.google.com/search-console?resource_id=${encodeURIComponent(GSC_RESOURCE)}`,
       "_blank",
       "noopener,noreferrer",
     );
-    toast.success(`URL copiada: ${url}. Pégala en la barra superior de Search Console y pulsa "Solicitar indexación".`, { duration: 8000 });
+    toast.info("Copia la URL y pégala en la barra superior de Search Console.", { duration: 6000 });
     if (!gscTab) {
       toast.info("Abre manualmente Search Console — el navegador bloqueó la pestaña nueva.");
     }
-    // 3) Fire IndexNow + sitemap ping in background (non-blocking, no error toast).
     try {
       await supabase.functions.invoke("request-google-indexing", {
         body: { adminKey, urls: [url], siteUrl: "https://ilinguerelax.com/" },
@@ -806,7 +820,7 @@ const AdminSEO = () => {
                                 {(verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) && (
                                   <button
                                     type="button"
-                                    onClick={() => requestIndexing(p.slug)}
+                                    onClick={() => setCopyPost({ slug: p.slug, title: p.title })}
                                     disabled={requestLoading === p.slug}
                                     className="text-amber-600 hover:text-amber-500 dark:text-amber-400 transition-colors mt-0.5"
                                     title="Solicitar indexación en Google Search Console"
@@ -827,6 +841,55 @@ const AdminSEO = () => {
                 </div>
               </div>
             )}
+
+            {copyPost && (() => {
+              const postUrl = `https://ilinguerelax.com/blog/${copyPost.slug}`;
+              return (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="copy-index-title">
+                  <div className="w-full sm:max-w-lg rounded-t-lg sm:rounded-lg border bg-background p-4 shadow-xl space-y-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 id="copy-index-title" className="font-semibold">Solicitar indexación</h3>
+                        <p className="text-xs text-muted-foreground">Copia la URL desde tu celular y pégala en Google Search Console.</p>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => setCopyPost(null)} aria-label="Cerrar">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Título</Label>
+                      <div className="flex gap-2">
+                        <Textarea readOnly value={copyPost.title} rows={2} className="text-sm resize-none" onFocus={(e) => e.currentTarget.select()} />
+                        <Button variant="outline" size="icon" className="shrink-0" onClick={() => copyText(copyPost.title, "Título copiado")} aria-label="Copiar título">
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>URL</Label>
+                      <div className="flex gap-2">
+                        <Textarea readOnly value={postUrl} rows={2} className="text-sm resize-none break-all" onFocus={(e) => e.currentTarget.select()} />
+                        <Button variant="outline" size="icon" className="shrink-0" onClick={() => copyText(postUrl, "URL copiada")} aria-label="Copiar URL">
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <Button variant="outline" onClick={() => copyText(`${copyPost.title}\n${postUrl}`, "Título y URL copiados")}>
+                        <Copy className="h-4 w-4 mr-2" /> Copiar título + URL
+                      </Button>
+                      <Button onClick={() => requestIndexing(copyPost.slug)} disabled={requestLoading === copyPost.slug}>
+                        {requestLoading === copyPost.slug ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ExternalLink className="h-4 w-4 mr-2" />}
+                        Abrir Search Console
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </Card>
         </div>
       </main>

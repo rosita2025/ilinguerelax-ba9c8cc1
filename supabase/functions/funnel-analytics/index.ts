@@ -20,28 +20,37 @@ const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 // Only meaningful for real browser events (PageView / InitiateCheckout / etc.);
 // gateway-injected Purchase events pack JSON into referrer and are excluded upstream.
 type TrafficSource =
-  | "pixel_meta"      // Facebook / Instagram (fbclid or fb/ig referrer)
-  | "google_organic"  // google.* without gclid/utm=cpc
-  | "google_ads"      // gclid or utm_medium=cpc/ppc from google
-  | "otro_organico"   // bing/yahoo/duckduckgo/ecosia
-  | "email"           // utm_source=email / mailchimp / brevo / newsletter
-  | "referral"        // any other external site
-  | "directo";        // no referrer at all
+  | "pixel_meta"      // Facebook / Instagram / Messenger / Threads (fbclid o hostname)
+  | "google_organic"  // google.* sin gclid/utm=cpc
+  | "google_ads"      // gclid o utm_medium=cpc/ppc desde google
+  | "otro_organico"   // bing/yahoo/duckduckgo/ecosia/yandex/baidu/naver/daum/qwant/brave
+  | "social"          // tiktok/youtube/twitter-x/linkedin/pinterest/reddit/snapchat/weibo/wechat/line
+  | "mensajeria"      // whatsapp/telegram/messenger link
+  | "email"           // utm_source=email / mailchimp / brevo / newsletter / sendgrid / mailgun
+  | "referral"        // cualquier otro sitio externo
+  | "directo";        // sin referrer
 function classifyTrafficSource(referrer: string | null): TrafficSource {
   const raw = (referrer || "").trim().toLowerCase();
   if (!raw) return "directo";
-  // fbclid or fb/ig hostnames
-  if (raw.includes("fbclid=") || /(?:^|[\/.@])(facebook|instagram|fb|m\.facebook|l\.facebook|lm\.facebook|fb\.watch)\b/.test(raw)) {
+  // Meta (Facebook, Instagram, Messenger, Threads)
+  if (raw.includes("fbclid=") || /(?:^|[\/.@])(facebook|instagram|fb|m\.facebook|l\.facebook|lm\.facebook|fb\.watch|messenger|threads\.net)\b/.test(raw)) {
     return "pixel_meta";
   }
-  // Email tools
-  if (/utm_source=(email|newsletter|brevo|mailchimp|resend|sendinblue)/.test(raw) || raw.includes("mailto:") || raw.includes("brevo.com") || raw.includes("sendinblue")) {
+  // Email tools (UTMs y dominios de trackers)
+  if (/utm_source=(email|newsletter|brevo|mailchimp|resend|sendinblue|sendgrid|mailgun)/.test(raw)
+      || raw.includes("mailto:") || raw.includes("brevo.com") || raw.includes("sendinblue")
+      || raw.includes("sendibt") || raw.includes("mailchi") || raw.includes("list-manage")
+      || raw.includes("mailgun") || raw.includes("sendgrid") || raw.includes("mcusercontent")) {
     return "email";
   }
   // Google ads vs organic
   if (raw.includes("gclid=") || /utm_medium=(cpc|ppc|paid)/.test(raw)) return "google_ads";
   if (/(?:^|[\/.@])google\./.test(raw) || raw.includes("google.com")) return "google_organic";
-  if (/(?:^|[\/.@])(bing|yahoo|duckduckgo|ecosia|yandex|baidu)\./.test(raw)) return "otro_organico";
+  if (/(?:^|[\/.@])(bing|yahoo|duckduckgo|ecosia|yandex|baidu|naver|daum|kakao|qwant|brave)\./.test(raw)) return "otro_organico";
+  // Mensajería directa
+  if (/(?:^|[\/.@])(wa\.me|whatsapp|t\.me|telegram)\b/.test(raw)) return "mensajeria";
+  // Redes sociales adicionales
+  if (/(?:^|[\/.@])(tiktok|youtube|youtu\.be|twitter|x\.com|t\.co|linkedin|lnkd\.in|pinterest|pin\.it|reddit|redd\.it|snapchat|weibo|wechat|weixin|line\.me|discord)\b/.test(raw)) return "social";
   return "referral";
 }
 

@@ -1,6 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { pingIndexNow, pingSitemap } from '../_shared/indexnow.ts';
+import { logIndexingEvents, type IndexingEvent } from '../_shared/indexingLog.ts';
 
 const ADMIN_REVIEW_KEY = Deno.env.get('ADMIN_REVIEW_KEY') ?? '';
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY') ?? '';

@@ -65,7 +65,7 @@ const AdminSEO = () => {
   const [genCategory, setGenCategory] = useState("Aprendizaje");
   const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
   const [genLoading, setGenLoading] = useState(false);
-  const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
+  const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean; google_index_requested_at: string | null }>>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
   type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };
@@ -114,6 +114,12 @@ const AdminSEO = () => {
   };
 
   const requestIndexing = async (slug: string) => {
+    const post = genPosts.find((item) => item.slug === slug);
+    if (post?.google_index_requested_at) {
+      toast.info("Esta URL ya tuvo su única solicitud de indexación.");
+      setCopyPost(null);
+      return;
+    }
     const url = `https://ilinguerelax.com/blog/${slug}`;
     setRequestLoading(slug);
     const gscTab = window.open(
@@ -126,11 +132,21 @@ const AdminSEO = () => {
       toast.info("Abre manualmente Search Console — el navegador bloqueó la pestaña nueva.");
     }
     try {
-      await supabase.functions.invoke("request-google-indexing", {
+      const { data, error } = await supabase.functions.invoke("request-google-indexing", {
         body: { adminKey, urls: [url], siteUrl: "https://ilinguerelax.com/" },
       });
-        toast.success("Solicitud preparada. Google puede tardar horas o días en actualizar el estado real.", { duration: 7000 });
-    } catch { /* background ping failure is not user-facing */ }
+      if (error) throw error;
+      const result = data as { alreadyRequested?: boolean };
+      if (result?.alreadyRequested) {
+        toast.info("Esta URL ya había sido solicitada. No se envió de nuevo.");
+      } else {
+        toast.success("Solicitud única registrada. No podrá repetirse mañana ni otro día.", { duration: 7000 });
+      }
+      await loadGenPosts();
+      setCopyPost(null);
+    } catch {
+      toast.error("No se pudo registrar la solicitud. No se marcó como enviada.");
+    }
     setRequestLoading(null);
   };
 
@@ -225,7 +241,7 @@ const AdminSEO = () => {
   const loadGenPosts = async () => {
     const { data } = await supabase
       .from("generated_blog_posts")
-      .select("id,slug,title,category,created_at,published")
+      .select("id,slug,title,category,created_at,published,google_index_requested_at")
       .order("created_at", { ascending: false })
       .limit(50);
     setGenPosts(data ?? []);
@@ -775,7 +791,7 @@ const AdminSEO = () => {
                       onClick={async () => {
                         const discovered = genPosts.filter((p) => {
                           const v = indexStatus[p.slug]?.verdict;
-                          return v === "NEUTRAL" || v === "FAIL" || !v;
+                          return !p.google_index_requested_at && (v === "NEUTRAL" || v === "FAIL" || !v);
                         });
                         if (discovered.length === 0) {
                           toast.info("No hay URLs descubiertas o pendientes en la lista visible.");
@@ -788,8 +804,9 @@ const AdminSEO = () => {
                             body: { adminKey, urls, siteUrl: "https://ilinguerelax.com/" },
                           });
                           if (error) throw error;
-                          const note = (data as { note?: string })?.note;
-                          toast.success(`${urls.length} URLs enviadas a IndexNow + sitemap${note ? ". Solicita indexación manual en GSC para cada una." : ""}.`);
+                          const result = data as { sent?: number; skipped?: number };
+                          toast.success(`${result.sent ?? urls.length} solicitudes únicas registradas${result.skipped ? `; ${result.skipped} ya estaban solicitadas` : ""}.`);
+                          await loadGenPosts();
                         } catch (err) {
                           toast.error(err instanceof Error ? err.message : "Error al solicitar indexación masiva");
                         } finally {
@@ -888,7 +905,7 @@ const AdminSEO = () => {
                                     ? <Loader2 className="w-3 h-3 animate-spin" />
                                     : <RefreshCw className="w-3 h-3" />}
                                 </button>
-                                {(verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) && (
+                                {!p.google_index_requested_at && (verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) && (
                                   <button
                                     type="button"
                                     onClick={() => setCopyPost({ slug: p.slug, title: p.title })}
@@ -900,6 +917,14 @@ const AdminSEO = () => {
                                       ? <Loader2 className="w-3 h-3 animate-spin" />
                                       : <Zap className="w-3 h-3" />}
                                   </button>
+                                )}
+                                {p.google_index_requested_at && verdict !== "PASS" && (
+                                  <span
+                                    className="text-[10px] text-muted-foreground"
+                                    title={new Date(p.google_index_requested_at).toLocaleString("es-ES")}
+                                  >
+                                    Solicitada 1 vez
+                                  </span>
                                 )}
                               </div>
                             </td>

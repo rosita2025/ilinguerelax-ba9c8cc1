@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 import { pingIndexNow, pingSitemap } from '../_shared/indexnow.ts';
 
 const ADMIN_REVIEW_KEY = Deno.env.get('ADMIN_REVIEW_KEY') ?? '';
@@ -17,10 +18,41 @@ Deno.serve(async (req) => {
       });
     }
 
-    const list: string[] = Array.isArray(urls) ? urls.filter((u) => typeof u === 'string') : [];
+    const requestedList: string[] = Array.isArray(urls) ? urls.filter((u) => typeof u === 'string') : [];
+    const admin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+    const slugs = requestedList.flatMap((rawUrl) => {
+      try {
+        const match = new URL(rawUrl).pathname.match(/^\/blog\/([^/]+)\/?$/);
+        return match ? [decodeURIComponent(match[1])] : [];
+      } catch {
+        return [];
+      }
+    });
+    const { data: claimed, error: claimError } = slugs.length > 0
+      ? await admin
+          .from('generated_blog_posts')
+          .update({ google_index_requested_at: new Date().toISOString() })
+          .in('slug', slugs)
+          .is('google_index_requested_at', null)
+          .select('slug')
+      : { data: [], error: null };
+    if (claimError) throw claimError;
+    const claimedSlugs = new Set((claimed ?? []).map((row) => row.slug));
+    const list = requestedList.filter((rawUrl) => {
+      try {
+        const match = new URL(rawUrl).pathname.match(/^\/blog\/([^/]+)\/?$/);
+        return !match || claimedSlugs.has(decodeURIComponent(match[1]));
+      } catch {
+        return true;
+      }
+    });
+    const skipped = requestedList.length - list.length;
     if (list.length === 0) {
-      return new Response(JSON.stringify({ error: 'urls required' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      return new Response(JSON.stringify({ ok: true, alreadyRequested: true, sent: 0, skipped }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -79,6 +111,8 @@ Deno.serve(async (req) => {
     const okCount = indexingResults.filter((r) => r.ok).length;
     return new Response(JSON.stringify({
       ok: true,
+      sent: list.length,
+      skipped,
       indexnow: 'sent',
       sitemap: 'resubmitted',
       indexingApi: { attempted: indexingResults.length, ok: okCount, results: indexingResults },

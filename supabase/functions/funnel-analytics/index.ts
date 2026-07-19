@@ -741,15 +741,32 @@ serve(async (req) => {
       .sort((a, b) => b.sessions - a.sessions)
       .slice(0, 30);
 
-    // Product × Country breakdown, filtered to products with real activity
+    // Product × Country breakdown, filtered to products with real activity.
+    // Collapse duplicate product keys (slug vs name vs SKU) into one row per (SKU, country).
     const validProductIds = new Set(byProduct.map((p) => p.product_id));
-    const byProductCountry = Array.from(byProductCountryAgg.values())
-      .filter((v) => validProductIds.has(v.product_id) && (v.sessions.size + v.views + v.carts + v.purchases) > 0)
+    const mergedPC = new Map<string, { product_id: string; country: string; sessionsIds: Set<string>; views: number; carts: number; purchases: number; revenue: number }>();
+    for (const v of byProductCountryAgg.values()) {
+      const canon = canonicalProductKey(v.product_id);
+      if (!validProductIds.has(canon)) continue;
+      if ((v.sessions.size + v.views + v.carts + v.purchases) === 0) continue;
+      const k = `${canon}::${v.country}`;
+      let m = mergedPC.get(k);
+      if (!m) {
+        m = { product_id: canon, country: v.country, sessionsIds: new Set(), views: 0, carts: 0, purchases: 0, revenue: 0 };
+        mergedPC.set(k, m);
+      }
+      for (const s of v.sessions) m.sessionsIds.add(s);
+      m.views += v.views;
+      m.carts += v.carts;
+      m.purchases += v.purchases;
+      m.revenue += v.revenue;
+    }
+    const byProductCountry = Array.from(mergedPC.values())
       .map((v) => ({
         product_id: v.product_id,
         name: nameMap.get(v.product_id) || null,
         country: v.country,
-        sessions: v.sessions.size,
+        sessions: v.sessionsIds.size,
         views: v.views,
         carts: v.carts,
         purchases: v.purchases,

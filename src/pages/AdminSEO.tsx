@@ -70,6 +70,10 @@ const AdminSEO = () => {
   const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean; google_index_requested_at: string | null }>>([]);
+  const [postsPage, setPostsPage] = useState(1);
+  const [postsFilter, setPostsFilter] = useState<"all" | "pending" | "indexed" | "drafts">("all");
+  const isMobile = useIsMobile();
+  const postsPerPage = isMobile ? 4 : 5;
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
   type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };

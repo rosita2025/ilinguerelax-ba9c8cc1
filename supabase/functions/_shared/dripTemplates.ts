@@ -310,21 +310,6 @@ const STEPS: Record<DripStepKey, Bundle> = {
 function renderCards(lang: DripLang): string {
   const cards = cardsFor(lang);
   const label = HISPANO_LANGS.includes(lang) ? 'Ver producto' : 'View product';
-  const cellHtml = cards.map((c) => `
-    <td style="width:50%;padding:6px;vertical-align:top;">
-      <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#ffffff;">
-        <a href="${BASE}/products/${c.slug}" style="text-decoration:none;color:inherit;display:block;">
-          <img src="${c.cover}" alt="${c.name.replace(/"/g,'&quot;')}" style="display:block;width:100%;height:150px;object-fit:cover;" />
-          <div style="padding:12px 14px;">
-            <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.35;min-height:38px;">${c.name}</p>
-            <div style="text-align:center;">
-              <span style="display:inline-block;background:#1e6f6f;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;">${label}</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </td>`).join('');
-  // Build 2-per-row table
   const rows: string[] = [];
   for (let i = 0; i < cards.length; i += 2) {
     const pair = cards.slice(i, i + 2)
@@ -336,7 +321,7 @@ function renderCards(lang: DripLang): string {
             <div style="padding:12px 14px;">
               <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.35;min-height:38px;">${c.name}</p>
               <div style="text-align:center;">
-                <span style="display:inline-block;background:#1e6f6f;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;">${label}</span>
+                <span style="display:inline-block;background:#000000;color:#ffffff;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:0.02em;">${label}</span>
               </div>
             </div>
           </a>
@@ -355,10 +340,19 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
   const cardsHtml = c.showcase ? renderCards(lang) : '';
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f7fa;font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;">
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:'Helvetica Neue','Segoe UI',Arial,sans-serif;color:#1a1a1a;">
   <div style="max-width:600px;margin:24px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
-    <div style="background:linear-gradient(135deg,#1e6f6f 0%,#2fa7a7 100%);padding:28px 24px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">${BRAND}</h1>
+    <div style="background:#000000;padding:24px 24px 16px;text-align:center;">
+      <h1 style="margin:0 0 14px;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:0.5px;">iLingue Relax</h1>
+      <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">
+        <a href="${BASE}" style="color:#ffffff;text-decoration:none;opacity:0.85;">Home</a>
+        <span style="color:#555;padding:0 8px;">·</span>
+        <a href="${BASE}/products" style="color:#ffffff;text-decoration:none;opacity:0.85;">Productos</a>
+        <span style="color:#555;padding:0 8px;">·</span>
+        <a href="${BASE}/blog" style="color:#ffffff;text-decoration:none;opacity:0.85;">Blog</a>
+        <span style="color:#555;padding:0 8px;">·</span>
+        <a href="${BASE}/contact" style="color:#ffffff;text-decoration:none;opacity:0.85;">Contacto</a>
+      </p>
     </div>
     <div style="padding:32px 28px;line-height:1.6;">
       <p style="font-size:16px;margin:0 0 12px;">${hello}</p>
@@ -366,15 +360,15 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
       <p style="font-size:15px;color:#374151;margin:0 0 8px;">${c.body}</p>
       ${cardsHtml}
       <div style="text-align:center;margin:24px 0;">
-        <a href="${c.ctaUrl}" style="display:inline-block;background:#e85d3c;color:#ffffff;text-decoration:none;padding:14px 34px;border-radius:50px;font-weight:600;font-size:15px;">${c.ctaText}</a>
+        <a href="${c.ctaUrl}" style="display:inline-block;background:#000000;color:#ffffff;text-decoration:none;padding:14px 34px;border-radius:50px;font-weight:600;font-size:15px;letter-spacing:0.02em;">${c.ctaText}</a>
       </div>
       <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:16px;text-align:center;">
         <p style="font-size:13px;color:#6b7280;margin:0 0 8px;">${c.footer}</p>
-        <p style="font-size:12px;color:#9ca3af;margin:8px 0 0;">
-          <a href="${BASE}" style="color:#1e6f6f;text-decoration:none;">Home</a> ·
-          <a href="${BASE}/products" style="color:#1e6f6f;text-decoration:none;">Productos</a> ·
-          <a href="${BASE}/blog" style="color:#1e6f6f;text-decoration:none;">Blog</a> ·
-          <a href="${BASE}/contact" style="color:#1e6f6f;text-decoration:none;">Contacto</a>
+        <p style="font-size:12px;color:#6b7280;margin:8px 0 0;">
+          <a href="${BASE}" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Home</a> ·
+          <a href="${BASE}/products" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Productos</a> ·
+          <a href="${BASE}/blog" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Blog</a> ·
+          <a href="${BASE}/contact" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Contacto</a>
         </p>
         <p style="font-size:11px;color:#9ca3af;margin:12px 0 0;">
           ${BRAND} · <a href="mailto:${HELP_EMAIL}" style="color:#9ca3af;">${HELP_EMAIL}</a><br>

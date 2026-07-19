@@ -1181,8 +1181,34 @@ const AdminSEO = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Paginación */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                    >
+                      ← Anterior
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      Página {page} de {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPostsPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page >= totalPages}
+                    >
+                      Siguiente →
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
+              );
+            })()}
 
             {copyPost && (() => {
               const postUrl = `https://ilinguerelax.com/blog/${copyPost.slug}`;

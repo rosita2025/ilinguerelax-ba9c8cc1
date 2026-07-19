@@ -67,6 +67,32 @@ const AdminSEO = () => {
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
+  const [indexStatus, setIndexStatus] = useState<Record<string, { verdict: string; coverageState: string; lastCrawlTime?: string | null }>>({});
+  const [indexLoading, setIndexLoading] = useState(false);
+
+  const checkIndexing = async () => {
+    if (genPosts.length === 0) return;
+    setIndexLoading(true);
+    try {
+      const urls = genPosts.slice(0, 25).map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+      const { data, error } = await supabase.functions.invoke("gsc-inspect-urls", {
+        body: { adminKey, urls },
+      });
+      if (error) throw error;
+      const results = (data as { results?: Array<{ url: string; verdict: string; coverageState: string; lastCrawlTime?: string | null }> })?.results ?? [];
+      const map: Record<string, { verdict: string; coverageState: string; lastCrawlTime?: string | null }> = {};
+      for (const r of results) {
+        const slug = r.url.split("/blog/")[1];
+        if (slug) map[slug] = { verdict: r.verdict, coverageState: r.coverageState, lastCrawlTime: r.lastCrawlTime };
+      }
+      setIndexStatus(map);
+      toast.success("Estado de indexación actualizado");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al consultar Google Search Console");
+    } finally {
+      setIndexLoading(false);
+    }
+  };
 
   const toggleProduct = (id: string) => {
     setSelectedProducts((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
@@ -577,7 +603,18 @@ const AdminSEO = () => {
 
             {genPosts.length > 0 && (
               <div className="pt-2">
-                <h3 className="text-sm font-semibold mb-2">Últimos posts generados</h3>
+                <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+                  <h3 className="text-sm font-semibold">Últimos posts generados</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={checkIndexing}
+                    disabled={indexLoading}
+                  >
+                    {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
+                    Verificar indexación en Google
+                  </Button>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="text-left text-xs uppercase text-muted-foreground border-b">
@@ -585,36 +622,63 @@ const AdminSEO = () => {
                         <th className="py-2 pr-2">Título</th>
                         <th className="py-2 px-2">Categoría</th>
                         <th className="py-2 px-2">Fecha</th>
-                        <th className="py-2 pl-2">Estado</th>
+                        <th className="py-2 px-2">Estado</th>
+                        <th className="py-2 pl-2">Google Index</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {genPosts.map((p) => (
-                        <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30">
-                          <td className="py-2 pr-2 max-w-[320px] truncate">
-                            <a
-                              href={`/blog/${p.slug}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:text-primary inline-flex items-center gap-1"
-                            >
-                              <span className="truncate">{p.title}</span>
-                              <ExternalLink className="w-3 h-3 shrink-0" />
-                            </a>
-                          </td>
-                          <td className="py-2 px-2">{p.category}</td>
-                          <td className="py-2 px-2 text-xs text-muted-foreground">
-                            {new Date(p.created_at).toLocaleDateString("es-ES")}
-                          </td>
-                          <td className="py-2 pl-2">
-                            {p.published ? (
-                              <span className="text-primary text-xs">Publicado</span>
-                            ) : (
-                              <span className="text-muted-foreground text-xs">Borrador</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                      {genPosts.map((p) => {
+                        const idx = indexStatus[p.slug];
+                        const verdict = idx?.verdict;
+                        const badgeClass =
+                          verdict === "PASS" ? "text-green-600 dark:text-green-400" :
+                          verdict === "PARTIAL" ? "text-amber-600 dark:text-amber-400" :
+                          verdict === "FAIL" ? "text-destructive" :
+                          verdict === "NEUTRAL" ? "text-muted-foreground" :
+                          "text-muted-foreground";
+                        const label =
+                          verdict === "PASS" ? "Indexado" :
+                          verdict === "PARTIAL" ? "Parcial" :
+                          verdict === "FAIL" ? "No indexado" :
+                          verdict === "NEUTRAL" ? "Descubierta" :
+                          verdict ? "Desconocido" : "—";
+                        return (
+                          <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30">
+                            <td className="py-2 pr-2 max-w-[320px] truncate">
+                              <a
+                                href={`/blog/${p.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-primary inline-flex items-center gap-1"
+                              >
+                                <span className="truncate">{p.title}</span>
+                                <ExternalLink className="w-3 h-3 shrink-0" />
+                              </a>
+                            </td>
+                            <td className="py-2 px-2">{p.category}</td>
+                            <td className="py-2 px-2 text-xs text-muted-foreground">
+                              {new Date(p.created_at).toLocaleDateString("es-ES")}
+                            </td>
+                            <td className="py-2 px-2">
+                              {p.published ? (
+                                <span className="text-primary text-xs">Publicado</span>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">Borrador</span>
+                              )}
+                            </td>
+                            <td className="py-2 pl-2">
+                              <span className={`text-xs font-medium ${badgeClass}`} title={idx?.coverageState || ""}>
+                                {label}
+                              </span>
+                              {idx?.coverageState && idx.coverageState !== "—" && (
+                                <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+                                  {idx.coverageState}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

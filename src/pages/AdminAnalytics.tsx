@@ -310,6 +310,7 @@ const AdminAnalytics = () => {
         return;
       }
       setData(normalizeAnalyticsData(res as Partial<AnalyticsData>, range));
+      setLastUpdated(new Date());
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Error al cargar analíticas";
       setLoadError(msg);

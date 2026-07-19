@@ -69,14 +69,24 @@ const AdminSEO = () => {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
   type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };
+  type EngineName = "bing" | "yandex" | "duckduckgo" | "brave";
+  type EngineEntry = { indexed: boolean | null; note?: string; checkedAt: number };
+  type MultiEntry = Partial<Record<EngineName, EngineEntry>>;
   const INDEX_CACHE_KEY = "ilr_gsc_index_cache_v1";
+  const MULTI_CACHE_KEY = "ilr_multi_index_cache_v1";
   const [indexStatus, setIndexStatus] = useState<Record<string, IndexEntry>>(() => {
     try { return JSON.parse(localStorage.getItem(INDEX_CACHE_KEY) || "{}"); } catch { return {}; }
   });
+  const [multiStatus, setMultiStatus] = useState<Record<string, MultiEntry>>(() => {
+    try { return JSON.parse(localStorage.getItem(MULTI_CACHE_KEY) || "{}"); } catch { return {}; }
+  });
   const [indexLoading, setIndexLoading] = useState(false);
+  const [multiLoading, setMultiLoading] = useState(false);
+  const [multiRowLoading, setMultiRowLoading] = useState<string | null>(null);
   const [rowLoading, setRowLoading] = useState<string | null>(null);
   const [requestLoading, setRequestLoading] = useState<string | null>(null);
   const [copyPost, setCopyPost] = useState<{ slug: string; title: string } | null>(null);
+
 
   const GSC_RESOURCE = "sc-domain:ilinguerelax.com";
   const gscInspectUrl = (url: string) =>
@@ -160,6 +170,53 @@ const AdminSEO = () => {
       setRowLoading(null);
     }
   };
+
+  const persistMulti = (next: Record<string, MultiEntry>) => {
+    setMultiStatus(next);
+    try { localStorage.setItem(MULTI_CACHE_KEY, JSON.stringify(next)); } catch { /* noop */ }
+  };
+
+  const checkMultiIndex = async (slugsFilter?: string[]) => {
+    const targets = slugsFilter
+      ? genPosts.filter((p) => slugsFilter.includes(p.slug))
+      : genPosts.slice(0, 15);
+    if (targets.length === 0) return;
+    const isSingle = !!slugsFilter && slugsFilter.length === 1;
+    if (isSingle) setMultiRowLoading(slugsFilter![0]); else setMultiLoading(true);
+    try {
+      const urls = targets.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+      const { data, error } = await supabase.functions.invoke("check-multi-search-index", {
+        body: { adminKey, urls },
+      });
+      if (error) throw error;
+      const results = (data as {
+        results?: Array<{
+          url: string;
+          results: Record<EngineName, { indexed: boolean | null; note?: string }>;
+        }>;
+      })?.results ?? [];
+      const now = Date.now();
+      const merged: Record<string, MultiEntry> = { ...multiStatus };
+      for (const r of results) {
+        const slug = r.url.split("/blog/")[1]?.replace(/\/$/, "");
+        if (!slug) continue;
+        const entry: MultiEntry = {};
+        (Object.keys(r.results) as EngineName[]).forEach((eng) => {
+          const v = r.results[eng];
+          entry[eng] = { indexed: v?.indexed ?? null, note: v?.note, checkedAt: now };
+        });
+        merged[slug] = entry;
+      }
+      persistMulti(merged);
+      if (!isSingle) toast.success("Verificado en Bing, Yandex, DuckDuckGo y Brave");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al verificar buscadores");
+    } finally {
+      setMultiLoading(false);
+      setMultiRowLoading(null);
+    }
+  };
+
 
   const toggleProduct = (id: string) => {
     setSelectedProducts((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
@@ -699,8 +756,19 @@ const AdminSEO = () => {
                       disabled={indexLoading}
                     >
                       {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
-                      Verificar indexación
+                      Verificar Google
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => checkMultiIndex()}
+                      disabled={multiLoading}
+                      title="Verificar Bing, Yandex, DuckDuckGo y Brave"
+                    >
+                      {multiLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
+                      Verificar buscadores
+                    </Button>
+
                     <Button
                       variant="default"
                       size="sm"
@@ -746,8 +814,13 @@ const AdminSEO = () => {
                         <th className="py-2 px-2">Categoría</th>
                         <th className="py-2 px-2">Fecha</th>
                         <th className="py-2 px-2">Estado</th>
-                        <th className="py-2 pl-2">Google Index</th>
+                        <th className="py-2 px-2">Google</th>
+                        <th className="py-2 px-2 text-center">Bing</th>
+                        <th className="py-2 px-2 text-center">Yandex</th>
+                        <th className="py-2 px-2 text-center">DuckDuckGo</th>
+                        <th className="py-2 pl-2 text-center">Brave</th>
                       </tr>
+
                     </thead>
                     <tbody>
                       {genPosts.map((p) => {
@@ -792,20 +865,15 @@ const AdminSEO = () => {
                                 <span className="text-muted-foreground text-xs">Borrador</span>
                               )}
                             </td>
-                            <td className="py-2 pl-2">
+                            <td className="py-2 px-2">
                               <div className="flex items-start gap-2">
                                 <div className="min-w-0">
                                   <span className={`text-xs font-medium ${badgeClass}`} title={idx?.coverageState || ""}>
                                     {label}
                                   </span>
-                                  {idx?.coverageState && idx.coverageState !== "—" && (
-                                    <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">
-                                      {idx.coverageState}
-                                    </div>
-                                  )}
                                   {idx?.checkedAt && (
                                     <div className="text-[10px] text-muted-foreground">
-                                      Verificado {new Date(idx.checkedAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                      {new Date(idx.checkedAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                                     </div>
                                   )}
                                 </div>
@@ -833,9 +901,42 @@ const AdminSEO = () => {
                                       : <Zap className="w-3 h-3" />}
                                   </button>
                                 )}
-
                               </div>
                             </td>
+                            {(["bing", "yandex", "duckduckgo", "brave"] as EngineName[]).map((eng, i) => {
+                              const e = multiStatus[p.slug]?.[eng];
+                              const isLast = i === 3;
+                              const glyph = e?.indexed === true ? "✓" : e?.indexed === false ? "✗" : "—";
+                              const color = e?.indexed === true ? "text-green-600 dark:text-green-400"
+                                : e?.indexed === false ? "text-destructive"
+                                : "text-muted-foreground";
+                              const title = e?.note
+                                ? `${eng}: ${e.note}`
+                                : e?.checkedAt
+                                  ? `Verificado ${new Date(e.checkedAt).toLocaleString("es-ES")}`
+                                  : "Sin verificar";
+                              return (
+                                <td key={eng} className={`py-2 px-2 text-center ${isLast ? "pl-2" : ""}`}>
+                                  <div className="flex flex-col items-center gap-0.5">
+                                    <span className={`text-base font-semibold ${color}`} title={title}>{glyph}</span>
+                                    {isLast && (
+                                      <button
+                                        type="button"
+                                        onClick={() => checkMultiIndex([p.slug])}
+                                        disabled={multiRowLoading === p.slug}
+                                        className="text-muted-foreground hover:text-primary transition-colors"
+                                        title="Volver a verificar en Bing, Yandex, DuckDuckGo y Brave"
+                                      >
+                                        {multiRowLoading === p.slug
+                                          ? <Loader2 className="w-3 h-3 animate-spin" />
+                                          : <RefreshCw className="w-3 h-3" />}
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
+                              );
+                            })}
+
                           </tr>
                         );
                       })}

@@ -26,18 +26,17 @@ const SitemapHealthCard = () => {
     setLoading(true);
     setFetchError(null);
     try {
-      const [xml, dbRes] = await Promise.all([
-        fetch(SITEMAP_URL, { cache: "no-store" }).then((r) => r.text()),
+      const [probeRes, dbRes] = await Promise.all([
+        supabase.functions.invoke("sitemap-notify", { body: { action: "probe" } }),
         supabase
           .from("digital_products")
           .select("sku,name,updated_at")
           .eq("active", true)
           .order("updated_at", { ascending: false }),
       ]);
-      const matches = Array.from(xml.matchAll(/<loc>[^<]*\/products\/([^<]+)<\/loc>/g)).map(
-        (m) => m[1],
-      );
-      setSitemapSlugs(new Set(matches));
+      if (probeRes.error) throw probeRes.error;
+      const slugs: string[] = (probeRes.data as { slugs?: string[] })?.slugs ?? [];
+      setSitemapSlugs(new Set(slugs));
       setDbSlugs((dbRes.data ?? []) as { sku: string; name: string; updated_at: string }[]);
     } catch (e) {
       setFetchError((e as Error).message);
@@ -45,6 +44,7 @@ const SitemapHealthCard = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     load();

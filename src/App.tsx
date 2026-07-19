@@ -83,6 +83,7 @@ const AdminBrevoAbandonedStats = lazy(() => import("./pages/AdminBrevoAbandonedS
 const AdminNewsletterDrip = lazy(() => import("./pages/AdminNewsletterDrip"));
 
 const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
+const AdminBotReport = lazy(() => import("./pages/AdminBotReport"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
@@ -284,6 +285,7 @@ const App = () => (
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />
                   
                   <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />
+                  <Route path="/admin/bot-report" element={<AdminGate><AdminBotReport /></AdminGate>} />
                   <Route path="/admin/analytics" element={<AdminGate><AdminAnalytics /></AdminGate>} />
                   
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />

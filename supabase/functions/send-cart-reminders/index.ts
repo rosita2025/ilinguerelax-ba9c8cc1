@@ -21,29 +21,37 @@ const SUBJECTS_ES: Record<Step, string> = {
   7200: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
 };
 
-const STEP_LABEL: Record<Step, string> = {
-  30: "30 min", 1440: "Día 1", 7200: "Día 5",
-};
+interface ProductItem {
+  name: string;
+  ctaUrl: string;
+  origin: "hotmart" | "tienda";
+}
 
 function buildHtml(opts: {
   name?: string;
-  productName?: string;
-  ctaUrl: string;
-  origin: "hotmart" | "tienda";
+  products: ProductItem[];
   step: Step;
   coupon?: string;
 }): string {
   const greeting = opts.name ? `Hola ${opts.name}` : "Hola";
-  const product = opts.productName || "tu producto";
-  const ctaLabel = opts.origin === "hotmart" ? "Retomar compra en Hotmart" : "Recuperar mi carrito";
-  const platformNote = opts.origin === "hotmart"
-    ? "Retomarás la compra desde donde la dejaste en Hotmart (pago 100% seguro)."
-    : "Retomarás el checkout en nuestra tienda con los productos que dejaste.";
   const stepMsg: Record<Step, string> = {
-    30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tu carrito sigue reservado — retómalo en 1 clic.",
+    30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tus productos siguen reservados — retómalos en 1 clic.",
     1440: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
     7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
+
+  const productsHtml = opts.products.map((p) => {
+    const ctaLabel = p.origin === "hotmart" ? "Retomar en Hotmart" : "Recuperar carrito";
+    return `
+      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:600;color:#0f172a">${p.name}</div>
+        <div style="margin-top:10px">
+          <a href="${p.ctaUrl}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:10px;font-size:14px">${ctaLabel} →</a>
+        </div>
+      </div>`;
+  }).join("");
+
+  const plural = opts.products.length > 1;
 
   return `<!DOCTYPE html>
 <html lang="es"><body style="margin:0;padding:0;background:#f6f7fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#0f172a;">
@@ -51,21 +59,12 @@ function buildHtml(opts: {
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.08)">
         <tr><td style="padding:28px 28px 8px">
-          <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:${opts.origin === "hotmart" ? "#fff7ed" : "#f0fdfa"};color:${opts.origin === "hotmart" ? "#c2410c" : "#0f766e"};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">
-            ${opts.origin === "hotmart" ? "Hotmart" : "Tienda iLingue Relax"} · ${STEP_LABEL[opts.step]}
-          </div>
-          <h1 style="margin:12px 0 4px;font-size:22px;line-height:1.3">${greeting} 👋</h1>
-          <p style="margin:0 0 12px;color:#475569">${stepMsg[opts.step]}</p>
+          <h1 style="margin:0 0 8px;font-size:22px;line-height:1.3">${greeting} 👋</h1>
+          <p style="margin:0 0 16px;color:#475569">${stepMsg[opts.step]}</p>
         </td></tr>
-        <tr><td style="padding:8px 28px 4px">
-          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px">
-            <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em">Producto en tu carrito</div>
-            <div style="font-size:16px;font-weight:600;margin-top:4px">${product}</div>
-            <div style="font-size:12px;color:#94a3b8;margin-top:6px">${platformNote}</div>
-          </div>
-        </td></tr>
-        <tr><td align="center" style="padding:20px 28px 8px">
-          <a href="${opts.ctaUrl}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:12px;font-size:15px">${ctaLabel} →</a>
+        <tr><td style="padding:0 28px 4px">
+          <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">${plural ? `${opts.products.length} productos en tu carrito` : "Producto en tu carrito"}</div>
+          ${productsHtml}
         </td></tr>
         ${opts.coupon ? `<tr><td align="center" style="padding:4px 28px 16px">
           <div style="display:inline-block;padding:8px 14px;border:1px dashed #f97316;border-radius:8px;background:#fff7ed;color:#c2410c;font-weight:600;font-size:14px">Código: ${opts.coupon}</div>
@@ -251,55 +250,58 @@ Deno.serve(async (req) => {
       const stat = { candidates: (rows ?? []).length, sent: 0, skipped: 0, errors: 0 };
       results[`day${step}`] = stat;
 
-      // Deduplicate: keep latest row per (email, sku)
-      const seen = new Map<string, typeof rows[number]>();
+      // Group rows by email; each email gets ONE consolidated reminder listing
+      // all products the user abandoned in this window.
+      type Row = NonNullable<typeof rows>[number];
+      const byEmail = new Map<string, Row[]>();
       for (const r of rows ?? []) {
-        const key = `${(r.email || "").toLowerCase()}::${r.product_sku || ""}`;
-        if (!seen.has(key)) seen.set(key, r);
-      }
-
-      for (const r of seen.values()) {
         const email = (r.email || "").trim().toLowerCase();
         const sku = r.product_sku || "";
-        if (!email || !sku) { stat.skipped++; continue; }
-        const attrs = (r.attributes || {}) as Record<string, unknown>;
-        const origin: "hotmart" | "tienda" = r.origin === "hotmart" || r.event_type === "hotmart_abandoned" ? "hotmart" : "tienda";
+        if (!email || !sku) continue;
+        const list = byEmail.get(email) ?? [];
+        // Dedupe by SKU inside the group (latest wins, rows already desc)
+        if (!list.some((x) => (x.product_sku || "") === sku)) list.push(r);
+        byEmail.set(email, list);
+      }
 
-        // Build recovery URL
-        let ctaUrl = String(attrs.ABANDONED_CART_URL || attrs.PRODUCT_URL || "").trim();
-        if (!ctaUrl) {
-          if (origin === "hotmart") {
-            ctaUrl = `https://pay.hotmart.com/${sku}`;
-          } else {
-            ctaUrl = `https://ilinguerelax.com/checkouts/${encodeURIComponent(sku)}?recover=${encodeURIComponent(email)}`;
-          }
-        } else if (origin === "tienda" && !/[?&]recover=/.test(ctaUrl)) {
-          ctaUrl += (ctaUrl.includes("?") ? "&" : "?") + `recover=${encodeURIComponent(email)}`;
-        }
-
-        // Check if already sent
-        const { data: existing } = await admin
+      for (const [email, group] of byEmail) {
+        // Filter out SKUs already sent at this step
+        const { data: alreadySent } = await admin
           .from("cart_reminder_sends")
-          .select("id")
-          .eq("email", email).eq("product_sku", sku).eq("step", step)
-          .maybeSingle();
-        if (existing) { stat.skipped++; continue; }
+          .select("product_sku")
+          .eq("email", email).eq("step", step)
+          .in("product_sku", group.map((r) => r.product_sku || ""));
+        const sentSkus = new Set((alreadySent ?? []).map((x) => x.product_sku));
+        const pending = group.filter((r) => !sentSkus.has(r.product_sku || ""));
+        if (pending.length === 0) { stat.skipped++; continue; }
+
+        // Build product list
+        const products: ProductItem[] = pending.map((r) => {
+          const attrs = (r.attributes || {}) as Record<string, unknown>;
+          const sku = r.product_sku || "";
+          const origin: "hotmart" | "tienda" =
+            r.origin === "hotmart" || r.event_type === "hotmart_abandoned" ? "hotmart" : "tienda";
+          let ctaUrl = String(attrs.ABANDONED_CART_URL || attrs.PRODUCT_URL || "").trim();
+          if (!ctaUrl) {
+            ctaUrl = origin === "hotmart"
+              ? `https://pay.hotmart.com/${sku}`
+              : `https://ilinguerelax.com/checkouts/${encodeURIComponent(sku)}?recover=${encodeURIComponent(email)}`;
+          } else if (origin === "tienda" && !/[?&]recover=/.test(ctaUrl)) {
+            ctaUrl += (ctaUrl.includes("?") ? "&" : "?") + `recover=${encodeURIComponent(email)}`;
+          }
+          return { name: r.product_name || "Producto", ctaUrl, origin };
+        });
 
         if (dryRun) { stat.sent++; continue; }
 
-        const name = (attrs.NOMBRE as string | undefined)
-          || (r.attributes as any)?.first_name
+        const firstAttrs = (pending[0].attributes || {}) as Record<string, unknown>;
+        const name = (firstAttrs.NOMBRE as string | undefined)
+          || (firstAttrs as any)?.first_name
           || undefined;
-        const coupon = (attrs.ABANDONED_COUPON as string | undefined) || (step === 7200 ? "NEW10" : undefined);
+        const coupon = (firstAttrs.ABANDONED_COUPON as string | undefined)
+          || (step === 7200 ? "NEW10" : undefined);
 
-        const html = buildHtml({
-          name,
-          productName: r.product_name || undefined,
-          ctaUrl,
-          origin,
-          step,
-          coupon,
-        });
+        const html = buildHtml({ name, products, step, coupon });
 
         const sendRes = await sendEmail({
           to: email,
@@ -308,22 +310,22 @@ Deno.serve(async (req) => {
           replyTo: "hola@ilinguerelax.com",
         });
 
-        if (sendRes.error) {
-          stat.errors++;
-          await admin.from("cart_reminder_sends").insert({
-            email, product_sku: sku, origin, step,
-            cart_url: ctaUrl, status: "failed",
-            error: sendRes.error.message?.slice(0, 500) || null,
-          });
-        } else {
-          stat.sent++;
-          await admin.from("cart_reminder_sends").insert({
-            email, product_sku: sku, origin, step,
-            cart_url: ctaUrl, status: "sent",
-          });
-        }
+        // Record ONE row per SKU so future runs skip them all
+        const rowsToInsert = pending.map((r) => ({
+          email,
+          product_sku: r.product_sku || "",
+          origin: (r.origin === "hotmart" || r.event_type === "hotmart_abandoned") ? "hotmart" : "tienda",
+          step,
+          cart_url: products.find((_, i) => pending[i].product_sku === r.product_sku)?.ctaUrl || null,
+          status: sendRes.error ? "failed" : "sent",
+          error: sendRes.error ? (sendRes.error.message?.slice(0, 500) || null) : null,
+        }));
+        await admin.from("cart_reminder_sends").insert(rowsToInsert);
+
+        if (sendRes.error) stat.errors++; else stat.sent++;
       }
     }
+
 
     return new Response(JSON.stringify({ ok: true, dryRun, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

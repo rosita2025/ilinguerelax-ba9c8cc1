@@ -309,17 +309,46 @@ Deno.serve(async (req) => {
       ...({ language: lang } as Record<string, unknown>),
     } as Parameters<typeof upsertBrevoContact>[0]);
 
-    const { subject, text, html } = buildWelcomeEmail(lang, name);
-    const result = await sendEmail({
-      from: FROM,
-      to: email,
-      replyTo: REPLY_TO,
-      subject,
-      html,
-      text,
-    } as any);
-    if ((result as any)?.error) {
-      console.warn('welcome email send failed', (result as any).error);
+    // Dedupe welcome email: only send once per email address, ever.
+    // Uses email_contacts with source='newsletter_welcome' (unique on lower(email)+source).
+    let alreadyWelcomed = false;
+    try {
+      const { error: insErr } = await supabase
+        .from('email_contacts')
+        .insert({
+          email,
+          name: name || null,
+          source: 'newsletter_welcome',
+          language: lang,
+          metadata: { coupon: COUPON, origin: source },
+        });
+      if (insErr) {
+        // 23505 = unique violation → already sent before
+        if ((insErr as any).code === '23505' || /duplicate|unique/i.test(insErr.message || '')) {
+          alreadyWelcomed = true;
+        } else {
+          console.warn('welcome dedupe insert warn', insErr);
+        }
+      }
+    } catch (e) {
+      console.warn('welcome dedupe check failed', e);
+    }
+
+    if (!alreadyWelcomed) {
+      const { subject, text, html } = buildWelcomeEmail(lang, name);
+      const result = await sendEmail({
+        from: FROM,
+        to: email,
+        replyTo: REPLY_TO,
+        subject,
+        html,
+        text,
+      } as any);
+      if ((result as any)?.error) {
+        console.warn('welcome email send failed', (result as any).error);
+      }
+    } else {
+      console.log('welcome email skipped (already sent):', email);
     }
 
     return new Response(JSON.stringify({ ok: true, lang }), {

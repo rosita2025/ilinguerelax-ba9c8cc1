@@ -624,7 +624,7 @@ const AdminSEO = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={checkIndexing}
+                    onClick={() => checkIndexing()}
                     disabled={indexLoading}
                   >
                     {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}

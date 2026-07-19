@@ -58,10 +58,10 @@ const ContentBriefDialog = ({ keyword, onClose }: Props) => {
     setBrief(null);
     supabase
       .from("digital_products")
-      .select("sku,title,slug")
+      .select("sku,name")
       .eq("active", true)
-      .order("title")
-      .then(({ data }) => setProducts(data ?? []));
+      .order("name")
+      .then(({ data }) => setProducts((data ?? []).map((p) => ({ sku: p.sku, title: p.name, slug: p.sku }))));
   }, [keyword]);
 
   const toggle = (sku: string) =>

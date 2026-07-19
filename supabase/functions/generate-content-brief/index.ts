@@ -74,11 +74,11 @@ serve(async (req) => {
       );
       const { data } = await supabase
         .from("digital_products")
-        .select("sku,title,slug,subtitle")
+        .select("sku,name")
         .in("sku", productSkus.slice(0, 6));
       if (data?.length) {
-        productsCtx = `\n\nPRODUCTOS iLINGUE RELAX A INTEGRAR EN EL CTA (usa el título exacto y enlaza a /products/{slug}):\n${
-          data.map((p) => `- ${p.title} → /products/${p.slug}${p.subtitle ? " · " + p.subtitle : ""}`).join("\n")
+        productsCtx = `\n\nPRODUCTOS iLINGUE RELAX A INTEGRAR EN EL CTA (usa el título exacto y enlaza a /products/{sku}):\n${
+          data.map((p) => `- ${p.name} → /products/${p.sku}`).join("\n")
         }`;
       }
     }

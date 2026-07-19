@@ -12,6 +12,8 @@ interface SendArgs {
   /** Ignored (kept for legacy Brevo template compatibility). */
   templateId?: number;
   params?: Record<string, unknown>;
+  /** Force a specific provider for this send, bypassing EMAIL_PROVIDER env. */
+  provider?: 'brevo' | 'resend';
 }
 
 interface SendResult {

@@ -374,6 +374,7 @@ serve(async (req) => {
     const nameToSku = new Map<string, string>();
     const skuToName = new Map<string, string>();
     const slugToSku = new Map<string, string>();
+    const skuSlugs: Array<{ sku: string; slug: string }> = [];
     const slugify = (s: string) =>
       s.toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -384,15 +385,37 @@ serve(async (req) => {
         const nameKey = p.name.trim().toLowerCase();
         nameToSku.set(nameKey, p.sku);
         skuToName.set(p.sku, p.name);
-        slugToSku.set(slugify(p.name), p.sku);
+        const nameSlug = slugify(p.name);
+        slugToSku.set(nameSlug, p.sku);
         slugToSku.set(String(p.sku).toLowerCase(), p.sku);
+        skuSlugs.push({ sku: p.sku, slug: nameSlug });
+        // sku_aliases: legacy SKUs / slugs that must collapse into this SKU
+        const aliases = Array.isArray(p.sku_aliases) ? p.sku_aliases : [];
+        for (const a of aliases) {
+          if (!a) continue;
+          const aStr = String(a).trim().toLowerCase();
+          slugToSku.set(aStr, p.sku);
+          slugToSku.set(slugify(aStr), p.sku);
+        }
       }
     }
+    // Sort by descending slug length so longer/more specific names win first
+    skuSlugs.sort((a, b) => b.slug.length - a.slug.length);
     const canonicalProductKey = (raw: string): string => {
       if (!raw) return raw;
       const trimmed = String(raw).trim();
       const lower = trimmed.toLowerCase();
-      return nameToSku.get(lower) || slugToSku.get(lower) || slugToSku.get(slugify(trimmed)) || trimmed;
+      // Strip path/query noise: keep last segment only
+      const lastSeg = lower.split("?")[0].split("#")[0].split("/").filter(Boolean).pop() || lower;
+      const slug = slugify(lastSeg);
+      const direct = nameToSku.get(lower) || slugToSku.get(lower) || slugToSku.get(slug) || slugToSku.get(slugify(trimmed));
+      if (direct) return direct;
+      // Substring fallback: URL slug like "patrones-especiales-alfabeto-ingles-a1" contains SKU slug
+      for (const { sku, slug: s } of skuSlugs) {
+        if (!s) continue;
+        if (slug.includes(s) || s.includes(slug)) return sku;
+      }
+      return trimmed;
     };
 
 

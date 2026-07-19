@@ -144,7 +144,8 @@ const BlogPost = () => {
     "description": post.excerpt,
     "image": post.image,
     "datePublished": post.date,
-    "dateModified": post.date,
+    "dateModified": (post.updatedAt ?? post.date).slice(0, 10),
+
     "author": {
       "@type": "Organization",
       "name": post.author,

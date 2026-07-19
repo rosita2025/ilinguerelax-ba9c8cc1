@@ -13,6 +13,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { products } from "@/data/products";
 import SitemapHealthCard from "@/components/admin/SitemapHealthCard";
+import BacklinksCard from "@/components/admin/BacklinksCard";
 
 
 interface GscRow {
@@ -651,6 +652,10 @@ const AdminSEO = () => {
               </div>
             )}
           </Card>
+
+          <BacklinksCard />
+
+
 
           <Card className="p-4 space-y-4">
             <div className="flex items-center gap-2">

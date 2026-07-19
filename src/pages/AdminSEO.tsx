@@ -14,6 +14,8 @@ import { useAdminKey } from "@/components/admin/AdminGate";
 import { products } from "@/data/products";
 import SitemapHealthCard from "@/components/admin/SitemapHealthCard";
 import BacklinksCard from "@/components/admin/BacklinksCard";
+import GscKeywordsMultilangCard from "@/components/admin/GscKeywordsMultilangCard";
+import GoogleSuggestCard from "@/components/admin/GoogleSuggestCard";
 
 
 interface GscRow {
@@ -653,6 +655,8 @@ const AdminSEO = () => {
             )}
           </Card>
 
+          <GscKeywordsMultilangCard />
+          <GoogleSuggestCard />
           <BacklinksCard />
 
 

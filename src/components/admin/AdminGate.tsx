@@ -210,9 +210,9 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("admin-2fa", {
-        body: { action: "verify", challengeId, code: otp },
+        body: { action: "verify", challengeId, code: otp, remember },
       });
-      const payload = data as { token?: string; expiresAt?: number; error?: string } | null;
+      const payload = data as { token?: string; expiresAt?: number; error?: string; remembered?: boolean } | null;
       if (error || payload?.error || !payload?.token || !payload?.expiresAt) {
         let attempts = 0;
         try { attempts = Number(sessionStorage.getItem(OTP_ATTEMPTS_KEY) || 0) + 1; } catch { /* noop */ }
@@ -227,8 +227,9 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         }
         return;
       }
-      setAdmin2FAToken(payload.token, payload.expiresAt);
-      try { sessionStorage.setItem(STORAGE_KEY, pendingKey); } catch { /* noop */ }
+      const persist = !!payload.remembered;
+      setAdmin2FAToken(payload.token, payload.expiresAt, persist);
+      writeAdminKey(pendingKey, persist);
       setAdminKey(pendingKey);
       setPendingKey("");
       setChallengeId("");

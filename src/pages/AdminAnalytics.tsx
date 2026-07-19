@@ -360,7 +360,18 @@ const AdminAnalytics = () => {
                 Visitas · carrito · checkout · compras · conversión · humanos (bots excluidos)
               </p>
             </div>
-            {loading && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] px-2 py-1 rounded-full border bg-emerald-500/10 border-emerald-500/30 text-emerald-700 font-medium">
+                Solo humanos · bots excluidos
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                Auto 60s{lastUpdated ? ` · ${format(lastUpdated, "HH:mm:ss", { locale: es })}` : ""}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading} className="gap-1">
+                <Loader2 className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+                Actualizar
+              </Button>
+            </div>
           </div>
 
           {loadError && (

@@ -3,8 +3,10 @@ import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe, Pencil, S
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+
 import { useAdminKey } from "@/components/admin/AdminGate";
 
 interface ManualPayment {
@@ -75,7 +77,10 @@ const AdminManualPayments = () => {
         body: { action: "list", adminKey },
       });
       if (error) throw error;
-      setOrders(((data as { orders?: ManualPayment[] } | null)?.orders) ?? []);
+      const list = ((data as { orders?: ManualPayment[] } | null)?.orders) ?? [];
+      // Ensure newest orders always appear on top (Shopify-style)
+      list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setOrders(list);
     } catch {
       toast({ title: "Error al cargar órdenes", variant: "destructive" });
     } finally {
@@ -83,14 +88,27 @@ const AdminManualPayments = () => {
     }
   };
 
+
   useEffect(() => {
     void fetchOrders();
     const iv = setInterval(() => { void fetchOrders(); }, 20000);
     const onVis = () => { if (document.visibilityState === "visible") void fetchOrders(); };
     document.addEventListener("visibilitychange", onVis);
-    return () => { clearInterval(iv); document.removeEventListener("visibilitychange", onVis); };
+    // Realtime: new manual payments appear instantly at the top (Shopify-style)
+    const channel = supabase
+      .channel("admin-manual-payments")
+      .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => {
+        void fetchOrders();
+      })
+      .subscribe();
+    return () => {
+      clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVis);
+      supabase.removeChannel(channel);
+    };
     /* eslint-disable-next-line */
   }, [adminKey]);
+
 
   const runAction = async (action: "verify" | "reject" | "reset", orderId: string) => {
     try {

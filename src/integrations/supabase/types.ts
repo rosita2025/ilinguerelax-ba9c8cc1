@@ -1293,6 +1293,48 @@ export type Database = {
         }
         Relationships: []
       }
+      persistent_carts: {
+        Row: {
+          buyer: Json
+          cart_token: string
+          converted: boolean
+          country: string | null
+          created_at: string
+          email: string
+          id: string
+          items: Json
+          language: string | null
+          last_activity: string
+          updated_at: string
+        }
+        Insert: {
+          buyer?: Json
+          cart_token?: string
+          converted?: boolean
+          country?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          items?: Json
+          language?: string | null
+          last_activity?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer?: Json
+          cart_token?: string
+          converted?: boolean
+          country?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          items?: Json
+          language?: string | null
+          last_activity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_upsells: {
         Row: {
           created_at: string

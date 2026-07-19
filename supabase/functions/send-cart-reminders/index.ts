@@ -275,9 +275,47 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // DAILY THROTTLE: máximo 1 email de carrito abandonado por cliente
-        // cada 24h, sin importar cuántos steps o productos tenga. Evita que
-        // el mismo comprador reciba 2-3 correos el mismo día.
+        // OPT-OUT / SUPPRESSION: respetar baja de marketing y bounces.
+        // Bloquea envío si el email está en suppressed_emails (unsubscribe,
+        // bounce, complaint) o marcado como opt-out en email_contacts.
+        const { data: suppressed } = await admin
+          .from("suppressed_emails")
+          .select("reason")
+          .eq("email", email)
+          .limit(1)
+          .maybeSingle();
+        if (suppressed) { stat.skipped++; continue; }
+
+        const { data: contact } = await admin
+          .from("email_contacts")
+          .select("metadata")
+          .eq("email", email)
+          .limit(1)
+          .maybeSingle();
+        const meta = (contact?.metadata || {}) as Record<string, unknown>;
+        if (meta.unsubscribed === true || meta.marketing_opt_in === false) {
+          stat.skipped++; continue;
+        }
+
+        // FRECUENCIA: máximo 1 email de carrito abandonado por ventana.
+        // Ventanas: 30 min → 1 en últimas 25 min; 1 día → 1 en últimas 20 h;
+        // 5 días → 1 en últimos 4 días. Además, throttle global de 24h
+        // entre correos de recuperación aunque se disparen distintos steps.
+        const windowMs: Record<Step, number> = {
+          30: 25 * 60 * 1000,
+          1440: 20 * 3600 * 1000,
+          7200: 4 * 24 * 3600 * 1000,
+        };
+        const sinceWindow = new Date(Date.now() - windowMs[step]).toISOString();
+        const { count: windowCount } = await admin
+          .from("cart_reminder_sends")
+          .select("id", { count: "exact", head: true })
+          .eq("email", email)
+          .eq("step", step)
+          .eq("status", "sent")
+          .gte("created_at", sinceWindow);
+        if ((windowCount ?? 0) > 0) { stat.skipped++; continue; }
+
         const since24h = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
         const { count: recentCount } = await admin
           .from("cart_reminder_sends")

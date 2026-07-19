@@ -805,6 +805,8 @@ const AdminAnalytics = () => {
                 </div>
               </Card>
 
+              {/* Top productos por país (agrupado por SKU, expandible) */}
+              <ProductCountryGrouped rows={data.byProductCountry || []} />
 
 
 

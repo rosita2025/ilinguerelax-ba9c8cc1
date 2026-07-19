@@ -18,6 +18,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
 
 import { BrevoChatToggle } from "@/components/BrevoChatToggle";
+import AdminSubdomainGate from "@/components/admin/AdminSubdomainGate";
 import { AutoTranslate } from "@/components/AutoTranslate";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 

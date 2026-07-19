@@ -106,8 +106,12 @@ const AdminPurchasesStatus = () => {
         body: { adminKey, provider: provider === "all" ? undefined : provider, mapped, search, limit: 300 },
       });
       if (error) throw error;
-      setRows((data as any)?.rows ?? []);
+      const rows = ((data as any)?.rows ?? []) as any[];
+      // Newest first (Shopify-style)
+      rows.sort((a, b) => String(b.received_at ?? "").localeCompare(String(a.received_at ?? "")));
+      setRows(rows);
       setSummary((data as any)?.summary ?? {});
+
     } catch (e) {
       toast.error("Error al cargar", { description: (e as Error).message });
     } finally {

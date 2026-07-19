@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,11 +67,20 @@ export default function AdminNewsletterDrip() {
     if (!cfg) { toast.error("Paso no encontrado"); return; }
     setSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke("send-newsletter-drip", {
+      const { data, error } = await adminInvoke<{ ok?: boolean; error?: string }>("send-newsletter-drip", {
         body: { mode, email, template_key: stepKey, step: cfg.step, language, name: name || undefined },
       });
-      if (error) throw error;
-      if ((data as any)?.ok === false) throw new Error((data as any).error || "Error al enviar");
+      if (error) {
+        let detail = error.message;
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const payload = await error.context.json();
+            detail = payload?.error || payload?.detail || detail;
+          } catch { /* retain the original message */ }
+        }
+        throw new Error(detail);
+      }
+      if (data?.ok === false) throw new Error(data.error || "Error al enviar");
       toast.success(mode === "test" ? `Test enviado a ${email}` : `Reenvío del paso ${cfg.step} a ${email}`);
       loadAll();
     } catch (e: any) {

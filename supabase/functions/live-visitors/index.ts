@@ -378,8 +378,9 @@ serve(async (req) => {
       }
     }
     const ga4Active = ga4?.activeUsers || 0;
-    const activeNow = Math.max(activeFive.size, ga4Active);
-    const totalOut = Math.max(visitors.length, ga4Active);
+    // Solo humanos reales del pixel interno (GA4 puede incluir bots/crawlers).
+    const activeNow = activeFive.size;
+    const totalOut = visitors.length;
 
     return new Response(JSON.stringify({
       windowMinutes: win,

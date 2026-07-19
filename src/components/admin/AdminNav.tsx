@@ -93,6 +93,8 @@ export const AdminNav = () => {
   const CurrentIcon = current.icon;
 
   return (
+    <>
+    <AdminPWAMeta />
     <nav className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="max-w-6xl mx-auto px-3 sm:px-4">
         <div className="flex items-center gap-2 h-12 sm:h-14">

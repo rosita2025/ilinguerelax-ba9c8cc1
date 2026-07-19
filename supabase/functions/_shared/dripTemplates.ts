@@ -340,10 +340,19 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
   const cardsHtml = c.showcase ? renderCards(lang) : '';
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f7fa;font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;">
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:'Helvetica Neue','Segoe UI',Arial,sans-serif;color:#1a1a1a;">
   <div style="max-width:600px;margin:24px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
-    <div style="background:linear-gradient(135deg,#1e6f6f 0%,#2fa7a7 100%);padding:28px 24px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">${BRAND}</h1>
+    <div style="background:#000000;padding:24px 24px 16px;text-align:center;">
+      <h1 style="margin:0 0 14px;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:0.5px;">iLingue Relax</h1>
+      <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">
+        <a href="${BASE}" style="color:#ffffff;text-decoration:none;opacity:0.85;">Home</a>
+        <span style="color:#555;padding:0 8px;">·</span>
+        <a href="${BASE}/products" style="color:#ffffff;text-decoration:none;opacity:0.85;">Productos</a>
+        <span style="color:#555;padding:0 8px;">·</span>
+        <a href="${BASE}/blog" style="color:#ffffff;text-decoration:none;opacity:0.85;">Blog</a>
+        <span style="color:#555;padding:0 8px;">·</span>
+        <a href="${BASE}/contact" style="color:#ffffff;text-decoration:none;opacity:0.85;">Contacto</a>
+      </p>
     </div>
     <div style="padding:32px 28px;line-height:1.6;">
       <p style="font-size:16px;margin:0 0 12px;">${hello}</p>

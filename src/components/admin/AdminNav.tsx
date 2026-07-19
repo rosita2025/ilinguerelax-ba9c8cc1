@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import AdminPWAMeta from "./AdminPWAMeta";
 
 type Group = { label: string; items: Array<{ to: string; label: string; icon: any }> };
 

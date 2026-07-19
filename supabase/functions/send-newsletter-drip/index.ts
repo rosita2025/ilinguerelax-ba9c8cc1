@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
       try {
         const { subject, html, text } = getDripCopy(stepKey, lang, name);
         const finalSubject = mode === 'test' ? `[TEST] ${subject}` : subject;
-        const res = await sendEmail({ from: FROM, to: email, replyTo: REPLY_TO, subject: finalSubject, html, text } as any);
+        const res = await sendEmail({ from: FROM, to: email, replyTo: REPLY_TO, subject: finalSubject, html, text, provider: 'resend' } as any);
         if ((res as any)?.error) throw new Error((res as any).error.message || 'send failed');
 
         if (mode === 'resend' && stepNum > 0) {
@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
 
       try {
         const res = await sendEmail({
-          from: FROM, to: email, replyTo: REPLY_TO, subject, html, text,
+          from: FROM, to: email, replyTo: REPLY_TO, subject, html, text, provider: 'resend',
         } as any);
         if ((res as any)?.error) throw new Error((res as any).error.message || 'send failed');
 

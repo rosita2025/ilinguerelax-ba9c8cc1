@@ -993,21 +993,8 @@ const AdminSEO = () => {
                           <span>·</span>
                           <span>{p.published ? "Publicado" : "Borrador"}</span>
                         </div>
-                        <div className="flex items-center gap-3 flex-wrap text-[11px]">
-                          {(["bing", "yandex", "duckduckgo", "brave"] as EngineName[]).map((eng) => {
-                            const e = multiStatus[p.slug]?.[eng];
-                            const glyph = e?.indexed === true ? "✓" : e?.indexed === false ? "✗" : "—";
-                            const color = e?.indexed === true ? "text-green-600 dark:text-green-400"
-                              : e?.indexed === false ? "text-destructive"
-                              : "text-muted-foreground";
-                            return (
-                              <span key={eng} className="flex items-center gap-1">
-                                <span className="capitalize text-muted-foreground">{eng}</span>
-                                <span className={`font-semibold ${color}`}>{glyph}</span>
-                              </span>
-                            );
-                          })}
-                        </div>
+
+
                         <div className="flex items-center gap-2 pt-1 border-t">
                           <Button
                             variant="outline"

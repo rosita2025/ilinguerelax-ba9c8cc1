@@ -103,9 +103,10 @@ export const AdminNav = () => {
             <span className="hidden sm:inline">iLingue · Admin</span>
           </NavLink>
 
+          <div className="ml-auto flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 ml-auto sm:ml-2">
+              <Button variant="outline" size="sm" className="gap-2">
                 <Menu className="w-4 h-4" />
                 <CurrentIcon className="w-4 h-4 hidden sm:inline" />
                 <span className="truncate max-w-[160px] sm:max-w-none">{current.label}</span>

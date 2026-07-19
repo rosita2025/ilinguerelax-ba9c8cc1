@@ -756,8 +756,19 @@ const AdminSEO = () => {
                       disabled={indexLoading}
                     >
                       {indexLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
-                      Verificar indexación
+                      Verificar Google
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => checkMultiIndex()}
+                      disabled={multiLoading}
+                      title="Verificar Bing, Yandex, DuckDuckGo y Brave"
+                    >
+                      {multiLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Search className="w-3 h-3 mr-1" />}
+                      Verificar buscadores
+                    </Button>
+
                     <Button
                       variant="default"
                       size="sm"

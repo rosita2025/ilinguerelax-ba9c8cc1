@@ -171,6 +171,53 @@ const AdminSEO = () => {
     }
   };
 
+  const persistMulti = (next: Record<string, MultiEntry>) => {
+    setMultiStatus(next);
+    try { localStorage.setItem(MULTI_CACHE_KEY, JSON.stringify(next)); } catch { /* noop */ }
+  };
+
+  const checkMultiIndex = async (slugsFilter?: string[]) => {
+    const targets = slugsFilter
+      ? genPosts.filter((p) => slugsFilter.includes(p.slug))
+      : genPosts.slice(0, 15);
+    if (targets.length === 0) return;
+    const isSingle = !!slugsFilter && slugsFilter.length === 1;
+    if (isSingle) setMultiRowLoading(slugsFilter![0]); else setMultiLoading(true);
+    try {
+      const urls = targets.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+      const { data, error } = await supabase.functions.invoke("check-multi-search-index", {
+        body: { adminKey, urls },
+      });
+      if (error) throw error;
+      const results = (data as {
+        results?: Array<{
+          url: string;
+          results: Record<EngineName, { indexed: boolean | null; note?: string }>;
+        }>;
+      })?.results ?? [];
+      const now = Date.now();
+      const merged: Record<string, MultiEntry> = { ...multiStatus };
+      for (const r of results) {
+        const slug = r.url.split("/blog/")[1]?.replace(/\/$/, "");
+        if (!slug) continue;
+        const entry: MultiEntry = {};
+        (Object.keys(r.results) as EngineName[]).forEach((eng) => {
+          const v = r.results[eng];
+          entry[eng] = { indexed: v?.indexed ?? null, note: v?.note, checkedAt: now };
+        });
+        merged[slug] = entry;
+      }
+      persistMulti(merged);
+      if (!isSingle) toast.success("Verificado en Bing, Yandex, DuckDuckGo y Brave");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al verificar buscadores");
+    } finally {
+      setMultiLoading(false);
+      setMultiRowLoading(null);
+    }
+  };
+
+
   const toggleProduct = (id: string) => {
     setSelectedProducts((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
   };

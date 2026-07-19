@@ -16,12 +16,47 @@ import {
 import { toast } from "sonner";
 
 const STORAGE_KEY = "ilr_admin_key";
+const PERSIST_KEY = "ilr_admin_persist"; // "1" when trusted device
 const ATTEMPTS_KEY = "ilr_admin_attempts";
 const LOCK_KEY = "ilr_admin_lock_until";
 const OTP_ATTEMPTS_KEY = "ilr_admin_otp_attempts";
 const MAX_ATTEMPTS = 5;
 const MAX_OTP_ATTEMPTS = 5;
 const LOCK_MS = 5 * 60 * 1000;
+
+function isStandalonePWA(): boolean {
+  try {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      // iOS Safari
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window.navigator as any).standalone === true
+    );
+  } catch { return false; }
+}
+
+function readAdminKey(): string {
+  try {
+    return localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY) || "";
+  } catch { return ""; }
+}
+function writeAdminKey(key: string, persist: boolean) {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(PERSIST_KEY);
+    const store = persist ? localStorage : sessionStorage;
+    store.setItem(STORAGE_KEY, key);
+    if (persist) localStorage.setItem(PERSIST_KEY, "1");
+  } catch { /* noop */ }
+}
+function clearAdminKey() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(PERSIST_KEY);
+  } catch { /* noop */ }
+}
 
 // Install once: any call to /functions/v1/* gets CSRF + 2FA headers.
 let fetchPatched = false;
@@ -60,11 +95,12 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
   getAdminCsrfToken();
 
   const [adminKey, setAdminKey] = useState<string>(() => {
-    try {
-      const key = sessionStorage.getItem(STORAGE_KEY) || "";
-      // Only consider logged-in if we also have a valid 2FA token.
-      return key && getAdmin2FAToken() ? key : "";
-    } catch { return ""; }
+    const key = readAdminKey();
+    return key && getAdmin2FAToken() ? key : "";
+  });
+  // Default trust on installed PWA — device is already protected by Face ID / passcode.
+  const [remember, setRemember] = useState<boolean>(() => {
+    try { return localStorage.getItem(PERSIST_KEY) === "1" || isStandalonePWA(); } catch { return false; }
   });
   const [stage, setStage] = useState<Stage>("password");
   const [pendingKey, setPendingKey] = useState("");
@@ -77,7 +113,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
 
   const logout = () => {
-    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+    clearAdminKey();
     resetAdminCsrfToken();
     resetAdmin2FAToken();
     setAdminKey("");
@@ -98,7 +134,7 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
       if (cancelled) return;
       const err = (data as { error?: string; code?: string } | null);
       if (error || err?.error) {
-        try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+        clearAdminKey();
         resetAdmin2FAToken();
         setAdminKey("");
         if (err?.code === "TWO_FA_REQUIRED") {
@@ -174,9 +210,9 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("admin-2fa", {
-        body: { action: "verify", challengeId, code: otp },
+        body: { action: "verify", challengeId, code: otp, remember },
       });
-      const payload = data as { token?: string; expiresAt?: number; error?: string } | null;
+      const payload = data as { token?: string; expiresAt?: number; error?: string; remembered?: boolean } | null;
       if (error || payload?.error || !payload?.token || !payload?.expiresAt) {
         let attempts = 0;
         try { attempts = Number(sessionStorage.getItem(OTP_ATTEMPTS_KEY) || 0) + 1; } catch { /* noop */ }
@@ -191,8 +227,9 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         }
         return;
       }
-      setAdmin2FAToken(payload.token, payload.expiresAt);
-      try { sessionStorage.setItem(STORAGE_KEY, pendingKey); } catch { /* noop */ }
+      const persist = !!payload.remembered;
+      setAdmin2FAToken(payload.token, payload.expiresAt, persist);
+      writeAdminKey(pendingKey, persist);
       setAdminKey(pendingKey);
       setPendingKey("");
       setChallengeId("");
@@ -301,6 +338,15 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
                     spellCheck={false}
                   />
                 </div>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="w-4 h-4 accent-primary"
+                  />
+                  Confiar en este dispositivo (7 días · Face ID / passcode)
+                </label>
                 <Button type="submit" className="w-full" disabled={loading || otp.length !== 6}>
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verificar y entrar"}
                 </Button>

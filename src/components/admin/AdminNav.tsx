@@ -41,6 +41,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import AdminPWAMeta from "./AdminPWAMeta";
+import AdminTrustBadge from "./AdminTrustBadge";
 
 type Group = { label: string; items: Array<{ to: string; label: string; icon: any }> };
 

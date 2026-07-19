@@ -5,6 +5,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { pingIndexNow, pingSitemap } from "../_shared/indexnow.ts";
+import { resubmitSitemapsGSC } from "../_shared/gsc.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -253,13 +254,15 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     }
 
 
-    // On publish, notify search engines immediately (IndexNow + sitemap ping).
+    // On publish, notify IndexNow engines and explicitly ask Google Search
+    // Console to re-read the sitemap set. Google does not support IndexNow.
     // Failures are swallowed inside the helpers — never block the response.
     if (publish) {
       const postUrl = `https://ilinguerelax.com/blog/${slug}`;
       await Promise.allSettled([
         pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
         pingSitemap(),
+        resubmitSitemapsGSC(),
       ]);
     }
 

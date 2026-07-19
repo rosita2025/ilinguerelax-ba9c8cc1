@@ -67,30 +67,46 @@ const AdminSEO = () => {
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean }>>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
-  const [indexStatus, setIndexStatus] = useState<Record<string, { verdict: string; coverageState: string; lastCrawlTime?: string | null }>>({});
+  type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };
+  const INDEX_CACHE_KEY = "ilr_gsc_index_cache_v1";
+  const [indexStatus, setIndexStatus] = useState<Record<string, IndexEntry>>(() => {
+    try { return JSON.parse(localStorage.getItem(INDEX_CACHE_KEY) || "{}"); } catch { return {}; }
+  });
   const [indexLoading, setIndexLoading] = useState(false);
+  const [rowLoading, setRowLoading] = useState<string | null>(null);
 
-  const checkIndexing = async () => {
-    if (genPosts.length === 0) return;
-    setIndexLoading(true);
+  const persistIndex = (next: Record<string, IndexEntry>) => {
+    setIndexStatus(next);
+    try { localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify(next)); } catch { /* noop */ }
+  };
+
+  const checkIndexing = async (slugsFilter?: string[]) => {
+    const targets = slugsFilter
+      ? genPosts.filter((p) => slugsFilter.includes(p.slug))
+      : genPosts.slice(0, 25);
+    if (targets.length === 0) return;
+    const isSingle = !!slugsFilter && slugsFilter.length === 1;
+    if (isSingle) setRowLoading(slugsFilter![0]); else setIndexLoading(true);
     try {
-      const urls = genPosts.slice(0, 25).map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
+      const urls = targets.map((p) => `https://ilinguerelax.com/blog/${p.slug}`);
       const { data, error } = await supabase.functions.invoke("gsc-inspect-urls", {
         body: { adminKey, urls },
       });
       if (error) throw error;
       const results = (data as { results?: Array<{ url: string; verdict: string; coverageState: string; lastCrawlTime?: string | null }> })?.results ?? [];
-      const map: Record<string, { verdict: string; coverageState: string; lastCrawlTime?: string | null }> = {};
+      const now = Date.now();
+      const merged: Record<string, IndexEntry> = { ...indexStatus };
       for (const r of results) {
         const slug = r.url.split("/blog/")[1];
-        if (slug) map[slug] = { verdict: r.verdict, coverageState: r.coverageState, lastCrawlTime: r.lastCrawlTime };
+        if (slug) merged[slug] = { verdict: r.verdict, coverageState: r.coverageState, lastCrawlTime: r.lastCrawlTime, checkedAt: now };
       }
-      setIndexStatus(map);
-      toast.success("Estado de indexación actualizado");
+      persistIndex(merged);
+      if (!isSingle) toast.success("Estado de indexación actualizado");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al consultar Google Search Console");
     } finally {
       setIndexLoading(false);
+      setRowLoading(null);
     }
   };
 

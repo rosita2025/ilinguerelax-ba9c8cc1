@@ -338,6 +338,15 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
                     spellCheck={false}
                   />
                 </div>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="w-4 h-4 accent-primary"
+                  />
+                  Confiar en este dispositivo (7 días · Face ID / passcode)
+                </label>
                 <Button type="submit" className="w-full" disabled={loading || otp.length !== 6}>
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verificar y entrar"}
                 </Button>

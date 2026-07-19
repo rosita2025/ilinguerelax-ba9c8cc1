@@ -362,11 +362,11 @@ const AdminSEO = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-10 px-4">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4">
+        <div className="max-w-6xl mx-auto space-y-4 md:space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">SEO · Google Search Console + Semrush</h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <h1 className="text-xl md:text-3xl font-bold leading-tight">SEO · Google Search Console + Semrush</h1>
+            <p className="text-muted-foreground text-xs md:text-sm mt-1">
               Rendimiento orgánico automático por intervalo de fechas.
             </p>
           </div>
@@ -852,7 +852,113 @@ const AdminSEO = () => {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* Mobile: stacked cards */}
+                <div className="md:hidden space-y-3">
+                  {genPosts.map((p) => {
+                    const idx = indexStatus[p.slug];
+                    const verdict = idx?.verdict;
+                    const badgeClass =
+                      verdict === "PASS" ? "bg-green-500/15 text-green-700 dark:text-green-400" :
+                      verdict === "PARTIAL" ? "bg-amber-500/15 text-amber-700 dark:text-amber-400" :
+                      verdict === "FAIL" ? "bg-destructive/15 text-destructive" :
+                      "bg-muted text-muted-foreground";
+                    const coverage = idx?.coverageState?.toLowerCase() || "";
+                    const label =
+                      verdict === "PASS" ? "Indexado" :
+                      coverage.includes("crawled") || coverage.includes("rastreada") ? "Rastreada s/indexar" :
+                      coverage.includes("discovered") || coverage.includes("descubierta") ? "Descubierta" :
+                      verdict === "PARTIAL" ? "Parcial" :
+                      verdict === "FAIL" ? "No indexado" :
+                      verdict === "NEUTRAL" ? "Pendiente" : "—";
+                    const created = new Date(p.created_at);
+                    const days = Math.floor((Date.now() - created.getTime()) / 86400000);
+                    const hours = Math.floor((Date.now() - created.getTime()) / 3600000);
+                    const ageLabel = days >= 1 ? `hace ${days}d` : `hace ${hours}h`;
+                    return (
+                      <div key={p.id} className="border rounded-lg p-3 space-y-2 bg-card">
+                        <div className="flex items-start justify-between gap-2">
+                          <a
+                            href={`/blog/${p.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium leading-snug hover:text-primary flex-1 min-w-0"
+                          >
+                            {p.title}
+                            <ExternalLink className="w-3 h-3 inline ml-1 shrink-0" />
+                          </a>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0 ${badgeClass}`}>
+                            {label}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap text-[11px] text-muted-foreground">
+                          <span>{p.category}</span>
+                          <span>·</span>
+                          <span>{created.toLocaleDateString("es-ES")} ({ageLabel})</span>
+                          <span>·</span>
+                          <span>{p.published ? "Publicado" : "Borrador"}</span>
+                        </div>
+                        <div className="flex items-center gap-3 flex-wrap text-[11px]">
+                          {(["bing", "yandex", "duckduckgo", "brave"] as EngineName[]).map((eng) => {
+                            const e = multiStatus[p.slug]?.[eng];
+                            const glyph = e?.indexed === true ? "✓" : e?.indexed === false ? "✗" : "—";
+                            const color = e?.indexed === true ? "text-green-600 dark:text-green-400"
+                              : e?.indexed === false ? "text-destructive"
+                              : "text-muted-foreground";
+                            return (
+                              <span key={eng} className="flex items-center gap-1">
+                                <span className="capitalize text-muted-foreground">{eng}</span>
+                                <span className={`font-semibold ${color}`}>{glyph}</span>
+                              </span>
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center gap-2 pt-1 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 text-xs flex-1"
+                            onClick={() => checkIndexing([p.slug])}
+                            disabled={rowLoading === p.slug}
+                          >
+                            {rowLoading === p.slug
+                              ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                              : <RefreshCw className="w-3 h-3 mr-1" />}
+                            Google
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 text-xs flex-1"
+                            onClick={() => checkMultiIndex([p.slug])}
+                            disabled={multiRowLoading === p.slug}
+                          >
+                            {multiRowLoading === p.slug
+                              ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                              : <RefreshCw className="w-3 h-3 mr-1" />}
+                            Buscadores
+                          </Button>
+                          {!p.google_index_requested_at && (verdict === "NEUTRAL" || verdict === "FAIL" || !verdict) ? (
+                            <Button
+                              size="sm"
+                              className="h-8 text-xs flex-1"
+                              onClick={() => setCopyPost({ slug: p.slug, title: p.title })}
+                            >
+                              <Zap className="w-3 h-3 mr-1" />
+                              Indexar
+                            </Button>
+                          ) : p.google_index_requested_at && verdict !== "PASS" ? (
+                            <span className="text-[10px] text-muted-foreground flex-1 text-center">
+                              Solicitada 1 vez
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop: table */}
+                <div className="overflow-x-auto hidden md:block">
                   <table className="w-full text-sm">
                     <thead className="text-left text-xs uppercase text-muted-foreground border-b">
                       <tr>

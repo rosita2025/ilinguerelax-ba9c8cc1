@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -69,6 +70,10 @@ const AdminSEO = () => {
   const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean; google_index_requested_at: string | null }>>([]);
+  const [postsPage, setPostsPage] = useState(1);
+  const [postsFilter, setPostsFilter] = useState<"all" | "pending" | "indexed" | "drafts">("all");
+  const isMobile = useIsMobile();
+  const postsPerPage = isMobile ? 4 : 5;
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [publishNow, setPublishNow] = useState(true);
   type IndexEntry = { verdict: string; coverageState: string; lastCrawlTime?: string | null; checkedAt: number };
@@ -810,10 +815,21 @@ const AdminSEO = () => {
               {publishNow ? "Generar y publicar" : "Generar borrador"}
             </Button>
 
-            {genPosts.length > 0 && (
+            {genPosts.length > 0 && (() => {
+              const filteredPosts = genPosts.filter((p) => {
+                if (postsFilter === "drafts") return !p.published;
+                const v = indexStatus[p.slug]?.verdict;
+                if (postsFilter === "indexed") return v === "PASS";
+                if (postsFilter === "pending") return v !== "PASS";
+                return true;
+              });
+              const totalPages = Math.max(1, Math.ceil(filteredPosts.length / postsPerPage));
+              const page = Math.min(postsPage, totalPages);
+              const paginatedPosts = filteredPosts.slice((page - 1) * postsPerPage, page * postsPerPage);
+              return (
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-                  <h3 className="text-sm font-semibold">Últimos posts generados</h3>
+                  <h3 className="text-sm font-semibold">Últimos posts generados ({filteredPosts.length})</h3>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Button
                       variant="outline"
@@ -893,9 +909,32 @@ const AdminSEO = () => {
                   </div>
                 </div>
 
+                {/* Filtros */}
+                <div className="flex items-center gap-1.5 flex-wrap mb-3 pb-2 border-b">
+                  {([
+                    { id: "all", label: "Todos" },
+                    { id: "pending", label: "No indexados" },
+                    { id: "indexed", label: "Indexados" },
+                    { id: "drafts", label: "Borradores" },
+                  ] as const).map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => { setPostsFilter(f.id); setPostsPage(1); }}
+                      className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${
+                        postsFilter === f.id
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+
                 {/* Mobile: stacked cards */}
                 <div className="md:hidden space-y-3">
-                  {genPosts.map((p) => {
+                  {paginatedPosts.map((p) => {
                     const idx = indexStatus[p.slug];
                     const verdict = idx?.verdict;
                     const badgeClass =
@@ -1016,7 +1055,7 @@ const AdminSEO = () => {
 
                     </thead>
                     <tbody>
-                      {genPosts.map((p) => {
+                      {paginatedPosts.map((p) => {
                         const idx = indexStatus[p.slug];
                         const verdict = idx?.verdict;
                         const badgeClass =
@@ -1165,8 +1204,34 @@ const AdminSEO = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Paginación */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                    >
+                      ← Anterior
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      Página {page} de {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPostsPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page >= totalPages}
+                    >
+                      Siguiente →
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
+              );
+            })()}
 
             {copyPost && (() => {
               const postUrl = `https://ilinguerelax.com/blog/${copyPost.slug}`;

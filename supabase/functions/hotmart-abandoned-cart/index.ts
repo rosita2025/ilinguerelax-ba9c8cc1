@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { pushAbandonedCartToBrevo } from "../_shared/brevoAbandonedCart.ts";
+import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -144,6 +145,10 @@ serve(async (req) => {
         ""
       ).trim();
       const countryReason = rawCountry ? undefined : "hotmart_payload_incomplete";
+      const alreadyOwned = (await getPurchasedSkus(supabase, buyerEmail)).has(String(productSku).toLowerCase());
+      if (alreadyOwned) {
+        console.log(`[skip] ${buyerEmail} already purchased ${productSku} — no Hotmart abandoned push`);
+      } else {
       await pushAbandonedCartToBrevo({
         email: buyerEmail.toLowerCase(),
         name: buyerName,
@@ -158,6 +163,7 @@ serve(async (req) => {
         countryReason,
         source: "hotmart",
       });
+      }
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
     }

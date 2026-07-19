@@ -148,6 +148,9 @@ serve(async (req) => {
       }),
     );
 
+    const okCount = results.filter((r) => !r.error).length;
+    console.log(`google-suggest: ${okCount}/${results.length} markets ok for "${q}"`);
+
     return new Response(
       JSON.stringify({ query: q, results }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },

@@ -911,7 +911,7 @@ const AdminSEO = () => {
 
                 {/* Mobile: stacked cards */}
                 <div className="md:hidden space-y-3">
-                  {genPosts.map((p) => {
+                  {paginatedPosts.map((p) => {
                     const idx = indexStatus[p.slug];
                     const verdict = idx?.verdict;
                     const badgeClass =

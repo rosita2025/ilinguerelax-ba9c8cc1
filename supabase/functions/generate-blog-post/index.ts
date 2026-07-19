@@ -264,6 +264,14 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
         pingSitemap(),
         resubmitSitemapsGSC(),
       ]);
+      // Auto-stamp the "one-time" indexing request so the admin panel
+      // treats the automated notification as THE request and doesn't
+      // offer a duplicate manual submission later.
+      await supabase
+        .from("generated_blog_posts")
+        .update({ google_index_requested_at: new Date().toISOString() })
+        .eq("id", inserted.id)
+        .is("google_index_requested_at", null);
     }
 
     return new Response(JSON.stringify({ post: inserted }), {

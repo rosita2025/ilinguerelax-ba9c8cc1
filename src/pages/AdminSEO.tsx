@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { products } from "@/data/products";
+import SitemapHealthCard from "@/components/admin/SitemapHealthCard";
 
 
 interface GscRow {
@@ -243,6 +244,9 @@ const AdminSEO = () => {
               Rendimiento orgánico automático por intervalo de fechas.
             </p>
           </div>
+
+          <SitemapHealthCard />
+
 
           <Card className="p-4 space-y-3">
             <div className="flex flex-wrap gap-2">

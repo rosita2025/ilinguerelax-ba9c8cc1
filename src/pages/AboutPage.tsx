@@ -123,6 +123,9 @@ const AboutPage = () => {
                 ofrece materiales prácticos, organizados y accesibles, diseñados especialmente para 
                 autodidactas y principiantes.
               </p>
+              <p className="text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed mt-4">
+                iLingue Relax es una marca educativa operada por Youtumundial LLC, una empresa registrada en Nuevo México, Estados Unidos.
+              </p>
             </motion.div>
 
             {/* Mission & Vision */}

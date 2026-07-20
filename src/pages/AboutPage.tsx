@@ -28,9 +28,10 @@ const AboutPage = () => {
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "iLingue Relax",
+          "alternateName": "Youtumundial LLC",
           "url": "https://ilinguerelax.com",
           "logo": "https://ilinguerelax.com/og-image.png",
-          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes.",
+          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes. Operada por Youtumundial LLC, registrada en Nuevo México, Estados Unidos.",
           "foundingDate": "2025",
           "sameAs": [
             "https://www.instagram.com/ilinguerelax/",

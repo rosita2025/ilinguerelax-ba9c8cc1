@@ -28,9 +28,10 @@ const AboutPage = () => {
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "iLingue Relax",
+          "alternateName": "Youtumundial LLC",
           "url": "https://ilinguerelax.com",
           "logo": "https://ilinguerelax.com/og-image.png",
-          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes.",
+          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes. Operada por Youtumundial LLC, registrada en Nuevo México, Estados Unidos.",
           "foundingDate": "2025",
           "sameAs": [
             "https://www.instagram.com/ilinguerelax/",
@@ -122,6 +123,9 @@ const AboutPage = () => {
                 Creemos que aprender un idioma no debe ser difícil ni frustrante. Por eso, iLingue Relax 
                 ofrece materiales prácticos, organizados y accesibles, diseñados especialmente para 
                 autodidactas y principiantes.
+              </p>
+              <p className="text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed mt-4">
+                iLingue Relax es una marca educativa operada por Youtumundial LLC, una empresa registrada en Nuevo México, Estados Unidos.
               </p>
             </motion.div>
 

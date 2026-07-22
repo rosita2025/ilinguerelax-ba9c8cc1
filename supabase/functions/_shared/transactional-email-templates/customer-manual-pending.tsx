@@ -26,6 +26,9 @@ interface Props {
   binancePayId?: string
   binanceAddress?: string
   binanceNetwork?: string
+  clabeNumber?: string
+  clabeHolder?: string
+  clabeBank?: string
 }
 
 const fmtMoney = (amount?: number, currency?: string) => {

@@ -280,6 +280,7 @@ export function PaymentMethodsGroup() {
   const [stripeAutoRetried, setStripeAutoRetried] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedBinance, setCopiedBinance] = useState(false);
+  const [copiedClabe, setCopiedClabe] = useState(false);
 
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);

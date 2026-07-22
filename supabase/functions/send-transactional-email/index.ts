@@ -288,6 +288,39 @@ Deno.serve(async (req) => {
     { plainText: true }
   )
 
+  // 4b. Pre-send validation: guard against regressions in critical payment data.
+  // If the customer-manual-pending email mentions Yape/Plin, the ONLY valid
+  // holder number is +51 972 119 741. Any other Peruvian mobile is blocked.
+  if (templateName === 'customer-manual-pending') {
+    const method = String(templateData?.method || '').toLowerCase()
+    const mentionsYape = /yape|plin/.test(html.toLowerCase())
+    if (method.includes('yape') || method.includes('plin') || mentionsYape) {
+      const REQUIRED = '+51 972 119 741'
+      const forbidden = /\+?51\s?9(?!72\s?119\s?741)\d{2}\s?\d{3}\s?\d{3}/
+      const hasRequired = html.includes(REQUIRED)
+      const hasForbidden = forbidden.test(html.replace(/\u00a0/g, ' '))
+      if (!hasRequired || hasForbidden) {
+        console.error('Yape number validation FAILED — email blocked', {
+          templateName, hasRequired, hasForbidden,
+        })
+        await supabase.from('email_send_log').insert({
+          message_id: messageId,
+          template_name: templateName,
+          recipient_email: effectiveRecipient,
+          status: 'failed',
+          error_message: `Pre-send guard: Yape number mismatch (required ${REQUIRED})`,
+        })
+        return new Response(
+          JSON.stringify({
+            error: 'Pre-send validation failed',
+            reason: `Yape/Plin holder number must be exactly ${REQUIRED}`,
+          }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        )
+      }
+    }
+  }
+
   // Resolve subject — supports static string or dynamic function
   const resolvedSubject =
     typeof template.subject === 'function'

@@ -666,7 +666,7 @@ const Product8000 = () => {
         flag={tier.isPeru ? "🇵🇪" : undefined}
         rating={4.9}
         reviewCount={10000}
-        ctaText={`Comprar ahora · ${tier.priceLabel}`}
+        ctaText={"Comprar ahora"}
         buyUrl={TIENDA_PATH_8000}
 
         onBuyClick={handleBuyNow} />

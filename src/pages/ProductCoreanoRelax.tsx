@@ -392,7 +392,7 @@ const ProductCoreanoRelax = () => {
         currencyCode={currencyLabel}
         flag={displayFlag}
         productName="Coreano · +100 Mapas Mentales"
-        ctaText={`Comprar ahora · ${displayPrice}`}
+        ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
 

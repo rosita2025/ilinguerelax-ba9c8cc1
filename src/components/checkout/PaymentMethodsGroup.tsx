@@ -947,9 +947,18 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // Hotmart 1-clic: resuelve URL y precio local por país
   const hotmartResolvedUrl = hotmartCfg.urlsByCountry[country] || hotmartCfg.fallbackUrl || null;
   const hotmartResolvedPrice = hotmartCfg.pricesByCountry[country] || null;
+  // Si el precio configurado está en USD, conviértelo a la moneda local del país (igual que el resto del checkout).
+  const hotmartUsdForLocal = hotmartResolvedPrice && hotmartResolvedPrice.currency === "USD"
+    ? hotmartResolvedPrice.amount
+    : total;
+  const hotmartLocal = useLocalCurrency(hotmartUsdForLocal);
   const hotmartPriceLabel = hotmartResolvedPrice
-    ? `${hotmartResolvedPrice.currency} ${hotmartResolvedPrice.amount.toLocaleString()}`
-    : `USD $${totalUsd}`;
+    ? (hotmartResolvedPrice.currency === "USD"
+        ? (hotmartLocal.loading || hotmartLocal.isUsd
+            ? `USD $${hotmartResolvedPrice.amount.toLocaleString()}`
+            : hotmartLocal.formatted)
+        : `${hotmartResolvedPrice.currency} ${hotmartResolvedPrice.amount.toLocaleString()}`)
+    : priceBadge;
 
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [

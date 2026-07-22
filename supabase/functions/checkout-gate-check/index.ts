@@ -39,10 +39,14 @@ Deno.serve(async (req) => {
     });
 
   try {
-    const body = (await req.json().catch(() => ({}))) as { slug?: string };
+    const body = (await req.json().catch(() => ({}))) as { slug?: string; referer?: string };
     const slug = (body.slug || "").toString().slice(0, 120) || null;
     const ip = clientIp(req);
     const ua = (req.headers.get("user-agent") || "").slice(0, 300);
+    // Preferimos el referer que envía el cliente (document.referrer) porque
+    // el header HTTP suele venir de nuestro propio dominio. Fallback al header.
+    const referer = ((body.referer || req.headers.get("referer") || "") + "").slice(0, 500) || null;
+    const source = detectSource(ua, referer);
     const now = new Date();
 
     const admin = createClient(
@@ -67,7 +71,7 @@ Deno.serve(async (req) => {
     }
 
     // 2) Registrar hit (best effort, no bloquea).
-    await admin.from("checkout_rate_hits").insert({ ip, ua, slug });
+    await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source });
 
     // 3) Contar hits en ventana.
     const since = new Date(now.getTime() - WINDOW_MS).toISOString();

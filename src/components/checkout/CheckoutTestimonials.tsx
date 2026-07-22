@@ -245,7 +245,7 @@ const TestimonialsContent = memo(function TestimonialsContent() {
 });
 
 export const CheckoutTestimonials = memo(function CheckoutTestimonials() {
-  const rootRef = useRef<HTMLElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -265,7 +265,7 @@ export const CheckoutTestimonials = memo(function CheckoutTestimonials() {
   }, []);
 
   return (
-    <div ref={rootRef as React.RefObject<HTMLDivElement>} className="w-full max-w-full overflow-hidden contain-layout">
+    <div ref={rootRef} className="w-full max-w-full overflow-hidden [contain:layout]">
       {isVisible ? <TestimonialsContent /> : <TestimonialsSkeleton />}
     </div>
   );

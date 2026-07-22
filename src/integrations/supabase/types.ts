@@ -809,7 +809,9 @@ export type Database = {
           drive_url: string | null
           excluded_countries: string[]
           hotmart_excluded_countries: string[]
+          hotmart_prices_by_country: Json
           hotmart_url: string | null
+          hotmart_urls_by_country: Json
           id: string
           is_physical: boolean
           is_upsell: boolean
@@ -844,7 +846,9 @@ export type Database = {
           drive_url?: string | null
           excluded_countries?: string[]
           hotmart_excluded_countries?: string[]
+          hotmart_prices_by_country?: Json
           hotmart_url?: string | null
+          hotmart_urls_by_country?: Json
           id?: string
           is_physical?: boolean
           is_upsell?: boolean
@@ -879,7 +883,9 @@ export type Database = {
           drive_url?: string | null
           excluded_countries?: string[]
           hotmart_excluded_countries?: string[]
+          hotmart_prices_by_country?: Json
           hotmart_url?: string | null
+          hotmart_urls_by_country?: Json
           id?: string
           is_physical?: boolean
           is_upsell?: boolean

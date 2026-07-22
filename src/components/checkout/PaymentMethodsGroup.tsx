@@ -22,7 +22,7 @@ import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -75,6 +75,10 @@ function BankBadge({ label, bg, color }: { label: string; bg: string; color: str
 const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
+
+const CLABE_NUMBER = "646180546709905176";
+const CLABE_HOLDER = "Carmen Rosa Aliaga Domínguez";
+const CLABE_BANK = "STP (Sistema de Transferencias y Pagos)";
 
 // Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.
 // See admin panel at /admin/binance-config.
@@ -276,6 +280,7 @@ export function PaymentMethodsGroup() {
   const [stripeAutoRetried, setStripeAutoRetried] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedBinance, setCopiedBinance] = useState(false);
+  const [copiedClabe, setCopiedClabe] = useState(false);
 
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -752,6 +757,108 @@ export function PaymentMethodsGroup() {
     navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
+  const copyClabe = async () => {
+    try {
+      await navigator.clipboard.writeText(CLABE_NUMBER);
+      setCopiedClabe(true);
+      setTimeout(() => setCopiedClabe(false), 1800);
+    } catch { /* noop */ }
+  };
+
+  const handleClabePaid = async () => {
+    const s = useCheckoutPruebaStore.getState();
+    const orderNumber = `ILR-MX-${Math.floor(1000 + Math.random() * 9000)}`;
+    const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
+    const productList = s.items.map((i) => `• ${i.name} x${i.quantity}`).join("\n");
+    const msg =
+      `Hola! 👋 Acabo de pagar por SPEI / CLABE (México).\n\n` +
+      `📦 Orden: ${orderNumber}\n` +
+      `👤 Nombre: ${s.buyer.fullName.trim()}\n` +
+      `📧 Email: ${s.buyer.email.trim()}\n` +
+      `💰 Monto: ${amountText} (USD $${totalUsd})\n` +
+      `🏦 CLABE: ${CLABE_NUMBER}\n` +
+      `👤 Titular: ${CLABE_HOLDER}\n\n` +
+      `Productos:\n${productList}\n\n` +
+      `Adjunto captura del pago. Gracias!`;
+    const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
+
+    try {
+      await supabase.from("manual_payments").insert({
+        order_number: orderNumber,
+        buyer_name: s.buyer.fullName.trim(),
+        buyer_email: s.buyer.email.trim().toLowerCase(),
+        buyer_phone: s.buyer.phone ?? null,
+        buyer_country: (region.country || "MX").toUpperCase() || null,
+        amount_usd: Number(totalUsd),
+        amount_local: local.loading ? null : Number(local.amount ?? totalUsd),
+        currency_local: local.currency || "MXN",
+        method: "clabe_mx",
+        items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+        status: "pending",
+      });
+    } catch (e) {
+      console.warn("[manual_payments] clabe insert failed", e);
+    }
+
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-manual-pending",
+        idempotencyKey: `manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim(),
+          customerEmail: s.buyer.email.trim().toLowerCase(),
+          customerPhone: s.buyer.phone ?? "",
+          customerCountry: (region.country || "MX").toUpperCase(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "MXN",
+          method: "SPEI / CLABE (México)",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[admin-manual-pending] clabe notify failed", err));
+
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "customer-manual-pending",
+        recipientEmail: s.buyer.email.trim().toLowerCase(),
+        idempotencyKey: `customer-manual-pending-${orderNumber}`,
+        templateData: {
+          orderNumber,
+          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+          productName: s.items.map((i) => i.name).join(" + "),
+          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+          currency: local.currency || "MXN",
+          amountUsd: Number(totalUsd),
+          method: "SPEI / CLABE (México)",
+          orderDate: new Date().toISOString(),
+        },
+      },
+    }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));
+
+    supabase.from("email_contacts").upsert({
+      email: s.buyer.email.trim().toLowerCase(),
+      name: s.buyer.fullName.trim(),
+      source: "checkout-prueba-1",
+      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "clabe_mx", orderNumber },
+    }, { onConflict: "email,source" }).then(() => {});
+
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+    const q = new URLSearchParams({
+      order: orderNumber,
+      name: s.buyer.fullName.trim(),
+      email: s.buyer.email.trim(),
+      amount: `${amountText} (USD $${totalUsd})`,
+      method: "SPEI / CLABE (México)",
+      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+    }).toString();
+    navigate(`/checkouts/pendiente-manual?${q}`);
+  };
+
+
+
+
 
 
   // Métodos locales de Perú (Mercado Pago transferencias/efectivo + Yape/Plin manual)
@@ -801,6 +908,19 @@ export function PaymentMethodsGroup() {
         : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
       badge: `USD $${totalUsd}`,
     },
+    {
+      id: "clabe",
+      icon: Building2,
+      title: language === "en" ? "SPEI · Bank transfer (Mexico)"
+        : language === "pt" ? "SPEI · Transferência bancária (México)"
+        : language === "fr" ? "SPEI · Virement bancaire (Mexique)"
+        : "SPEI · Transferencia bancaria (México)",
+      sub: language === "en" ? "Transfer in MXN to a Mexican CLABE · 1-24h verification by Supervisor Rosa"
+        : language === "pt" ? "Transferência em MXN para uma CLABE mexicana · Verificação 1-24h pela Supervisora Rosa"
+        : language === "fr" ? "Virement en MXN vers une CLABE mexicaine · Vérification 1-24h par la Superviseure Rosa"
+        : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
+      badge: priceBadge,
+    },
   ];
 
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.
@@ -824,6 +944,7 @@ export function PaymentMethodsGroup() {
         if (m.id === "cash") return methodsConfig.cash;
         if (m.id === "yape") return methodsConfig.yape;
         if (m.id === "binance") return methodsConfig.binance;
+        if (m.id === "clabe") return methodsConfig.clabe && country === "MX";
 
         return true;
       })
@@ -844,7 +965,7 @@ export function PaymentMethodsGroup() {
     ? orderedByAdmin.filter((m) => m.id !== "paypal")
     : methodsConfig.loaded && methodsConfig.regionCode
       ? orderedByAdmin
-      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance");
+      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance" || (m.id === "clabe" && country === "MX"));
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 
@@ -1069,6 +1190,12 @@ export function PaymentMethodsGroup() {
                     <BankBadge label="Binance" bg="#F0B90B" color="#0A0A0A" />
                     <BankBadge label="USDT" bg="#26A17B" color="#ffffff" />
                     <BankBadge label="Pay ID" bg="#1F2937" color="#ffffff" />
+                  </div>
+                ) : m.id === "clabe" ? (
+                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="SPEI" bg="#0A2540" color="#ffffff" />
+                    <BankBadge label="CLABE" bg="#006341" color="#ffffff" />
+                    <BankBadge label="MXN" bg="#ffffff" color="#0A2540" />
                   </div>
                 ) : (
                   <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
@@ -1357,6 +1484,68 @@ export function PaymentMethodsGroup() {
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
             )}
+
+            {m.id === "clabe" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="text-center space-y-1">
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">
+                    {language === "en" ? "Transfer to CLABE (Mexico)" : language === "pt" ? "Transferência para CLABE (México)" : language === "fr" ? "Virement vers CLABE (Mexique)" : "Transferencia a CLABE (México)"}
+                  </p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{CLABE_HOLDER}</p>
+                  <p className="text-[11px] text-neutral-500">{CLABE_BANK}</p>
+                </div>
+
+                <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 p-3 space-y-1.5">
+                  <p className="text-[11px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 text-center">CLABE</p>
+                  <button
+                    type="button"
+                    onClick={copyClabe}
+                    className="w-full inline-flex items-center justify-center gap-2 text-lg font-mono font-bold text-emerald-900 dark:text-emerald-200 hover:opacity-80 transition"
+                  >
+                    <span className="tracking-wider">{CLABE_NUMBER}</span>
+                    {copiedClabe ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
+                  </button>
+                  <p className="text-[11px] text-neutral-500 text-center">{copiedClabe ? t.copied : (language === "en" ? "Tap to copy the 18-digit CLABE" : language === "pt" ? "Toque para copiar a CLABE de 18 dígitos" : language === "fr" ? "Touchez pour copier la CLABE (18 chiffres)" : "Toca para copiar la CLABE de 18 dígitos")}</p>
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
+                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                    {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
+                  </p>
+                  {!local.isUsd && !local.loading && (
+                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
+                  )}
+                </div>
+
+                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
+                  <li>{language === "en" ? "Open your Mexican bank app (BBVA, Banorte, Santander, etc.) and go to SPEI transfer." : language === "pt" ? "Abra o app do seu banco mexicano (BBVA, Banorte, Santander etc.) e vá em transferência SPEI." : language === "fr" ? "Ouvre l'app de ta banque mexicaine (BBVA, Banorte, Santander, etc.) et va au virement SPEI." : "Abre la app de tu banco mexicano (BBVA, Banorte, Santander, etc.) y ve a transferencia SPEI."}</li>
+                  <li>{language === "en" ? `Paste the CLABE ${CLABE_NUMBER} and send the exact amount in MXN.` : language === "pt" ? `Cole a CLABE ${CLABE_NUMBER} e envie o valor exato em MXN.` : language === "fr" ? `Colle la CLABE ${CLABE_NUMBER} et envoie le montant exact en MXN.` : `Pega la CLABE ${CLABE_NUMBER} y envía el monto exacto en MXN.`}</li>
+                  <li>{language === "en" ? "Save the transfer receipt screenshot." : language === "pt" ? "Salve a captura do comprovante." : language === "fr" ? "Sauvegarde la capture du reçu." : "Guarda la captura del comprobante."}</li>
+                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
+                </ol>
+
+                <button
+                  type="button"
+                  onClick={handleClabePaid}
+                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 rounded-xl transition-colors"
+                >
+                  {t.alreadyPaid}
+                </button>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
+                </a>
+
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
+              </div>
+            )}
+
 
 
 

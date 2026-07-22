@@ -131,10 +131,11 @@ export function CheckoutTestimonials() {
       <section
         aria-label="Testimonios verificados"
         aria-busy="true"
-        className="rounded-2xl border bg-card/60 backdrop-blur px-4 py-4 sm:px-5 sm:py-5 min-h-[176px] sm:min-h-[168px]"
+        className="rounded-2xl border bg-card/60 backdrop-blur px-4 py-4 sm:px-5 sm:py-5 min-h-[176px] sm:min-h-[168px] overflow-hidden max-w-full"
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="h-4 w-48 rounded bg-muted animate-pulse" />
+          {/* heading placeholder same height as h3 text-sm/base */}
+          <div className="h-5 sm:h-6 w-40 sm:w-52 rounded bg-muted animate-pulse" />
           <div className="hidden sm:flex gap-1">
             <div className="h-7 w-7 rounded-full bg-muted animate-pulse" />
             <div className="h-7 w-7 rounded-full bg-muted animate-pulse" />
@@ -142,21 +143,30 @@ export function CheckoutTestimonials() {
         </div>
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-muted animate-pulse" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
-            <div className="h-3.5 w-full rounded bg-muted animate-pulse" />
-            <div className="h-3.5 w-3/4 rounded bg-muted animate-pulse" />
-            <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+          <div className="flex-1 min-w-0 space-y-1.5">
+            {/* stars row */}
+            <div className="flex items-center gap-1 mb-1">
+              {[0, 1, 2, 3, 4].map((s) => (
+                <div key={s} className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-sm bg-muted animate-pulse" />
+              ))}
+              <div className="ml-1 h-3 w-6 rounded bg-muted animate-pulse" />
+            </div>
+            {/* quote (2 lines) */}
+            <div className="h-3.5 sm:h-4 w-full rounded bg-muted animate-pulse" />
+            <div className="h-3.5 sm:h-4 w-3/4 rounded bg-muted animate-pulse" />
+            {/* meta */}
+            <div className="mt-1.5 h-3 w-2/3 rounded bg-muted animate-pulse" />
           </div>
         </div>
         <div className="flex items-center justify-center gap-1.5 mt-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-1.5 w-1.5 rounded-full bg-muted animate-pulse" />
+            <div key={i} className={`h-1.5 rounded-full bg-muted animate-pulse ${i === 0 ? "w-6" : "w-1.5"}`} />
           ))}
         </div>
       </section>
     );
   }
+
 
   return (
     <section

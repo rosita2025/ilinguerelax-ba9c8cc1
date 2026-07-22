@@ -713,9 +713,10 @@ const ProductPatronesEspeciales = () => {
         rating={4.9}
         reviewCount={6}
         showReviews={true}
-        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
+        buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
-        ctaText={useTiendaOnly ? "Comprar en tienda online" : "Comprar en Hotmart LATAM"}
+        ctaText={`Comprar ahora · ${priceLabel}`}
+
       />
 
       <div className="h-20 md:h-16" />

@@ -130,6 +130,26 @@ const Email = ({
           </Section>
         )}
 
+        {(clabeNumber || clabeHolder) && (
+          <Section style={binanceBox}>
+            <Text style={binanceTitle}>🏦 Datos SPEI / CLABE (México)</Text>
+            {clabeNumber && (
+              <Text style={binanceLine}><strong>CLABE:</strong> {clabeNumber}</Text>
+            )}
+            {clabeHolder && (
+              <Text style={binanceLine}><strong>Titular:</strong> {clabeHolder}</Text>
+            )}
+            {clabeBank && (
+              <Text style={binanceLine}><strong>Banco:</strong> {clabeBank}</Text>
+            )}
+            <Text style={binanceHint}>
+              Si aún no has transferido, usa estos datos desde tu app bancaria (SPEI) por el monto exacto en MXN. Guarda el comprobante como referencia.
+            </Text>
+          </Section>
+        )}
+
+
+
 
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>

@@ -62,6 +62,7 @@ export default function AdminCheckoutAbuse() {
   const { toast } = useToast();
   const [bans, setBans] = useState<Ban[]>([]);
   const [top, setTop] = useState<StatRow[]>([]);
+  const [sources, setSources] = useState<SourceRow[]>([]);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -74,7 +75,9 @@ export default function AdminCheckoutAbuse() {
       if (b.error) throw b.error;
       if (s.error) throw s.error;
       setBans(((b.data as { bans?: Ban[] } | null)?.bans) ?? []);
-      setTop(((s.data as { top?: StatRow[] } | null)?.top) ?? []);
+      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[] } | null;
+      setTop(stats?.top ?? []);
+      setSources(stats?.sources ?? []);
     } catch {
       toast({ title: "Error al cargar datos", variant: "destructive" });
     } finally {

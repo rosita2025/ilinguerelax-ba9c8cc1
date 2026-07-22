@@ -260,7 +260,7 @@ const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "meth
   },
 };
 
-export function PaymentMethodsGroup() {
+export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();

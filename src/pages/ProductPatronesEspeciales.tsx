@@ -124,22 +124,16 @@ const ProductPatronesEspeciales = () => {
 
   const handleBuy = () => {
     if (!pricingReady) return;
-    if (useTiendaOnly) {
-      // Fire Meta Pixel only for our own /checkouts page. Hotmart embeds the
-      // same pixel id, so firing here for Hotmart routes would double-count.
-      trackHotmartEvent("InitiateCheckout", {
-        content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-        content_category: "Digital Book",
-        content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
-        content_type: "product",
-        value: PRICE_USD,
-        currency: "USD",
-        num_items: 1,
-      });
-      goToTienda();
-      return;
-    }
-    window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+      content_category: "Digital Book",
+      content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
+      content_type: "product",
+      value: PRICE_USD,
+      currency: "USD",
+      num_items: 1,
+    });
+    goToTienda();
   };
 
   const handleAddToCart = () => {

@@ -117,7 +117,7 @@ const ProductCoreanoRelax = () => {
     navigate(TIENDA_CHECKOUT_PATH);
   };
 
-  const handleBuy = () => (useTiendaOnly ? handleBuyStore() : handleBuyHotmart());
+  const handleBuy = () => handleBuyStore();
 
 
   const handleSubscribe = async (e: React.FormEvent) => {

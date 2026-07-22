@@ -1217,7 +1217,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             >
               <div className={cn(
                 "w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0",
-                isSelected
+                m.id === "hotmart"
+                  ? "bg-white ring-1 ring-neutral-200 dark:ring-neutral-600"
+                  : isSelected
                   ? "bg-neutral-700 text-white"
                   : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
               )}>

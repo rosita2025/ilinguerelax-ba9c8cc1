@@ -72,6 +72,7 @@ const EMPTY: Product = {
   store_excluded_countries: [],
   hotmart_excluded_countries: [],
   sku_aliases: [],
+  local_prices: {},
 };
 
 const AdminProductEdit = () => {

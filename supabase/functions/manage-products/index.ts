@@ -215,6 +215,35 @@ Deno.serve(async (req) => {
           }
           return out;
         })(),
+        hotmart_urls_by_country: (() => {
+          const raw = (p as unknown as { hotmart_urls_by_country?: unknown }).hotmart_urls_by_country;
+          if (!raw || typeof raw !== "object") return {};
+          const out: Record<string, string> = {};
+          for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+            const cc = k.toUpperCase();
+            if (!/^[A-Z]{2}$/.test(cc)) continue;
+            const url = String(v ?? "").trim();
+            if (/^https?:\/\//i.test(url)) out[cc] = url;
+          }
+          return out;
+        })(),
+        hotmart_prices_by_country: (() => {
+          const raw = (p as unknown as { hotmart_prices_by_country?: unknown }).hotmart_prices_by_country;
+          if (!raw || typeof raw !== "object") return {};
+          const out: Record<string, { amount: number; currency: string }> = {};
+          for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+            const cc = k.toUpperCase();
+            if (!/^[A-Z]{2}$/.test(cc)) continue;
+            const obj = v as { amount?: unknown; currency?: unknown } | null;
+            if (!obj) continue;
+            const amount = typeof obj.amount === "string" ? Number(obj.amount) : (obj.amount as number);
+            const currency = String(obj.currency ?? "").trim().toUpperCase();
+            if (typeof amount === "number" && isFinite(amount) && amount > 0 && /^[A-Z]{3}$/.test(currency)) {
+              out[cc] = { amount, currency };
+            }
+          }
+          return out;
+        })(),
       };
 
       // Duplicate-alias guard: if any alias is already used by a different product, reject.

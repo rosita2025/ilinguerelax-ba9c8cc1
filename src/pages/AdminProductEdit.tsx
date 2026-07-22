@@ -560,11 +560,48 @@ const AdminProductEdit = () => {
                 </p>
               </div>
             </div>
-
-            
-
-
-            
+            <div className="border-t pt-4 mt-2 space-y-3">
+              <div>
+                <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (LATAM)</h3>
+                <p className="text-[11px] text-muted-foreground">
+                  Fija el monto <b>exacto</b> que verá el cliente en su moneda (igual que Hotmart). Dejar vacío = usar conversión automática desde USD. El cobro real sigue en USD por Stripe/PayPal/MercadoPago.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {[
+                  { code: "MXN", flag: "🇲🇽", label: "México" },
+                  { code: "COP", flag: "🇨🇴", label: "Colombia" },
+                  { code: "ARS", flag: "🇦🇷", label: "Argentina" },
+                  { code: "CLP", flag: "🇨🇱", label: "Chile" },
+                  { code: "BRL", flag: "🇧🇷", label: "Brasil" },
+                  { code: "UYU", flag: "🇺🇾", label: "Uruguay" },
+                  { code: "PYG", flag: "🇵🇾", label: "Paraguay" },
+                  { code: "BOB", flag: "🇧🇴", label: "Bolivia" },
+                  { code: "CRC", flag: "🇨🇷", label: "Costa Rica" },
+                  { code: "DOP", flag: "🇩🇴", label: "Rep. Dominicana" },
+                  { code: "GTQ", flag: "🇬🇹", label: "Guatemala" },
+                  { code: "HNL", flag: "🇭🇳", label: "Honduras" },
+                  { code: "NIO", flag: "🇳🇮", label: "Nicaragua" },
+                  { code: "VES", flag: "🇻🇪", label: "Venezuela" },
+                ].map(({ code, flag, label }) => (
+                  <div key={code}>
+                    <Label className="text-xs">{flag} {code} <span className="text-muted-foreground font-normal">· {label}</span></Label>
+                    <Input
+                      type="number" step="0.01" inputMode="decimal"
+                      value={product.local_prices?.[code] ?? ""}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const next = { ...(product.local_prices || {}) };
+                        if (v === "" || Number(v) <= 0) delete next[code];
+                        else next[code] = Number(v);
+                        update("local_prices", next);
+                      }}
+                      placeholder="auto"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </Card>
 
 

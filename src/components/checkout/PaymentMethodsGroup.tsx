@@ -558,7 +558,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       return;
     }
     await captureAbandonedCheckout(selected, true);
-    if (selected === "hotmart") { await redirectToHotmart(); return; }
+    if (selected === "hotmart") { redirectToHotmart(); return; }
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }

@@ -518,15 +518,18 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   };
 
   const redirectToHotmart = useCallback(async () => {
-    if (!hotmartResolvedUrl) return;
+    const c = (region.country || "").toUpperCase();
+    const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
+    if (!url) return;
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     redirectingRef.current = true;
     try {
       await captureAbandonedCheckout("hotmart", true);
     } catch { /* noop */ }
-    window.location.assign(hotmartResolvedUrl);
-  }, [hotmartResolvedUrl, valid, captureAbandonedCheckout]);
+    window.location.assign(url);
+  }, [hotmartCfg, region.country, valid, captureAbandonedCheckout]);
+
 
 
   const handleSelect = (m: Method) => {

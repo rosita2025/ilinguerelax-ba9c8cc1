@@ -1221,7 +1221,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   ? "bg-neutral-700 text-white"
                   : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
               )}>
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : m.id === "hotmart" ? <img src={hotmartLogo.url} alt="Hotmart" className="w-6 h-6 object-contain" /> : <Icon className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">

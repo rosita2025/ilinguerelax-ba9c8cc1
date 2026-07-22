@@ -1017,6 +1017,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         if (m.id === "yape") return methodsConfig.yape;
         if (m.id === "binance") return methodsConfig.binance;
         if (m.id === "clabe") return methodsConfig.clabe && country === "MX";
+        if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
+
 
         return true;
       })

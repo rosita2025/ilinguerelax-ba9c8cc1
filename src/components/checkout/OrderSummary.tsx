@@ -90,7 +90,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{expanded ? t.hideSummary : t.showSummary}</span>
             {expanded ? <ChevronUp className="w-4 h-4 opacity-60" /> : <ChevronDown className="w-4 h-4 opacity-60" />}
           </span>
-          <span className="text-base font-bold">{fmtMoney(total, localTotal, penTotals?.total)}</span>
+          <span className="text-base font-bold">{penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}</span>
         </button>
       )}
 

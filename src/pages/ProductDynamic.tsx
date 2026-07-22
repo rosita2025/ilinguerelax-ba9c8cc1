@@ -307,20 +307,10 @@ const ProductDynamic = () => {
         const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
         const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
         const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
-        const hotmartExcluded = globalExcluded || (product.hotmart_excluded_countries ?? []).includes(effectiveCountry);
         const storeOn = product.store_enabled && !storeExcluded;
-        const hotmartOn = !!product.hotmart_url && !hotmartExcluded;
-        const useHotmart = tier.useHotmartLatam && hotmartOn;
+        if (!storeOn) return null;
         const priceLabel = tier.loaded ? tier.priceLabel : displayFormatted;
         const originalLabel = tier.loaded ? tier.originalLabel : undefined;
-        const buyUrl = useHotmart
-          ? product.hotmart_url!
-          : storeOn
-            ? `/checkouts/${product.sku}`
-            : hotmartOn
-              ? product.hotmart_url!
-              : undefined;
-        if (!buyUrl) return null;
         return (
           <>
             <StickyBuyBar
@@ -331,13 +321,14 @@ const ProductDynamic = () => {
               rating={4.8}
               reviewCount={120}
               productName={product.name}
-              ctaText={`${useHotmart ? "COMPRAR EN HOTMART" : "COMPRAR EN TIENDA"} · ${priceLabel}`}
-              buyUrl={buyUrl}
+              ctaText={`COMPRAR AHORA · ${priceLabel}`}
+              buyUrl={`/checkouts/${product.sku}`}
             />
             <div className="h-20 md:h-16" />
           </>
         );
       })()}
+
     </>
   );
 };

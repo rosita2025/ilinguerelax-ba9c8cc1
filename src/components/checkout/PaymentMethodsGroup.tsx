@@ -518,15 +518,21 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
   };
 
-  const redirectToHotmart = useCallback(() => {
+  const redirectToHotmart = useCallback(async () => {
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
     if (!url) return;
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     redirectingRef.current = true;
-    // Fire-and-forget: no bloquear la redirección esperando la captura.
-    try { void captureAbandonedCheckout("hotmart", true); } catch { /* noop */ }
+    // Guarda el carrito abandonado ANTES de redirigir a Hotmart para no perder al cliente.
+    // Esperamos hasta 2s máx; si la red tarda más, redirigimos igual (la captura ya salió al servidor).
+    try {
+      await Promise.race([
+        captureAbandonedCheckout("hotmart", true),
+        new Promise((resolve) => setTimeout(resolve, 2000)),
+      ]);
+    } catch { /* noop */ }
     // Reemplaza la tienda por Hotmart en la misma pestaña (evita bloqueo de popups).
     window.location.replace(url);
   }, [hotmartCfg, region.country, valid, captureAbandonedCheckout]);
@@ -558,8 +564,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
-    // Hotmart: redirige de inmediato (sin await) para máxima velocidad; la captura corre en paralelo dentro de redirectToHotmart.
-    if (selected === "hotmart") { redirectToHotmart(); return; }
+    // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
+    if (selected === "hotmart") { await redirectToHotmart(); return; }
     await captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }

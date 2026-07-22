@@ -76,6 +76,10 @@ const YAPE_PHONE = "972119741";
 const YAPE_NAME = "Carmen Aliaga";
 const WHATSAPP_URL = "https://wa.link/unpa9n";
 
+const CLABE_NUMBER = "646180546709905176";
+const CLABE_HOLDER = "Carmen Rosa Aliaga Domínguez";
+const CLABE_BANK = "STP (Sistema de Transferencias y Pagos)";
+
 // Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.
 // See admin panel at /admin/binance-config.
 

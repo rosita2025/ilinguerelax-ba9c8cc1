@@ -30,6 +30,42 @@ function clientIp(req: Request): string {
   );
 }
 
+// Detecta el origen del visitante (Instagram, Facebook, WhatsApp, TikTok,
+// Google, correo, directo…) combinando el UA (apps in-app) y el referer.
+function detectSource(ua: string, referer: string | null): string {
+  const u = (ua || "").toLowerCase();
+  if (u.includes("instagram")) return "instagram";
+  if (u.includes("fbav") || u.includes("fban") || u.includes("facebook")) return "facebook";
+  if (u.includes("tiktok") || u.includes("bytedance")) return "tiktok";
+  if (u.includes("whatsapp") || u.includes("wa/")) return "whatsapp";
+  if (u.includes("telegram")) return "telegram";
+  if (u.includes("threads")) return "threads";
+  if (u.includes("line/")) return "line";
+  if (u.includes("kakao")) return "kakao";
+  if (u.includes("gsa/") || u.includes("googleapp")) return "google-app";
+
+  const r = (referer || "").toLowerCase();
+  if (!r) return "direct";
+  try {
+    const h = new URL(r).hostname.replace(/^www\./, "");
+    if (h.includes("instagram") || h.includes("l.instagram")) return "instagram";
+    if (h.includes("facebook") || h.includes("fb.com") || h.includes("l.facebook") || h.includes("m.facebook")) return "facebook";
+    if (h.includes("tiktok")) return "tiktok";
+    if (h.includes("whatsapp") || h.includes("wa.me")) return "whatsapp";
+    if (h.includes("t.me") || h.includes("telegram")) return "telegram";
+    if (h.includes("youtube") || h.includes("youtu.be")) return "youtube";
+    if (h.includes("google")) return "google";
+    if (h.includes("bing")) return "bing";
+    if (h.includes("duckduckgo")) return "duckduckgo";
+    if (h.includes("yandex")) return "yandex";
+    if (h.includes("mail.") || h.includes("gmail") || h.includes("outlook") || h.includes("yahoo")) return "email";
+    if (h.includes("ilinguerelax")) return "internal";
+    return h;
+  } catch {
+    return "direct";
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const json = (body: unknown, status = 200) =>
@@ -39,10 +75,14 @@ Deno.serve(async (req) => {
     });
 
   try {
-    const body = (await req.json().catch(() => ({}))) as { slug?: string };
+    const body = (await req.json().catch(() => ({}))) as { slug?: string; referer?: string };
     const slug = (body.slug || "").toString().slice(0, 120) || null;
     const ip = clientIp(req);
     const ua = (req.headers.get("user-agent") || "").slice(0, 300);
+    // Preferimos el referer que envía el cliente (document.referrer) porque
+    // el header HTTP suele venir de nuestro propio dominio. Fallback al header.
+    const referer = ((body.referer || req.headers.get("referer") || "") + "").slice(0, 500) || null;
+    const source = detectSource(ua, referer);
     const now = new Date();
 
     const admin = createClient(
@@ -67,7 +107,7 @@ Deno.serve(async (req) => {
     }
 
     // 2) Registrar hit (best effort, no bloquea).
-    await admin.from("checkout_rate_hits").insert({ ip, ua, slug });
+    await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source });
 
     // 3) Contar hits en ventana.
     const since = new Date(now.getTime() - WINDOW_MS).toISOString();

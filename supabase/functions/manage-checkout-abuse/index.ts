@@ -72,24 +72,42 @@ Deno.serve(async (req) => {
       const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
       const { data, error } = await admin
         .from("checkout_rate_hits")
-        .select("ip, slug, created_at")
+        .select("ip, slug, created_at, source, referer, ua")
         .gte("created_at", since)
         .limit(5000);
       if (error) throw error;
-      const byIp = new Map<string, { ip: string; count: number; last: string; slugs: Set<string> }>();
+      type Agg = { ip: string; count: number; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null };
+      const byIp = new Map<string, Agg>();
+      const bySource = new Map<string, number>();
       for (const row of data || []) {
-        const r = row as { ip: string; slug: string | null; created_at: string };
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set<string>() };
+        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null };
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua };
         cur.count += 1;
         if (r.created_at > cur.last) cur.last = r.created_at;
         if (r.slug) cur.slugs.add(r.slug);
+        if (r.source) cur.sources.add(r.source);
+        if (r.referer) cur.referers.add(r.referer);
+        if (!cur.ua && r.ua) cur.ua = r.ua;
         byIp.set(r.ip, cur);
+        const src = r.source || "direct";
+        bySource.set(src, (bySource.get(src) || 0) + 1);
       }
       const top = [...byIp.values()]
-        .map((x) => ({ ip: x.ip, count: x.count, last: x.last, slugs: [...x.slugs].slice(0, 5) }))
+        .map((x) => ({
+          ip: x.ip,
+          count: x.count,
+          last: x.last,
+          slugs: [...x.slugs].slice(0, 5),
+          sources: [...x.sources],
+          referers: [...x.referers].slice(0, 3),
+          ua: x.ua,
+        }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 100);
-      return json({ top, total: (data || []).length });
+      const sources = [...bySource.entries()]
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count);
+      return json({ top, sources, total: (data || []).length });
     }
 
     return json({ error: "unknown action" }, 400);

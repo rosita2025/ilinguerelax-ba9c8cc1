@@ -541,7 +541,7 @@ export default function Checkout() {
         <div className="space-y-6">
           <BuyerInfoForm />
           <MoreProductsPanel parentSku={catalogItem?.adminSku ?? null} />
-          <PaymentMethodsGroup />
+          <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
             <span className="flex items-center gap-1">

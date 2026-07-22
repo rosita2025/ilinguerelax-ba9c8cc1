@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency, useLocalCurrencyForSku } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
@@ -24,6 +24,7 @@ function Price({
   emphasis = false,
   added = false,
   prefix = "",
+  sku,
 }: {
   usd: number;
   pen?: number;
@@ -31,9 +32,10 @@ function Price({
   emphasis?: boolean;
   added?: boolean;
   prefix?: string;
+  sku?: string;
 }) {
   const { country } = useRegionTier();
-  const local = useLocalCurrency(usd);
+  const local = useLocalCurrencyForSku(usd, sku);
   const isPeru = country === "PE";
 
   let label: string;
@@ -246,8 +248,8 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
               </div>
 
               <div className="text-right shrink-0 space-y-0.5">
-                {hasDiscount && <Price usd={u.originalPrice!} strike />}
-                <Price usd={shownPrice} pen={u.pricePen} emphasis added={added} prefix="+" />
+                {hasDiscount && <Price usd={u.originalPrice!} strike sku={u.id} />}
+                <Price usd={shownPrice} pen={u.pricePen} emphasis added={added} prefix="+" sku={u.id} />
               </div>
             </button>
           );

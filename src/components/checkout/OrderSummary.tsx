@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useLocalCurrency, formatLocalAmount } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
@@ -32,12 +32,21 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
   const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
+  const overridesFor = useSkuOverridesResolver();
   const localTotal = useLocalCurrency(total);
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
   const penMode = penTotals !== null;
-  // PE: soles nativos. Otros países con moneda local (MX, AR, CO, BR, VE, EU, etc.): moneda local principal + USD referencial.
   const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading;
+  // Local totals honoring per-sku overrides from /admin/products/:sku
+  const localItemsSum = sumItemsLocal(
+    items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
+    region.country || "",
+    overridesFor,
+  );
+  const localSubtotalAmount = localItemsSum.amount;
+  const localTotalAmount = localSubtotalAmount * (1 - (couponPercent || 0) / 100);
+  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : `$${total.toFixed(2)}`;
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
@@ -81,7 +90,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{expanded ? t.hideSummary : t.showSummary}</span>
             {expanded ? <ChevronUp className="w-4 h-4 opacity-60" /> : <ChevronDown className="w-4 h-4 opacity-60" />}
           </span>
-          <span className="text-base font-bold">{fmtMoney(total, localTotal, penTotals?.total)}</span>
+          <span className="text-base font-bold">{penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}</span>
         </button>
       )}
 
@@ -138,7 +147,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen)
                     : showLocalRef
-                      ? formatLocalAmount(itemPrice(item, region.tier), region.country).formatted
+                      ? formatLocalAmount(itemPrice(item, region.tier), region.country, overridesFor(item.id)).formatted
                       : `$${itemPrice(item, region.tier).toFixed(2)}`}
                   {showLocalRef && (
                     <div className="text-[10px] font-normal text-muted-foreground">
@@ -200,12 +209,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>{fmtMoney(subtotal, localSubtotal, penTotals?.subtotal)}</span>
+            <span>{penMode && penTotals ? formatPen(penTotals.subtotal) : showLocalRef ? formatLocalDirect(localSubtotalAmount, region.country || "") : `$${subtotal.toFixed(2)}`}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-{fmtMoney(discount, localDiscount, penTotals?.discount)}</span>
+              <span>-{penMode && penTotals ? formatPen(penTotals.discount) : showLocalRef ? formatLocalDirect(localSubtotalAmount - localTotalAmount, region.country || "") : `$${discount.toFixed(2)}`}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
@@ -215,7 +224,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : `USD $${total.toFixed(2)}`}</div>
               {showLocalRef && (
                 <div className="text-xs font-normal text-muted-foreground mt-0.5">
                   ≈ USD ${total.toFixed(2)}

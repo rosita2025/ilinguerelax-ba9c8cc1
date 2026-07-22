@@ -24,24 +24,32 @@ export type LivePrice = {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  local_prices: Record<string, number> | null;
 };
 
 type Ctx = {
   version: number;
   prices: Record<string, LivePrice>;
   getLivePrice: (slugOrSku: string) => LivePrice | undefined;
+  getLocalOverrides: (slugOrSku?: string | null) => Record<string, number> | null;
 };
 
 const LivePricesContext = createContext<Ctx>({
   version: 0,
   prices: {},
   getLivePrice: () => undefined,
+  getLocalOverrides: () => null,
 });
 
 export const useLivePrices = () => useContext(LivePricesContext);
 export const useLivePrice = (slugOrSku?: string | null) => {
   const { getLivePrice } = useLivePrices();
   return slugOrSku ? getLivePrice(slugOrSku) : undefined;
+};
+/** Manual per-currency overrides for a sku/slug (set from admin/products/:sku). */
+export const useLocalOverrides = (slugOrSku?: string | null) => {
+  const { getLocalOverrides } = useLivePrices();
+  return getLocalOverrides(slugOrSku);
 };
 
 // Fallback flag/country for auto-injected products (based on target language).
@@ -117,18 +125,28 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
       try {
         const { data, error } = await supabase
           .from("digital_products")
-          .select("sku, name, description, target_language, learner_language, cover_image_url, is_upsell, is_physical, price_usd, price_usd_latam, price_usd_tienda, price_pen, sku_aliases")
+          .select("sku, name, description, target_language, learner_language, cover_image_url, is_upsell, is_physical, price_usd, price_usd_latam, price_usd_tienda, price_pen, sku_aliases, local_prices")
           .eq("active", true);
         if (error || !data) return;
         if (cancelled) return;
 
         const map: Record<string, LivePrice> = {};
         for (const row of data) {
+          const rawLocal = (row as any).local_prices;
+          const local_prices: Record<string, number> | null =
+            rawLocal && typeof rawLocal === "object" && !Array.isArray(rawLocal)
+              ? Object.fromEntries(
+                  Object.entries(rawLocal)
+                    .map(([k, v]) => [String(k).toUpperCase(), Number(v)])
+                    .filter(([, v]) => Number.isFinite(v as number) && (v as number) > 0),
+                ) as Record<string, number>
+              : null;
           const entry: LivePrice = {
             price_usd: Number(row.price_usd) || 0,
             price_usd_latam: row.price_usd_latam != null ? Number(row.price_usd_latam) : null,
             price_usd_tienda: row.price_usd_tienda != null ? Number(row.price_usd_tienda) : null,
             price_pen: row.price_pen != null ? Number(row.price_pen) : null,
+            local_prices: local_prices && Object.keys(local_prices).length ? local_prices : null,
           };
           map[row.sku] = entry;
           for (const alias of row.sku_aliases ?? []) {
@@ -168,6 +186,10 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
       version,
       prices,
       getLivePrice: (slugOrSku: string) => prices[slugOrSku],
+      getLocalOverrides: (slugOrSku?: string | null) => {
+        if (!slugOrSku) return null;
+        return prices[slugOrSku]?.local_prices ?? null;
+      },
     }),
     [version, prices],
   );

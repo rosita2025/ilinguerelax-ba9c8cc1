@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
 import { useCheckoutMethodsConfig, type FamilyKey } from "@/hooks/useCheckoutMethodsConfig";
 import { useBinancePayConfig } from "@/hooks/useBinancePayConfig";
 
@@ -262,9 +262,17 @@ export function PaymentMethodsGroup() {
   const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
+  const overridesFor = useSkuOverridesResolver();
+  const localItemsSum = sumItemsLocal(
+    items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
+    region.country || "",
+    overridesFor,
+  );
+  const localTotalAmount = localItemsSum.amount * (1 - (couponPercent || 0) / 100);
+  const localFormatted = local.loading || local.isUsd ? local.formatted : formatLocalDirect(localTotalAmount, region.country || "");
   const penBadge = penTotals ? formatPen(penTotals.total) : null;
   // Badge principal: SIEMPRE en moneda local del país (USD, CAD, EUR, MXN, ARS, PEN, etc.)
-  const priceBadge = penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted);
+  const priceBadge = penBadge ?? (local.loading ? `USD $${totalUsd}` : localFormatted);
   const localBadge = "";
 
 

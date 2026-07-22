@@ -14,7 +14,8 @@ import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { useI18n } from "@/i18n/I18nContext";
-import { detectCurrency, formatPrice as formatPriceIntl } from "@/i18n";
+import { detectCurrency } from "@/i18n";
+import { useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.webp";
 import { BLOCKED_VARIANTS, isBlockedVariant } from "@/config/blockedVariants";
 
@@ -105,16 +106,31 @@ export const CartDrawer = () => {
     visibleInternalItems.length > 0 &&
     visibleInternalItems.every((i) => typeof i.pricePen === "number" && (i.pricePen as number) > 0);
 
-  const formatInternalUnit = (it: typeof visibleInternalItems[number]) =>
-    showNativePen
-      ? `S/ ${(it.pricePen as number).toFixed(2)} PEN`
-      : `${formatPriceIntl(itemPrice(it, tier), displayCurrency)} ${displayCurrency}`;
+  const overridesFor = useSkuOverridesResolver();
+  // Per-item local amount honoring admin overrides (digital_products.local_prices).
+  const localItemAmount = (it: typeof visibleInternalItems[number]) => {
+    const single = sumItemsLocal(
+      [{ id: it.id, usd: itemPrice(it, tier), quantity: 1 }],
+      country || "",
+      overridesFor,
+    );
+    return single.amount;
+  };
+  const formatInternalUnit = (it: typeof visibleInternalItems[number]) => {
+    if (showNativePen) return `S/ ${(it.pricePen as number).toFixed(2)} PEN`;
+    const amt = localItemAmount(it);
+    return `${formatLocalDirect(amt, country || "")} ${displayCurrency}`;
+  };
   const internalSubtotal = showNativePen
     ? visibleInternalItems.reduce((s, i) => s + (i.pricePen as number) * i.quantity, 0)
-    : visibleInternalItems.reduce((s, i) => s + itemPrice(i, tier) * i.quantity, 0);
+    : sumItemsLocal(
+        visibleInternalItems.map((i) => ({ id: i.id, usd: itemPrice(i, tier), quantity: i.quantity })),
+        country || "",
+        overridesFor,
+      ).amount;
   const internalSubtotalLabel = showNativePen
     ? `S/ ${internalSubtotal.toFixed(2)} PEN`
-    : `${formatPriceIntl(internalSubtotal, displayCurrency)} ${displayCurrency}`;
+    : `${formatLocalDirect(internalSubtotal, country || "")} ${displayCurrency}`;
 
   const [couponInput, setCouponInput] = useState("");
   const [isApplying, setIsApplying] = useState(false);

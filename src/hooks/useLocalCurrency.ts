@@ -1,5 +1,7 @@
 import { useRegionTier } from "./useRegionTier";
 import { detectCurrency, formatPrice, exchangeRates, type Currency } from "@/i18n";
+import { useLocalOverrides, useLivePrices } from "@/lib/livePrices";
+import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 
 /**
  * Moneda local aproximada del visitante (por IP). Delegamos el cálculo y el
@@ -56,4 +58,69 @@ export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverri
     isUsd,
     loading,
   };
+}
+
+/** Resolve a checkout item id (or product slug) to the digital_products admin sku. */
+export function resolveAdminSku(idOrSku?: string | null): string | null {
+  if (!idOrSku) return null;
+  const cat = CHECKOUT_CATALOG[idOrSku as keyof typeof CHECKOUT_CATALOG];
+  if (cat?.adminSku) return cat.adminSku;
+  for (const c of Object.values(CHECKOUT_CATALOG)) {
+    if (c.id === idOrSku) return c.adminSku ?? c.id;
+  }
+  return idOrSku;
+}
+
+/**
+ * Same as `useLocalCurrency` but pulls the manual per-currency overrides for
+ * the given sku/slug from LivePricesProvider (set at /admin/products/:sku).
+ */
+export function useLocalCurrencyForSku(usdAmount: number, skuOrId?: string | null): LocalPrice {
+  const overrides = useLocalOverrides(resolveAdminSku(skuOrId)) as LocalPriceOverrides;
+  return useLocalCurrency(usdAmount, overrides);
+}
+
+/**
+ * Returns a resolver `(idOrSku) => overrides` for use inside .map() loops
+ * without breaking React hook rules. Backed by LivePricesProvider.
+ */
+export function useSkuOverridesResolver(): (idOrSku?: string | null) => LocalPriceOverrides {
+  const { prices } = useLivePrices();
+  return (idOrSku?: string | null) => {
+    const sku = resolveAdminSku(idOrSku);
+    if (!sku) return null;
+    return (prices[sku]?.local_prices ?? null) as LocalPriceOverrides;
+  };
+}
+
+/**
+ * Format an already-computed LOCAL amount (not USD) in the visitor's currency.
+ * Use when totals were summed per-item in local currency (e.g. mixing manual
+ * overrides with USD*rate items), so the label reflects the exact sum.
+ */
+export function formatLocalDirect(localAmount: number, country: string): string {
+  const currency = detectCurrency((country || "US").toUpperCase());
+  return formatPrice(0, currency, { [currency]: localAmount } as any);
+}
+
+/**
+ * Sum a list of items into the visitor's local currency, honoring per-sku
+ * manual overrides (`digital_products.local_prices`). Falls back to the
+ * automatic USD→local conversion for items without an override.
+ */
+export function sumItemsLocal(
+  items: Array<{ id?: string; sku?: string; usd: number; quantity: number }>,
+  country: string,
+  resolver: (idOrSku?: string | null) => LocalPriceOverrides,
+): { amount: number; currency: Currency; isUsd: boolean } {
+  const currency = detectCurrency((country || "US").toUpperCase());
+  const rate = exchangeRates[currency] ?? 1;
+  let amount = 0;
+  for (const it of items) {
+    const ov = resolver(it.sku ?? it.id);
+    const override = ov && (ov as any)[currency];
+    const perUnit = typeof override === "number" && override > 0 ? override : it.usd * rate;
+    amount += perUnit * (it.quantity || 1);
+  }
+  return { amount, currency, isUsd: currency === "USD" };
 }

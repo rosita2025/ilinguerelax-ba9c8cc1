@@ -6,7 +6,7 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
-import { formatLocalAmount } from "@/hooks/useLocalCurrency";
+import { formatLocalAmount, useSkuOverridesResolver } from "@/hooks/useLocalCurrency";
 
 interface DBRow {
   id: string;
@@ -139,9 +139,10 @@ export function MoreProductsPanel({ parentSku }: Props) {
     return Number(r.price_usd) || 0;
   };
 
-  const fmt = (usd: number, pen?: number | null) => {
+  const overridesFor = useSkuOverridesResolver();
+  const fmt = (usd: number, pen?: number | null, sku?: string) => {
     if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
-    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "");
+    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "", overridesFor(sku));
     return isUsd ? `$${Number(usd).toFixed(2)}` : formatted;
   };
 
@@ -210,11 +211,11 @@ export function MoreProductsPanel({ parentSku }: Props) {
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   {pct > 0 && (
                     <span className="text-xs text-muted-foreground line-through">
-                      {fmt(p.originalDisplayUsd, p.originalPen)}
+                      {fmt(p.originalDisplayUsd, p.originalPen, r.sku)}
                     </span>
                   )}
                   <p className="text-sm font-semibold text-primary">
-                    {fmt(p.displayUsd, p.pricePen)}
+                    {fmt(p.displayUsd, p.pricePen, r.sku)}
                   </p>
                 </div>
                 {pct > 0 && (

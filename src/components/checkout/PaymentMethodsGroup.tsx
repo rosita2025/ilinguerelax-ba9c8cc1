@@ -833,6 +833,9 @@ export function PaymentMethodsGroup() {
           amountUsd: Number(totalUsd),
           method: "SPEI / CLABE (México)",
           orderDate: new Date().toISOString(),
+          clabeNumber: CLABE_NUMBER,
+          clabeHolder: "Carmen Rosa Aliaga Domínguez",
+          clabeBank: "STP (SPEI)",
         },
       },
     }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));

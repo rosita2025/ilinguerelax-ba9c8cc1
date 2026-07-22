@@ -72,23 +72,18 @@ const Product500Preguntas = () => {
 
   const handleBuy = () => {
     if (!pricingReady) return;
-    if (tier.useHotmartLatam) {
-      // Skip Meta Pixel: Hotmart fires the same pixel id at its checkout.
-      window.location.href = tier.hotmartUrl || HOTMART_URL;
-    } else {
-      trackHotmartEvent("InitiateCheckout", {
-        content_name: "Inglés Relax - 500 Preguntas en Inglés",
-        content_category: "Digital Book",
-        content_ids: ["product-500-preguntas"],
-        content_type: "product",
-        value: currentPrice,
-        currency: "USD",
-        num_items: 1,
-      });
-      addItem({ ...cartItem, quantity: 1 });
-      toast.success("Producto agregado al carrito");
-      navigate(CHECKOUT_PATH);
-    }
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Inglés Relax - 500 Preguntas en Inglés",
+      content_category: "Digital Book",
+      content_ids: ["product-500-preguntas"],
+      content_type: "product",
+      value: currentPrice,
+      currency: "USD",
+      num_items: 1,
+    });
+    addItem({ ...cartItem, quantity: 1 });
+    toast.success("Producto agregado al carrito");
+    navigate(CHECKOUT_PATH);
   };
 
   return (

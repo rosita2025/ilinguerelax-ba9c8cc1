@@ -321,7 +321,7 @@ const ProductDynamic = () => {
               rating={4.8}
               reviewCount={120}
               productName={product.name}
-              ctaText={`COMPRAR AHORA · ${priceLabel}`}
+              ctaText={`COMPRAR EN TIENDA · ${priceLabel}`}
               buyUrl={`/checkouts/${product.sku}`}
             />
             <div className="h-20 md:h-16" />

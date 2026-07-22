@@ -147,7 +147,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen)
                     : showLocalRef
-                      ? formatLocalAmount(itemPrice(item, region.tier), region.country).formatted
+                      ? formatLocalAmount(itemPrice(item, region.tier), region.country, overridesFor(item.id)).formatted
                       : `$${itemPrice(item, region.tier).toFixed(2)}`}
                   {showLocalRef && (
                     <div className="text-[10px] font-normal text-muted-foreground">

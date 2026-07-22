@@ -209,12 +209,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>{fmtMoney(subtotal, localSubtotal, penTotals?.subtotal)}</span>
+            <span>{penMode && penTotals ? formatPen(penTotals.subtotal) : showLocalRef ? formatLocalDirect(localSubtotalAmount, region.country || "") : `$${subtotal.toFixed(2)}`}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-{fmtMoney(discount, localDiscount, penTotals?.discount)}</span>
+              <span>-{penMode && penTotals ? formatPen(penTotals.discount) : showLocalRef ? formatLocalDirect(localSubtotalAmount - localTotalAmount, region.country || "") : `$${discount.toFixed(2)}`}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
@@ -224,7 +224,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotal.formatted : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : `USD $${total.toFixed(2)}`}</div>
               {showLocalRef && (
                 <div className="text-xs font-normal text-muted-foreground mt-0.5">
                   ≈ USD ${total.toFixed(2)}

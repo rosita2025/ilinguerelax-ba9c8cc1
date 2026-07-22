@@ -63,9 +63,11 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     catch { return null; }
   })();
 
+  // Idioma inicial: subdominio > guardado > idioma del navegador (respeta al usuario
+  // aunque viaje: un hispanohablante en Portugal sigue viendo español).
   const initialLang: Language = subCountry
     ? detectLanguageFromCountry(subCountry)
-    : (savedLang || "es");
+    : (savedLang || detectLanguage());
 
   const savedCountry = (() => {
     try { return typeof window !== "undefined" ? localStorage.getItem("ilr_country") : null; }
@@ -94,9 +96,20 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         setCountryCode(country);
         try { localStorage.setItem("ilr_country", country); } catch {}
 
-        if (!savedLang) {
-          const detectedLang = detectLanguageFromCountry(country);
-          setLanguageState(detectedLang);
+        // IMPORTANTE: NO sobrescribir el idioma con el país por IP si el
+        // navegador ya declara un idioma soportado. Un hispanohablante que
+        // viaja por Portugal/Brasil/Francia debe seguir viendo español para
+        // que el checkout y los correos de carrito abandonado le lleguen en
+        // su idioma real. Sólo usamos el país cuando el navegador no
+        // declara un idioma útil (no hay savedLang y navigator.language
+        // cae al default "es").
+        if (!savedLang && typeof navigator !== "undefined") {
+          const browserLang = navigator.language?.toLowerCase().split("-")[0];
+          const supported = browserLang === "en" || browserLang === "es" || browserLang === "fr" || browserLang === "pt";
+          if (!supported) {
+            const detectedLang = detectLanguageFromCountry(country);
+            setLanguageState(detectedLang);
+          }
         }
 
         const detectedCurrency = detectCurrency(country);
@@ -109,6 +122,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
     detectCountry();
   }, []);
+
 
   // Save preferences when they change
   const setLanguage = (lang: Language) => {

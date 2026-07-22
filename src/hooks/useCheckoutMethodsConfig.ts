@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Seguridad: si no hay región configurada o falla la consulta, no se habilita
  * ningún método. Así nunca aparecen opciones que el admin no guardó.
  */
-export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
@@ -27,15 +27,17 @@ export interface CheckoutMethodsConfig {
   yape: boolean;
   binance: boolean;
   clabe: boolean;
+  hotmart: boolean;
   /** Orden de las familias según el sort_order más bajo en la región activa. */
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe", "hotmart"];
 
 const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false,
+  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false,
 };
+
 
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }
@@ -94,8 +96,8 @@ function keyToFamily(key: string): FamilyKey | null {
   if (k === "yape_plin") return "yape";
   if (k === "binance_pay") return "binance";
   if (k === "clabe_mx" || k === "spei_mx") return "clabe";
+  if (k === "hotmart" || k === "hotmart_1click") return "hotmart";
 
-  if (k === "mercadopago_transfer") return "transfer";
   if (k === "mercadopago_cash") return "cash";
   return null;
 }
@@ -155,8 +157,9 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER });
         return;
       }
-      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity };
+      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity };
+
 
       const enabledMethodKeys: string[] = [];
       let configuredMethods = 0;

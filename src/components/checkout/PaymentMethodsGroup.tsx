@@ -22,10 +22,18 @@ import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
+
+interface HotmartCountryPrice { amount: number; currency: string }
+interface HotmartConfig {
+  fallbackUrl: string | null;
+  urlsByCountry: Record<string, string>;
+  pricesByCountry: Record<string, HotmartCountryPrice>;
+}
+
 
 
 const visaLogo = "/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg";
@@ -252,7 +260,7 @@ const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "meth
   },
 };
 
-export function PaymentMethodsGroup() {
+export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
   const region = useRegionTier();
@@ -289,6 +297,34 @@ export function PaymentMethodsGroup() {
   const [copied, setCopied] = useState(false);
   const [copiedBinance, setCopiedBinance] = useState(false);
   const [copiedClabe, setCopiedClabe] = useState(false);
+  const [hotmartCfg, setHotmartCfg] = useState<HotmartConfig>({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} });
+
+  useEffect(() => {
+    if (!parentSku) { setHotmartCfg({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} }); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("digital_products")
+          .select("hotmart_url, hotmart_urls_by_country, hotmart_prices_by_country")
+          .eq("sku", parentSku)
+          .maybeSingle();
+        if (cancelled || !data) return;
+        const row = data as unknown as {
+          hotmart_url: string | null;
+          hotmart_urls_by_country: Record<string, string> | null;
+          hotmart_prices_by_country: Record<string, HotmartCountryPrice> | null;
+        };
+        setHotmartCfg({
+          fallbackUrl: row.hotmart_url,
+          urlsByCountry: row.hotmart_urls_by_country ?? {},
+          pricesByCountry: row.hotmart_prices_by_country ?? {},
+        });
+      } catch { /* noop */ }
+    })();
+    return () => { cancelled = true; };
+  }, [parentSku]);
+
 
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -481,12 +517,28 @@ export function PaymentMethodsGroup() {
     }
   };
 
+  const redirectToHotmart = useCallback(async () => {
+    const c = (region.country || "").toUpperCase();
+    const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
+    if (!url) return;
+    if (!valid) { requestBuyerInfo(); return; }
+    if (redirectingRef.current) return;
+    redirectingRef.current = true;
+    try {
+      await captureAbandonedCheckout("hotmart", true);
+    } catch { /* noop */ }
+    window.location.assign(url);
+  }, [hotmartCfg, region.country, valid, captureAbandonedCheckout]);
+
+
+
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
     void captureAbandonedCheckout(m, true);
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
+    if (m === "hotmart") { void redirectToHotmart(); return; }
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
     // hacia arriba. Reancla la vista sobre el método recién elegido (PayPal,
     // Binance, Yape…) para que el comprador siga viendo lo que tocó.
@@ -497,6 +549,7 @@ export function PaymentMethodsGroup() {
       }, 60);
     }
   };
+
 
   const handleBuyNow = async () => {
     if (!valid) { requestBuyerInfo(); return; }
@@ -887,6 +940,14 @@ export function PaymentMethodsGroup() {
   const isUsa = country === "US";
   const methodsConfig = useCheckoutMethodsConfig(country);
   const binanceCfg = useBinancePayConfig(methodsConfig.regionCode);
+
+  // Hotmart 1-clic: resuelve URL y precio local por país
+  const hotmartResolvedUrl = hotmartCfg.urlsByCountry[country] || hotmartCfg.fallbackUrl || null;
+  const hotmartResolvedPrice = hotmartCfg.pricesByCountry[country] || null;
+  const hotmartPriceLabel = hotmartResolvedPrice
+    ? `${hotmartResolvedPrice.currency} ${hotmartResolvedPrice.amount.toLocaleString()}`
+    : `USD $${totalUsd}`;
+
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
@@ -932,7 +993,24 @@ export function PaymentMethodsGroup() {
         : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
       badge: priceBadge,
     },
+    {
+      id: "hotmart",
+      icon: CreditCard,
+      title: language === "en" ? "Hotmart (1-click)"
+        : language === "pt" ? "Hotmart (1 clique)"
+        : language === "fr" ? "Hotmart (1 clic)"
+        : "Hotmart (1 clic)",
+      sub: language === "en"
+        ? `Pay ${hotmartPriceLabel} on Hotmart (local taxes included). Redirects in 1 click.`
+        : language === "pt"
+        ? `Pague ${hotmartPriceLabel} na Hotmart (impostos locais incluídos). Redireciona em 1 clique.`
+        : language === "fr"
+        ? `Payez ${hotmartPriceLabel} sur Hotmart (taxes locales incluses). Redirige en 1 clic.`
+        : `Paga ${hotmartPriceLabel} en Hotmart (incluye impuestos locales). Te redirige en 1 clic.`,
+      badge: hotmartPriceLabel,
+    },
   ];
+
 
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.
   // Perú conserva sus rails locales (transfer/cash/yape) por defecto; el resto
@@ -956,6 +1034,8 @@ export function PaymentMethodsGroup() {
         if (m.id === "yape") return methodsConfig.yape;
         if (m.id === "binance") return methodsConfig.binance;
         if (m.id === "clabe") return methodsConfig.clabe && country === "MX";
+        if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
+
 
         return true;
       })

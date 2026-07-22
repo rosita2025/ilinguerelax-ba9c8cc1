@@ -127,6 +127,7 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },
   { key: "binance_pay", label: "Binance Pay (USDT)", note: "Cripto manual · global · Verificación 1-24h", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "clabe_mx", label: "SPEI / CLABE (México)", note: "Transferencia manual MXN a CLABE mexicana · Verificación 1-24h", icon: "Building2", countryCodes: ["MX"] },
+  { key: "hotmart_1click", label: "Hotmart (1 clic)", note: "Redirige al enlace de Hotmart del producto según el país. Precio y moneda gestionados por Hotmart.", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
 ];
 
 

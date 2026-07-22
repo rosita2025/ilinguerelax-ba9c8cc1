@@ -43,6 +43,8 @@ interface ProductIn {
   bonus_access_key?: string | null;
   bonuses?: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
   hotmart_url?: string | null;
+  hotmart_urls_by_country?: Record<string, string> | null;
+  hotmart_prices_by_country?: Record<string, { amount: number; currency: string }> | null;
   store_enabled?: boolean;
   excluded_countries?: string[] | null;
   store_excluded_countries?: string[] | null;
@@ -210,6 +212,35 @@ Deno.serve(async (req) => {
             if (!/^[A-Z]{3}$/.test(cur)) continue;
             const n = typeof v === "string" ? Number(v) : (v as number);
             if (typeof n === "number" && isFinite(n) && n > 0) out[cur] = n;
+          }
+          return out;
+        })(),
+        hotmart_urls_by_country: (() => {
+          const raw = (p as unknown as { hotmart_urls_by_country?: unknown }).hotmart_urls_by_country;
+          if (!raw || typeof raw !== "object") return {};
+          const out: Record<string, string> = {};
+          for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+            const cc = k.toUpperCase();
+            if (!/^[A-Z]{2}$/.test(cc)) continue;
+            const url = String(v ?? "").trim();
+            if (/^https?:\/\//i.test(url)) out[cc] = url;
+          }
+          return out;
+        })(),
+        hotmart_prices_by_country: (() => {
+          const raw = (p as unknown as { hotmart_prices_by_country?: unknown }).hotmart_prices_by_country;
+          if (!raw || typeof raw !== "object") return {};
+          const out: Record<string, { amount: number; currency: string }> = {};
+          for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+            const cc = k.toUpperCase();
+            if (!/^[A-Z]{2}$/.test(cc)) continue;
+            const obj = v as { amount?: unknown; currency?: unknown } | null;
+            if (!obj) continue;
+            const amount = typeof obj.amount === "string" ? Number(obj.amount) : (obj.amount as number);
+            const currency = String(obj.currency ?? "").trim().toUpperCase();
+            if (typeof amount === "number" && isFinite(amount) && amount > 0 && /^[A-Z]{3}$/.test(currency)) {
+              out[cc] = { amount, currency };
+            }
           }
           return out;
         })(),

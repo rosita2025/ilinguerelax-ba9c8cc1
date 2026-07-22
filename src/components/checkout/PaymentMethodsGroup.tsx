@@ -20,6 +20,7 @@ import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from 
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
+import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart";

@@ -52,12 +52,13 @@ function isBotEnvironment(): boolean {
   try {
     const ua = navigator.userAgent || "";
     if (BOT_UA_RE.test(ua)) return true;
-    // Signals típicas de headless / automation.
-    const nav = navigator as Navigator & { webdriver?: boolean; languages?: readonly string[] };
+    // Solo mantenemos la señal más fiable: WebDriver activo. Descartamos
+    // heurísticas como `!window.chrome` o `languages.length === 0` porque
+    // dan muchos falsos positivos en Chrome móvil, WebViews de Instagram/
+    // Facebook y Samsung Internet → expulsaban compradores reales del
+    // checkout haciéndolo parecer "carrito abandonado".
+    const nav = navigator as Navigator & { webdriver?: boolean };
     if (nav.webdriver === true) return true;
-    if (!nav.languages || nav.languages.length === 0) return true;
-    // Chrome real siempre expone window.chrome; headless suele no.
-    if (/Chrome\//.test(ua) && !(window as unknown as { chrome?: unknown }).chrome) return true;
     return false;
   } catch {
     return false;

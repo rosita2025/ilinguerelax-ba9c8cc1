@@ -119,41 +119,47 @@ const Email = ({
           </Row>
         </Section>
 
-        {(binancePayId || binanceAddress) && (
-          <Section style={binanceBox}>
-            <Text style={binanceTitle}>🔐 Datos de Binance Pay (por si pierdes la captura)</Text>
-            {binancePayId && (
-              <Text style={binanceLine}><strong>Pay ID:</strong> {binancePayId}</Text>
-            )}
-            {binanceAddress && (
-              <Text style={binanceLine}><strong>Dirección:</strong> {binanceAddress}</Text>
-            )}
-            {binanceNetwork && (
-              <Text style={binanceLine}><strong>Red:</strong> {binanceNetwork}</Text>
-            )}
-            <Text style={binanceHint}>
-              Puedes usar tu Pay ID o hash de la transacción como referencia al escribirnos.
-            </Text>
-          </Section>
-        )}
+        {(() => {
+          const m = (method || '').toLowerCase()
+          const isBinance = m.includes('binance')
+          const isClabe = m.includes('spei') || m.includes('clabe') || m.includes('mexic')
+          const isYape = m.includes('yape') || m.includes('plin')
+          // Only render one block, matching the method chosen by the customer.
+          if (isBinance && (binancePayId || binanceAddress)) {
+            return (
+              <Section style={binanceBox}>
+                <Text style={binanceTitle}>🔐 Datos de Binance Pay (por si pierdes la captura)</Text>
+                {binancePayId && (<Text style={binanceLine}><strong>Pay ID:</strong> {binancePayId}</Text>)}
+                {binanceAddress && (<Text style={binanceLine}><strong>Dirección:</strong> {binanceAddress}</Text>)}
+                {binanceNetwork && (<Text style={binanceLine}><strong>Red:</strong> {binanceNetwork}</Text>)}
+                <Text style={binanceHint}>Puedes usar tu Pay ID o hash de la transacción como referencia al escribirnos.</Text>
+              </Section>
+            )
+          }
+          if (isClabe && (clabeNumber || clabeHolder)) {
+            return (
+              <Section style={binanceBox}>
+                <Text style={binanceTitle}>🏦 Datos SPEI / CLABE (México)</Text>
+                {clabeNumber && (<Text style={binanceLine}><strong>CLABE:</strong> {clabeNumber}</Text>)}
+                {clabeHolder && (<Text style={binanceLine}><strong>Titular:</strong> {clabeHolder}</Text>)}
+                {clabeBank && (<Text style={binanceLine}><strong>Banco:</strong> {clabeBank}</Text>)}
+                <Text style={binanceHint}>Si aún no has transferido, usa estos datos desde tu app bancaria (SPEI) por el monto exacto en MXN. Guarda el comprobante como referencia.</Text>
+              </Section>
+            )
+          }
+          if (isYape) {
+            return (
+              <Section style={binanceBox}>
+                <Text style={binanceTitle}>📱 Datos Yape / Plin (Perú)</Text>
+                <Text style={binanceLine}><strong>Titular:</strong> Carmen Rosa Aliaga Domínguez</Text>
+                <Text style={binanceLine}><strong>Número:</strong> +51 987 654 321</Text>
+                <Text style={binanceHint}>Envía tu captura de Yape o Plin a hola@ilinguerelax.com con tu número de pedido.</Text>
+              </Section>
+            )
+          }
+          return null
+        })()}
 
-        {(clabeNumber || clabeHolder) && (
-          <Section style={binanceBox}>
-            <Text style={binanceTitle}>🏦 Datos SPEI / CLABE (México)</Text>
-            {clabeNumber && (
-              <Text style={binanceLine}><strong>CLABE:</strong> {clabeNumber}</Text>
-            )}
-            {clabeHolder && (
-              <Text style={binanceLine}><strong>Titular:</strong> {clabeHolder}</Text>
-            )}
-            {clabeBank && (
-              <Text style={binanceLine}><strong>Banco:</strong> {clabeBank}</Text>
-            )}
-            <Text style={binanceHint}>
-              Si aún no has transferido, usa estos datos desde tu app bancaria (SPEI) por el monto exacto en MXN. Guarda el comprobante como referencia.
-            </Text>
-          </Section>
-        )}
 
 
 

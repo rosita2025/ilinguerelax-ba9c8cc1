@@ -73,15 +73,22 @@ const Email = ({
         <Section style={cardHi}>
           <Text style={hiTitle}>¡Hola {customerName || ''}! 👋</Text>
           <Text style={hiLine}>
-            Recibimos tu comprobante de pago por <strong>{method || 'Yape/Plin'}</strong>. Nuestra
-            supervisora <strong>Rosa</strong> lo revisará y confirmará en un plazo{' '}
-            <strong>máximo de 24 horas</strong>.
+            Recibimos tu pedido con pago por <strong>{method || 'Yape / Plin / Binance Pay / SPEI (CLABE)'}</strong>.
+            Para completar la verificación, por favor <strong>envíanos tu comprobante de pago</strong> (captura o PDF) al correo{' '}
+            <strong>hola@ilinguerelax.com</strong> indicando tu número de pedido <strong>#{orderNumber || '—'}</strong>.
           </Text>
           <Text style={hiLine}>
-            Guarda este correo — es tu comprobante en caso de que se cierre la página o tu batería
-            se apague. No necesitas hacer nada más.
+            Nuestra supervisora <strong>Rosa</strong> lo revisará y confirmará en un plazo{' '}
+            <strong>máximo de 24 horas</strong>. Una vez validado, te enviaremos el enlace de descarga de tu material digital.
+          </Text>
+          <Text style={hiLine}>
+            Métodos aceptados: <strong>Yape</strong>, <strong>Plin</strong>, <strong>Binance Pay</strong> y <strong>SPEI / CLABE (México)</strong>.
+          </Text>
+          <Text style={hiLine}>
+            Guarda este correo — es tu comprobante en caso de que se cierre la página o tu batería se apague. No necesitas hacer nada más aparte de enviarnos tu captura.
           </Text>
         </Section>
+
 
         <Section style={card}>
           <Row>

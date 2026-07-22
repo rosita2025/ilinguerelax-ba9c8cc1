@@ -152,7 +152,7 @@ const Email = ({
               <Section style={binanceBox}>
                 <Text style={binanceTitle}>📱 Datos Yape / Plin (Perú)</Text>
                 <Text style={binanceLine}><strong>Titular:</strong> Carmen Rosa Aliaga Domínguez</Text>
-                <Text style={binanceLine}><strong>Número:</strong> +51 987 654 321</Text>
+                <Text style={binanceLine}><strong>Número:</strong> +51 972 119 741</Text>
                 <Text style={binanceHint}>Envía tu captura de Yape o Plin a hola@ilinguerelax.com con tu número de pedido.</Text>
               </Section>
             )

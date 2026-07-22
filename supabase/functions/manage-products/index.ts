@@ -43,6 +43,8 @@ interface ProductIn {
   bonus_access_key?: string | null;
   bonuses?: Array<{ name?: string; drive_url?: string; access_key?: string }> | null;
   hotmart_url?: string | null;
+  hotmart_urls_by_country?: Record<string, string> | null;
+  hotmart_prices_by_country?: Record<string, { amount: number; currency: string }> | null;
   store_enabled?: boolean;
   excluded_countries?: string[] | null;
   store_excluded_countries?: string[] | null;

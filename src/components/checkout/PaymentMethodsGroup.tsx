@@ -517,17 +517,17 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
   };
 
-  const redirectToHotmart = useCallback(async () => {
+  const redirectToHotmart = useCallback(() => {
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
     if (!url) return;
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     redirectingRef.current = true;
-    try {
-      await captureAbandonedCheckout("hotmart", true);
-    } catch { /* noop */ }
-    window.location.assign(url);
+    // Fire-and-forget: no bloquear la redirección esperando la captura.
+    try { void captureAbandonedCheckout("hotmart", true); } catch { /* noop */ }
+    // Reemplaza la tienda por Hotmart en la misma pestaña (evita bloqueo de popups).
+    window.location.replace(url);
   }, [hotmartCfg, region.country, valid, captureAbandonedCheckout]);
 
 
@@ -557,8 +557,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
+    // Hotmart: redirige de inmediato (sin await) para máxima velocidad; la captura corre en paralelo dentro de redirectToHotmart.
+    if (selected === "hotmart") { redirectToHotmart(); return; }
     await captureAbandonedCheckout(selected, true);
-    if (selected === "hotmart") { await redirectToHotmart(); return; }
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }

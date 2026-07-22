@@ -965,7 +965,7 @@ export function PaymentMethodsGroup() {
     ? orderedByAdmin.filter((m) => m.id !== "paypal")
     : methodsConfig.loaded && methodsConfig.regionCode
       ? orderedByAdmin
-      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance");
+      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance" || (m.id === "clabe" && country === "MX"));
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 

@@ -297,6 +297,34 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const [copied, setCopied] = useState(false);
   const [copiedBinance, setCopiedBinance] = useState(false);
   const [copiedClabe, setCopiedClabe] = useState(false);
+  const [hotmartCfg, setHotmartCfg] = useState<HotmartConfig>({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} });
+
+  useEffect(() => {
+    if (!parentSku) { setHotmartCfg({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} }); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("digital_products")
+          .select("hotmart_url, hotmart_urls_by_country, hotmart_prices_by_country")
+          .eq("sku", parentSku)
+          .maybeSingle();
+        if (cancelled || !data) return;
+        const row = data as unknown as {
+          hotmart_url: string | null;
+          hotmart_urls_by_country: Record<string, string> | null;
+          hotmart_prices_by_country: Record<string, HotmartCountryPrice> | null;
+        };
+        setHotmartCfg({
+          fallbackUrl: row.hotmart_url,
+          urlsByCountry: row.hotmart_urls_by_country ?? {},
+          pricesByCountry: row.hotmart_prices_by_country ?? {},
+        });
+      } catch { /* noop */ }
+    })();
+    return () => { cancelled = true; };
+  }, [parentSku]);
+
 
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);

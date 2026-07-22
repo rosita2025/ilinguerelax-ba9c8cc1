@@ -1485,6 +1485,68 @@ export function PaymentMethodsGroup() {
               </div>
             )}
 
+            {m.id === "clabe" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="text-center space-y-1">
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">
+                    {language === "en" ? "Transfer to CLABE (Mexico)" : language === "pt" ? "Transferência para CLABE (México)" : language === "fr" ? "Virement vers CLABE (Mexique)" : "Transferencia a CLABE (México)"}
+                  </p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{CLABE_HOLDER}</p>
+                  <p className="text-[11px] text-neutral-500">{CLABE_BANK}</p>
+                </div>
+
+                <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 p-3 space-y-1.5">
+                  <p className="text-[11px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 text-center">CLABE</p>
+                  <button
+                    type="button"
+                    onClick={copyClabe}
+                    className="w-full inline-flex items-center justify-center gap-2 text-lg font-mono font-bold text-emerald-900 dark:text-emerald-200 hover:opacity-80 transition"
+                  >
+                    <span className="tracking-wider">{CLABE_NUMBER}</span>
+                    {copiedClabe ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
+                  </button>
+                  <p className="text-[11px] text-neutral-500 text-center">{copiedClabe ? t.copied : (language === "en" ? "Tap to copy the 18-digit CLABE" : language === "pt" ? "Toque para copiar a CLABE de 18 dígitos" : language === "fr" ? "Touchez pour copier la CLABE (18 chiffres)" : "Toca para copiar la CLABE de 18 dígitos")}</p>
+                </div>
+
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
+                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                    {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
+                  </p>
+                  {!local.isUsd && !local.loading && (
+                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
+                  )}
+                </div>
+
+                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
+                  <li>{language === "en" ? "Open your Mexican bank app (BBVA, Banorte, Santander, etc.) and go to SPEI transfer." : language === "pt" ? "Abra o app do seu banco mexicano (BBVA, Banorte, Santander etc.) e vá em transferência SPEI." : language === "fr" ? "Ouvre l'app de ta banque mexicaine (BBVA, Banorte, Santander, etc.) et va au virement SPEI." : "Abre la app de tu banco mexicano (BBVA, Banorte, Santander, etc.) y ve a transferencia SPEI."}</li>
+                  <li>{language === "en" ? `Paste the CLABE ${CLABE_NUMBER} and send the exact amount in MXN.` : language === "pt" ? `Cole a CLABE ${CLABE_NUMBER} e envie o valor exato em MXN.` : language === "fr" ? `Colle la CLABE ${CLABE_NUMBER} et envoie le montant exact en MXN.` : `Pega la CLABE ${CLABE_NUMBER} y envía el monto exacto en MXN.`}</li>
+                  <li>{language === "en" ? "Save the transfer receipt screenshot." : language === "pt" ? "Salve a captura do comprovante." : language === "fr" ? "Sauvegarde la capture du reçu." : "Guarda la captura del comprobante."}</li>
+                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
+                </ol>
+
+                <button
+                  type="button"
+                  onClick={handleClabePaid}
+                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 rounded-xl transition-colors"
+                >
+                  {t.alreadyPaid}
+                </button>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
+                </a>
+
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
+              </div>
+            )}
+
+
 
 
             {m.id === "paypal" && isSelected && (

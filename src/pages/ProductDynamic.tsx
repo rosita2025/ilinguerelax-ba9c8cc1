@@ -110,7 +110,7 @@ const ProductDynamic = () => {
           ? Number(product.price_usd_latam)
           : Number(product.price_usd))
     : 0;
-  const local = useLocalCurrency(effectiveUsd);
+  const local = useLocalCurrency(effectiveUsd, (product as any)?.local_prices ?? null);
   const tier = useCountryTierRouting(slug ?? "");
 
   // Track ViewContent per SKU for every product (existing + new) in /admin/live

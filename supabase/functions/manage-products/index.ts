@@ -47,6 +47,7 @@ interface ProductIn {
   excluded_countries?: string[] | null;
   store_excluded_countries?: string[] | null;
   hotmart_excluded_countries?: string[] | null;
+  local_prices?: Record<string, number> | null;
   upsells?: UpsellIn[];
 }
 
@@ -200,6 +201,18 @@ Deno.serve(async (req) => {
                 .filter((a) => a && a !== p.sku)
             ))
           : [],
+        local_prices: (() => {
+          const raw = (p as unknown as { local_prices?: unknown }).local_prices;
+          if (!raw || typeof raw !== "object") return {};
+          const out: Record<string, number> = {};
+          for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+            const cur = k.toUpperCase();
+            if (!/^[A-Z]{3}$/.test(cur)) continue;
+            const n = typeof v === "string" ? Number(v) : (v as number);
+            if (typeof n === "number" && isFinite(n) && n > 0) out[cur] = n;
+          }
+          return out;
+        })(),
       };
 
       // Duplicate-alias guard: if any alias is already used by a different product, reject.

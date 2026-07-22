@@ -37,6 +37,8 @@ interface Product {
   bonus_access_key: string | null;
   bonuses: Bonus[] | null;
   hotmart_url: string | null;
+  hotmart_urls_by_country: Record<string, string>;
+  hotmart_prices_by_country: Record<string, { amount: number; currency: string }>;
   store_enabled: boolean;
   excluded_countries: string[];
   store_excluded_countries: string[];

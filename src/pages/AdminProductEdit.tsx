@@ -42,6 +42,7 @@ interface Product {
   store_excluded_countries: string[];
   hotmart_excluded_countries: string[];
   sku_aliases: string[];
+  local_prices: Record<string, number>;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;

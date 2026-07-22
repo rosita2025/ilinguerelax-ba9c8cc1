@@ -211,11 +211,11 @@ export function MoreProductsPanel({ parentSku }: Props) {
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   {pct > 0 && (
                     <span className="text-xs text-muted-foreground line-through">
-                      {fmt(p.originalDisplayUsd, p.originalPen)}
+                      {fmt(p.originalDisplayUsd, p.originalPen, r.sku)}
                     </span>
                   )}
                   <p className="text-sm font-semibold text-primary">
-                    {fmt(p.displayUsd, p.pricePen)}
+                    {fmt(p.displayUsd, p.pricePen, r.sku)}
                   </p>
                 </div>
                 {pct > 0 && (

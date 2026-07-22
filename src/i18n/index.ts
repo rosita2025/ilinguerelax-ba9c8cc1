@@ -228,11 +228,20 @@ const AMBIGUOUS_DOLLAR_CURRENCIES = new Set<Currency>([
   "MXN", "ARS", "COP", "CLP", "BRL", "CRC",
 ] as unknown as Currency[]);
 
-// Format price with currency
-export const formatPrice = (priceInUSD: number, currency: Currency): string => {
+// Format price with currency.
+// `overrides` permite fijar el monto exacto en una moneda (ej. { COP: 33900 })
+// para no depender de la tasa de cambio. Si la moneda no está en overrides,
+// se usa la conversión USD × tasa habitual.
+export const formatPrice = (
+  priceInUSD: number,
+  currency: Currency,
+  overrides?: Partial<Record<Currency, number>> | null,
+): string => {
   const config = currencyConfig[currency];
+  const override = overrides && overrides[currency];
+  const hasOverride = typeof override === "number" && override > 0;
   const rate = exchangeRates[currency];
-  const convertedPrice = priceInUSD * rate;
+  const convertedPrice = hasOverride ? (override as number) : priceInUSD * rate;
 
   const formattedNumber = convertedPrice.toLocaleString(undefined, {
     minimumFractionDigits: config.decimals,

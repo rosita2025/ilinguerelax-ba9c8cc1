@@ -1238,7 +1238,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
                     <span className="inline-flex items-center gap-2 min-w-0">
-                      <img src={hotmartLogo.url} alt="Hotmart" className="h-6 sm:h-7 w-auto object-contain" />
+                      <img src={hotmartLogo.url} alt="Hotmart" className="h-9 sm:h-11 w-auto object-contain" />
                       <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
                         {language === "en" ? "1-click" : language === "pt" ? "1 clique" : "1 clic"}
                       </span>

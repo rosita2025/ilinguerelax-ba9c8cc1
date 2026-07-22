@@ -59,3 +59,23 @@ export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverri
     loading,
   };
 }
+
+/** Resolve a checkout item id (or product slug) to the digital_products admin sku. */
+export function resolveAdminSku(idOrSku?: string | null): string | null {
+  if (!idOrSku) return null;
+  const cat = CHECKOUT_CATALOG[idOrSku as keyof typeof CHECKOUT_CATALOG];
+  if (cat?.adminSku) return cat.adminSku;
+  for (const c of Object.values(CHECKOUT_CATALOG)) {
+    if (c.id === idOrSku) return c.adminSku ?? c.id;
+  }
+  return idOrSku;
+}
+
+/**
+ * Same as `useLocalCurrency` but pulls the manual per-currency overrides for
+ * the given sku/slug from LivePricesProvider (set at /admin/products/:sku).
+ */
+export function useLocalCurrencyForSku(usdAmount: number, skuOrId?: string | null): LocalPrice {
+  const overrides = useLocalOverrides(resolveAdminSku(skuOrId)) as LocalPriceOverrides;
+  return useLocalCurrency(usdAmount, overrides);
+}

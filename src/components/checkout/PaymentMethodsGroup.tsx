@@ -1227,23 +1227,20 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 !valid && "cursor-not-allowed",
               )}
             >
-              <div className={cn(
-                "rounded-lg flex items-center justify-center shrink-0",
-                m.id === "hotmart"
-                  ? "w-14 h-14 sm:w-14 sm:h-14 bg-white ring-1 ring-neutral-200 dark:ring-neutral-600 p-2"
-                  : cn(
-                      "w-9 h-9 sm:w-10 sm:h-10",
-                      isSelected
-                        ? "bg-neutral-700 text-white"
-                        : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
-                    ),
-              )}>
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : m.id === "hotmart" ? <img src={hotmartLogo.url} alt="Hotmart" className="w-full h-full object-contain" /> : <Icon className="w-5 h-5" />}
-              </div>
+              {m.id !== "hotmart" && (
+                <div className={cn(
+                  "rounded-lg flex items-center justify-center shrink-0 w-9 h-9 sm:w-10 sm:h-10",
+                  isSelected
+                    ? "bg-neutral-700 text-white"
+                    : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
+                )}>
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
-                    <img src={hotmartLogo.url} alt="Hotmart" className="h-11 sm:h-10 w-auto object-contain" />
+                    <img src={hotmartLogo.url} alt="Hotmart" className="h-12 sm:h-14 w-auto object-contain" />
                   ) : (
                     <span className="min-w-0 break-words">{m.title}</span>
                   )}

@@ -17,8 +17,8 @@ const TTL_MS = 60 * 60 * 1000; // 1h ventana de compra
 
 // Rate limit: máximo N accesos al checkout por ventana.
 const RATE_WINDOW_MS = 10 * 60 * 1000; // 10 min
-const RATE_MAX_HITS = 15; // 15 aperturas / 10 min por dispositivo
-const BAN_MS = 30 * 60 * 1000; // 30 min de cooldown tras exceder
+const RATE_MAX_HITS = 40; // 40 aperturas / 10 min por dispositivo (compras multi-producto)
+const BAN_MS = 10 * 60 * 1000; // 10 min de cooldown tras exceder (antes 30)
 
 const RESERVED = new Set([
   "return",
@@ -52,12 +52,13 @@ function isBotEnvironment(): boolean {
   try {
     const ua = navigator.userAgent || "";
     if (BOT_UA_RE.test(ua)) return true;
-    // Signals típicas de headless / automation.
-    const nav = navigator as Navigator & { webdriver?: boolean; languages?: readonly string[] };
+    // Solo mantenemos la señal más fiable: WebDriver activo. Descartamos
+    // heurísticas como `!window.chrome` o `languages.length === 0` porque
+    // dan muchos falsos positivos en Chrome móvil, WebViews de Instagram/
+    // Facebook y Samsung Internet → expulsaban compradores reales del
+    // checkout haciéndolo parecer "carrito abandonado".
+    const nav = navigator as Navigator & { webdriver?: boolean };
     if (nav.webdriver === true) return true;
-    if (!nav.languages || nav.languages.length === 0) return true;
-    // Chrome real siempre expone window.chrome; headless suele no.
-    if (/Chrome\//.test(ua) && !(window as unknown as { chrome?: unknown }).chrome) return true;
     return false;
   } catch {
     return false;
@@ -163,7 +164,14 @@ export function evaluateCheckoutGate(): GateReason {
     } catch { /* ignore */ }
   }
 
-  if (!authorized) return "unauthorized";
+  // No bloqueamos por "unauthorized": muchos compradores legítimos llegan
+  // sin referer (email, WhatsApp, tab nueva, referrer-policy estricta) y
+  // los expulsábamos silenciosamente → parecía "abandono de carrito".
+  // El rate-limit por IP en el servidor (checkout-gate-check) sigue activo.
+  if (!authorized) {
+    // Autorizamos on-the-fly para que el resto del flujo funcione igual.
+    try { sessionStorage.setItem(KEY, JSON.stringify({ ts: Date.now(), slug: "*" })); } catch { /* ignore */ }
+  }
 
   const { limited } = recordCheckoutHit();
   if (limited) return "rate_limited";

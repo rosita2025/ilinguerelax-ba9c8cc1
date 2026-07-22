@@ -642,9 +642,96 @@ const AdminProductEdit = () => {
               <Input
                 value={product.hotmart_url ?? ""}
                 onChange={(e) => update("hotmart_url", e.target.value)}
-                placeholder="https://pay.hotmart.com/…"
+                placeholder="https://pay.hotmart.com/… (fallback si no hay link por país)"
               />
+
+              {/* Enlaces Hotmart por país + precio local (para método "Hotmart 1 clic" en el checkout) */}
+              <div className="mt-3 pt-3 border-t space-y-2">
+                <div className="text-xs font-semibold">🌎 Enlaces Hotmart por país (1 clic desde el checkout)</div>
+                <p className="text-[11px] text-muted-foreground">
+                  Cada país puede tener un enlace de Hotmart distinto y un precio local exacto (ej. México MXN 180, Colombia COP 34.000). Se muestra como "Hotmart (1 clic)" dentro del checkout de la tienda.
+                </p>
+                {Object.entries(product.hotmart_urls_by_country ?? {}).map(([cc, url]) => {
+                  const price = product.hotmart_prices_by_country?.[cc];
+                  return (
+                    <div key={cc} className="grid grid-cols-[70px_1fr_100px_80px_36px] gap-1.5 items-center">
+                      <span className="text-xs font-mono font-semibold">
+                        {COUNTRY_INFO[cc]?.flag ?? ""} {cc}
+                      </span>
+                      <Input
+                        value={url}
+                        onChange={(e) => {
+                          const next = { ...(product.hotmart_urls_by_country ?? {}) };
+                          next[cc] = e.target.value;
+                          update("hotmart_urls_by_country", next);
+                        }}
+                        placeholder="https://pay.hotmart.com/…"
+                        className="h-8 text-xs"
+                      />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={price?.amount ?? ""}
+                        onChange={(e) => {
+                          const next = { ...(product.hotmart_prices_by_country ?? {}) };
+                          const amt = e.target.value === "" ? 0 : Number(e.target.value);
+                          next[cc] = { amount: amt, currency: price?.currency ?? "USD" };
+                          update("hotmart_prices_by_country", next);
+                        }}
+                        placeholder="180"
+                        className="h-8 text-xs"
+                      />
+                      <Input
+                        value={price?.currency ?? ""}
+                        onChange={(e) => {
+                          const next = { ...(product.hotmart_prices_by_country ?? {}) };
+                          next[cc] = { amount: price?.amount ?? 0, currency: e.target.value.toUpperCase().slice(0, 3) };
+                          update("hotmart_prices_by_country", next);
+                        }}
+                        placeholder="MXN"
+                        className="h-8 text-xs uppercase"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => {
+                          const u = { ...(product.hotmart_urls_by_country ?? {}) };
+                          const pp = { ...(product.hotmart_prices_by_country ?? {}) };
+                          delete u[cc]; delete pp[cc];
+                          update("hotmart_urls_by_country", u);
+                          update("hotmart_prices_by_country", pp);
+                        }}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  );
+                })}
+                <div className="flex items-center gap-2 pt-1">
+                  <select
+                    className="h-8 text-xs border border-input rounded-md px-2 bg-background flex-1"
+                    onChange={(e) => {
+                      const cc = e.target.value;
+                      if (!cc || (product.hotmart_urls_by_country ?? {})[cc]) return;
+                      const next = { ...(product.hotmart_urls_by_country ?? {}), [cc]: "" };
+                      update("hotmart_urls_by_country", next);
+                      e.target.value = "";
+                    }}
+                    defaultValue=""
+                  >
+                    <option value="">+ Añadir país…</option>
+                    {Object.entries(COUNTRY_INFO)
+                      .filter(([cc]) => !(product.hotmart_urls_by_country ?? {})[cc])
+                      .map(([cc, info]) => (
+                        <option key={cc} value={cc}>{info.flag} {cc} · {info.name}</option>
+                      ))}
+                  </select>
+                </div>
+              </div>
             </div>
+
 
             {/* Presets rápidos: 2 políticas comunes */}
             <div className="grid md:grid-cols-2 gap-3">

@@ -1310,7 +1310,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <BankBadge label="MXN" bg="#ffffff" color="#0A2540" />
                   </div>
                 ) : (
-                  <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
+                  <div className={cn("text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5", m.id !== "hotmart" && "line-clamp-2")}>{m.sub}</div>
                 )}
 
 

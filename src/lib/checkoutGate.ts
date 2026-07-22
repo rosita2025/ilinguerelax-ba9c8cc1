@@ -17,8 +17,8 @@ const TTL_MS = 60 * 60 * 1000; // 1h ventana de compra
 
 // Rate limit: máximo N accesos al checkout por ventana.
 const RATE_WINDOW_MS = 10 * 60 * 1000; // 10 min
-const RATE_MAX_HITS = 15; // 15 aperturas / 10 min por dispositivo
-const BAN_MS = 30 * 60 * 1000; // 30 min de cooldown tras exceder
+const RATE_MAX_HITS = 40; // 40 aperturas / 10 min por dispositivo (compras multi-producto)
+const BAN_MS = 10 * 60 * 1000; // 10 min de cooldown tras exceder (antes 30)
 
 const RESERVED = new Set([
   "return",

@@ -112,7 +112,7 @@ export function CheckoutTestimonials() {
   }, [region.country]);
 
   const countryLabel = items[0]?.country ?? "";
-  const quote = QUOTES[language] ?? QUOTES.es;
+  const quotes = QUOTES[language] ?? QUOTES.es;
   const heading = HEADINGS[language] ?? HEADINGS.es;
   const verified = VERIFIED[language] ?? VERIFIED.es;
 

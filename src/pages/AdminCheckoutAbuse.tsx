@@ -171,32 +171,77 @@ export default function AdminCheckoutAbuse() {
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b">
+            <h2 className="font-semibold">Origen del tráfico · últimas 24 h</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              De dónde vienen los visitantes que abren el checkout. Instagram/Facebook = humanos reales desde anuncios.
+            </p>
+          </div>
+          {sources.length === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground text-center">Sin actividad reciente.</p>
+          ) : (
+            <div className="p-4 flex flex-wrap gap-2">
+              {sources.map((s) => (
+                <div key={s.source} className="flex items-center gap-2">
+                  <SourceBadge source={s.source} />
+                  <span className="font-mono text-sm">{s.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-muted/40 border-b">
             <h2 className="font-semibold">Top IPs · últimas 24 h</h2>
           </div>
           {top.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground text-center">Sin actividad reciente.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/20 text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="text-left px-3 py-2">IP</th>
-                    <th className="text-left px-3 py-2">Hits</th>
-                    <th className="text-left px-3 py-2">Último</th>
-                    <th className="text-left px-3 py-2">Productos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {top.map((r) => (
-                    <tr key={r.ip} className="border-t">
-                      <td className="px-3 py-2 font-mono">{r.ip}</td>
-                      <td className={`px-3 py-2 font-semibold ${r.count > 20 ? "text-destructive" : ""}`}>{r.count}</td>
-                      <td className="px-3 py-2">{new Date(r.last).toLocaleString()}</td>
-                      <td className="px-3 py-2 text-xs text-muted-foreground">{r.slugs.join(", ") || "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="divide-y">
+              {top.map((r) => (
+                <div key={r.ip} className="p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-sm">{r.ip}</span>
+                      {(r.sources.length ? r.sources : ["direct"]).map((s) => (
+                        <SourceBadge key={s} source={s} />
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className={`font-semibold ${r.count > 20 ? "text-destructive" : "text-foreground"}`}>{r.count} hits</span>
+                      <span>{new Date(r.last).toLocaleString()}</span>
+                    </div>
+                  </div>
+                  {r.slugs.length > 0 && (
+                    <div className="text-xs">
+                      <span className="text-muted-foreground">Productos: </span>
+                      <span className="text-foreground">{r.slugs.join(", ")}</span>
+                    </div>
+                  )}
+                  {r.referers.length > 0 && (
+                    <div className="text-xs space-y-1">
+                      <span className="text-muted-foreground">URLs de origen:</span>
+                      {r.referers.map((u, i) => (
+                        <a
+                          key={i}
+                          href={u}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block text-primary hover:underline truncate max-w-full"
+                          title={u}
+                        >
+                          {u}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {r.ua && (
+                    <div className="text-[10px] text-muted-foreground truncate" title={r.ua}>
+                      {r.ua}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </section>

@@ -231,7 +231,7 @@ const ProductDynamic = () => {
                   <div className="space-y-2">
                     <Button asChild size="lg" className="w-full">
                       <Link to={`/checkouts/${product.sku}`}>
-                        Comprar ahora · {displayFormatted}
+                        Comprar ahora
                       </Link>
                     </Button>
                   </div>
@@ -321,7 +321,7 @@ const ProductDynamic = () => {
               rating={4.8}
               reviewCount={120}
               productName={product.name}
-              ctaText={`Comprar ahora · ${priceLabel}`}
+              ctaText={"Comprar ahora"}
               buyUrl={`/checkouts/${product.sku}`}
             />
             <div className="h-20 md:h-16" />

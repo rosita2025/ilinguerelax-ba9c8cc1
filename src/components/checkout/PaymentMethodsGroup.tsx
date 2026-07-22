@@ -929,8 +929,8 @@ export function PaymentMethodsGroup() {
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.
   // Perú conserva sus rails locales (transfer/cash/yape) por defecto; el resto
   // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí
-  // deja de aparecer. Antes de cargar la config, mostramos el conjunto legacy
-  // para no parpadear.
+  // deja de aparecer. Antes de cargar la config no mostramos opciones para
+  // evitar que aparezcan fugazmente todos los métodos legacy.
   const filteredByAdmin = methodsConfig.loaded
     ? allMethods.filter((m) => {
         if (m.id === "card") {
@@ -951,7 +951,7 @@ export function PaymentMethodsGroup() {
 
         return true;
       })
-    : allMethods;
+    : [];
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
   const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id;

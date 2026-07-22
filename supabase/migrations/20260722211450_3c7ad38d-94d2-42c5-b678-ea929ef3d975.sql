@@ -1,0 +1,1 @@
+ALTER TABLE public.checkout_rate_hits ADD COLUMN IF NOT EXISTS referer text, ADD COLUMN IF NOT EXISTS source text;

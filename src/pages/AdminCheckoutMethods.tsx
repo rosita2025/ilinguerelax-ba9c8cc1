@@ -126,6 +126,7 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },
   { key: "binance_pay", label: "Binance Pay (USDT)", note: "Cripto manual · global · Verificación 1-24h", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
+  { key: "clabe_mx", label: "SPEI / CLABE (México)", note: "Transferencia manual MXN a CLABE mexicana · Verificación 1-24h", icon: "Building2", countryCodes: ["MX"] },
 ];
 
 

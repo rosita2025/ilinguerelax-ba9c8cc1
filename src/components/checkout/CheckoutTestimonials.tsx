@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Star, ChevronLeft, ChevronRight, BadgeCheck } from "lucide-react";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
@@ -101,7 +101,38 @@ const VERIFIED: Record<string, string> = {
   pt: "Compra verificada",
 };
 
-export function CheckoutTestimonials() {
+const cardClass = "h-[148px] sm:h-[152px] w-full max-w-full overflow-hidden rounded-xl border bg-card/60 px-3.5 py-3 sm:px-4 sm:py-3.5 backdrop-blur";
+
+function TestimonialsSkeleton() {
+  return (
+    <section aria-label="Testimonios verificados" aria-busy="true" className={cardClass}>
+      <div className="mb-2 flex h-5 items-center justify-between">
+        <div className="h-4 w-40 rounded bg-muted animate-pulse" />
+        <div className="hidden gap-1 sm:flex">
+          <div className="h-6 w-6 rounded-full bg-muted animate-pulse" />
+          <div className="h-6 w-6 rounded-full bg-muted animate-pulse" />
+        </div>
+      </div>
+      <div className="flex h-[72px] items-start gap-2.5 sm:gap-3">
+        <div className="h-9 w-9 shrink-0 rounded-full bg-muted animate-pulse sm:h-10 sm:w-10" />
+        <div className="min-w-0 flex-1">
+          <div className="mb-1.5 flex h-3.5 items-center gap-1">
+            {[0, 1, 2, 3, 4].map((s) => <div key={s} className="h-3.5 w-3.5 rounded-sm bg-muted animate-pulse" />)}
+            <div className="ml-1 h-3 w-6 rounded bg-muted animate-pulse" />
+          </div>
+          <div className="mb-1 h-3.5 w-full rounded bg-muted animate-pulse" />
+          <div className="mb-1.5 h-3.5 w-3/4 rounded bg-muted animate-pulse" />
+          <div className="h-3 w-2/3 rounded bg-muted animate-pulse" />
+        </div>
+      </div>
+      <div className="mt-1.5 flex h-2 items-center justify-center gap-1.5">
+        {[0, 1, 2].map((i) => <div key={i} className={`h-1.5 rounded-full bg-muted animate-pulse ${i === 0 ? "w-5" : "w-1.5"}`} />)}
+      </div>
+    </section>
+  );
+}
+
+const TestimonialsContent = memo(function TestimonialsContent() {
   const region = useRegionTier();
   const { language } = useI18n();
   const [idx, setIdx] = useState(0);
@@ -126,56 +157,17 @@ export function CheckoutTestimonials() {
 
   const isLoading = !region.country;
 
-  if (isLoading) {
-    return (
-      <section
-        aria-label="Testimonios verificados"
-        aria-busy="true"
-        className="rounded-2xl border bg-card/60 backdrop-blur px-4 py-4 sm:px-5 sm:py-5 min-h-[176px] sm:min-h-[168px] overflow-hidden max-w-full"
-      >
-        <div className="flex items-center justify-between mb-3">
-          {/* heading placeholder same height as h3 text-sm/base */}
-          <div className="h-5 sm:h-6 w-40 sm:w-52 rounded bg-muted animate-pulse" />
-          <div className="hidden sm:flex gap-1">
-            <div className="h-7 w-7 rounded-full bg-muted animate-pulse" />
-            <div className="h-7 w-7 rounded-full bg-muted animate-pulse" />
-          </div>
-        </div>
-        <div className="flex items-start gap-3 sm:gap-4">
-          <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-muted animate-pulse" />
-          <div className="flex-1 min-w-0 space-y-1.5">
-            {/* stars row */}
-            <div className="flex items-center gap-1 mb-1">
-              {[0, 1, 2, 3, 4].map((s) => (
-                <div key={s} className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-sm bg-muted animate-pulse" />
-              ))}
-              <div className="ml-1 h-3 w-6 rounded bg-muted animate-pulse" />
-            </div>
-            {/* quote (2 lines) */}
-            <div className="h-3.5 sm:h-4 w-full rounded bg-muted animate-pulse" />
-            <div className="h-3.5 sm:h-4 w-3/4 rounded bg-muted animate-pulse" />
-            {/* meta */}
-            <div className="mt-1.5 h-3 w-2/3 rounded bg-muted animate-pulse" />
-          </div>
-        </div>
-        <div className="flex items-center justify-center gap-1.5 mt-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className={`h-1.5 rounded-full bg-muted animate-pulse ${i === 0 ? "w-6" : "w-1.5"}`} />
-          ))}
-        </div>
-      </section>
-    );
-  }
+  if (isLoading) return <TestimonialsSkeleton />;
 
 
   return (
     <section
       aria-label="Testimonios verificados"
-      className="rounded-2xl border bg-card/60 backdrop-blur px-4 py-4 sm:px-5 sm:py-5 min-h-[176px] sm:min-h-[168px] overflow-hidden max-w-full"
+      className={cardClass}
     >
 
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm sm:text-base font-semibold text-foreground">
+      <div className="mb-2 flex h-5 items-center justify-between">
+        <h3 className="min-w-0 truncate text-[13px] sm:text-sm font-semibold text-foreground">
           {heading} <span className="text-primary">{countryLabel}</span>
         </h3>
         <div className="hidden sm:flex items-center gap-1">
@@ -183,7 +175,7 @@ export function CheckoutTestimonials() {
             type="button"
             onClick={prev}
             aria-label="Anterior"
-            className="p-1.5 rounded-full hover:bg-muted transition"
+            className="p-1 rounded-full hover:bg-muted transition"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -191,14 +183,14 @@ export function CheckoutTestimonials() {
             type="button"
             onClick={next}
             aria-label="Siguiente"
-            className="p-1.5 rounded-full hover:bg-muted transition"
+            className="p-1 rounded-full hover:bg-muted transition"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <div className="relative overflow-hidden">
+      <div className="relative h-[72px] w-full overflow-hidden">
         <div
           className="flex transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${idx * 100}%)` }}
@@ -206,25 +198,25 @@ export function CheckoutTestimonials() {
           {items.map((it, i) => (
             <article
               key={i}
-              className="min-w-full flex items-start gap-3 sm:gap-4 pr-1"
+              className="w-full min-w-full max-w-full flex items-start gap-2.5 sm:gap-3 pr-1 overflow-hidden"
             >
-              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-lg sm:text-2xl">
+              <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-lg sm:text-xl">
                 {it.flag}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 text-amber-500 mb-1">
+                <div className="flex h-3.5 items-center gap-1 text-amber-500 mb-1">
                   {[0, 1, 2, 3, 4].map((s) => (
-                    <Star key={s} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+                    <Star key={s} className="w-3.5 h-3.5 fill-current" />
                   ))}
                   <span className="ml-1 text-[11px] sm:text-xs text-muted-foreground">5/5</span>
                 </div>
-                <p className="text-[13px] sm:text-[15px] text-foreground leading-snug break-words">
+                 <p className="line-clamp-2 text-[13px] sm:text-sm text-foreground leading-[1.25] break-words">
                   "{quotes[i % quotes.length]}"
                 </p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] sm:text-xs text-muted-foreground min-w-0">
-                  <span className="font-medium text-foreground truncate max-w-full">{it.name}</span>
-                  <span className="truncate max-w-full">· {it.city}, {it.country}</span>
-                  <span className="inline-flex items-center gap-1 text-emerald-600">
+                <div className="mt-1 flex min-w-0 items-center gap-1.5 overflow-hidden text-[10px] sm:text-[11px] text-muted-foreground">
+                  <span className="shrink-0 font-medium text-foreground">{it.name}</span>
+                  <span className="min-w-0 truncate">· {it.city}, {it.country}</span>
+                  <span className="ml-auto inline-flex shrink-0 items-center gap-0.5 text-emerald-600">
                     <BadgeCheck className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{verified}</span>
                   </span>
                 </div>
@@ -235,7 +227,7 @@ export function CheckoutTestimonials() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-1.5 mt-3">
+      <div className="mt-1.5 flex h-2 items-center justify-center gap-1.5">
         {items.map((_, i) => (
           <button
             key={i}
@@ -243,13 +235,40 @@ export function CheckoutTestimonials() {
             aria-label={`Ir al testimonio ${i + 1}`}
             onClick={() => setIdx(i)}
             className={`h-1.5 rounded-full transition-all ${
-              i === idx ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"
+              i === idx ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/30"
             }`}
           />
         ))}
       </div>
     </section>
   );
-}
+});
+
+export const CheckoutTestimonials = memo(function CheckoutTestimonials() {
+  const rootRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = rootRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "160px 0px" });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={rootRef as React.RefObject<HTMLDivElement>} className="w-full max-w-full overflow-hidden contain-layout">
+      {isVisible ? <TestimonialsContent /> : <TestimonialsSkeleton />}
+    </div>
+  );
+});
 
 export default CheckoutTestimonials;

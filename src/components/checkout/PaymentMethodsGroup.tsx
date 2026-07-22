@@ -976,7 +976,24 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
       badge: priceBadge,
     },
+    {
+      id: "hotmart",
+      icon: CreditCard,
+      title: language === "en" ? "Hotmart (1-click)"
+        : language === "pt" ? "Hotmart (1 clique)"
+        : language === "fr" ? "Hotmart (1 clic)"
+        : "Hotmart (1 clic)",
+      sub: language === "en"
+        ? `Pay ${hotmartPriceLabel} on Hotmart (local taxes included). Redirects in 1 click.`
+        : language === "pt"
+        ? `Pague ${hotmartPriceLabel} na Hotmart (impostos locais incluídos). Redireciona em 1 clique.`
+        : language === "fr"
+        ? `Payez ${hotmartPriceLabel} sur Hotmart (taxes locales incluses). Redirige en 1 clic.`
+        : `Paga ${hotmartPriceLabel} en Hotmart (incluye impuestos locales). Te redirige en 1 clic.`,
+      badge: hotmartPriceLabel,
+    },
   ];
+
 
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.
   // Perú conserva sus rails locales (transfer/cash/yape) por defecto; el resto

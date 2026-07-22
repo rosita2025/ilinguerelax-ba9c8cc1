@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Seguridad: si no hay región configurada o falla la consulta, no se habilita
  * ningún método. Así nunca aparecen opciones que el admin no guardó.
  */
-export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
@@ -27,15 +27,17 @@ export interface CheckoutMethodsConfig {
   yape: boolean;
   binance: boolean;
   clabe: boolean;
+  hotmart: boolean;
   /** Orden de las familias según el sort_order más bajo en la región activa. */
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe", "hotmart"];
 
 const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false,
+  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false,
 };
+
 
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }

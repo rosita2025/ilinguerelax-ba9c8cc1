@@ -204,7 +204,7 @@ const Product5000 = () => {
     ? `S/${Math.round(pricePen * 2.4 * 100) / 100}`
     : formatPrice(Math.max(priceUSD * 2.4, priceUSD + 1), displayCurrency);
   const regionLabel = isPeru ? "PE" : isLatam ? "LATAM" : "Global";
-  const buyUrl = useTiendaOnly ? TIENDA_CHECKOUT_5000 : (tier.hotmartUrl || HOTMART_5000_LATAM);
+  const buyUrl = TIENDA_CHECKOUT_5000;
   const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";
 
   const heroImages = [productoPrincipalInglesRelax];

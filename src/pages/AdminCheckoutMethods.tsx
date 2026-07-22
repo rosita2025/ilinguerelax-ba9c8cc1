@@ -559,6 +559,9 @@ export default function AdminCheckoutMethods() {
                     <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={() => setRegionEdit(r)}>
                       <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
                     </Button>
+                    <Button size="sm" variant="outline" className="h-8 px-2 text-xs" title="Duplicar esta región y sus métodos a otro país" onClick={() => duplicateRegion(r)} disabled={savingRegion === r.code}>
+                      📋 Duplicar
+                    </Button>
                     <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => deleteRegion(r.code)}>
                       <Trash2 className="w-3.5 h-3.5 mr-1" /> Eliminar
                     </Button>

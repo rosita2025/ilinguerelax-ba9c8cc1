@@ -24,24 +24,32 @@ export type LivePrice = {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  local_prices: Record<string, number> | null;
 };
 
 type Ctx = {
   version: number;
   prices: Record<string, LivePrice>;
   getLivePrice: (slugOrSku: string) => LivePrice | undefined;
+  getLocalOverrides: (slugOrSku?: string | null) => Record<string, number> | null;
 };
 
 const LivePricesContext = createContext<Ctx>({
   version: 0,
   prices: {},
   getLivePrice: () => undefined,
+  getLocalOverrides: () => null,
 });
 
 export const useLivePrices = () => useContext(LivePricesContext);
 export const useLivePrice = (slugOrSku?: string | null) => {
   const { getLivePrice } = useLivePrices();
   return slugOrSku ? getLivePrice(slugOrSku) : undefined;
+};
+/** Manual per-currency overrides for a sku/slug (set from admin/products/:sku). */
+export const useLocalOverrides = (slugOrSku?: string | null) => {
+  const { getLocalOverrides } = useLivePrices();
+  return getLocalOverrides(slugOrSku);
 };
 
 // Fallback flag/country for auto-injected products (based on target language).

@@ -923,6 +923,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const isUsa = country === "US";
   const methodsConfig = useCheckoutMethodsConfig(country);
   const binanceCfg = useBinancePayConfig(methodsConfig.regionCode);
+
+  // Hotmart 1-clic: resuelve URL y precio local por país
+  const hotmartResolvedUrl = hotmartCfg.urlsByCountry[country] || hotmartCfg.fallbackUrl || null;
+  const hotmartResolvedPrice = hotmartCfg.pricesByCountry[country] || null;
+  const hotmartPriceLabel = hotmartResolvedPrice
+    ? `${hotmartResolvedPrice.currency} ${hotmartResolvedPrice.amount.toLocaleString()}`
+    : `USD $${totalUsd}`;
+
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },

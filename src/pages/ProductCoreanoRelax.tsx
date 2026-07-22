@@ -392,10 +392,10 @@ const ProductCoreanoRelax = () => {
         currencyCode={currencyLabel}
         flag={displayFlag}
         productName="Coreano · +100 Mapas Mentales"
-        ctaText={useTiendaOnly ? `TIENDA ILINGUE · ${displayPrice}` : `COMPRAR EN HOTMART · ${displayPrice}`}
-        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : (tier.hotmartUrl || HOTMART_URL_LATAM)}
+        ctaText={`Comprar ahora · ${displayPrice}`}
+        buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
-        {...(useHotmartLatam ? { secondaryCtaText: "TIENDA", onSecondaryClick: handleBuyStore } : {})}
+
         rating={4.9}
         reviewCount={120}
         lang="es"

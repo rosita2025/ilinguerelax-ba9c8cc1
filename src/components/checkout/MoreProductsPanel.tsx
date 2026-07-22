@@ -139,9 +139,10 @@ export function MoreProductsPanel({ parentSku }: Props) {
     return Number(r.price_usd) || 0;
   };
 
-  const fmt = (usd: number, pen?: number | null) => {
+  const overridesFor = useSkuOverridesResolver();
+  const fmt = (usd: number, pen?: number | null, sku?: string) => {
     if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
-    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "");
+    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "", overridesFor(sku));
     return isUsd ? `$${Number(usd).toFixed(2)}` : formatted;
   };
 

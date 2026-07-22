@@ -30,6 +30,42 @@ function clientIp(req: Request): string {
   );
 }
 
+// Detecta el origen del visitante (Instagram, Facebook, WhatsApp, TikTok,
+// Google, correo, directo…) combinando el UA (apps in-app) y el referer.
+function detectSource(ua: string, referer: string | null): string {
+  const u = (ua || "").toLowerCase();
+  if (u.includes("instagram")) return "instagram";
+  if (u.includes("fbav") || u.includes("fban") || u.includes("facebook")) return "facebook";
+  if (u.includes("tiktok") || u.includes("bytedance")) return "tiktok";
+  if (u.includes("whatsapp") || u.includes("wa/")) return "whatsapp";
+  if (u.includes("telegram")) return "telegram";
+  if (u.includes("threads")) return "threads";
+  if (u.includes("line/")) return "line";
+  if (u.includes("kakao")) return "kakao";
+  if (u.includes("gsa/") || u.includes("googleapp")) return "google-app";
+
+  const r = (referer || "").toLowerCase();
+  if (!r) return "direct";
+  try {
+    const h = new URL(r).hostname.replace(/^www\./, "");
+    if (h.includes("instagram") || h.includes("l.instagram")) return "instagram";
+    if (h.includes("facebook") || h.includes("fb.com") || h.includes("l.facebook") || h.includes("m.facebook")) return "facebook";
+    if (h.includes("tiktok")) return "tiktok";
+    if (h.includes("whatsapp") || h.includes("wa.me")) return "whatsapp";
+    if (h.includes("t.me") || h.includes("telegram")) return "telegram";
+    if (h.includes("youtube") || h.includes("youtu.be")) return "youtube";
+    if (h.includes("google")) return "google";
+    if (h.includes("bing")) return "bing";
+    if (h.includes("duckduckgo")) return "duckduckgo";
+    if (h.includes("yandex")) return "yandex";
+    if (h.includes("mail.") || h.includes("gmail") || h.includes("outlook") || h.includes("yahoo")) return "email";
+    if (h.includes("ilinguerelax")) return "internal";
+    return h;
+  } catch {
+    return "direct";
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const json = (body: unknown, status = 200) =>

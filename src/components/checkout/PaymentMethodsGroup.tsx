@@ -525,15 +525,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     try {
       await captureAbandonedCheckout("hotmart", true);
     } catch { /* noop */ }
-    try {
-      trackHotmartEvent && trackHotmartEvent("hotmart_1click_redirect", {
-        value: hotmartResolvedPrice?.amount ?? Number(totalUsd),
-        currency: hotmartResolvedPrice?.currency ?? "USD",
-        content_ids: items.map((i) => i.id),
-      });
-    } catch { /* noop */ }
     window.location.assign(hotmartResolvedUrl);
-  }, [hotmartResolvedUrl, hotmartResolvedPrice, valid, captureAbandonedCheckout, totalUsd, items]);
+  }, [hotmartResolvedUrl, valid, captureAbandonedCheckout]);
+
 
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }

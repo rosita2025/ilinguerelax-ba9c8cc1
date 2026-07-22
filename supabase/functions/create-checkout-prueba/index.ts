@@ -105,18 +105,15 @@ Deno.serve(async (req) => {
       skus: deliverySkus,
     };
 
-    // Para "card" omitimos payment_method_types: Stripe Checkout muestra
-    // automáticamente los métodos habilitados en el Dashboard según el país
-    // del comprador (OXXO, iDEAL, Boleto, SEPA, Konbini, etc.).
-    // Para sub-familias específicas (ACH, Cash App, Klarna) forzamos ese método.
-    const useAutomatic = body.stripePaymentMethod === "card";
+    // Respeta exactamente la opción elegida en /admin/checkout-methods.
+    // Antes, al elegir "Tarjeta", se omitía payment_method_types y Stripe
+    // volvía a mostrar automáticamente PayPal, Klarna y todos los métodos
+    // activados en la cuenta, aunque el administrador no los hubiera elegido.
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
-      ...(useAutomatic
-        ? {}
-        : { payment_method_types: [body.stripePaymentMethod] }),
+      payment_method_types: [body.stripePaymentMethod],
       return_url: body.returnUrl,
       // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
       adaptive_pricing: { enabled: true },

@@ -908,6 +908,19 @@ export function PaymentMethodsGroup() {
         : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
       badge: `USD $${totalUsd}`,
     },
+    {
+      id: "clabe",
+      icon: Building2,
+      title: language === "en" ? "SPEI · Bank transfer (Mexico)"
+        : language === "pt" ? "SPEI · Transferência bancária (México)"
+        : language === "fr" ? "SPEI · Virement bancaire (Mexique)"
+        : "SPEI · Transferencia bancaria (México)",
+      sub: language === "en" ? "Transfer in MXN to a Mexican CLABE · 1-24h verification by Supervisor Rosa"
+        : language === "pt" ? "Transferência em MXN para uma CLABE mexicana · Verificação 1-24h pela Supervisora Rosa"
+        : language === "fr" ? "Virement en MXN vers une CLABE mexicaine · Vérification 1-24h par la Superviseure Rosa"
+        : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
+      badge: priceBadge,
+    },
   ];
 
   // Métodos habilitados dinámicamente desde /admin/checkout-methods.

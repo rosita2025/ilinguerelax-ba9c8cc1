@@ -69,6 +69,8 @@ const EMPTY: Product = {
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
   hotmart_url: "",
+  hotmart_urls_by_country: {},
+  hotmart_prices_by_country: {},
   store_enabled: true,
   excluded_countries: [],
   store_excluded_countries: [],

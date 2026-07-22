@@ -53,6 +53,9 @@ const Email = ({
   binancePayId,
   binanceAddress,
   binanceNetwork,
+  clabeNumber,
+  clabeHolder,
+  clabeBank,
 }: Props) => (
   <Html lang="es" dir="ltr">
     <Head />

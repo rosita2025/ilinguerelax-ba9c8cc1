@@ -20,6 +20,7 @@ import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from 
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
+import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart";
@@ -1216,11 +1217,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             >
               <div className={cn(
                 "w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0",
-                isSelected
+                m.id === "hotmart"
+                  ? "bg-white ring-1 ring-neutral-200 dark:ring-neutral-600"
+                  : isSelected
                   ? "bg-neutral-700 text-white"
                   : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
               )}>
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : m.id === "hotmart" ? <img src={hotmartLogo.url} alt="Hotmart" className="w-6 h-6 object-contain" /> : <Icon className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">

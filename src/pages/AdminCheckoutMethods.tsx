@@ -238,6 +238,45 @@ export default function AdminCheckoutMethods() {
     if (error || data?.error) return toast.error(error?.message || data?.error);
     toast.success("Eliminada"); load();
   }
+  async function duplicateRegion(r: Region) {
+    const target = prompt(`Duplicar región "${r.name}" (${r.code}) a otro país.\n\nCódigo ISO destino (ej: AR, CO, CL, BR):`, "")?.trim().toUpperCase();
+    if (!target) return;
+    if (target === r.code) return toast.error("El destino no puede ser igual al origen");
+    if (regions.some(x => x.code === target)) return toast.error(`Ya existe una región ${target}`);
+    const meta = COUNTRY_LIST.find(c => c.code === target);
+    const newRegion: Region = {
+      ...r,
+      code: target,
+      name: meta?.name || target,
+      flag: meta?.flag || r.flag,
+      country_codes: [target],
+      sort_order: (regions.reduce((mx, x) => Math.max(mx, x.sort_order), 0) || 0) + 1,
+    };
+    const src = methods.filter(m => m.region_code === r.code);
+    setSavingRegion(target);
+    try {
+      const { data: rd, error: re } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "save_region", region: newRegion },
+      });
+      if (re || rd?.error) throw new Error(re?.message || rd?.error);
+      let copied = 0;
+      for (const m of src) {
+        const payload = { ...m, id: undefined, region_code: target };
+        const { data: md, error: me } = await adminInvoke<any>("manage-checkout-methods", {
+          body: { action: "save_method", method: payload },
+        });
+        if (!me && !md?.error) copied++;
+      }
+      toast.success(`✅ Región ${target} duplicada · ${copied}/${src.length} métodos copiados`);
+      invalidateCheckoutMethodsCache();
+      await load();
+    } catch (e) {
+      toast.error(`❌ No se pudo duplicar: ${(e as Error).message || "error"}`);
+      await load();
+    } finally {
+      setSavingRegion(null);
+    }
+  }
   async function saveMethod(m: Method) {
     const method_key = m.method_key.trim().toLowerCase();
     const label = m.label.trim();

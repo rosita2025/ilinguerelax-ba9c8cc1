@@ -19,6 +19,43 @@ interface StatRow {
   count: number;
   last: string;
   slugs: string[];
+  sources: string[];
+  referers: string[];
+  ua: string | null;
+}
+
+interface SourceRow {
+  source: string;
+  count: number;
+}
+
+const SOURCE_LABEL: Record<string, { label: string; emoji: string; className: string }> = {
+  instagram: { label: "Instagram", emoji: "📸", className: "bg-pink-500/10 text-pink-600 border-pink-500/30" },
+  facebook: { label: "Facebook", emoji: "👤", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
+  tiktok: { label: "TikTok", emoji: "🎵", className: "bg-black/10 text-foreground border-foreground/30" },
+  whatsapp: { label: "WhatsApp", emoji: "💬", className: "bg-green-500/10 text-green-600 border-green-500/30" },
+  telegram: { label: "Telegram", emoji: "✈️", className: "bg-sky-500/10 text-sky-600 border-sky-500/30" },
+  threads: { label: "Threads", emoji: "🧵", className: "bg-neutral-500/10 text-neutral-600 border-neutral-500/30" },
+  youtube: { label: "YouTube", emoji: "▶️", className: "bg-red-500/10 text-red-600 border-red-500/30" },
+  google: { label: "Google", emoji: "🔎", className: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30" },
+  "google-app": { label: "Google App", emoji: "🔎", className: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30" },
+  bing: { label: "Bing", emoji: "🔎", className: "bg-cyan-500/10 text-cyan-700 border-cyan-500/30" },
+  duckduckgo: { label: "DuckDuckGo", emoji: "🦆", className: "bg-orange-500/10 text-orange-700 border-orange-500/30" },
+  yandex: { label: "Yandex", emoji: "🔎", className: "bg-red-500/10 text-red-600 border-red-500/30" },
+  email: { label: "Correo", emoji: "✉️", className: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30" },
+  internal: { label: "Interno", emoji: "🏠", className: "bg-primary/10 text-primary border-primary/30" },
+  direct: { label: "Directo / desconocido", emoji: "🔗", className: "bg-muted text-muted-foreground border-border" },
+  line: { label: "LINE", emoji: "💚", className: "bg-green-500/10 text-green-600 border-green-500/30" },
+  kakao: { label: "KakaoTalk", emoji: "💛", className: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30" },
+};
+
+function SourceBadge({ source }: { source: string }) {
+  const s = SOURCE_LABEL[source] || { label: source, emoji: "🌐", className: "bg-muted text-muted-foreground border-border" };
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border ${s.className}`}>
+      <span aria-hidden>{s.emoji}</span>{s.label}
+    </span>
+  );
 }
 
 export default function AdminCheckoutAbuse() {

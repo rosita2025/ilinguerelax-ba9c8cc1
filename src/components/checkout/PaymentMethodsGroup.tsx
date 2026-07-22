@@ -564,8 +564,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
-    // Hotmart: redirige de inmediato (sin await) para máxima velocidad; la captura corre en paralelo dentro de redirectToHotmart.
-    if (selected === "hotmart") { redirectToHotmart(); return; }
+    // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
+    if (selected === "hotmart") { await redirectToHotmart(); return; }
     await captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }

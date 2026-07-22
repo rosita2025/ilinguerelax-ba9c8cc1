@@ -1,0 +1,1 @@
+ALTER TABLE public.digital_products ADD COLUMN IF NOT EXISTS local_prices jsonb NOT NULL DEFAULT '{}'::jsonb;

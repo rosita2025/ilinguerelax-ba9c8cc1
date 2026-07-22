@@ -715,7 +715,7 @@ const ProductPatronesEspeciales = () => {
         showReviews={true}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
-        ctaText={`Comprar ahora · ${priceLabel}`}
+        ctaText={"Comprar ahora"}
 
       />
 

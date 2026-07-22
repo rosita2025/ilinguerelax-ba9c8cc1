@@ -761,7 +761,7 @@ const Product5000 = () => {
           "Descarga inmediata",
           "2 Bonus GRATIS",
         ]}
-        ctaText={`COMPRAR AHORA | ${safePriceLabel}`}
+        ctaText={"COMPRAR AHORA"}
         onBuy={handleBuy}
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
@@ -902,7 +902,7 @@ const Product5000 = () => {
         rating={4.8}
         reviewCount={800}
         showReviews={true}
-        ctaText={`Comprar ahora · ${safePriceLabel}`}
+        ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_5000}
         onBuyClick={handleBuy}
 

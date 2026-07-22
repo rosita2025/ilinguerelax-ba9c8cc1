@@ -1,5 +1,7 @@
 import { useRegionTier } from "./useRegionTier";
 import { detectCurrency, formatPrice, exchangeRates, type Currency } from "@/i18n";
+import { useLocalOverrides } from "@/lib/livePrices";
+import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 
 /**
  * Moneda local aproximada del visitante (por IP). Delegamos el cálculo y el

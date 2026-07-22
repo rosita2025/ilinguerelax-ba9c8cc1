@@ -7,8 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
  * partir de las tablas `checkout_regions` + `checkout_payment_methods` que
  * edita el admin en `/admin/checkout-methods`.
  *
- * Fallback: si no hay región configurada o falla la consulta, TODAS quedan
- * habilitadas para no romper el checkout existente.
+ * Seguridad: si no hay región configurada o falla la consulta, no se habilita
+ * ningún método. Así nunca aparecen opciones que el admin no guardó.
  */
 export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe";
 
@@ -33,12 +33,8 @@ export interface CheckoutMethodsConfig {
 
 const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe"];
 
-const DEFAULT_ALL_ON: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: true, transfer: true, cash: true, yape: true, binance: true, clabe: true,
-};
-
-const US_DEFAULT: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: true, stripeAch: true, stripeCashApp: true, stripeKlarna: true, paypal: true, transfer: false, cash: false, yape: false, binance: true, clabe: false,
+const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
+  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false,
 };
 
 
@@ -107,7 +103,7 @@ function keyToFamily(key: string): FamilyKey | null {
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
   const [version, setVersion] = useState(0);
   const [state, setState] = useState<CheckoutMethodsConfig>({
-    loaded: false, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER,
+    loaded: false, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER,
   });
 
   useEffect(() => {
@@ -156,7 +152,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
           ?? regions.find((r) => r.code.toUpperCase() === "GLOBAL");
       }
       if (!region) {
-        if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_ON, familyOrder: DEFAULT_ORDER });
+        if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER });
         return;
       }
       const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false };
@@ -175,7 +171,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         const ord = m.sort_order ?? 999;
         if (ord < familyMinOrder[fam]) familyMinOrder[fam] = ord;
       }
-      const families = configuredMethods > 0 ? enabledFamilies : (iso === "US" ? US_DEFAULT : DEFAULT_ALL_ON);
+      const families = configuredMethods > 0 ? enabledFamilies : DEFAULT_ALL_OFF;
       const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
         .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
       if (alive) setState({ loaded: true, regionCode: region.code, enabledMethodKeys, ...families, familyOrder });

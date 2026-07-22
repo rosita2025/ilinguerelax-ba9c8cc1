@@ -101,7 +101,7 @@ const VERIFIED: Record<string, string> = {
   pt: "Compra verificada",
 };
 
-const cardClass = "h-[148px] sm:h-[152px] w-full max-w-full overflow-hidden rounded-xl border bg-card/60 px-3.5 py-3 sm:px-4 sm:py-3.5 backdrop-blur";
+const cardClass = "h-[148px] sm:h-[152px] w-full max-w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40 px-4 py-4 sm:px-5 sm:py-5";
 
 function TestimonialsSkeleton() {
   return (

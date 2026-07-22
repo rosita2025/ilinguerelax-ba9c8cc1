@@ -86,7 +86,7 @@ export default function Checkout() {
       // Server-side rate limit por IP en segundo plano (fail-open).
       try {
         const { data } = await supabase.functions.invoke("checkout-gate-check", {
-          body: { slug },
+          body: { slug, referer: (typeof document !== "undefined" && document.referrer) || "" },
         });
         const res = data as { allowed?: boolean; reason?: string } | null;
         if (res && res.allowed === false && !cancelled) {

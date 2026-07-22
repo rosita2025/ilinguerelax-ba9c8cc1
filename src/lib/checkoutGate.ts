@@ -164,7 +164,14 @@ export function evaluateCheckoutGate(): GateReason {
     } catch { /* ignore */ }
   }
 
-  if (!authorized) return "unauthorized";
+  // No bloqueamos por "unauthorized": muchos compradores legítimos llegan
+  // sin referer (email, WhatsApp, tab nueva, referrer-policy estricta) y
+  // los expulsábamos silenciosamente → parecía "abandono de carrito".
+  // El rate-limit por IP en el servidor (checkout-gate-check) sigue activo.
+  if (!authorized) {
+    // Autorizamos on-the-fly para que el resto del flujo funcione igual.
+    try { sessionStorage.setItem(KEY, JSON.stringify({ ts: Date.now(), slug: "*" })); } catch { /* ignore */ }
+  }
 
   const { limited } = recordCheckoutHit();
   if (limited) return "rate_limited";

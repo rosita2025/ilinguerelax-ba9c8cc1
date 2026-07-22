@@ -64,11 +64,27 @@ const DEFAULT: Testimonial[] = [
   { name: "Ana P.", city: "Ciudad", flag: "🌎", country: "LATAM" },
 ];
 
-const QUOTES: Record<string, string> = {
-  es: "Exactamente, fue rápido. Envío digital sin demoras.",
-  en: "Exactly as promised, fast digital delivery with no delays.",
-  fr: "Exactement comme promis, livraison numérique rapide sans retard.",
-  pt: "Exatamente como prometido, entrega digital rápida sem demoras.",
+const QUOTES: Record<string, string[]> = {
+  es: [
+    "Exactamente, fue rápido. Envío digital sin demoras.",
+    "Compré y en minutos ya tenía el material en mi correo. Excelente.",
+    "Todo llegó al instante, muy fácil de descargar. Súper recomendado.",
+  ],
+  en: [
+    "Exactly as promised, fast digital delivery with no delays.",
+    "Bought it and had the material in my inbox within minutes. Excellent.",
+    "Everything arrived instantly, super easy to download. Highly recommended.",
+  ],
+  fr: [
+    "Exactement comme promis, livraison numérique rapide sans retard.",
+    "Acheté et reçu le matériel en quelques minutes. Excellent.",
+    "Tout est arrivé instantanément, très facile à télécharger.",
+  ],
+  pt: [
+    "Exatamente como prometido, entrega digital rápida sem demoras.",
+    "Comprei e em minutos recebi o material no e-mail. Excelente.",
+    "Tudo chegou na hora, super fácil de baixar. Recomendo muito.",
+  ],
 };
 
 const HEADINGS: Record<string, string> = {
@@ -96,7 +112,7 @@ export function CheckoutTestimonials() {
   }, [region.country]);
 
   const countryLabel = items[0]?.country ?? "";
-  const quote = QUOTES[language] ?? QUOTES.es;
+  const quotes = QUOTES[language] ?? QUOTES.es;
   const heading = HEADINGS[language] ?? HEADINGS.es;
   const verified = VERIFIED[language] ?? VERIFIED.es;
 
@@ -147,23 +163,23 @@ export function CheckoutTestimonials() {
               key={i}
               className="min-w-full flex items-start gap-3 sm:gap-4 pr-1"
             >
-              <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-xl sm:text-2xl">
+              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-lg sm:text-2xl">
                 {it.flag}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1 text-amber-500 mb-1">
                   {[0, 1, 2, 3, 4].map((s) => (
-                    <Star key={s} className="w-4 h-4 fill-current" />
+                    <Star key={s} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
                   ))}
-                  <span className="ml-1 text-xs text-muted-foreground">5/5</span>
+                  <span className="ml-1 text-[11px] sm:text-xs text-muted-foreground">5/5</span>
                 </div>
-                <p className="text-sm sm:text-[15px] text-foreground leading-snug">
-                  "{quote}"
+                <p className="text-[13px] sm:text-[15px] text-foreground leading-snug break-words">
+                  "{quotes[i % quotes.length]}"
                 </p>
-                <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] sm:text-xs text-muted-foreground">
                   <span className="font-medium text-foreground">{it.name}</span>
-                  <span>· {it.city}, {it.country}</span>
-                  <span className="inline-flex items-center gap-1 text-emerald-600">
+                  <span className="truncate">· {it.city}, {it.country}</span>
+                  <span className="inline-flex items-center gap-1 text-emerald-600 whitespace-nowrap">
                     <BadgeCheck className="w-3.5 h-3.5" /> {verified}
                   </span>
                 </div>

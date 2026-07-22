@@ -160,10 +160,12 @@ const Email = ({
 
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>
-          <Text style={nextLine}>1️⃣ Rosa verifica tu pago (máximo 24 h).</Text>
-          <Text style={nextLine}>2️⃣ Recibirás un correo con el enlace de descarga de tu material digital.</Text>
-          <Text style={nextLine}>3️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
+          <Text style={nextLine}>1️⃣ Envíanos tu comprobante de pago a <strong>hola@ilinguerelax.com</strong> con tu pedido <strong>#{orderNumber || '—'}</strong>.</Text>
+          <Text style={nextLine}>2️⃣ Rosa verifica tu pago (Yape, Plin, Binance o SPEI) — máximo 24 h.</Text>
+          <Text style={nextLine}>3️⃣ Recibirás un correo con el enlace de descarga de tu material digital.</Text>
+          <Text style={nextLine}>4️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
         </Section>
+
 
         <Text style={footer}>Gracias por tu compra 💛 — Equipo ILINGUE RELAX</Text>
         <Text style={footer}>hola@ilinguerelax.com · www.ilinguerelax.com</Text>

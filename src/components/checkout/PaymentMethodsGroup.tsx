@@ -517,12 +517,31 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
   };
 
+  const redirectToHotmart = useCallback(async () => {
+    if (!hotmartResolvedUrl) return;
+    if (!valid) { requestBuyerInfo(); return; }
+    if (redirectingRef.current) return;
+    redirectingRef.current = true;
+    try {
+      await captureAbandonedCheckout("hotmart", true);
+    } catch { /* noop */ }
+    try {
+      trackHotmartEvent && trackHotmartEvent("hotmart_1click_redirect", {
+        value: hotmartResolvedPrice?.amount ?? Number(totalUsd),
+        currency: hotmartResolvedPrice?.currency ?? "USD",
+        content_ids: items.map((i) => i.id),
+      });
+    } catch { /* noop */ }
+    window.location.assign(hotmartResolvedUrl);
+  }, [hotmartResolvedUrl, hotmartResolvedPrice, valid, captureAbandonedCheckout, totalUsd, items]);
+
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
     void captureAbandonedCheckout(m, true);
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
+    if (m === "hotmart") { void redirectToHotmart(); return; }
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
     // hacia arriba. Reancla la vista sobre el método recién elegido (PayPal,
     // Binance, Yape…) para que el comprador siga viendo lo que tocó.
@@ -533,6 +552,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       }, 60);
     }
   };
+
 
   const handleBuyNow = async () => {
     if (!valid) { requestBuyerInfo(); return; }

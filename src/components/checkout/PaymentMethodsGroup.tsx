@@ -1240,7 +1240,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
-                    <img src={hotmartLogo.url} alt="Hotmart" className="h-12 sm:h-14 w-auto object-contain" />
+                    <img src={hotmartLogo.url} alt="Hotmart" className="h-16 sm:h-20 w-auto object-contain" />
                   ) : (
                     <span className="min-w-0 break-words">{m.title}</span>
                   )}

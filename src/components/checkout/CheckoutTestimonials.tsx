@@ -171,8 +171,9 @@ export function CheckoutTestimonials() {
   return (
     <section
       aria-label="Testimonios verificados"
-      className="rounded-2xl border bg-card/60 backdrop-blur px-4 py-4 sm:px-5 sm:py-5 min-h-[176px] sm:min-h-[168px]"
+      className="rounded-2xl border bg-card/60 backdrop-blur px-4 py-4 sm:px-5 sm:py-5 min-h-[176px] sm:min-h-[168px] overflow-hidden max-w-full"
     >
+
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm sm:text-base font-semibold text-foreground">
           {heading} <span className="text-primary">{countryLabel}</span>

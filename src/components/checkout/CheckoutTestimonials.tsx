@@ -221,13 +221,14 @@ export function CheckoutTestimonials() {
                 <p className="text-[13px] sm:text-[15px] text-foreground leading-snug break-words">
                   "{quotes[i % quotes.length]}"
                 </p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] sm:text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">{it.name}</span>
-                  <span className="truncate">· {it.city}, {it.country}</span>
-                  <span className="inline-flex items-center gap-1 text-emerald-600 whitespace-nowrap">
-                    <BadgeCheck className="w-3.5 h-3.5" /> {verified}
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] sm:text-xs text-muted-foreground min-w-0">
+                  <span className="font-medium text-foreground truncate max-w-full">{it.name}</span>
+                  <span className="truncate max-w-full">· {it.city}, {it.country}</span>
+                  <span className="inline-flex items-center gap-1 text-emerald-600">
+                    <BadgeCheck className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{verified}</span>
                   </span>
                 </div>
+
               </div>
             </article>
           ))}

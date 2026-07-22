@@ -64,11 +64,27 @@ const DEFAULT: Testimonial[] = [
   { name: "Ana P.", city: "Ciudad", flag: "🌎", country: "LATAM" },
 ];
 
-const QUOTES: Record<string, string> = {
-  es: "Exactamente, fue rápido. Envío digital sin demoras.",
-  en: "Exactly as promised, fast digital delivery with no delays.",
-  fr: "Exactement comme promis, livraison numérique rapide sans retard.",
-  pt: "Exatamente como prometido, entrega digital rápida sem demoras.",
+const QUOTES: Record<string, string[]> = {
+  es: [
+    "Exactamente, fue rápido. Envío digital sin demoras.",
+    "Compré y en minutos ya tenía el material en mi correo. Excelente.",
+    "Todo llegó al instante, muy fácil de descargar. Súper recomendado.",
+  ],
+  en: [
+    "Exactly as promised, fast digital delivery with no delays.",
+    "Bought it and had the material in my inbox within minutes. Excellent.",
+    "Everything arrived instantly, super easy to download. Highly recommended.",
+  ],
+  fr: [
+    "Exactement comme promis, livraison numérique rapide sans retard.",
+    "Acheté et reçu le matériel en quelques minutes. Excellent.",
+    "Tout est arrivé instantanément, très facile à télécharger.",
+  ],
+  pt: [
+    "Exatamente como prometido, entrega digital rápida sem demoras.",
+    "Comprei e em minutos recebi o material no e-mail. Excelente.",
+    "Tudo chegou na hora, super fácil de baixar. Recomendo muito.",
+  ],
 };
 
 const HEADINGS: Record<string, string> = {

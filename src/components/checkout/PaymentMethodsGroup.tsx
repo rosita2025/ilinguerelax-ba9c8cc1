@@ -1217,7 +1217,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               disabled={isLoading}
               aria-disabled={!valid}
               className={cn(
-                "w-full text-left p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 transition-colors",
+                "w-full text-left flex items-center transition-colors",
+                m.id === "hotmart"
+                  ? "px-4 py-5 sm:px-5 sm:py-6 gap-4 sm:gap-5"
+                  : "p-3 sm:p-4 gap-2.5 sm:gap-3",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
@@ -1225,24 +1228,22 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               )}
             >
               <div className={cn(
-                "w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0",
+                "rounded-lg flex items-center justify-center shrink-0",
                 m.id === "hotmart"
-                  ? "bg-white ring-1 ring-neutral-200 dark:ring-neutral-600"
-                  : isSelected
-                  ? "bg-neutral-700 text-white"
-                  : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
+                  ? "w-14 h-14 sm:w-14 sm:h-14 bg-white ring-1 ring-neutral-200 dark:ring-neutral-600 p-2"
+                  : cn(
+                      "w-9 h-9 sm:w-10 sm:h-10",
+                      isSelected
+                        ? "bg-neutral-700 text-white"
+                        : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
+                    ),
               )}>
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : m.id === "hotmart" ? <img src={hotmartLogo.url} alt="Hotmart" className="w-8 h-8 sm:w-9 sm:h-9 object-contain" /> : <Icon className="w-5 h-5" />}
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : m.id === "hotmart" ? <img src={hotmartLogo.url} alt="Hotmart" className="w-full h-full object-contain" /> : <Icon className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
-                    <span className="inline-flex items-center gap-2 min-w-0">
-                      <img src={hotmartLogo.url} alt="Hotmart" className="h-9 sm:h-11 w-auto object-contain" />
-                      <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                        {language === "en" ? "1-click" : language === "pt" ? "1 clique" : "1 clic"}
-                      </span>
-                    </span>
+                    <img src={hotmartLogo.url} alt="Hotmart" className="h-11 sm:h-10 w-auto object-contain" />
                   ) : (
                     <span className="min-w-0 break-words">{m.title}</span>
                   )}

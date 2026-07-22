@@ -666,8 +666,9 @@ const Product8000 = () => {
         flag={tier.isPeru ? "🇵🇪" : undefined}
         rating={4.9}
         reviewCount={10000}
-        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${tier.priceLabel}` : `COMPRAR EN HOTMART · ${tier.priceLabel}`}
-        buyUrl={useTiendaOnly ? TIENDA_PATH_8000 : (tier.hotmartUrl || HOTMART_8000_LATAM)}
+        ctaText={`Comprar ahora · ${tier.priceLabel}`}
+        buyUrl={TIENDA_PATH_8000}
+
         onBuyClick={handleBuyNow} />
       
 

@@ -902,9 +902,10 @@ const Product5000 = () => {
         rating={4.8}
         reviewCount={800}
         showReviews={true}
-        ctaText={useTiendaOnly ? `COMPRAR EN TIENDA · ${safePriceLabel}` : `COMPRAR EN HOTMART · ${safePriceLabel}`}
-        buyUrl={buyUrl}
+        ctaText={`Comprar ahora · ${safePriceLabel}`}
+        buyUrl={TIENDA_CHECKOUT_5000}
         onBuyClick={handleBuy}
+
       />
 
       {/* Spacer for sticky bar */}

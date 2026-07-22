@@ -231,7 +231,7 @@ const ProductDynamic = () => {
                   <div className="space-y-2">
                     <Button asChild size="lg" className="w-full">
                       <Link to={`/checkouts/${product.sku}`}>
-                        Comprar ahora · {displayFormatted}
+                        Comprar ahora
                       </Link>
                     </Button>
                   </div>

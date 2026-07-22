@@ -32,12 +32,21 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
   const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
+  const overridesFor = useSkuOverridesResolver();
   const localTotal = useLocalCurrency(total);
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
   const penMode = penTotals !== null;
-  // PE: soles nativos. Otros países con moneda local (MX, AR, CO, BR, VE, EU, etc.): moneda local principal + USD referencial.
   const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading;
+  // Local totals honoring per-sku overrides from /admin/products/:sku
+  const localItemsSum = sumItemsLocal(
+    items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
+    region.country || "",
+    overridesFor,
+  );
+  const localSubtotalAmount = localItemsSum.amount;
+  const localTotalAmount = localSubtotalAmount * (1 - (couponPercent || 0) / 100);
+  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : `$${total.toFixed(2)}`;
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)

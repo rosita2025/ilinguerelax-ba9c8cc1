@@ -24,6 +24,7 @@ function Price({
   emphasis = false,
   added = false,
   prefix = "",
+  sku,
 }: {
   usd: number;
   pen?: number;
@@ -31,9 +32,10 @@ function Price({
   emphasis?: boolean;
   added?: boolean;
   prefix?: string;
+  sku?: string;
 }) {
   const { country } = useRegionTier();
-  const local = useLocalCurrency(usd);
+  const local = useLocalCurrencyForSku(usd, sku);
   const isPeru = country === "PE";
 
   let label: string;

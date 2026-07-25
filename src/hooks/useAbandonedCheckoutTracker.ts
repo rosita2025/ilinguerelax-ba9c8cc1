@@ -3,7 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, type PruebaItem } from "@/stores/checkoutStore";
 import { useI18n } from "@/i18n/I18nContext";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Exige un TLD de 2+ letras para no capturar correos a medio escribir
+// (ej. "cliente@gmail.c"), que generaban carritos imposibles de recuperar.
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[a-z]{2,}$/i;
+
 const SENT_KEY = "abandoned-cart-sent-v2";
 
 type TrackAbandonedCheckoutInput = {
@@ -144,7 +147,9 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
       } catch (err) {
         console.warn("abandoned-cart track failed", err);
       }
-    }, 1200);
+      // 2.5 s: da tiempo a terminar de escribir el correo antes de capturar.
+    }, 2500);
+
 
     return () => {
       if (timer.current) window.clearTimeout(timer.current);

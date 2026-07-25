@@ -73,11 +73,10 @@ const groups: Group[] = [
   },
   {
     label: "Marketing",
-    items: [
-      { to: "/admin/reviews", label: "Reseñas", icon: Star },
-      { to: "/admin/brevo-abandoned", label: "Brevo · Abandonos", icon: Send },
-      { to: "/admin/brevo-abandoned-stats", label: "Brevo · Dashboard", icon: LineChart },
-    ],
+      items: [
+        { to: "/admin/reviews", label: "Reseñas", icon: Star },
+        { to: "/admin/brevo-abandoned", label: "Brevo · Abandonos", icon: Send },
+      ],
   },
   {
     label: "Analítica",

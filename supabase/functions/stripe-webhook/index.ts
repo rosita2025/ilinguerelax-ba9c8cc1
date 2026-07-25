@@ -3,6 +3,7 @@ import { resend } from "../_shared/brevo.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 // NOTE: We do NOT instantiate the Stripe SDK here. There is no STRIPE_SECRET_KEY
 // in this project; API keys are opaque gateway connection IDs. Webhook signature
@@ -162,6 +163,20 @@ async function recordStripePurchase(params: {
       skus: skus || "",
       status: "approved",
     }).slice(0, 2000),
+  });
+
+  // Meta Conversions API (server-side) so the sale shows up in Facebook Ads
+  // even if the buyer never lands back on the success page.
+  const orderId = eventKey ? `ILR-ST-${String(eventKey).slice(-8).toUpperCase()}` : sourceId;
+  await sendPurchaseCapi({
+    eventId: `Purchase_${orderId}`,
+    email: customerEmail,
+    country: customerCountry,
+    value: purchase.value,
+    currency: purchase.currency,
+    contentIds: (skus ? splitSkuList(skus) : [purchase.product_id]).filter(Boolean),
+    contentName: purchase.content_name,
+    orderId,
   });
 }
 

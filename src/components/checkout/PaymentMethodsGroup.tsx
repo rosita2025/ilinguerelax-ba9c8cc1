@@ -326,7 +326,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       } catch { /* noop */ }
     })();
     return () => { cancelled = true; };
-  }, [parentSku]);
+  }, [parentSku, cfgReload]);
 
 
   const redirectingRef = useRef(false);

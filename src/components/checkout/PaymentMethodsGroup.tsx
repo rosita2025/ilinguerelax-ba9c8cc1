@@ -1424,9 +1424,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
                     <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
                   </div>
+                ) : m.id === "hotmart" ? (
+                  <div className="mt-2">
+                    <div className="text-[10px] uppercase tracking-wide text-neutral-500 dark:text-neutral-400 mb-1">
+                      {language === "en" ? "Available in your country" : language === "pt" ? "Disponível no seu país" : language === "fr" ? "Disponible dans votre pays" : "Disponible en tu país"}
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {(m.badges ?? []).map((badge) => <BankBadge key={badge.label} {...badge} />)}
+                    </div>
+                  </div>
                 ) : m.badges?.length ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}
+
                   </div>
                 ) : m.id === "transfer" ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">

@@ -1078,11 +1078,13 @@ export type Database = {
           country: string | null
           created_at: string
           currency: string | null
+          error_reason: string | null
           event_name: string
           id: string
           is_bot: boolean
           page_path: string | null
           product_id: string | null
+          provider: string | null
           referrer: string | null
           session_id: string | null
           user_agent: string | null
@@ -1094,11 +1096,13 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
+          error_reason?: string | null
           event_name: string
           id?: string
           is_bot?: boolean
           page_path?: string | null
           product_id?: string | null
+          provider?: string | null
           referrer?: string | null
           session_id?: string | null
           user_agent?: string | null
@@ -1110,11 +1114,13 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
+          error_reason?: string | null
           event_name?: string
           id?: string
           is_bot?: boolean
           page_path?: string | null
           product_id?: string | null
+          provider?: string | null
           referrer?: string | null
           session_id?: string | null
           user_agent?: string | null

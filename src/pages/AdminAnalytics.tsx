@@ -156,12 +156,16 @@ const toNumber = (value: unknown) => {
   const n = Number(value ?? 0);
   return Number.isFinite(n) ? n : 0;
 };
+// Los buckets ya vienen en hora de Perú (UTC-5) desde el backend:
+// se leen literalmente, sin convertir a la zona del navegador.
 const safeDateLabel = (bucket: string, granularity: Granularity) => {
-  const date = new Date(bucket);
+  if (granularity === "hour") {
+    const m = /T(\d{2}):(\d{2})/.exec(bucket || "");
+    if (m) return `${m[1]}:${m[2]}`;
+  }
+  const date = new Date(`${bucket}T12:00:00`);
   if (Number.isNaN(date.getTime())) return bucket || "—";
-  return granularity === "hour"
-    ? format(date, "HH:mm", { locale: es })
-    : format(date, "d MMM", { locale: es });
+  return format(date, "d MMM", { locale: es });
 };
 const countryDisplay = (code: unknown) => {
   const text = toText(code, "Desconocido");

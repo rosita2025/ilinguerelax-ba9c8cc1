@@ -1047,11 +1047,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
         if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
         if (m.id === "paypal") return methodsConfig.paypal;
-        if (m.id === "transfer") return methodsConfig.transfer;
-        if (m.id === "cash") return methodsConfig.cash;
-        if (m.id === "yape") return methodsConfig.yape;
+        // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
+        // SOLO deben verse desde Perú. Un comprador en México no puede pagar a
+        // cuentas peruanas: para MX el rail local es SPEI/CLABE.
+        if (m.id === "transfer") return methodsConfig.transfer && isPeru;
+        if (m.id === "cash") return methodsConfig.cash && isPeru;
+        if (m.id === "yape") return methodsConfig.yape && isPeru;
         if (m.id === "binance") return methodsConfig.binance;
-        if (m.id === "clabe") return methodsConfig.clabe && country === "MX";
+        if (m.id === "clabe") return country === "MX";
+
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 
 

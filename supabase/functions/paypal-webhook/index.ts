@@ -170,6 +170,33 @@ Deno.serve(async (req) => {
           payerCountry: payer.address?.country_code ?? null,
           payerEmail: payerEmail ? "present" : "missing",
         });
+        // Log the sale into funnel_events so admin analytics counts it.
+        try {
+          const captureId = resource.id ?? null;
+          const skus = String(pu.custom_id || pu.reference_id || "").trim();
+          const amountNum = resource.amount?.value ? Number(resource.amount.value) : null;
+          await supabase.from("funnel_events").insert({
+            event_name: "Purchase",
+            product_id: (skus ? skus.split(",")[0].trim() : "") || pu.items?.[0]?.sku || "store",
+            value: Number.isFinite(amountNum as number) ? amountNum : null,
+            currency: resource.amount?.currency_code ?? "USD",
+            session_id: captureId ? `paypal:${captureId}` : `paypal:${eventId}`,
+            page_path: "/payment-success",
+            country: payer.address?.country_code || null,
+            referrer: JSON.stringify({
+              provider: "paypal",
+              event_type: eventType,
+              capture_id: captureId,
+              external_reference: correlationId,
+              customer_email: payerEmail,
+              customer_name: payerName,
+              skus,
+              status: "approved",
+            }).slice(0, 2000),
+          });
+        } catch (e) {
+          log("funnel_log_failed", { error: e instanceof Error ? e.message : String(e) });
+        }
         if (payerEmail) {
           const amt = resource.amount?.value ? Number(resource.amount.value) : undefined;
           const captureId2 = resource.id ?? null;
@@ -187,6 +214,7 @@ Deno.serve(async (req) => {
         }
         break;
       }
+
 
       case "PAYMENT.CAPTURE.DENIED":
       case "PAYMENT.CAPTURE.REVERSED":

@@ -13,6 +13,8 @@ import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { MoreProductsPanel } from "@/components/checkout/MoreProductsPanel";
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";
+import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
+
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";

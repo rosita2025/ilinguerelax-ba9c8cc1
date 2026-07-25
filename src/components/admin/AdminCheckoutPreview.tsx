@@ -33,6 +33,7 @@ const COUNTRY_META: Record<string, { name: string; flag: string }> = {
   CR: { name: "Costa Rica", flag: "🇨🇷" },
   PA: { name: "Panamá", flag: "🇵🇦" },
   DO: { name: "R. Dominicana", flag: "🇩🇴" },
+  PR: { name: "Puerto Rico", flag: "🇵🇷" },
   GT: { name: "Guatemala", flag: "🇬🇹" },
   HN: { name: "Honduras", flag: "🇭🇳" },
   SV: { name: "El Salvador", flag: "🇸🇻" },

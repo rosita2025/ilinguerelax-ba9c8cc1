@@ -98,6 +98,16 @@ const groups: Group[] = [
 
 const flat = groups.flatMap((g) => g.items);
 
+// Accesos rápidos (estilo Shopify): los 5 destinos más usados del panel
+const quickLinks = [
+  { to: "/admin", label: "Inicio", icon: LayoutDashboard },
+  { to: "/admin/orders", label: "Órdenes / Pedidos", icon: Mail },
+  { to: "/admin/productos", label: "Productos digitales", icon: Package },
+  { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },
+  { to: "/admin/live", label: "Visitas en vivo · Hoy", icon: Globe },
+  { to: "/admin/analytics", label: "Funnel", icon: TrendingUp },
+];
+
 export const AdminNav = () => {
   const { logout } = useAdminKey();
   const { pathname } = useLocation();

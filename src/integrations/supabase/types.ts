@@ -1323,6 +1323,36 @@ export type Database = {
         }
         Relationships: []
       }
+      meta_attribution: {
+        Row: {
+          country: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          fbc: string | null
+          fbp: string | null
+          updated_at: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          fbc?: string | null
+          fbp?: string | null
+          updated_at?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          fbc?: string | null
+          fbp?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_drip_config: {
         Row: {
           day_offset: number

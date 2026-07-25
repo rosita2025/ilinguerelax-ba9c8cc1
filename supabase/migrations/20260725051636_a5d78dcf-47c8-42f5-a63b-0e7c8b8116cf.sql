@@ -1,0 +1,1 @@
+DELETE FROM public.checkout_ip_bans;

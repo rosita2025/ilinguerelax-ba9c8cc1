@@ -966,6 +966,61 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : `${hotmartResolvedPrice.currency} ${hotmartResolvedPrice.amount.toLocaleString()}`)
     : priceBadge;
 
+  // Métodos locales reales que ofrece Hotmart en cada país (se muestran en la
+  // tarjeta para que el comprador sepa que puede pagar con su rail habitual).
+  const HOTMART_LOCAL_METHODS: Record<string, { es: string; en: string; pt: string; fr: string }> = {
+    MX: {
+      es: "OXXO, transferencia bancaria (SPEI) y tarjeta",
+      en: "OXXO, bank transfer (SPEI) and card",
+      pt: "OXXO, transferência bancária (SPEI) e cartão",
+      fr: "OXXO, virement bancaire (SPEI) et carte",
+    },
+    AR: {
+      es: "pago en efectivo (Rapipago / Pago Fácil) y tarjeta en cuotas",
+      en: "cash payment (Rapipago / Pago Fácil) and card in installments",
+      pt: "pagamento em dinheiro (Rapipago / Pago Fácil) e cartão parcelado",
+      fr: "paiement en espèces (Rapipago / Pago Fácil) et carte en plusieurs fois",
+    },
+    CO: {
+      es: "Nequi, PSE, Efecty y tarjeta",
+      en: "Nequi, PSE, Efecty and card",
+      pt: "Nequi, PSE, Efecty e cartão",
+      fr: "Nequi, PSE, Efecty et carte",
+    },
+    BR: {
+      es: "Pix, boleto y tarjeta",
+      en: "Pix, boleto and card",
+      pt: "Pix, boleto e cartão",
+      fr: "Pix, boleto et carte",
+    },
+    PE: {
+      es: "PagoEfectivo, transferencia y tarjeta",
+      en: "PagoEfectivo, transfer and card",
+      pt: "PagoEfectivo, transferência e cartão",
+      fr: "PagoEfectivo, virement et carte",
+    },
+    CL: {
+      es: "transferencia bancaria y tarjeta",
+      en: "bank transfer and card",
+      pt: "transferência bancária e cartão",
+      fr: "virement bancaire et carte",
+    },
+  };
+  const hotmartMethodsHint = (() => {
+    const entry = HOTMART_LOCAL_METHODS[country];
+    if (!entry) return null;
+    return entry[(language as "es" | "en" | "pt" | "fr")] ?? entry.es;
+  })();
+  const hotmartTaxNote = language === "en"
+    ? "includes local taxes (10-20%)"
+    : language === "pt"
+    ? "inclui impostos locais (10-20%)"
+    : language === "fr"
+    ? "taxes locales incluses (10-20 %)"
+    : "incluye impuestos locales (10-20%)";
+
+
+
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
@@ -1019,12 +1074,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Hotmart (1 clic)"
         : "Hotmart (1 clic)",
       sub: language === "en"
-        ? `Pay ${hotmartPriceLabel} on Hotmart (local taxes included). Redirects in 1 click.`
+        ? `Pay ${hotmartPriceLabel} on Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` You can pay with ${hotmartMethodsHint}.` : ""} Redirects in 1 click.`
         : language === "pt"
-        ? `Pague ${hotmartPriceLabel} na Hotmart (impostos locais incluídos). Redireciona em 1 clique.`
+        ? `Pague ${hotmartPriceLabel} na Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Você pode pagar com ${hotmartMethodsHint}.` : ""} Redireciona em 1 clique.`
         : language === "fr"
-        ? `Payez ${hotmartPriceLabel} sur Hotmart (taxes locales incluses). Redirige en 1 clic.`
-        : `Paga ${hotmartPriceLabel} en Hotmart (incluye impuestos locales). Te redirige en 1 clic.`,
+        ? `Payez ${hotmartPriceLabel} sur Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Vous pouvez payer avec ${hotmartMethodsHint}.` : ""} Redirige en 1 clic.`
+        : `Paga ${hotmartPriceLabel} en Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Puedes pagar con ${hotmartMethodsHint}.` : ""} Te redirige en 1 clic.`,
+
       badge: hotmartPriceLabel,
     },
   ];

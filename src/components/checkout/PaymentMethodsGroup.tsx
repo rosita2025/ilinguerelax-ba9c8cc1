@@ -512,6 +512,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           currency: "USD",
         });
       } catch { /* noop */ }
+      setMethodError({
+        method: paymentType === "transfer" ? "transfer" : "cash",
+        message: err instanceof Error ? err.message : t.tryAgain,
+      });
       toast({
         title: t.mpError,
         description: err instanceof Error ? err.message : t.tryAgain,
@@ -523,7 +527,17 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const redirectToHotmart = useCallback(async () => {
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
-    if (!url) return;
+    if (!url) {
+      setMethodError({
+        method: "hotmart",
+        message:
+          language === "en" ? "We couldn't open the Hotmart checkout. Please try again."
+          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente novamente."
+          : language === "fr" ? "Impossible d'ouvrir le paiement Hotmart. Réessaie."
+          : "No pudimos abrir el pago con Hotmart. Inténtalo de nuevo.",
+      });
+      return;
+    }
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     redirectingRef.current = true;

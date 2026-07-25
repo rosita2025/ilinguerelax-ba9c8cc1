@@ -8,7 +8,7 @@ import { SEO } from "@/components/SEO";
 import { getBlogPostBySlug, getRelatedPosts, blogPosts, type BlogPost as BlogPostType } from "@/data/blogPosts";
 import { fetchGeneratedBlogPostBySlug, fetchGeneratedBlogPosts } from "@/hooks/useGeneratedBlogPosts";
 
-import { getProductById } from "@/data/products";
+import { getProductById, products } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

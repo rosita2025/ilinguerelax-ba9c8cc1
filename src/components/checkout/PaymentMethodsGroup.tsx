@@ -1228,11 +1228,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // Si el admin configuró explícitamente la región (methodsConfig.loaded con
   // regionCode), respetamos exactamente lo que habilitó, sin forzar el filtro
   // legacy card+paypal fuera de Perú. Perú siempre oculta paypal directo.
-  const methods = isPeru
-    ? orderedByAdmin.filter((m) => m.id !== "paypal")
-    : methodsConfig.loaded && methodsConfig.regionCode
-      ? orderedByAdmin
-      : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance" || (m.id === "clabe" && country === "MX"));
+  const methods = methodsConfig.loaded && methodsConfig.regionCode
+    ? orderedByAdmin
+    : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance" || (m.id === "clabe" && country === "MX"));
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 

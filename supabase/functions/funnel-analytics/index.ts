@@ -558,39 +558,14 @@ serve(async (req) => {
       if (["stripe", "paypal", "mercadopago", "mp"].includes(p)) gatewayEvents.push(ev);
       else pixelEvents.push(ev);
     }
-    for (const ev of [...gatewayEvents, ...pixelEvents]) {
+    // Solo webhooks verificados (Stripe, PayPal, Mercado Pago) + Hotmart y manual.
+    // Los píxeles del navegador NO cuentan como compra.
+    for (const ev of gatewayEvents) {
 
       let meta: any = {};
       try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
       const provider = String(meta.provider || "").toLowerCase();
-      const isGateway = ["stripe", "paypal", "mercadopago", "mp"].includes(provider);
-      if (!isGateway) {
-        // Browser-side Purchase pixel (CheckoutSuccess). The webhook may not
-        // have landed (or its referrer carries UTM text instead of JSON), so
-        // count it as a store sale unless the same product was already
-        // ingested from Hotmart/manual within ±45 min.
-        const evTime = new Date(ev.created_at).getTime();
-        const pidRaw = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "");
-        if (!pidRaw || pidRaw === "0") continue;
-        const dupe = alreadyIngested.some(
-          (p) => p.productId === pidRaw && Math.abs(p.at - evTime) < 45 * 60 * 1000,
-        );
-        if (dupe) continue;
-        const key = `client:${ev.session_id || ev.id}:${pidRaw}`;
-        if (seenGatewayKeys.has(key)) continue;
-        seenGatewayKeys.add(key);
-        const cur = String(ev.currency || "USD").toUpperCase();
-        const raw = Number(ev.value || 0);
-        realPurchases.push({
-          at: ev.created_at,
-          productId: pidRaw,
-          country: ev.country || "??",
-          usd: cur === "USD" ? raw : toUsd(raw, cur),
-          source: "store",
-          pending: false,
-        });
-        continue;
-      }
+
       const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
       if (/test|sandbox|prueba/i.test(txn)) continue;
       const dedupeKey = `${provider}:${txn}`;

@@ -3,7 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, type PruebaItem } from "@/stores/checkoutStore";
 import { useI18n } from "@/i18n/I18nContext";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Exige un TLD de 2+ letras para no capturar correos a medio escribir
+// (ej. "cliente@gmail.c"), que generaban carritos imposibles de recuperar.
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[a-z]{2,}$/i;
+
 const SENT_KEY = "abandoned-cart-sent-v2";
 
 type TrackAbandonedCheckoutInput = {

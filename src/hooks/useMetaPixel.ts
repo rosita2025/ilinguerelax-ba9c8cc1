@@ -278,7 +278,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
   useEffect(() => {
     ensurePixelReady();
     const eventId = generateEventId();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
     sendCapiEvent("ViewContent", eventId, params as unknown as Record<string, unknown>);
@@ -299,7 +299,7 @@ export const trackHotmartEvent = (
   const eventId = eventName === "Purchase" && orderId
     ? `Purchase_${orderId}`
     : generateEventId();
-  if (typeof window !== "undefined" && window.fbq) {
+  if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
     window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
   }
   sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
@@ -311,7 +311,7 @@ export const trackHotmartEvent = (
 export const useHotmartPixelPageView = () => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
       window.fbq("track", "PageView", { eventID: eventId });
     }
@@ -322,7 +322,7 @@ export const useHotmartPixelPageView = () => {
 export const useHotmartPixelContact = () => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", {
         content_name: "Contact Page",
@@ -340,7 +340,7 @@ export const trackLead = (
 ) => {
   ensurePixelReady();
   const eventId = generateEventId();
-  if (typeof window !== "undefined" && window.fbq) {
+  if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
     window.fbq("track", "Lead", { ...params, eventID: eventId });
   }
   sendCapiEvent("Lead", eventId, params, email);
@@ -384,7 +384,7 @@ export const trackPaymentError = (params: {
 export const useMetaPixelViewContent = (params: ViewContentParams, _pixelId?: string) => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }

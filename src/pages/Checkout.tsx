@@ -28,7 +28,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
-import { isCheckoutAuthorized, authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
+import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
 
 function MobileOrderSummarySticky({ slug }: { slug?: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -80,13 +80,7 @@ export default function Checkout() {
         navigate("/", { replace: true });
         return;
       }
-      if (reason !== "ok") {
-        if (reason === "rate_limited" || reason === "banned") {
-          toast.error("Demasiados intentos. Intenta de nuevo en unos minutos.");
-        }
-        navigate(`/products/${slug}`, { replace: true });
-        return;
-      }
+      if (reason !== "ok") return;
       authorizeCheckout(slug); // renueva ventana de 1h
       // Server-side rate limit por IP en segundo plano (fail-open).
       try {
@@ -94,14 +88,9 @@ export default function Checkout() {
           body: { slug, referer: (typeof document !== "undefined" && document.referrer) || "" },
         });
         const res = data as { allowed?: boolean; reason?: string } | null;
-        if (res && res.allowed === false && !cancelled) {
-          toast.error(
-            res.reason === "banned"
-              ? "Acceso bloqueado temporalmente por actividad sospechosa."
-              : "Demasiados intentos desde tu red. Intenta más tarde.",
-          );
-          navigate(`/products/${slug}`, { replace: true });
-        }
+        // Este endpoint es solo observacional. Nunca se expulsa a un comprador
+        // legítimo por compartir IP o por volver a abrir su carrito.
+        if (res && res.allowed === false && !cancelled) authorizeCheckout(slug);
       } catch { /* fail-open */ }
     })();
     return () => { cancelled = true; };

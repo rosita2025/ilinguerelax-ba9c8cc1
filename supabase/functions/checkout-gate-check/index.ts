@@ -15,10 +15,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_HITS = 20;
-const BAN_MS = 30 * 60 * 1000;
-
 function clientIp(req: Request): string {
   const xff = req.headers.get("x-forwarded-for") || "";
   const first = xff.split(",")[0]?.trim();
@@ -91,53 +87,11 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
-    // 1) Ban activo?
-    const { data: ban } = await admin
-      .from("checkout_ip_bans")
-      .select("banned_until, reason")
-      .eq("ip", ip)
-      .maybeSingle();
-
-    if (ban && new Date(ban.banned_until as string) > now) {
-      return json({
-        allowed: false,
-        reason: "banned",
-        until: ban.banned_until,
-      });
-    }
-
-    // 2) Registrar hit (best effort, no bloquea).
+    // Registrar el acceso para analítica y detección de abuso. Este endpoint
+    // nunca bloquea compras: una IP puede ser compartida por una oficina,
+    // operadora móvil, VPN o por la vista previa del administrador.
     await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source });
-
-    // 3) Contar hits en ventana.
-    const since = new Date(now.getTime() - WINDOW_MS).toISOString();
-    const { count } = await admin
-      .from("checkout_rate_hits")
-      .select("id", { count: "exact", head: true })
-      .eq("ip", ip)
-      .gte("created_at", since);
-
-    const hits = count || 0;
-
-    if (hits > MAX_HITS) {
-      const until = new Date(now.getTime() + BAN_MS).toISOString();
-      await admin
-        .from("checkout_ip_bans")
-        .upsert(
-          {
-            ip,
-            reason: "rate_limit",
-            banned_until: until,
-            ua,
-            hits,
-            updated_at: now.toISOString(),
-          },
-          { onConflict: "ip" },
-        );
-      return json({ allowed: false, reason: "rate", until });
-    }
-
-    return json({ allowed: true, hits });
+    return json({ allowed: true });
   } catch (err) {
     console.error("checkout-gate-check error", err);
     // Fail-open: si el gate server-side falla, no rompemos ventas legítimas.

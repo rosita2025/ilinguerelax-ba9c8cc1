@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+import CheckoutRecommendations from "@/components/admin/CheckoutRecommendations";
 
 interface ErrRow {
   id: string;
@@ -174,6 +175,8 @@ export default function AdminPaymentErrors() {
             </div>
           </section>
         </div>
+
+        <CheckoutRecommendations rows={rows} />
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b">

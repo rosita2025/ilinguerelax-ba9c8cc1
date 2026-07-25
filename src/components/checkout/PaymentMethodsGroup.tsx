@@ -1339,14 +1339,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         </div>
       )}
 
-      {!isFree && !isInvalidZero && (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/40 px-3 py-2">
-          <span className="text-xs text-muted-foreground">
-            {language === "en" ? "Total" : language === "pt" ? "Total" : language === "fr" ? "Total" : "Total"}
-          </span>
-          <span className="text-base font-bold text-neutral-900 dark:text-neutral-50">{priceBadge}</span>
-        </div>
-      )}
+
+
 
 
 

@@ -1006,7 +1006,62 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       fr: "virement bancaire et carte",
     },
   };
+  // Etiquetas visuales de los rails locales que Hotmart ofrece en cada país.
+  const HOTMART_BADGES: Record<string, MethodBadge[]> = {
+    MX: [
+      { label: "OXXO", bg: "#E31E24", color: "#ffffff" },
+      { label: "SPEI", bg: "#0F766E", color: "#ffffff" },
+      { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    ],
+    AR: [
+      { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
+      { label: "Rapipago", bg: "#F5A623", color: "#1F2937" },
+      { label: "Pago Fácil", bg: "#E4002B", color: "#ffffff" },
+      { label: "Cuotas", bg: "#1F2937", color: "#ffffff" },
+    ],
+    CO: [
+      { label: "Nequi", bg: "#200020", color: "#DA0081" },
+      { label: "PSE", bg: "#0B5AA6", color: "#ffffff" },
+      { label: "Efecty", bg: "#FFD400", color: "#1F2937" },
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    ],
+    BR: [
+      { label: "Pix", bg: "#32BCAD", color: "#06211F" },
+      { label: "Boleto", bg: "#1F2937", color: "#ffffff" },
+      { label: "Cartão", bg: "#ffffff", color: "#1F2937" },
+    ],
+    PE: [
+      { label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" },
+      { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    ],
+    CL: [
+      { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
+      { label: "Webpay", bg: "#E4002B", color: "#ffffff" },
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    ],
+    EC: [
+      { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    ],
+    UY: [
+      { label: "Redpagos", bg: "#E4002B", color: "#ffffff" },
+      { label: "Abitab", bg: "#F5A623", color: "#1F2937" },
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    ],
+    ES: [
+      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
+    ],
+  };
+  const hotmartBadges: MethodBadge[] = HOTMART_BADGES[country] ?? [
+    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+    { label: "PayPal", bg: "#003087", color: "#ffffff" },
+  ];
+
   const hotmartMethodsHint = (() => {
+
     const entry = HOTMART_LOCAL_METHODS[country];
     if (!entry) return null;
     return entry[(language as "es" | "en" | "pt" | "fr")] ?? entry.es;

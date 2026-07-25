@@ -544,7 +544,7 @@ export default function Checkout() {
       <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-10 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-6 lg:gap-8">
         <div className="min-w-0 space-y-6">
           <BuyerInfoForm />
-          <CheckoutTrustBar />
+          
           <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
           <CheckoutTestimonials />
           <MoreProductsPanel parentSku={catalogItem?.adminSku ?? null} />

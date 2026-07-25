@@ -877,12 +877,15 @@ serve(async (req) => {
         },
         abandoned: {
           total: abandonedTotal,
+          newCustomers: abandonedNew,
+          returningCustomers: abandonedReturning,
           recovered: abandonedRecovered,
           openValue: Number(abandonedValue.toFixed(2)),
           recoveryRatePct: abandonedTotal
             ? Number(((abandonedRecovered / abandonedTotal) * 100).toFixed(2))
             : 0,
         },
+
         series,
         byProduct,
         byProductCountry,

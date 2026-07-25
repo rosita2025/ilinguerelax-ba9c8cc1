@@ -138,27 +138,21 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
   if (!upsells?.length) return null;
 
   return (
-    <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-4 sm:p-5 space-y-3 shadow-sm">
+    <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-3 sm:p-4 space-y-2 shadow-sm">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground">
-            <Sparkles className="w-4 h-4" />
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="inline-flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-primary text-primary-foreground">
+            <Sparkles className="w-3.5 h-3.5" />
           </span>
-          <div>
-            <h3 className="font-bold text-sm sm:text-base leading-tight">
-              Agrega a tu pedido y ahorra
-            </h3>
-            <p className="text-[11px] text-muted-foreground">
-              {mainInCart
-                ? "Solo disponible en esta compra"
-                : "Precio normal (sin el descuento del combo)"}
-            </p>
-          </div>
+          <h3 className="font-bold text-sm leading-tight truncate">
+            Agrega a tu pedido y ahorra
+          </h3>
         </div>
         {totalSavings > 0 && <SavingsBadge usd={totalSavings} />}
       </div>
 
-      <div className="space-y-2.5">
+      <div className="space-y-2">
+
         {upsells.map((u) => {
           const added = items.some((i) => i.id === u.id);
           const shownPrice = effectivePrice(u);

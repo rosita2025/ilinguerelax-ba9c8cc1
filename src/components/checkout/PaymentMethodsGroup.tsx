@@ -1566,15 +1566,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                             </button>
                           </div>
                         )}
-                        <div className="mx-auto mt-6 max-w-md space-y-3">
-                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                          <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                            <div className="h-11 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-                          </div>
-                          <div className="h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
-                        </div>
                       </div>
                     );
                   })()}

@@ -24,7 +24,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { getCountryInfo } from "@/lib/countryInfo";
 import { cn } from "@/lib/utils";
-import { mergeProductRows } from "@/lib/productSkuAliases";
+import { mergeProductRows, canonicalProductId } from "@/lib/productSkuAliases";
 
 
 type Granularity = "hour" | "day";

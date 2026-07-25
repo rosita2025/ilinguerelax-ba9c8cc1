@@ -659,7 +659,11 @@ const AdminAnalytics = () => {
 
               {/* Product table */}
               <Card className="p-4">
-                <h2 className="font-semibold mb-3">Top productos</h2>
+                <h2 className="font-semibold mb-1">Top productos</h2>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Filas unificadas: el SKU largo de <code>/products</code> y el slug corto de <code>/checkouts</code> del mismo producto se suman en una sola línea.
+                </p>
+
 
                 {/* Mobile cards */}
                 <div className="md:hidden space-y-2">

@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, type PruebaItem } from "@/stores/checkoutStore";
 import { useI18n } from "@/i18n/I18nContext";
+import { saveMetaAttribution } from "@/lib/metaAttribution";
+
 
 // Exige un TLD de 2+ letras para no capturar correos a medio escribir
 // (ej. "cliente@gmail.c"), que generaban carritos imposibles de recuperar.
@@ -61,7 +63,13 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
   const productType = input.productType || input.items?.[0]?.id || "checkout";
 
   if (!EMAIL_RE.test(email)) return false;
+
+  // Vincula el correo con la atribución de Meta Ads (solo si vino de anuncio),
+  // para que el webhook de compra pueda reportar el Purchase a la CAPI.
+  void saveMetaAttribution(email, input.country);
+
   if (!input.force && alreadySent(email, productType)) return true;
+
 
   const { data, error } = await supabase.functions.invoke<{ ok?: boolean }>("track-abandoned-checkout", {
     body: {

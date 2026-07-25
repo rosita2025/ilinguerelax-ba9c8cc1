@@ -13,6 +13,8 @@ import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
+import { captureMetaClickId } from "@/lib/metaAttribution";
+
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";
 import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
@@ -154,7 +156,10 @@ const getAttributionReferrer = () => {
 const RouteTracker = () => {
   const location = useLocation();
   useEffect(() => { initClientIdSync(); }, []);
+  // Captura el fbclid del anuncio en cualquier página (home, blog, productos).
+  useEffect(() => { captureMetaClickId(); }, [location.search]);
   useEffect(() => {
+
     if (location.pathname.startsWith("/admin")) return;
     try {
       void supabase.functions.invoke("log-funnel-event", {

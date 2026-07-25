@@ -667,10 +667,10 @@ const AdminAnalytics = () => {
 
                 {/* Mobile cards */}
                 <div className="md:hidden space-y-2">
-                  {data.byProduct.length === 0 && (
+                  {mergedProducts.length === 0 && (
                     <div className="py-6 text-center text-muted-foreground text-sm">Sin datos en este rango</div>
                   )}
-                  {data.byProduct.map((p: any) => {
+                  {mergedProducts.map((p: any) => {
                     const src = p.source as string | undefined;
                     const badge =
                       src === "hotmart"
@@ -692,14 +692,19 @@ const AdminAnalytics = () => {
                             >
                               {p.name || p.product_id}
                             </a>
-                            <a
-                              href={`/products/${p.product_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[10px] text-muted-foreground truncate block hover:underline"
-                            >
-                              /products/{p.product_id}
-                            </a>
+                            <div className="flex flex-col gap-0.5 mt-0.5">
+                              {(p.aliases ?? [p.product_id]).map((a: string, i: number) => (
+                                <a
+                                  key={a}
+                                  href={i === 0 ? `/products/${a}` : `/checkouts/${a}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] text-muted-foreground truncate block hover:underline"
+                                >
+                                  {i === 0 ? `/products/${a}` : `/checkouts/${a}`}
+                                </a>
+                              ))}
+                            </div>
                           </div>
                           <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${badge.cls}`}>
                             {badge.label}
@@ -743,14 +748,14 @@ const AdminAnalytics = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.byProduct.length === 0 && (
+                      {mergedProducts.length === 0 && (
                         <tr>
                           <td colSpan={8} className="py-6 text-center text-muted-foreground">
                             Sin datos en este rango
                           </td>
                         </tr>
                       )}
-                      {data.byProduct.map((p: any) => {
+                      {mergedProducts.map((p: any) => {
                         const src = p.source as string | undefined;
                         const badge =
                           src === "hotmart"
@@ -771,14 +776,19 @@ const AdminAnalytics = () => {
                               >
                                 {p.name || p.product_id}
                               </a>
-                              <a
-                                href={`/products/${p.product_id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[11px] text-muted-foreground truncate block hover:underline"
-                              >
-                                /products/{p.product_id}
-                              </a>
+                              <div className="flex flex-col gap-0.5">
+                                {(p.aliases ?? [p.product_id]).map((a: string, i: number) => (
+                                  <a
+                                    key={a}
+                                    href={i === 0 ? `/products/${a}` : `/checkouts/${a}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[11px] text-muted-foreground truncate block hover:underline"
+                                  >
+                                    {i === 0 ? `/products/${a}` : `/checkouts/${a}`}
+                                  </a>
+                                ))}
+                              </div>
                             </td>
 
                             <td className="px-2">

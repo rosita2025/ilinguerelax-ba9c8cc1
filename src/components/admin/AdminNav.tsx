@@ -201,7 +201,27 @@ export const AdminNav = () => {
           </AlertDialog>
           </div>
         </div>
+
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none">
+          {quickLinks.map(({ to, label, icon: Icon }) => (
+            <button
+              key={to}
+              type="button"
+              onClick={() => navigate(to)}
+              className={cn(
+                "flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                pathname === to
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
+
     </nav>
     </>
   );

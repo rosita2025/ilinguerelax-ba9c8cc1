@@ -17,6 +17,7 @@ import {
   ClipboardList,
   Send,
   LineChart,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
@@ -90,6 +91,7 @@ const groups: Group[] = [
     label: "Seguridad",
     items: [
       { to: "/admin/checkout-abuse", label: "Anti-abuso Checkout", icon: Shield },
+      { to: "/admin/payment-errors", label: "Fallos de pago", icon: AlertTriangle },
     ],
   },
 ];

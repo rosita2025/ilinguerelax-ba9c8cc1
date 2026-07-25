@@ -1081,6 +1081,7 @@ export type Database = {
           error_reason: string | null
           event_name: string
           id: string
+          ip: string | null
           is_bot: boolean
           page_path: string | null
           product_id: string | null
@@ -1099,6 +1100,7 @@ export type Database = {
           error_reason?: string | null
           event_name: string
           id?: string
+          ip?: string | null
           is_bot?: boolean
           page_path?: string | null
           product_id?: string | null
@@ -1117,6 +1119,7 @@ export type Database = {
           error_reason?: string | null
           event_name?: string
           id?: string
+          ip?: string | null
           is_bot?: boolean
           page_path?: string | null
           product_id?: string | null

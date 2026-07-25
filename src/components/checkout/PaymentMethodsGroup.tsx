@@ -1143,12 +1143,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Hotmart (1 clic)"
         : "Hotmart (1 clic)",
       sub: language === "en"
-        ? `Pay ${hotmartPriceLabel} on Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` You can pay with ${hotmartMethodsHint}.` : ""} Redirects in 1 click.`
+        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 click`
         : language === "pt"
-        ? `Pague ${hotmartPriceLabel} na Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Você pode pagar com ${hotmartMethodsHint}.` : ""} Redireciona em 1 clique.`
+        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clique`
         : language === "fr"
-        ? `Payez ${hotmartPriceLabel} sur Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Vous pouvez payer avec ${hotmartMethodsHint}.` : ""} Redirige en 1 clic.`
-        : `Paga ${hotmartPriceLabel} en Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Puedes pagar con ${hotmartMethodsHint}.` : ""} Te redirige en 1 clic.`,
+        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`
+        : `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`,
+
 
       badge: hotmartPriceLabel,
       badges: hotmartBadges,
@@ -1425,16 +1426,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "hotmart" ? (
-                  <div className="mt-2">
-                    <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mb-2">{m.sub}</div>
-
-                    <div className="text-[10px] uppercase tracking-wide text-neutral-500 dark:text-neutral-400 mb-1">
-                      {language === "en" ? "Available in your country" : language === "pt" ? "Disponível no seu país" : language === "fr" ? "Disponible dans votre pays" : "Disponible en tu país"}
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                  <div className="mt-1.5">
+                    <div className="flex items-center gap-1 flex-wrap">
                       {(m.badges ?? []).map((badge) => <BankBadge key={badge.label} {...badge} />)}
                     </div>
+                    <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{m.sub}</div>
                   </div>
+
                 ) : m.badges?.length ? (
                   <div className="mt-1.5 flex items-center gap-1 flex-wrap">
                     {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}

@@ -211,9 +211,13 @@ Deno.serve(async (req) => {
       case "payment": {
         const payment = await fetchPayment(dataId);
         logged = {
-          event_type: payment.status === "approved" ? "purchase" : `mp_${payment.status}`,
-          product_id: payment.metadata?.source ?? "checkout-prueba-1",
+          event_type: payment.status === "approved" ? "Purchase" : `mp_${payment.status}`,
+          product_id: (payment.metadata?.skus ? String(payment.metadata.skus).split(",")[0].trim() : "")
+            || getPaymentSkus(payment)[0]
+            || payment.metadata?.source
+            || "checkout-prueba-1",
           product_name: payment.description ?? "Mercado Pago",
+
           amount: payment.transaction_amount ?? null,
           currency: payment.currency_id ?? "PEN",
           country: payment.payer?.address?.country_id ?? "PE",

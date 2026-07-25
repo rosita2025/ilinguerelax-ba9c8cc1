@@ -61,7 +61,13 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
   const productType = input.productType || input.items?.[0]?.id || "checkout";
 
   if (!EMAIL_RE.test(email)) return false;
+
+  // Vincula el correo con la atribución de Meta Ads (solo si vino de anuncio),
+  // para que el webhook de compra pueda reportar el Purchase a la CAPI.
+  void saveMetaAttribution(email, input.country);
+
   if (!input.force && alreadySent(email, productType)) return true;
+
 
   const { data, error } = await supabase.functions.invoke<{ ok?: boolean }>("track-abandoned-checkout", {
     body: {

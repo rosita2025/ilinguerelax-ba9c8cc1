@@ -451,6 +451,11 @@ const AdminAnalytics = () => {
     }));
   }, [data]);
 
+  // Une el SKU largo (/products/:sku) con el slug corto (/checkouts/:slug) del mismo producto.
+  const mergedProducts = useMemo(() => mergeProductRows(data.byProduct as any), [data]);
+
+
+
   return (
     <>
       <AdminNav />

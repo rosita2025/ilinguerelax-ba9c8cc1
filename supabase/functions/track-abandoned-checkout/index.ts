@@ -9,7 +9,10 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// TLD de al menos 2 letras: evita guardar correos a medio escribir
+// (ej. "cliente@gmail.c") que luego nunca reciben el recordatorio.
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[a-z]{2,}$/i;
+
 
 function normalizeEmail(raw: unknown) {
   const email = String(raw || "").trim().toLowerCase();

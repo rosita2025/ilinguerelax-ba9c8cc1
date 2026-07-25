@@ -75,13 +75,9 @@ export default function Checkout() {
     if (!slug) return;
     let cancelled = false;
     (async () => {
-      const reason = evaluateCheckoutGate();
-      if (reason === "bot") {
-        navigate("/", { replace: true });
-        return;
-      }
-      if (reason !== "ok") return;
-      authorizeCheckout(slug); // renueva ventana de 1h
+      // El gate ya nunca bloquea: solo renueva la ventana de compra.
+      evaluateCheckoutGate();
+
       // Server-side rate limit por IP en segundo plano (fail-open).
       try {
         const { data } = await supabase.functions.invoke("checkout-gate-check", {

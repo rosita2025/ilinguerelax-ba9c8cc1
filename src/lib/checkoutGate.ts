@@ -46,29 +46,13 @@ export function authorizeCheckout(slug?: string | null) {
   } catch { /* ignore */ }
 }
 
-function isBotEnvironment(): boolean {
-  try {
-    const ua = navigator.userAgent || "";
-    if (BOT_UA_RE.test(ua)) return true;
-    // Solo mantenemos la señal más fiable: WebDriver activo. Descartamos
-    // heurísticas como `!window.chrome` o `languages.length === 0` porque
-    // dan muchos falsos positivos en Chrome móvil, WebViews de Instagram/
-    // Facebook y Samsung Internet → expulsaban compradores reales del
-    // checkout haciéndolo parecer "carrito abandonado".
-    const nav = navigator as Navigator & { webdriver?: boolean };
-    if (nav.webdriver === true) return true;
-    return false;
-  } catch {
-    return false;
-  }
-}
-
 /**
- * Decide si el visitante puede abrir el checkout. Devuelve una razón para
- * poder mostrar mensajes / logs distintos en la UI.
+ * Decide si el visitante puede abrir el checkout.
+ * Política actual: NUNCA se bloquea (ni por IP, país, UA o webdriver).
+ * Cualquier señal sospechosa se registra solo para analítica.
  */
 export function evaluateCheckoutGate(): GateReason {
-  if (isBotEnvironment()) return "bot";
+
 
   // Autorización explícita (click / navigate / referer / token).
   let authorized = false;

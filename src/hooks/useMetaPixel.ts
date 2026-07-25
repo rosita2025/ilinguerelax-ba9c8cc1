@@ -256,7 +256,7 @@ export const trackHotmartEvent = (
   params: Record<string, unknown> = {}
 ) => {
   ensurePixelReady();
-  const { __skipFunnelLog, ...pixelParams } = params;
+  const { __skipFunnelLog, email: userEmail, ...pixelParams } = params;
   // Purchase: usar un event_id determinista basado en el número de orden para
   // que Meta pueda desduplicar con el evento enviado por el servidor (CAPI).
   const orderId = typeof pixelParams.order_id === "string" ? pixelParams.order_id : "";
@@ -266,7 +266,7 @@ export const trackHotmartEvent = (
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
   }
-  sendCapiEvent(eventName, eventId, pixelParams, typeof pixelParams.email === "string" ? pixelParams.email : undefined);
+  sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
   if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);
   if (eventName === "ViewContent") markViewContentFired(pixelParams);
 };

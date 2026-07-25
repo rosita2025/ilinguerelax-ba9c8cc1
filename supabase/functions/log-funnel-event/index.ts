@@ -159,6 +159,9 @@ serve(async (req) => {
       is_bot: !!botReason,
       bot_reason: botReason,
       user_agent: ua ? ua.slice(0, 300) : null,
+      // Guardamos proveedor y motivo para poder diagnosticar pagos fallidos.
+      provider: typeof body.provider === "string" ? body.provider.slice(0, 60) : null,
+      error_reason: typeof body.reason === "string" ? body.reason.slice(0, 300) : null,
     });
 
     if (error) {

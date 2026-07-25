@@ -30,7 +30,12 @@ const RESERVED = new Set([
 ]);
 
 // User agents de bots conocidos y navegadores headless.
-const BOT_UA_RE = /(bot|crawl|spider|slurp|bingpreview|facebookexternalhit|whatsapp|telegrambot|discordbot|slackbot|linkedinbot|twitterbot|headlesschrome|phantomjs|puppeteer|playwright|selenium|scrapy|python-requests|curl\/|wget\/|axios\/|okhttp\/|go-http-client|java\/)/i;
+// OJO: NO incluimos "whatsapp", "telegrambot", "discordbot" ni "slackbot":
+// los navegadores internos de esas apps (y sus previsualizaciones de enlace)
+// comparten UA con compradores reales que llegan desde nuestros enlaces de
+// WhatsApp, y los estábamos expulsando del checkout → parecía "abandono".
+const BOT_UA_RE = /(bot\b|crawl|spider|slurp|bingpreview|facebookexternalhit|headlesschrome|phantomjs|puppeteer|playwright|selenium|scrapy|python-requests|curl\/|wget\/|axios\/|okhttp\/|go-http-client|java\/)/i;
+
 
 export type GateReason =
   | "ok"

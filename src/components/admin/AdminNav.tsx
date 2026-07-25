@@ -17,7 +17,8 @@ import {
   ClipboardList,
   Send,
   LineChart,
-}, AlertTriangle } from "lucide-react";
+  AlertTriangle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
 import {

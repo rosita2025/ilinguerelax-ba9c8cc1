@@ -321,31 +321,43 @@ serve(async (req) => {
           pcAgg.views++;
           break;
         case "AddToCart":
-          if (!totals.cartSessions.has(sid)) {
+          if (!totals.cartSessions.has(vid)) {
             b.addToCart++;
             totals.addToCart++;
-            totals.cartSessions.add(sid);
+            totals.cartSessions.add(vid);
           }
-          pAgg.carts++;
-          pcAgg.carts++;
+          if (!cartVisitorProduct.has(`${vid}::${pKey}`)) {
+            cartVisitorProduct.add(`${vid}::${pKey}`);
+            pAgg.carts++;
+          }
+          if (!cartVisitorProductCountry.has(`${vid}::${pcKey}`)) {
+            cartVisitorProductCountry.add(`${vid}::${pcKey}`);
+            pcAgg.carts++;
+          }
           break;
         case "InitiateCheckout":
         case "BeginCheckout": {
           // Direct "Comprar / continuar pago" skips a visible cart but still
           // represents cart intent in the funnel, so checkout sessions are also
           // counted in the cart step if no AddToCart was seen first.
-          if (!totals.cartSessions.has(sid)) {
-            totals.cartSessions.add(sid);
+          if (!totals.cartSessions.has(vid)) {
+            totals.cartSessions.add(vid);
             b.addToCart++;
             totals.addToCart++;
+          }
+          if (!cartVisitorProduct.has(`${vid}::${pKey}`)) {
+            cartVisitorProduct.add(`${vid}::${pKey}`);
             pAgg.carts++;
+          }
+          if (!cartVisitorProductCountry.has(`${vid}::${pcKey}`)) {
+            cartVisitorProductCountry.add(`${vid}::${pcKey}`);
             pcAgg.carts++;
           }
 
-          if (!totals.checkoutSessions.has(sid)) {
+          if (!totals.checkoutSessions.has(vid)) {
             b.checkout++;
             totals.checkout++;
-            totals.checkoutSessions.add(sid);
+            totals.checkoutSessions.add(vid);
           }
           const src = classifyTrafficSource(r.referrer);
           const country = r.country || "??";
@@ -355,9 +367,10 @@ serve(async (req) => {
             sAgg = { country, source: src, sessions: new Set<string>() };
             checkoutBySrcAgg.set(key, sAgg);
           }
-          sAgg.sessions.add(sid);
+          sAgg.sessions.add(vid);
           break;
         }
+
 
         case "Purchase":
         case "purchase": {

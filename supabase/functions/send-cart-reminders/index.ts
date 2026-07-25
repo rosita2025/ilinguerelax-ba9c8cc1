@@ -306,6 +306,9 @@ Deno.serve(async (req) => {
           1440: 20 * 3600 * 1000,
           7200: 4 * 24 * 3600 * 1000,
         };
+        // NOTA: la tabla usa `sent_at` (no `created_at`); usar la columna
+        // equivocada hacía que estos filtros fallaran y se desactivara el
+        // control de frecuencia (riesgo de correos repetidos).
         const sinceWindow = new Date(Date.now() - windowMs[step]).toISOString();
         const { count: windowCount } = await admin
           .from("cart_reminder_sends")
@@ -313,7 +316,7 @@ Deno.serve(async (req) => {
           .eq("email", email)
           .eq("step", step)
           .eq("status", "sent")
-          .gte("created_at", sinceWindow);
+          .gte("sent_at", sinceWindow);
         if ((windowCount ?? 0) > 0) { stat.skipped++; continue; }
 
         const since24h = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
@@ -322,7 +325,7 @@ Deno.serve(async (req) => {
           .select("id", { count: "exact", head: true })
           .eq("email", email)
           .eq("status", "sent")
-          .gte("created_at", since24h);
+          .gte("sent_at", since24h);
         if ((recentCount ?? 0) > 0) { stat.skipped++; continue; }
 
         // ATOMIC CLAIM: sentinel row per (email, step) using the existing

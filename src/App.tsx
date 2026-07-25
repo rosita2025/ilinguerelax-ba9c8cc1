@@ -13,6 +13,8 @@ import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
+import { captureMetaClickId } from "@/lib/metaAttribution";
+
 import Index from "./pages/Index";
 import { CookieConsent } from "@/components/CookieConsent";
 import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";

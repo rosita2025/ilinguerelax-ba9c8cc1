@@ -62,11 +62,47 @@ const isEuUser = (): boolean => {
     return EU_COUNTRIES.has(c);
   } catch { return false; }
 };
+// ---------------------------------------------------------------------------
+// Tráfico interno (admin / pruebas propias): NO debe llegar al Pixel ni a CAPI.
+// Se marca de forma permanente en el navegador para que, aunque el admin luego
+// navegue por la tienda como usuario normal, sus visitas no ensucien Meta.
+// ---------------------------------------------------------------------------
+const INTERNAL_KEY = "ilr_internal_traffic";
+
+const isInternalTraffic = (): boolean => {
+  if (typeof window === "undefined") return true;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("notrack") === "1") localStorage.setItem(INTERNAL_KEY, "1");
+    if (params.get("notrack") === "0") localStorage.removeItem(INTERNAL_KEY);
+
+    // Rutas de administración
+    if (window.location.pathname.startsWith("/admin")) {
+      localStorage.setItem(INTERNAL_KEY, "1");
+      return true;
+    }
+    // Sesión de admin activa (llave guardada por AdminGate)
+    if (localStorage.getItem("ilr_admin_key") || sessionStorage.getItem("ilr_admin_key")) {
+      localStorage.setItem(INTERNAL_KEY, "1");
+      return true;
+    }
+    // Entornos que no son producción real
+    const host = window.location.hostname;
+    if (host === "localhost" || host.endsWith(".lovable.app") || host.endsWith(".lovableproject.com")) return true;
+
+    return localStorage.getItem(INTERNAL_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 const hasPixelConsent = (): boolean => {
   if (typeof window === "undefined") return false;
+  if (isInternalTraffic()) return false; // admin / pruebas: nunca enviar a Meta
   if (!isEuUser()) return true; // non-EU: implicit consent
   try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
 };
+
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
 const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {
@@ -242,7 +278,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
   useEffect(() => {
     ensurePixelReady();
     const eventId = generateEventId();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }
     sendCapiEvent("ViewContent", eventId, params as unknown as Record<string, unknown>);
@@ -263,7 +299,7 @@ export const trackHotmartEvent = (
   const eventId = eventName === "Purchase" && orderId
     ? `Purchase_${orderId}`
     : generateEventId();
-  if (typeof window !== "undefined" && window.fbq) {
+  if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
     window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
   }
   sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
@@ -275,7 +311,7 @@ export const trackHotmartEvent = (
 export const useHotmartPixelPageView = () => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
       window.fbq("track", "PageView", { eventID: eventId });
     }
@@ -286,7 +322,7 @@ export const useHotmartPixelPageView = () => {
 export const useHotmartPixelContact = () => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", {
         content_name: "Contact Page",
@@ -304,7 +340,7 @@ export const trackLead = (
 ) => {
   ensurePixelReady();
   const eventId = generateEventId();
-  if (typeof window !== "undefined" && window.fbq) {
+  if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
     window.fbq("track", "Lead", { ...params, eventID: eventId });
   }
   sendCapiEvent("Lead", eventId, params, email);
@@ -348,7 +384,7 @@ export const trackPaymentError = (params: {
 export const useMetaPixelViewContent = (params: ViewContentParams, _pixelId?: string) => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
       window.fbq("track", "ViewContent", { ...params, eventID: eventId });
     }

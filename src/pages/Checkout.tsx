@@ -12,6 +12,8 @@ import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { MoreProductsPanel } from "@/components/checkout/MoreProductsPanel";
+import { UpsellPanel } from "@/components/checkout/UpsellPanel";
+
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";
 
 

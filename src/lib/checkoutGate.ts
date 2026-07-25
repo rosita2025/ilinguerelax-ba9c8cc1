@@ -11,14 +11,7 @@
  */
 
 const KEY = "ilr_checkout_auth";
-const RATE_KEY = "ilr_checkout_rate";
-const BAN_KEY = "ilr_checkout_ban";
 const TTL_MS = 60 * 60 * 1000; // 1h ventana de compra
-
-// Rate limit: máximo N accesos al checkout por ventana.
-const RATE_WINDOW_MS = 10 * 60 * 1000; // 10 min
-const RATE_MAX_HITS = 40; // 40 aperturas / 10 min por dispositivo (compras multi-producto)
-const BAN_MS = 10 * 60 * 1000; // 10 min de cooldown tras exceder (antes 30)
 
 const RESERVED = new Set([
   "return",
@@ -70,67 +63,12 @@ function isBotEnvironment(): boolean {
   }
 }
 
-function readRate(): { hits: number[]; } {
-  try {
-    const raw = localStorage.getItem(RATE_KEY);
-    if (!raw) return { hits: [] };
-    const parsed = JSON.parse(raw) as { hits?: number[] };
-    return { hits: Array.isArray(parsed?.hits) ? parsed.hits : [] };
-  } catch {
-    return { hits: [] };
-  }
-}
-
-function writeRate(hits: number[]) {
-  try {
-    localStorage.setItem(RATE_KEY, JSON.stringify({ hits }));
-  } catch { /* ignore */ }
-}
-
-function isBanned(): boolean {
-  try {
-    const raw = localStorage.getItem(BAN_KEY);
-    if (!raw) return false;
-    const parsed = JSON.parse(raw) as { until?: number };
-    if (parsed?.until && parsed.until > Date.now()) return true;
-    localStorage.removeItem(BAN_KEY);
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-function applyBan() {
-  try {
-    localStorage.setItem(BAN_KEY, JSON.stringify({ until: Date.now() + BAN_MS }));
-    localStorage.removeItem(RATE_KEY);
-  } catch { /* ignore */ }
-}
-
-/**
- * Registra un hit al checkout y devuelve si el dispositivo excedió el límite.
- * Aplica un ban temporal cuando se supera para bloquear scraping repetido.
- */
-export function recordCheckoutHit(): { limited: boolean } {
-  const now = Date.now();
-  const { hits } = readRate();
-  const recent = hits.filter((t) => now - t < RATE_WINDOW_MS);
-  recent.push(now);
-  writeRate(recent);
-  if (recent.length > RATE_MAX_HITS) {
-    applyBan();
-    return { limited: true };
-  }
-  return { limited: false };
-}
-
 /**
  * Decide si el visitante puede abrir el checkout. Devuelve una razón para
  * poder mostrar mensajes / logs distintos en la UI.
  */
 export function evaluateCheckoutGate(): GateReason {
   if (isBotEnvironment()) return "bot";
-  if (isBanned()) return "banned";
 
   // Autorización explícita (click / navigate / referer / token).
   let authorized = false;
@@ -177,9 +115,6 @@ export function evaluateCheckoutGate(): GateReason {
     // Autorizamos on-the-fly para que el resto del flujo funcione igual.
     try { sessionStorage.setItem(KEY, JSON.stringify({ ts: Date.now(), slug: "*" })); } catch { /* ignore */ }
   }
-
-  const { limited } = recordCheckoutHit();
-  if (limited) return "rate_limited";
 
   return "ok";
 }

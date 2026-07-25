@@ -96,12 +96,50 @@ const isInternalTraffic = (): boolean => {
   }
 };
 
+// ---------------------------------------------------------------------------
+// Solo tráfico pagado de Meta (Facebook / Instagram ads).
+// Orgánico, email marketing, enlaces externos y directo NO envían al Pixel.
+// La atribución se guarda 28 días (ventana estándar de Meta) para que el
+// usuario que llegó por un anuncio siga siendo medido hasta la compra.
+// ---------------------------------------------------------------------------
+const META_ATTR_KEY = "ilr_meta_paid_until";
+const META_WINDOW_MS = 28 * 24 * 60 * 60 * 1000;
+const META_SOURCES = new Set(["facebook", "fb", "instagram", "ig", "meta", "facebook_ads", "instagram_ads", "meta_ads", "an", "audience_network", "messenger"]);
+
+const isMetaPaidTraffic = (): boolean => {
+  if (typeof window === "undefined") return false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const src = (params.get("utm_source") || "").toLowerCase().trim();
+    const medium = (params.get("utm_medium") || "").toLowerCase().trim();
+
+    const hasFbclid = !!params.get("fbclid");
+    const isMetaSource = META_SOURCES.has(src) || (src.includes("facebook") || src.includes("instagram") || src.includes("meta"));
+    const isPaidMedium = /cpc|ppc|paid|ads?$/.test(medium);
+
+    // Cookie _fbc: la crea el propio Pixel cuando hubo un clic en anuncio.
+    const hasFbc = document.cookie.includes("_fbc=");
+
+    if (hasFbclid || hasFbc || (isMetaSource && (isPaidMedium || hasFbclid || !medium))) {
+      localStorage.setItem(META_ATTR_KEY, String(Date.now() + META_WINDOW_MS));
+      return true;
+    }
+
+    const until = Number(localStorage.getItem(META_ATTR_KEY) || "0");
+    return Number.isFinite(until) && until > Date.now();
+  } catch {
+    return false;
+  }
+};
+
 const hasPixelConsent = (): boolean => {
   if (typeof window === "undefined") return false;
   if (isInternalTraffic()) return false; // admin / pruebas: nunca enviar a Meta
+  if (!isMetaPaidTraffic()) return false; // orgánico, email, referidos: fuera del Pixel
   if (!isEuUser()) return true; // non-EU: implicit consent
   try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
 };
+
 
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)

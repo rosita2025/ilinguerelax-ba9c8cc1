@@ -138,6 +138,18 @@ serve(async (req) => {
       .lte("created_at", toDate.toISOString());
     if (abandonedErr) console.error("abandoned_carts query failed", abandonedErr);
 
+    // Correos que ya habían abandonado antes del rango → clientes recurrentes.
+    const { data: priorAbandoned } = await supabase
+      .from("abandoned_carts")
+      .select("customer_email")
+      .lt("created_at", fromDate.toISOString());
+    const priorEmails = new Set(
+      (priorAbandoned || [])
+        .map((r) => String(r.customer_email || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+
+
 
     // ---------- Aggregation ----------
     const bucketKey = (iso: string) => {

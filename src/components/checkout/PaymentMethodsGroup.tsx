@@ -299,6 +299,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const [copiedBinance, setCopiedBinance] = useState(false);
   const [copiedClabe, setCopiedClabe] = useState(false);
   const [hotmartCfg, setHotmartCfg] = useState<HotmartConfig>({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} });
+  const [methodError, setMethodError] = useState<{ method: Method; message: string } | null>(null);
+  const [cfgReload, setCfgReload] = useState(0);
 
   useEffect(() => {
     if (!parentSku) { setHotmartCfg({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} }); return; }
@@ -324,7 +326,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       } catch { /* noop */ }
     })();
     return () => { cancelled = true; };
-  }, [parentSku]);
+  }, [parentSku, cfgReload]);
 
 
   const redirectingRef = useRef(false);
@@ -510,6 +512,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           currency: "USD",
         });
       } catch { /* noop */ }
+      setMethodError({
+        method: paymentType === "transfer" ? "transfer" : "cash",
+        message: err instanceof Error ? err.message : t.tryAgain,
+      });
       toast({
         title: t.mpError,
         description: err instanceof Error ? err.message : t.tryAgain,
@@ -521,7 +527,17 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const redirectToHotmart = useCallback(async () => {
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
-    if (!url) return;
+    if (!url) {
+      setMethodError({
+        method: "hotmart",
+        message:
+          language === "en" ? "We couldn't open the Hotmart checkout. Please try again."
+          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente novamente."
+          : language === "fr" ? "Impossible d'ouvrir le paiement Hotmart. Réessaie."
+          : "No pudimos abrir el pago con Hotmart. Inténtalo de nuevo.",
+      });
+      return;
+    }
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     redirectingRef.current = true;
@@ -535,7 +551,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     } catch { /* noop */ }
     // Reemplaza la tienda por Hotmart en la misma pestaña (evita bloqueo de popups).
     window.location.replace(url);
-  }, [hotmartCfg, region.country, valid, captureAbandonedCheckout]);
+  }, [hotmartCfg, region.country, valid, captureAbandonedCheckout, language, requestBuyerInfo]);
 
 
 
@@ -1339,7 +1355,42 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         </div>
       )}
 
-
+      {methodError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
+          <p className="font-semibold">
+            {language === "en" ? "We couldn't open this payment method"
+              : language === "pt" ? "Não conseguimos abrir este método de pagamento"
+              : language === "fr" ? "Impossible d'ouvrir ce moyen de paiement"
+              : "No pudimos abrir este método de pago"}
+          </p>
+          <p className="mt-1 text-xs">{methodError.message}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const m = methodError.method;
+                setMethodError(null);
+                if (m === "hotmart") { setCfgReload((n) => n + 1); void redirectToHotmart(); }
+                else if (m === "transfer") { payMercado("transfer"); }
+                else if (m === "cash") { payMercado("cash"); }
+              }}
+              className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
+            >
+              <Loader2 className="w-3.5 h-3.5" />
+              {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
+            </button>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#20b858]"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              {language === "en" ? "Contact us on WhatsApp" : language === "pt" ? "Fale conosco no WhatsApp" : language === "fr" ? "Contactez-nous sur WhatsApp" : "Escríbenos por WhatsApp"}
+            </a>
+          </div>
+        </div>
+      )}
 
 
 

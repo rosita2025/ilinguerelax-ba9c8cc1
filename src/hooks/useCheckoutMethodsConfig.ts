@@ -98,7 +98,8 @@ function keyToFamily(key: string): FamilyKey | null {
   if (k === "clabe_mx" || k === "spei_mx") return "clabe";
   if (k === "hotmart" || k === "hotmart_1click") return "hotmart";
 
-  if (k === "mercadopago_cash") return "cash";
+  if (k === "mercadopago_cash" || k === "cash" || k === "pagoefectivo") return "cash";
+  if (k === "mercadopago_transfer" || k === "transfer" || k === "bank_transfer") return "transfer";
   return null;
 }
 

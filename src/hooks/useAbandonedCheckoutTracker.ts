@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, type PruebaItem } from "@/stores/checkoutStore";
 import { useI18n } from "@/i18n/I18nContext";
+import { saveMetaAttribution } from "@/lib/metaAttribution";
+
 
 // Exige un TLD de 2+ letras para no capturar correos a medio escribir
 // (ej. "cliente@gmail.c"), que generaban carritos imposibles de recuperar.

@@ -244,13 +244,23 @@ serve(async (req) => {
       current.lastSeen = at;
       return `${base}#${current.index}`;
     };
+    // Identidad estable del visitante (sin el #índice de sesión): un mismo
+    // cliente que vuelve más tarde NO debe contar otra vez en "agregar al
+    // carrito" ni en "checkouts iniciados".
+    const visitorKeyFor = (r: { session_id: string | null; created_at: string }) =>
+      r.session_id?.trim() || `anon-${r.created_at}`;
+    // Dedupe de carrito por visitante × producto (y × país).
+    const cartVisitorProduct = new Set<string>();
+    const cartVisitorProductCountry = new Set<string>();
 
     for (const r of filtered) {
       const k = bucketKey(r.created_at);
       const b = ensure(k);
       const sid = sessionKeyFor(r);
+      const vid = visitorKeyFor(r);
       b.sessions.add(sid);
       totals.sessions.add(sid);
+
 
       // Traffic source aggregation (per session, based on referrer of first event seen)
       const src = classifyTrafficSource(r.referrer);

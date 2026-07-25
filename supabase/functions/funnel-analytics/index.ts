@@ -244,13 +244,23 @@ serve(async (req) => {
       current.lastSeen = at;
       return `${base}#${current.index}`;
     };
+    // Identidad estable del visitante (sin el #índice de sesión): un mismo
+    // cliente que vuelve más tarde NO debe contar otra vez en "agregar al
+    // carrito" ni en "checkouts iniciados".
+    const visitorKeyFor = (r: { session_id: string | null; created_at: string }) =>
+      r.session_id?.trim() || `anon-${r.created_at}`;
+    // Dedupe de carrito por visitante × producto (y × país).
+    const cartVisitorProduct = new Set<string>();
+    const cartVisitorProductCountry = new Set<string>();
 
     for (const r of filtered) {
       const k = bucketKey(r.created_at);
       const b = ensure(k);
       const sid = sessionKeyFor(r);
+      const vid = visitorKeyFor(r);
       b.sessions.add(sid);
       totals.sessions.add(sid);
+
 
       // Traffic source aggregation (per session, based on referrer of first event seen)
       const src = classifyTrafficSource(r.referrer);
@@ -311,31 +321,43 @@ serve(async (req) => {
           pcAgg.views++;
           break;
         case "AddToCart":
-          if (!totals.cartSessions.has(sid)) {
+          if (!totals.cartSessions.has(vid)) {
             b.addToCart++;
             totals.addToCart++;
-            totals.cartSessions.add(sid);
+            totals.cartSessions.add(vid);
           }
-          pAgg.carts++;
-          pcAgg.carts++;
+          if (!cartVisitorProduct.has(`${vid}::${pKey}`)) {
+            cartVisitorProduct.add(`${vid}::${pKey}`);
+            pAgg.carts++;
+          }
+          if (!cartVisitorProductCountry.has(`${vid}::${pcKey}`)) {
+            cartVisitorProductCountry.add(`${vid}::${pcKey}`);
+            pcAgg.carts++;
+          }
           break;
         case "InitiateCheckout":
         case "BeginCheckout": {
           // Direct "Comprar / continuar pago" skips a visible cart but still
           // represents cart intent in the funnel, so checkout sessions are also
           // counted in the cart step if no AddToCart was seen first.
-          if (!totals.cartSessions.has(sid)) {
-            totals.cartSessions.add(sid);
+          if (!totals.cartSessions.has(vid)) {
+            totals.cartSessions.add(vid);
             b.addToCart++;
             totals.addToCart++;
+          }
+          if (!cartVisitorProduct.has(`${vid}::${pKey}`)) {
+            cartVisitorProduct.add(`${vid}::${pKey}`);
             pAgg.carts++;
+          }
+          if (!cartVisitorProductCountry.has(`${vid}::${pcKey}`)) {
+            cartVisitorProductCountry.add(`${vid}::${pcKey}`);
             pcAgg.carts++;
           }
 
-          if (!totals.checkoutSessions.has(sid)) {
+          if (!totals.checkoutSessions.has(vid)) {
             b.checkout++;
             totals.checkout++;
-            totals.checkoutSessions.add(sid);
+            totals.checkoutSessions.add(vid);
           }
           const src = classifyTrafficSource(r.referrer);
           const country = r.country || "??";
@@ -345,9 +367,10 @@ serve(async (req) => {
             sAgg = { country, source: src, sessions: new Set<string>() };
             checkoutBySrcAgg.set(key, sAgg);
           }
-          sAgg.sessions.add(sid);
+          sAgg.sessions.add(vid);
           break;
         }
+
 
         case "Purchase":
         case "purchase": {

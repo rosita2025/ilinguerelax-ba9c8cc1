@@ -1315,7 +1315,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   return (
     <div id="payment-methods" ref={methodsAnchorRef} className="space-y-3 scroll-mt-24">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {isFree ? (language === "en" ? "Free order" : language === "pt" ? "Pedido grátis" : language === "fr" ? "Commande gratuite" : "Pedido gratis") : (isPeru ? t.choosePaymentMethod : t.cardPayment)}
+        {isFree ? (language === "en" ? "Free order" : language === "pt" ? "Pedido grátis" : language === "fr" ? "Commande gratuite" : "Pedido gratis") : t.choosePaymentMethod}
       </h2>
 
       {isFree && (

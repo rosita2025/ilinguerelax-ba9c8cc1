@@ -1257,50 +1257,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         </div>
       )}
 
-      {!isFree && !isInvalidZero && (() => {
-        const isLocal = !local.loading && !local.isUsd && !!region.country;
-        const fmt = (usd: number) => {
-          if (penTotals) return formatPen(usd * (penTotals.total / (total || 1)));
-          if (isLocal) return formatLocalDirect(localTotalAmount * (usd / (total || 1)), region.country || "");
-          return `USD $${usd.toFixed(2)}`;
-        };
-        const baseLabel = priceBadge;
-        const taxApplies = !!HOTMART_LOCAL_METHODS[country];
-        const taxLow = fmt(total * 1.1);
-        const taxHigh = fmt(total * 1.2);
-        return (
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/40 p-4 space-y-2">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm text-muted-foreground">
-                {language === "en" ? "Estimated total" : language === "pt" ? "Total estimado" : language === "fr" ? "Total estimé" : "Total estimado"}
-              </span>
-              <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">{baseLabel}</span>
-            </div>
-            <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
-              {language === "en"
-                ? "Final price with card, PayPal, transfer or crypto — no extra fees."
-                : language === "pt"
-                ? "Preço final com cartão, PayPal, transferência ou cripto — sem taxas extras."
-                : language === "fr"
-                ? "Prix final par carte, PayPal, virement ou crypto — sans frais supplémentaires."
-                : "Precio final con tarjeta, PayPal, transferencia o cripto — sin cargos extra."}
-            </p>
-            {taxApplies && (
-              <div className="flex items-start justify-between gap-3 pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                <span className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
-                  {language === "en"
-                    ? `If you pay via Hotmart (OXXO, cash, Nequi…), local taxes (10-20%) apply: approx. ${taxLow} – ${taxHigh}.`
-                    : language === "pt"
-                    ? `Se pagar via Hotmart (OXXO, dinheiro, Nequi…), aplicam-se impostos locais (10-20%): aprox. ${taxLow} – ${taxHigh}.`
-                    : language === "fr"
-                    ? `En payant via Hotmart (OXXO, espèces, Nequi…), des taxes locales (10-20 %) s'appliquent : env. ${taxLow} – ${taxHigh}.`
-                    : `Si pagas por Hotmart (OXXO, efectivo, Nequi…), se suman impuestos locales (10-20%): aprox. ${taxLow} – ${taxHigh}.`}
-                </span>
-              </div>
-            )}
-          </div>
-        );
-      })()}
+      {!isFree && !isInvalidZero && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/40 px-3 py-2">
+          <span className="text-xs text-muted-foreground">
+            {language === "en" ? "Total" : language === "pt" ? "Total" : language === "fr" ? "Total" : "Total"}
+          </span>
+          <span className="text-base font-bold text-neutral-900 dark:text-neutral-50">{priceBadge}</span>
+        </div>
+      )}
+
 
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {

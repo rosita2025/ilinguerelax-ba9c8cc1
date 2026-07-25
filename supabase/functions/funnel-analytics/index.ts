@@ -375,7 +375,7 @@ serve(async (req) => {
       supabase.from("digital_products").select("sku, name, sku_aliases"),
       supabase
         .from("funnel_events")
-        .select("id, created_at, product_id, value, currency, country, session_id, referrer")
+        .select("id, created_at, product_id, value, currency, country, session_id, referrer, page_path, is_bot")
         .in("event_name", ["Purchase", "purchase"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
@@ -604,6 +604,34 @@ serve(async (req) => {
       });
       // Make this webhook sale visible to the pixel dedupe pass below.
       alreadyIngested.push({ at: new Date(ev.created_at).getTime(), productId: pid });
+    }
+
+    // Respaldo para pagos cuyo webhook no llegó: CheckoutSuccess solo emite
+    // Purchase después de volver del proveedor con referencia de pago y con el
+    // comprador/carrito presentes. No contamos visitas directas, bots ni filas
+    // sin producto/importe. Si el webhook sí existe, la ventana evita duplicarlo.
+    for (const ev of pixelEvents) {
+      if (ev.page_path !== "/checkouts/success" || ev.is_bot === true) continue;
+      const pid = String(ev.product_id || "").trim();
+      const rawAmount = Number(ev.value || 0);
+      if (!pid || pid === "0" || !Number.isFinite(rawAmount) || rawAmount <= 0) continue;
+
+      const eventAt = new Date(ev.created_at).getTime();
+      const duplicatedByWebhook = alreadyIngested.some((known) =>
+        known.productId === pid && Math.abs(known.at - eventAt) <= 30 * 60 * 1000
+      );
+      if (duplicatedByWebhook) continue;
+
+      const currency = String(ev.currency || "USD").toUpperCase();
+      realPurchases.push({
+        at: ev.created_at,
+        productId: pid,
+        country: ev.country || "??",
+        usd: currency === "USD" ? rawAmount : toUsd(rawAmount, currency),
+        source: "store",
+        pending: false,
+      });
+      alreadyIngested.push({ at: eventAt, productId: pid });
     }
 
     console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);

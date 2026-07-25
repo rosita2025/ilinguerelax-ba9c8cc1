@@ -62,11 +62,47 @@ const isEuUser = (): boolean => {
     return EU_COUNTRIES.has(c);
   } catch { return false; }
 };
+// ---------------------------------------------------------------------------
+// Tráfico interno (admin / pruebas propias): NO debe llegar al Pixel ni a CAPI.
+// Se marca de forma permanente en el navegador para que, aunque el admin luego
+// navegue por la tienda como usuario normal, sus visitas no ensucien Meta.
+// ---------------------------------------------------------------------------
+const INTERNAL_KEY = "ilr_internal_traffic";
+
+const isInternalTraffic = (): boolean => {
+  if (typeof window === "undefined") return true;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("notrack") === "1") localStorage.setItem(INTERNAL_KEY, "1");
+    if (params.get("notrack") === "0") localStorage.removeItem(INTERNAL_KEY);
+
+    // Rutas de administración
+    if (window.location.pathname.startsWith("/admin")) {
+      localStorage.setItem(INTERNAL_KEY, "1");
+      return true;
+    }
+    // Sesión de admin activa (llave guardada por AdminGate)
+    if (localStorage.getItem("ilr_admin_key") || sessionStorage.getItem("ilr_admin_key")) {
+      localStorage.setItem(INTERNAL_KEY, "1");
+      return true;
+    }
+    // Entornos que no son producción real
+    const host = window.location.hostname;
+    if (host === "localhost" || host.endsWith(".lovable.app") || host.endsWith(".lovableproject.com")) return true;
+
+    return localStorage.getItem(INTERNAL_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 const hasPixelConsent = (): boolean => {
   if (typeof window === "undefined") return false;
+  if (isInternalTraffic()) return false; // admin / pruebas: nunca enviar a Meta
   if (!isEuUser()) return true; // non-EU: implicit consent
   try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
 };
+
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
 const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {

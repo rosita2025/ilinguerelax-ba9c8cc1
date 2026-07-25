@@ -1378,7 +1378,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               className={cn(
                 "w-full text-left flex items-center transition-colors",
                 m.id === "hotmart"
-                  ? "px-4 py-5 sm:px-5 sm:py-6 gap-4 sm:gap-5"
+                  ? "px-4 pt-2 pb-3 sm:px-5 sm:pt-2.5 sm:pb-3.5 gap-3 sm:gap-4"
                   : "p-3 sm:p-4 gap-2.5 sm:gap-3",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
@@ -1399,7 +1399,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
-                    <img src={hotmartLogo.url} alt="Hotmart" className="h-16 sm:h-20 w-auto object-contain" />
+                    <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1" />
                   ) : (
                     <span className="min-w-0 break-words">{m.title}</span>
                   )}

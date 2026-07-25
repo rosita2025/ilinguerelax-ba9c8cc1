@@ -5,6 +5,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 const encoder = new TextEncoder();
 
@@ -302,6 +303,18 @@ Deno.serve(async (req) => {
           const couponPctRaw = Number(payment.metadata?.coupon_percent);
           const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
           const skusForDelivery = getPaymentSkus(payment);
+          // Meta Conversions API: registrar la venta aunque el comprador no
+          // regrese a la página de éxito (pixel del navegador puede no dispararse).
+          await sendPurchaseCapi({
+            eventId: `Purchase_${orderNumber}`,
+            email: payerEmail,
+            country: payment.payer?.address?.country_id || null,
+            value: payment.transaction_amount ?? null,
+            currency: payment.currency_id || "PEN",
+            contentIds: skusForDelivery,
+            contentName: payment.metadata?.items_summary || payment.description || undefined,
+            orderId: orderNumber,
+          });
           // Siempre enviamos "Gracias por tu compra" (con producto y precio).
           // Si además hay SKUs digitales, luego se dispara la entrega de materiales.
           try {

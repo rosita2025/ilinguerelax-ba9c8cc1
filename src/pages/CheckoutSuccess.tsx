@@ -138,6 +138,7 @@ export default function CheckoutSuccess() {
         content_name: items.map((i) => i.name).join(" + "),
         num_items: items.reduce((n, i) => n + (i.quantity || 1), 0),
         order_id: orderNumber,
+        email: buyer.email,
       });
       sessionStorage.setItem(key, "1");
     } catch { /* ignore */ }

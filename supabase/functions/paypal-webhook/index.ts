@@ -16,6 +16,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
@@ -193,6 +194,17 @@ Deno.serve(async (req) => {
               skus,
               status: "approved",
             }).slice(0, 2000),
+          });
+          const orderIdPp = `ILR-PP-${String(captureId || eventId).slice(-8).toUpperCase()}`;
+          await sendPurchaseCapi({
+            eventId: `Purchase_${orderIdPp}`,
+            email: payerEmail,
+            country: payer.address?.country_code || null,
+            value: Number.isFinite(amountNum as number) ? (amountNum as number) : null,
+            currency: resource.amount?.currency_code ?? "USD",
+            contentIds: skus ? skus.split(",").map((x: string) => x.trim()).filter(Boolean) : [],
+            contentName: skus || undefined,
+            orderId: orderIdPp,
           });
         } catch (e) {
           log("funnel_log_failed", { error: e instanceof Error ? e.message : String(e) });

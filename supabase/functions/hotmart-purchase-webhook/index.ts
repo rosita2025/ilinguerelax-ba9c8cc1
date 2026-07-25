@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -148,6 +149,18 @@ Deno.serve(async (req) => {
         page_path: "/hotmart-success",
         country: data?.buyer?.address?.country || data?.purchase?.buyer?.address?.country || null,
         referrer: "hotmart-webhook",
+      });
+
+      await sendPurchaseCapi({
+        eventId: `Purchase_HM_${transactionCode}`,
+        email: buyerEmail,
+        country: data?.buyer?.address?.country_iso || data?.buyer?.address?.country || null,
+        value: Number.isFinite(priceValue) ? priceValue : product.value,
+        currency,
+        contentIds: [product.id],
+        contentName: productName || product.id,
+        orderId: transactionCode,
+        eventSourceUrl: "https://ilinguerelax.com/hotmart-success",
       });
     }
 

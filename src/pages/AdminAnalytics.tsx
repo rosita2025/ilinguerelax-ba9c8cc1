@@ -48,7 +48,7 @@ interface AnalyticsData {
     checkoutToPurchasePct: number;
     abandonedCheckoutPct: number;
   };
-  abandoned: { total: number; recovered: number; openValue: number; recoveryRatePct: number };
+  abandoned: { total: number; newCustomers: number; returningCustomers: number; recovered: number; openValue: number; recoveryRatePct: number };
   series: Array<{
     bucket: string;
     pageviews: number;
@@ -204,6 +204,9 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
     },
     abandoned: {
       total: toNumber(abandoned.total),
+      newCustomers: toNumber(abandoned.newCustomers),
+      returningCustomers: toNumber(abandoned.returningCustomers),
+
       recovered: toNumber(abandoned.recovered),
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
@@ -581,7 +584,7 @@ const AdminAnalytics = () => {
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub="compra / sesión" />
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Checkout → Compra" value={`${data.conversion.checkoutToPurchasePct}%`} sub={`${data.totals.purchases} de ${data.totals.checkout}`} />
                 <Kpi icon={<PackageX className="w-4 h-4" />} label="Abandono checkout" value={`${data.conversion.abandonedCheckoutPct}%`} sub={`${Math.max(0, data.totals.checkout - data.totals.purchases)} sin comprar`} />
-                <Kpi icon={<PackageX className="w-4 h-4" />} label="Carritos abandonados" value={data.abandoned.total.toLocaleString()} sub={`${data.abandoned.recovered} recuperados · ${money(data.abandoned.openValue)}`} />
+                <Kpi icon={<PackageX className="w-4 h-4" />} label="Clientes con carrito abandonado" value={data.abandoned.total.toLocaleString()} sub={`${data.abandoned.newCustomers} nuevos · ${data.abandoned.returningCustomers} recurrentes · ${data.abandoned.recovered} recuperados`} />
               </div>
 
               {/* Funnel evolution */}

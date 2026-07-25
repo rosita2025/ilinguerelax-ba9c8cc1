@@ -138,6 +138,18 @@ serve(async (req) => {
       .lte("created_at", toDate.toISOString());
     if (abandonedErr) console.error("abandoned_carts query failed", abandonedErr);
 
+    // Correos que ya habían abandonado antes del rango → clientes recurrentes.
+    const { data: priorAbandoned } = await supabase
+      .from("abandoned_carts")
+      .select("customer_email")
+      .lt("created_at", fromDate.toISOString());
+    const priorEmails = new Set(
+      (priorAbandoned || [])
+        .map((r) => String(r.customer_email || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+
+
 
     // ---------- Aggregation ----------
     const bucketKey = (iso: string) => {
@@ -558,39 +570,14 @@ serve(async (req) => {
       if (["stripe", "paypal", "mercadopago", "mp"].includes(p)) gatewayEvents.push(ev);
       else pixelEvents.push(ev);
     }
-    for (const ev of [...gatewayEvents, ...pixelEvents]) {
+    // Solo webhooks verificados (Stripe, PayPal, Mercado Pago) + Hotmart y manual.
+    // Los píxeles del navegador NO cuentan como compra.
+    for (const ev of gatewayEvents) {
 
       let meta: any = {};
       try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
       const provider = String(meta.provider || "").toLowerCase();
-      const isGateway = ["stripe", "paypal", "mercadopago", "mp"].includes(provider);
-      if (!isGateway) {
-        // Browser-side Purchase pixel (CheckoutSuccess). The webhook may not
-        // have landed (or its referrer carries UTM text instead of JSON), so
-        // count it as a store sale unless the same product was already
-        // ingested from Hotmart/manual within ±45 min.
-        const evTime = new Date(ev.created_at).getTime();
-        const pidRaw = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "");
-        if (!pidRaw || pidRaw === "0") continue;
-        const dupe = alreadyIngested.some(
-          (p) => p.productId === pidRaw && Math.abs(p.at - evTime) < 45 * 60 * 1000,
-        );
-        if (dupe) continue;
-        const key = `client:${ev.session_id || ev.id}:${pidRaw}`;
-        if (seenGatewayKeys.has(key)) continue;
-        seenGatewayKeys.add(key);
-        const cur = String(ev.currency || "USD").toUpperCase();
-        const raw = Number(ev.value || 0);
-        realPurchases.push({
-          at: ev.created_at,
-          productId: pidRaw,
-          country: ev.country || "??",
-          usd: cur === "USD" ? raw : toUsd(raw, cur),
-          source: "store",
-          pending: false,
-        });
-        continue;
-      }
+
       const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
       if (/test|sandbox|prueba/i.test(txn)) continue;
       const dedupeKey = `${provider}:${txn}`;
@@ -719,14 +706,27 @@ serve(async (req) => {
       };
     });
 
-    // Abandoned carts summary (clientes únicos por correo)
-    const abandonedRows = abandoned || [];
-    const uniqueEmails = new Set(
-      abandonedRows.map((c) => String(c.customer_email || "").toLowerCase()).filter(Boolean),
+    // Abandoned carts summary (clientes únicos por correo, sin correos de prueba)
+    const isTestEmail = (e: string) => /prueba|test|ejemplo|example\.com|\+test/i.test(e);
+    const abandonedRows = (abandoned || []).filter(
+      (c) => !isTestEmail(String(c.customer_email || "")),
     );
-    const abandonedTotal = uniqueEmails.size || abandonedRows.length;
-    const abandonedRecovered = abandonedRows.filter((c) => c.converted === true || c.is_completed === true).length;
+    const uniqueEmails = new Set(
+      abandonedRows.map((c) => String(c.customer_email || "").trim().toLowerCase()).filter(Boolean),
+    );
+    const newEmails = Array.from(uniqueEmails).filter((e) => !priorEmails.has(e));
+    const abandonedTotal = uniqueEmails.size;
+    const abandonedNew = newEmails.length;
+    const abandonedReturning = abandonedTotal - abandonedNew;
+    const recoveredEmails = new Set(
+      abandonedRows
+        .filter((c) => c.converted === true || c.is_completed === true)
+        .map((c) => String(c.customer_email || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    const abandonedRecovered = recoveredEmails.size;
     const abandonedValue = 0;
+
 
 
     // Conversion metrics
@@ -877,12 +877,15 @@ serve(async (req) => {
         },
         abandoned: {
           total: abandonedTotal,
+          newCustomers: abandonedNew,
+          returningCustomers: abandonedReturning,
           recovered: abandonedRecovered,
           openValue: Number(abandonedValue.toFixed(2)),
           recoveryRatePct: abandonedTotal
             ? Number(((abandonedRecovered / abandonedTotal) * 100).toFixed(2))
             : 0,
         },
+
         series,
         byProduct,
         byProductCountry,

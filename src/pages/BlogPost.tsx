@@ -8,7 +8,7 @@ import { SEO } from "@/components/SEO";
 import { getBlogPostBySlug, getRelatedPosts, blogPosts, type BlogPost as BlogPostType } from "@/data/blogPosts";
 import { fetchGeneratedBlogPostBySlug, fetchGeneratedBlogPosts } from "@/hooks/useGeneratedBlogPosts";
 
-import { getProductById } from "@/data/products";
+import { getProductById, products } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,9 +63,25 @@ const BlogPost = () => {
     .slice(0, 3);
   const relatedPosts = related.length ? related : getRelatedPosts(post.slug, 3);
 
-  const relatedProducts = post.relatedProducts
+  const explicitProducts = (post.relatedProducts || [])
     .map(id => getProductById(id))
     .filter(Boolean);
+
+  // Fallback: si el post no tiene productos asignados, mostramos igualmente
+  // recursos relevantes (por categoría/tags) para que TODOS los posts tengan tarjeta.
+  const haystack = `${post.title} ${post.category} ${(post.tags || []).join(" ")}`.toLowerCase();
+  const fallbackProducts = products
+    .map(p => {
+      const words = `${p.title} ${p.subtitle} ${p.slug}`.toLowerCase().split(/[^a-záéíóúñ]+/).filter(w => w.length > 3);
+      const score = words.reduce((acc, w) => acc + (haystack.includes(w) ? 1 : 0), 0);
+      return { p, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2)
+    .map(x => x.p);
+
+  const relatedProducts = explicitProducts.length ? explicitProducts : fallbackProducts;
+
 
 
   // Convert markdown-like content to HTML

@@ -147,7 +147,9 @@ export function useAbandonedCheckoutTracker(slug: string | undefined, productNam
       } catch (err) {
         console.warn("abandoned-cart track failed", err);
       }
-    }, 1200);
+      // 2.5 s: da tiempo a terminar de escribir el correo antes de capturar.
+    }, 2500);
+
 
     return () => {
       if (timer.current) window.clearTimeout(timer.current);

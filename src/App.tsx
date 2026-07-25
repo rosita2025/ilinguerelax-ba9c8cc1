@@ -154,7 +154,10 @@ const getAttributionReferrer = () => {
 const RouteTracker = () => {
   const location = useLocation();
   useEffect(() => { initClientIdSync(); }, []);
+  // Captura el fbclid del anuncio en cualquier página (home, blog, productos).
+  useEffect(() => { captureMetaClickId(); }, [location.search]);
   useEffect(() => {
+
     if (location.pathname.startsWith("/admin")) return;
     try {
       void supabase.functions.invoke("log-funnel-event", {

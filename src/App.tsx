@@ -247,6 +247,9 @@ const App = () => (
                   <Route path="/hotmart-credit-pending" element={<HotmartCreditPending />} />
                   <Route path="/sobre-nosotros" element={<AboutPage />} />
                   <Route path="/contacto" element={<ContactPage />} />
+                  <Route path="/contact" element={<Navigate to="/contacto" replace />} />
+                  <Route path="/about" element={<Navigate to="/sobre-nosotros" replace />} />
+
                   <Route path="/faq" element={<FAQPage />} />
                   <Route path="/privacidad" element={<PrivacyPage />} />
                   <Route path="/condiciones" element={<TermsPage />} />

@@ -24,7 +24,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { getCountryInfo } from "@/lib/countryInfo";
 import { cn } from "@/lib/utils";
-import { mergeProductRows } from "@/lib/productSkuAliases";
+import { mergeProductRows, canonicalProductId } from "@/lib/productSkuAliases";
 
 
 type Granularity = "hour" | "day";
@@ -285,22 +285,37 @@ const ProductCountryGrouped = ({ rows }: { rows: PCRow[] }) => {
   const [query, setQuery] = useState("");
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { product_id: string; name: string | null; sessions: number; views: number; carts: number; purchases: number; revenue: number; countries: PCRow[] }>();
+    type G = { product_id: string; name: string | null; aliases: string[]; sessions: number; views: number; carts: number; purchases: number; revenue: number; countries: PCRow[] };
+    const map = new Map<string, G>();
     for (const r of rows) {
-      const g = map.get(r.product_id) ?? { product_id: r.product_id, name: r.name, sessions: 0, views: 0, carts: 0, purchases: 0, revenue: 0, countries: [] };
+      const key = canonicalProductId(r.product_id);
+      const g: G = map.get(key) ?? { product_id: key, name: null, aliases: [], sessions: 0, views: 0, carts: 0, purchases: 0, revenue: 0, countries: [] };
       g.sessions += r.sessions; g.views += r.views; g.carts += r.carts; g.purchases += r.purchases; g.revenue += r.revenue;
-      g.countries.push(r);
-      map.set(r.product_id, g);
+      const candidate = (r.name || "").trim();
+      if (candidate && candidate !== r.product_id && candidate.length > (g.name?.length ?? 0)) g.name = candidate;
+      if (!g.aliases.includes(r.product_id)) g.aliases.push(r.product_id);
+      // Fusionar países repetidos entre el SKU largo y el slug corto
+      const existing = g.countries.find((c) => c.country === r.country);
+      if (existing) {
+        existing.sessions += r.sessions; existing.views += r.views; existing.carts += r.carts;
+        existing.purchases += r.purchases; existing.revenue += r.revenue;
+      } else {
+        g.countries.push({ ...r, product_id: key });
+      }
+      map.set(key, g);
     }
     const arr = Array.from(map.values());
-    arr.forEach((g) => g.countries.sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions));
+    arr.forEach((g) => {
+      g.aliases.sort((a, b) => (a === g.product_id ? -1 : b === g.product_id ? 1 : b.length - a.length));
+      g.countries.sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions);
+    });
     return arr.sort((a, b) => b.revenue - a.revenue || b.purchases - a.purchases || b.sessions - a.sessions);
   }, [rows]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return grouped;
-    return grouped.filter((g) => (g.name || "").toLowerCase().includes(q) || g.product_id.toLowerCase().includes(q));
+    return grouped.filter((g) => (g.name || "").toLowerCase().includes(q) || g.aliases.some((a) => a.toLowerCase().includes(q)));
   }, [grouped, query]);
 
   return (
@@ -343,6 +358,11 @@ const ProductCountryGrouped = ({ rows }: { rows: PCRow[] }) => {
                       <td className="py-2 pr-3 max-w-xs">
                         <span className="mr-1 text-muted-foreground">{open ? "▾" : "▸"}</span>
                         <span className="font-medium">{g.name || g.product_id}</span>
+                        <div className="pl-5 mt-0.5 text-[10px] text-muted-foreground font-mono break-all leading-tight">
+                          {g.aliases.map((a) => (
+                            <div key={a}>{a === g.product_id ? `/products/${a}` : `/checkouts/${a}`}</div>
+                          ))}
+                        </div>
                       </td>
                       <td className="text-right px-2 tabular-nums">{g.countries.length}</td>
                       <td className="text-right px-2 tabular-nums">{g.sessions}</td>

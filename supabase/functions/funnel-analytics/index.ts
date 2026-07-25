@@ -130,12 +130,14 @@ serve(async (req) => {
       (r) => !isExcludedPath(r.page_path) && (includeBots || r.is_bot !== true),
     );
 
-    // Fetch abandoned carts within window
-    const { data: abandoned } = await supabase
+    // Fetch abandoned carts within window (columnas reales de la tabla)
+    const { data: abandoned, error: abandonedErr } = await supabase
       .from("abandoned_carts")
-      .select("id, created_at, recovered_at, total_amount, currency")
+      .select("id, created_at, converted, is_completed, customer_email, product_type")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
+    if (abandonedErr) console.error("abandoned_carts query failed", abandonedErr);
+
 
     // ---------- Aggregation ----------
     const bucketKey = (iso: string) => {

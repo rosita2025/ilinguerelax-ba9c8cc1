@@ -158,7 +158,11 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
         page_path: window.location.pathname,
         country: getCountry(),
         referrer: getAttributionReferrer(),
+        // Diagnóstico de pagos fallidos: método usado y mensaje de error.
+        provider: typeof params.provider === "string" ? params.provider : null,
+        reason: typeof params.reason === "string" ? params.reason : null,
       },
+
     });
   } catch (e) {
     console.error("funnel log error:", e);

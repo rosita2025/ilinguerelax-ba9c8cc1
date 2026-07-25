@@ -204,6 +204,9 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
     },
     abandoned: {
       total: toNumber(abandoned.total),
+      newCustomers: toNumber(abandoned.newCustomers),
+      returningCustomers: toNumber(abandoned.returningCustomers),
+
       recovered: toNumber(abandoned.recovered),
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),

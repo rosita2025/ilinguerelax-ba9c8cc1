@@ -46,6 +46,7 @@ const COUNTRY_LIST: { code: string; name: string; flag: string }[] = [
   { code: "CR", name: "Costa Rica", flag: "🇨🇷" },
   { code: "PA", name: "Panamá", flag: "🇵🇦" },
   { code: "DO", name: "R. Dominicana", flag: "🇩🇴" },
+  { code: "PR", name: "Puerto Rico", flag: "🇵🇷" },
   { code: "GT", name: "Guatemala", flag: "🇬🇹" },
   { code: "HN", name: "Honduras", flag: "🇭🇳" },
   { code: "SV", name: "El Salvador", flag: "🇸🇻" },

@@ -48,7 +48,7 @@ interface AnalyticsData {
     checkoutToPurchasePct: number;
     abandonedCheckoutPct: number;
   };
-  abandoned: { total: number; recovered: number; openValue: number; recoveryRatePct: number };
+  abandoned: { total: number; newCustomers: number; returningCustomers: number; recovered: number; openValue: number; recoveryRatePct: number };
   series: Array<{
     bucket: string;
     pageviews: number;

@@ -1198,7 +1198,17 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const i = methodsConfig.familyOrder.indexOf(fam as FamilyKey);
     return i === -1 ? 99 : i;
   };
-  const orderedByAdmin = [...filteredByAdmin].sort((a, b) => orderIndex(a.id) - orderIndex(b.id));
+  const sortedByAdmin = [...filteredByAdmin].sort((a, b) => orderIndex(a.id) - orderIndex(b.id));
+  // Hotmart sube una posición: se muestra justo después de la tarjeta (Stripe)
+  // para darle más visibilidad sin desplazar el método principal.
+  const orderedByAdmin = (() => {
+    const hIdx = sortedByAdmin.findIndex((m) => m.id === "hotmart");
+    if (hIdx <= 1) return sortedByAdmin;
+    const copy = [...sortedByAdmin];
+    const [h] = copy.splice(hIdx, 1);
+    copy.splice(1, 0, h);
+    return copy;
+  })();
   // Si el admin configuró explícitamente la región (methodsConfig.loaded con
   // regionCode), respetamos exactamente lo que habilitó, sin forzar el filtro
   // legacy card+paypal fuera de Perú. Perú siempre oculta paypal directo.

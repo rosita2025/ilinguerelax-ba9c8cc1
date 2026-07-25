@@ -719,13 +719,15 @@ serve(async (req) => {
       };
     });
 
-    // Abandoned carts summary
-    const abandonedTotal = abandoned?.length || 0;
-    const abandonedRecovered = (abandoned || []).filter((c) => c.recovered_at).length;
-    const abandonedValue = (abandoned || []).reduce(
-      (s, c) => s + Number(c.total_amount || 0),
-      0,
+    // Abandoned carts summary (clientes únicos por correo)
+    const abandonedRows = abandoned || [];
+    const uniqueEmails = new Set(
+      abandonedRows.map((c) => String(c.customer_email || "").toLowerCase()).filter(Boolean),
     );
+    const abandonedTotal = uniqueEmails.size || abandonedRows.length;
+    const abandonedRecovered = abandonedRows.filter((c) => c.converted === true || c.is_completed === true).length;
+    const abandonedValue = 0;
+
 
     // Conversion metrics
     const sessions = totals.sessions.size;

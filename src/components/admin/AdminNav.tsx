@@ -51,14 +51,14 @@ const groups: Group[] = [
     label: "General",
     items: [
       { to: "/admin", label: "Inicio", icon: LayoutDashboard },
-      { to: "/admin/live", label: "Visitas en vivo", icon: Globe },
+      { to: "/admin/live", label: "Visitas en vivo · Hoy", icon: Globe },
     ],
   },
   {
     label: "Ventas",
     items: [
       { to: "/admin/purchases-status", label: "Pagos · Estado", icon: CreditCard },
-      { to: "/admin/checkout-methods", label: "Métodos Stripe", icon: CreditCard },
+      { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },
       { to: "/admin/manual-payments", label: "Pagos manuales", icon: Wallet },
       { to: "/admin/binance-config", label: "Binance Pay", icon: Wallet },
       { to: "/admin/orders", label: "Órdenes / Pedidos", icon: Mail },

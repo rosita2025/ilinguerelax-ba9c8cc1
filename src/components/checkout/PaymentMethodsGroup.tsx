@@ -1137,6 +1137,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : `Paga ${hotmartPriceLabel} en Hotmart (${hotmartTaxNote}).${hotmartMethodsHint ? ` Puedes pagar con ${hotmartMethodsHint}.` : ""} Te redirige en 1 clic.`,
 
       badge: hotmartPriceLabel,
+      badges: hotmartBadges,
+
     },
   ];
 

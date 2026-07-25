@@ -138,27 +138,21 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
   if (!upsells?.length) return null;
 
   return (
-    <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-4 sm:p-5 space-y-3 shadow-sm">
+    <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-3 sm:p-4 space-y-2 shadow-sm">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground">
-            <Sparkles className="w-4 h-4" />
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="inline-flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-primary text-primary-foreground">
+            <Sparkles className="w-3.5 h-3.5" />
           </span>
-          <div>
-            <h3 className="font-bold text-sm sm:text-base leading-tight">
-              Agrega a tu pedido y ahorra
-            </h3>
-            <p className="text-[11px] text-muted-foreground">
-              {mainInCart
-                ? "Solo disponible en esta compra"
-                : "Precio normal (sin el descuento del combo)"}
-            </p>
-          </div>
+          <h3 className="font-bold text-sm leading-tight truncate">
+            Agrega a tu pedido y ahorra
+          </h3>
         </div>
         {totalSavings > 0 && <SavingsBadge usd={totalSavings} />}
       </div>
 
-      <div className="space-y-2.5">
+      <div className="space-y-2">
+
         {upsells.map((u) => {
           const added = items.some((i) => i.id === u.id);
           const shownPrice = effectivePrice(u);
@@ -188,23 +182,23 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
                   });
                 }
               }}
-              className={`w-full text-left flex items-center gap-3 rounded-lg border-2 p-2.5 sm:p-3 transition-all ${
+              className={`w-full text-left flex items-center gap-2.5 rounded-lg border-2 p-2 transition-all ${
                 added
                   ? "border-primary bg-primary/10 shadow-sm"
                   : "border-border bg-background hover:border-primary/60 hover:bg-primary/[0.03]"
               }`}
             >
               <span
-                className={`shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition ${
+                className={`shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition ${
                   added
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-muted-foreground/40 bg-background"
                 }`}
               >
                 {added ? (
-                  <Check className="w-4 h-4" strokeWidth={3} />
+                  <Check className="w-3.5 h-3.5" strokeWidth={3} />
                 ) : (
-                  <Plus className="w-4 h-4 text-muted-foreground" />
+                  <Plus className="w-3.5 h-3.5 text-muted-foreground" />
                 )}
               </span>
 
@@ -212,11 +206,11 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
                 <img
                   src={u.image}
                   alt=""
-                  className="w-14 h-14 rounded-md object-cover bg-muted"
+                  className="w-11 h-11 rounded-md object-cover bg-muted"
                   loading="lazy"
                 />
                 {hasDiscount && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-accent text-accent-foreground text-[10px] font-black leading-none px-1.5 py-0.5 rounded shadow">
+                  <span className="absolute -top-1.5 -right-1.5 bg-accent text-accent-foreground text-[10px] font-black leading-none px-1 py-0.5 rounded shadow">
                     -{percentOff}%
                   </span>
                 )}
@@ -224,7 +218,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <p className="font-semibold text-sm leading-tight line-clamp-2">
+                  <p className="font-semibold text-[13px] leading-tight line-clamp-1">
                     {u.name}
                   </p>
                   {u.badge && (
@@ -233,21 +227,16 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
                     </span>
                   )}
                 </div>
-                {u.description && (
-                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                    {u.description}
-                  </p>
-                )}
                 <p
-                  className={`text-[11px] font-semibold mt-1 ${
+                  className={`text-[11px] font-semibold ${
                     added ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  {added ? "✓ Añadido a tu pedido · toca para quitar" : "Toca para agregar"}
+                  {added ? "✓ Añadido · toca para quitar" : "Toca para agregar"}
                 </p>
               </div>
 
-              <div className="text-right shrink-0 space-y-0.5">
+              <div className="text-right shrink-0">
                 {hasDiscount && <Price usd={u.originalPrice!} strike sku={u.id} />}
                 <Price usd={shownPrice} pen={u.pricePen} emphasis added={added} prefix="+" sku={u.id} />
               </div>
@@ -255,10 +244,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
           );
         })}
       </div>
-
-      <p className="text-[11px] text-center text-muted-foreground pt-1">
-        🔒 Se cobra junto con tu pedido · entrega inmediata por email
-      </p>
     </div>
+
   );
 }

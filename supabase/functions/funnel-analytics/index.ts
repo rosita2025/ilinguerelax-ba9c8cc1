@@ -152,12 +152,16 @@ serve(async (req) => {
 
 
     // ---------- Aggregation ----------
+    // Todos los buckets se calculan en hora de Perú (UTC-5) para que el gráfico
+    // muestre la hora local real del negocio.
+    const PERU_OFFSET_MS = 5 * 60 * 60 * 1000;
+    const toPeru = (d: Date) => new Date(d.getTime() - PERU_OFFSET_MS);
     const bucketKey = (iso: string) => {
-      const d = new Date(iso);
+      const d = toPeru(new Date(iso));
       if (gran === "day") {
-        return d.toISOString().slice(0, 10); // YYYY-MM-DD
+        return d.toISOString().slice(0, 10); // YYYY-MM-DD (Perú)
       }
-      // hour → YYYY-MM-DDTHH:00
+      // hour → YYYY-MM-DDTHH:00 (Perú)
       const pad = (n: number) => String(n).padStart(2, "0");
       return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:00`;
     };
@@ -703,10 +707,11 @@ serve(async (req) => {
 
     // Fill missing buckets so the chart renders zeros
     const seriesKeys: string[] = [];
-    const cursor = new Date(fromDate);
+    const cursor = toPeru(new Date(fromDate));
+    const toDatePeru = toPeru(toDate);
     if (gran === "hour") {
       cursor.setUTCMinutes(0, 0, 0);
-      while (cursor <= toDate) {
+      while (cursor <= toDatePeru) {
         const pad = (n: number) => String(n).padStart(2, "0");
         seriesKeys.push(
           `${cursor.getUTCFullYear()}-${pad(cursor.getUTCMonth() + 1)}-${pad(cursor.getUTCDate())}T${pad(cursor.getUTCHours())}:00`,
@@ -715,7 +720,7 @@ serve(async (req) => {
       }
     } else {
       cursor.setUTCHours(0, 0, 0, 0);
-      while (cursor <= toDate) {
+      while (cursor <= toDatePeru) {
         seriesKeys.push(cursor.toISOString().slice(0, 10));
         cursor.setUTCDate(cursor.getUTCDate() + 1);
       }

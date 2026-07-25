@@ -308,14 +308,7 @@ const BlogPost = () => {
               </CardContent>
             </Card>
 
-            {/* Article Content */}
-            <Card className="mb-8">
-              <CardContent className="p-6 md:p-10 prose prose-lg max-w-none">
-                {renderContent(post.content)}
-              </CardContent>
-            </Card>
-
-            {/* Related Products CTA */}
+            {/* Related Products CTA (arriba, antes del artículo) */}
             {relatedProducts.length > 0 && (
               <Card className="mb-8 bg-primary/5 border-primary/20">
                 <CardContent className="p-6 md:p-8">
@@ -365,6 +358,14 @@ const BlogPost = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Article Content */}
+            <Card className="mb-8">
+              <CardContent className="p-6 md:p-10 prose prose-lg max-w-none">
+                {renderContent(post.content)}
+              </CardContent>
+            </Card>
+
 
             {/* Post Navigation */}
             <div className="grid sm:grid-cols-2 gap-4 mb-8">

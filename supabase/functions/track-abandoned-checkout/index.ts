@@ -111,15 +111,20 @@ Deno.serve(async (req) => {
       language = langMap[country] || detectFromTld(email);
     }
 
-    // Upsert-like: reset existing open cart or create new
-    const { data: existing } = await supabase
+    // Upsert-like: reutiliza el carrito abierto del cliente en vez de crear uno
+    // nuevo cada vez. Antes usaba .maybeSingle(), que falla cuando ya hay más de
+    // una fila abierta del mismo correo y terminaba insertando duplicados.
+    const { data: existingRows } = await supabase
       .from("abandoned_carts")
       .select("id")
       .eq("customer_email", email)
       .eq("is_completed", false)
-      .maybeSingle();
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const existing = existingRows?.[0] ?? null;
 
     if (existing) {
+
       await supabase
         .from("abandoned_carts")
         .update({

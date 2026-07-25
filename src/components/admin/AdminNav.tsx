@@ -51,14 +51,14 @@ const groups: Group[] = [
     label: "General",
     items: [
       { to: "/admin", label: "Inicio", icon: LayoutDashboard },
-      { to: "/admin/live", label: "Visitas en vivo", icon: Globe },
+      { to: "/admin/live", label: "Visitas en vivo · Hoy", icon: Globe },
     ],
   },
   {
     label: "Ventas",
     items: [
       { to: "/admin/purchases-status", label: "Pagos · Estado", icon: CreditCard },
-      { to: "/admin/checkout-methods", label: "Métodos Stripe", icon: CreditCard },
+      { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },
       { to: "/admin/manual-payments", label: "Pagos manuales", icon: Wallet },
       { to: "/admin/binance-config", label: "Binance Pay", icon: Wallet },
       { to: "/admin/orders", label: "Órdenes / Pedidos", icon: Mail },
@@ -97,6 +97,16 @@ const groups: Group[] = [
 ];
 
 const flat = groups.flatMap((g) => g.items);
+
+// Accesos rápidos (estilo Shopify): los 5 destinos más usados del panel
+const quickLinks = [
+  { to: "/admin", label: "Inicio", icon: LayoutDashboard },
+  { to: "/admin/orders", label: "Órdenes / Pedidos", icon: Mail },
+  { to: "/admin/productos", label: "Productos digitales", icon: Package },
+  { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },
+  { to: "/admin/live", label: "Visitas en vivo · Hoy", icon: Globe },
+  { to: "/admin/analytics", label: "Funnel", icon: TrendingUp },
+];
 
 export const AdminNav = () => {
   const { logout } = useAdminKey();
@@ -191,7 +201,27 @@ export const AdminNav = () => {
           </AlertDialog>
           </div>
         </div>
+
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none">
+          {quickLinks.map(({ to, label, icon: Icon }) => (
+            <button
+              key={to}
+              type="button"
+              onClick={() => navigate(to)}
+              className={cn(
+                "flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                pathname === to
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
+
     </nav>
     </>
   );

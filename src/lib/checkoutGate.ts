@@ -1,13 +1,8 @@
 /**
- * Anti-fraud gate for /checkouts/:slug.
- * Los visitantes solo pueden abrir el checkout si:
- *  - Hicieron clic en "Comprar" / "Agregar al carrito" (SPA push o <a>).
- *  - Vienen desde un enlace de recuperación de carrito abandonado (?r=...).
- *  - Traen un token firmado en la URL (?t=...).
- *  - Vienen con Referer de una página propia (product / cart / home).
- * Cualquier otro acceso directo (bot, crawler, link filtrado) es rechazado.
- *
- * Además incluye rate limiting por dispositivo y detección de bots.
+ * Gate de /checkouts/:slug — SOLO OBSERVACIONAL.
+ * No se bloquea a nadie: ni por IP, país, referer, user-agent ni frecuencia.
+ * Se mantiene una "ventana de compra" en sessionStorage solo para analítica
+ * y para rellenar datos del flujo.
  */
 
 const KEY = "ilr_checkout_auth";
@@ -22,20 +17,8 @@ const RESERVED = new Set([
   "prueba-1",
 ]);
 
-// User agents de bots conocidos y navegadores headless.
-// OJO: NO incluimos "whatsapp", "telegrambot", "discordbot" ni "slackbot":
-// los navegadores internos de esas apps (y sus previsualizaciones de enlace)
-// comparten UA con compradores reales que llegan desde nuestros enlaces de
-// WhatsApp, y los estábamos expulsando del checkout → parecía "abandono".
-const BOT_UA_RE = /(bot\b|crawl|spider|slurp|bingpreview|facebookexternalhit|headlesschrome|phantomjs|puppeteer|playwright|selenium|scrapy|python-requests|curl\/|wget\/|axios\/|okhttp\/|go-http-client|java\/)/i;
+export type GateReason = "ok";
 
-
-export type GateReason =
-  | "ok"
-  | "bot"
-  | "rate_limited"
-  | "banned"
-  | "unauthorized";
 
 export function authorizeCheckout(slug?: string | null) {
   try {

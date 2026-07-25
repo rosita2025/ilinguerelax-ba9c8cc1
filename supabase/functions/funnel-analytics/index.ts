@@ -613,7 +613,10 @@ serve(async (req) => {
         source: "store",
         pending: isPending,
       });
+      // Make this webhook sale visible to the pixel dedupe pass below.
+      alreadyIngested.push({ at: new Date(ev.created_at).getTime(), productId: pid });
     }
+
     console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 
 

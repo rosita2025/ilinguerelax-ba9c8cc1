@@ -358,6 +358,11 @@ const ProductCountryGrouped = ({ rows }: { rows: PCRow[] }) => {
                       <td className="py-2 pr-3 max-w-xs">
                         <span className="mr-1 text-muted-foreground">{open ? "▾" : "▸"}</span>
                         <span className="font-medium">{g.name || g.product_id}</span>
+                        <div className="pl-5 mt-0.5 text-[10px] text-muted-foreground font-mono break-all leading-tight">
+                          {g.aliases.map((a) => (
+                            <div key={a}>{a === g.product_id ? `/products/${a}` : `/checkouts/${a}`}</div>
+                          ))}
+                        </div>
                       </td>
                       <td className="text-right px-2 tabular-nums">{g.countries.length}</td>
                       <td className="text-right px-2 tabular-nums">{g.sessions}</td>

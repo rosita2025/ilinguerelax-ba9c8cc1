@@ -299,6 +299,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const [copiedBinance, setCopiedBinance] = useState(false);
   const [copiedClabe, setCopiedClabe] = useState(false);
   const [hotmartCfg, setHotmartCfg] = useState<HotmartConfig>({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} });
+  const [methodError, setMethodError] = useState<{ method: Method; message: string } | null>(null);
+  const [cfgReload, setCfgReload] = useState(0);
 
   useEffect(() => {
     if (!parentSku) { setHotmartCfg({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} }); return; }

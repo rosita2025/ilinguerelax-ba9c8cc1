@@ -145,6 +145,8 @@ const AdminEmailTest = () => {
   const [pageSize, setPageSize] = useState<number>(20);
   const [page, setPage] = useState<number>(1);
   const [auditAlert, setAuditAlert] = useState<{ errors: number; partial: number; last?: string } | null>(null);
+  // Catálogo activo (SKUs válidos) para validar antes de reenviar
+  const [catalogSkus, setCatalogSkus] = useState<Set<string>>(new Set());
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);

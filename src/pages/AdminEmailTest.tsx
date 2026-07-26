@@ -346,13 +346,51 @@ const AdminEmailTest = () => {
   }, [adminKey]);
 
   const retryDelivery = async (r: OrderRow) => {
-    if (!r.email || r.email === "—") { toast.error("Falta email del cliente"); return; }
-    const skus = Array.from(new Set(
-      r.productLines.map((p) => canonicalProductId(p.sku)).filter(Boolean) as string[],
-    ));
-    if (skus.length === 0) { toast.error("Sin SKUs en la orden"); return; }
+    // 1) Email válido
+    const email = (r.email || "").trim().toLowerCase();
+    if (!email || email === "—" || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) {
+      toast.error("Email del cliente inválido o ausente — corrígelo antes de reenviar");
+      return;
+    }
+
+    // 2) SKU canónico válido y presente en el catálogo digital
+    const raw = r.productLines.map((p) => p.sku).filter(Boolean) as string[];
+    const skus = Array.from(new Set(raw.map((s) => canonicalProductId(s)).filter(Boolean) as string[]));
+    if (skus.length === 0) {
+      toast.error("Sin SKUs en la orden — no se puede determinar el material a enviar");
+      return;
+    }
+    if (catalogSkus.size > 0) {
+      const unknown = skus.filter((s) => !catalogSkus.has(s.toLowerCase()));
+      if (unknown.length === skus.length) {
+        toast.error(`SKU no encontrado en el catálogo: ${unknown.join(", ")}`);
+        return;
+      }
+      if (unknown.length > 0) {
+        toast.warning(`Se omitirán SKUs desconocidos: ${unknown.join(", ")}`);
+      }
+    }
+    const validSkus = catalogSkus.size > 0
+      ? skus.filter((s) => catalogSkus.has(s.toLowerCase()))
+      : skus;
+
+    // 3) Historial de correos: confirmar antes de duplicar un envío reciente
+    const lastAt = r.delivery?.last_event_at ? new Date(r.delivery.last_event_at) : null;
+    const minsAgo = lastAt ? (Date.now() - lastAt.getTime()) / 60000 : null;
+    if (minsAgo !== null && minsAgo < 30) {
+      const ok = window.confirm(
+        `Ya se envió material a ${email} hace ${Math.max(1, Math.round(minsAgo))} min. ¿Reenviar de todas formas?`,
+      );
+      if (!ok) return;
+    } else if (!r.delivery) {
+      const ok = window.confirm(
+        `No hay historial de envío para ${email}. Se enviará el material por primera vez. ¿Continuar?`,
+      );
+      if (!ok) return;
+    }
 
     setRetrying((prev) => new Set(prev).add(r.id));
+
     try {
       const { data, error } = await adminInvoke<{ ok?: boolean; error?: string; details?: string }>(
         "manage-delivery-retry",

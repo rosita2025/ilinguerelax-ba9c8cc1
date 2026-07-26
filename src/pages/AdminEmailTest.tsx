@@ -176,6 +176,7 @@ const AdminEmailTest = () => {
           });
         }
       });
+      setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
 
       const digitalByEmail = new Map<string, any>();
       const digitalByOrder = new Map<string, any>();

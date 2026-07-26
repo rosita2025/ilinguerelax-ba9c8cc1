@@ -227,7 +227,8 @@ const AdminEmailTest = () => {
             return [usdStr, localStr].filter(Boolean).join(" · ") || `USD ${Number(r.amount_usd ?? r.amount_local ?? 0).toFixed(2)}`;
           })(),
           status: r.status || "pending",
-          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : materialDelivery(r.buyer_email),
+
         });
         perSource.manual++;
       });

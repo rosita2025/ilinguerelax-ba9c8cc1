@@ -258,7 +258,7 @@ const AdminEmailTest = () => {
           productLines: buildProductLines(skus, products, productMap),
           amount: `${r.currency || ""} ${Number(r.value ?? 0).toFixed(2)}`.trim(),
           status,
-          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : materialDelivery(email),
         });
         perSource[src]++;
       });

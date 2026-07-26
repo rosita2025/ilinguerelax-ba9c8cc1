@@ -102,7 +102,7 @@ async function resolveMaterials(
       });
     }
   }
-  return { materials: out, missing };
+  return { materials: out, missing, resolvedSkus: Array.from(seen) };
 }
 
 async function sendTemplate(admin: any, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>) {

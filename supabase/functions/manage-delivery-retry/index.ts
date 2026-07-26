@@ -45,6 +45,43 @@ Deno.serve(async (req) => {
         .eq("id", body.id);
     }
 
+    // Manual re-send of one order's digital delivery (admin "Reintentar envío").
+    if (action === "resend_order") {
+      const email = String(body?.customerEmail || "").trim().toLowerCase();
+      const skus: string[] = Array.isArray(body?.skus) ? body.skus.filter(Boolean) : [];
+      if (!email || skus.length === 0) {
+        return new Response(JSON.stringify({ error: "customerEmail y skus son obligatorios" }), {
+          status: 400, headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const res = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-digital-ilinguerelax`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+        },
+        body: JSON.stringify({
+          customerEmail: email,
+          customerName: body?.customerName || undefined,
+          orderId: body?.orderId || undefined,
+          skus,
+          provider: body?.provider || "admin",
+          force: true,
+        }),
+      });
+      const text = await res.text();
+      if (!res.ok) {
+        console.error(`resend_order failed [${res.status}]: ${text}`);
+        return new Response(JSON.stringify({ error: "Fallo el reenvío", status: res.status, details: text.slice(0, 500) }), {
+          status: res.status, headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ ok: true, result: text.slice(0, 500) }), {
+        headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+
     let runReport: unknown = null;
     if (action === "run") {
       const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/retry-digital-delivery`;

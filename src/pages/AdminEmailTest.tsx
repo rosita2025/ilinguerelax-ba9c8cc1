@@ -327,25 +327,35 @@ const AdminEmailTest = () => {
     if (skus.length === 0) { toast.error("Sin SKUs en la orden"); return; }
     setRetrying((prev) => new Set(prev).add(r.id));
     try {
-      const { error } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-        body: {
-          customerEmail: r.email,
-          customerName: r.customer !== "—" ? r.customer : undefined,
-          orderId: r.order_ref,
-          skus,
-          provider: r.source,
-          force: true,
+      const { data, error } = await adminInvoke<{ ok?: boolean; error?: string; details?: string }>(
+        "manage-delivery-retry",
+        {
+          body: {
+            adminKey,
+            action: "resend_order",
+            customerEmail: r.email,
+            customerName: r.customer !== "—" ? r.customer : undefined,
+            orderId: r.order_ref,
+            skus,
+            provider: r.source,
+          },
         },
-      });
-      if (error) throw error;
+      );
+      if (error) {
+        const ctx = (error as unknown as { context?: { text?: () => Promise<string> } })?.context;
+        const detail = ctx?.text ? await ctx.text().catch(() => "") : "";
+        throw new Error(detail || error.message);
+      }
+      if (data?.error) throw new Error(data.details || data.error);
       toast.success("Reenvío disparado — la validación se actualizará en unos segundos");
       scheduleReload();
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(`No se pudo reenviar: ${(e as Error).message}`);
     } finally {
       setRetrying((prev) => { const n = new Set(prev); n.delete(r.id); return n; });
     }
   };
+
 
 
   const statusColor = (s: string) => {

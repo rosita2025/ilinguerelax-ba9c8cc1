@@ -183,11 +183,30 @@ const AdminEmailTest = () => {
         if (orderKey && !digitalByOrder.has(orderKey)) digitalByOrder.set(orderKey, d);
       });
 
+      // Los pagos manuales entregan el material con la plantilla
+      // "material-delivery" (email_send_log) y no crean fila en
+      // digital_email_sends: sin esto salían siempre como "Revisar".
+      const materialByEmail = new Map<string, any>();
+      ((data as any)?.emailLog ?? []).forEach((l: any) => {
+        const tpl = String(l.template_name || "").toLowerCase();
+        if (!tpl.includes("material") && !tpl.includes("digital")) return;
+        if (String(l.status || "").toLowerCase() !== "sent") return;
+        const k = (l.recipient_email || "").toLowerCase();
+        if (k && !materialByEmail.has(k)) materialByEmail.set(k, l);
+      });
+      const materialDelivery = (email?: string | null) => {
+        const l = materialByEmail.get((email || "").toLowerCase());
+        return l
+          ? { status: "sent", last_event: l.template_name, last_event_at: l.created_at, message_id: l.message_id || l.id }
+          : null;
+      };
+
       const merged: OrderRow[] = [];
       const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
 
       (manualRes.data ?? []).forEach((r: any) => {
         const d = digitalByOrder.get((r.order_number || "").toLowerCase()) || digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
+
         const skus = Array.isArray(r.items) ? r.items.map((i: any) => i?.sku || i?.id).filter(Boolean) : [];
         const products = (Array.isArray(r.items) ? r.items.map((i: any) => i?.name).filter(Boolean).join(", ") : "") || "—";
         merged.push({

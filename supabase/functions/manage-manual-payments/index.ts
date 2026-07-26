@@ -161,7 +161,7 @@ Deno.serve(async (req) => {
 
       const items = Array.isArray(order.items) ? order.items : [];
       const productNames = items.map((i: any) => i?.name).filter(Boolean).join(" + ") || "Tu pedido ILINGUE RELAX";
-      const { materials, missing } = await resolveMaterials(admin, items);
+      const { materials, missing, resolvedSkus } = await resolveMaterials(admin, items);
       if (materials.length === 0 || missing.length > 0) {
         return new Response(JSON.stringify({
           success: false,
@@ -186,13 +186,34 @@ Deno.serve(async (req) => {
         .eq("id", orderId);
       if (updErr) throw updErr;
 
+      // Registro digital ligado al pedido manual (Yape/Plin, Binance, SPEI,
+      // transferencias). Sin esta fila el panel mostraba "Revisar" en rojo y
+      // obligaba a reintentar el envío a mano.
+      const deliveryIdemKey = `manual-material-${order.order_number}`;
+      const upsertDelivery = async (patch: Record<string, unknown>) => {
+        try {
+          await admin.from("digital_email_sends").upsert({
+            idempotency_key: deliveryIdemKey,
+            order_id: order.order_number,
+            customer_email: order.buyer_email,
+            customer_name: order.buyer_name ?? null,
+            customer_phone: order.buyer_phone ?? null,
+            customer_country: order.buyer_country ?? null,
+            amount: Number(order.amount_local ?? order.amount_usd) || null,
+            currency: order.currency_local || "USD",
+            skus: resolvedSkus,
+            provider: order.method || "manual",
+            last_event_at: new Date().toISOString(),
+            ...patch,
+          }, { onConflict: "idempotency_key" });
+        } catch (e) {
+          console.error("[manual-payments] digital_email_sends upsert failed", e);
+        }
+      };
+      await upsertDelivery({ status: "processing", last_event: "processing" });
+
       // Disparar emails y sincronizaciones en paralelo, sin bloquear la respuesta
-      // (EdgeRuntime.waitUntil los mantiene vivos tras el 200). Antes tardaba
-      // 3-5s porque se ejecutaban en secuencia con await.
-      // Enviamos "Gracias por tu compra" (con precio y productos) + entrega
-      // digital de materiales. El "Recibimos tu pedido" ya se envió al crear
-      // el pedido, así que el cliente recibe 3 correos: pendiente → gracias
-      // → materiales.
+      // (EdgeRuntime.waitUntil los mantiene vivos tras el 200).
       const bg = Promise.allSettled([
         sendThankYouEmail({
           customerEmail: order.buyer_email,
@@ -200,25 +221,25 @@ Deno.serve(async (req) => {
           customerPhone: order.buyer_phone,
           customerCountry: order.buyer_country,
           productName: productNames,
-          skus: items.map((i: any) => i?.sku).filter(Boolean),
+          skus: resolvedSkus,
           amount: Number(order.amount_local ?? order.amount_usd),
           currency: order.currency_local || "USD",
           provider: order.method || "yape_plin",
           orderNumber: order.order_number,
           idempotencyKey: `manual-thankyou-${order.order_number}`,
         }),
-        sendTemplate(admin, "material-delivery", order.buyer_email, `manual-material-${order.order_number}`, {
+        sendTemplate(admin, "material-delivery", order.buyer_email, deliveryIdemKey, {
           customerName: order.buyer_name,
           orderNumber: order.order_number,
           materials,
-        }),
+        }).then(() => upsertDelivery({ status: "sent", last_event: "material-delivery" })),
         upsertBrevoContact({
           email: order.buyer_email,
           name: order.buyer_name,
           phone: order.buyer_phone,
           country: order.buyer_country,
           productName: productNames,
-          skus: items.map((i: any) => i?.sku).filter(Boolean),
+          skus: resolvedSkus,
           amount: Number(order.amount_local ?? order.amount_usd),
           currency: order.currency_local || "USD",
           orderNumber: order.order_number,
@@ -229,9 +250,10 @@ Deno.serve(async (req) => {
       // @ts-expect-error EdgeRuntime is available in Supabase Deno runtime
       if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) EdgeRuntime.waitUntil(bg);
 
-      return new Response(JSON.stringify({ success: true, materialsSent: materials.length }), {
+      return new Response(JSON.stringify({ success: true, materialsSent: materials.length, skus: resolvedSkus }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+
     }
 
 

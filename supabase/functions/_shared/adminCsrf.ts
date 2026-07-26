@@ -11,6 +11,7 @@
 const ALLOWED_ORIGINS = [
   "https://ilinguerelax.com",
   "https://www.ilinguerelax.com",
+  "https://admin.ilinguerelax.com",
   "https://ilinguerelax.lovable.app",
   // Lovable preview / sandbox subdomains
   /^https:\/\/[a-z0-9-]+\.lovable\.app$/i,

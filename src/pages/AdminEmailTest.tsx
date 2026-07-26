@@ -398,10 +398,10 @@ const AdminEmailTest = () => {
           body: {
             adminKey,
             action: "resend_order",
-            customerEmail: r.email,
+            customerEmail: email,
             customerName: r.customer !== "—" ? r.customer : undefined,
             orderId: r.order_ref,
-            skus,
+            skus: validSkus,
             provider: r.source,
           },
         },

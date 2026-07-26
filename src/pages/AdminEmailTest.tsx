@@ -343,8 +343,11 @@ const AdminEmailTest = () => {
 
   const retryDelivery = async (r: OrderRow) => {
     if (!r.email || r.email === "—") { toast.error("Falta email del cliente"); return; }
-    const skus = r.productLines.map((p) => p.sku).filter(Boolean) as string[];
+    const skus = Array.from(new Set(
+      r.productLines.map((p) => canonicalProductId(p.sku)).filter(Boolean) as string[],
+    ));
     if (skus.length === 0) { toast.error("Sin SKUs en la orden"); return; }
+
     setRetrying((prev) => new Set(prev).add(r.id));
     try {
       const { data, error } = await adminInvoke<{ ok?: boolean; error?: string; details?: string }>(

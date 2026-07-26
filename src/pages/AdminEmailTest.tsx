@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { canonicalProductId } from "@/lib/productSkuAliases";
 import { supabase } from "@/integrations/supabase/client";
 import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send, FileSearch } from "lucide-react";
 import { toast } from "sonner";
@@ -183,11 +184,30 @@ const AdminEmailTest = () => {
         if (orderKey && !digitalByOrder.has(orderKey)) digitalByOrder.set(orderKey, d);
       });
 
+      // Los pagos manuales entregan el material con la plantilla
+      // "material-delivery" (email_send_log) y no crean fila en
+      // digital_email_sends: sin esto salían siempre como "Revisar".
+      const materialByEmail = new Map<string, any>();
+      ((data as any)?.emailLog ?? []).forEach((l: any) => {
+        const tpl = String(l.template_name || "").toLowerCase();
+        if (!tpl.includes("material") && !tpl.includes("digital")) return;
+        if (String(l.status || "").toLowerCase() !== "sent") return;
+        const k = (l.recipient_email || "").toLowerCase();
+        if (k && !materialByEmail.has(k)) materialByEmail.set(k, l);
+      });
+      const materialDelivery = (email?: string | null) => {
+        const l = materialByEmail.get((email || "").toLowerCase());
+        return l
+          ? { status: "sent", last_event: l.template_name, last_event_at: l.created_at, message_id: l.message_id || l.id }
+          : null;
+      };
+
       const merged: OrderRow[] = [];
       const perSource: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
 
       (manualRes.data ?? []).forEach((r: any) => {
         const d = digitalByOrder.get((r.order_number || "").toLowerCase()) || digitalByEmail.get((r.buyer_email || "").toLowerCase()) || null;
+
         const skus = Array.isArray(r.items) ? r.items.map((i: any) => i?.sku || i?.id).filter(Boolean) : [];
         const products = (Array.isArray(r.items) ? r.items.map((i: any) => i?.name).filter(Boolean).join(", ") : "") || "—";
         merged.push({
@@ -208,7 +228,8 @@ const AdminEmailTest = () => {
             return [usdStr, localStr].filter(Boolean).join(" · ") || `USD ${Number(r.amount_usd ?? r.amount_local ?? 0).toFixed(2)}`;
           })(),
           status: r.status || "pending",
-          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : materialDelivery(r.buyer_email),
+
         });
         perSource.manual++;
       });
@@ -238,7 +259,7 @@ const AdminEmailTest = () => {
           productLines: buildProductLines(skus, products, productMap),
           amount: `${r.currency || ""} ${Number(r.value ?? 0).toFixed(2)}`.trim(),
           status,
-          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : null,
+          delivery: d ? { status: d.status, last_event: d.last_event, last_event_at: d.last_event_at, message_id: d.message_id } : materialDelivery(email),
         });
         perSource[src]++;
       });
@@ -323,8 +344,11 @@ const AdminEmailTest = () => {
 
   const retryDelivery = async (r: OrderRow) => {
     if (!r.email || r.email === "—") { toast.error("Falta email del cliente"); return; }
-    const skus = r.productLines.map((p) => p.sku).filter(Boolean) as string[];
+    const skus = Array.from(new Set(
+      r.productLines.map((p) => canonicalProductId(p.sku)).filter(Boolean) as string[],
+    ));
     if (skus.length === 0) { toast.error("Sin SKUs en la orden"); return; }
+
     setRetrying((prev) => new Set(prev).add(r.id));
     try {
       const { data, error } = await adminInvoke<{ ok?: boolean; error?: string; details?: string }>(

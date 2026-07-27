@@ -20,7 +20,7 @@ interface Props {
   productName?: string
   amount?: number
   currency?: string
-  amountUsd?: number
+
   method?: string
   orderDate?: string
   binancePayId?: string
@@ -47,7 +47,7 @@ const Email = ({
   productName,
   amount,
   currency,
-  amountUsd,
+
   method,
   orderDate,
   binancePayId,
@@ -211,7 +211,6 @@ const nextBox = { backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borde
 const nextTitle = { margin: '0 0 8px', fontSize: '14px', color: '#92400e', fontWeight: 'bold' as const }
 const nextLine = { margin: '4px 0', fontSize: '13px', color: '#78350f', lineHeight: '1.5' }
 const footer = { textAlign: 'center' as const, color: '#9ca3af', fontSize: '12px', margin: '8px 0 0' }
-const usdSub = { margin: '2px 0 0', fontSize: '12px', color: '#6b7280', fontWeight: 'normal' as const }
 const binanceBox = { backgroundColor: '#fefce8', border: '1px solid #eab308', borderRadius: '12px', padding: '16px 20px', marginBottom: '16px' }
 const binanceTitle = { margin: '0 0 8px', fontSize: '14px', color: '#854d0e', fontWeight: 'bold' as const }
 const binanceLine = { margin: '4px 0', fontSize: '13px', color: '#713f12', lineHeight: '1.5', wordBreak: 'break-all' as const }

@@ -47,7 +47,15 @@ const Email = ({ customerName, orderNumber, materials }: Props) => {
             Tu pago fue verificado correctamente. A continuación encontrarás los enlaces para acceder a los PDFs y contenidos que compraste.
           </Text>
 
+          <Section style={noticeBox}>
+            <Text style={noticeText}>
+              📄 <strong>Material digital en PDF descargable.</strong> No es un curso, no incluye clases en vivo,
+              profesor ni tutorías. Acceso inmediato y de por vida desde los enlaces de abajo.
+            </Text>
+          </Section>
+
           <Hr style={hr} />
+
 
           {list.map((m, i) => (
             <Section key={i} style={itemCard}>

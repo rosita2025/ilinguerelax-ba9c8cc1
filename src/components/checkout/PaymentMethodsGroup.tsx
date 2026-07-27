@@ -1868,11 +1868,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
                   <p className="text-xs text-neutral-500">{t.amountToPay}</p>
                   <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
+                    USD ${totalUsd}
                   </p>
-                  {!local.isUsd && !local.loading && (
-                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
-                  )}
                 </div>
                 <PayPalButtons
                   amountUsd={Number(totalUsd)}

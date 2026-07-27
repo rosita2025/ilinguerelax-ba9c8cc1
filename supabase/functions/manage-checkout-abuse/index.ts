@@ -215,7 +215,23 @@ Deno.serve(async (req) => {
       const countries = [...byCountry.entries()]
         .map(([country, count]) => ({ country, count }))
         .sort((a, b) => b.count - a.count);
-      return json({ top, sources, countries, total: (data || []).length });
+
+      // Resumen real de las últimas 24 h (lo más importante para decidir).
+      const summary = {
+        visits: (data || []).length,
+        visitors: byIp.size,
+        with_email: top.filter((r) => !!r.email).length,
+        without_email: top.filter((r) => !r.email).length,
+        purchased: top.filter((r) => r.status === "purchased").length,
+        abandoned: top.filter((r) => r.status === "abandoned").length,
+        countries: countries.length,
+        generated_at: new Date().toISOString(),
+      };
+      const leads = top
+        .filter((r) => !!r.email)
+        .map((r) => ({ email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders }));
+      return json({ top, sources, countries, summary, leads, total: (data || []).length });
+
     }
 
     return json({ error: "unknown action" }, 400);

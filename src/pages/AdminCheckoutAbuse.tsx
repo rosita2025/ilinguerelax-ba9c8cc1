@@ -243,7 +243,31 @@ export default function AdminCheckoutAbuse() {
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b">
-            <h2 className="font-semibold">Top IPs · últimas 24 h</h2>
+            <h2 className="font-semibold">Países · últimas 24 h</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Desde qué país se abre el checkout. Útil para saber si el método de pago mostrado es el correcto.
+            </p>
+          </div>
+          {countries.length === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground text-center">Sin datos de país todavía.</p>
+          ) : (
+            <div className="p-4 flex flex-wrap gap-2">
+              {countries.map((c) => (
+                <div key={c.country} className="flex items-center gap-2">
+                  <CountryBadge code={c.country} />
+                  <span className="font-mono text-sm">{c.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-muted/40 border-b">
+            <h2 className="font-semibold">Visitantes del checkout · últimas 24 h</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Correo (si lo escribió), país y si terminó comprando o abandonó el carrito.
+            </p>
           </div>
           {top.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground text-center">Sin actividad reciente.</p>
@@ -253,6 +277,7 @@ export default function AdminCheckoutAbuse() {
                 <div key={r.ip} className="p-3 space-y-2">
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div className="flex items-center gap-2 flex-wrap">
+                      <CountryBadge code={r.country} />
                       <span className="font-mono text-sm">{r.ip}</span>
                       {(r.sources.length ? r.sources : ["direct"]).map((s) => (
                         <SourceBadge key={s} source={s} />
@@ -262,6 +287,19 @@ export default function AdminCheckoutAbuse() {
                       <span className={`font-semibold ${r.count > 20 ? "text-destructive" : "text-foreground"}`}>{r.count} hits</span>
                       <span>{new Date(r.last).toLocaleString()}</span>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap text-xs">
+                    <StatusBadge status={r.status} />
+                    {r.email ? (
+                      <a href={`mailto:${r.email}`} className="text-primary hover:underline break-all">
+                        {r.email}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">Sin correo — no llenó el formulario</span>
+                    )}
+                    {(r.reminders ?? 0) > 0 && (
+                      <span className="text-muted-foreground">· {r.reminders} recordatorio(s) enviados</span>
+                    )}
                   </div>
                   {r.slugs.length > 0 && (
                     <div className="text-xs">

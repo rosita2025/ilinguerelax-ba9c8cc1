@@ -1114,14 +1114,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   ];
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
-    .map((key) => ({ id: "card", methodKey: key, badge: "Stripe", ...STRIPE_VISIBLE_METHODS[key] }));
+    .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
-    { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: "Stripe" },
+    { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: priceBadge },
     ...dynamicStripeRows,
-    { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: "Stripe" },
-    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: "Stripe" },
-    { id: "stripe_klarna", icon: Wallet, title: "Klarna — Paga en 4", sub: "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: "Stripe" },
-    { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: priceBadge },
+    { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: priceBadge },
+    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: priceBadge },
+    { id: "stripe_klarna", icon: Wallet, title: "Klarna — Paga en 4", sub: "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: priceBadge },
+    { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: `USD $${totalUsd}` },
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },

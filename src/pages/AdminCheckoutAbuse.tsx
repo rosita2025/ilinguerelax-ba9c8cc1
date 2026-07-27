@@ -22,11 +22,60 @@ interface StatRow {
   sources: string[];
   referers: string[];
   ua: string | null;
+  country?: string | null;
+  email?: string | null;
+  status?: "purchased" | "abandoned" | "browsing" | "anonymous";
+  reminders?: number;
 }
 
 interface SourceRow {
   source: string;
   count: number;
+}
+
+interface CountryRow {
+  country: string;
+  count: number;
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  PE: "Perú", MX: "México", CO: "Colombia", AR: "Argentina", CL: "Chile", EC: "Ecuador",
+  VE: "Venezuela", BO: "Bolivia", PY: "Paraguay", UY: "Uruguay", BR: "Brasil", US: "Estados Unidos",
+  ES: "España", CA: "Canadá", GT: "Guatemala", CR: "Costa Rica", PA: "Panamá", DO: "Rep. Dominicana",
+  HN: "Honduras", SV: "El Salvador", NI: "Nicaragua", CU: "Cuba", PR: "Puerto Rico", IT: "Italia",
+  FR: "Francia", DE: "Alemania", GB: "Reino Unido", PT: "Portugal", KR: "Corea del Sur", JP: "Japón",
+};
+
+function flagEmoji(code?: string | null) {
+  const c = (code || "").toUpperCase();
+  if (!/^[A-Z]{2}$/.test(c)) return "🌐";
+  return String.fromCodePoint(...[...c].map((ch) => 127397 + ch.charCodeAt(0)));
+}
+
+function CountryBadge({ code }: { code?: string | null }) {
+  const c = (code || "").toUpperCase();
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-muted text-foreground border-border">
+      <span aria-hidden>{flagEmoji(c)}</span>
+      {c ? COUNTRY_NAMES[c] || c : "País desconocido"}
+    </span>
+  );
+}
+
+const STATUS_META: Record<string, { label: string; className: string }> = {
+  purchased: { label: "✅ Compró", className: "bg-green-500/10 text-green-600 border-green-500/30" },
+  abandoned: { label: "🛒 Abandonó el carrito", className: "bg-orange-500/10 text-orange-600 border-orange-500/30" },
+  browsing: { label: "✍️ Dejó su correo, sin comprar", className: "bg-amber-500/10 text-amber-700 border-amber-500/30" },
+  anonymous: { label: "👤 Sin correo (solo visita)", className: "bg-muted text-muted-foreground border-border" },
+};
+
+function StatusBadge({ status }: { status?: string }) {
+  const s = STATUS_META[status || "anonymous"] || STATUS_META.anonymous;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border ${s.className}`}>
+      {s.label}
+    </span>
+  );
 }
 
 const SOURCE_LABEL: Record<string, { label: string; emoji: string; className: string }> = {

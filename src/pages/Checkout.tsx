@@ -81,7 +81,11 @@ export default function Checkout() {
       // Server-side rate limit por IP en segundo plano (fail-open).
       try {
         const { data } = await supabase.functions.invoke("checkout-gate-check", {
-          body: { slug, referer: (typeof document !== "undefined" && document.referrer) || "" },
+          body: {
+            slug,
+            referer: (typeof document !== "undefined" && document.referrer) || "",
+            country: (region.country || "").toUpperCase(),
+          },
         });
         const res = data as { allowed?: boolean; reason?: string } | null;
         // Este endpoint es solo observacional. Nunca se expulsa a un comprador
@@ -92,6 +96,25 @@ export default function Checkout() {
     return () => { cancelled = true; };
   }, [slug, navigate]);
 
+  // Cuando el comprador escribe su correo, lo asociamos al acceso ya
+  // registrado (misma IP) para poder ver en /admin/checkout-abuse quién
+  // dejó datos y no completó la compra. No crea hits nuevos.
+  const buyerEmail = useCheckoutPruebaStore((s) => s.buyer.email);
+  const identifiedRef = useRef<string | null>(null);
+  useEffect(() => {
+    const email = (buyerEmail || "").trim().toLowerCase();
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return;
+    if (identifiedRef.current === email) return;
+    identifiedRef.current = email;
+    const tid = setTimeout(() => {
+      supabase.functions
+        .invoke("checkout-gate-check", {
+          body: { slug, email, country: (region.country || "").toUpperCase() },
+        })
+        .catch(() => {});
+    }, 1200);
+    return () => clearTimeout(tid);
+  }, [buyerEmail, slug, region.country]);
 
 
 

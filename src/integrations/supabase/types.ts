@@ -437,7 +437,9 @@ export type Database = {
       }
       checkout_rate_hits: {
         Row: {
+          country: string | null
           created_at: string
+          email: string | null
           id: number
           ip: string
           referer: string | null
@@ -446,7 +448,9 @@ export type Database = {
           ua: string | null
         }
         Insert: {
+          country?: string | null
           created_at?: string
+          email?: string | null
           id?: number
           ip: string
           referer?: string | null
@@ -455,7 +459,9 @@ export type Database = {
           ua?: string | null
         }
         Update: {
+          country?: string | null
           created_at?: string
+          email?: string | null
           id?: number
           ip?: string
           referer?: string | null

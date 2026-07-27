@@ -71,7 +71,12 @@ Deno.serve(async (req) => {
     });
 
   try {
-    const body = (await req.json().catch(() => ({}))) as { slug?: string; referer?: string };
+    const body = (await req.json().catch(() => ({}))) as {
+      slug?: string;
+      referer?: string;
+      country?: string;
+      email?: string;
+    };
     const slug = (body.slug || "").toString().slice(0, 120) || null;
     const ip = clientIp(req);
     const ua = (req.headers.get("user-agent") || "").slice(0, 300);
@@ -79,7 +84,17 @@ Deno.serve(async (req) => {
     // el header HTTP suele venir de nuestro propio dominio. Fallback al header.
     const referer = ((body.referer || req.headers.get("referer") || "") + "").slice(0, 500) || null;
     const source = detectSource(ua, referer);
-    const now = new Date();
+    // País: cabecera del edge (Cloudflare/Supabase) o el país detectado por IP
+    // en el cliente (ipapi.co) como respaldo.
+    const headerCountry =
+      req.headers.get("cf-ipcountry") ||
+      req.headers.get("x-country") ||
+      req.headers.get("x-vercel-ip-country") ||
+      "";
+    const country =
+      (headerCountry || body.country || "").toString().trim().toUpperCase().slice(0, 2) || null;
+    const rawEmail = (body.email || "").toString().trim().toLowerCase().slice(0, 200);
+    const email = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rawEmail) ? rawEmail : null;
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -87,10 +102,31 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
+    // Si el comprador ya escribió su correo, enriquecemos el último acceso de
+    // esa IP en vez de crear otro hit (evita inflar el contador).
+    if (email) {
+      const since = new Date(Date.now() - 6 * 3600 * 1000).toISOString();
+      const { data: last } = await admin
+        .from("checkout_rate_hits")
+        .select("id")
+        .eq("ip", ip)
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      const lastId = (last as { id: string }[] | null)?.[0]?.id;
+      if (lastId) {
+        await admin
+          .from("checkout_rate_hits")
+          .update({ email, ...(country ? { country } : {}), ...(slug ? { slug } : {}) })
+          .eq("id", lastId);
+        return json({ allowed: true, updated: true });
+      }
+    }
+
     // Registrar el acceso para analítica y detección de abuso. Este endpoint
     // nunca bloquea compras: una IP puede ser compartida por una oficina,
     // operadora móvil, VPN o por la vista previa del administrador.
-    await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source });
+    await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source, country, email });
     return json({ allowed: true });
   } catch (err) {
     console.error("checkout-gate-check error", err);

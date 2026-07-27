@@ -105,6 +105,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
 
         <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
 
+        <DigitalProductNotice />
+
+
         {/* Badge de región oculto al cliente (solo se aplica el precio por IP internamente) */}
 
         {items.length === 0 ? (

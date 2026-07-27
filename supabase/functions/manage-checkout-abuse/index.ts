@@ -72,17 +72,63 @@ Deno.serve(async (req) => {
       const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
       const { data, error } = await admin
         .from("checkout_rate_hits")
-        .select("ip, slug, created_at, source, referer, ua, country, email")
+        .select("ip, slug, created_at, source, referer, ua, country, email, city")
         .gte("created_at", since)
         .limit(5000);
       if (error) throw error;
-      type Agg = { ip: string; count: number; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; email: string | null };
+
+      // Resolvemos el país/ciudad real de las IPs que aún no lo tienen
+      // (visitas antiguas o cabeceras sin geo). Guardamos el resultado para
+      // no volver a consultar la misma IP.
+      const unknown = [
+        ...new Set(
+          (data || [])
+            .filter((r) => !(r as { country: string | null }).country)
+            .map((r) => (r as { ip: string }).ip)
+            .filter((ip) => ip && ip !== "unknown" && !ip.startsWith("127.") && !ip.startsWith("192.168.")),
+        ),
+      ].slice(0, 40);
+      const resolved = new Map<string, { country: string; city: string | null }>();
+      if (unknown.length) {
+        await Promise.all(
+          unknown.map(async (ip) => {
+            try {
+              const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`);
+              if (!res.ok) return;
+              const geo = (await res.json()) as {
+                success?: boolean;
+                country_code?: string;
+                city?: string;
+              };
+              if (!geo?.success || !geo.country_code) return;
+              const country = geo.country_code.toUpperCase().slice(0, 2);
+              const city = (geo.city || "").slice(0, 80) || null;
+              resolved.set(ip, { country, city });
+              await admin
+                .from("checkout_rate_hits")
+                .update({ country, city, geo_checked_at: new Date().toISOString() })
+                .eq("ip", ip)
+                .is("country", null);
+            } catch (_e) {
+              // Si el servicio de geo falla, seguimos mostrando el resto.
+            }
+          }),
+        );
+      }
+
+      type Agg = { ip: string; count: number; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
       const byIp = new Map<string, Agg>();
       const bySource = new Map<string, number>();
       const byCountry = new Map<string, number>();
       for (const row of data || []) {
-        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; email: string | null };
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, email: r.email };
+        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null };
+        const geo = resolved.get(r.ip);
+        if (geo) {
+          r.country = r.country || geo.country;
+          r.city = r.city || geo.city;
+        }
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
+
         cur.count += 1;
         if (r.created_at > cur.last) cur.last = r.created_at;
         if (r.slug) cur.slugs.add(r.slug);
@@ -90,6 +136,7 @@ Deno.serve(async (req) => {
         if (r.referer) cur.referers.add(r.referer);
         if (!cur.ua && r.ua) cur.ua = r.ua;
         if (!cur.country && r.country) cur.country = r.country;
+        if (!cur.city && r.city) cur.city = r.city;
         if (!cur.email && r.email) cur.email = r.email;
         byIp.set(r.ip, cur);
         const src = r.source || "direct";
@@ -134,6 +181,7 @@ Deno.serve(async (req) => {
             referers: [...x.referers].slice(0, 3),
             ua: x.ua,
             country: x.country,
+            city: x.city,
             email: x.email,
             status,
             reminders: cart?.emails_sent ?? 0,

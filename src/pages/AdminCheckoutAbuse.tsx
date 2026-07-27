@@ -23,6 +23,7 @@ interface StatRow {
   referers: string[];
   ua: string | null;
   country?: string | null;
+  city?: string | null;
   email?: string | null;
   status?: "purchased" | "abandoned" | "browsing" | "anonymous";
   reminders?: number;
@@ -278,6 +279,9 @@ export default function AdminCheckoutAbuse() {
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div className="flex items-center gap-2 flex-wrap">
                       <CountryBadge code={r.country} />
+                      {r.city && (
+                        <span className="text-xs text-muted-foreground">📍 {r.city}</span>
+                      )}
                       <span className="font-mono text-sm">{r.ip}</span>
                       {(r.sources.length ? r.sources : ["direct"]).map((s) => (
                         <SourceBadge key={s} source={s} />

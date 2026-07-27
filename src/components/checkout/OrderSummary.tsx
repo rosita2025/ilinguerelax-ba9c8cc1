@@ -225,7 +225,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : `USD $${total.toFixed(2)}`}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : `$${total.toFixed(2)}`}</div>
             </div>
           </div>
 

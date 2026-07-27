@@ -229,7 +229,7 @@ const AdminManualPayments = () => {
                         ? `${o.currency_local} ${Number(o.amount_local).toFixed(2)}`
                         : `USD ${Number(o.amount_usd).toFixed(2)}`}
                     </div>
-                    <div className="text-xs text-muted-foreground">USD ${Number(o.amount_usd).toFixed(2)} · {o.method}</div>
+                    <div className="text-xs text-muted-foreground">{o.method}</div>
                   </div>
                 </div>
 

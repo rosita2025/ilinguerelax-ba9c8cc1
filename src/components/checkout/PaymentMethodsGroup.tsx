@@ -1827,9 +1827,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
                     {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
                   </p>
-                  {!local.isUsd && !local.loading && (
-                    <p className="text-[11px] text-neutral-500 mt-1">≈ USD ${totalUsd}</p>
-                  )}
                 </div>
 
                 <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">

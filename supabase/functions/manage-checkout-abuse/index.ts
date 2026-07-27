@@ -72,42 +72,82 @@ Deno.serve(async (req) => {
       const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
       const { data, error } = await admin
         .from("checkout_rate_hits")
-        .select("ip, slug, created_at, source, referer, ua")
+        .select("ip, slug, created_at, source, referer, ua, country, email")
         .gte("created_at", since)
         .limit(5000);
       if (error) throw error;
-      type Agg = { ip: string; count: number; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null };
+      type Agg = { ip: string; count: number; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; email: string | null };
       const byIp = new Map<string, Agg>();
       const bySource = new Map<string, number>();
+      const byCountry = new Map<string, number>();
       for (const row of data || []) {
-        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null };
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua };
+        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; email: string | null };
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, email: r.email };
         cur.count += 1;
         if (r.created_at > cur.last) cur.last = r.created_at;
         if (r.slug) cur.slugs.add(r.slug);
         if (r.source) cur.sources.add(r.source);
         if (r.referer) cur.referers.add(r.referer);
         if (!cur.ua && r.ua) cur.ua = r.ua;
+        if (!cur.country && r.country) cur.country = r.country;
+        if (!cur.email && r.email) cur.email = r.email;
         byIp.set(r.ip, cur);
         const src = r.source || "direct";
         bySource.set(src, (bySource.get(src) || 0) + 1);
+        const c = (r.country || "").toUpperCase();
+        if (c) byCountry.set(c, (byCountry.get(c) || 0) + 1);
       }
+
+      // Cruce con carritos abandonados para saber si ese correo compró o no.
+      const emails = [...new Set([...byIp.values()].map((x) => x.email).filter(Boolean) as string[])];
+      const cartByEmail = new Map<string, { converted: boolean; is_completed: boolean; emails_sent: number | null }>();
+      if (emails.length) {
+        const { data: carts } = await admin
+          .from("abandoned_carts")
+          .select("customer_email, converted, is_completed, emails_sent")
+          .in("customer_email", emails);
+        for (const c of (carts || []) as { customer_email: string; converted: boolean | null; is_completed: boolean | null; emails_sent: number | null }[]) {
+          const key = (c.customer_email || "").toLowerCase();
+          const prev = cartByEmail.get(key);
+          cartByEmail.set(key, {
+            converted: Boolean(c.converted) || Boolean(prev?.converted),
+            is_completed: Boolean(c.is_completed) || Boolean(prev?.is_completed),
+            emails_sent: c.emails_sent ?? prev?.emails_sent ?? 0,
+          });
+        }
+      }
+
       const top = [...byIp.values()]
-        .map((x) => ({
-          ip: x.ip,
-          count: x.count,
-          last: x.last,
-          slugs: [...x.slugs].slice(0, 5),
-          sources: [...x.sources],
-          referers: [...x.referers].slice(0, 3),
-          ua: x.ua,
-        }))
+        .map((x) => {
+          const cart = x.email ? cartByEmail.get(x.email) : undefined;
+          const status: "purchased" | "abandoned" | "browsing" | "anonymous" = cart
+            ? (cart.converted || cart.is_completed ? "purchased" : "abandoned")
+            : x.email
+              ? "browsing"
+              : "anonymous";
+          return {
+            ip: x.ip,
+            count: x.count,
+            last: x.last,
+            slugs: [...x.slugs].slice(0, 5),
+            sources: [...x.sources],
+            referers: [...x.referers].slice(0, 3),
+            ua: x.ua,
+            country: x.country,
+            email: x.email,
+            status,
+            reminders: cart?.emails_sent ?? 0,
+          };
+        })
         .sort((a, b) => b.count - a.count)
         .slice(0, 100);
       const sources = [...bySource.entries()]
         .map(([source, count]) => ({ source, count }))
         .sort((a, b) => b.count - a.count);
-      return json({ top, sources, total: (data || []).length });
+      const countries = [...byCountry.entries()]
+        .map(([country, count]) => ({ country, count }))
+        .sort((a, b) => b.count - a.count);
+      return json({ top, sources, countries, total: (data || []).length });
     }
 
     return json({ error: "unknown action" }, 400);

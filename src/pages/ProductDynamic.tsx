@@ -8,6 +8,8 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { DigitalProductNotice } from "@/components/DigitalProductNotice";
+
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
@@ -212,6 +214,9 @@ const ProductDynamic = () => {
                   <Shield className="w-4 h-4 text-primary" /> <span>Pago seguro</span>
                 </div>
               </div>
+
+              <DigitalProductNotice className="mb-6" />
+
 
               {(() => {
                 const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";

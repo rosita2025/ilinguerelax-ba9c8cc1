@@ -47,7 +47,15 @@ const Email = ({ customerName, orderNumber, materials }: Props) => {
             Tu pago fue verificado correctamente. A continuación encontrarás los enlaces para acceder a los PDFs y contenidos que compraste.
           </Text>
 
+          <Section style={noticeBox}>
+            <Text style={noticeText}>
+              📄 <strong>Material digital en PDF descargable.</strong> No es un curso, no incluye clases en vivo,
+              profesor ni tutorías. Acceso inmediato y de por vida desde los enlaces de abajo.
+            </Text>
+          </Section>
+
           <Hr style={hr} />
+
 
           {list.map((m, i) => (
             <Section key={i} style={itemCard}>
@@ -113,3 +121,5 @@ const link = { margin: '8px 0 0', fontSize: '12px', color: '#6b7280', wordBreak:
 const linkA = { color: '#0f766e', textDecoration: 'underline' }
 const support = { fontSize: '14px', color: '#4b5563', lineHeight: '1.6', margin: '0 0 16px' }
 const footer = { textAlign: 'center' as const, color: '#9ca3af', fontSize: '12px', margin: '16px 0 0' }
+const noticeBox = { padding: '12px 16px', backgroundColor: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: '10px', margin: '4px 0 0' }
+const noticeText = { margin: 0, fontSize: '14px', color: '#115e59', lineHeight: '1.6' }

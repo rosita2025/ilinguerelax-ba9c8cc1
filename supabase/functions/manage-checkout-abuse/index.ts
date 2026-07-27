@@ -181,6 +181,7 @@ Deno.serve(async (req) => {
             referers: [...x.referers].slice(0, 3),
             ua: x.ua,
             country: x.country,
+            city: x.city,
             email: x.email,
             status,
             reminders: cart?.emails_sent ?? 0,

@@ -154,13 +154,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                     : showLocalRef
                       ? formatLocalAmount(itemPrice(item, region.tier), region.country, overridesFor(item.id)).formatted
                       : `$${itemPrice(item, region.tier).toFixed(2)}`}
-                  {showLocalRef && (
-                    <div className="text-[10px] font-normal text-muted-foreground">
-                      USD ${itemPrice(item, region.tier).toFixed(2)}
-                    </div>
-                  )}
                 </div>
               </div>
+
 
             ))}
           </div>
@@ -230,11 +226,6 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.total}</span>
             <div className="text-right">
               <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : `USD $${total.toFixed(2)}`}</div>
-              {showLocalRef && (
-                <div className="text-xs font-normal text-muted-foreground mt-0.5">
-                  ≈ USD ${total.toFixed(2)}
-                </div>
-              )}
             </div>
           </div>
 

@@ -386,8 +386,11 @@ export const StickyBuyBar = ({
                   </span>
                   <span className="flex items-center gap-1">
                     <Check className="w-3 h-3 text-emerald-600" />
-                    {lang === "en" ? "Instant access" : "Acceso inmediato"}
+                    {isPhysical
+                      ? (lang === "en" ? "Printed book" : "Libro impreso")
+                      : (lang === "en" ? "PDF · not a live course" : "PDF · no son clases")}
                   </span>
+
                   <span className="flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-emerald-600" />
                     {lang === "en" ? "6-day guarantee" : "Garantía 6 días"}

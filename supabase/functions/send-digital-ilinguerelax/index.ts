@@ -407,9 +407,7 @@ serve(async (req) => {
         ...(p.bonus_drive_url ? [{ name: p.bonus_name || "Bonus", drive_url: p.bonus_drive_url, access_key: p.bonus_access_key }] : []),
         ...((p.bonuses ?? []).filter((b) => b && b.drive_url)),
       ];
-      const priceLine = p.price_usd
-        ? `<div style="font-size:12px;color:${BRAND.muted};margin-top:2px;">USD ${Number(p.price_usd).toFixed(2)}</div>`
-        : "";
+      const priceLine = "";
       const catParts: string[] = [];
       if (p.learner_language) catParts.push(langName(p.learner_language, lang));
       if (p.target_language) catParts.push(langName(p.target_language, lang));

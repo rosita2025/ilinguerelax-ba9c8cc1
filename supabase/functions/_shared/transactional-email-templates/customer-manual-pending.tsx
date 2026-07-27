@@ -100,9 +100,6 @@ const Email = ({
             <Column><Text style={label}>Monto pagado</Text></Column>
             <Column align="right">
               <Text style={amountVal}>{fmtMoney(amount, currency)}</Text>
-              {amountUsd != null && (currency || '').toUpperCase() !== 'USD' && (
-                <Text style={usdSub}>≈ USD ${Number(amountUsd).toFixed(2)}</Text>
-              )}
             </Column>
           </Row>
           <Row>

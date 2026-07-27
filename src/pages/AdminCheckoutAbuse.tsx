@@ -108,12 +108,36 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
+interface Summary {
+  visits: number;
+  visitors: number;
+  with_email: number;
+  without_email: number;
+  purchased: number;
+  abandoned: number;
+  countries: number;
+  generated_at: string;
+}
+
+interface Lead {
+  email: string;
+  country?: string | null;
+  city?: string | null;
+  status?: string;
+  last: string;
+  slugs?: string[];
+  reminders?: number;
+}
+
 export default function AdminCheckoutAbuse() {
   const { toast } = useToast();
   const [bans, setBans] = useState<Ban[]>([]);
   const [top, setTop] = useState<StatRow[]>([]);
   const [sources, setSources] = useState<SourceRow[]>([]);
   const [countries, setCountries] = useState<CountryRow[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -126,10 +150,13 @@ export default function AdminCheckoutAbuse() {
       if (b.error) throw b.error;
       if (s.error) throw s.error;
       setBans(((b.data as { bans?: Ban[] } | null)?.bans) ?? []);
-      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[] } | null;
+      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[]; summary?: Summary; leads?: Lead[] } | null;
       setTop(stats?.top ?? []);
       setSources(stats?.sources ?? []);
       setCountries(stats?.countries ?? []);
+      setSummary(stats?.summary ?? null);
+      setLeads(stats?.leads ?? []);
+      setUpdatedAt(new Date());
     } catch {
       toast({ title: "Error al cargar datos", variant: "destructive" });
     } finally {
@@ -142,6 +169,7 @@ export default function AdminCheckoutAbuse() {
     const iv = setInterval(() => { void load(); }, 30000);
     return () => clearInterval(iv);
   }, []);
+
 
   const unban = async (ip: string) => {
     if (!confirm(`¿Desbloquear IP ${ip}?`)) return;
@@ -168,7 +196,8 @@ export default function AdminCheckoutAbuse() {
               Checkout · anti-abuso
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Rate limiting server-side por IP. Máx 20 accesos / 10 min → ban de 30 min.
+              Datos reales de las últimas 24 h · se actualiza solo cada 30 s
+              {updatedAt ? ` · actualizado ${updatedAt.toLocaleTimeString()}` : ""}
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
@@ -176,6 +205,53 @@ export default function AdminCheckoutAbuse() {
             Refrescar
           </Button>
         </div>
+
+        {summary && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { label: "Visitantes", value: summary.visitors, hint: `${summary.visits} visitas` },
+              { label: "Países", value: summary.countries, hint: "distintos" },
+              { label: "Dejaron correo", value: summary.with_email, hint: "identificados" },
+              { label: "Sin correo", value: summary.without_email, hint: "no llenó formulario" },
+              { label: "Compraron", value: summary.purchased, hint: "confirmadas" },
+              { label: "Abandonaron", value: summary.abandoned, hint: "carrito abierto" },
+            ].map((k) => (
+              <div key={k.label} className="border rounded-lg p-3">
+                <div className="text-xs text-muted-foreground">{k.label}</div>
+                <div className="text-2xl font-bold">{k.value}</div>
+                <div className="text-[11px] text-muted-foreground">{k.hint}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <section className="border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-muted/40 border-b">
+            <h2 className="font-semibold">Correos capturados · últimas 24 h ({leads.length})</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Personas que escribieron su correo en el checkout, con su país y si compraron o abandonaron.
+            </p>
+          </div>
+          {leads.length === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground text-center">
+              Nadie llenó el formulario en las últimas 24 h.
+            </p>
+          ) : (
+            <div className="divide-y">
+              {leads.map((l, i) => (
+                <div key={`${l.email}-${i}`} className="p-3 flex flex-wrap items-center gap-2 text-sm">
+                  <CountryBadge code={l.country} />
+                  {l.city && <span className="text-xs text-muted-foreground">📍 {l.city}</span>}
+                  <a href={`mailto:${l.email}`} className="text-primary hover:underline break-all">{l.email}</a>
+                  <StatusBadge status={l.status} />
+                  <span className="text-xs text-muted-foreground ml-auto">{new Date(l.last).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b flex items-center justify-between">

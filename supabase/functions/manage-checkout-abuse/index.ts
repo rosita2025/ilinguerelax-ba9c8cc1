@@ -85,9 +85,10 @@ Deno.serve(async (req) => {
           (data || [])
             .filter((r) => !(r as { country: string | null }).country)
             .map((r) => (r as { ip: string }).ip)
-            .filter((ip) => ip && ip !== "unknown" && !ip.startsWith("127.") && !ip.startsWith("192.168.")),
+            .filter((ip) => ip && ip !== "unknown" && !ip.startsWith("127.") && !ip.startsWith("192.168.") && !ip.startsWith("10.")),
         ),
-      ].slice(0, 40);
+      ].slice(0, 250);
+
       const resolved = new Map<string, { country: string; city: string | null }>();
       if (unknown.length) {
         await Promise.all(
@@ -145,6 +146,25 @@ Deno.serve(async (req) => {
         if (c) byCountry.set(c, (byCountry.get(c) || 0) + 1);
       }
 
+      // Backfill de correo: si en las últimas 24 h la IP no dejó correo pero esa
+      // misma IP sí lo escribió antes (visita previa), lo recuperamos para saber
+      // quién es. No inventa datos: solo reutiliza correos reales de esa IP.
+      const ipsSinEmail = [...byIp.values()].filter((x) => !x.email).map((x) => x.ip).slice(0, 200);
+      if (ipsSinEmail.length) {
+        const { data: prev } = await admin
+          .from("checkout_rate_hits")
+          .select("ip, email, created_at")
+          .in("ip", ipsSinEmail)
+          .not("email", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(500);
+        for (const p of (prev || []) as { ip: string; email: string }[]) {
+          const agg = byIp.get(p.ip);
+          if (agg && !agg.email) agg.email = p.email;
+        }
+      }
+
+
       // Cruce con carritos abandonados para saber si ese correo compró o no.
       const emails = [...new Set([...byIp.values()].map((x) => x.email).filter(Boolean) as string[])];
       const cartByEmail = new Map<string, { converted: boolean; is_completed: boolean; emails_sent: number | null }>();
@@ -195,7 +215,23 @@ Deno.serve(async (req) => {
       const countries = [...byCountry.entries()]
         .map(([country, count]) => ({ country, count }))
         .sort((a, b) => b.count - a.count);
-      return json({ top, sources, countries, total: (data || []).length });
+
+      // Resumen real de las últimas 24 h (lo más importante para decidir).
+      const summary = {
+        visits: (data || []).length,
+        visitors: byIp.size,
+        with_email: top.filter((r) => !!r.email).length,
+        without_email: top.filter((r) => !r.email).length,
+        purchased: top.filter((r) => r.status === "purchased").length,
+        abandoned: top.filter((r) => r.status === "abandoned").length,
+        countries: countries.length,
+        generated_at: new Date().toISOString(),
+      };
+      const leads = top
+        .filter((r) => !!r.email)
+        .map((r) => ({ email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders }));
+      return json({ top, sources, countries, summary, leads, total: (data || []).length });
+
     }
 
     return json({ error: "unknown action" }, 400);

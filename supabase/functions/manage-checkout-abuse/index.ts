@@ -85,9 +85,10 @@ Deno.serve(async (req) => {
           (data || [])
             .filter((r) => !(r as { country: string | null }).country)
             .map((r) => (r as { ip: string }).ip)
-            .filter((ip) => ip && ip !== "unknown" && !ip.startsWith("127.") && !ip.startsWith("192.168.")),
+            .filter((ip) => ip && ip !== "unknown" && !ip.startsWith("127.") && !ip.startsWith("192.168.") && !ip.startsWith("10.")),
         ),
-      ].slice(0, 40);
+      ].slice(0, 250);
+
       const resolved = new Map<string, { country: string; city: string | null }>();
       if (unknown.length) {
         await Promise.all(

@@ -96,6 +96,25 @@ export default function Checkout() {
     return () => { cancelled = true; };
   }, [slug, navigate]);
 
+  // Cuando el comprador escribe su correo, lo asociamos al acceso ya
+  // registrado (misma IP) para poder ver en /admin/checkout-abuse quién
+  // dejó datos y no completó la compra. No crea hits nuevos.
+  const buyerEmail = useCheckoutPruebaStore((s) => s.buyer.email);
+  const identifiedRef = useRef<string | null>(null);
+  useEffect(() => {
+    const email = (buyerEmail || "").trim().toLowerCase();
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return;
+    if (identifiedRef.current === email) return;
+    identifiedRef.current = email;
+    const tid = setTimeout(() => {
+      supabase.functions
+        .invoke("checkout-gate-check", {
+          body: { slug, email, country: (region.country || "").toUpperCase() },
+        })
+        .catch(() => {});
+    }, 1200);
+    return () => clearTimeout(tid);
+  }, [buyerEmail, slug, region.country]);
 
 
 

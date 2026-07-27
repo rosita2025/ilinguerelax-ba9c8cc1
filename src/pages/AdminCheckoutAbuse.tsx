@@ -23,6 +23,7 @@ interface StatRow {
   referers: string[];
   ua: string | null;
   country?: string | null;
+  city?: string | null;
   email?: string | null;
   status?: "purchased" | "abandoned" | "browsing" | "anonymous";
   reminders?: number;

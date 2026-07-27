@@ -108,12 +108,36 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
+interface Summary {
+  visits: number;
+  visitors: number;
+  with_email: number;
+  without_email: number;
+  purchased: number;
+  abandoned: number;
+  countries: number;
+  generated_at: string;
+}
+
+interface Lead {
+  email: string;
+  country?: string | null;
+  city?: string | null;
+  status?: string;
+  last: string;
+  slugs?: string[];
+  reminders?: number;
+}
+
 export default function AdminCheckoutAbuse() {
   const { toast } = useToast();
   const [bans, setBans] = useState<Ban[]>([]);
   const [top, setTop] = useState<StatRow[]>([]);
   const [sources, setSources] = useState<SourceRow[]>([]);
   const [countries, setCountries] = useState<CountryRow[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -126,10 +150,13 @@ export default function AdminCheckoutAbuse() {
       if (b.error) throw b.error;
       if (s.error) throw s.error;
       setBans(((b.data as { bans?: Ban[] } | null)?.bans) ?? []);
-      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[] } | null;
+      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[]; summary?: Summary; leads?: Lead[] } | null;
       setTop(stats?.top ?? []);
       setSources(stats?.sources ?? []);
       setCountries(stats?.countries ?? []);
+      setSummary(stats?.summary ?? null);
+      setLeads(stats?.leads ?? []);
+      setUpdatedAt(new Date());
     } catch {
       toast({ title: "Error al cargar datos", variant: "destructive" });
     } finally {
@@ -142,6 +169,7 @@ export default function AdminCheckoutAbuse() {
     const iv = setInterval(() => { void load(); }, 30000);
     return () => clearInterval(iv);
   }, []);
+
 
   const unban = async (ip: string) => {
     if (!confirm(`¿Desbloquear IP ${ip}?`)) return;

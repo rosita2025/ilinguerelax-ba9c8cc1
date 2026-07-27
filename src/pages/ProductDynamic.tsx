@@ -213,6 +213,9 @@ const ProductDynamic = () => {
                 </div>
               </div>
 
+              <DigitalProductNotice className="mb-6" />
+
+
               {(() => {
                 const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
                 const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);

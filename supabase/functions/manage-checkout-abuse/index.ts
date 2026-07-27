@@ -136,6 +136,7 @@ Deno.serve(async (req) => {
         if (r.referer) cur.referers.add(r.referer);
         if (!cur.ua && r.ua) cur.ua = r.ua;
         if (!cur.country && r.country) cur.country = r.country;
+        if (!cur.city && r.city) cur.city = r.city;
         if (!cur.email && r.email) cur.email = r.email;
         byIp.set(r.ip, cur);
         const src = r.source || "direct";

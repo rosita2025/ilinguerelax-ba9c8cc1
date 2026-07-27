@@ -8,6 +8,8 @@ import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsL
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
+import { DigitalProductNotice } from "@/components/DigitalProductNotice";
+
 
 
 interface OrderSummaryProps {

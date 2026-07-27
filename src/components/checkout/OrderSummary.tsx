@@ -154,11 +154,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                     : showLocalRef
                       ? formatLocalAmount(itemPrice(item, region.tier), region.country, overridesFor(item.id)).formatted
                       : `$${itemPrice(item, region.tier).toFixed(2)}`}
-                  {showLocalRef && (
-                    <div className="text-[10px] font-normal text-muted-foreground">
-                      USD ${itemPrice(item, region.tier).toFixed(2)}
-                    </div>
-                  )}
+                </div>
+
                 </div>
               </div>
 

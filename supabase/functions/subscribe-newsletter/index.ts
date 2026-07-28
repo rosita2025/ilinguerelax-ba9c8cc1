@@ -281,11 +281,6 @@ Deno.serve(async (req) => {
     const bodyLang = body?.language ? String(body.language) : undefined;
     const countryHint = body?.country ? String(body.country) : undefined;
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return new Response(JSON.stringify({ error: 'invalid_email' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
     if (name && name.length > 120) {
       return new Response(JSON.stringify({ error: 'invalid_name' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },

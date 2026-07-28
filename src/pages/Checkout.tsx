@@ -565,7 +565,6 @@ export default function Checkout() {
           <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
 
           <CheckoutTestimonials />
-          <MoreProductsPanel parentSku={catalogItem?.adminSku ?? null} />
 
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

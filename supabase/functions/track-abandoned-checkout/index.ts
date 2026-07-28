@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const email = normalizeEmail(body.email);
+    let email = normalizeEmail(body.email);
     const name = String(body.name || "Cliente").trim() || "Cliente";
     const phone = String(body.phone || "").trim();
     const rawProductType = String(body.product_type || body.slug || "checkout").slice(0, 180);
@@ -102,6 +102,19 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Lista negra / blanca configurable: corrige typos y bloquea correos
+    // desechables o falsos ANTES de tocar Brevo (ahorra consumo de envíos).
+    const guard = await guardEmail(supabase, email);
+    if (!guard.ok) {
+      console.warn("[track-abandoned-checkout] correo rechazado:", guard.email, guard.reason);
+      return new Response(JSON.stringify({ error: "invalid email", reason: guard.reason }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    email = guard.email;
+
 
     // Resolver idioma: body.language > tabla country_language_map > TLD > "es"
     let language: string;

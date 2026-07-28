@@ -62,6 +62,23 @@ export type EmailCheck = {
   message?: string;
 };
 
+/** Distancia de edición (Levenshtein) simple para detectar typos de 1 letra. */
+function editDistance(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 2) return 99;
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+    }
+  }
+  return dp[a.length][b.length];
+}
+
 /** Corrige el dominio si coincide con un typo conocido o con una variante de un dominio confiable. */
 function fixDomain(domain: string): string {
   if (TYPO_DOMAINS[domain]) return TYPO_DOMAINS[domain];
@@ -70,8 +87,13 @@ function fixDomain(domain: string): string {
   for (const trusted of TRUSTED_DOMAINS) {
     if (domain.startsWith(trusted) && domain.length - trusted.length <= 2) return trusted;
   }
+  // "gmaily.com" / "gmail.xom" -> dominio confiable a 1 letra de distancia
+  for (const trusted of TRUSTED_DOMAINS) {
+    if (editDistance(domain, trusted) === 1) return trusted;
+  }
   return domain;
 }
+
 
 export function normalizeEmailBasic(raw: string): string {
   let email = String(raw || "").trim().toLowerCase().replace(/\s+/g, "");

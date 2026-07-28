@@ -274,7 +274,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const email = String(body?.email || '').trim().toLowerCase();
+    let email = String(body?.email || '').trim().toLowerCase();
     const name = body?.name ? String(body.name).trim() : undefined;
     const source = body?.source ? String(body.source).slice(0, 60) : 'popup';
     const bodyLang = body?.language ? String(body.language) : undefined;
@@ -295,6 +295,17 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
+
+    // Lista negra / blanca configurable (dominios, TLD y typos) antes de Brevo.
+    const guard = await guardEmail(supabase, email);
+    if (!guard.ok) {
+      console.warn('[subscribe-newsletter] correo rechazado:', guard.email, guard.reason);
+      return new Response(JSON.stringify({ error: 'invalid_email', reason: guard.reason }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    email = guard.email;
+
 
     const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim()
       || req.headers.get('cf-connecting-ip') || '';

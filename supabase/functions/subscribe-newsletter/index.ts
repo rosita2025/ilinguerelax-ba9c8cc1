@@ -2,6 +2,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { upsertBrevoContact } from '../_shared/brevoContact.ts';
 import { sendEmail } from '../_shared/brevo.ts';
+import { guardEmail } from '../_shared/emailGuard.ts';
 
 const FROM = 'iLingue Relax <hola@ilinguerelax.com>';
 const REPLY_TO = 'hola@ilinguerelax.com';

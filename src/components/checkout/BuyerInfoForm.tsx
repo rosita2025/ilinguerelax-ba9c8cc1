@@ -10,15 +10,16 @@ import "react-phone-number-input/style.css";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
+import { checkEmail } from "@/lib/emailGuard";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function normalizeEmail(raw: string) {
-  const email = (raw || "").trim().toLowerCase();
-  return email.endsWith("@gmail") ? `${email}.com` : email;
+  return checkEmail(raw).email;
 }
 
 export function isBuyerValid(buyer: { fullName: string; email: string }) {
-  return buyer.fullName.trim().length >= 3 && EMAIL_RE.test(buyer.email.trim());
+  return buyer.fullName.trim().length >= 3 && checkEmail(buyer.email).ok;
 }
 
 export const BUYER_FORM_ID = "buyer-info-form";

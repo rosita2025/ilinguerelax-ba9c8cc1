@@ -996,6 +996,42 @@ export type Database = {
         }
         Relationships: []
       }
+      email_domain_rules: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          kind: string
+          list_type: string
+          maps_to: string | null
+          note: string | null
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          kind: string
+          list_type: string
+          maps_to?: string | null
+          note?: string | null
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          kind?: string
+          list_type?: string
+          maps_to?: string | null
+          note?: string | null
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string

@@ -10,15 +10,14 @@ import "react-phone-number-input/style.css";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { checkEmail } from "@/lib/emailGuard";
 
 function normalizeEmail(raw: string) {
-  const email = (raw || "").trim().toLowerCase();
-  return email.endsWith("@gmail") ? `${email}.com` : email;
+  return checkEmail(raw).email;
 }
 
 export function isBuyerValid(buyer: { fullName: string; email: string }) {
-  return buyer.fullName.trim().length >= 3 && EMAIL_RE.test(buyer.email.trim());
+  return buyer.fullName.trim().length >= 3 && checkEmail(buyer.email).ok;
 }
 
 export const BUYER_FORM_ID = "buyer-info-form";
@@ -73,8 +72,11 @@ export function BuyerInfoForm() {
   // abandonado + Brevo inmediatamente, sin esperar a que elija método de
   // pago. Cubre casos de señal débil, celular apagado, olvido, etc.
   const fireAbandonedCapture = () => {
-    const email = normalizeEmail(buyer.email);
-    if (!EMAIL_RE.test(email)) return;
+    const check = checkEmail(buyer.email);
+    // Autocorrige typos frecuentes (.mxm -> .mx, gmial -> gmail) al salir del campo
+    if (check.corrected && check.email !== buyer.email) setBuyer({ email: check.email });
+    if (!check.ok) return;
+    const email = check.email;
     trackAbandonedCheckoutNow({
       email,
       name: buyer.fullName,
@@ -94,7 +96,8 @@ export function BuyerInfoForm() {
   const emailRef = useRef<HTMLInputElement | null>(null);
 
   const nameInvalid = buyer.fullName.trim().length < 3;
-  const emailInvalid = !EMAIL_RE.test(buyer.email.trim());
+  const emailCheck = checkEmail(buyer.email);
+  const emailInvalid = !emailCheck.ok;
 
   useEffect(() => {
     const handler = () => {
@@ -203,7 +206,7 @@ export function BuyerInfoForm() {
             />
           </div>
           {showEmailError ? (
-            <p className="text-[11px] text-destructive mt-1">{t.emailError}</p>
+            <p className="text-[11px] text-destructive mt-1">{emailCheck.message || t.emailError}</p>
           ) : (
             <p className="text-[11px] text-muted-foreground mt-1">
               {t.emailHint}

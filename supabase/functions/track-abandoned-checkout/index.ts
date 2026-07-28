@@ -91,13 +91,6 @@ Deno.serve(async (req) => {
           })
       : [];
 
-    if (!EMAIL_RE.test(email)) {
-      return new Response(JSON.stringify({ error: "invalid email" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -106,9 +99,9 @@ Deno.serve(async (req) => {
     // Lista negra / blanca configurable: corrige typos y bloquea correos
     // desechables o falsos ANTES de tocar Brevo (ahorra consumo de envíos).
     const guard = await guardEmail(supabase, email);
-    if (!guard.ok) {
+    if (!guard.ok || !EMAIL_RE.test(guard.email)) {
       console.warn("[track-abandoned-checkout] correo rechazado:", guard.email, guard.reason);
-      return new Response(JSON.stringify({ error: "invalid email", reason: guard.reason }), {
+      return new Response(JSON.stringify({ error: "invalid email", reason: guard.reason ?? "format" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

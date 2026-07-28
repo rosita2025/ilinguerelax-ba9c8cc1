@@ -131,6 +131,18 @@ export function normalizeEmailBasic(raw: unknown): string {
   return email;
 }
 
+function editDistance(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 2) return 99;
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+  }
+  return dp[a.length][b.length];
+}
+
 export function checkEmailWithRules(raw: unknown, rules: EmailRules): EmailCheck {
   const base = normalizeEmailBasic(raw);
   const at = base.lastIndexOf("@");
@@ -141,10 +153,18 @@ export function checkEmailWithRules(raw: unknown, rules: EmailRules): EmailCheck
   if (rules.typos[domain]) {
     domain = rules.typos[domain];
   } else if (!rules.allowDomains.has(domain) && !rules.blockDomains.has(domain)) {
+    let fixed = "";
     for (const trusted of rules.allowDomains) {
-      if (domain.startsWith(trusted) && domain.length - trusted.length <= 2) { domain = trusted; break; }
+      if (domain.startsWith(trusted) && domain.length - trusted.length <= 2) { fixed = trusted; break; }
     }
+    if (!fixed) {
+      for (const trusted of rules.allowDomains) {
+        if (editDistance(domain, trusted) === 1) { fixed = trusted; break; }
+      }
+    }
+    if (fixed) domain = fixed;
   }
+
   const email = `${local}@${domain}`;
   const corrected = email !== base;
 

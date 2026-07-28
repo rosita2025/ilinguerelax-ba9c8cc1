@@ -206,7 +206,7 @@ export function BuyerInfoForm() {
             />
           </div>
           {showEmailError ? (
-            <p className="text-[11px] text-destructive mt-1">{t.emailError}</p>
+            <p className="text-[11px] text-destructive mt-1">{emailCheck.message || t.emailError}</p>
           ) : (
             <p className="text-[11px] text-muted-foreground mt-1">
               {t.emailHint}

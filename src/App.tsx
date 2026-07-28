@@ -289,6 +289,7 @@ const App = () => (
                   <Route path="/admin/purchases-status" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />
                   <Route path="/admin/checkout-abuse" element={<AdminGate><AdminCheckoutAbuse /></AdminGate>} />
                   <Route path="/admin/payment-errors" element={<AdminGate><AdminPaymentErrors /></AdminGate>} />
+                  <Route path="/admin/email-rules" element={<AdminGate><AdminEmailRules /></AdminGate>} />
                   <Route path="/admin/delivery-audit" element={<AdminGate><AdminDeliveryAudit /></AdminGate>} />
                   <Route path="/admin/brevo-abandoned" element={<AdminGate><AdminBrevoAbandoned /></AdminGate>} />
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />

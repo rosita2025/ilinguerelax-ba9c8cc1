@@ -86,6 +86,7 @@ const AdminNewsletterDrip = lazy(() => import("./pages/AdminNewsletterDrip"));
 
 const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
 const AdminBotReport = lazy(() => import("./pages/AdminBotReport"));
+const AdminEmailRules = lazy(() => import("./pages/AdminEmailRules"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));

@@ -74,8 +74,11 @@ export function BuyerInfoForm() {
   // abandonado + Brevo inmediatamente, sin esperar a que elija método de
   // pago. Cubre casos de señal débil, celular apagado, olvido, etc.
   const fireAbandonedCapture = () => {
-    const email = normalizeEmail(buyer.email);
-    if (!EMAIL_RE.test(email)) return;
+    const check = checkEmail(buyer.email);
+    // Autocorrige typos frecuentes (.mxm -> .mx, gmial -> gmail) al salir del campo
+    if (check.corrected && check.email !== buyer.email) setBuyer({ email: check.email });
+    if (!check.ok) return;
+    const email = check.email;
     trackAbandonedCheckoutNow({
       email,
       name: buyer.fullName,

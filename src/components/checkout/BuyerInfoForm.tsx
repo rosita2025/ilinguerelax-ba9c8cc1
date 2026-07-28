@@ -12,8 +12,6 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 
 import { checkEmail } from "@/lib/emailGuard";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 function normalizeEmail(raw: string) {
   return checkEmail(raw).email;
 }

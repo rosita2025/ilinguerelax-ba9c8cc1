@@ -98,7 +98,8 @@ export function BuyerInfoForm() {
   const emailRef = useRef<HTMLInputElement | null>(null);
 
   const nameInvalid = buyer.fullName.trim().length < 3;
-  const emailInvalid = !EMAIL_RE.test(buyer.email.trim());
+  const emailCheck = checkEmail(buyer.email);
+  const emailInvalid = !emailCheck.ok;
 
   useEffect(() => {
     const handler = () => {

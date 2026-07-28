@@ -35,7 +35,9 @@ export function BuyerInfoForm() {
         if (!raw) return;
         const saved = JSON.parse(raw) as { email?: string; name?: string; phone?: string; coupon?: string };
         const patch: Partial<{ fullName: string; email: string; phone: string }> = {};
-        if (saved.email && !buyer.email) patch.email = saved.email;
+        // Solo autocompletamos correos válidos (ya corregidos: gmaily.com -> gmail.com)
+        const savedCheck = saved.email ? checkEmail(saved.email) : null;
+        if (savedCheck?.ok && !buyer.email) patch.email = savedCheck.email;
         if (saved.name && !buyer.fullName) patch.fullName = saved.name;
         if (saved.phone && !buyer.phone) patch.phone = saved.phone;
         if (patch.email || patch.fullName || patch.phone) setBuyer(patch);
@@ -51,16 +53,20 @@ export function BuyerInfoForm() {
   // Persist buyer edits into `ilr_buyer` so abandoned-cart recovery links
   // pueden regenerar los datos en cualquier dispositivo (estilo Shopify).
   useEffect(() => {
-    const email = (buyer.email || "").trim();
+    const typed = (buyer.email || "").trim();
+    const check = typed ? checkEmail(typed) : null;
+    // Nunca guardamos correos inválidos (gmaily.com, .mxm1, desechables)
+    const email = check?.ok ? check.email : "";
     const name = (buyer.fullName || "").trim();
     const phone = (buyer.phone || "").trim();
     if (!email && !name && !phone) return;
     try {
       const raw = localStorage.getItem("ilr_buyer");
       const prev = raw ? JSON.parse(raw) : {};
-      localStorage.setItem("ilr_buyer", JSON.stringify({ ...prev, email, name, phone }));
+      localStorage.setItem("ilr_buyer", JSON.stringify({ ...prev, ...(email ? { email } : {}), name, phone }));
     } catch { /* ignore */ }
   }, [buyer.email, buyer.fullName, buyer.phone]);
+
 
   const region = useRegionTier();
   const { language, countryCode } = useI18n();

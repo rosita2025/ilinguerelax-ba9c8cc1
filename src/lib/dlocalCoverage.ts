@@ -24,6 +24,8 @@ export type DlocalCountry = {
   walletLabel?: string;
   /** Clave de método para el bloque separado (por defecto dlocal_mercadopago). */
   walletKey?: string;
+  /** Si true, el bloque de billetera se muestra como "Muy pronto" y no permite comprar. */
+  walletComingSoon?: boolean;
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [

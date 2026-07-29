@@ -69,9 +69,20 @@ const COUNTRY_META: Record<string, { name: string; flag: string }> = {
 const DEFAULT_SKU =
   "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
+type MethodLite = {
+  region_code: string;
+  method_key: string;
+  label: string;
+  note?: string | null;
+  enabled: boolean;
+  sort_order?: number;
+};
+
 interface Props {
   regions?: RegionLite[];
+  methods?: MethodLite[];
 }
+
 
 export default function AdminCheckoutPreview({ regions = [] }: Props) {
   // Construir lista de países disponibles SOLO a partir de las regiones configuradas.

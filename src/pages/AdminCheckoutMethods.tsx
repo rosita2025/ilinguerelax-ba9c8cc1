@@ -128,8 +128,8 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },
   { key: "binance_pay", label: "Binance Pay (USDT)", note: "Cripto manual · global · Verificación 1-24h", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "clabe_mx", label: "SPEI / CLABE (México)", note: "Transferencia manual MXN a CLABE mexicana · Verificación 1-24h", icon: "Building2", countryCodes: ["MX"] },
-  { key: "dlocal_transfer", label: "dLocal Go — transferencia", note: "Transferencia bancaria local vía dLocal Go (SPEI MX, PSE CO, Pix BR, CBU AR, PagoEfectivo/transferencia PE…)", icon: "Building2", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
-  { key: "dlocal_cash", label: "dLocal Go — efectivo", note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)", icon: "Banknote", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
+  { key: "dlocal_transfer", label: "Transferencia bancaria", note: "Transferencia bancaria local vía dLocal Go (SPEI MX, PSE CO, Pix BR, CBU AR, PagoEfectivo/transferencia PE…)", icon: "Building2", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
+  { key: "dlocal_cash", label: "Pago en efectivo", note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)", icon: "Banknote", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
   { key: "hotmart_1click", label: "Hotmart (1 clic)", note: "Redirige al enlace de Hotmart del producto según el país. Precio y moneda gestionados por Hotmart.", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
 ];
 

@@ -34,12 +34,12 @@ const DLOCAL_COUNTRIES = DLOCAL_COVERAGE;
 
 const LABELS: Record<Kind, { label: string; note: string; icon: string }> = {
   transfer: {
-    label: "dLocal Go — transferencia",
+    label: "Transferencia bancaria",
     note: "Transferencia bancaria local vía dLocal Go (SPEI MX, PSE CO, Pix BR, CBU AR, transferencia PE…)",
     icon: "Building2",
   },
   cash: {
-    label: "dLocal Go — efectivo",
+    label: "Pago en efectivo",
     note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)",
     icon: "Banknote",
   },
@@ -140,7 +140,7 @@ export default function AdminDlocal() {
           method_key: keyFor(country, kind),
           label: kind === "wallet"
             ? (DLOCAL_COUNTRIES.find(x => x.code === country)?.walletLabel
-                ? `dLocal Go — ${DLOCAL_COUNTRIES.find(x => x.code === country)!.walletLabel}`
+                ? `${DLOCAL_COUNTRIES.find(x => x.code === country)!.walletLabel}`
                 : LABELS.wallet.label)
             : LABELS[kind].label,
           note: LABELS[kind].note,

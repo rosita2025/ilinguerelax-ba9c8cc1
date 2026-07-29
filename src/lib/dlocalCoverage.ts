@@ -111,3 +111,101 @@ export function dlocalRails(country: string | null | undefined, kind: DlocalKind
 }
 
 export const DLOCAL_COUNTRY_CODES = DLOCAL_COVERAGE.map((c) => c.code);
+
+/* ------------------------------------------------------------------
+ * Etiquetas visuales (badges) generadas SIEMPRE desde la cobertura real
+ * mostrada en /admin/dlocal, para que el checkout y el panel coincidan
+ * en todos los países (transferencia, efectivo y billetera digital).
+ * ------------------------------------------------------------------ */
+
+export type DlocalBadge = { label: string; bg: string; color: string };
+
+const BRAND_COLORS: Record<string, { bg: string; color: string }> = {
+  // Transferencia / banca
+  pix: { bg: "#32BCAD", color: "#06211F" },
+  pse: { bg: "#0B5AA6", color: "#ffffff" },
+  spei: { bg: "#0F766E", color: "#ffffff" },
+  sinpe: { bg: "#0B5AA6", color: "#ffffff" },
+  "sinpe movil": { bg: "#0B5AA6", color: "#ffffff" },
+  "transferencia cbu/cvu": { bg: "#0F766E", color: "#ffffff" },
+  bcp: { bg: "#F58220", color: "#1F2937" },
+  interbank: { bg: "#00A94F", color: "#ffffff" },
+  bbva: { bg: "#004481", color: "#ffffff" },
+  "bbva mexico": { bg: "#004481", color: "#ffffff" },
+  scotiabank: { bg: "#EC111A", color: "#ffffff" },
+  santander: { bg: "#EC0000", color: "#ffffff" },
+  banorte: { bg: "#EB0029", color: "#ffffff" },
+  citibanamex: { bg: "#003B70", color: "#ffffff" },
+  bancolombia: { bg: "#FDDA24", color: "#1F2937" },
+  davivienda: { bg: "#E1251B", color: "#ffffff" },
+  itau: { bg: "#EC7000", color: "#1F2937" },
+  "banco do brasil": { bg: "#FAE128", color: "#1F2937" },
+  bradesco: { bg: "#CC092F", color: "#ffffff" },
+  brou: { bg: "#0B5AA6", color: "#ffffff" },
+  "bac credomatic": { bg: "#E4002B", color: "#ffffff" },
+  "banco pichincha": { bg: "#FFD100", color: "#1F2937" },
+  // Efectivo
+  oxxo: { bg: "#E31E24", color: "#ffffff" },
+  pagoefectivo: { bg: "#EC0928", color: "#ffffff" },
+  "pago efectivo": { bg: "#EC0928", color: "#ffffff" },
+  rapipago: { bg: "#F5A623", color: "#1F2937" },
+  "pago facil": { bg: "#E4002B", color: "#ffffff" },
+  efecty: { bg: "#FFD400", color: "#1F2937" },
+  baloto: { bg: "#0B5AA6", color: "#ffffff" },
+  "boleto bancario": { bg: "#1F2937", color: "#ffffff" },
+  loterica: { bg: "#ffffff", color: "#1F2937" },
+  servipag: { bg: "#111827", color: "#00C08B" },
+  multicaja: { bg: "#ffffff", color: "#1F2937" },
+  redpagos: { bg: "#E4002B", color: "#ffffff" },
+  abitab: { bg: "#F5A623", color: "#1F2937" },
+  infonet: { bg: "#0B5AA6", color: "#ffffff" },
+  // Billeteras
+  yape: { bg: "#6B1FA0", color: "#ffffff" },
+  plin: { bg: "#00C2C7", color: "#04252B" },
+  nequi: { bg: "#200020", color: "#DA0081" },
+  daviplata: { bg: "#E1251B", color: "#ffffff" },
+  "mercado pago": { bg: "#00A6E0", color: "#00263A" },
+  "spin by oxxo": { bg: "#E31E24", color: "#ffffff" },
+  uala: { bg: "#FF4E4E", color: "#ffffff" },
+  "personal pay": { bg: "#00B2E3", color: "#00263A" },
+  modo: { bg: "#111827", color: "#00E0A1" },
+  picpay: { bg: "#21C25E", color: "#04250F" },
+  pagbank: { bg: "#0F9D58", color: "#ffffff" },
+  "ame digital": { bg: "#FF3C82", color: "#ffffff" },
+  mach: { bg: "#111827", color: "#00E0A1" },
+  tenpo: { bg: "#00E08F", color: "#04250F" },
+  "tigo money": { bg: "#0033A0", color: "#ffffff" },
+  yappy: { bg: "#00A9E0", color: "#00263A" },
+  deuna: { bg: "#E1251B", color: "#ffffff" },
+};
+
+const KIND_FALLBACK: Record<DlocalKind, { bg: string; color: string }> = {
+  transfer: { bg: "#0F766E", color: "#ffffff" },
+  cash: { bg: "#F5A623", color: "#1F2937" },
+  wallet: { bg: "#4F46E5", color: "#ffffff" },
+};
+
+const normalize = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+/**
+ * Badges del checkout para un país + tipo de cobro, tomados de la misma
+ * cobertura que muestra /admin/dlocal (una sola fuente de verdad).
+ */
+export function dlocalBadges(
+  country: string | null | undefined,
+  kind: DlocalKind,
+  max = 3,
+): DlocalBadge[] {
+  const rails = dlocalRails(country, kind).slice(0, max);
+  return rails.map((rail) => {
+    const key = normalize(rail);
+    const brand =
+      BRAND_COLORS[key] ??
+      BRAND_COLORS[key.replace(/\s*\(.*\)\s*/g, "").trim()] ??
+      Object.entries(BRAND_COLORS).find(([k]) => key.startsWith(k))?.[1] ??
+      KIND_FALLBACK[kind];
+    return { label: rail, bg: brand.bg, color: brand.color };
+  });
+}
+

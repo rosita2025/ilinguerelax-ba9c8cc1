@@ -12,6 +12,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
+import { isSettledStatus, isPendingStatus, isFailedStatus } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const API_BASE = "https://api.dlocalgo.com/v1";
@@ -52,9 +53,10 @@ function tooMany(ip: string): boolean {
 /** Traduce el estado crudo de dLocal a los 4 estados que entiende el checkout. */
 function normalize(status: string): "paid" | "pending" | "rejected" | "unknown" {
   const s = status.toUpperCase();
-  if (s === "PAID" || s === "AUTHORIZED" || s === "COMPLETED") return "paid";
-  if (s === "PENDING" || s === "PROCESSING" || s === "IN_PROCESS" || s === "VERIFIED") return "pending";
-  if (s === "REJECTED" || s === "CANCELLED" || s === "CANCELED" || s === "EXPIRED" || s === "FAILED") return "rejected";
+  // AUTHORIZED/VERIFIED NO son "pagado": el dinero aún no está acreditado.
+  if (isSettledStatus(s)) return "paid";
+  if (isPendingStatus(s)) return "pending";
+  if (isFailedStatus(s)) return "rejected";
   return "unknown";
 }
 

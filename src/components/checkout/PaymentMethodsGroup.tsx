@@ -512,13 +512,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     redirectingRef.current = true;
     setMpLoading(paymentType);
     try {
-      await captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
-      supabase.from("email_contacts").upsert({
+      void captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
+      void supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
         source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
-      }, { onConflict: "email,source" }).then(() => {});
+      }, { onConflict: "email,source" }).then(() => {}, () => {});
 
       const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
@@ -712,7 +712,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
     // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
     if (selected === "hotmart") { await redirectToHotmart(); return; }
-    await captureAbandonedCheckout(selected, true);
+    // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
+    // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
+    void captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
     if (selected === "dlocal_cash") { await payDlocal("cash"); return; }

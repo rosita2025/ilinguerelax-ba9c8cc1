@@ -212,6 +212,8 @@ export const template = {
   previewData: {
     orderNumber: 'ILR-YP-1234',
     customerName: 'María',
+    customerEmail: 'maria@ejemplo.com',
+
     productName: '1,000 Verbos en Inglés',
     amount: 45,
     currency: 'PEN',

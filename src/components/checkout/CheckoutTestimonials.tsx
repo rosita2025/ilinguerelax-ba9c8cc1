@@ -209,8 +209,8 @@ const TestimonialsContent = memo(function TestimonialsContent() {
 
   const items = useMemo(() => {
     const cc = (region.country || "").toUpperCase();
-    return POOL[cc] ?? DEFAULT;
-  }, [region.country]);
+    return poolForCountry(cc, language);
+  }, [region.country, language]);
 
   const countryLabel = items[0]?.country ?? "";
   const quotes = QUOTES[language] ?? QUOTES.es;

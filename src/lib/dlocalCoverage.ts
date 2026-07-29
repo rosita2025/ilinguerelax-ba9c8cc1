@@ -20,6 +20,8 @@ export type DlocalCountry = {
   cash: string[];
   /** Billeteras / tarjetas Mercado Pago (bloque separado, vacío = no soportado). */
   wallet?: string[];
+  /** Título del bloque separado (por defecto Mercado Pago). */
+  walletLabel?: string;
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [
@@ -28,7 +30,8 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     cash: ["Rapipago", "Pago Fácil", "Cobro Express", "Provincia NET"],
     wallet: ["Mercado Pago (saldo)", "Tarjeta Mercado Pago", "Tarjeta de crédito/débito vía Mercado Pago"] },
   { code: "BO", name: "Bolivia", flag: "🇧🇴", currency: "BOB",
-    transfer: ["QR bancario", "Transferencia bancaria"], cash: ["Pago al Paso", "Efectivo (agentes)"] },
+    transfer: ["Transferencia bancaria"], cash: ["Pago al Paso", "Efectivo (agentes)"],
+    wallet: ["QR bancario (Simple / Tigo Money)", "Tarjeta de crédito/débito"], walletLabel: "QR y tarjeta" },
   { code: "BR", name: "Brasil", flag: "🇧🇷", currency: "BRL",
     transfer: ["Pix", "PicPay", "Santander", "Itaú", "Bradesco", "Banco do Brasil"],
     cash: ["Boleto bancário", "Lotérica"] },

@@ -247,30 +247,53 @@ export default function OrderStatus() {
                   Horas en zona horaria de Perú (GMT-5)
                 </span>
               </div>
-              <ol className="space-y-4">
-                {(result.timeline ?? []).map((t, i) => (
-                  <li key={`${t.event}-${i}`} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <span className="w-2.5 h-2.5 rounded-full bg-primary mt-1.5" />
-                      {i < (result.timeline?.length ?? 0) - 1 && <span className="w-px flex-1 bg-border" />}
-                    </div>
-                    <div className="pb-1">
-                      <div className="text-sm font-medium">{EVENT_LABEL[t.event] ?? t.event}</div>
-                      <div className="text-xs text-muted-foreground">{formatDate(t.createdAt)}</div>
-                      {t.detail && <div className="text-xs text-muted-foreground mt-1">{t.detail}</div>}
-                      <div className="text-[11px] text-muted-foreground mt-1 space-x-2">
-                        {t.method && <span>Método: {t.method}</span>}
-                        {t.reference && <span>Ref: {t.reference}</span>}
+              <ol className="relative">
+                {(result.timeline ?? []).map((t, i) => {
+                  const meta = EVENT_META[t.event] ?? {
+                    icon: Clock,
+                    tone: "text-muted-foreground",
+                    ring: "border-border bg-muted",
+                  };
+                  const Icon = meta.icon;
+                  const isLast = i === (result.timeline?.length ?? 0) - 1;
+                  return (
+                    <li key={`${t.event}-${i}`} className="relative flex gap-4 pb-6 last:pb-0">
+                      {!isLast && (
+                        <span className="absolute left-[15px] top-9 bottom-0 w-px bg-border" aria-hidden />
+                      )}
+                      <div
+                        className={`relative z-10 w-8 h-8 shrink-0 rounded-full border-2 flex items-center justify-center ${meta.ring}`}
+                      >
+                        <Icon className={`w-4 h-4 ${meta.tone}`} />
                       </div>
-                    </div>
-                  </li>
-                ))}
+                      <div className="min-w-0 flex-1 rounded-lg bg-muted/30 px-3 py-2">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="text-sm font-medium">{EVENT_LABEL[t.event] ?? t.event}</span>
+                          {isLast && (
+                            <span className="text-[10px] uppercase tracking-wide rounded-full bg-primary/10 text-primary px-2 py-0.5">
+                              Último estado
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{formatDate(t.createdAt)}</div>
+                        {t.detail && <div className="text-xs text-muted-foreground mt-1">{t.detail}</div>}
+                        {(t.method || t.reference) && (
+                          <div className="text-[11px] text-muted-foreground mt-1 flex flex-wrap gap-x-3">
+                            {t.method && <span>Método: {t.method}</span>}
+                            {t.reference && <span>Ref: {t.reference}</span>}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
                 {(result.timeline ?? []).length === 0 && (
                   <li className="text-sm text-muted-foreground">
                     Aún no hay eventos registrados para este pedido.
                   </li>
                 )}
               </ol>
+
             </div>
           </div>
         )}

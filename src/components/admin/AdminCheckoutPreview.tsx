@@ -4,6 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Eye, ExternalLink, RefreshCw, Monitor, Smartphone } from "lucide-react";
+import { dlocalBadges, dlocalComingSoon, type DlocalKind } from "@/lib/dlocalCoverage";
+
+/** Métodos dLocal → tipo de cobro, para pintar las mismas etiquetas del checkout. */
+const PREVIEW_KIND: Record<string, DlocalKind> = {
+  dlocal_transfer: "transfer",
+  dlocal_bank: "transfer",
+  dlocal: "transfer",
+  dlocal_go: "transfer",
+  dlocal_cash: "cash",
+  dlocal_ticket: "cash",
+  dlocal_wallet: "wallet",
+  dlocal_mercadopago: "wallet",
+};
+
 
 type Country = { code: string; name: string; flag: string; region?: string };
 

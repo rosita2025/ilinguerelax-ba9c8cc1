@@ -1684,14 +1684,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm flex items-center gap-2 flex-wrap text-neutral-800 dark:text-neutral-100">
+                <div className="font-semibold text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
                     <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1" />
                   ) : (
-                    <span className="min-w-0 break-words">{m.title}</span>
+                    <span className="min-w-0 truncate">{m.title}</span>
                   )}
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 whitespace-nowrap">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 whitespace-nowrap shrink-0">
                       {m.badge}
                     </span>
                   )}

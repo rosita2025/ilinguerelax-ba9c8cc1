@@ -62,11 +62,12 @@ function GooglePayBadge() {
   return (
     <span
       className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0 bg-white"
+      role="img"
       aria-label="Google Pay"
     >
-      <span className="text-[10px] font-bold leading-none tracking-tight">
-        <span style={{ color: "#4285F4" }}>G</span>
-        <span style={{ color: "#5F6368" }}> Pay</span>
+      <span className="text-[10px] font-bold leading-none tracking-tight" aria-hidden="true">
+        <span style={{ color: "#1A56C4" }}>G</span>
+        <span style={{ color: "#3C4043" }}> Pay</span>
       </span>
     </span>
   );
@@ -88,8 +89,8 @@ function LinkBadge() {
 
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
-    <span className="inline-flex items-center gap-1 h-6 px-2 rounded-md border border-neutral-200 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 text-[10px] font-semibold tracking-tight leading-none shrink-0">
-      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: bg }} />
+    <span className="inline-flex items-center gap-1 h-6 px-2 rounded-md border border-neutral-300 bg-neutral-50 text-neutral-800 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 text-[10px] font-semibold tracking-tight leading-none shrink-0">
+      <span className="w-1.5 h-1.5 rounded-full shrink-0 ring-1 ring-inset ring-black/10" style={{ background: bg }} aria-hidden="true" />
       {label}
     </span>
   );
@@ -1662,6 +1663,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               aria-disabled={!valid}
               className={cn(
                 "w-full text-left flex items-center transition-colors",
+                "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
                 m.id === "hotmart"
                   ? "px-4 pt-2 pb-3 sm:px-5 sm:pt-2.5 sm:pb-3.5 gap-3 sm:gap-4"
                   : "px-3 py-2.5 sm:px-4 sm:py-3 gap-2.5 sm:gap-3",
@@ -1689,7 +1691,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 whitespace-nowrap shrink-0">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100 whitespace-nowrap shrink-0">
                       {m.badge}
                     </span>
                   )}

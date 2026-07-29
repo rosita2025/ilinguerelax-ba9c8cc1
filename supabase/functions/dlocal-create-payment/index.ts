@@ -119,12 +119,28 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Moneda oficial que dLocal Go acepta en cada país LatAm. Si el cliente
+    // manda otra (por caché o geo-IP desfasado), cobramos en USD en vez de
+    // fallar: dLocal acepta USD en toda su cobertura.
+    const DLOCAL_CURRENCY: Record<string, string> = {
+      AR: "ARS", BO: "BOB", BR: "BRL", CL: "CLP", CO: "COP", CR: "CRC",
+      EC: "USD", GT: "GTQ", MX: "MXN", PA: "USD", PE: "PEN", PY: "PYG", UY: "UYU",
+    };
+    const countryCode = body.country.toUpperCase();
     // Monedas sin decimales: dLocal rechaza montos con centavos.
     const ZERO_DECIMAL = new Set(["CLP", "PYG", "COP", "ARS", "CRC", "GTQ"]);
-    const localCurrency = body.currency.toUpperCase();
-    const localAmount = ZERO_DECIMAL.has(localCurrency)
+    const requested = body.currency.toUpperCase();
+    const expected = DLOCAL_CURRENCY[countryCode];
+    // Si la moneda enviada no es la del país (ni USD), no intentamos en local.
+    const localCurrency = !expected || requested === expected || requested === "USD"
+      ? requested
+      : "USD";
+    const localAmount = localCurrency === "USD" && requested !== "USD"
+      ? calculatedUsd
+      : ZERO_DECIMAL.has(localCurrency)
       ? Math.round(body.amount)
       : Number(body.amount.toFixed(2));
+
 
     const payloadFor = (amount: number, currency: string): Record<string, unknown> => ({
       amount,

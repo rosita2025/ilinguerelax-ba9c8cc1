@@ -56,6 +56,31 @@ export function dlocalNoteForCountries(methodKey: string, countryCodes: string[]
   return `dLocal Go · ${parts.join(" — ")}`;
 }
 
+/**
+ * ¿La cobertura real de /admin/dlocal soporta este método en la región?
+ * Devuelve null si el método no es de dLocal (no se sincroniza).
+ * true  = hay rails activos (y no "muy pronto") en al menos un país de la región.
+ * false = ningún país de la región tiene ese rail activo → debe quedar desactivado.
+ */
+export function dlocalCoverageEnabled(methodKey: string, countryCodes: string[]): boolean | null {
+  const kind = DLOCAL_KIND_BY_KEY[methodKey];
+  if (!kind) return null;
+  const codes = (countryCodes.length ? countryCodes : DLOCAL_COVERAGE.map((c) => c.code))
+    .map((c) => c.toUpperCase())
+    .filter((c) => !!getDlocalCountry(c));
+  if (!codes.length) return false;
+  return codes.some((code) => {
+    const c = getDlocalCountry(code)!;
+    const soon =
+      (kind === "transfer" && c.transferComingSoon) ||
+      (kind === "cash" && c.cashComingSoon) ||
+      (kind === "wallet" && c.walletComingSoon);
+    return !soon && dlocalRails(code, kind).length > 0;
+  });
+}
+
+
+
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;

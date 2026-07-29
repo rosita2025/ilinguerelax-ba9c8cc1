@@ -86,12 +86,10 @@ function LinkBadge() {
   );
 }
 
-function BankBadge({ label, bg, color }: { label: string; bg: string; color: string }) {
+function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
-    <span
-      className="inline-flex items-center justify-center h-6 px-2 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm text-[10px] font-bold tracking-tight leading-none shrink-0"
-      style={{ background: bg, color }}
-    >
+    <span className="inline-flex items-center gap-1 h-6 px-2 rounded-md border border-neutral-200 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 text-[10px] font-semibold tracking-tight leading-none shrink-0">
+      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: bg }} />
       {label}
     </span>
   );

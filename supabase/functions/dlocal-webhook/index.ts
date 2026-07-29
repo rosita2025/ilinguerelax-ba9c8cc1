@@ -119,11 +119,64 @@ Deno.serve(async (req) => {
     }).then(({ error }) => { if (error) console.error("dLocal funnel log failed:", error.message); });
 
     if (status !== "PAID") {
+      // Transferencia / efectivo: dLocal deja el pago en PENDING mientras el
+      // cliente paga en el banco o en la caja. Igual que Mercado Pago Perú,
+      // le enviamos el comprobante "pago pendiente" con las instrucciones y
+      // avisamos al admin. La entrega digital se dispara sola cuando dLocal
+      // vuelve a llamar este webhook con estado PAID.
+      const PENDING_STATUS = ["PENDING", "AUTHORIZED", "VERIFIED"];
+      if (PENDING_STATUS.includes(status) && customerEmail) {
+        const rawMethod = String(
+          payment.payment_method_id || payment.payment_method_type || q.get("ptype") || "",
+        ).toUpperCase();
+        const method = rawMethod.includes("TICKET") || rawMethod.includes("CASH")
+          ? "Pago en efectivo (dLocal Go)"
+          : rawMethod.includes("WALLET")
+          ? "Billetera digital (dLocal Go)"
+          : "Transferencia bancaria (dLocal Go)";
+
+        const templateData = {
+          orderNumber,
+          customerName,
+          productName: summary,
+          amount: amount ?? null,
+          currency,
+          method,
+          orderDate: new Date().toISOString(),
+        };
+        const idemBase = `dlocal-pending-${paymentId}`;
+
+        await Promise.allSettled([
+          supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "customer-manual-pending",
+              recipientEmail: customerEmail,
+              idempotencyKey: `${idemBase}-customer`,
+              templateData,
+            },
+          }),
+          supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "admin-manual-pending",
+              recipientEmail: "hola@ilinguerelax.com",
+              idempotencyKey: `${idemBase}-admin`,
+              templateData: {
+                ...templateData,
+                customerEmail,
+                customerWhatsapp: phone ?? "",
+                country: country ?? "",
+              },
+            },
+          }),
+        ]).catch((e) => console.error("dLocal pending emails failed:", e));
+      }
+
       return new Response(JSON.stringify({ received: true, status }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     if (!customerEmail) {
       console.error("dLocal PAID sin email de comprador", { paymentId, orderNumber });

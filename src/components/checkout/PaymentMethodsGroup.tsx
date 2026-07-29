@@ -21,6 +21,7 @@ import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
+import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails } from "@/lib/dlocalCoverage";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash";
@@ -97,8 +98,8 @@ const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
 };
 
 // Rails locales de dLocal Go, separados por tipo (transferencia / efectivo).
-// Solo estos países tienen dLocal Go habilitado en la tienda.
-const DLOCAL_COUNTRIES = ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"];
+// La cobertura real por país vive en src/lib/dlocalCoverage.ts
+const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 
 const DLOCAL_TRANSFER_BADGES: Record<string, MethodBadge[]> = {
   MX: [{ label: "SPEI", bg: "#0F766E", color: "#ffffff" }, { label: "Transferencia", bg: "#111827", color: "#ffffff" }],
@@ -1266,10 +1267,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Transferência bancária (dLocal Go)"
         : language === "fr" ? "Virement bancaire (dLocal Go)"
         : "Transferencia bancaria (dLocal Go)",
-      sub: language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
+      sub: (dlocalRails(country, "transfer").length
+        ? `${dlocalRails(country, "transfer").join(" · ")} — `
+        : "") + (language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
         : language === "pt" ? "Pague pelo seu banco ou carteira em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
-        : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata.",
+        : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
       badge: priceBadge,
       badges: DLOCAL_TRANSFER_BADGES[country] ?? [
         { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
@@ -1282,10 +1285,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pagamento em dinheiro (dLocal Go)"
         : language === "fr" ? "Paiement en espèces (dLocal Go)"
         : "Pago en efectivo (dLocal Go)",
-      sub: language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
+      sub: (dlocalRails(country, "cash").length
+        ? `${dlocalRails(country, "cash").join(" · ")} — `
+        : "") + (language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
         : language === "pt" ? "Gere um voucher e pague em dinheiro em uma loja ou agente."
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
-        : "Genera un cupón y paga en efectivo en una tienda o agente cercano.",
+        : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
       badge: priceBadge,
       badges: DLOCAL_CASH_BADGES[country] ?? [
         { label: "Efectivo", bg: "#F5A623", color: "#1F2937" },
@@ -1340,8 +1345,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         if (m.id === "binance") return methodsConfig.binance;
         if (m.id === "clabe") return country === "MX";
 
-        if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && DLOCAL_COUNTRIES.includes(country);
-        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && DLOCAL_COUNTRIES.includes(country);
+        // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
+        if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer");
+        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash");
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 

@@ -21,6 +21,7 @@ const BodySchema = z.object({
   payerEmail: z.string().email(),
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),
+  payerDocument: z.string().max(30).optional(),
   country: z.string().length(2),
   paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
   currency: z.string().length(3).default("USD"),
@@ -29,6 +30,7 @@ const BodySchema = z.object({
   successUrl: z.string().url(),
   backUrl: z.string().url(),
 });
+
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });

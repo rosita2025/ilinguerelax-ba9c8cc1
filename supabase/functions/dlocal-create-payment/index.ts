@@ -229,7 +229,14 @@ Deno.serve(async (req) => {
       customerEmail: body.payerEmail,
       amount: calculatedUsd,
       currency: "USD",
-      metadata: { country: body.country.toUpperCase(), skus, localAmount: body.amount, localCurrency: body.currency },
+      metadata: {
+        country: body.country.toUpperCase(),
+        skus,
+        localAmount: usedUsdFallback ? calculatedUsd : localAmount,
+        localCurrency: usedUsdFallback ? "USD" : localCurrency,
+        usdFallback: usedUsdFallback,
+      },
+
     });
     await logOrderEvent({
       orderNumber: orderId,

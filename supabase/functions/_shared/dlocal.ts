@@ -1,0 +1,73 @@
+// dLocal Go — utilidades compartidas de seguridad.
+// Verificación de la firma HMAC-SHA256 que dLocal Go envía en sus webhooks.
+//
+// Formato del header:
+//   Authorization: V2-HMAC-SHA256, Signature: <hex>
+// Datos firmados: apiKey + [X-Date] + rawBody   (probamos ambas variantes)
+
+const enc = new TextEncoder();
+
+function hexToBytes(hex: string): Uint8Array | null {
+  const clean = hex.trim().toLowerCase().replace(/^0x/, "");
+  if (clean.length === 0 || clean.length % 2 !== 0 || /[^0-9a-f]/.test(clean)) return null;
+  const out = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
+
+function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+
+async function hmacHex(secret: string, data: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(data));
+  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export function extractSignature(authHeader: string | null): string | null {
+  if (!authHeader) return null;
+  const m = authHeader.match(/Signature:\s*([0-9a-fA-F]+)/);
+  if (m) return m[1];
+  // Algunas integraciones envían solo el hex.
+  const bare = authHeader.trim();
+  return /^[0-9a-fA-F]{64}$/.test(bare) ? bare : null;
+}
+
+/**
+ * Verifica la firma del webhook de dLocal Go.
+ * Devuelve true solo si la firma coincide con el cuerpo recibido.
+ */
+export async function verifyDlocalSignature(
+  req: Request,
+  rawBody: string,
+): Promise<boolean> {
+  const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");
+  const secretKey = Deno.env.get("DLOCAL_GO_SECRET_KEY");
+  if (!apiKey || !secretKey) return false;
+
+  const provided = extractSignature(req.headers.get("authorization"))
+    ?? extractSignature(req.headers.get("x-signature"));
+  if (!provided) return false;
+
+  const providedBytes = hexToBytes(provided);
+  if (!providedBytes) return false;
+
+  const xDate = req.headers.get("x-date") ?? req.headers.get("x-login-date") ?? "";
+  const candidates = [apiKey + xDate + rawBody, apiKey + rawBody];
+
+  for (const data of candidates) {
+    const expected = hexToBytes(await hmacHex(secretKey, data));
+    if (expected && equalBytes(expected, providedBytes)) return true;
+  }
+  return false;
+}

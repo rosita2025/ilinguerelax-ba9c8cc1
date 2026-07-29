@@ -17,6 +17,7 @@ import type { TemplateEntry } from './registry.ts'
 interface Props {
   orderNumber?: string
   customerName?: string
+  customerEmail?: string
   productName?: string
   amount?: number
   currency?: string
@@ -31,6 +32,15 @@ interface Props {
   clabeBank?: string
 }
 
+const trackingUrl = (orderNumber?: string, customerEmail?: string) => {
+  const base = 'https://www.ilinguerelax.com/mi-pedido'
+  const params: string[] = []
+  if (orderNumber) params.push(`order=${encodeURIComponent(orderNumber)}`)
+  if (customerEmail) params.push(`email=${encodeURIComponent(customerEmail)}`)
+  return params.length ? `${base}?${params.join('&')}` : base
+}
+
+
 const fmtMoney = (amount?: number, currency?: string) => {
   if (amount == null) return '—'
   const c = (currency || 'USD').toUpperCase()
@@ -44,7 +54,9 @@ const fmtMoney = (amount?: number, currency?: string) => {
 const Email = ({
   orderNumber,
   customerName,
+  customerEmail,
   productName,
+
   amount,
   currency,
 
@@ -161,17 +173,32 @@ const Email = ({
 
 
 
+        <Section style={trackBox}>
+          <Text style={trackTitle}>📦 Sigue tu pedido en línea</Text>
+          <Text style={trackLine}>
+            Puedes ver en cualquier momento si tu pago está <strong>pendiente, pagado o entregado</strong> aquí:
+          </Text>
+          <Text style={{ textAlign: 'center' as const, margin: '12px 0' }}>
+            <a href={trackingUrl(orderNumber, customerEmail)} style={trackBtn}>Ver estado de mi pedido</a>
+          </Text>
+          <Text style={trackHint}>
+            www.ilinguerelax.com/mi-pedido — ingresa tu pedido <strong>#{orderNumber || '—'}</strong> y el correo con el que compraste.
+          </Text>
+        </Section>
+
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>
           <Text style={nextLine}>1️⃣ Envíanos tu comprobante de pago a <strong>hola@ilinguerelax.com</strong> con tu pedido <strong>#{orderNumber || '—'}</strong>.</Text>
           <Text style={nextLine}>2️⃣ Rosa verifica tu pago (Yape, Plin, Binance o SPEI) — máximo 24 h.</Text>
           <Text style={nextLine}>3️⃣ Recibirás un correo con el enlace de descarga de tu material digital.</Text>
-          <Text style={nextLine}>4️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
+          <Text style={nextLine}>4️⃣ Revisa el estado cuando quieras en <a href={trackingUrl(orderNumber, customerEmail)} style={inlineLink}>www.ilinguerelax.com/mi-pedido</a>.</Text>
+          <Text style={nextLine}>5️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
         </Section>
 
 
         <Text style={footer}>Gracias por tu compra 💛 — Equipo ILINGUE RELAX</Text>
-        <Text style={footer}>hola@ilinguerelax.com · www.ilinguerelax.com</Text>
+        <Text style={footer}>hola@ilinguerelax.com · www.ilinguerelax.com/mi-pedido</Text>
+
       </Container>
     </Body>
   </Html>
@@ -185,6 +212,8 @@ export const template = {
   previewData: {
     orderNumber: 'ILR-YP-1234',
     customerName: 'María',
+    customerEmail: 'maria@ejemplo.com',
+
     productName: '1,000 Verbos en Inglés',
     amount: 45,
     currency: 'PEN',
@@ -215,3 +244,10 @@ const binanceBox = { backgroundColor: '#fefce8', border: '1px solid #eab308', bo
 const binanceTitle = { margin: '0 0 8px', fontSize: '14px', color: '#854d0e', fontWeight: 'bold' as const }
 const binanceLine = { margin: '4px 0', fontSize: '13px', color: '#713f12', lineHeight: '1.5', wordBreak: 'break-all' as const }
 const binanceHint = { margin: '8px 0 0', fontSize: '12px', color: '#a16207', fontStyle: 'italic' as const }
+
+const trackBox = { backgroundColor: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: '10px', padding: '16px', margin: '18px 0' }
+const trackTitle = { margin: '0 0 6px', fontSize: '15px', fontWeight: 'bold' as const, color: '#0f766e' }
+const trackLine = { margin: '0', fontSize: '14px', color: '#134e4a', lineHeight: '1.6' }
+const trackBtn = { backgroundColor: '#0d9488', color: '#ffffff', textDecoration: 'none', padding: '11px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
+const trackHint = { margin: '4px 0 0', fontSize: '12px', color: '#0f766e', textAlign: 'center' as const }
+const inlineLink = { color: '#0d9488', fontWeight: 'bold' as const, textDecoration: 'underline' }

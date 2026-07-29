@@ -280,9 +280,15 @@ Deno.serve(async (req) => {
   }
 
   // 4. Render React Email template to HTML and plain text
+  // El correo del cliente se inyecta para poder armar el enlace de seguimiento
+  // https://www.ilinguerelax.com/mi-pedido?order=...&email=...
+  if (!templateData.customerEmail && recipientEmail) {
+    templateData = { ...templateData, customerEmail: recipientEmail }
+  }
   const html = await renderAsync(
     React.createElement(template.component, templateData)
   )
+
   const plainText = await renderAsync(
     React.createElement(template.component, templateData),
     { plainText: true }

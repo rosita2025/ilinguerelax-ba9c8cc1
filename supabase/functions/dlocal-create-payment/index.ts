@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    const payload: Record<string, unknown> = {
+    const basePayload: Record<string, unknown> = {
       amount: Number(body.amount.toFixed(2)),
       currency: body.currency.toUpperCase(),
       country: body.country.toUpperCase(),
@@ -127,7 +127,6 @@ Deno.serve(async (req) => {
       success_url: body.successUrl,
       back_url: body.backUrl,
       ...(notificationUrl ? { notification_url: notificationUrl } : {}),
-      ...(paymentMethodId ? { payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" } : {}),
       payer: {
         name: body.payerName.slice(0, 100),
         email: body.payerEmail,
@@ -135,31 +134,57 @@ Deno.serve(async (req) => {
       },
     };
 
-    const resp = await fetch("https://api.dlocalgo.com/v1/payments", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}:${secretKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const createPayment = async (payload: Record<string, unknown>) => {
+      const resp = await fetch("https://api.dlocalgo.com/v1/payments", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}:${secretKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      return { ok: resp.ok, status: resp.status, text: await resp.text() };
+    };
 
-    const text = await resp.text();
-    if (!resp.ok) {
-      console.error(`dLocal Go create payment failed [${resp.status}]: ${text}`);
-      return json({ error: "dLocal Go rechazó el pago", status: resp.status, details: text }, resp.status);
+    // Intento 1: checkout restringido al rail elegido (transferencia / efectivo /
+    // billetera). Intento 2 (fallback): checkout completo de dLocal, para que un
+    // método no disponible en el país nunca haga fallar la venta.
+    let attempt = await createPayment(
+      paymentMethodId
+        ? { ...basePayload, payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" }
+        : basePayload,
+    );
+    if (!attempt.ok && paymentMethodId) {
+      console.warn(
+        `dLocal create payment falló con payment_method_id=${paymentMethodId} [${attempt.status}]; reintentando sin restricción`,
+      );
+      attempt = await createPayment(basePayload);
     }
 
-    const data = JSON.parse(text);
-    const redirectUrl = data.redirect_url || data.redirectUrl;
+    if (!attempt.ok) {
+      console.error(`dLocal Go create payment failed [${attempt.status}]: ${attempt.text}`);
+      return json({ error: "No pudimos iniciar el pago con dLocal. Intenta de nuevo o elige otro método." }, 502);
+    }
+
+    let data: Record<string, unknown>;
+    try {
+      data = JSON.parse(attempt.text);
+    } catch {
+      console.error("dLocal Go respuesta no-JSON:", attempt.text.slice(0, 500));
+      return json({ error: "Respuesta inválida de dLocal. Intenta de nuevo." }, 502);
+    }
+
+    const redirectUrl = (data.redirect_url || (data as any).redirectUrl) as string | undefined;
     if (!redirectUrl) {
-      console.error("dLocal Go response without redirect_url:", text);
-      return json({ error: "dLocal Go no devolvió URL de pago", details: data }, 502);
+      console.error("dLocal Go response without redirect_url:", attempt.text.slice(0, 500));
+      return json({ error: "dLocal no devolvió la URL de pago. Intenta de nuevo." }, 502);
     }
 
     return json({ id: data.id, orderId, redirect_url: redirectUrl });
+
   } catch (err) {
     console.error("dlocal-create-payment error:", err);
-    return json({ error: err instanceof Error ? err.message : "Unknown error" }, 500);
+    return json({ error: "No pudimos iniciar el pago. Intenta de nuevo en unos segundos." }, 500);
   }
+
 });

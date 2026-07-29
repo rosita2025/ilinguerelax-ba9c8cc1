@@ -19,13 +19,27 @@ function authHeader(): string {
 }
 
 async function fetchPayment(id: string) {
-  const r = await fetch(`${API_BASE}/payments/${encodeURIComponent(id)}`, {
-    headers: { Authorization: authHeader() },
-  });
-  const text = await r.text();
-  if (!r.ok) throw new Error(`dLocal GET /payments/${id} failed [${r.status}]`);
-  return JSON.parse(text);
+  // Reintenta hasta 3 veces: un 5xx o un corte de red momentáneo de dLocal no
+  // debe hacernos perder la confirmación de un pago ya realizado.
+  let lastErr = "";
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(`${API_BASE}/payments/${encodeURIComponent(id)}`, {
+        headers: { Authorization: authHeader() },
+      });
+      const text = await r.text();
+      if (r.ok) return JSON.parse(text);
+      lastErr = `status ${r.status}`;
+      // 4xx = no va a cambiar reintentando.
+      if (r.status < 500 && r.status !== 429) break;
+    } catch (e) {
+      lastErr = e instanceof Error ? e.message : "network error";
+    }
+    if (attempt < 3) await new Promise((res) => setTimeout(res, attempt * 700));
+  }
+  throw new Error(`dLocal GET /payments/${id} failed (${lastErr})`);
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

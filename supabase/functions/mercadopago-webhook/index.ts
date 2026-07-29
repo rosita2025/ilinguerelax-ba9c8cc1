@@ -6,6 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
+import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const encoder = new TextEncoder();
 
@@ -266,6 +267,20 @@ Deno.serve(async (req) => {
             orderDate: payment.date_created || new Date().toISOString(),
           };
           const idemBase = `mp-pending-${payment.id}`;
+
+          await logOrderEvent({
+            orderNumber,
+            event: "payment_pending",
+            provider: "mercadopago",
+            status: String(payment.status),
+            method,
+            reference: String(payment.id),
+            detail: "Mercado Pago registró el pedido como pendiente de pago",
+            customerEmail: payerEmail,
+            amount: payment.transaction_amount ?? null,
+            currency: payment.currency_id || "PEN",
+            metadata: { paymentType: payment.payment_type_id, skus: getPaymentSkus(payment) },
+          });
           // Fire both emails in parallel, best-effort
           await Promise.allSettled([
             supabase.functions.invoke("send-transactional-email", {
@@ -303,6 +318,26 @@ Deno.serve(async (req) => {
           const couponPctRaw = Number(payment.metadata?.coupon_percent);
           const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
           const skusForDelivery = getPaymentSkus(payment);
+
+          await logOrderEvent({
+            orderNumber,
+            event: "payment_paid",
+            provider: "mercadopago",
+            status: "approved",
+            method: payment.payment_type_id === "ticket"
+              ? "Pago en efectivo (Mercado Pago)"
+              : payment.payment_type_id === "bank_transfer"
+              ? "Transferencia bancaria (Mercado Pago)"
+              : payment.payment_type_id === "digital_wallet"
+              ? "Billetera digital (Mercado Pago)"
+              : `Mercado Pago (${payment.payment_method_id || payment.payment_type_id || "pago"})`,
+            reference: String(payment.id),
+            detail: "Pago confirmado por Mercado Pago",
+            customerEmail: payerEmail,
+            amount: payment.transaction_amount ?? null,
+            currency: payment.currency_id || "PEN",
+            metadata: { skus: skusForDelivery },
+          });
           // Meta Conversions API: registrar la venta aunque el comprador no
           // regrese a la página de éxito (pixel del navegador puede no dispararse).
           await sendPurchaseCapi({
@@ -352,6 +387,18 @@ Deno.serve(async (req) => {
                   provider: "mercadopago",
                   idempotencyKey: `digital:mp:${payment.id}`,
                 },
+              });
+              await logOrderEvent({
+                orderNumber,
+                event: digitalErr ? "delivery_failed" : "delivery_sent",
+                provider: "mercadopago",
+                status: digitalErr ? "ERROR" : "SENT",
+                reference: String(payment.id),
+                detail: digitalErr
+                  ? `Fallo al enviar la entrega digital: ${digitalErr.message}`
+                  : `Entrega digital enviada a ${payerEmail} (${skus.join(", ")})`,
+                customerEmail: payerEmail,
+                metadata: { skus },
               });
               if (digitalErr) console.error("MP digital delivery failed:", digitalErr);
             } else {

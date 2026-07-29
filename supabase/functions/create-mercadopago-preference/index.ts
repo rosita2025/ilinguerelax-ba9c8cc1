@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
+import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const ItemSchema = z.object({
   id: z.string().min(1).max(64),
@@ -89,6 +90,17 @@ Deno.serve(async (req) => {
       .slice(0, 300);
     const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
 
+    // Número de pedido legible (ILR-MP-XXXXXX). Es la referencia que ve el
+    // cliente en /mi-pedido y la que usa soporte junto con su correo.
+    const orderNumber = (body.orderId ?? `ILR-MP-${crypto.randomUUID().slice(0, 6).toUpperCase()}`).toUpperCase();
+    const methodLabel = body.paymentType === "yape"
+      ? "Billetera digital (Mercado Pago)"
+      : body.paymentType === "transfer"
+      ? "Transferencia bancaria (Mercado Pago)"
+      : body.paymentType === "cash"
+      ? "Pago en efectivo (Mercado Pago)"
+      : "Mercado Pago";
+
     // Webhook URL — Mercado Pago llamará aquí en cada cambio de estado del pago.
     // Sin esto el webhook nunca se dispara (fue el bug encontrado en el test live).
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
@@ -106,11 +118,11 @@ Deno.serve(async (req) => {
       auto_return: body.autoReturn,
       ...(notificationUrl ? { notification_url: notificationUrl } : {}),
       statement_descriptor: "ILINGUE RELAX",
-      external_reference: body.orderId ?? crypto.randomUUID(),
+      external_reference: orderNumber,
       binary_mode: false,
       metadata: {
         source: "checkout-prueba-1",
-        order_id: body.orderId ?? "",
+        order_id: orderNumber,
         coupon_code: body.couponCode ?? "",
         coupon_percent: body.couponPercent,
         total_usd: calculatedTotalUsd,
@@ -161,14 +173,43 @@ Deno.serve(async (req) => {
     if (!resp.ok) {
       console.error("MP preference error:", data);
       return new Response(
-        JSON.stringify({ error: data?.message || "MP error", details: data }),
+        JSON.stringify({ error: "No pudimos iniciar el pago con Mercado Pago. Intenta de nuevo o elige otro método." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
+    }
+
+    await logOrderEvent({
+      orderNumber,
+      event: "order_created",
+      provider: "mercadopago",
+      status: "CREATED",
+      method: methodLabel,
+      reference: data.id ? String(data.id) : null,
+      detail: productSummary,
+      customerEmail: body.payerEmail ?? null,
+      amount: calculatedTotalUsd,
+      currency: "USD",
+      metadata: { skus: deliverySkus, paymentType: body.paymentType },
+    });
+    if (body.paymentType === "transfer" || body.paymentType === "cash" || body.paymentType === "yape") {
+      await logOrderEvent({
+        orderNumber,
+        event: "payment_instructions",
+        provider: "mercadopago",
+        status: "AWAITING_PAYMENT",
+        method: methodLabel,
+        reference: data.id ? String(data.id) : null,
+        detail: "Instrucciones de pago (cupón / QR / transferencia) generadas en Mercado Pago",
+        customerEmail: body.payerEmail ?? null,
+        amount: calculatedTotalUsd,
+        currency: "USD",
+      });
     }
 
     return new Response(
       JSON.stringify({
         id: data.id,
+        orderId: orderNumber,
         init_point: data.init_point,
         sandbox_init_point: data.sandbox_init_point,
       }),
@@ -177,7 +218,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("create-mercadopago-preference error:", err);
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
+      JSON.stringify({ error: "No pudimos iniciar el pago. Intenta de nuevo en unos segundos." }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }

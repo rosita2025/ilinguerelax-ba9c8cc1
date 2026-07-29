@@ -173,17 +173,32 @@ const Email = ({
 
 
 
+        <Section style={trackBox}>
+          <Text style={trackTitle}>📦 Sigue tu pedido en línea</Text>
+          <Text style={trackLine}>
+            Puedes ver en cualquier momento si tu pago está <strong>pendiente, pagado o entregado</strong> aquí:
+          </Text>
+          <Text style={{ textAlign: 'center' as const, margin: '12px 0' }}>
+            <a href={trackingUrl(orderNumber, customerEmail)} style={trackBtn}>Ver estado de mi pedido</a>
+          </Text>
+          <Text style={trackHint}>
+            www.ilinguerelax.com/mi-pedido — ingresa tu pedido <strong>#{orderNumber || '—'}</strong> y el correo con el que compraste.
+          </Text>
+        </Section>
+
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>
           <Text style={nextLine}>1️⃣ Envíanos tu comprobante de pago a <strong>hola@ilinguerelax.com</strong> con tu pedido <strong>#{orderNumber || '—'}</strong>.</Text>
           <Text style={nextLine}>2️⃣ Rosa verifica tu pago (Yape, Plin, Binance o SPEI) — máximo 24 h.</Text>
           <Text style={nextLine}>3️⃣ Recibirás un correo con el enlace de descarga de tu material digital.</Text>
-          <Text style={nextLine}>4️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
+          <Text style={nextLine}>4️⃣ Revisa el estado cuando quieras en <a href={trackingUrl(orderNumber, customerEmail)} style={inlineLink}>www.ilinguerelax.com/mi-pedido</a>.</Text>
+          <Text style={nextLine}>5️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
         </Section>
 
 
         <Text style={footer}>Gracias por tu compra 💛 — Equipo ILINGUE RELAX</Text>
-        <Text style={footer}>hola@ilinguerelax.com · www.ilinguerelax.com</Text>
+        <Text style={footer}>hola@ilinguerelax.com · www.ilinguerelax.com/mi-pedido</Text>
+
       </Container>
     </Body>
   </Html>

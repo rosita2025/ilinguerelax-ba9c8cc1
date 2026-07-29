@@ -44,7 +44,12 @@ export function extractSignature(authHeader: string | null): string | null {
 }
 
 /**
- * Verifica la firma del webhook de dLocal Go.
+ * Verifica la firma del webhook de dLocal.
+ *
+ * Esquema documentado (docs.dlocal.com/reference/payins-security):
+ *   Authorization: V2-HMAC-SHA256, Signature: <hmac(secretKey, X-Login + X-Date + RequestBody)>
+ * dLocal Go usa la misma construcción, donde X-Login es la API key del comercio.
+ *
  * Devuelve true solo si la firma coincide con el cuerpo recibido.
  */
 export async function verifyDlocalSignature(
@@ -62,8 +67,18 @@ export async function verifyDlocalSignature(
   const providedBytes = hexToBytes(provided);
   if (!providedBytes) return false;
 
+  // Si viene X-Login debe ser el de nuestra cuenta: una notificación firmada
+  // por otro comercio nunca puede validar contra nuestros pedidos.
+  const xLogin = (req.headers.get("x-login") ?? "").trim();
+  if (xLogin && xLogin !== apiKey) return false;
+
   const xDate = req.headers.get("x-date") ?? req.headers.get("x-login-date") ?? "";
-  const candidates = [apiKey + xDate + rawBody, apiKey + rawBody];
+  const login = xLogin || apiKey;
+  const candidates = [
+    login + xDate + rawBody, // esquema documentado V2-HMAC-SHA256
+    apiKey + xDate + rawBody,
+    apiKey + rawBody,
+  ];
 
   for (const data of candidates) {
     const expected = hexToBytes(await hmacHex(secretKey, data));

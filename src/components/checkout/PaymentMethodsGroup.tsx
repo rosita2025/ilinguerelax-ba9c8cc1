@@ -21,7 +21,7 @@ import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
-import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, getDlocalCountry } from "@/lib/dlocalCoverage";
+import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
@@ -104,38 +104,6 @@ const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
 // Rails locales de dLocal Go, separados por tipo (transferencia / efectivo).
 // La cobertura real por país vive en src/lib/dlocalCoverage.ts
 const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
-
-const DLOCAL_TRANSFER_BADGES: Record<string, MethodBadge[]> = {
-  MX: [{ label: "SPEI", bg: "#0F766E", color: "#ffffff" }, { label: "Transferencia", bg: "#111827", color: "#ffffff" }],
-  CO: [{ label: "PSE", bg: "#0B5AA6", color: "#ffffff" }, { label: "Nequi", bg: "#200020", color: "#DA0081" }],
-  BR: [{ label: "Pix", bg: "#32BCAD", color: "#06211F" }, { label: "TED", bg: "#111827", color: "#ffffff" }],
-  AR: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "CBU/CVU", bg: "#111827", color: "#ffffff" }],
-  PE: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "BCP/Interbank", bg: "#111827", color: "#ffffff" }],
-  CL: [{ label: "Webpay", bg: "#0B5AA6", color: "#ffffff" }, { label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
-  UY: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banred", bg: "#111827", color: "#ffffff" }],
-  EC: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
-  BO: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
-  CR: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "SINPE", bg: "#111827", color: "#ffffff" }],
-  GT: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
-  PA: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
-  PY: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
-};
-
-const DLOCAL_CASH_BADGES: Record<string, MethodBadge[]> = {
-  MX: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }, { label: "7-Eleven", bg: "#ffffff", color: "#1F2937" }],
-  CO: [{ label: "Efecty", bg: "#FFD400", color: "#1F2937" }, { label: "Baloto", bg: "#0B5AA6", color: "#ffffff" }],
-  BR: [{ label: "Boleto", bg: "#1F2937", color: "#ffffff" }, { label: "Lotérica", bg: "#ffffff", color: "#1F2937" }],
-  AR: [{ label: "Rapipago", bg: "#F5A623", color: "#1F2937" }, { label: "Pago Fácil", bg: "#E4002B", color: "#ffffff" }],
-  PE: [{ label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-  CL: [{ label: "Servipag", bg: "#111827", color: "#00C08B" }, { label: "Multicaja", bg: "#ffffff", color: "#1F2937" }],
-  UY: [{ label: "Abitab", bg: "#E4002B", color: "#ffffff" }, { label: "Redpagos", bg: "#0B5AA6", color: "#ffffff" }],
-  EC: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-  BO: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-  CR: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-  GT: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-  PA: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-  PY: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
-};
 
 // Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.
 // See admin panel at /admin/binance-config.
@@ -1300,9 +1268,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
         : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
       badge: priceBadge,
-      badges: DLOCAL_TRANSFER_BADGES[country] ?? [
-        { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      ],
+      badges: dlocalBadges(country, "transfer", 4).length
+        ? dlocalBadges(country, "transfer", 4)
+        : [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
     },
     {
       id: "dlocal_cash",
@@ -1318,9 +1286,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
         : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
       badge: priceBadge,
-      badges: DLOCAL_CASH_BADGES[country] ?? [
-        { label: "Efectivo", bg: "#F5A623", color: "#1F2937" },
-      ],
+      badges: dlocalBadges(country, "cash", 4).length
+        ? dlocalBadges(country, "cash", 4)
+        : [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }],
     },
     {
       id: "dlocal_wallet",
@@ -1338,7 +1306,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Payez depuis votre portefeuille en monnaie locale. Confirmation immédiate."
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
       badge: priceBadge,
-      badges: (dlocalRails(country, "wallet").slice(0, 3).map((r) => ({ label: r, bg: "#4F46E5", color: "#ffffff" }))),
+      badges: dlocalBadges(country, "wallet", 4),
     },
     {
       id: "dlocal_card",

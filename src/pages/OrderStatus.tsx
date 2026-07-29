@@ -241,7 +241,12 @@ export default function OrderStatus() {
             </div>
 
             <div className="rounded-xl border bg-card p-5">
-              <h2 className="font-semibold mb-4">Historial del pedido</h2>
+              <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="font-semibold">Historial del pedido</h2>
+                <span className="text-xs text-muted-foreground">
+                  Horas en zona horaria de Perú (GMT-5)
+                </span>
+              </div>
               <ol className="space-y-4">
                 {(result.timeline ?? []).map((t, i) => (
                   <li key={`${t.event}-${i}`} className="flex gap-3">

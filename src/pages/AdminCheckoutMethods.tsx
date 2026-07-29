@@ -57,6 +57,22 @@ export function dlocalNoteForCountries(methodKey: string, countryCodes: string[]
 }
 
 /**
+ * Etiqueta (título) del método dLocal según la cobertura real por país.
+ * Ej.: BO → "Billetera digital (QR)", AR/MX → "Billetera digital".
+ */
+export function dlocalLabelForCountries(methodKey: string, countryCodes: string[]): string | null {
+  const kind = DLOCAL_KIND_BY_KEY[methodKey];
+  if (!kind) return null;
+  if (kind === "transfer") return "Transferencia bancaria";
+  if (kind === "cash") return "Pago en efectivo";
+  const codes = countryCodes.map((c) => c.toUpperCase()).filter((c) => !!getDlocalCountry(c));
+  const labels = Array.from(
+    new Set(codes.map((c) => getDlocalCountry(c)!.walletLabel || "Billetera digital")),
+  );
+  return labels.length === 1 ? labels[0] : "Billetera digital";
+}
+
+/**
  * ¿La cobertura real de /admin/dlocal soporta este método en la región?
  * Devuelve null si el método no es de dLocal (no se sincroniza).
  * true  = hay rails activos (y no "muy pronto") en al menos un país de la región.
@@ -196,6 +212,8 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "clabe_mx", label: "SPEI / CLABE (México)", note: "Transferencia manual MXN a CLABE mexicana · Verificación 1-24h", icon: "Building2", countryCodes: ["MX"] },
   { key: "dlocal_transfer", label: "Transferencia bancaria", note: "Transferencia bancaria local vía dLocal Go (SPEI MX, PSE CO, Pix BR, CBU AR, PagoEfectivo/transferencia PE…)", icon: "Building2", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
   { key: "dlocal_cash", label: "Pago en efectivo", note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)", icon: "Banknote", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
+  { key: "dlocal_wallet", label: "Billetera digital", note: "Billeteras digitales locales vía dLocal Go (Yape/Plin PE, Nequi CO, MACH CL, PicPay BR…)", icon: "Smartphone", countryCodes: ["BO", "BR", "CL", "CO", "CR", "EC", "GT", "PA", "PE", "PY", "UY"] },
+  { key: "dlocal_mercadopago", label: "Billetera digital (Mercado Pago)", note: "Mercado Pago y billeteras locales vía dLocal Go (Ualá/MODO AR, Spin by OXXO MX)", icon: "Wallet", countryCodes: ["AR", "MX"] },
   { key: "hotmart_1click", label: "Hotmart (1 clic)", note: "Redirige al enlace de Hotmart del producto según el país. Precio y moneda gestionados por Hotmart.", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
 ];
 
@@ -315,10 +333,12 @@ export default function AdminCheckoutMethods() {
         if (note === null) continue; // no es método dLocal
         checked++;
         const should = dlocalCoverageEnabled(m.method_key, r.country_codes || []);
+        const label = dlocalLabelForCountries(m.method_key, r.country_codes || []) || m.label;
         const needsNote = (m.note || "") !== note;
+        const needsLabel = (m.label || "") !== label;
         const needsEnabled = should !== null && should !== m.enabled;
-        if (!needsNote && !needsEnabled) continue;
-        const payload: Method = { ...m, note, enabled: should ?? m.enabled };
+        if (!needsNote && !needsLabel && !needsEnabled) continue;
+        const payload: Method = { ...m, label, note, enabled: should ?? m.enabled };
         const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
           body: { action: "save_method", method: payload },
         });
@@ -333,6 +353,38 @@ export default function AdminCheckoutMethods() {
           }`,
         );
       }
+
+      // 2) Crear los métodos dLocal que FALTAN en cada región (transferencia,
+      //    efectivo y billetera digital) según la cobertura real por país.
+      const DLOCAL_KEYS = ["dlocal_transfer", "dlocal_cash", "dlocal_wallet", "dlocal_mercadopago"];
+      for (const r of regions) {
+        const codes = (r.country_codes || []).map((c) => c.toUpperCase());
+        if (!codes.some((c) => !!getDlocalCountry(c))) continue;
+        for (const key of DLOCAL_KEYS) {
+          if (methods.some((m) => m.region_code === r.code && m.method_key === key)) continue;
+          const def = CHECKOUT_METHODS.find((d) => d.key === key);
+          if (!def) continue;
+          if (def.countryCodes?.length && !def.countryCodes.some((c) => codes.includes(c))) continue;
+          const should = dlocalCoverageEnabled(key, r.country_codes || []);
+          if (should !== true) continue;
+          const note = dlocalNoteForCountries(key, r.country_codes || []) || def.note;
+          const label = dlocalLabelForCountries(key, r.country_codes || []) || def.label;
+          const payload: Method = {
+            id: "", region_code: r.code, method_key: key, label, note, icon: def.icon,
+            enabled: true,
+            sort_order: methods.filter((x) => x.region_code === r.code).length + 1,
+          };
+          const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+            body: { action: "save_method", method: payload },
+          });
+          if (error || data?.error) {
+            errors.push(`${r.code} · ${label}: ${error?.message || data?.error}`);
+            continue;
+          }
+          changed.push(`${r.flag || ""} ${r.code} · ${label} (agregado)`);
+        }
+      }
+      await load();
       invalidateCheckoutMethodsCache();
       if (errors.length) {
         toast.error(`⚠️ ${errors.length} error(es) al sincronizar`, {
@@ -529,9 +581,11 @@ export default function AdminCheckoutMethods() {
       invalidateCheckoutMethodsCache();
       return;
     }
+    const regionCodes = (regions.find(r => r.code === region_code)?.country_codes) || [];
     const m: Method = {
-      id: "", region_code, method_key: q.key, label: q.label,
-      note: dlocalNoteForCountries(q.key, (regions.find(r => r.code === region_code)?.country_codes) || []) || q.note, icon: q.icon, enabled: true,
+      id: "", region_code, method_key: q.key,
+      label: dlocalLabelForCountries(q.key, regionCodes) || q.label,
+      note: dlocalNoteForCountries(q.key, regionCodes) || q.note, icon: q.icon, enabled: true,
       sort_order: methods.filter(x => x.region_code === region_code).length + 1,
     };
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
@@ -885,7 +939,7 @@ export default function AdminCheckoutMethods() {
                                     className={`text-[11px] px-2 py-1 rounded border ${isActive ? "bg-primary text-primary-foreground border-primary" : canReactivate ? "bg-background border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
                                     title={dlocalNoteForCountries(q.key, r.country_codes || []) || q.note}
                                   >
-                                    {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{q.label}
+                                    {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{dlocalLabelForCountries(q.key, r.country_codes || []) || q.label}
                                   </button>
                                 );
                               })}

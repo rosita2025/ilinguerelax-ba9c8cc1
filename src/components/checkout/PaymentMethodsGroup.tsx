@@ -668,6 +668,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
+    if (isDlocalMethodId(m)) {
+      const v = validateDlocalMethod(country, m);
+      if (!v.ok) {
+        setMethodError({ method: m, message: v.reason || "Método no disponible en tu país." });
+        return;
+      }
+    }
     void captureAbandonedCheckout(m, true);
     if (m !== selected) setShowStripe(false);
     setSelected(m);

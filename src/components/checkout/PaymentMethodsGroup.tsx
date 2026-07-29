@@ -1433,6 +1433,33 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
 
+  // Validación automática: el método dLocal seleccionado y sus etiquetas deben
+  // coincidir siempre con la cobertura activa de /admin/dlocal para el país
+  // detectado. Si el país cambia y el método deja de estar cubierto, se
+  // deselecciona automáticamente y se avisa al comprador.
+  useEffect(() => {
+    if (!methodsConfig.loaded) return;
+    const shown = methods
+      .filter((m) => isDlocalMethodId(m.id))
+      .map((m) => ({ methodId: m.id as string, labels: (m.badges ?? []).map((b) => b.label) }));
+    const problems = auditDlocalCheckout(country, shown);
+    if (problems.length && import.meta.env.DEV) {
+      console.warn("[dLocal] Cobertura desincronizada con /admin/dlocal:", problems);
+    }
+    if (selected && isDlocalMethodId(selected)) {
+      const v = validateDlocalMethod(country, selected);
+      const stillVisible = methods.some((m) => m.id === selected);
+      if (!v.ok || !stillVisible) {
+        setSelected(null);
+        setMethodError({
+          method: selected,
+          message: v.reason || "Este método de pago no está disponible para tu país. Elige otro.",
+        });
+      }
+    }
+  }, [country, methods, methodsConfig.loaded, selected]);
+
+
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".
   useEffect(() => {

@@ -673,14 +673,18 @@ export default function AdminCheckoutMethods() {
                       const Icon = ICONS[m.icon] || CreditCard;
                       const isFirst = idx === 0;
                       const isLast = idx === rms.length - 1;
+                      // Los métodos dLocal muestran SIEMPRE las etiquetas reales
+                      // por país tomadas de /admin/dlocal (una sola fuente de verdad).
+                      const dlNote = dlocalNoteForCountries(m.method_key, r.country_codes || []);
                       return (
                         <div key={m.id} className={`text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
                           <div className="flex items-center gap-2">
                             <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
                             <div className="flex-1 min-w-0">
                               <div className="font-medium leading-tight text-xs sm:text-sm">{m.label}</div>
-                              {m.note && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate">{m.note}</div>}
+                              {(dlNote || m.note) && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate" title={dlNote || m.note || ""}>{dlNote || m.note}</div>}
                             </div>
+
                             <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} className="shrink-0" />
                           </div>
                           <div className="mt-1.5 flex items-center justify-between gap-1 pl-6">

@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Seguridad: si no hay región configurada o falla la consulta, no se habilita
  * ningún método. Así nunca aparecen opciones que el admin no guardó.
  */
-export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocalTransfer" | "dlocalCash" | "dlocalWallet";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocalTransfer" | "dlocalCash" | "dlocalWallet" | "dlocalCard";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
@@ -31,14 +31,15 @@ export interface CheckoutMethodsConfig {
   dlocalTransfer: boolean;
   dlocalCash: boolean;
   dlocalWallet: boolean;
+  dlocalCard: boolean;
   /** Orden de las familias según el sort_order más bajo en la región activa. */
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe", "hotmart", "dlocalTransfer", "dlocalCash", "dlocalWallet"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe", "hotmart", "dlocalTransfer", "dlocalCash", "dlocalWallet", "dlocalCard"];
 
 const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false,
+  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false,
 };
 
 
@@ -100,6 +101,7 @@ function keyToFamily(key: string): FamilyKey | null {
   if (k === "binance_pay") return "binance";
   if (k === "clabe_mx" || k === "spei_mx") return "clabe";
   if (k === "hotmart" || k === "hotmart_1click") return "hotmart";
+  if (k === "dlocal_card" || k === "dlocal_smartfields") return "dlocalCard";
   if (k === "dlocal_wallet" || k === "dlocal_mercadopago") return "dlocalWallet";
   if (k === "dlocal_cash" || k === "dlocal_ticket") return "dlocalCash";
   if (k === "dlocal_transfer" || k === "dlocal_bank" || k === "dlocal" || k === "dlocal_go") return "dlocalTransfer";
@@ -164,8 +166,8 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER });
         return;
       }
-      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity };
+      const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: Infinity, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
 
 
       const enabledMethodKeys: string[] = [];

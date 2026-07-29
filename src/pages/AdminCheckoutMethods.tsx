@@ -408,7 +408,7 @@ export default function AdminCheckoutMethods() {
     }
     const m: Method = {
       id: "", region_code, method_key: q.key, label: q.label,
-      note: q.note, icon: q.icon, enabled: true,
+      note: dlocalNoteForCountries(q.key, (regions.find(r => r.code === region_code)?.country_codes) || []) || q.note, icon: q.icon, enabled: true,
       sort_order: methods.filter(x => x.region_code === region_code).length + 1,
     };
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {

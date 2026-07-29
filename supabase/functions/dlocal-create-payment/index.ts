@@ -184,6 +184,7 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error("dlocal-create-payment error:", err);
-    return json({ error: err instanceof Error ? err.message : "Unknown error" }, 500);
+    return json({ error: "No pudimos iniciar el pago. Intenta de nuevo en unos segundos." }, 500);
   }
+
 });

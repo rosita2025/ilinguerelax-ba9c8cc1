@@ -50,10 +50,10 @@ const applePayLogo = "/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/appl
 function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
+      className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
       style={{ background: bg }}
     >
-      <img src={src} alt={alt} className="max-h-4 max-w-[28px] object-contain" />
+      <img src={src} alt={alt} className="max-h-3.5 max-w-[24px] object-contain" />
     </span>
   );
 }
@@ -61,7 +61,7 @@ function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?
 function GooglePayBadge() {
   return (
     <span
-      className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0 bg-white"
+      className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0 bg-white"
       role="img"
       aria-label="Google Pay"
     >
@@ -77,7 +77,7 @@ function GooglePayBadge() {
 function LinkBadge() {
   return (
     <span
-      className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
+      className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
       style={{ background: "#00D66F" }}
     >
       <span className="text-[10px] font-bold tracking-tight leading-none" style={{ color: "#0A2540" }}>
@@ -89,7 +89,7 @@ function LinkBadge() {
 
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
-    <span className="inline-flex items-center gap-1 h-6 px-2 rounded-md border border-neutral-300 bg-neutral-50 text-neutral-800 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 text-[10px] font-semibold tracking-tight leading-none shrink-0">
+    <span className="inline-flex items-center gap-1 h-5 px-1.5 rounded-md border border-neutral-300 bg-neutral-50 text-neutral-800 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 text-[10px] font-semibold tracking-tight leading-none shrink-0">
       <span className="w-1.5 h-1.5 rounded-full shrink-0 ring-1 ring-inset ring-black/10" style={{ background: bg }} aria-hidden="true" />
       {label}
     </span>
@@ -1577,7 +1577,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   };
 
   return (
-    <div id="payment-methods" ref={methodsAnchorRef} className="space-y-3 scroll-mt-24">
+    <div id="payment-methods" ref={methodsAnchorRef} className="space-y-2 scroll-mt-24">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
         {isFree ? (language === "en" ? "Free order" : language === "pt" ? "Pedido grátis" : language === "fr" ? "Commande gratuite" : "Pedido gratis") : t.choosePaymentMethod}
       </h2>
@@ -1701,8 +1701,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 "w-full text-left flex items-center transition-colors",
                 "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
                 m.id === "hotmart"
-                  ? "px-4 pt-2 pb-3 sm:px-5 sm:pt-2.5 sm:pb-3.5 gap-3 sm:gap-4"
-                  : "px-3 py-2.5 sm:px-4 sm:py-3 gap-2.5 sm:gap-3",
+                  ? "px-3 pt-1.5 pb-2.5 sm:px-4 sm:pt-2 sm:pb-3 gap-2.5 sm:gap-3"
+                  : "px-2.5 py-2 sm:px-3 sm:py-2.5 gap-2 sm:gap-2.5",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
@@ -1711,7 +1711,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             >
               {m.id !== "hotmart" && (
                 <div className={cn(
-                  "rounded-lg flex items-center justify-center shrink-0 w-9 h-9 sm:w-10 sm:h-10",
+                  "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected
                     ? "bg-neutral-700 text-white"
                     : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
@@ -1720,7 +1720,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
+                <div className="font-semibold text-[13px] sm:text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
                     <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1" />
                   ) : (
@@ -1733,7 +1733,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   )}
                 </div>
                 {isPrimaryCard ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     {primaryCardBadges.map((badge) => {
                       if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
                       if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
@@ -1746,16 +1746,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 ) : null}
 
                 {isPrimaryCard ? null : m.id === "stripe_ach" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="ACH" bg="#0F766E" color="#ffffff" />
                     <BankBadge label="US Bank" bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "stripe_cashapp" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Cash App" bg="#00D632" color="#001B0A" />
                   </div>
                 ) : m.id === "stripe_klarna" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
                     <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
                   </div>
@@ -1768,41 +1768,41 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </div>
 
                 ) : m.badges?.length ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}
 
                   </div>
                 ) : m.id === "transfer" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="BCP" bg="#00447C" color="#FF9E1B" />
                     <BankBadge label="BBVA" bg="#004481" color="#ffffff" />
                     <BankBadge label="Interbank" bg="#00953B" color="#ffffff" />
                     <BankBadge label="Scotiabank" bg="#EC111A" color="#ffffff" />
                   </div>
                 ) : m.id === "cash" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="PagoEfectivo" bg="#EC0928" color="#ffffff" />
                     <BankBadge label="Western Union" bg="#FFDD00" color="#000000" />
                   </div>
                 ) : m.id === "yape" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Yape" bg="#742282" color="#ffffff" />
                     <BankBadge label="Plin" bg="#00BFB3" color="#ffffff" />
                   </div>
                 ) : m.id === "binance" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Binance" bg="#F0B90B" color="#0A0A0A" />
                     <BankBadge label="USDT" bg="#26A17B" color="#ffffff" />
                     <BankBadge label="Pay ID" bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "clabe" ? (
-                  <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="SPEI" bg="#0A2540" color="#ffffff" />
                     <BankBadge label="CLABE" bg="#006341" color="#ffffff" />
                     <BankBadge label="MXN" bg="#ffffff" color="#0A2540" />
                   </div>
                 ) : (
-                  <div className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
+                  <div className="text-[11px] leading-snug text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{m.sub}</div>
                 )}
 
 

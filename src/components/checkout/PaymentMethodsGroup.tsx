@@ -1285,10 +1285,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pagamento em dinheiro (dLocal Go)"
         : language === "fr" ? "Paiement en espèces (dLocal Go)"
         : "Pago en efectivo (dLocal Go)",
-      sub: language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
+      sub: (dlocalRails(country, "cash").length
+        ? `${dlocalRails(country, "cash").join(" · ")} — `
+        : "") + (language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
         : language === "pt" ? "Gere um voucher e pague em dinheiro em uma loja ou agente."
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
-        : "Genera un cupón y paga en efectivo en una tienda o agente cercano.",
+        : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
       badge: priceBadge,
       badges: DLOCAL_CASH_BADGES[country] ?? [
         { label: "Efectivo", bg: "#F5A623", color: "#1F2937" },

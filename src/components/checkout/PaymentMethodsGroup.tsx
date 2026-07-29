@@ -1666,7 +1666,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 "w-full text-left flex items-center transition-colors",
                 m.id === "hotmart"
                   ? "px-4 pt-2 pb-3 sm:px-5 sm:pt-2.5 sm:pb-3.5 gap-3 sm:gap-4"
-                  : "p-3 sm:p-4 gap-2.5 sm:gap-3",
+                  : "px-3 py-2.5 sm:px-4 sm:py-3 gap-2.5 sm:gap-3",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",

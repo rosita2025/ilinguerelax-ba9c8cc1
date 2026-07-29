@@ -174,6 +174,7 @@ export default function AdminDlocal() {
     if (!q) return DLOCAL_COUNTRIES;
     return DLOCAL_COUNTRIES.filter(c =>
       c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || c.currency.toLowerCase().includes(q)
+      || [...c.transfer, ...c.cash].some(r => r.toLowerCase().includes(q))
     );
   }, [search]);
 

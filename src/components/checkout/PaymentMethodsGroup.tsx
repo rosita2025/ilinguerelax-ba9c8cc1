@@ -58,6 +58,21 @@ function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?
   );
 }
 
+function GooglePayBadge() {
+  return (
+    <span
+      className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0 bg-white"
+      aria-label="Google Pay"
+    >
+      <span className="text-[10px] font-bold leading-none tracking-tight">
+        <span style={{ color: "#4285F4" }}>G</span>
+        <span style={{ color: "#5F6368" }}> Pay</span>
+      </span>
+    </span>
+  );
+}
+
+
 function LinkBadge() {
   return (
     <span
@@ -1233,6 +1248,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
     { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+    { label: "Apple Pay", bg: "#000000", color: "#ffffff" },
+    { label: "Google Pay", bg: "#ffffff", color: "#1F2937" },
     ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
   ];
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
@@ -1685,6 +1702,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
                       if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
                       if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+                      if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
                       if (badge.label === "Link") return <LinkBadge key={badge.label} />;
                       return <BankBadge key={badge.label} {...badge} />;
                     })}

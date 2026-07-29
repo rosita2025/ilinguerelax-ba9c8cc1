@@ -582,6 +582,12 @@ serve(async (req) => {
           <p style="color:#16a34a;"><strong>Entrega digital enviada correctamente.</strong></p>
         </div>`,
       });
+      console.log("[send-digital-ilinguerelax] admin sale notice sent", {
+        to: adminRecipients,
+        order: orderRef || orderId || null,
+        error: (adminSale as { error?: unknown })?.error ?? null,
+      });
+
     } catch (adminSaleError) {
       console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
     }

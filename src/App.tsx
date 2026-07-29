@@ -72,6 +72,7 @@ const AdminHome = lazy(() => import("./pages/AdminHome"));
 const AdminLive = lazy(() => import("./pages/AdminLive"));
 const AdminCheckoutMethods = lazy(() => import("./pages/AdminCheckoutMethods"));
 const AdminBinanceConfig = lazy(() => import("./pages/AdminBinanceConfig"));
+const AdminDlocal = lazy(() => import("./pages/AdminDlocal"));
 const AdminManualPayments = lazy(() => import("./pages/AdminManualPayments"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));

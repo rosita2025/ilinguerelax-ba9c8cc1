@@ -1663,6 +1663,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               aria-disabled={!valid}
               className={cn(
                 "w-full text-left flex items-center transition-colors",
+                "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
                 m.id === "hotmart"
                   ? "px-4 pt-2 pb-3 sm:px-5 sm:pt-2.5 sm:pb-3.5 gap-3 sm:gap-4"
                   : "px-3 py-2.5 sm:px-4 sm:py-3 gap-2.5 sm:gap-3",

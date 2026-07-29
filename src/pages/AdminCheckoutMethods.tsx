@@ -748,7 +748,7 @@ export default function AdminCheckoutMethods() {
                                     aria-pressed={isActive}
                                     onClick={() => quickAdd(r.code, q)}
                                     className={`text-[11px] px-2 py-1 rounded border ${isActive ? "bg-primary text-primary-foreground border-primary" : canReactivate ? "bg-background border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
-                                    title={q.note}
+                                    title={dlocalNoteForCountries(q.key, r.country_codes || []) || q.note}
                                   >
                                     {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{q.label}
                                   </button>

@@ -62,11 +62,12 @@ function GooglePayBadge() {
   return (
     <span
       className="inline-flex items-center justify-center h-6 w-9 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0 bg-white"
+      role="img"
       aria-label="Google Pay"
     >
-      <span className="text-[10px] font-bold leading-none tracking-tight">
-        <span style={{ color: "#4285F4" }}>G</span>
-        <span style={{ color: "#5F6368" }}> Pay</span>
+      <span className="text-[10px] font-bold leading-none tracking-tight" aria-hidden="true">
+        <span style={{ color: "#1A56C4" }}>G</span>
+        <span style={{ color: "#3C4043" }}> Pay</span>
       </span>
     </span>
   );

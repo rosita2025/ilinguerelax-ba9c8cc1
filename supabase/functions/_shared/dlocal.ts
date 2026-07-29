@@ -71,3 +71,51 @@ export async function verifyDlocalSignature(
   }
   return false;
 }
+
+// ---------------------------------------------------------------------------
+// Estados de pago — fuente única de verdad.
+//
+// IMPORTANTE: solo un pago LIQUIDADO habilita la entrega digital. En los rails
+// de efectivo/transferencia de LATAM (PagoEfectivo, PIX, SPEI, boleto, Yape)
+// dLocal usa AUTHORIZED / VERIFIED / PENDING mientras el dinero todavía NO está
+// acreditado; tratarlos como pagados permitiría descargar el producto sin
+// cobrar. Cualquier función que decida "¿está pagado?" debe usar estos helpers
+// y nunca su propia lista, para que no vuelvan a divergir.
+// ---------------------------------------------------------------------------
+
+/** Estados en los que el dinero está realmente acreditado. */
+export const DLOCAL_SETTLED_STATUSES = ["PAID", "COMPLETED", "SUCCEEDED"] as const;
+
+/** Estados intermedios: el pago existe pero NO está acreditado. */
+export const DLOCAL_PENDING_STATUSES = [
+  "PENDING",
+  "AUTHORIZED",
+  "VERIFIED",
+  "PROCESSING",
+  "IN_PROCESS",
+] as const;
+
+/** Estados finales fallidos. */
+export const DLOCAL_FAILED_STATUSES = [
+  "REJECTED",
+  "CANCELLED",
+  "CANCELED",
+  "EXPIRED",
+  "EXPIRED_PARTIAL",
+  "FAILED",
+] as const;
+
+export function isSettledStatus(status: unknown): boolean {
+  return (DLOCAL_SETTLED_STATUSES as readonly string[])
+    .includes(String(status ?? "").trim().toUpperCase());
+}
+
+export function isPendingStatus(status: unknown): boolean {
+  return (DLOCAL_PENDING_STATUSES as readonly string[])
+    .includes(String(status ?? "").trim().toUpperCase());
+}
+
+export function isFailedStatus(status: unknown): boolean {
+  return (DLOCAL_FAILED_STATUSES as readonly string[])
+    .includes(String(status ?? "").trim().toUpperCase());
+}

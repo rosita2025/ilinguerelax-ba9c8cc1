@@ -581,9 +581,11 @@ export default function AdminCheckoutMethods() {
       invalidateCheckoutMethodsCache();
       return;
     }
+    const regionCodes = (regions.find(r => r.code === region_code)?.country_codes) || [];
     const m: Method = {
-      id: "", region_code, method_key: q.key, label: q.label,
-      note: dlocalNoteForCountries(q.key, (regions.find(r => r.code === region_code)?.country_codes) || []) || q.note, icon: q.icon, enabled: true,
+      id: "", region_code, method_key: q.key,
+      label: dlocalLabelForCountries(q.key, regionCodes) || q.label,
+      note: dlocalNoteForCountries(q.key, regionCodes) || q.note, icon: q.icon, enabled: true,
       sort_order: methods.filter(x => x.region_code === region_code).length + 1,
     };
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {

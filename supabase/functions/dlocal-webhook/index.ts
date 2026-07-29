@@ -8,6 +8,7 @@ import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { verifyDlocalSignature } from "../_shared/dlocal.ts";
+import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const API_BASE = "https://api.dlocalgo.com/v1";
 
@@ -160,6 +161,20 @@ Deno.serve(async (req) => {
         };
         const idemBase = `dlocal-pending-${paymentId}`;
 
+        await logOrderEvent({
+          orderNumber,
+          event: "payment_pending",
+          provider: "dlocalgo",
+          status,
+          method,
+          reference: paymentId,
+          detail: "dLocal confirmó el pedido como pendiente de pago",
+          customerEmail,
+          amount: amount ?? null,
+          currency,
+          metadata: { country: country ?? null, skus },
+        });
+
         await Promise.allSettled([
           supabase.functions.invoke("send-transactional-email", {
             body: {
@@ -191,6 +206,20 @@ Deno.serve(async (req) => {
       });
     }
 
+
+    await logOrderEvent({
+      orderNumber,
+      event: "payment_paid",
+      provider: "dlocalgo",
+      status,
+      method: String(payment.payment_method_id || payment.payment_method_type || q.get("ptype") || "dLocal Go"),
+      reference: paymentId,
+      detail: "Pago confirmado por dLocal Go",
+      customerEmail: customerEmail || null,
+      amount: amount ?? null,
+      currency,
+      metadata: { country: country ?? null, skus },
+    });
 
     if (!customerEmail) {
       console.error("dLocal PAID sin email de comprador", { paymentId, orderNumber });
@@ -245,6 +274,18 @@ Deno.serve(async (req) => {
           provider: "dlocalgo",
           idempotencyKey: `digital:dlocal:${paymentId}`,
         },
+      });
+      await logOrderEvent({
+        orderNumber,
+        event: digitalErr ? "delivery_failed" : "delivery_sent",
+        provider: "dlocalgo",
+        status: digitalErr ? "ERROR" : "SENT",
+        reference: paymentId,
+        detail: digitalErr
+          ? `Fallo al enviar la entrega digital: ${digitalErr.message}`
+          : `Entrega digital enviada a ${customerEmail} (${skus.join(", ")})`,
+        customerEmail,
+        metadata: { skus },
       });
       if (digitalErr) console.error("dLocal digital delivery failed:", digitalErr);
     } else {

@@ -427,7 +427,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
     if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
-    await captureAbandonedCheckout(selected || "stripe", true);
+    // No bloquea el checkout: la captura del carrito viaja en segundo plano.
+    void captureAbandonedCheckout(selected || "stripe", true);
     setStripeLoading(true);
     setStripeError(null);
     const parts = s.buyer.fullName.trim().split(/\s+/);
@@ -587,17 +588,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     setMpLoading(dlMethod);
     const dlOrderId = `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     try {
-      await captureAbandonedCheckout(dlMethod, true);
+      // Auditoría y contactos NO bloquean la creación del pago: se disparan en
+      // paralelo y el comprador se va al link de dLocal apenas esté listo.
+      void captureAbandonedCheckout(dlMethod, true);
       // Guardamos el pedido en curso: si dLocal rechaza la transacción, la
       // pantalla de retorno puede consultar el estado real y mostrar un
       // mensaje claro en vez de dejar al comprador en un error sin salida.
       saveDlocalPending(dlOrderId, s.buyer.email.trim());
-      supabase.from("email_contacts").upsert({
+      void supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
         source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "dlocalgo" },
-      }, { onConflict: "email,source" }).then(() => {});
+      }, { onConflict: "email,source" }).then(() => {}, () => {});
 
       const returnUrl = `${window.location.origin}/checkouts/return?provider=dlocal&order=${encodeURIComponent(dlOrderId)}`;
       const { data, error } = await invokeWithRetry<{ redirect_url?: string }>("dlocal-create-payment", {

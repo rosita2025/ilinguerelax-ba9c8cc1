@@ -558,6 +558,34 @@ serve(async (req) => {
       message_id: messageId,
     });
 
+    // Aviso de venta al administrador (todas las pasarelas). Nunca bloquea la entrega.
+    try {
+      const adminEmail = Deno.env.get("ADMIN_2FA_EMAIL") || BRAND.supportEmail;
+      const productList = products.map((p) => `<li>${escapeHtml(p.name || prettifySlug(p.sku))}</li>`).join("");
+      const amountLine = amount ? `${amount} ${currency || "USD"}` : "—";
+      await resend.emails.send({
+        from: `Ventas iLingue Relax <${BRAND.supportEmail}>`,
+        to: [adminEmail],
+        reply_to: BRAND.supportEmail,
+        subject: `💰 Nueva venta ${orderRef || ""} — ${amountLine} (${customerCountry || resolvedCountry || "?"})`,
+        html: `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;">
+          <h2 style="margin:0 0 12px;">💰 Nueva venta confirmada</h2>
+          <p><strong>Pedido:</strong> ${escapeHtml(orderRef || "—")}<br>
+          <strong>Cliente:</strong> ${escapeHtml(customerName || "—")} &lt;${escapeHtml(customerEmail)}&gt;<br>
+          <strong>Teléfono:</strong> ${escapeHtml(customerPhone || "—")}<br>
+          <strong>País:</strong> ${escapeHtml(customerCountry || resolvedCountry || "—")}<br>
+          <strong>Monto:</strong> ${escapeHtml(amountLine)}<br>
+          <strong>Método:</strong> ${escapeHtml(String(provider || "—"))}</p>
+          <p><strong>Productos:</strong></p><ul>${productList}</ul>
+          <p style="color:#16a34a;"><strong>Entrega digital enviada correctamente.</strong></p>
+        </div>`,
+      });
+    } catch (adminSaleError) {
+      console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
+    }
+
+
+
 
     // Sync buyer to Brevo "Clientes iLingue Relax" list. Runs after the email
     // to avoid blocking delivery if Brevo is slow; failures only log.

@@ -57,6 +57,22 @@ export function dlocalNoteForCountries(methodKey: string, countryCodes: string[]
 }
 
 /**
+ * Etiqueta (título) del método dLocal según la cobertura real por país.
+ * Ej.: BO → "Billetera digital (QR)", AR/MX → "Billetera digital".
+ */
+export function dlocalLabelForCountries(methodKey: string, countryCodes: string[]): string | null {
+  const kind = DLOCAL_KIND_BY_KEY[methodKey];
+  if (!kind) return null;
+  if (kind === "transfer") return "Transferencia bancaria";
+  if (kind === "cash") return "Pago en efectivo";
+  const codes = countryCodes.map((c) => c.toUpperCase()).filter((c) => !!getDlocalCountry(c));
+  const labels = Array.from(
+    new Set(codes.map((c) => getDlocalCountry(c)!.walletLabel || "Billetera digital")),
+  );
+  return labels.length === 1 ? labels[0] : "Billetera digital";
+}
+
+/**
  * ¿La cobertura real de /admin/dlocal soporta este método en la región?
  * Devuelve null si el método no es de dLocal (no se sincroniza).
  * true  = hay rails activos (y no "muy pronto") en al menos un país de la región.

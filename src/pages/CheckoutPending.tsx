@@ -64,11 +64,17 @@ export default function CheckoutPending() {
         )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <Button asChild size="lg"><Link to="/">{t.backHome}</Link></Button>
+          <Button asChild size="lg">
+            <Link to={`/mi-pedido${sp.get("external_reference") ? `?order=${encodeURIComponent(sp.get("external_reference")!)}` : ""}`}>
+              Ver estado de mi pedido
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="lg"><Link to="/">{t.backHome}</Link></Button>
           <Button asChild variant="outline" size="lg">
             <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
           </Button>
         </div>
+
       </main>
     </div>
   );

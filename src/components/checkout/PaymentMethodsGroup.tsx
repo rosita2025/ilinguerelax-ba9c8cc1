@@ -550,6 +550,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     const ctry = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
+    // Guardia final: nunca crear una orden con un método fuera de la cobertura
+    // activa de /admin/dlocal para el país real del comprador.
+    const coverage = validateDlocalMethod(ctry, dlMethod);
+    if (!coverage.ok) {
+      setSelected(null);
+      setMethodError({ method: dlMethod, message: coverage.reason || "Método no disponible en tu país." });
+      toast({
+        title: "Método no disponible",
+        description: coverage.reason || "Elige otro método de pago para tu país.",
+        variant: "destructive",
+      });
+      return;
+    }
     const dlCurrency = DLOCAL_CURRENCY_BY_COUNTRY[ctry] ?? "USD";
     const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
     redirectingRef.current = true;

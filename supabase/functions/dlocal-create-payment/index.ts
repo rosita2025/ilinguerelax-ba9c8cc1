@@ -84,12 +84,15 @@ Deno.serve(async (req) => {
       ? `${supabaseUrl}/functions/v1/dlocal-webhook?${notifyParams.toString()}`
       : undefined;
 
-    // Restringe el checkout de dLocal Go a un solo tipo de rail (transferencia
-    // o efectivo). Consultamos los métodos disponibles del país y elegimos el
-    // primero cuyo tipo coincida; si la consulta falla, dejamos el checkout
-    // completo de dLocal (mejor cobrar que bloquear la venta).
+    // Rail específico (transferencia / efectivo / billetera) como RESPALDO.
+    // La consulta a /payment-methods es perezosa: el primer intento usa el
+    // checkout completo de dLocal, que no necesita el rail, así que no
+    // gastamos un viaje de red extra en el 99% de los pagos que salen bien.
+    let railLookupDone = false;
     let paymentMethodId: string | undefined;
-    if (body.paymentType) {
+    const resolveRail = async (): Promise<string | undefined> => {
+      if (railLookupDone || !body.paymentType) return paymentMethodId;
+      railLookupDone = true;
       try {
         const pmResp = await fetch(
           `https://api.dlocalgo.com/v1/payment-methods?country=${body.country.toUpperCase()}`,
@@ -119,7 +122,9 @@ Deno.serve(async (req) => {
       } catch (e) {
         console.warn("dLocal payment-methods lookup error:", e);
       }
-    }
+      return paymentMethodId;
+    };
+
 
     // Moneda oficial que dLocal Go acepta en cada país LatAm. Si el cliente
     // manda otra (por caché o geo-IP desfasado), cobramos en USD en vez de

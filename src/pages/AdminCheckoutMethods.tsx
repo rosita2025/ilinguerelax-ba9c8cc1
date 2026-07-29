@@ -294,6 +294,65 @@ export default function AdminCheckoutMethods() {
     }
   }
 
+  /**
+   * Botón manual: reescribe las etiquetas/notas de TODOS los métodos dLocal
+   * usando la cobertura activa de /admin/dlocal y sincroniza activado/desactivado.
+   * Reporta cambios aplicados y errores.
+   */
+  async function syncDlocalLabels() {
+    setSyncingDlocal(true);
+    const byCode = new Map(regions.map((r) => [r.code, r]));
+    const changed: string[] = [];
+    const errors: string[] = [];
+    let checked = 0;
+    try {
+      for (const m of methods) {
+        const r = byCode.get(m.region_code);
+        if (!r || !m.id) continue;
+        const note = dlocalNoteForCountries(m.method_key, r.country_codes || []);
+        if (note === null) continue; // no es método dLocal
+        checked++;
+        const should = dlocalCoverageEnabled(m.method_key, r.country_codes || []);
+        const needsNote = (m.note || "") !== note;
+        const needsEnabled = should !== null && should !== m.enabled;
+        if (!needsNote && !needsEnabled) continue;
+        const payload: Method = { ...m, note, enabled: should ?? m.enabled };
+        const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+          body: { action: "save_method", method: payload },
+        });
+        if (error || data?.error) {
+          errors.push(`${r.code} · ${m.label}: ${error?.message || data?.error}`);
+          continue;
+        }
+        setMethods((prev) => prev.map((x) => (x.id === m.id ? payload : x)));
+        changed.push(
+          `${r.flag || ""} ${r.code} · ${m.label}${needsNote ? " (etiquetas)" : ""}${
+            needsEnabled ? (payload.enabled ? " (activado)" : " (desactivado)") : ""
+          }`,
+        );
+      }
+      invalidateCheckoutMethodsCache();
+      if (errors.length) {
+        toast.error(`⚠️ ${errors.length} error(es) al sincronizar`, {
+          description: errors.slice(0, 5).join(" — "),
+          duration: 12000,
+        });
+      }
+      if (changed.length) {
+        toast.success(`🔄 ${changed.length} de ${checked} métodos dLocal actualizados`, {
+          description: changed.slice(0, 8).join(" — "),
+          duration: 10000,
+        });
+      } else if (!errors.length) {
+        toast.success(`✅ Todo al día: ${checked} métodos dLocal ya coinciden con /admin/dlocal`);
+      }
+    } finally {
+      setSyncingDlocal(false);
+    }
+  }
+
+
+
   useEffect(() => { load(); }, []);
 
   async function saveRegion(r: Region, opts: { fromDialog?: boolean } = {}) {

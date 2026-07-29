@@ -17,6 +17,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { isSettledStatus } from "../_shared/dlocal.ts";
 
 const API_BASE = "https://api.dlocalgo.com/v1";
 
@@ -53,7 +54,8 @@ function tooMany(ip: string): boolean {
   return cur.n > MAX_ATTEMPTS;
 }
 
-const PAID_STATUSES = new Set(["PAID", "AUTHORIZED", "COMPLETED", "APPROVED", "SUCCEEDED"]);
+// Solo un pago LIQUIDADO habilita la entrega. AUTHORIZED / VERIFIED / PENDING
+// significan "aún no acreditado" en efectivo y transferencia (ver _shared/dlocal.ts).
 
 // deno-lint-ignore no-explicit-any
 type Admin = any;
@@ -160,7 +162,7 @@ Deno.serve(async (req) => {
 
     // ---- ¿Está pagado de verdad? ------------------------------------------
     let paid = (events ?? []).some(
-      (e) => e.event === "payment_paid" || PAID_STATUSES.has(String(e.status ?? "").toUpperCase()),
+      (e) => e.event === "payment_paid" || isSettledStatus(e.status),
     );
     paid = paid || (manualRows ?? []).some((m) =>
       ["verified", "completed", "paid", "approved"].includes(String(m.status ?? "").toLowerCase())
@@ -181,7 +183,7 @@ Deno.serve(async (req) => {
           if (resp.ok) {
             const raw = await resp.json();
             const rawStatus = String(raw?.status ?? "").toUpperCase();
-            if (PAID_STATUSES.has(rawStatus)) {
+            if (isSettledStatus(rawStatus)) {
               paid = true;
               await logOrderEvent({
                 orderNumber,

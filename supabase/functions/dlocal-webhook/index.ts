@@ -7,7 +7,14 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
-import { verifyDlocalSignature } from "../_shared/dlocal.ts";
+import {
+  verifyDlocalSignature,
+  isSettledStatus,
+  isPendingStatus,
+  DLOCAL_SETTLED_STATUSES,
+  DLOCAL_PENDING_STATUSES,
+  DLOCAL_FAILED_STATUSES,
+} from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const API_BASE = "https://api.dlocalgo.com/v1";
@@ -93,7 +100,11 @@ Deno.serve(async (req) => {
     // 2) Estado real consultado directamente a dLocal Go (nunca del body).
     const payment = await fetchPayment(paymentId);
     const status = String(payment.status || "").toUpperCase();
-    const ALLOWED_STATUS = ["PAID", "PENDING", "REJECTED", "CANCELLED", "EXPIRED", "AUTHORIZED", "VERIFIED", "EXPIRED_PARTIAL"];
+    const ALLOWED_STATUS: readonly string[] = [
+      ...DLOCAL_SETTLED_STATUSES,
+      ...DLOCAL_PENDING_STATUSES,
+      ...DLOCAL_FAILED_STATUSES,
+    ];
     if (!ALLOWED_STATUS.includes(status)) {
       console.warn("dLocal webhook: estado desconocido", { paymentId, status });
       return new Response(JSON.stringify({ received: true, ignored: "unknown status" }), {
@@ -139,7 +150,7 @@ Deno.serve(async (req) => {
     const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
 
     await supabase.from("funnel_events").insert({
-      event_name: status === "PAID" ? "Purchase" : `dlocal_${status.toLowerCase()}`,
+      event_name: isSettledStatus(status) ? "Purchase" : `dlocal_${status.toLowerCase()}`,
       product_id: skus[0] || orderNumber,
       value: amount ?? null,
       currency,
@@ -147,16 +158,16 @@ Deno.serve(async (req) => {
       provider: "dlocalgo",
     }).then(({ error }) => { if (error) console.error("dLocal funnel log failed:", error.message); });
 
-    if (status !== "PAID") {
+    if (!isSettledStatus(status)) {
       // Transferencia / efectivo: dLocal deja el pago en PENDING mientras el
       // cliente paga en el banco o en la caja. Igual que Mercado Pago Perú,
       // le enviamos el comprobante "pago pendiente" con las instrucciones y
       // avisamos al admin. La entrega digital se dispara sola cuando dLocal
       // vuelve a llamar este webhook con estado PAID.
-      const PENDING_STATUS = ["PENDING", "AUTHORIZED", "VERIFIED"];
+
       // Estados finales fallidos: quedan registrados en el historial del pedido
       // para que /mi-pedido y el admin muestren el estado real.
-      if (!PENDING_STATUS.includes(status)) {
+      if (!isPendingStatus(status)) {
         await logOrderEvent({
           orderNumber,
           event: "payment_failed",
@@ -171,7 +182,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      if (PENDING_STATUS.includes(status) && customerEmail) {
+      if (isPendingStatus(status) && customerEmail) {
         const rawMethod = String(
           payment.payment_method_id || payment.payment_method_type || q.get("ptype") || "",
         ).toUpperCase();

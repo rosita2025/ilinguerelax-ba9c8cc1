@@ -1268,8 +1268,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
         : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
       badge: priceBadge,
-      badges: dlocalBadges(country, "transfer", 4).length
-        ? dlocalBadges(country, "transfer", 4)
+      badges: dlocalBadges(country, "transfer", 6).length
+        ? dlocalBadges(country, "transfer", 6)
         : [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
     },
     {
@@ -1286,8 +1286,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
         : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
       badge: priceBadge,
-      badges: dlocalBadges(country, "cash", 4).length
-        ? dlocalBadges(country, "cash", 4)
+      badges: dlocalBadges(country, "cash", 6).length
+        ? dlocalBadges(country, "cash", 6)
         : [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }],
     },
     {
@@ -1306,7 +1306,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "fr" ? "Payez depuis votre portefeuille en monnaie locale. Confirmation immédiate."
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
       badge: priceBadge,
-      badges: dlocalBadges(country, "wallet", 4),
+      badges: dlocalBadges(country, "wallet", 6),
     },
     {
       id: "dlocal_card",

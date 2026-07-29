@@ -54,15 +54,26 @@ Deno.serve(async (req) => {
   try {
     const rawBody = await req.text();
 
-    // 1) Verificación de firma HMAC-SHA256 de dLocal Go (obligatoria).
+    // 1) Firma HMAC-SHA256 de dLocal Go. Si no valida, NO descartamos la
+    // notificación: dLocal no firma todas sus llamadas (retries, cambios de
+    // estado de efectivo/transferencia) y perder un PAID significa una compra
+    // pagada sin entregar. En ese caso exigimos que la notificación traiga el
+    // `order` que nosotros mismos pusimos en la notification_url y que coincida
+    // con el order_id que devuelve la API de dLocal (paso 3). El estado siempre
+    // se consulta a la API con nuestras credenciales, nunca se toma del body.
     const signatureOk = await verifyDlocalSignature(req, rawBody);
-    if (!signatureOk) {
-      console.warn("dLocal webhook rechazado: firma inválida o ausente");
+    const expectedOrderParam = (url.searchParams.get("order") || "").trim();
+    if (!signatureOk && !expectedOrderParam) {
+      console.warn("dLocal webhook rechazado: sin firma válida y sin order en la URL");
       return new Response(JSON.stringify({ error: "invalid signature" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (!signatureOk) {
+      console.warn("dLocal webhook sin firma válida: se valida contra la API por order_id");
+    }
+
 
     let body: Record<string, unknown> = {};
     try { body = rawBody ? JSON.parse(rawBody) : {}; } catch { body = {}; }

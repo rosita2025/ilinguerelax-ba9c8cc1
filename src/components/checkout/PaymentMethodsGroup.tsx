@@ -21,10 +21,10 @@ import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
-import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails } from "@/lib/dlocalCoverage";
+import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, getDlocalCountry } from "@/lib/dlocalCoverage";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -570,8 +570,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   // dLocal Go — pagos locales de LatAm (OXXO/SPEI, PSE/Nequi, Pix, tarjetas).
   // Cobra en la moneda local del país cuando dLocal la soporta; si no, USD.
-  const payDlocal = async (kind: "transfer" | "cash") => {
-    const dlMethod: Method = kind === "cash" ? "dlocal_cash" : "dlocal_transfer";
+  const payDlocal = async (kind: "transfer" | "cash" | "wallet") => {
+    const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     const s = useCheckoutPruebaStore.getState();
@@ -693,6 +693,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
     if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
+    if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }
     // yape → user uses "Ya pagué" button in the manual panel
@@ -1297,6 +1298,24 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       ],
     },
     {
+      id: "dlocal_wallet",
+      icon: Wallet,
+      title: (getDlocalCountry(country)?.walletLabel
+        ? `${getDlocalCountry(country)!.walletLabel} (dLocal Go)`
+        : language === "en" ? "Digital wallet (dLocal Go)"
+        : language === "pt" ? "Carteira digital (dLocal Go)"
+        : language === "fr" ? "Portefeuille numérique (dLocal Go)"
+        : "Billetera digital (dLocal Go)"),
+      sub: (dlocalRails(country, "wallet").length
+        ? `${dlocalRails(country, "wallet").join(" · ")} — `
+        : "") + (language === "en" ? "Pay from your wallet app in local currency. Instant confirmation."
+        : language === "pt" ? "Pague pela sua carteira digital em moeda local. Confirmação imediata."
+        : language === "fr" ? "Payez depuis votre portefeuille en monnaie locale. Confirmation immédiate."
+        : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
+      badge: priceBadge,
+      badges: (dlocalRails(country, "wallet").slice(0, 3).map((r) => ({ label: r, bg: "#4F46E5", color: "#ffffff" }))),
+    },
+    {
       id: "hotmart",
       icon: CreditCard,
       title: language === "en" ? "Hotmart (1-click)"
@@ -1348,6 +1367,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer");
         if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash");
+        if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet");
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 
@@ -1357,7 +1377,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     : [];
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
-  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id;
+  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id === "dlocal_wallet" ? "dlocalWallet" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
     const i = methodsConfig.familyOrder.indexOf(fam as FamilyKey);

@@ -1367,7 +1367,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer");
         if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash");
-        if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet");
+        if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon;
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 

@@ -1267,10 +1267,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Transferência bancária (dLocal Go)"
         : language === "fr" ? "Virement bancaire (dLocal Go)"
         : "Transferencia bancaria (dLocal Go)",
-      sub: language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
+      sub: (dlocalRails(country, "transfer").length
+        ? `${dlocalRails(country, "transfer").join(" · ")} — `
+        : "") + (language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
         : language === "pt" ? "Pague pelo seu banco ou carteira em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
-        : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata.",
+        : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
       badge: priceBadge,
       badges: DLOCAL_TRANSFER_BADGES[country] ?? [
         { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },

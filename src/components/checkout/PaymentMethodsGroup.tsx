@@ -96,6 +96,29 @@ function BankBadge({ label, bg }: { label: string; bg: string; color?: string })
   );
 }
 
+/** Agrupación visual de métodos para reducir la saturación del checkout. */
+type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
+
+function methodSection(id: string): MethodSection {
+  if (["card", "dlocal_card", "stripe_klarna"].includes(id)) return "cards";
+  if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
+  if (["cash", "dlocal_cash"].includes(id)) return "cash";
+  if (["paypal", "yape", "binance", "dlocal_wallet", "stripe_cashapp"].includes(id)) return "wallet";
+  return "other";
+}
+
+const SECTION_LABELS: Record<MethodSection, Record<string, string>> = {
+  cards: { es: "Tarjetas", en: "Cards", pt: "Cartões", fr: "Cartes" },
+  transfer: { es: "Transferencias bancarias", en: "Bank transfers", pt: "Transferências bancárias", fr: "Virements bancaires" },
+  cash: { es: "Pago en efectivo", en: "Cash payment", pt: "Pagamento em dinheiro", fr: "Paiement en espèces" },
+  wallet: { es: "Billeteras digitales", en: "Digital wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques" },
+  other: { es: "Otros métodos", en: "Other methods", pt: "Outros métodos", fr: "Autres moyens" },
+};
+
+function sectionLabel(section: MethodSection, language: string) {
+  return SECTION_LABELS[section][language] ?? SECTION_LABELS[section].es;
+}
+
 
 
 

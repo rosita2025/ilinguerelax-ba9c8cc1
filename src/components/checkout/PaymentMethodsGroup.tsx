@@ -22,9 +22,10 @@ import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, getDlocalCountry } from "@/lib/dlocalCoverage";
+import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -1316,6 +1317,23 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       badges: (dlocalRails(country, "wallet").slice(0, 3).map((r) => ({ label: r, bg: "#4F46E5", color: "#ffffff" }))),
     },
     {
+      id: "dlocal_card",
+      icon: CreditCard,
+      title: language === "en" ? "Debit / credit card (dLocal Go)"
+        : language === "pt" ? "Cartão de débito / crédito (dLocal Go)"
+        : language === "fr" ? "Carte bancaire (dLocal Go)"
+        : "Tarjeta de débito / crédito (dLocal Go)",
+      sub: language === "en" ? "Pay in local currency with your card. Secure fields by dLocal."
+        : language === "pt" ? "Pague em moeda local com seu cartão. Campos seguros da dLocal."
+        : language === "fr" ? "Payez en monnaie locale par carte. Champs sécurisés dLocal."
+        : "Paga en tu moneda local con tu tarjeta. Campos seguros de dLocal.",
+      badge: priceBadge,
+      badges: [
+        { label: "Visa", bg: "#1A1F71", color: "#ffffff" },
+        { label: "Mastercard", bg: "#EB001B", color: "#ffffff" },
+      ],
+    },
+    {
       id: "hotmart",
       icon: CreditCard,
       title: language === "en" ? "Hotmart (1-click)"
@@ -1367,6 +1385,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
         if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon;
+        if (m.id === "dlocal_card") return methodsConfig.dlocalCard && DLOCAL_COUNTRY_CODES.includes(country);
         if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon;
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
@@ -1377,7 +1396,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     : [];
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
-  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id === "dlocal_wallet" ? "dlocalWallet" : id;
+  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id === "dlocal_wallet" ? "dlocalWallet" : id === "dlocal_card" ? "dlocalCard" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
     const i = methodsConfig.familyOrder.indexOf(fam as FamilyKey);
@@ -1832,6 +1851,30 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             )}
 
 
+            {m.id === "dlocal_card" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">
+                <DlocalSmartFields
+                  country={country}
+                  currency={DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD"}
+                  amount={(DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") === "USD"
+                    ? total
+                    : (local.currency === (DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") ? local.amount : total)}
+                  expectedTotalUsd={total}
+                  items={items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity }))}
+                  couponPercent={couponPercent}
+                  couponCode={coupon ?? undefined}
+                  payerName={buyer.fullName}
+                  payerEmail={buyer.email}
+                  payerPhone={buyer.phone ?? undefined}
+                  language={language}
+                  onPaid={(orderId) => {
+                    navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
+                  }}
+                  onError={(message) => setMethodError({ method: "dlocal_card", message })}
+                />
+              </div>
+            )}
+
             {m.id === "yape" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
                 <div className="text-center space-y-1">
@@ -2085,7 +2128,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         </p>
       )}
 
-      {selected !== "yape" && selected !== "binance" && selected !== "paypal" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

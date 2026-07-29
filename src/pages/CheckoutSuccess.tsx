@@ -222,22 +222,22 @@ export default function CheckoutSuccess() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch delivery info (drive links + bonuses) for purchased SKUs
+  // Enlaces de descarga (producto + bonos + upsells). El backend sólo los
+  // devuelve si el pedido tiene un pago confirmado; nunca se piden por SKU.
   useEffect(() => {
-    if (!isVerifiedBuyer) return;
-    const skus = items.map((i) => i.id);
-    if (!skus.length) return;
+    if (!isVerifiedBuyer || !buyer.email || !orderNumber) return;
     setDeliveryLoading(true);
     supabase.functions
-      .invoke("manage-products", { body: { action: "get_delivery", skus } })
+      .invoke("order-delivery", { body: { orderId: orderNumber, email: buyer.email } })
       .then(({ data, error }) => {
         if (error) throw error;
         setDelivery((data?.items ?? []) as DeliveryItem[]);
       })
-      .catch((e) => console.error("get_delivery failed", e))
+      .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const copyKey = (val: string) => {
     navigator.clipboard.writeText(val).then(

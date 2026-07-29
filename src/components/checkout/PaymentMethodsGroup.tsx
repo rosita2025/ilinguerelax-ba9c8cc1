@@ -97,8 +97,8 @@ const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
 };
 
 // Rails locales de dLocal Go, separados por tipo (transferencia / efectivo).
-// Solo estos países tienen dLocal Go habilitado en la tienda.
-const DLOCAL_COUNTRIES = ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"];
+// La cobertura real por país vive en src/lib/dlocalCoverage.ts
+const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 
 const DLOCAL_TRANSFER_BADGES: Record<string, MethodBadge[]> = {
   MX: [{ label: "SPEI", bg: "#0F766E", color: "#ffffff" }, { label: "Transferencia", bg: "#111827", color: "#ffffff" }],

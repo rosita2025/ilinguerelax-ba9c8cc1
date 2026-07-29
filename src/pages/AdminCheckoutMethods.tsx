@@ -15,6 +15,47 @@ import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
 import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, ArrowUp, ArrowDown, Save, Loader2 } from "lucide-react";
+import { DLOCAL_COVERAGE, dlocalRails, getDlocalCountry, type DlocalKind } from "@/lib/dlocalCoverage";
+
+/**
+ * Etiquetas reales de dLocal Go por país, tomadas de /admin/dlocal.
+ * Se usan como descripción de los métodos dLocal en /admin/checkout-methods
+ * para que ambos paneles (y el checkout) muestren siempre lo mismo.
+ */
+const DLOCAL_KIND_BY_KEY: Record<string, DlocalKind> = {
+  dlocal_transfer: "transfer",
+  dlocal_bank: "transfer",
+  dlocal: "transfer",
+  dlocal_go: "transfer",
+  dlocal_cash: "cash",
+  dlocal_ticket: "cash",
+  dlocal_wallet: "wallet",
+  dlocal_mercadopago: "wallet",
+};
+
+export function dlocalNoteForCountries(methodKey: string, countryCodes: string[]): string | null {
+  const kind = DLOCAL_KIND_BY_KEY[methodKey];
+  if (!kind) return null;
+  const codes = (countryCodes.length ? countryCodes : DLOCAL_COVERAGE.map((c) => c.code))
+    .map((c) => c.toUpperCase())
+    .filter((c) => !!getDlocalCountry(c));
+  if (!codes.length) return null;
+  const parts = codes
+    .map((code) => {
+      const c = getDlocalCountry(code)!;
+      const rails = dlocalRails(code, kind);
+      if (!rails.length) return null;
+      const soon =
+        (kind === "transfer" && c.transferComingSoon) ||
+        (kind === "cash" && c.cashComingSoon) ||
+        (kind === "wallet" && c.walletComingSoon);
+      return `${c.flag} ${code}: ${rails.join(", ")}${soon ? " (muy pronto)" : ""}`;
+    })
+    .filter(Boolean) as string[];
+  if (!parts.length) return null;
+  return `dLocal Go · ${parts.join(" — ")}`;
+}
+
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;

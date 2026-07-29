@@ -247,6 +247,8 @@ export default function AdminCheckoutMethods() {
   const [search, setSearch] = useState("");
   const [filterCountry, setFilterCountry] = useState("");
   const [filterGateway, setFilterGateway] = useState("");
+  const [syncingDlocal, setSyncingDlocal] = useState(false);
+
 
   async function load() {
     invalidateCheckoutMethodsCache();

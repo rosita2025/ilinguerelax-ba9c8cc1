@@ -1,28 +1,78 @@
 // Estado público de un pedido para el cliente.
-// Seguridad: no hay login, así que exigimos número de pedido + correo exacto.
-// Sin la combinación correcta no se devuelve absolutamente nada.
+// Seguridad: no hay login, así que exigimos número de pedido + correo exacto del comprador.
+// Validación extra:
+//  - el correo se canonicaliza (mayúsculas, puntos/alias de Gmail, dominios mal escritos)
+//  - se compara SOLO contra los correos realmente vinculados a ese pedido
+//  - respuesta genérica idéntica cuando no coincide (no revela si el pedido existe)
+//  - límite de intentos por IP para evitar adivinar correos de pedidos ajenos
+//  - la respuesta nunca incluye correos, detalles internos ni referencias completas
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
+import { normalizeEmailBasic } from "../_shared/emailGuard.ts";
 
 const BodySchema = z.object({
-  orderNumber: z.string().trim().min(4).max(80),
+  orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
   email: z.string().trim().email().max(160),
 });
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+/** Canonicaliza para comparar identidades: gmail ignora puntos y +alias. */
+function canonicalEmail(raw: unknown): string {
+  const base = normalizeEmailBasic(raw);
+  const at = base.lastIndexOf("@");
+  if (at <= 0) return base;
+  let local = base.slice(0, at);
+  const domain = base.slice(at + 1);
+  local = local.split("+")[0];
+  if (domain === "gmail.com" || domain === "googlemail.com") local = local.replace(/\./g, "");
+  return `${local}@${domain === "googlemail.com" ? "gmail.com" : domain}`;
+}
+
+/** Deja visible solo el final de una referencia de pago. */
+function maskRef(v: unknown): string | null {
+  const s = v == null ? "" : String(v);
+  if (!s) return null;
+  return s.length <= 4 ? "••••" : `••••${s.slice(-4)}`;
+}
+
+// Límite de intentos por IP (por isolate). Evita enumerar correos de pedidos ajenos.
+const MAX_ATTEMPTS = 12;
+const WINDOW_MS = 10 * 60 * 1000;
+const attempts = new Map<string, { n: number; until: number }>();
+
+function tooManyAttempts(ip: string): boolean {
+  const now = Date.now();
+  const cur = attempts.get(ip);
+  if (!cur || cur.until < now) {
+    attempts.set(ip, { n: 1, until: now + WINDOW_MS });
+    return false;
+  }
+  cur.n += 1;
+  return cur.n > MAX_ATTEMPTS;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+    if (tooManyAttempts(ip)) {
+      return json({ error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo." }, 429);
+    }
+
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
 
     const orderNumber = parsed.data.orderNumber.toUpperCase();
-    const email = parsed.data.email.toLowerCase();
+    const email = canonicalEmail(parsed.data.email);
+    if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -32,7 +82,7 @@ Deno.serve(async (req) => {
     const [{ data: events }, { data: manual }, { data: sends }] = await Promise.all([
       supabase
         .from("order_events")
-        .select("event, status, method, reference, detail, amount, currency, provider, customer_email, created_at")
+        .select("event, status, method, reference, amount, currency, provider, customer_email, created_at")
         .eq("order_number", orderNumber)
         .order("created_at", { ascending: true }),
       supabase
@@ -47,14 +97,15 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: true }),
     ]);
 
-    // El correo debe coincidir con alguno de los registros del pedido.
+    // El correo debe coincidir con alguno de los correos vinculados al pedido.
     const owners = new Set<string>();
-    (events ?? []).forEach((e) => e.customer_email && owners.add(String(e.customer_email).toLowerCase()));
-    if (manual?.buyer_email) owners.add(String(manual.buyer_email).toLowerCase());
-    (sends ?? []).forEach((s) => s.customer_email && owners.add(String(s.customer_email).toLowerCase()));
+    (events ?? []).forEach((e) => e.customer_email && owners.add(canonicalEmail(e.customer_email)));
+    if (manual?.buyer_email) owners.add(canonicalEmail(manual.buyer_email));
+    (sends ?? []).forEach((s) => s.customer_email && owners.add(canonicalEmail(s.customer_email)));
 
     if (owners.size === 0 || !owners.has(email)) {
-      // Respuesta genérica: no revelamos si el pedido existe.
+      console.warn("[order-status] acceso denegado", { orderNumber, ip });
+      // Respuesta genérica: no revelamos si el pedido existe ni a quién pertenece.
       return json({ found: false }, 200);
     }
 
@@ -62,8 +113,8 @@ Deno.serve(async (req) => {
       event: e.event,
       status: e.status,
       method: e.method,
-      reference: e.reference,
-      detail: e.detail,
+      reference: maskRef(e.reference),
+      detail: null as string | null, // detalle interno nunca se expone al cliente
       amount: e.amount,
       currency: e.currency,
       provider: e.provider,

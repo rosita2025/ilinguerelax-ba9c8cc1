@@ -7,7 +7,7 @@
  * Si un país no tiene rails para un tipo, ese método NO debe mostrarse en el checkout.
  * Fuente: panel dLocal Go → Métodos de pago / Cobertura.
  */
-export type DlocalKind = "transfer" | "cash";
+export type DlocalKind = "transfer" | "cash" | "wallet";
 
 export type DlocalCountry = {
   code: string;
@@ -18,12 +18,15 @@ export type DlocalCountry = {
   transfer: string[];
   /** Redes de efectivo disponibles (vacío = no soportado). */
   cash: string[];
+  /** Billeteras / tarjetas Mercado Pago (bloque separado, vacío = no soportado). */
+  wallet?: string[];
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [
   { code: "AR", name: "Argentina", flag: "🇦🇷", currency: "ARS",
-    transfer: ["Transferencia CBU/CVU", "Mercado Pago", "Banco Nación", "Santander", "Galicia", "BBVA", "Macro"],
-    cash: ["Rapipago", "Pago Fácil", "Cobro Express", "Provincia NET"] },
+    transfer: ["Transferencia CBU/CVU", "Banco Nación", "Santander", "Galicia", "BBVA", "Macro"],
+    cash: ["Rapipago", "Pago Fácil", "Cobro Express", "Provincia NET"],
+    wallet: ["Mercado Pago (saldo)", "Tarjeta Mercado Pago", "Tarjeta de crédito/débito vía Mercado Pago"] },
   { code: "BO", name: "Bolivia", flag: "🇧🇴", currency: "BOB",
     transfer: ["QR bancario", "Transferencia bancaria"], cash: ["Pago al Paso", "Efectivo (agentes)"] },
   { code: "BR", name: "Brasil", flag: "🇧🇷", currency: "BRL",
@@ -42,8 +45,9 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
   { code: "GT", name: "Guatemala", flag: "🇬🇹", currency: "GTQ",
     transfer: [], cash: ["PAYCASH (agentes)"] },
   { code: "MX", name: "México", flag: "🇲🇽", currency: "MXN",
-    transfer: ["SPEI", "BBVA Bancomer", "Banorte", "Banregio", "Banbajío", "Citibanamex", "Compartamos", "HSBC", "Inbursa", "Mercado Pago", "Santander", "Scotiabank"],
-    cash: ["OXXO", "7-Eleven"] },
+    transfer: ["SPEI", "BBVA Bancomer", "Banorte", "Banregio", "Banbajío", "Citibanamex", "Compartamos", "HSBC", "Inbursa", "Santander", "Scotiabank"],
+    cash: ["OXXO", "7-Eleven"],
+    wallet: ["Mercado Pago (saldo)", "Tarjeta Mercado Pago"] },
   { code: "PA", name: "Panamá", flag: "🇵🇦", currency: "USD",
     transfer: ["Transferencia bancaria"], cash: [] },
   { code: "PE", name: "Perú", flag: "🇵🇪", currency: "PEN",
@@ -66,14 +70,16 @@ export function getDlocalCountry(country?: string | null): DlocalCountry | undef
 export function dlocalSupports(country: string | null | undefined, kind: DlocalKind): boolean {
   const c = getDlocalCountry(country);
   if (!c) return false;
-  return (kind === "cash" ? c.cash : c.transfer).length > 0;
+  return dlocalRails(country, kind).length > 0;
 }
 
 /** Nombres de los rails disponibles para mostrar como sub-texto/badges. */
 export function dlocalRails(country: string | null | undefined, kind: DlocalKind): string[] {
   const c = getDlocalCountry(country);
   if (!c) return [];
-  return kind === "cash" ? c.cash : c.transfer;
+  if (kind === "cash") return c.cash;
+  if (kind === "wallet") return c.wallet ?? [];
+  return c.transfer;
 }
 
 export const DLOCAL_COUNTRY_CODES = DLOCAL_COVERAGE.map((c) => c.code);

@@ -9,7 +9,7 @@ import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
 import { DLOCAL_COVERAGE } from "@/lib/dlocalCoverage";
-import { Building2, Banknote, Loader2, RefreshCw, Globe, CheckCircle2 } from "lucide-react";
+import { Building2, Banknote, Loader2, RefreshCw, Globe, CheckCircle2, Wallet } from "lucide-react";
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -21,11 +21,12 @@ type Method = {
   note?: string | null; icon: string; enabled: boolean; sort_order: number;
 };
 
-type Kind = "transfer" | "cash";
+type Kind = "transfer" | "cash" | "wallet";
 
 const METHOD_KEY: Record<Kind, string> = {
   transfer: "dlocal_transfer",
   cash: "dlocal_cash",
+  wallet: "dlocal_mercadopago",
 };
 
 /** Países con cobertura dLocal Go (fuente única: src/lib/dlocalCoverage.ts). */
@@ -41,6 +42,11 @@ const LABELS: Record<Kind, { label: string; note: string; icon: string }> = {
     label: "dLocal Go — efectivo",
     note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)",
     icon: "Banknote",
+  },
+  wallet: {
+    label: "Mercado Pago (tarjeta / saldo)",
+    note: "Pago con tarjeta de crédito, débito o saldo de Mercado Pago vía dLocal Go",
+    icon: "Wallet",
   },
 };
 
@@ -154,9 +160,9 @@ export default function AdminDlocal() {
     setBulk(true);
     try {
       for (const c of visible) {
-        const kinds: Kind[] = kind === "both" ? ["transfer", "cash"] : [kind];
+        const kinds: Kind[] = kind === "both" ? ["transfer", "cash", "wallet"] : [kind];
         for (const k of kinds) {
-          const supported = k === "cash" ? c.cash.length > 0 : c.transfer.length > 0;
+          const supported = (k === "cash" ? c.cash : k === "wallet" ? (c.wallet ?? []) : c.transfer).length > 0;
           if (!supported) continue;
           if (isOn(c.code, k) === next) continue;
           await toggle(c.code, k, next);
@@ -227,6 +233,8 @@ export default function AdminDlocal() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {visible.map((c) => {
+                const wallet = c.wallet ?? [];
+                const walletOn = isOn(c.code, "wallet");
                 const transferOn = isOn(c.code, "transfer");
                 const cashOn = isOn(c.code, "cash");
                 const region = regionFor(c.code);
@@ -243,7 +251,7 @@ export default function AdminDlocal() {
                           </div>
                         </div>
                       </div>
-                      {(transferOn || cashOn) && (
+                      {(transferOn || cashOn || walletOn) && (
                         <Badge className="shrink-0 text-[10px]">Activo</Badge>
                       )}
                     </div>
@@ -293,6 +301,25 @@ export default function AdminDlocal() {
                         <div className="text-[11px] text-muted-foreground">No disponible en este país</div>
                       )}
                     </div>
+
+                    {wallet.length > 0 && (
+                      <div className="rounded-lg border border-primary/40 bg-primary/5 p-2.5 space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-1.5 text-sm font-medium">
+                            <Wallet className="h-4 w-4 text-primary" /> Mercado Pago (tarjeta / saldo)
+                            <span className="text-[10px] text-muted-foreground font-normal">({wallet.length})</span>
+                          </div>
+                          {busy === `${c.code}:wallet`
+                            ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
+                            : <Switch checked={walletOn} onCheckedChange={(v) => toggle(c.code, "wallet", v)} />}
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {wallet.map((r) => (
+                            <span key={r} className="text-[10px] rounded-md bg-background px-1.5 py-0.5 text-muted-foreground border">{r}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                   </Card>
                 );

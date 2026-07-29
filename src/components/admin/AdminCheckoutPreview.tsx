@@ -155,6 +155,15 @@ export default function AdminCheckoutPreview({ regions = [], methods = [] }: Pro
     return `/checkouts/${sku}?${q.toString()}`;
   }, [sku, country, nonce]);
 
+  // Métodos activos de la región del país seleccionado, en el orden del checkout.
+  const previewMethods = useMemo(() => {
+    if (!country) return [] as MethodLite[];
+    return methods
+      .filter((m) => m.enabled && m.region_code === country.region)
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  }, [methods, country]);
+
+
   const isMobileDevice = device === "mobile";
   const frameWidth = isMobileDevice ? 360 : "100%";
   const frameHeight = isMobileDevice ? 720 : 700;

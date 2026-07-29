@@ -272,8 +272,13 @@ export default function AdminDlocal() {
                           {!!c.transfer.length && (
                             <span className="text-[10px] text-muted-foreground font-normal">({c.transfer.length})</span>
                           )}
+                          {c.transferComingSoon && (
+                            <span className="text-[10px] rounded-md bg-amber-500/15 text-amber-700 border border-amber-500/30 px-1.5 py-0.5 font-medium">Muy pronto</span>
+                          )}
                         </div>
-                        {busy === `${c.code}:transfer`
+                        {c.transferComingSoon
+                          ? <span className="text-[10px] text-muted-foreground">No disponible</span>
+                          : busy === `${c.code}:transfer`
                           ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
                           : <Switch disabled={!c.transfer.length} checked={transferOn && !!c.transfer.length} onCheckedChange={(v) => toggle(c.code, "transfer", v)} />}
                       </div>

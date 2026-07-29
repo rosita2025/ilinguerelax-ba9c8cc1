@@ -99,6 +99,8 @@ function BankBadge({ label, bg }: { label: string; bg: string; color?: string })
 /** Agrupación visual de métodos para reducir la saturación del checkout. */
 type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 
+const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
+
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";

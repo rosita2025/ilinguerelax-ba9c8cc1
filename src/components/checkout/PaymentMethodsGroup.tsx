@@ -23,6 +23,9 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, getDlocalCountry } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
+import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
+import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
+import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card";

@@ -569,7 +569,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   // dLocal Go — pagos locales de LatAm (OXXO/SPEI, PSE/Nequi, Pix, tarjetas).
   // Cobra en la moneda local del país cuando dLocal la soporta; si no, USD.
-  const payDlocal = async () => {
+  const payDlocal = async (kind: "transfer" | "cash") => {
+    const dlMethod: Method = kind === "cash" ? "dlocal_cash" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     const s = useCheckoutPruebaStore.getState();
@@ -578,9 +579,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const dlCurrency = DLOCAL_CURRENCY_BY_COUNTRY[ctry] ?? "USD";
     const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
     redirectingRef.current = true;
-    setMpLoading("dlocal");
+    setMpLoading(dlMethod);
     try {
-      await captureAbandonedCheckout("dlocal", true);
+      await captureAbandonedCheckout(dlMethod, true);
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
@@ -598,6 +599,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
           country: ctry,
+          paymentType: kind,
           currency: dlCurrency,
           amount: Number(dlAmount.toFixed(2)),
           expectedTotalUsd: Number(totals.total.toFixed(2)),
@@ -619,7 +621,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           currency: "USD",
         });
       } catch { /* noop */ }
-      setMethodError({ method: "dlocal", message: err instanceof Error ? err.message : t.tryAgain });
+      setMethodError({ method: dlMethod, message: err instanceof Error ? err.message : t.tryAgain });
       toast({
         title: t.errorPayment,
         description: err instanceof Error ? err.message : t.tryAgain,
@@ -688,7 +690,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     if (selected === "hotmart") { await redirectToHotmart(); return; }
     await captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
-    if (selected === "dlocal") { await payDlocal(); return; }
+    if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
+    if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }
     // yape → user uses "Ya pagué" button in the manual panel
@@ -1257,17 +1260,35 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       badge: priceBadge,
     },
     {
-      id: "dlocal",
-      icon: CreditCard,
-      title: "dLocal Go",
-      sub: language === "en" ? "Local payment methods: OXXO/SPEI, PSE/Nequi, Pix, cards and bank transfer."
-        : language === "pt" ? "Métodos locais: Pix, boleto, cartões e transferência bancária."
-        : language === "fr" ? "Moyens de paiement locaux : OXXO/SPEI, PSE/Nequi, Pix, cartes."
-        : "Métodos locales: OXXO/SPEI, PSE/Nequi, Pix, tarjetas y transferencia bancaria.",
+      id: "dlocal_transfer",
+      icon: Building2,
+      title: language === "en" ? "Bank transfer (dLocal Go)"
+        : language === "pt" ? "Transferência bancária (dLocal Go)"
+        : language === "fr" ? "Virement bancaire (dLocal Go)"
+        : "Transferencia bancaria (dLocal Go)",
+      sub: language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
+        : language === "pt" ? "Pague pelo seu banco ou carteira em moeda local. Confirmação imediata."
+        : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
+        : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata.",
       badge: priceBadge,
-      badges: DLOCAL_BADGES[country] ?? [
-        { label: "Tarjetas", bg: "#ffffff", color: "#1F2937" },
+      badges: DLOCAL_TRANSFER_BADGES[country] ?? [
         { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
+      ],
+    },
+    {
+      id: "dlocal_cash",
+      icon: Banknote,
+      title: language === "en" ? "Cash payment (dLocal Go)"
+        : language === "pt" ? "Pagamento em dinheiro (dLocal Go)"
+        : language === "fr" ? "Paiement en espèces (dLocal Go)"
+        : "Pago en efectivo (dLocal Go)",
+      sub: language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
+        : language === "pt" ? "Gere um voucher e pague em dinheiro em uma loja ou agente."
+        : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
+        : "Genera un cupón y paga en efectivo en una tienda o agente cercano.",
+      badge: priceBadge,
+      badges: DLOCAL_CASH_BADGES[country] ?? [
+        { label: "Efectivo", bg: "#F5A623", color: "#1F2937" },
       ],
     },
     {
@@ -1319,7 +1340,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         if (m.id === "binance") return methodsConfig.binance;
         if (m.id === "clabe") return country === "MX";
 
-        if (m.id === "dlocal") return methodsConfig.dlocal;
+        if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && DLOCAL_COUNTRIES.includes(country);
+        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && DLOCAL_COUNTRIES.includes(country);
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 

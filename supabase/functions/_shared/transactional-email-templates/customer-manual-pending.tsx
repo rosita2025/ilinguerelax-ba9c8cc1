@@ -242,3 +242,10 @@ const binanceBox = { backgroundColor: '#fefce8', border: '1px solid #eab308', bo
 const binanceTitle = { margin: '0 0 8px', fontSize: '14px', color: '#854d0e', fontWeight: 'bold' as const }
 const binanceLine = { margin: '4px 0', fontSize: '13px', color: '#713f12', lineHeight: '1.5', wordBreak: 'break-all' as const }
 const binanceHint = { margin: '8px 0 0', fontSize: '12px', color: '#a16207', fontStyle: 'italic' as const }
+
+const trackBox = { backgroundColor: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: '10px', padding: '16px', margin: '18px 0' }
+const trackTitle = { margin: '0 0 6px', fontSize: '15px', fontWeight: 'bold' as const, color: '#0f766e' }
+const trackLine = { margin: '0', fontSize: '14px', color: '#134e4a', lineHeight: '1.6' }
+const trackBtn = { backgroundColor: '#0d9488', color: '#ffffff', textDecoration: 'none', padding: '11px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
+const trackHint = { margin: '4px 0 0', fontSize: '12px', color: '#0f766e', textAlign: 'center' as const }
+const inlineLink = { color: '#0d9488', fontWeight: 'bold' as const, textDecoration: 'underline' }

@@ -4,6 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Eye, ExternalLink, RefreshCw, Monitor, Smartphone } from "lucide-react";
+import { dlocalBadges, dlocalComingSoon, type DlocalKind } from "@/lib/dlocalCoverage";
+
+/** Métodos dLocal → tipo de cobro, para pintar las mismas etiquetas del checkout. */
+const PREVIEW_KIND: Record<string, DlocalKind> = {
+  dlocal_transfer: "transfer",
+  dlocal_bank: "transfer",
+  dlocal: "transfer",
+  dlocal_go: "transfer",
+  dlocal_cash: "cash",
+  dlocal_ticket: "cash",
+  dlocal_wallet: "wallet",
+  dlocal_mercadopago: "wallet",
+};
+
 
 type Country = { code: string; name: string; flag: string; region?: string };
 
@@ -69,11 +83,22 @@ const COUNTRY_META: Record<string, { name: string; flag: string }> = {
 const DEFAULT_SKU =
   "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
 
+type MethodLite = {
+  region_code: string;
+  method_key: string;
+  label: string;
+  note?: string | null;
+  enabled: boolean;
+  sort_order?: number;
+};
+
 interface Props {
   regions?: RegionLite[];
+  methods?: MethodLite[];
 }
 
-export default function AdminCheckoutPreview({ regions = [] }: Props) {
+
+export default function AdminCheckoutPreview({ regions = [], methods = [] }: Props) {
   // Construir lista de países disponibles SOLO a partir de las regiones configuradas.
   // La región con código "*" (global) se representa con un botón "🌐 Global".
   const countries = useMemo<Country[]>(() => {
@@ -129,6 +154,15 @@ export default function AdminCheckoutPreview({ regions = [] }: Props) {
     });
     return `/checkouts/${sku}?${q.toString()}`;
   }, [sku, country, nonce]);
+
+  // Métodos activos de la región del país seleccionado, en el orden del checkout.
+  const previewMethods = useMemo(() => {
+    if (!country) return [] as MethodLite[];
+    return methods
+      .filter((m) => m.enabled && m.region_code === country.region)
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  }, [methods, country]);
+
 
   const isMobileDevice = device === "mobile";
   const frameWidth = isMobileDevice ? 360 : "100%";
@@ -232,7 +266,55 @@ export default function AdminCheckoutPreview({ regions = [] }: Props) {
         />
       </div>
 
+      {/* Resumen de métodos y etiquetas tal como se verán en el checkout */}
+      {country && (
+        <div className="rounded-lg border bg-background p-2.5 space-y-2">
+          <div className="text-[11px] font-semibold text-muted-foreground">
+            Métodos y etiquetas para {country.flag} {country.name}
+            {country.region ? ` · región ${country.region}` : ""}
+          </div>
+          {previewMethods.length === 0 ? (
+            <div className="text-[11px] text-muted-foreground">
+              No hay métodos activos configurados para esta región.
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {previewMethods.map((m) => {
+                const kind = PREVIEW_KIND[m.method_key];
+                const badges = kind && country.code !== "XX" ? dlocalBadges(country.code, kind, 6) : [];
+                const soon = kind && country.code !== "XX" ? dlocalComingSoon(country.code, kind) : false;
+                return (
+                  <div key={`${m.region_code}-${m.method_key}`} className="rounded border p-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-medium">{m.label}</span>
+                      {soon && <Badge variant="outline" className="text-[9px]">Muy pronto</Badge>}
+                    </div>
+                    {badges.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {badges.map((b) => (
+                          <span
+                            key={b.label}
+                            className="text-[10px] px-1.5 py-0.5 rounded"
+                            style={{ background: b.bg, color: b.color }}
+                          >
+                            {b.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {!badges.length && m.note && (
+                      <div className="text-[10px] text-muted-foreground mt-1 line-clamp-2">{m.note}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {url && (
+
         <div className="rounded-lg border bg-muted/20 overflow-hidden flex justify-center">
           <iframe
             key={`${country?.code}-${nonce}`}

@@ -196,6 +196,8 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "clabe_mx", label: "SPEI / CLABE (México)", note: "Transferencia manual MXN a CLABE mexicana · Verificación 1-24h", icon: "Building2", countryCodes: ["MX"] },
   { key: "dlocal_transfer", label: "Transferencia bancaria", note: "Transferencia bancaria local vía dLocal Go (SPEI MX, PSE CO, Pix BR, CBU AR, PagoEfectivo/transferencia PE…)", icon: "Building2", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
   { key: "dlocal_cash", label: "Pago en efectivo", note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)", icon: "Banknote", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"] },
+  { key: "dlocal_wallet", label: "Billetera digital", note: "Billeteras digitales locales vía dLocal Go (Yape/Plin PE, Nequi CO, MACH CL, PicPay BR…)", icon: "Smartphone", countryCodes: ["BO", "BR", "CL", "CO", "CR", "EC", "GT", "PA", "PE", "PY", "UY"] },
+  { key: "dlocal_mercadopago", label: "Billetera digital (Mercado Pago)", note: "Mercado Pago y billeteras locales vía dLocal Go (Ualá/MODO AR, Spin by OXXO MX)", icon: "Wallet", countryCodes: ["AR", "MX"] },
   { key: "hotmart_1click", label: "Hotmart (1 clic)", note: "Redirige al enlace de Hotmart del producto según el país. Precio y moneda gestionados por Hotmart.", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
 ];
 

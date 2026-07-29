@@ -21,7 +21,7 @@ const BodySchema = z.object({
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),
   country: z.string().length(2),
-  paymentType: z.enum(["transfer", "cash"]).optional(),
+  paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
   currency: z.string().length(3).default("USD"),
   amount: z.number().positive().max(200000),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
@@ -99,6 +99,8 @@ Deno.serve(async (req) => {
             : [];
           const wanted = body.paymentType === "cash"
             ? ["TICKET", "CASH"]
+            : body.paymentType === "wallet"
+            ? ["WALLET", "E_WALLET", "EWALLET", "DIGITAL_WALLET"]
             : ["BANK_TRANSFER", "BANK-TRANSFER", "TRANSFER", "BANK"];
           const match = methods.find((m) => {
             const type = String(m.type ?? m.payment_method_type ?? "").toUpperCase().replace(/\s+/g, "_");

@@ -245,28 +245,32 @@ export default function AdminDlocal() {
                       )}
                     </div>
 
-                    <div className="rounded-lg border p-2.5 flex items-start justify-between gap-3">
+                    <div className={`rounded-lg border p-2.5 flex items-start justify-between gap-3 ${c.transfer.length ? "" : "opacity-60"}`}>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 text-sm font-medium">
                           <Building2 className="h-4 w-4 text-primary" /> Transferencia bancaria
                         </div>
-                        <div className="text-[11px] text-muted-foreground truncate">{c.transfer.join(" · ")}</div>
+                        <div className="text-[11px] text-muted-foreground truncate">
+                          {c.transfer.length ? c.transfer.join(" · ") : "No disponible en este país"}
+                        </div>
                       </div>
                       {busy === `${c.code}:transfer`
                         ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
-                        : <Switch checked={transferOn} onCheckedChange={(v) => toggle(c.code, "transfer", v)} />}
+                        : <Switch disabled={!c.transfer.length} checked={transferOn && !!c.transfer.length} onCheckedChange={(v) => toggle(c.code, "transfer", v)} />}
                     </div>
 
-                    <div className="rounded-lg border p-2.5 flex items-start justify-between gap-3">
+                    <div className={`rounded-lg border p-2.5 flex items-start justify-between gap-3 ${c.cash.length ? "" : "opacity-60"}`}>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 text-sm font-medium">
                           <Banknote className="h-4 w-4 text-primary" /> Pago en efectivo
                         </div>
-                        <div className="text-[11px] text-muted-foreground truncate">{c.cash.join(" · ")}</div>
+                        <div className="text-[11px] text-muted-foreground truncate">
+                          {c.cash.length ? c.cash.join(" · ") : "No disponible en este país"}
+                        </div>
                       </div>
                       {busy === `${c.code}:cash`
                         ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
-                        : <Switch checked={cashOn} onCheckedChange={(v) => toggle(c.code, "cash", v)} />}
+                        : <Switch disabled={!c.cash.length} checked={cashOn && !!c.cash.length} onCheckedChange={(v) => toggle(c.code, "cash", v)} />}
                     </div>
                   </Card>
                 );

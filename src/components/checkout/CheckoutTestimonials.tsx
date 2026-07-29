@@ -56,13 +56,83 @@ const POOL: Record<string, Testimonial[]> = {
     { name: "Gabriela R.", city: "Maracaibo", flag: "🇻🇪", country: "Venezuela" },
     { name: "Ricardo P.", city: "Valencia", flag: "🇻🇪", country: "Venezuela" },
   ],
+  BO: [
+    { name: "Marcela T.", city: "La Paz", flag: "🇧🇴", country: "Bolivia" },
+    { name: "Iván C.", city: "Santa Cruz", flag: "🇧🇴", country: "Bolivia" },
+    { name: "Noelia R.", city: "Cochabamba", flag: "🇧🇴", country: "Bolivia" },
+  ],
+  UY: [
+    { name: "Federico A.", city: "Montevideo", flag: "🇺🇾", country: "Uruguay" },
+    { name: "Lucía D.", city: "Salto", flag: "🇺🇾", country: "Uruguay" },
+    { name: "Santiago P.", city: "Maldonado", flag: "🇺🇾", country: "Uruguay" },
+  ],
+  PY: [
+    { name: "Rodrigo B.", city: "Asunción", flag: "🇵🇾", country: "Paraguay" },
+    { name: "Belén O.", city: "Ciudad del Este", flag: "🇵🇾", country: "Paraguay" },
+    { name: "Hugo M.", city: "Encarnación", flag: "🇵🇾", country: "Paraguay" },
+  ],
+  CR: [
+    { name: "Natalia S.", city: "San José", flag: "🇨🇷", country: "Costa Rica" },
+    { name: "Esteban V.", city: "Alajuela", flag: "🇨🇷", country: "Costa Rica" },
+    { name: "Mariela G.", city: "Heredia", flag: "🇨🇷", country: "Costa Rica" },
+  ],
+  PA: [
+    { name: "Roberto Q.", city: "Ciudad de Panamá", flag: "🇵🇦", country: "Panamá" },
+    { name: "Yariela C.", city: "Colón", flag: "🇵🇦", country: "Panamá" },
+    { name: "Luis A.", city: "David", flag: "🇵🇦", country: "Panamá" },
+  ],
+  GT: [
+    { name: "Silvia M.", city: "Ciudad de Guatemala", flag: "🇬🇹", country: "Guatemala" },
+    { name: "Erick L.", city: "Quetzaltenango", flag: "🇬🇹", country: "Guatemala" },
+    { name: "Dulce R.", city: "Escuintla", flag: "🇬🇹", country: "Guatemala" },
+  ],
+  DO: [
+    { name: "Yamil P.", city: "Santo Domingo", flag: "🇩🇴", country: "República Dominicana" },
+    { name: "Ingrid F.", city: "Santiago", flag: "🇩🇴", country: "República Dominicana" },
+    { name: "Héctor N.", city: "La Romana", flag: "🇩🇴", country: "República Dominicana" },
+  ],
+  PR: [
+    { name: "Wanda S.", city: "San Juan", flag: "🇵🇷", country: "Puerto Rico" },
+    { name: "Ángel R.", city: "Ponce", flag: "🇵🇷", country: "Puerto Rico" },
+    { name: "Keila M.", city: "Bayamón", flag: "🇵🇷", country: "Puerto Rico" },
+  ],
 };
 
-const DEFAULT: Testimonial[] = [
-  { name: "Laura M.", city: "Ciudad", flag: "🌎", country: "LATAM" },
-  { name: "Diego S.", city: "Ciudad", flag: "🌎", country: "LATAM" },
-  { name: "Ana P.", city: "Ciudad", flag: "🌎", country: "LATAM" },
-];
+// Generic first names used when a country has no hand-written pool.
+const GENERIC_NAMES = ["Laura M.", "Diego S.", "Ana P."];
+
+/** 🇦🇷 style flag emoji from any ISO-3166 alpha-2 code. */
+function flagFromCode(cc: string): string {
+  if (!/^[A-Z]{2}$/.test(cc)) return "🌎";
+  return String.fromCodePoint(...[...cc].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+}
+
+/** Localized country name (Bolivia, Argentina, ...) from the ISO code. */
+function countryNameFromCode(cc: string, language: string): string {
+  try {
+    const dn = new Intl.DisplayNames([language || "es"], { type: "region" });
+    return dn.of(cc) || cc;
+  } catch {
+    return cc;
+  }
+}
+
+/**
+ * Testimonials always match the visitor's country. Countries with a curated
+ * pool use real cities; any new country (Bolivia, Uruguay, ...) is generated
+ * automatically with its own flag and localized country name instead of the
+ * old generic "LATAM" label.
+ */
+function poolForCountry(cc: string, language: string): Testimonial[] {
+  if (POOL[cc]) return POOL[cc];
+  if (!/^[A-Z]{2}$/.test(cc)) {
+    return GENERIC_NAMES.map((name) => ({ name, city: "Ciudad", flag: "🌎", country: "LATAM" }));
+  }
+  const country = countryNameFromCode(cc, language);
+  const flag = flagFromCode(cc);
+  return GENERIC_NAMES.map((name) => ({ name, city: country, flag, country }));
+}
+
 
 const QUOTES: Record<string, string[]> = {
   es: [

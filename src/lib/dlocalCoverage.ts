@@ -34,7 +34,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     walletLabel: "Billetera digital", walletKey: "dlocal_mercadopago" },
   { code: "BO", name: "Bolivia", flag: "🇧🇴", currency: "BOB",
     transfer: ["Banco de Crédito de Bolivia"], cash: ["Pago al Paso"],
-    wallet: ["QR"],
+    wallet: ["Yape", "Belo", "Takenos"],
     walletLabel: "Billetera digital (QR)", walletKey: "dlocal_wallet" },
   { code: "BR", name: "Brasil", flag: "🇧🇷", currency: "BRL",
     transfer: ["Pix", "Itaú", "Banco do Brasil", "Bradesco"],

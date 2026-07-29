@@ -84,7 +84,7 @@ interface Props {
 }
 
 
-export default function AdminCheckoutPreview({ regions = [] }: Props) {
+export default function AdminCheckoutPreview({ regions = [], methods = [] }: Props) {
   // Construir lista de países disponibles SOLO a partir de las regiones configuradas.
   // La región con código "*" (global) se representa con un botón "🌐 Global".
   const countries = useMemo<Country[]>(() => {

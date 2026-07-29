@@ -390,24 +390,37 @@ export default function AdminCheckoutMethods() {
     const idx = siblings.findIndex(x => x.id === m.id);
     const targetIdx = idx + dir;
     if (idx < 0 || targetIdx < 0 || targetIdx >= siblings.length) return;
-    const other = siblings[targetIdx];
-    // Optimistic swap
-    setMethods(prev => prev.map(x => {
-      if (x.id === m.id) return { ...x, sort_order: other.sort_order };
-      if (x.id === other.id) return { ...x, sort_order: m.sort_order };
-      return x;
-    }));
-    const [r1, r2] = await Promise.all([
-      adminInvoke<any>("manage-checkout-methods", { body: { action: "save_method", method: { ...m, sort_order: other.sort_order } } }),
-      adminInvoke<any>("manage-checkout-methods", { body: { action: "save_method", method: { ...other, sort_order: m.sort_order } } }),
-    ]);
-    if (r1.error || r1.data?.error || r2.error || r2.data?.error) {
+
+    // Move the item and re-index the whole list sequentially. Swapping the two
+    // sort_order values alone fails whenever siblings share the same value
+    // (e.g. every method saved with 0/1), which made "mover hacia abajo" look broken.
+    const ordered = [...siblings];
+    const [moved] = ordered.splice(idx, 1);
+    ordered.splice(targetIdx, 0, moved);
+
+    const nextOrder = new Map<string, number>();
+    ordered.forEach((x, i) => nextOrder.set(x.id, i + 1));
+
+    // Optimistic update
+    setMethods(prev => prev.map(x =>
+      nextOrder.has(x.id) ? { ...x, sort_order: nextOrder.get(x.id)! } : x
+    ));
+
+    // Persist only the rows whose position actually changed
+    const changed = ordered.filter(x => x.sort_order !== nextOrder.get(x.id));
+    const results = await Promise.all(
+      changed.map(x => adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "save_method", method: { ...x, sort_order: nextOrder.get(x.id)! } },
+      }))
+    );
+    if (results.some(r => r.error || r.data?.error)) {
       toast.error("No se pudo reordenar");
       load();
       return;
     }
     invalidateCheckoutMethodsCache();
   }
+
 
 
 

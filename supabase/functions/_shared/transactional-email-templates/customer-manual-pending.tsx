@@ -54,7 +54,9 @@ const fmtMoney = (amount?: number, currency?: string) => {
 const Email = ({
   orderNumber,
   customerName,
+  customerEmail,
   productName,
+
   amount,
   currency,
 

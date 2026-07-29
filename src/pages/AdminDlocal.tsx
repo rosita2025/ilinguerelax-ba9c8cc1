@@ -306,7 +306,7 @@ export default function AdminDlocal() {
                       <div className="rounded-lg border border-primary/40 bg-primary/5 p-2.5 space-y-2">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-1.5 text-sm font-medium">
-                            <Wallet className="h-4 w-4 text-primary" /> Mercado Pago (tarjeta / saldo)
+                            <Wallet className="h-4 w-4 text-primary" /> {c.walletLabel ?? "Mercado Pago (tarjeta / saldo)"}
                             <span className="text-[10px] text-muted-foreground font-normal">({wallet.length})</span>
                           </div>
                           {busy === `${c.code}:wallet`

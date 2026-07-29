@@ -303,8 +303,13 @@ export default function AdminDlocal() {
                           {!!c.cash.length && (
                             <span className="text-[10px] text-muted-foreground font-normal">({c.cash.length})</span>
                           )}
+                          {c.cashComingSoon && (
+                            <span className="text-[10px] rounded-md bg-amber-500/15 text-amber-700 border border-amber-500/30 px-1.5 py-0.5 font-medium">Muy pronto</span>
+                          )}
                         </div>
-                        {busy === `${c.code}:cash`
+                        {c.cashComingSoon
+                          ? <span className="text-[10px] text-muted-foreground">No disponible</span>
+                          : busy === `${c.code}:cash`
                           ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
                           : <Switch disabled={!c.cash.length} checked={cashOn && !!c.cash.length} onCheckedChange={(v) => toggle(c.code, "cash", v)} />}
                       </div>

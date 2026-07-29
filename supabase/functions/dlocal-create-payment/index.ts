@@ -247,8 +247,9 @@ Deno.serve(async (req) => {
       reference: data.id ? String(data.id) : null,
       detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
       customerEmail: body.payerEmail,
-      currency: body.currency.toUpperCase(),
-      amount: body.amount,
+      currency: usedUsdFallback ? "USD" : localCurrency,
+      amount: usedUsdFallback ? calculatedUsd : localAmount,
+
     });
 
     return json({ id: data.id, orderId, redirect_url: redirectUrl });

@@ -1233,6 +1233,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
     { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+    { label: "Apple Pay", bg: "#000000", color: "#ffffff" },
+    { label: "Google Pay", bg: "#ffffff", color: "#1F2937" },
     ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
   ];
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys

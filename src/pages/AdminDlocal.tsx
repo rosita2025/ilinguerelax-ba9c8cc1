@@ -323,8 +323,13 @@ export default function AdminDlocal() {
                           <div className="flex items-center gap-1.5 text-sm font-medium">
                             <Wallet className="h-4 w-4 text-primary" /> {c.walletLabel ?? "Mercado Pago (tarjeta / saldo)"}
                             <span className="text-[10px] text-muted-foreground font-normal">({wallet.length})</span>
+                            {c.walletComingSoon && (
+                              <span className="text-[10px] rounded-md bg-amber-500/15 text-amber-700 border border-amber-500/30 px-1.5 py-0.5 font-medium">Muy pronto</span>
+                            )}
                           </div>
-                          {busy === `${c.code}:wallet`
+                          {c.walletComingSoon
+                            ? <span className="text-[10px] text-muted-foreground">No disponible</span>
+                            : busy === `${c.code}:wallet`
                             ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
                             : <Switch checked={walletOn} onCheckedChange={(v) => toggle(c.code, "wallet", v)} />}
                         </div>

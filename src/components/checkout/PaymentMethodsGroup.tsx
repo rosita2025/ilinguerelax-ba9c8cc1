@@ -23,7 +23,7 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -88,6 +88,47 @@ const WHATSAPP_URL = "https://wa.link/unpa9n";
 const CLABE_NUMBER = "646180546709905176";
 const CLABE_HOLDER = "Carmen Rosa Aliaga Domínguez";
 const CLABE_BANK = "STP (Sistema de Transferencias y Pagos)";
+
+// dLocal Go — moneda de cobro por país (cuando dLocal la soporta).
+const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
+  MX: "MXN", CO: "COP", BR: "BRL", AR: "ARS", CL: "CLP", PE: "PEN",
+  UY: "UYU", EC: "USD", CR: "CRC", GT: "GTQ", PA: "USD", DO: "DOP",
+  BO: "BOB", PY: "PYG", SV: "USD", HN: "HNL", NI: "NIO",
+};
+
+// Rails locales que dLocal Go ofrece en cada país (badges visuales).
+const DLOCAL_BADGES: Record<string, MethodBadge[]> = {
+  MX: [
+    { label: "OXXO", bg: "#E31E24", color: "#ffffff" },
+    { label: "SPEI", bg: "#0F766E", color: "#ffffff" },
+    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+  ],
+  CO: [
+    { label: "PSE", bg: "#0B5AA6", color: "#ffffff" },
+    { label: "Nequi", bg: "#200020", color: "#DA0081" },
+    { label: "Efecty", bg: "#FFD400", color: "#1F2937" },
+  ],
+  BR: [
+    { label: "Pix", bg: "#32BCAD", color: "#06211F" },
+    { label: "Boleto", bg: "#1F2937", color: "#ffffff" },
+    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+  ],
+  AR: [
+    { label: "Rapipago", bg: "#F5A623", color: "#1F2937" },
+    { label: "Pago Fácil", bg: "#E4002B", color: "#ffffff" },
+    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+  ],
+  PE: [
+    { label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" },
+    { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
+    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+  ],
+  CL: [
+    { label: "Servipag", bg: "#111827", color: "#00C08B" },
+    { label: "Webpay", bg: "#0B5AA6", color: "#ffffff" },
+    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+  ],
+};
 
 // Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.
 // See admin panel at /admin/binance-config.
@@ -524,6 +565,67 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
   };
 
+  // dLocal Go — pagos locales de LatAm (OXXO/SPEI, PSE/Nequi, Pix, tarjetas).
+  // Cobra en la moneda local del país cuando dLocal la soporta; si no, USD.
+  const payDlocal = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    if (redirectingRef.current) return;
+    const s = useCheckoutPruebaStore.getState();
+    const totals = calcTotals(s.items, s.couponPercent, region.tier);
+    const ctry = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
+    const dlCurrency = DLOCAL_CURRENCY_BY_COUNTRY[ctry] ?? "USD";
+    const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
+    redirectingRef.current = true;
+    setMpLoading("dlocal");
+    try {
+      await captureAbandonedCheckout("dlocal", true);
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "dlocalgo" },
+      }, { onConflict: "email,source" }).then(() => {});
+
+      const { data, error } = await invokeWithRetry<{ redirect_url?: string }>("dlocal-create-payment", {
+        body: {
+          orderId: `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+          items: s.items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity })),
+          couponPercent: s.couponPercent,
+          couponCode: s.coupon ?? undefined,
+          payerEmail: s.buyer.email.trim(),
+          payerName: s.buyer.fullName.trim(),
+          payerPhone: s.buyer.phone ?? undefined,
+          country: ctry,
+          currency: dlCurrency,
+          amount: Number(dlAmount.toFixed(2)),
+          expectedTotalUsd: Number(totals.total.toFixed(2)),
+          successUrl: `${window.location.origin}/checkouts/success`,
+          backUrl: `${window.location.origin}/checkouts/return`,
+        },
+      }, { attempts: 3, baseDelayMs: 500 });
+      if (error || !data?.redirect_url) throw new Error((error as { message?: string } | null)?.message || t.errorPayment);
+      window.location.assign(data.redirect_url);
+    } catch (err) {
+      redirectingRef.current = false;
+      setMpLoading(null);
+      try {
+        trackPaymentError({
+          provider: "dlocalgo",
+          skus: s.items.map((i) => i.id),
+          reason: err instanceof Error ? err.message : String(err),
+          value: totals.total,
+          currency: "USD",
+        });
+      } catch { /* noop */ }
+      setMethodError({ method: "dlocal", message: err instanceof Error ? err.message : t.tryAgain });
+      toast({
+        title: t.errorPayment,
+        description: err instanceof Error ? err.message : t.tryAgain,
+        variant: "destructive",
+      });
+    }
+  };
+
   const redirectToHotmart = useCallback(async () => {
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
@@ -584,6 +686,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     if (selected === "hotmart") { await redirectToHotmart(); return; }
     await captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
+    if (selected === "dlocal") { await payDlocal(); return; }
     if (selected === "transfer") { payMercado("transfer"); return; }
     if (selected === "cash") { payMercado("cash"); return; }
     // yape → user uses "Ya pagué" button in the manual panel
@@ -1152,6 +1255,20 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       badge: priceBadge,
     },
     {
+      id: "dlocal",
+      icon: CreditCard,
+      title: "dLocal Go",
+      sub: language === "en" ? "Local payment methods: OXXO/SPEI, PSE/Nequi, Pix, cards and bank transfer."
+        : language === "pt" ? "Métodos locais: Pix, boleto, cartões e transferência bancária."
+        : language === "fr" ? "Moyens de paiement locaux : OXXO/SPEI, PSE/Nequi, Pix, cartes."
+        : "Métodos locales: OXXO/SPEI, PSE/Nequi, Pix, tarjetas y transferencia bancaria.",
+      badge: priceBadge,
+      badges: DLOCAL_BADGES[country] ?? [
+        { label: "Tarjetas", bg: "#ffffff", color: "#1F2937" },
+        { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
+      ],
+    },
+    {
       id: "hotmart",
       icon: CreditCard,
       title: language === "en" ? "Hotmart (1-click)"
@@ -1199,6 +1316,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         if (m.id === "yape") return methodsConfig.yape && isPeru;
         if (m.id === "binance") return methodsConfig.binance;
         if (m.id === "clabe") return country === "MX";
+
+        if (m.id === "dlocal") return methodsConfig.dlocal;
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 

@@ -51,3 +51,7 @@ project_id = "opyitzdvvurdyyyzkwwv"
     verify_jwt = false
   [functions.hotmart-purchase-pixel]
     verify_jwt = false
+  [functions.dlocal-create-payment]
+    verify_jwt = false
+  [functions.dlocal-webhook]
+    verify_jwt = false

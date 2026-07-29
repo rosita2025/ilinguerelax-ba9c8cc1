@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { saveDlocalPending } from "@/lib/dlocalPending";
+import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { Button } from "@/components/ui/button";
 
@@ -138,15 +140,22 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
           currency: currency.toUpperCase(),
           amount: Number(amount.toFixed(2)),
           expectedTotalUsd: Number(expectedTotalUsd.toFixed(2)),
-          successUrl: `${window.location.origin}/checkouts/success`,
-          backUrl: `${window.location.origin}/checkouts/return`,
+          successUrl: `${window.location.origin}/checkouts/return?provider=dlocal`,
+          backUrl: `${window.location.origin}/checkouts/return?provider=dlocal`,
         },
       }, { attempts: 2, baseDelayMs: 400 });
 
       if (fnErr || !data || data.error) {
-        throw new Error(data?.error || "No se pudo procesar el pago");
+        const detail = data?.error || (await extractEdgeErrorMessage(fnErr));
+        throw new Error(
+          detail && !looksTechnical(detail)
+            ? detail
+            : "No pudimos procesar el pago con esta tarjeta. No se realizó ningún cobro: prueba con otra tarjeta o elige otro método.",
+        );
       }
       if (data.redirect_url) {
+        // 3DS: al volver, la pantalla puente consulta el estado real del pago.
+        if (data.orderId) saveDlocalPending(data.orderId, payerEmail.trim());
         window.location.assign(data.redirect_url);
         return;
       }
@@ -155,7 +164,9 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
         onPaid(data.orderId || "");
         return;
       }
-      throw new Error("El pago fue rechazado. Intenta con otra tarjeta.");
+      throw new Error(
+        "El banco no aprobó el pago y no se realizó ningún cobro. Prueba con otra tarjeta o elige transferencia, efectivo o billetera digital.",
+      );
     } catch (e) {
       const msg = e instanceof Error ? e.message : "No se pudo procesar el pago";
       setError(msg);

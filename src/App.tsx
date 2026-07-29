@@ -72,6 +72,7 @@ const AdminHome = lazy(() => import("./pages/AdminHome"));
 const AdminLive = lazy(() => import("./pages/AdminLive"));
 const AdminCheckoutMethods = lazy(() => import("./pages/AdminCheckoutMethods"));
 const AdminBinanceConfig = lazy(() => import("./pages/AdminBinanceConfig"));
+const AdminDlocal = lazy(() => import("./pages/AdminDlocal"));
 const AdminManualPayments = lazy(() => import("./pages/AdminManualPayments"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
@@ -281,6 +282,7 @@ const App = () => (
                   
                   <Route path="/admin/checkout-methods" element={<AdminGate><AdminCheckoutMethods /></AdminGate>} />
                   <Route path="/admin/binance-config" element={<AdminGate><AdminBinanceConfig /></AdminGate>} />
+                  <Route path="/admin/dlocal" element={<AdminGate><AdminDlocal /></AdminGate>} />
                   <Route path="/admin/manual-payments" element={<AdminGate><AdminManualPayments /></AdminGate>} />
                   <Route path="/admin/productos" element={<AdminGate><AdminProducts /></AdminGate>} />
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />

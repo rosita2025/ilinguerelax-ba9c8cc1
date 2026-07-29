@@ -99,6 +99,8 @@ function BankBadge({ label, bg }: { label: string; bg: string; color?: string })
 /** Agrupación visual de métodos para reducir la saturación del checkout. */
 type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 
+const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
+
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
@@ -1467,9 +1469,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // Si el admin configuró explícitamente la región (methodsConfig.loaded con
   // regionCode), respetamos exactamente lo que habilitó, sin forzar el filtro
   // legacy card+paypal fuera de Perú. Perú siempre oculta paypal directo.
-  const methods = methodsConfig.loaded && methodsConfig.regionCode
+  const visibleMethods = methodsConfig.loaded && methodsConfig.regionCode
     ? orderedByAdmin
     : orderedByAdmin.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance" || (m.id === "clabe" && country === "MX"));
+  // Orden de secciones para que el checkout se lea de arriba a abajo sin saltos:
+  // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
+  const methods = [...visibleMethods].sort(
+    (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
+  );
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 

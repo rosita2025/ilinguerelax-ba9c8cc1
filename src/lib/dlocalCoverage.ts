@@ -26,6 +26,10 @@ export type DlocalCountry = {
   walletKey?: string;
   /** Si true, el bloque de billetera se muestra como "Muy pronto" y no permite comprar. */
   walletComingSoon?: boolean;
+  /** Si true, transferencia bancaria se muestra como "Muy pronto" y no permite comprar. */
+  transferComingSoon?: boolean;
+  /** Si true, pago en efectivo se muestra como "Muy pronto" y no permite comprar. */
+  cashComingSoon?: boolean;
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [
@@ -67,8 +71,10 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     wallet: ["Mercado Pago", "Spin by OXXO"],
     walletLabel: "Billetera digital", walletKey: "dlocal_mercadopago" },
   { code: "PA", name: "Panamá", flag: "🇵🇦", currency: "USD",
-    transfer: ["Banco General", "Banistmo", "BAC Credomatic", "Global Bank"], cash: [],
-    wallet: ["Yappy", "Nequi Panamá"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+    transfer: ["Banco General", "Banistmo", "BAC Credomatic", "Global Bank"], transferComingSoon: true,
+    cash: ["Punto Pago"], cashComingSoon: true,
+    wallet: ["Yappy", "Nequi Panamá"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
+    walletComingSoon: true },
   { code: "PE", name: "Perú", flag: "🇵🇪", currency: "PEN",
     transfer: ["BCP", "Interbank", "BBVA", "Scotiabank"],
     cash: ["PagoEfectivo", "Agentes / bodegas"],

@@ -17,6 +17,7 @@ import type { TemplateEntry } from './registry.ts'
 interface Props {
   orderNumber?: string
   customerName?: string
+  customerEmail?: string
   productName?: string
   amount?: number
   currency?: string
@@ -30,6 +31,15 @@ interface Props {
   clabeHolder?: string
   clabeBank?: string
 }
+
+const trackingUrl = (orderNumber?: string, customerEmail?: string) => {
+  const base = 'https://www.ilinguerelax.com/mi-pedido'
+  const params: string[] = []
+  if (orderNumber) params.push(`order=${encodeURIComponent(orderNumber)}`)
+  if (customerEmail) params.push(`email=${encodeURIComponent(customerEmail)}`)
+  return params.length ? `${base}?${params.join('&')}` : base
+}
+
 
 const fmtMoney = (amount?: number, currency?: string) => {
   if (amount == null) return '—'

@@ -59,17 +59,20 @@ const STAGES = [
 function formatDate(value?: string | null) {
   if (!value) return "";
   try {
-    return new Date(value).toLocaleString("es-PE", {
+    const formatted = new Date(value).toLocaleString("es-PE", {
       day: "2-digit",
       month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "America/Lima",
     });
+    return `${formatted} (hora Perú, GMT-5)`;
   } catch {
     return value;
   }
 }
+
 
 export default function OrderStatus() {
   const [sp] = useSearchParams();

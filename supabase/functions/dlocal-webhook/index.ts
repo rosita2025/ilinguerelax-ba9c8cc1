@@ -54,15 +54,26 @@ Deno.serve(async (req) => {
   try {
     const rawBody = await req.text();
 
-    // 1) Verificación de firma HMAC-SHA256 de dLocal Go (obligatoria).
+    // 1) Firma HMAC-SHA256 de dLocal Go. Si no valida, NO descartamos la
+    // notificación: dLocal no firma todas sus llamadas (retries, cambios de
+    // estado de efectivo/transferencia) y perder un PAID significa una compra
+    // pagada sin entregar. En ese caso exigimos que la notificación traiga el
+    // `order` que nosotros mismos pusimos en la notification_url y que coincida
+    // con el order_id que devuelve la API de dLocal (paso 3). El estado siempre
+    // se consulta a la API con nuestras credenciales, nunca se toma del body.
     const signatureOk = await verifyDlocalSignature(req, rawBody);
-    if (!signatureOk) {
-      console.warn("dLocal webhook rechazado: firma inválida o ausente");
+    const expectedOrderParam = (url.searchParams.get("order") || "").trim();
+    if (!signatureOk && !expectedOrderParam) {
+      console.warn("dLocal webhook rechazado: sin firma válida y sin order en la URL");
       return new Response(JSON.stringify({ error: "invalid signature" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (!signatureOk) {
+      console.warn("dLocal webhook sin firma válida: se valida contra la API por order_id");
+    }
+
 
     let body: Record<string, unknown> = {};
     try { body = rawBody ? JSON.parse(rawBody) : {}; } catch { body = {}; }
@@ -94,13 +105,16 @@ Deno.serve(async (req) => {
     // 3) El pago debe corresponder a una orden creada por nosotros.
     const expectedOrder = (q.get("order") || "").trim();
     const remoteOrder = String(payment.order_id || "").trim();
-    if (expectedOrder && remoteOrder && expectedOrder !== remoteOrder) {
+    const orderMismatch = expectedOrder && remoteOrder && expectedOrder !== remoteOrder;
+    // Sin firma válida exigimos coincidencia estricta de order_id.
+    if (orderMismatch || (!signatureOk && expectedOrder !== remoteOrder)) {
       console.warn("dLocal webhook rechazado: order_id no coincide", { paymentId });
       return new Response(JSON.stringify({ error: "order mismatch" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     console.log("dLocal webhook:", { paymentId, status, order: payment.order_id });
 
@@ -140,6 +154,23 @@ Deno.serve(async (req) => {
       // avisamos al admin. La entrega digital se dispara sola cuando dLocal
       // vuelve a llamar este webhook con estado PAID.
       const PENDING_STATUS = ["PENDING", "AUTHORIZED", "VERIFIED"];
+      // Estados finales fallidos: quedan registrados en el historial del pedido
+      // para que /mi-pedido y el admin muestren el estado real.
+      if (!PENDING_STATUS.includes(status)) {
+        await logOrderEvent({
+          orderNumber,
+          event: "payment_failed",
+          provider: "dlocalgo",
+          status,
+          reference: paymentId,
+          detail: `dLocal reportó el pago como ${status}`,
+          customerEmail: customerEmail || null,
+          amount: amount ?? null,
+          currency,
+          metadata: { country: country ?? null, skus },
+        });
+      }
+
       if (PENDING_STATUS.includes(status) && customerEmail) {
         const rawMethod = String(
           payment.payment_method_id || payment.payment_method_type || q.get("ptype") || "",

@@ -26,6 +26,10 @@ export type DlocalCountry = {
   walletKey?: string;
   /** Si true, el bloque de billetera se muestra como "Muy pronto" y no permite comprar. */
   walletComingSoon?: boolean;
+  /** Si true, transferencia bancaria se muestra como "Muy pronto" y no permite comprar. */
+  transferComingSoon?: boolean;
+  /** Si true, pago en efectivo se muestra como "Muy pronto" y no permite comprar. */
+  cashComingSoon?: boolean;
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [

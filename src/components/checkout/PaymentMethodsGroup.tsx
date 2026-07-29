@@ -1351,7 +1351,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     : [];
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
-  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id;
+  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
     const i = methodsConfig.familyOrder.indexOf(fam as FamilyKey);

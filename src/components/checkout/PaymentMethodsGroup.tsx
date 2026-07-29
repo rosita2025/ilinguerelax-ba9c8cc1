@@ -1668,12 +1668,25 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         const isSelected = valid && selected === m.id && (!isStripeRow || selectedCardRow === rowKey);
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
+        const section = methodSection(m.id);
+        const prev = idx > 0 ? methods[idx - 1] : null;
+        const showSectionHeader = !prev || methodSection(prev.id) !== section;
         return (
+          <React.Fragment key={rowKey}>
+          {showSectionHeader && (
+            <div className={cn(
+              "flex items-center gap-2 pt-1",
+              idx > 0 && "mt-1 border-t border-neutral-200/70 dark:border-neutral-800 pt-2.5",
+            )}>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                {sectionLabel(section, language)}
+              </span>
+            </div>
+          )}
           <div
-            key={rowKey}
             data-method-row={m.id}
             className={cn(
-              "rounded-xl border overflow-hidden transition-colors scroll-mt-24",
+              "rounded-lg border overflow-hidden transition-colors scroll-mt-24",
               isSelected
                 ? "border-neutral-400 bg-neutral-100 dark:bg-neutral-800/60"
                 : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40",

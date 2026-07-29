@@ -30,13 +30,21 @@ export default function CheckoutSuccess() {
   const status = sp.get("status") || sp.get("collection_status") || "approved";
   const externalRef = sp.get("external_reference") || sp.get("preference_id");
   const paypalToken = sp.get("token") || sp.get("PayerID");
-  const provider = sp.get("session_id")
+  // dLocal Go vuelve por /checkouts/return, que ya confirmó el pago contra la
+  // API y redirige aquí con ?provider=dlocal&order=ILR-DL-xxx. Sin este caso el
+  // comprador de dLocal caía en la pantalla "confirmación privada" y nunca veía
+  // sus descargas.
+  const dlocalOrder = (sp.get("provider") || "").toLowerCase() === "dlocal" ? sp.get("order") : null;
+  const provider = dlocalOrder
+    ? "dlocalgo"
+    : sp.get("session_id")
     ? "stripe"
     : (paypalToken || sp.get("paypal_order"))
     ? "paypal"
     : sp.get("payment_id") || sp.get("collection_id")
     ? "mercadopago"
     : "unknown";
+
 
   const store = useCheckoutPruebaStore();
   const region = useRegionTier();
@@ -67,18 +75,21 @@ export default function CheckoutSuccess() {
   const providerCode = provider === "stripe" ? "ST" : provider === "paypal" ? "PP" : provider === "mercadopago" ? "MP" : "OR";
   const rawRef = String(paymentId || externalRef || paypalToken || "").replace(/[^a-zA-Z0-9]/g, "");
   const refTail = rawRef ? rawRef.slice(-6).toUpperCase().padStart(6, "0") : Math.random().toString(36).slice(2, 8).toUpperCase();
-  const orderNumber = `ILR-${providerCode}-${refTail}`;
+  // Con dLocal usamos el número real del pedido (el mismo que conocen el
+  // webhook y el historial), no uno derivado del navegador.
+  const orderNumber = dlocalOrder ? dlocalOrder.toUpperCase() : `ILR-${providerCode}-${refTail}`;
 
-  // Gate: only real buyers from Stripe or PayPal should see the confirmation.
-  // A visitor without a valid payment reference OR without buyer info in the
-  // session store is treated as public/unknown and gets a neutral screen.
-  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order"));
+  // Gate: only real buyers with an approved payment reference should see the
+  // confirmation. A visitor without a valid reference OR without buyer info in
+  // the session store is treated as public/unknown and gets a neutral screen.
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order") || dlocalOrder);
   const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
   const initialVerified =
     hasPaymentRef &&
     hasBuyerContext &&
-    (provider === "stripe" || provider === "paypal" || provider === "mercadopago") &&
+    (provider === "stripe" || provider === "paypal" || provider === "mercadopago" || provider === "dlocalgo") &&
     status !== "rejected" && status !== "failure";
+
   // Freeze verification at mount so clearing the cart after sending the
   // confirmation email doesn't flip the screen to "private confirmation".
   const [isVerifiedBuyer] = useState(initialVerified);
@@ -222,22 +233,22 @@ export default function CheckoutSuccess() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch delivery info (drive links + bonuses) for purchased SKUs
+  // Enlaces de descarga (producto + bonos + upsells). El backend sólo los
+  // devuelve si el pedido tiene un pago confirmado; nunca se piden por SKU.
   useEffect(() => {
-    if (!isVerifiedBuyer) return;
-    const skus = items.map((i) => i.id);
-    if (!skus.length) return;
+    if (!isVerifiedBuyer || !buyer.email || !orderNumber) return;
     setDeliveryLoading(true);
     supabase.functions
-      .invoke("manage-products", { body: { action: "get_delivery", skus } })
+      .invoke("order-delivery", { body: { orderId: orderNumber, email: buyer.email } })
       .then(({ data, error }) => {
         if (error) throw error;
         setDelivery((data?.items ?? []) as DeliveryItem[]);
       })
-      .catch((e) => console.error("get_delivery failed", e))
+      .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const copyKey = (val: string) => {
     navigator.clipboard.writeText(val).then(

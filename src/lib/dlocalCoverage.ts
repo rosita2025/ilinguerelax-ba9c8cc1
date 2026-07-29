@@ -64,7 +64,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
   { code: "MX", name: "México", flag: "🇲🇽", currency: "MXN",
     transfer: ["BBVA México", "Banorte", "Santander", "Citibanamex"],
     cash: ["OXXO"],
-    wallet: ["Mercado Pago", "Spin by OXXO", "Nu"],
+    wallet: ["Mercado Pago", "Spin by OXXO"],
     walletLabel: "Billetera digital", walletKey: "dlocal_mercadopago" },
   { code: "PA", name: "Panamá", flag: "🇵🇦", currency: "USD",
     transfer: ["Banco General", "Banistmo", "BAC Credomatic", "Global Bank"], cash: [],

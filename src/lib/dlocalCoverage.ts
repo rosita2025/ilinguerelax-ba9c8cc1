@@ -83,8 +83,8 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["Banco Central del Paraguay", "Itaú Paraguay", "Banco GNB"], cash: ["Infonet"],
     wallet: ["Ueno", "Personal Pay", "Tigo Money"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "UY", name: "Uruguay", flag: "🇺🇾", currency: "UYU",
-    transfer: ["BROU", "Itaú Uruguay", "Santander", "Scotiabank"], cash: ["Abitab", "RedPagos"],
-    wallet: ["Prex", "Mi Dinero", "OCA Blue"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+    transfer: ["BROU", "Itaú Uruguay", "Santander", "Scotiabank"], cash: ["RedPagos"],
+    wallet: [], walletComingSoon: true, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
 ];
 
 const BY_CODE = new Map(DLOCAL_COVERAGE.map((c) => [c.code, c]));

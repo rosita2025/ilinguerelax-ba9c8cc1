@@ -75,10 +75,15 @@ export default function AdminDlocal() {
       || regions.find(r => (r.country_codes || []).includes(country));
   }
 
+  function keyFor(country: string, kind: Kind) {
+    if (kind !== "wallet") return METHOD_KEY[kind];
+    return DLOCAL_COUNTRIES.find(x => x.code === country)?.walletKey || METHOD_KEY.wallet;
+  }
+
   function methodFor(country: string, kind: Kind): Method | undefined {
     const r = regionFor(country);
     if (!r) return undefined;
-    return methods.find(m => m.region_code === r.code && m.method_key === METHOD_KEY[kind]);
+    return methods.find(m => m.region_code === r.code && m.method_key === keyFor(country, kind));
   }
 
   function isOn(country: string, kind: Kind) {
@@ -118,7 +123,7 @@ export default function AdminDlocal() {
     try {
       const region = await ensureRegion(country);
       if (!region) return;
-      const existing = methods.find(m => m.region_code === region.code && m.method_key === METHOD_KEY[kind]);
+      const existing = methods.find(m => m.region_code === region.code && m.method_key === keyFor(country, kind));
       if (existing?.id) {
         setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: next } : x));
         const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
@@ -132,7 +137,7 @@ export default function AdminDlocal() {
         const payload: Method = {
           id: "",
           region_code: region.code,
-          method_key: METHOD_KEY[kind],
+          method_key: keyFor(country, kind),
           label: kind === "wallet"
             ? (DLOCAL_COUNTRIES.find(x => x.code === country)?.walletLabel
                 ? `dLocal Go — ${DLOCAL_COUNTRIES.find(x => x.code === country)!.walletLabel}`

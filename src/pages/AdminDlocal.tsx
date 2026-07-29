@@ -247,33 +247,52 @@ export default function AdminDlocal() {
                       )}
                     </div>
 
-                    <div className={`rounded-lg border p-2.5 flex items-start justify-between gap-3 ${c.transfer.length ? "" : "opacity-60"}`}>
-                      <div className="min-w-0">
+                    <div className={`rounded-lg border p-2.5 space-y-2 ${c.transfer.length ? "" : "opacity-60"}`}>
+                      <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-1.5 text-sm font-medium">
                           <Building2 className="h-4 w-4 text-primary" /> Transferencia bancaria
+                          {!!c.transfer.length && (
+                            <span className="text-[10px] text-muted-foreground font-normal">({c.transfer.length})</span>
+                          )}
                         </div>
-                        <div className="text-[11px] text-muted-foreground truncate">
-                          {c.transfer.length ? c.transfer.join(" · ") : "No disponible en este país"}
-                        </div>
+                        {busy === `${c.code}:transfer`
+                          ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
+                          : <Switch disabled={!c.transfer.length} checked={transferOn && !!c.transfer.length} onCheckedChange={(v) => toggle(c.code, "transfer", v)} />}
                       </div>
-                      {busy === `${c.code}:transfer`
-                        ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
-                        : <Switch disabled={!c.transfer.length} checked={transferOn && !!c.transfer.length} onCheckedChange={(v) => toggle(c.code, "transfer", v)} />}
+                      {c.transfer.length ? (
+                        <div className="flex flex-wrap gap-1">
+                          {c.transfer.map((r) => (
+                            <span key={r} className="text-[10px] rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground">{r}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-muted-foreground">No disponible en este país</div>
+                      )}
                     </div>
 
-                    <div className={`rounded-lg border p-2.5 flex items-start justify-between gap-3 ${c.cash.length ? "" : "opacity-60"}`}>
-                      <div className="min-w-0">
+                    <div className={`rounded-lg border p-2.5 space-y-2 ${c.cash.length ? "" : "opacity-60"}`}>
+                      <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-1.5 text-sm font-medium">
                           <Banknote className="h-4 w-4 text-primary" /> Pago en efectivo
+                          {!!c.cash.length && (
+                            <span className="text-[10px] text-muted-foreground font-normal">({c.cash.length})</span>
+                          )}
                         </div>
-                        <div className="text-[11px] text-muted-foreground truncate">
-                          {c.cash.length ? c.cash.join(" · ") : "No disponible en este país"}
-                        </div>
+                        {busy === `${c.code}:cash`
+                          ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
+                          : <Switch disabled={!c.cash.length} checked={cashOn && !!c.cash.length} onCheckedChange={(v) => toggle(c.code, "cash", v)} />}
                       </div>
-                      {busy === `${c.code}:cash`
-                        ? <Loader2 className="h-4 w-4 animate-spin mt-1" />
-                        : <Switch disabled={!c.cash.length} checked={cashOn && !!c.cash.length} onCheckedChange={(v) => toggle(c.code, "cash", v)} />}
+                      {c.cash.length ? (
+                        <div className="flex flex-wrap gap-1">
+                          {c.cash.map((r) => (
+                            <span key={r} className="text-[10px] rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground">{r}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-muted-foreground">No disponible en este país</div>
+                      )}
                     </div>
+
                   </Card>
                 );
               })}

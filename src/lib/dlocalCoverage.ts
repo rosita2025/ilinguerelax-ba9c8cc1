@@ -81,7 +81,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     wallet: ["Yape", "Plin", "Mercado Pago"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "PY", name: "Paraguay", flag: "🇵🇾", currency: "PYG",
     transfer: ["Banco Continental", "Itaú Paraguay", "Banco Familiar", "Ueno Bank"], cash: ["Infonet", "Pago Express", "Aquí Pago"],
-    wallet: ["Tigo Money", "Billetera Personal", "Zimple", "QR"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+    wallet: ["Ueno", "Tipo Money", "Personal Pay", "Tigo Money"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "UY", name: "Uruguay", flag: "🇺🇾", currency: "UYU",
     transfer: ["BROU", "Itaú Uruguay", "Santander", "Scotiabank"], cash: ["Abitab", "RedPagos"],
     wallet: ["Prex", "Mi Dinero", "OCA Blue"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },

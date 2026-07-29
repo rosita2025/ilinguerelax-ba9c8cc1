@@ -53,7 +53,8 @@ function tooMany(ip: string): boolean {
   return cur.n > MAX_ATTEMPTS;
 }
 
-const PAID_STATUSES = new Set(["PAID", "AUTHORIZED", "COMPLETED", "APPROVED", "SUCCEEDED"]);
+// Solo un pago LIQUIDADO habilita la entrega. AUTHORIZED / VERIFIED / PENDING
+// significan "aún no acreditado" en efectivo y transferencia (ver _shared/dlocal.ts).
 
 // deno-lint-ignore no-explicit-any
 type Admin = any;

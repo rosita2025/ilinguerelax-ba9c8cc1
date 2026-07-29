@@ -260,39 +260,51 @@ Deno.serve(async (req) => {
       ? "Transferencia bancaria (dLocal Go)"
       : "dLocal Go";
 
-    await logOrderEvent({
-      orderNumber: orderId,
-      event: "order_created",
-      provider: "dlocalgo",
-      status: "CREATED",
-      method: methodLabel,
-      reference: data.id ? String(data.id) : null,
-      detail: description,
-      customerEmail: body.payerEmail,
-      amount: calculatedUsd,
-      currency: "USD",
-      metadata: {
-        country: body.country.toUpperCase(),
-        skus,
-        localAmount: usedUsdFallback ? calculatedUsd : localAmount,
-        localCurrency: usedUsdFallback ? "USD" : localCurrency,
-        usdFallback: usedUsdFallback,
-      },
-
-    });
-    await logOrderEvent({
-      orderNumber: orderId,
-      event: "payment_instructions",
-      provider: "dlocalgo",
-      status: "AWAITING_PAYMENT",
-      method: methodLabel,
-      reference: data.id ? String(data.id) : null,
-      detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
-      customerEmail: body.payerEmail,
-      currency: usedUsdFallback ? "USD" : localCurrency,
-      amount: usedUsdFallback ? calculatedUsd : localAmount,
-
-    });
+    // Auditoría del pedido: se ejecuta DESPUÉS de responder. El comprador
+    // recibe el link de pago de inmediato y el historial se escribe en
+    // segundo plano con waitUntil (la función sigue viva hasta terminarlo).
+    const audit = (async () => {
+      try {
+        await Promise.all([
+          logOrderEvent({
+            orderNumber: orderId,
+            event: "order_created",
+            provider: "dlocalgo",
+            status: "CREATED",
+            method: methodLabel,
+            reference: data.id ? String(data.id) : null,
+            detail: description,
+            customerEmail: body.payerEmail,
+            amount: calculatedUsd,
+            currency: "USD",
+            metadata: {
+              country: body.country.toUpperCase(),
+              skus,
+              localAmount: usedUsdFallback ? calculatedUsd : localAmount,
+              localCurrency: usedUsdFallback ? "USD" : localCurrency,
+              usdFallback: usedUsdFallback,
+            },
+          }),
+          logOrderEvent({
+            orderNumber: orderId,
+            event: "payment_instructions",
+            provider: "dlocalgo",
+            status: "AWAITING_PAYMENT",
+            method: methodLabel,
+            reference: data.id ? String(data.id) : null,
+            detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
+            customerEmail: body.payerEmail,
+            currency: usedUsdFallback ? "USD" : localCurrency,
+            amount: usedUsdFallback ? calculatedUsd : localAmount,
+          }),
+        ]);
+      } catch (e) {
+        console.error("dLocal audit log failed:", e instanceof Error ? e.message : e);
+      }
+    })();
+    const runtime = (globalThis as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } }).EdgeRuntime;
+    if (runtime?.waitUntil) runtime.waitUntil(audit);
+    else void audit;
 
     return json({ id: data.id, orderId, redirect_url: redirectUrl });
 

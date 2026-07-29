@@ -30,13 +30,21 @@ export default function CheckoutSuccess() {
   const status = sp.get("status") || sp.get("collection_status") || "approved";
   const externalRef = sp.get("external_reference") || sp.get("preference_id");
   const paypalToken = sp.get("token") || sp.get("PayerID");
-  const provider = sp.get("session_id")
+  // dLocal Go vuelve por /checkouts/return, que ya confirmó el pago contra la
+  // API y redirige aquí con ?provider=dlocal&order=ILR-DL-xxx. Sin este caso el
+  // comprador de dLocal caía en la pantalla "confirmación privada" y nunca veía
+  // sus descargas.
+  const dlocalOrder = (sp.get("provider") || "").toLowerCase() === "dlocal" ? sp.get("order") : null;
+  const provider = dlocalOrder
+    ? "dlocalgo"
+    : sp.get("session_id")
     ? "stripe"
     : (paypalToken || sp.get("paypal_order"))
     ? "paypal"
     : sp.get("payment_id") || sp.get("collection_id")
     ? "mercadopago"
     : "unknown";
+
 
   const store = useCheckoutPruebaStore();
   const region = useRegionTier();

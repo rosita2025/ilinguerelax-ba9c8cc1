@@ -50,6 +50,19 @@ const EVENT_LABEL: Record<string, string> = {
   delivery_failed: "Error al enviar la entrega digital",
 };
 
+const EVENT_META: Record<
+  string,
+  { icon: typeof Clock; tone: string; ring: string }
+> = {
+  order_created: { icon: Package, tone: "text-muted-foreground", ring: "border-border bg-muted" },
+  payment_instructions: { icon: CreditCard, tone: "text-primary", ring: "border-primary/40 bg-primary/10" },
+  payment_pending: { icon: Clock, tone: "text-amber-600", ring: "border-amber-400/50 bg-amber-100/50" },
+  payment_paid: { icon: CheckCircle2, tone: "text-primary", ring: "border-primary bg-primary/10" },
+  payment_failed: { icon: AlertCircle, tone: "text-destructive", ring: "border-destructive/50 bg-destructive/10" },
+  delivery_sent: { icon: PackageCheck, tone: "text-primary", ring: "border-primary bg-primary/10" },
+  delivery_failed: { icon: AlertCircle, tone: "text-destructive", ring: "border-destructive/50 bg-destructive/10" },
+};
+
 const STAGES = [
   { key: "pending", label: "Pendiente", icon: Clock },
   { key: "paid", label: "Pagado", icon: CheckCircle2 },

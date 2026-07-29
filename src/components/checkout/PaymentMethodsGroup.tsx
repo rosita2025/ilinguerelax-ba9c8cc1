@@ -1691,7 +1691,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 whitespace-nowrap shrink-0">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100 whitespace-nowrap shrink-0">
                       {m.badge}
                     </span>
                   )}

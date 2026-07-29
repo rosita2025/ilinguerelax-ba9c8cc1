@@ -59,17 +59,20 @@ const STAGES = [
 function formatDate(value?: string | null) {
   if (!value) return "";
   try {
-    return new Date(value).toLocaleString("es-PE", {
+    const formatted = new Date(value).toLocaleString("es-PE", {
       day: "2-digit",
       month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "America/Lima",
     });
+    return `${formatted} (hora Perú, GMT-5)`;
   } catch {
     return value;
   }
 }
+
 
 export default function OrderStatus() {
   const [sp] = useSearchParams();
@@ -238,7 +241,12 @@ export default function OrderStatus() {
             </div>
 
             <div className="rounded-xl border bg-card p-5">
-              <h2 className="font-semibold mb-4">Historial del pedido</h2>
+              <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="font-semibold">Historial del pedido</h2>
+                <span className="text-xs text-muted-foreground">
+                  Horas en zona horaria de Perú (GMT-5)
+                </span>
+              </div>
               <ol className="space-y-4">
                 {(result.timeline ?? []).map((t, i) => (
                   <li key={`${t.event}-${i}`} className="flex gap-3">

@@ -105,13 +105,16 @@ Deno.serve(async (req) => {
     // 3) El pago debe corresponder a una orden creada por nosotros.
     const expectedOrder = (q.get("order") || "").trim();
     const remoteOrder = String(payment.order_id || "").trim();
-    if (expectedOrder && remoteOrder && expectedOrder !== remoteOrder) {
+    const orderMismatch = expectedOrder && remoteOrder && expectedOrder !== remoteOrder;
+    // Sin firma válida exigimos coincidencia estricta de order_id.
+    if (orderMismatch || (!signatureOk && expectedOrder !== remoteOrder)) {
       console.warn("dLocal webhook rechazado: order_id no coincide", { paymentId });
       return new Response(JSON.stringify({ error: "order mismatch" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     console.log("dLocal webhook:", { paymentId, status, order: payment.order_id });
 

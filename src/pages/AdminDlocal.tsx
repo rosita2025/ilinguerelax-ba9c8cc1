@@ -156,6 +156,8 @@ export default function AdminDlocal() {
       for (const c of visible) {
         const kinds: Kind[] = kind === "both" ? ["transfer", "cash"] : [kind];
         for (const k of kinds) {
+          const supported = k === "cash" ? c.cash.length > 0 : c.transfer.length > 0;
+          if (!supported) continue;
           if (isOn(c.code, k) === next) continue;
           await toggle(c.code, k, next);
         }

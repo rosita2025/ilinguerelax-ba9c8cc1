@@ -15,6 +15,47 @@ import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
 import { Lock, Plus, Trash2, Pencil, CreditCard, Banknote, Wallet, Smartphone, Eye, ShieldCheck, Building2, ArrowUp, ArrowDown, Save, Loader2 } from "lucide-react";
+import { DLOCAL_COVERAGE, dlocalRails, getDlocalCountry, type DlocalKind } from "@/lib/dlocalCoverage";
+
+/**
+ * Etiquetas reales de dLocal Go por país, tomadas de /admin/dlocal.
+ * Se usan como descripción de los métodos dLocal en /admin/checkout-methods
+ * para que ambos paneles (y el checkout) muestren siempre lo mismo.
+ */
+const DLOCAL_KIND_BY_KEY: Record<string, DlocalKind> = {
+  dlocal_transfer: "transfer",
+  dlocal_bank: "transfer",
+  dlocal: "transfer",
+  dlocal_go: "transfer",
+  dlocal_cash: "cash",
+  dlocal_ticket: "cash",
+  dlocal_wallet: "wallet",
+  dlocal_mercadopago: "wallet",
+};
+
+export function dlocalNoteForCountries(methodKey: string, countryCodes: string[]): string | null {
+  const kind = DLOCAL_KIND_BY_KEY[methodKey];
+  if (!kind) return null;
+  const codes = (countryCodes.length ? countryCodes : DLOCAL_COVERAGE.map((c) => c.code))
+    .map((c) => c.toUpperCase())
+    .filter((c) => !!getDlocalCountry(c));
+  if (!codes.length) return null;
+  const parts = codes
+    .map((code) => {
+      const c = getDlocalCountry(code)!;
+      const rails = dlocalRails(code, kind);
+      if (!rails.length) return null;
+      const soon =
+        (kind === "transfer" && c.transferComingSoon) ||
+        (kind === "cash" && c.cashComingSoon) ||
+        (kind === "wallet" && c.walletComingSoon);
+      return `${c.flag} ${code}: ${rails.join(", ")}${soon ? " (muy pronto)" : ""}`;
+    })
+    .filter(Boolean) as string[];
+  if (!parts.length) return null;
+  return `dLocal Go · ${parts.join(" — ")}`;
+}
+
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -367,7 +408,7 @@ export default function AdminCheckoutMethods() {
     }
     const m: Method = {
       id: "", region_code, method_key: q.key, label: q.label,
-      note: q.note, icon: q.icon, enabled: true,
+      note: dlocalNoteForCountries(q.key, (regions.find(r => r.code === region_code)?.country_codes) || []) || q.note, icon: q.icon, enabled: true,
       sort_order: methods.filter(x => x.region_code === region_code).length + 1,
     };
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
@@ -632,14 +673,18 @@ export default function AdminCheckoutMethods() {
                       const Icon = ICONS[m.icon] || CreditCard;
                       const isFirst = idx === 0;
                       const isLast = idx === rms.length - 1;
+                      // Los métodos dLocal muestran SIEMPRE las etiquetas reales
+                      // por país tomadas de /admin/dlocal (una sola fuente de verdad).
+                      const dlNote = dlocalNoteForCountries(m.method_key, r.country_codes || []);
                       return (
                         <div key={m.id} className={`text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
                           <div className="flex items-center gap-2">
                             <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
                             <div className="flex-1 min-w-0">
                               <div className="font-medium leading-tight text-xs sm:text-sm">{m.label}</div>
-                              {m.note && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate">{m.note}</div>}
+                              {(dlNote || m.note) && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate" title={dlNote || m.note || ""}>{dlNote || m.note}</div>}
                             </div>
+
                             <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} className="shrink-0" />
                           </div>
                           <div className="mt-1.5 flex items-center justify-between gap-1 pl-6">
@@ -703,7 +748,7 @@ export default function AdminCheckoutMethods() {
                                     aria-pressed={isActive}
                                     onClick={() => quickAdd(r.code, q)}
                                     className={`text-[11px] px-2 py-1 rounded border ${isActive ? "bg-primary text-primary-foreground border-primary" : canReactivate ? "bg-background border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground" : "bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
-                                    title={q.note}
+                                    title={dlocalNoteForCountries(q.key, r.country_codes || []) || q.note}
                                   >
                                     {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{q.label}
                                   </button>

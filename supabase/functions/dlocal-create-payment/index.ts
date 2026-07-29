@@ -144,6 +144,15 @@ Deno.serve(async (req) => {
       : Number(body.amount.toFixed(2));
 
 
+    // dLocal rechaza el pago en su checkout ("la transacción no pudo ser
+    // aprobada") cuando el pagador llega incompleto: nombre sin apellido,
+    // teléfono con caracteres raros o sin referencia de usuario.
+    const cleanName = body.payerName.replace(/\s+/g, " ").trim().slice(0, 100);
+    const payerName = cleanName.includes(" ") ? cleanName : `${cleanName} .`;
+    const rawPhone = (body.payerPhone ?? "").replace(/[^\d+]/g, "");
+    const payerPhone = rawPhone.replace(/\+/g, "").length >= 8 ? rawPhone : undefined;
+    const payerDocument = (body.payerDocument ?? "").replace(/[^\dA-Za-z]/g, "") || undefined;
+
     const payloadFor = (amount: number, currency: string): Record<string, unknown> => ({
       amount,
       currency,
@@ -154,9 +163,11 @@ Deno.serve(async (req) => {
       back_url: body.backUrl,
       ...(notificationUrl ? { notification_url: notificationUrl } : {}),
       payer: {
-        name: body.payerName.slice(0, 100),
+        name: payerName,
         email: body.payerEmail,
-        ...(body.payerPhone ? { phone: body.payerPhone } : {}),
+        user_reference: body.payerEmail.toLowerCase(),
+        ...(payerPhone ? { phone: payerPhone } : {}),
+        ...(payerDocument ? { document: payerDocument } : {}),
       },
     });
 
@@ -174,21 +185,23 @@ Deno.serve(async (req) => {
       return { ok: resp.ok, status: resp.status, text: await resp.text() };
     };
 
-    // Cadena de intentos: nunca perdemos la venta por una restricción del rail,
-    // un monto mínimo en moneda local o una moneda no habilitada.
-    // 1) rail elegido + moneda local · 2) checkout completo + moneda local
-    // 3) checkout completo en USD (dLocal siempre acepta USD en su cobertura).
+    // Cadena de intentos. El checkout hospedado va primero: fijar un
+    // payment_method_id con flow REDIRECT hacía que dLocal creara el pago pero
+    // luego lo rechazara en su página ("no pudo ser aprobada") cuando ese rail
+    // exige datos extra. El rail fijo queda como respaldo.
+    // 1) checkout completo + moneda local · 2) rail elegido · 3) USD.
     const attempts: Array<{ label: string; payload: Record<string, unknown> }> = [];
+    attempts.push({ label: `checkout ${localCurrency}`, payload: basePayload });
     if (paymentMethodId) {
       attempts.push({
         label: `rail ${paymentMethodId}`,
         payload: { ...basePayload, payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" },
       });
     }
-    attempts.push({ label: `checkout ${localCurrency}`, payload: basePayload });
     if (localCurrency !== "USD") {
       attempts.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
     }
+
 
     let attempt = { ok: false, status: 0, text: "" };
     let usedUsdFallback = false;

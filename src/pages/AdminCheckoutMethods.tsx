@@ -56,6 +56,31 @@ export function dlocalNoteForCountries(methodKey: string, countryCodes: string[]
   return `dLocal Go · ${parts.join(" — ")}`;
 }
 
+/**
+ * ¿La cobertura real de /admin/dlocal soporta este método en la región?
+ * Devuelve null si el método no es de dLocal (no se sincroniza).
+ * true  = hay rails activos (y no "muy pronto") en al menos un país de la región.
+ * false = ningún país de la región tiene ese rail activo → debe quedar desactivado.
+ */
+export function dlocalCoverageEnabled(methodKey: string, countryCodes: string[]): boolean | null {
+  const kind = DLOCAL_KIND_BY_KEY[methodKey];
+  if (!kind) return null;
+  const codes = (countryCodes.length ? countryCodes : DLOCAL_COVERAGE.map((c) => c.code))
+    .map((c) => c.toUpperCase())
+    .filter((c) => !!getDlocalCountry(c));
+  if (!codes.length) return false;
+  return codes.some((code) => {
+    const c = getDlocalCountry(code)!;
+    const soon =
+      (kind === "transfer" && c.transferComingSoon) ||
+      (kind === "cash" && c.cashComingSoon) ||
+      (kind === "wallet" && c.walletComingSoon);
+    return !soon && dlocalRails(code, kind).length > 0;
+  });
+}
+
+
+
 
 type Region = {
   code: string; name: string; flag?: string | null; currency: string;
@@ -228,10 +253,47 @@ export default function AdminCheckoutMethods() {
     setLoading(true);
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
     if (error || data?.error) { toast.error(error?.message || data?.error); setLoading(false); return; }
-    setRegions(data.regions || []);
-    setMethods(data.methods || []);
+    const regs: Region[] = data.regions || [];
+    const mets: Method[] = data.methods || [];
+    setRegions(regs);
+    setMethods(mets);
     setLoading(false);
+    void syncDlocalCoverage(regs, mets);
   }
+
+  /**
+   * Sincroniza automáticamente los métodos dLocal de /admin/checkout-methods
+   * con la cobertura activa/desactivada de /admin/dlocal, para todos los países.
+   */
+  async function syncDlocalCoverage(regs: Region[], mets: Method[]) {
+    const byCode = new Map(regs.map((r) => [r.code, r]));
+    const pending = mets.filter((m) => {
+      const r = byCode.get(m.region_code);
+      if (!r || !m.id) return false;
+      const should = dlocalCoverageEnabled(m.method_key, r.country_codes || []);
+      return should !== null && should !== m.enabled;
+    });
+    if (!pending.length) return;
+    const results: string[] = [];
+    for (const m of pending) {
+      const r = byCode.get(m.region_code)!;
+      const should = dlocalCoverageEnabled(m.method_key, r.country_codes || [])!;
+      const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+        body: { action: "toggle_method", id: m.id, enabled: should },
+      });
+      if (error || data?.error) continue;
+      setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, enabled: should } : x)));
+      results.push(`${r.flag || ""} ${r.code} · ${m.label} ${should ? "activado" : "desactivado"}`);
+    }
+    if (results.length) {
+      invalidateCheckoutMethodsCache();
+      toast.success(`🔄 Sincronizado con /admin/dlocal (${results.length})`, {
+        description: results.slice(0, 6).join(" — "),
+        duration: 8000,
+      });
+    }
+  }
+
   useEffect(() => { load(); }, []);
 
   async function saveRegion(r: Region, opts: { fromDialog?: boolean } = {}) {

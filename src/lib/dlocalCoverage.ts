@@ -290,7 +290,7 @@ export function dlocalComingSoon(country: string | null | undefined, kind: Dloca
   return !!c.walletComingSoon;
 }
 
-export type DlocalValidation = { ok: true } | { ok: false; reason: string };
+export type DlocalValidation = { ok: boolean; reason?: string };
 
 /**
  * Valida que un método dLocal pueda usarse en el país seleccionado según la

@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: true }),
       supabase
         .from("manual_payments")
-        .select("order_number, buyer_email, status, method, amount_usd, currency_local, created_at, verified_at")
+        .select("order_number, buyer_email, status, method, amount_usd, amount_local, currency_local, created_at, verified_at")
         .eq("order_number", orderNumber)
         .maybeSingle(),
       supabase

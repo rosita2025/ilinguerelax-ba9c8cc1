@@ -23,7 +23,7 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -96,38 +96,40 @@ const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
   BO: "BOB", PY: "PYG", SV: "USD", HN: "HNL", NI: "NIO",
 };
 
-// Rails locales que dLocal Go ofrece en cada país (badges visuales).
-const DLOCAL_BADGES: Record<string, MethodBadge[]> = {
-  MX: [
-    { label: "OXXO", bg: "#E31E24", color: "#ffffff" },
-    { label: "SPEI", bg: "#0F766E", color: "#ffffff" },
-    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
-  ],
-  CO: [
-    { label: "PSE", bg: "#0B5AA6", color: "#ffffff" },
-    { label: "Nequi", bg: "#200020", color: "#DA0081" },
-    { label: "Efecty", bg: "#FFD400", color: "#1F2937" },
-  ],
-  BR: [
-    { label: "Pix", bg: "#32BCAD", color: "#06211F" },
-    { label: "Boleto", bg: "#1F2937", color: "#ffffff" },
-    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
-  ],
-  AR: [
-    { label: "Rapipago", bg: "#F5A623", color: "#1F2937" },
-    { label: "Pago Fácil", bg: "#E4002B", color: "#ffffff" },
-    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
-  ],
-  PE: [
-    { label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" },
-    { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
-  ],
-  CL: [
-    { label: "Servipag", bg: "#111827", color: "#00C08B" },
-    { label: "Webpay", bg: "#0B5AA6", color: "#ffffff" },
-    { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
-  ],
+// Rails locales de dLocal Go, separados por tipo (transferencia / efectivo).
+// Solo estos países tienen dLocal Go habilitado en la tienda.
+const DLOCAL_COUNTRIES = ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY"];
+
+const DLOCAL_TRANSFER_BADGES: Record<string, MethodBadge[]> = {
+  MX: [{ label: "SPEI", bg: "#0F766E", color: "#ffffff" }, { label: "Transferencia", bg: "#111827", color: "#ffffff" }],
+  CO: [{ label: "PSE", bg: "#0B5AA6", color: "#ffffff" }, { label: "Nequi", bg: "#200020", color: "#DA0081" }],
+  BR: [{ label: "Pix", bg: "#32BCAD", color: "#06211F" }, { label: "TED", bg: "#111827", color: "#ffffff" }],
+  AR: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "CBU/CVU", bg: "#111827", color: "#ffffff" }],
+  PE: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "BCP/Interbank", bg: "#111827", color: "#ffffff" }],
+  CL: [{ label: "Webpay", bg: "#0B5AA6", color: "#ffffff" }, { label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
+  UY: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banred", bg: "#111827", color: "#ffffff" }],
+  EC: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
+  BO: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
+  CR: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "SINPE", bg: "#111827", color: "#ffffff" }],
+  GT: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
+  PA: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
+  PY: [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }, { label: "Banco", bg: "#111827", color: "#ffffff" }],
+};
+
+const DLOCAL_CASH_BADGES: Record<string, MethodBadge[]> = {
+  MX: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }, { label: "7-Eleven", bg: "#ffffff", color: "#1F2937" }],
+  CO: [{ label: "Efecty", bg: "#FFD400", color: "#1F2937" }, { label: "Baloto", bg: "#0B5AA6", color: "#ffffff" }],
+  BR: [{ label: "Boleto", bg: "#1F2937", color: "#ffffff" }, { label: "Lotérica", bg: "#ffffff", color: "#1F2937" }],
+  AR: [{ label: "Rapipago", bg: "#F5A623", color: "#1F2937" }, { label: "Pago Fácil", bg: "#E4002B", color: "#ffffff" }],
+  PE: [{ label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
+  CL: [{ label: "Servipag", bg: "#111827", color: "#00C08B" }, { label: "Multicaja", bg: "#ffffff", color: "#1F2937" }],
+  UY: [{ label: "Abitab", bg: "#E4002B", color: "#ffffff" }, { label: "Redpagos", bg: "#0B5AA6", color: "#ffffff" }],
+  EC: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
+  BO: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
+  CR: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
+  GT: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
+  PA: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
+  PY: [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }, { label: "Agentes", bg: "#111827", color: "#ffffff" }],
 };
 
 // Binance Pay values are loaded from `binance_pay_configs` via `useBinancePayConfig`.

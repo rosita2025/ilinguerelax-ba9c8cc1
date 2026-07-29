@@ -133,7 +133,11 @@ export default function AdminDlocal() {
           id: "",
           region_code: region.code,
           method_key: METHOD_KEY[kind],
-          label: LABELS[kind].label,
+          label: kind === "wallet"
+            ? (DLOCAL_COUNTRIES.find(x => x.code === country)?.walletLabel
+                ? `dLocal Go — ${DLOCAL_COUNTRIES.find(x => x.code === country)!.walletLabel}`
+                : LABELS.wallet.label)
+            : LABELS[kind].label,
           note: LABELS[kind].note,
           icon: LABELS[kind].icon,
           enabled: next,

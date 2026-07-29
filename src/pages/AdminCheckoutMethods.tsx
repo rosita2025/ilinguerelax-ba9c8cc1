@@ -615,7 +615,19 @@ export default function AdminCheckoutMethods() {
               }}>
                 ⚡ Auto Stripe (todas)
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-9 w-full sm:w-auto"
+                disabled={syncingDlocal || loading}
+                onClick={syncDlocalLabels}
+                title="Reescribe las etiquetas de los métodos dLocal usando la cobertura activa de /admin/dlocal"
+              >
+                {syncingDlocal ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
+                🔄 Sincronizar etiquetas dLocal
+              </Button>
               <Button size="sm" className="h-9 w-full sm:w-auto" onClick={() => setRegionEdit(emptyRegion())}>
+
                 <Plus className="w-4 h-4 mr-1" /> Nueva región
               </Button>
             </div>

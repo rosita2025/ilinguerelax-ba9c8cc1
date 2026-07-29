@@ -274,9 +274,12 @@ export default function AdminDlocal() {
                       </div>
                       {c.transfer.length ? (
                         <div className="flex flex-wrap gap-1">
-                          {c.transfer.map((r) => (
+                          {c.transfer.slice(0, 4).map((r) => (
                             <span key={r} className="text-[10px] rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground">{r}</span>
                           ))}
+                          {c.transfer.length > 4 && (
+                            <span className="text-[10px] rounded-md px-1.5 py-0.5 text-muted-foreground">+{c.transfer.length - 4} más</span>
+                          )}
                         </div>
                       ) : (
                         <div className="text-[11px] text-muted-foreground">No disponible en este país</div>
@@ -297,9 +300,12 @@ export default function AdminDlocal() {
                       </div>
                       {c.cash.length ? (
                         <div className="flex flex-wrap gap-1">
-                          {c.cash.map((r) => (
+                          {c.cash.slice(0, 4).map((r) => (
                             <span key={r} className="text-[10px] rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground">{r}</span>
                           ))}
+                          {c.cash.length > 4 && (
+                            <span className="text-[10px] rounded-md px-1.5 py-0.5 text-muted-foreground">+{c.cash.length - 4} más</span>
+                          )}
                         </div>
                       ) : (
                         <div className="text-[11px] text-muted-foreground">No disponible en este país</div>

@@ -1340,8 +1340,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         if (m.id === "binance") return methodsConfig.binance;
         if (m.id === "clabe") return country === "MX";
 
-        if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && DLOCAL_COUNTRIES.includes(country);
-        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && DLOCAL_COUNTRIES.includes(country);
+        // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
+        if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer");
+        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash");
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 

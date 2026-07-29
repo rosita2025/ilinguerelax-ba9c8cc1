@@ -88,16 +88,24 @@ export default function OrderStatus() {
       const { data, error: fnError } = await supabase.functions.invoke("order-status", {
         body: { orderNumber: orderNumber.trim(), email: email.trim() },
       });
-      if (fnError) throw fnError;
+      if (fnError) {
+        const ctx = (fnError as { context?: Response }).context;
+        if (ctx?.status === 429) {
+          setError("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.");
+          return;
+        }
+        throw fnError;
+      }
       const res = data as OrderStatusResult;
       if (!res?.found) {
         setError(
-          "No encontramos un pedido con ese número y correo. Revisa el correo de confirmación o escríbenos por WhatsApp.",
+          "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
         );
       } else {
         setResult(res);
       }
     } catch {
+
       setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
     } finally {
       setLoading(false);

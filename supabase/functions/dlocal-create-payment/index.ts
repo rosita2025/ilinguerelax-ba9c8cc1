@@ -119,9 +119,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    const basePayload: Record<string, unknown> = {
-      amount: Number(body.amount.toFixed(2)),
-      currency: body.currency.toUpperCase(),
+    // Monedas sin decimales: dLocal rechaza montos con centavos.
+    const ZERO_DECIMAL = new Set(["CLP", "PYG", "COP", "ARS", "CRC", "GTQ"]);
+    const localCurrency = body.currency.toUpperCase();
+    const localAmount = ZERO_DECIMAL.has(localCurrency)
+      ? Math.round(body.amount)
+      : Number(body.amount.toFixed(2));
+
+    const payloadFor = (amount: number, currency: string): Record<string, unknown> => ({
+      amount,
+      currency,
       country: body.country.toUpperCase(),
       order_id: orderId,
       description,
@@ -133,7 +140,9 @@ Deno.serve(async (req) => {
         email: body.payerEmail,
         ...(body.payerPhone ? { phone: body.payerPhone } : {}),
       },
-    };
+    });
+
+    const basePayload = payloadFor(localAmount, localCurrency);
 
     const createPayment = async (payload: Record<string, unknown>) => {
       const resp = await fetch("https://api.dlocalgo.com/v1/payments", {
@@ -147,25 +156,45 @@ Deno.serve(async (req) => {
       return { ok: resp.ok, status: resp.status, text: await resp.text() };
     };
 
-    // Intento 1: checkout restringido al rail elegido (transferencia / efectivo /
-    // billetera). Intento 2 (fallback): checkout completo de dLocal, para que un
-    // método no disponible en el país nunca haga fallar la venta.
-    let attempt = await createPayment(
-      paymentMethodId
-        ? { ...basePayload, payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" }
-        : basePayload,
-    );
-    if (!attempt.ok && paymentMethodId) {
-      console.warn(
-        `dLocal create payment falló con payment_method_id=${paymentMethodId} [${attempt.status}]; reintentando sin restricción`,
-      );
-      attempt = await createPayment(basePayload);
+    // Cadena de intentos: nunca perdemos la venta por una restricción del rail,
+    // un monto mínimo en moneda local o una moneda no habilitada.
+    // 1) rail elegido + moneda local · 2) checkout completo + moneda local
+    // 3) checkout completo en USD (dLocal siempre acepta USD en su cobertura).
+    const attempts: Array<{ label: string; payload: Record<string, unknown> }> = [];
+    if (paymentMethodId) {
+      attempts.push({
+        label: `rail ${paymentMethodId}`,
+        payload: { ...basePayload, payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" },
+      });
+    }
+    attempts.push({ label: `checkout ${localCurrency}`, payload: basePayload });
+    if (localCurrency !== "USD") {
+      attempts.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
+    }
+
+    let attempt = { ok: false, status: 0, text: "" };
+    let usedUsdFallback = false;
+    for (let i = 0; i < attempts.length; i++) {
+      attempt = await createPayment(attempts[i].payload);
+      if (attempt.ok) {
+        usedUsdFallback = attempts[i].label === "checkout USD";
+        break;
+      }
+      console.warn(`dLocal intento "${attempts[i].label}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
     }
 
     if (!attempt.ok) {
       console.error(`dLocal Go create payment failed [${attempt.status}]: ${attempt.text}`);
-      return json({ error: "No pudimos iniciar el pago con dLocal. Intenta de nuevo o elige otro método." }, 502);
+      let msg = "No pudimos iniciar el pago con dLocal. Intenta de nuevo o elige otro método.";
+      try {
+        const code = Number(JSON.parse(attempt.text)?.code);
+        if (code === 5016) msg = "El monto es menor al mínimo permitido por dLocal para tu país. Agrega otro producto o elige otro método de pago.";
+        else if (code === 5000) msg = "dLocal no está disponible en tu país. Por favor elige otro método de pago.";
+        else if (code === 5010) msg = "Ese método no está disponible ahora en tu país. Por favor elige otro método de pago.";
+      } catch { /* respuesta no JSON */ }
+      return json({ error: msg }, 502);
     }
+
 
     let data: Record<string, unknown>;
     try {

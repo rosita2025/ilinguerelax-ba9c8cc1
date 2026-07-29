@@ -75,18 +75,21 @@ export default function CheckoutSuccess() {
   const providerCode = provider === "stripe" ? "ST" : provider === "paypal" ? "PP" : provider === "mercadopago" ? "MP" : "OR";
   const rawRef = String(paymentId || externalRef || paypalToken || "").replace(/[^a-zA-Z0-9]/g, "");
   const refTail = rawRef ? rawRef.slice(-6).toUpperCase().padStart(6, "0") : Math.random().toString(36).slice(2, 8).toUpperCase();
-  const orderNumber = `ILR-${providerCode}-${refTail}`;
+  // Con dLocal usamos el número real del pedido (el mismo que conocen el
+  // webhook y el historial), no uno derivado del navegador.
+  const orderNumber = dlocalOrder ? dlocalOrder.toUpperCase() : `ILR-${providerCode}-${refTail}`;
 
-  // Gate: only real buyers from Stripe or PayPal should see the confirmation.
-  // A visitor without a valid payment reference OR without buyer info in the
-  // session store is treated as public/unknown and gets a neutral screen.
-  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order"));
+  // Gate: only real buyers with an approved payment reference should see the
+  // confirmation. A visitor without a valid reference OR without buyer info in
+  // the session store is treated as public/unknown and gets a neutral screen.
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order") || dlocalOrder);
   const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
   const initialVerified =
     hasPaymentRef &&
     hasBuyerContext &&
-    (provider === "stripe" || provider === "paypal" || provider === "mercadopago") &&
+    (provider === "stripe" || provider === "paypal" || provider === "mercadopago" || provider === "dlocalgo") &&
     status !== "rejected" && status !== "failure";
+
   // Freeze verification at mount so clearing the cart after sending the
   // confirmation email doesn't flip the screen to "private confirmation".
   const [isVerifiedBuyer] = useState(initialVerified);

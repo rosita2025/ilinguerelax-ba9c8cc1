@@ -154,6 +154,23 @@ Deno.serve(async (req) => {
       // avisamos al admin. La entrega digital se dispara sola cuando dLocal
       // vuelve a llamar este webhook con estado PAID.
       const PENDING_STATUS = ["PENDING", "AUTHORIZED", "VERIFIED"];
+      // Estados finales fallidos: quedan registrados en el historial del pedido
+      // para que /mi-pedido y el admin muestren el estado real.
+      if (!PENDING_STATUS.includes(status)) {
+        await logOrderEvent({
+          orderNumber,
+          event: "payment_failed",
+          provider: "dlocalgo",
+          status,
+          reference: paymentId,
+          detail: `dLocal reportó el pago como ${status}`,
+          customerEmail: customerEmail || null,
+          amount: amount ?? null,
+          currency,
+          metadata: { country: country ?? null, skus },
+        });
+      }
+
       if (PENDING_STATUS.includes(status) && customerEmail) {
         const rawMethod = String(
           payment.payment_method_id || payment.payment_method_type || q.get("ptype") || "",

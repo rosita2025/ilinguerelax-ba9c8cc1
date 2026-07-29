@@ -84,12 +84,15 @@ Deno.serve(async (req) => {
       ? `${supabaseUrl}/functions/v1/dlocal-webhook?${notifyParams.toString()}`
       : undefined;
 
-    // Restringe el checkout de dLocal Go a un solo tipo de rail (transferencia
-    // o efectivo). Consultamos los métodos disponibles del país y elegimos el
-    // primero cuyo tipo coincida; si la consulta falla, dejamos el checkout
-    // completo de dLocal (mejor cobrar que bloquear la venta).
+    // Rail específico (transferencia / efectivo / billetera) como RESPALDO.
+    // La consulta a /payment-methods es perezosa: el primer intento usa el
+    // checkout completo de dLocal, que no necesita el rail, así que no
+    // gastamos un viaje de red extra en el 99% de los pagos que salen bien.
+    let railLookupDone = false;
     let paymentMethodId: string | undefined;
-    if (body.paymentType) {
+    const resolveRail = async (): Promise<string | undefined> => {
+      if (railLookupDone || !body.paymentType) return paymentMethodId;
+      railLookupDone = true;
       try {
         const pmResp = await fetch(
           `https://api.dlocalgo.com/v1/payment-methods?country=${body.country.toUpperCase()}`,
@@ -119,7 +122,9 @@ Deno.serve(async (req) => {
       } catch (e) {
         console.warn("dLocal payment-methods lookup error:", e);
       }
-    }
+      return paymentMethodId;
+    };
+
 
     // Moneda oficial que dLocal Go acepta en cada país LatAm. Si el cliente
     // manda otra (por caché o geo-IP desfasado), cobramos en USD en vez de
@@ -188,30 +193,36 @@ Deno.serve(async (req) => {
     // Cadena de intentos. El checkout hospedado va primero: fijar un
     // payment_method_id con flow REDIRECT hacía que dLocal creara el pago pero
     // luego lo rechazara en su página ("no pudo ser aprobada") cuando ese rail
-    // exige datos extra. El rail fijo queda como respaldo.
+    // exige datos extra. El rail fijo queda como respaldo y solo entonces
+    // consultamos /payment-methods.
     // 1) checkout completo + moneda local · 2) rail elegido · 3) USD.
-    const attempts: Array<{ label: string; payload: Record<string, unknown> }> = [];
-    attempts.push({ label: `checkout ${localCurrency}`, payload: basePayload });
-    if (paymentMethodId) {
-      attempts.push({
-        label: `rail ${paymentMethodId}`,
-        payload: { ...basePayload, payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" },
-      });
-    }
-    if (localCurrency !== "USD") {
-      attempts.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
-    }
-
-
-    let attempt = { ok: false, status: 0, text: "" };
-    let usedUsdFallback = false;
-    for (let i = 0; i < attempts.length; i++) {
-      attempt = await createPayment(attempts[i].payload);
-      if (attempt.ok) {
-        usedUsdFallback = attempts[i].label === "checkout USD";
-        break;
+    const buildAttempts = async (): Promise<Array<{ label: string; payload: Record<string, unknown> }>> => {
+      const rest: Array<{ label: string; payload: Record<string, unknown> }> = [];
+      const rail = await resolveRail();
+      if (rail) {
+        rest.push({
+          label: `rail ${rail}`,
+          payload: { ...basePayload, payment_method_id: rail, payment_method_flow: "REDIRECT" },
+        });
       }
-      console.warn(`dLocal intento "${attempts[i].label}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
+      if (localCurrency !== "USD") {
+        rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
+      }
+      return rest;
+    };
+
+    let attempt = await createPayment(basePayload);
+    let usedUsdFallback = false;
+    if (!attempt.ok) {
+      console.warn(`dLocal intento "checkout ${localCurrency}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
+      for (const next of await buildAttempts()) {
+        attempt = await createPayment(next.payload);
+        if (attempt.ok) {
+          usedUsdFallback = next.label === "checkout USD";
+          break;
+        }
+        console.warn(`dLocal intento "${next.label}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
+      }
     }
 
     if (!attempt.ok) {
@@ -249,39 +260,51 @@ Deno.serve(async (req) => {
       ? "Transferencia bancaria (dLocal Go)"
       : "dLocal Go";
 
-    await logOrderEvent({
-      orderNumber: orderId,
-      event: "order_created",
-      provider: "dlocalgo",
-      status: "CREATED",
-      method: methodLabel,
-      reference: data.id ? String(data.id) : null,
-      detail: description,
-      customerEmail: body.payerEmail,
-      amount: calculatedUsd,
-      currency: "USD",
-      metadata: {
-        country: body.country.toUpperCase(),
-        skus,
-        localAmount: usedUsdFallback ? calculatedUsd : localAmount,
-        localCurrency: usedUsdFallback ? "USD" : localCurrency,
-        usdFallback: usedUsdFallback,
-      },
-
-    });
-    await logOrderEvent({
-      orderNumber: orderId,
-      event: "payment_instructions",
-      provider: "dlocalgo",
-      status: "AWAITING_PAYMENT",
-      method: methodLabel,
-      reference: data.id ? String(data.id) : null,
-      detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
-      customerEmail: body.payerEmail,
-      currency: usedUsdFallback ? "USD" : localCurrency,
-      amount: usedUsdFallback ? calculatedUsd : localAmount,
-
-    });
+    // Auditoría del pedido: se ejecuta DESPUÉS de responder. El comprador
+    // recibe el link de pago de inmediato y el historial se escribe en
+    // segundo plano con waitUntil (la función sigue viva hasta terminarlo).
+    const audit = (async () => {
+      try {
+        await Promise.all([
+          logOrderEvent({
+            orderNumber: orderId,
+            event: "order_created",
+            provider: "dlocalgo",
+            status: "CREATED",
+            method: methodLabel,
+            reference: data.id ? String(data.id) : null,
+            detail: description,
+            customerEmail: body.payerEmail,
+            amount: calculatedUsd,
+            currency: "USD",
+            metadata: {
+              country: body.country.toUpperCase(),
+              skus,
+              localAmount: usedUsdFallback ? calculatedUsd : localAmount,
+              localCurrency: usedUsdFallback ? "USD" : localCurrency,
+              usdFallback: usedUsdFallback,
+            },
+          }),
+          logOrderEvent({
+            orderNumber: orderId,
+            event: "payment_instructions",
+            provider: "dlocalgo",
+            status: "AWAITING_PAYMENT",
+            method: methodLabel,
+            reference: data.id ? String(data.id) : null,
+            detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
+            customerEmail: body.payerEmail,
+            currency: usedUsdFallback ? "USD" : localCurrency,
+            amount: usedUsdFallback ? calculatedUsd : localAmount,
+          }),
+        ]);
+      } catch (e) {
+        console.error("dLocal audit log failed:", e instanceof Error ? e.message : e);
+      }
+    })();
+    const runtime = (globalThis as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } }).EdgeRuntime;
+    if (runtime?.waitUntil) runtime.waitUntil(audit);
+    else void audit;
 
     return json({ id: data.id, orderId, redirect_url: redirectUrl });
 

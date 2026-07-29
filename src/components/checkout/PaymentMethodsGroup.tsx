@@ -427,7 +427,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
     if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
-    await captureAbandonedCheckout(selected || "stripe", true);
+    // No bloquea el checkout: la captura del carrito viaja en segundo plano.
+    void captureAbandonedCheckout(selected || "stripe", true);
     setStripeLoading(true);
     setStripeError(null);
     const parts = s.buyer.fullName.trim().split(/\s+/);
@@ -511,13 +512,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     redirectingRef.current = true;
     setMpLoading(paymentType);
     try {
-      await captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
-      supabase.from("email_contacts").upsert({
+      void captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
+      void supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
         source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
-      }, { onConflict: "email,source" }).then(() => {});
+      }, { onConflict: "email,source" }).then(() => {}, () => {});
 
       const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
@@ -587,17 +588,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     setMpLoading(dlMethod);
     const dlOrderId = `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     try {
-      await captureAbandonedCheckout(dlMethod, true);
+      // Auditoría y contactos NO bloquean la creación del pago: se disparan en
+      // paralelo y el comprador se va al link de dLocal apenas esté listo.
+      void captureAbandonedCheckout(dlMethod, true);
       // Guardamos el pedido en curso: si dLocal rechaza la transacción, la
       // pantalla de retorno puede consultar el estado real y mostrar un
       // mensaje claro en vez de dejar al comprador en un error sin salida.
       saveDlocalPending(dlOrderId, s.buyer.email.trim());
-      supabase.from("email_contacts").upsert({
+      void supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
         source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "dlocalgo" },
-      }, { onConflict: "email,source" }).then(() => {});
+      }, { onConflict: "email,source" }).then(() => {}, () => {});
 
       const returnUrl = `${window.location.origin}/checkouts/return?provider=dlocal&order=${encodeURIComponent(dlOrderId)}`;
       const { data, error } = await invokeWithRetry<{ redirect_url?: string }>("dlocal-create-payment", {
@@ -709,7 +712,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
     // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
     if (selected === "hotmart") { await redirectToHotmart(); return; }
-    await captureAbandonedCheckout(selected, true);
+    // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
+    // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
+    void captureAbandonedCheckout(selected, true);
     if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
     if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
     if (selected === "dlocal_cash") { await payDlocal("cash"); return; }

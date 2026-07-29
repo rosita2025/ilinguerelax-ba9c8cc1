@@ -193,30 +193,36 @@ Deno.serve(async (req) => {
     // Cadena de intentos. El checkout hospedado va primero: fijar un
     // payment_method_id con flow REDIRECT hacía que dLocal creara el pago pero
     // luego lo rechazara en su página ("no pudo ser aprobada") cuando ese rail
-    // exige datos extra. El rail fijo queda como respaldo.
+    // exige datos extra. El rail fijo queda como respaldo y solo entonces
+    // consultamos /payment-methods.
     // 1) checkout completo + moneda local · 2) rail elegido · 3) USD.
-    const attempts: Array<{ label: string; payload: Record<string, unknown> }> = [];
-    attempts.push({ label: `checkout ${localCurrency}`, payload: basePayload });
-    if (paymentMethodId) {
-      attempts.push({
-        label: `rail ${paymentMethodId}`,
-        payload: { ...basePayload, payment_method_id: paymentMethodId, payment_method_flow: "REDIRECT" },
-      });
-    }
-    if (localCurrency !== "USD") {
-      attempts.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
-    }
-
-
-    let attempt = { ok: false, status: 0, text: "" };
-    let usedUsdFallback = false;
-    for (let i = 0; i < attempts.length; i++) {
-      attempt = await createPayment(attempts[i].payload);
-      if (attempt.ok) {
-        usedUsdFallback = attempts[i].label === "checkout USD";
-        break;
+    const buildAttempts = async (): Promise<Array<{ label: string; payload: Record<string, unknown> }>> => {
+      const rest: Array<{ label: string; payload: Record<string, unknown> }> = [];
+      const rail = await resolveRail();
+      if (rail) {
+        rest.push({
+          label: `rail ${rail}`,
+          payload: { ...basePayload, payment_method_id: rail, payment_method_flow: "REDIRECT" },
+        });
       }
-      console.warn(`dLocal intento "${attempts[i].label}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
+      if (localCurrency !== "USD") {
+        rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
+      }
+      return rest;
+    };
+
+    let attempt = await createPayment(basePayload);
+    let usedUsdFallback = false;
+    if (!attempt.ok) {
+      console.warn(`dLocal intento "checkout ${localCurrency}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
+      for (const next of await buildAttempts()) {
+        attempt = await createPayment(next.payload);
+        if (attempt.ok) {
+          usedUsdFallback = next.label === "checkout USD";
+          break;
+        }
+        console.warn(`dLocal intento "${next.label}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
+      }
     }
 
     if (!attempt.ok) {

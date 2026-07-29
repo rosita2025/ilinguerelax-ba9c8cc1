@@ -6,8 +6,8 @@ import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 
 const ItemSchema = z.object({
-  id: z.string().min(1).max(64),
-  name: z.string().min(1).max(200),
+  id: z.string().min(1).max(200),
+  name: z.string().min(1).max(300),
   price: z.number().positive().max(10000),
   quantity: z.number().int().min(1).max(50),
 });

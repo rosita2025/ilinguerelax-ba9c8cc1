@@ -22,6 +22,8 @@ export type DlocalCountry = {
   wallet?: string[];
   /** Título del bloque separado (por defecto Mercado Pago). */
   walletLabel?: string;
+  /** Clave de método para el bloque separado (por defecto dlocal_mercadopago). */
+  walletKey?: string;
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [
@@ -31,7 +33,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     wallet: ["Mercado Pago (saldo)", "Tarjeta Mercado Pago", "Tarjeta de crédito/débito vía Mercado Pago"] },
   { code: "BO", name: "Bolivia", flag: "🇧🇴", currency: "BOB",
     transfer: ["Transferencia bancaria"], cash: ["Pago al Paso", "Efectivo (agentes)"],
-    wallet: ["QR bancario (Simple / Tigo Money)", "Tarjeta de crédito/débito"], walletLabel: "QR y tarjeta" },
+    wallet: ["QR bancario (Simple / Tigo Money)", "Tarjeta de crédito/débito"], walletLabel: "QR y tarjeta", walletKey: "dlocal_wallet" },
   { code: "BR", name: "Brasil", flag: "🇧🇷", currency: "BRL",
     transfer: ["Pix", "PicPay", "Santander", "Itaú", "Bradesco", "Banco do Brasil"],
     cash: ["Boleto bancário", "Lotérica"] },
@@ -39,8 +41,9 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["Banco de Chile", "BancoEstado", "BBVA", "Webpay"],
     cash: ["Prepago Los Héroes", "Dale Coopeuch", "ServiPag", "Multicaja"] },
   { code: "CO", name: "Colombia", flag: "🇨🇴", currency: "COP",
-    transfer: ["PSE", "Nequi", "Bancolombia", "Davivienda", "Banco de Bogotá", "Banco Agrario", "Banco AV Villas", "Banco Caja Social", "Banco Colpatria", "Banco Corpbanca", "Banco de Occidente", "Banco Falabella", "Banco GNB Sudameris", "Banco Pichincha", "Banco Popular", "Banco Procredit", "Bancoomeva", "BBVA Colombia", "Citibank", "Helm Bank"],
-    cash: ["Efecty", "Baloto", "Gana", "Megared", "Sured", "Susuerte", "Punto Red", "Western Union"] },
+    transfer: ["PSE", "Bancolombia", "Davivienda", "Banco de Bogotá"],
+    cash: ["Efecty", "Baloto", "Gana", "Punto Red"],
+    wallet: ["Nequi", "Daviplata", "Movii", "Dale"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "CR", name: "Costa Rica", flag: "🇨🇷", currency: "CRC",
     transfer: ["SINPE", "SINPE Móvil"], cash: ["BN Servicios", "PayCash", "PuntoXpress"] },
   { code: "EC", name: "Ecuador", flag: "🇪🇨", currency: "USD",

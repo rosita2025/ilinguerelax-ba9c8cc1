@@ -23,6 +23,9 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, getDlocalCountry } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
+import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
+import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
+import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card";
@@ -582,8 +585,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
     redirectingRef.current = true;
     setMpLoading(dlMethod);
+    const dlOrderId = `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     try {
       await captureAbandonedCheckout(dlMethod, true);
+      // Guardamos el pedido en curso: si dLocal rechaza la transacción, la
+      // pantalla de retorno puede consultar el estado real y mostrar un
+      // mensaje claro en vez de dejar al comprador en un error sin salida.
+      saveDlocalPending(dlOrderId, s.buyer.email.trim());
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
@@ -591,9 +599,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         metadata: { phone: s.buyer.phone ?? "", processor: "dlocalgo" },
       }, { onConflict: "email,source" }).then(() => {});
 
+      const returnUrl = `${window.location.origin}/checkouts/return?provider=dlocal&order=${encodeURIComponent(dlOrderId)}`;
       const { data, error } = await invokeWithRetry<{ redirect_url?: string }>("dlocal-create-payment", {
         body: {
-          orderId: `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+          orderId: dlOrderId,
           items: s.items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity })),
           couponPercent: s.couponPercent,
           couponCode: s.coupon ?? undefined,
@@ -605,31 +614,41 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           currency: dlCurrency,
           amount: Number(dlAmount.toFixed(2)),
           expectedTotalUsd: Number(totals.total.toFixed(2)),
-          successUrl: `${window.location.origin}/checkouts/success`,
-          backUrl: `${window.location.origin}/checkouts/return`,
+          // Aprobado y rechazado vuelven al puente: ahí resolvemos el estado real.
+          successUrl: returnUrl,
+          backUrl: returnUrl,
         },
       }, { attempts: 3, baseDelayMs: 500 });
-      if (error || !data?.redirect_url) throw new Error((error as { message?: string } | null)?.message || t.errorPayment);
+      if (error || !data?.redirect_url) {
+        const detail = await extractEdgeErrorMessage(error);
+        throw new Error(detail || t.errorPayment);
+      }
       window.location.assign(data.redirect_url);
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
+      clearDlocalPending();
+      const rawReason = err instanceof Error ? err.message : String(err);
       try {
         trackPaymentError({
           provider: "dlocalgo",
           skus: s.items.map((i) => i.id),
-          reason: err instanceof Error ? err.message : String(err),
+          reason: rawReason,
           value: totals.total,
           currency: "USD",
         });
       } catch { /* noop */ }
-      setMethodError({ method: dlMethod, message: err instanceof Error ? err.message : t.tryAgain });
+      // Mensaje claro + siguiente paso: nunca dejamos un error técnico crudo.
+      const fallback = mapDlocalStatus("dlocal_create_failed", language);
+      const friendly = looksTechnical(rawReason) ? fallback.message : rawReason;
+      setMethodError({ method: dlMethod, message: friendly });
       toast({
-        title: t.errorPayment,
-        description: err instanceof Error ? err.message : t.tryAgain,
+        title: fallback.title,
+        description: friendly,
         variant: "destructive",
       });
     }
+
   };
 
   const redirectToHotmart = useCallback(async () => {

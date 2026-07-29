@@ -28,7 +28,7 @@ export type DlocalCountry = {
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [
   { code: "AR", name: "Argentina", flag: "🇦🇷", currency: "ARS",
-    transfer: ["Transferencia CBU/CVU", "Banco Nación", "Santander", "Galicia", "BBVA", "Macro"],
+    transfer: ["Transferencia CBU/CVU", "Banco Nación", "Santander", "Galicia"],
     cash: ["Rapipago", "Pago Fácil", "Cobro Express", "Provincia NET"],
     wallet: ["Mercado Pago", "Ualá", "Personal Pay", "MODO"],
     walletLabel: "Billetera digital", walletKey: "dlocal_mercadopago" },

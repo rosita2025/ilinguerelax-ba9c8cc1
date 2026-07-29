@@ -74,6 +74,8 @@ Deno.serve(async (req) => {
       ...(body.couponCode ? { coupon: body.couponCode } : {}),
       ...(body.couponPercent ? { coupon_pct: String(body.couponPercent) } : {}),
       ...(body.payerPhone ? { phone: body.payerPhone } : {}),
+      ...(body.paymentType ? { ptype: body.paymentType } : {}),
+
     });
     const notificationUrl = supabaseUrl
       ? `${supabaseUrl}/functions/v1/dlocal-webhook?${notifyParams.toString()}`

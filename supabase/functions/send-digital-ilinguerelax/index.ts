@@ -561,12 +561,14 @@ serve(async (req) => {
     // Aviso de venta al administrador (todas las pasarelas). Nunca bloquea la entrega.
     try {
       const adminEmail = Deno.env.get("ADMIN_2FA_EMAIL") || BRAND.supportEmail;
+      const adminRecipients = Array.from(new Set([adminEmail, BRAND.supportEmail].filter(Boolean)));
       const productList = products.map((p) => `<li>${escapeHtml(p.name || prettifySlug(p.sku))}</li>`).join("");
       const amountLine = amount ? `${amount} ${currency || "USD"}` : "—";
-      await resend.emails.send({
+      const adminSale = await resend.emails.send({
         from: `Ventas iLingue Relax <${BRAND.supportEmail}>`,
-        to: [adminEmail],
+        to: adminRecipients,
         reply_to: BRAND.supportEmail,
+
         subject: `💰 Nueva venta ${orderRef || ""} — ${amountLine} (${customerCountry || resolvedCountry || "?"})`,
         html: `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;">
           <h2 style="margin:0 0 12px;">💰 Nueva venta confirmada</h2>
@@ -580,6 +582,12 @@ serve(async (req) => {
           <p style="color:#16a34a;"><strong>Entrega digital enviada correctamente.</strong></p>
         </div>`,
       });
+      console.log("[send-digital-ilinguerelax] admin sale notice sent", {
+        to: adminRecipients,
+        order: orderRef || orderId || null,
+        error: (adminSale as { error?: unknown })?.error ?? null,
+      });
+
     } catch (adminSaleError) {
       console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
     }

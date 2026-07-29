@@ -4,6 +4,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
+import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const ItemSchema = z.object({
   id: z.string().min(1).max(64),
@@ -179,6 +180,40 @@ Deno.serve(async (req) => {
       console.error("dLocal Go response without redirect_url:", attempt.text.slice(0, 500));
       return json({ error: "dLocal no devolvió la URL de pago. Intenta de nuevo." }, 502);
     }
+
+    const methodLabel = body.paymentType === "cash"
+      ? "Pago en efectivo (dLocal Go)"
+      : body.paymentType === "wallet"
+      ? "Billetera digital (dLocal Go)"
+      : body.paymentType === "transfer"
+      ? "Transferencia bancaria (dLocal Go)"
+      : "dLocal Go";
+
+    await logOrderEvent({
+      orderNumber: orderId,
+      event: "order_created",
+      provider: "dlocalgo",
+      status: "CREATED",
+      method: methodLabel,
+      reference: data.id ? String(data.id) : null,
+      detail: description,
+      customerEmail: body.payerEmail,
+      amount: calculatedUsd,
+      currency: "USD",
+      metadata: { country: body.country.toUpperCase(), skus, localAmount: body.amount, localCurrency: body.currency },
+    });
+    await logOrderEvent({
+      orderNumber: orderId,
+      event: "payment_instructions",
+      provider: "dlocalgo",
+      status: "AWAITING_PAYMENT",
+      method: methodLabel,
+      reference: data.id ? String(data.id) : null,
+      detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
+      customerEmail: body.payerEmail,
+      currency: body.currency.toUpperCase(),
+      amount: body.amount,
+    });
 
     return json({ id: data.id, orderId, redirect_url: redirectUrl });
 

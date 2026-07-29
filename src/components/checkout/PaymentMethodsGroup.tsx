@@ -1265,10 +1265,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     {
       id: "dlocal_transfer",
       icon: Building2,
-      title: language === "en" ? "Bank transfer (dLocal Go)"
-        : language === "pt" ? "Transferência bancária (dLocal Go)"
-        : language === "fr" ? "Virement bancaire (dLocal Go)"
-        : "Transferencia bancaria (dLocal Go)",
+      title: language === "en" ? "Bank transfer"
+        : language === "pt" ? "Transferência bancária"
+        : language === "fr" ? "Virement bancaire"
+        : "Transferencia bancaria",
       sub: (dlocalRails(country, "transfer").length
         ? `${dlocalRails(country, "transfer").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
@@ -1283,10 +1283,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     {
       id: "dlocal_cash",
       icon: Banknote,
-      title: language === "en" ? "Cash payment (dLocal Go)"
-        : language === "pt" ? "Pagamento em dinheiro (dLocal Go)"
-        : language === "fr" ? "Paiement en espèces (dLocal Go)"
-        : "Pago en efectivo (dLocal Go)",
+      title: language === "en" ? "Cash payment"
+        : language === "pt" ? "Pagamento em dinheiro"
+        : language === "fr" ? "Paiement en espèces"
+        : "Pago en efectivo",
       sub: (dlocalRails(country, "cash").length
         ? `${dlocalRails(country, "cash").join(" · ")} — `
         : "") + (language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
@@ -1302,11 +1302,11 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       id: "dlocal_wallet",
       icon: Wallet,
       title: (getDlocalCountry(country)?.walletLabel
-        ? `${getDlocalCountry(country)!.walletLabel} (dLocal Go)`
-        : language === "en" ? "Digital wallet (dLocal Go)"
-        : language === "pt" ? "Carteira digital (dLocal Go)"
-        : language === "fr" ? "Portefeuille numérique (dLocal Go)"
-        : "Billetera digital (dLocal Go)"),
+        ? `${getDlocalCountry(country)!.walletLabel}`
+        : language === "en" ? "Digital wallet"
+        : language === "pt" ? "Carteira digital"
+        : language === "fr" ? "Portefeuille numérique"
+        : "Billetera digital"),
       sub: (dlocalRails(country, "wallet").length
         ? `${dlocalRails(country, "wallet").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your wallet app in local currency. Instant confirmation."
@@ -1319,10 +1319,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     {
       id: "dlocal_card",
       icon: CreditCard,
-      title: language === "en" ? "Debit / credit card (dLocal Go)"
-        : language === "pt" ? "Cartão de débito / crédito (dLocal Go)"
-        : language === "fr" ? "Carte bancaire (dLocal Go)"
-        : "Tarjeta de débito / crédito (dLocal Go)",
+      title: language === "en" ? "Debit / credit card"
+        : language === "pt" ? "Cartão de débito / crédito"
+        : language === "fr" ? "Carte bancaire"
+        : "Tarjeta de débito / crédito",
       sub: language === "en" ? "Pay in local currency with your card. Secure fields by dLocal."
         : language === "pt" ? "Pague em moeda local com seu cartão. Campos seguros da dLocal."
         : language === "fr" ? "Payez en monnaie locale par carte. Champs sécurisés dLocal."

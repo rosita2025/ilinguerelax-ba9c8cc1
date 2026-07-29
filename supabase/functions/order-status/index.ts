@@ -109,7 +109,19 @@ Deno.serve(async (req) => {
       return json({ found: false }, 200);
     }
 
-    const timeline = (events ?? []).map((e) => ({
+    type Item = {
+      event: string;
+      status: string | null;
+      method: string | null;
+      reference: string | null;
+      detail: string | null;
+      amount: number | null;
+      currency: string | null;
+      provider: string | null;
+      createdAt: string;
+    };
+
+    const timeline: Item[] = (events ?? []).map((e) => ({
       event: e.event,
       status: e.status,
       method: e.method,
@@ -120,6 +132,75 @@ Deno.serve(async (req) => {
       provider: e.provider,
       createdAt: e.created_at,
     }));
+
+    const has = (ev: string) => timeline.some((t) => t.event === ev);
+    const push = (i: Item) => timeline.push(i);
+
+    // Pagos manuales (Yape/Plin, SPEI, Binance…) no siempre escriben en order_events.
+    // Reconstruimos el historial para que el cliente vea las horas reales.
+    if (manual) {
+      const mMethod = manual.method ? String(manual.method) : null;
+      if (manual.created_at && !has("order_created")) {
+        push({
+          event: "order_created",
+          status: manual.status ?? null,
+          method: mMethod,
+          reference: null,
+          detail: null,
+          amount: null,
+          currency: null,
+          provider: "manual",
+          createdAt: manual.created_at,
+        });
+      }
+      if (manual.created_at && !has("payment_pending")) {
+        push({
+          event: "payment_pending",
+          status: "pending",
+          method: mMethod,
+          reference: null,
+          detail: null,
+          amount: manual.amount_local ?? manual.amount_usd ?? null,
+          currency: manual.currency_local ?? "USD",
+          provider: "manual",
+          createdAt: manual.created_at,
+        });
+      }
+      if (manual.status === "verified" && manual.verified_at && !has("payment_paid")) {
+        push({
+          event: "payment_paid",
+          status: "paid",
+          method: mMethod,
+          reference: null,
+          detail: null,
+          amount: manual.amount_local ?? manual.amount_usd ?? null,
+          currency: manual.currency_local ?? "USD",
+          provider: "manual",
+          createdAt: manual.verified_at,
+        });
+      }
+    }
+
+    // Entrega digital: usa la fecha real del envío del correo.
+    if (!has("delivery_sent")) {
+      const sent = (sends ?? []).find((s) => s.created_at);
+      if (sent) {
+        push({
+          event: "delivery_sent",
+          status: sent.status ?? "sent",
+          method: null,
+          reference: null,
+          detail: null,
+          amount: null,
+          currency: null,
+          provider: "email",
+          createdAt: sent.created_at,
+        });
+      }
+    }
+
+    timeline.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
 
     const delivered = (sends ?? []).length > 0 || timeline.some((t) => t.event === "delivery_sent");
     const paid = delivered ||

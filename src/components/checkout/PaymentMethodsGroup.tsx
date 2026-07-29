@@ -2212,6 +2212,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               </div>
             )}
           </div>
+          </React.Fragment>
         );
       })}
 

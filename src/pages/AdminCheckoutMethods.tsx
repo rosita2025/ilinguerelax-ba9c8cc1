@@ -333,10 +333,12 @@ export default function AdminCheckoutMethods() {
         if (note === null) continue; // no es método dLocal
         checked++;
         const should = dlocalCoverageEnabled(m.method_key, r.country_codes || []);
+        const label = dlocalLabelForCountries(m.method_key, r.country_codes || []) || m.label;
         const needsNote = (m.note || "") !== note;
+        const needsLabel = (m.label || "") !== label;
         const needsEnabled = should !== null && should !== m.enabled;
-        if (!needsNote && !needsEnabled) continue;
-        const payload: Method = { ...m, note, enabled: should ?? m.enabled };
+        if (!needsNote && !needsLabel && !needsEnabled) continue;
+        const payload: Method = { ...m, label, note, enabled: should ?? m.enabled };
         const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
           body: { action: "save_method", method: payload },
         });

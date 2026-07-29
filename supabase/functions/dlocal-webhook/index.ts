@@ -7,6 +7,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
+import { verifyDlocalSignature } from "../_shared/dlocal.ts";
 
 const API_BASE = "https://api.dlocalgo.com/v1";
 
@@ -22,13 +23,13 @@ async function fetchPayment(id: string) {
     headers: { Authorization: authHeader() },
   });
   const text = await r.text();
-  if (!r.ok) throw new Error(`dLocal GET /payments/${id} failed [${r.status}]: ${text}`);
+  if (!r.ok) throw new Error(`dLocal GET /payments/${id} failed [${r.status}]`);
   return JSON.parse(text);
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST" && req.method !== "GET") {
+  if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
 
@@ -36,22 +37,59 @@ Deno.serve(async (req) => {
   const q = url.searchParams;
 
   try {
-    const body = await req.json().catch(() => ({} as Record<string, unknown>));
+    const rawBody = await req.text();
+
+    // 1) Verificación de firma HMAC-SHA256 de dLocal Go (obligatoria).
+    const signatureOk = await verifyDlocalSignature(req, rawBody);
+    if (!signatureOk) {
+      console.warn("dLocal webhook rechazado: firma inválida o ausente");
+      return new Response(JSON.stringify({ error: "invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    let body: Record<string, unknown> = {};
+    try { body = rawBody ? JSON.parse(rawBody) : {}; } catch { body = {}; }
+
     const paymentId = String(
       (body as any)?.payment_id ?? (body as any)?.id ?? q.get("payment_id") ?? q.get("id") ?? "",
     ).trim();
 
-    if (!paymentId) {
-      console.log("dLocal webhook ignored: sin payment_id (probable bot/scanner)");
+    if (!paymentId || !/^[A-Za-z0-9_-]{4,80}$/.test(paymentId)) {
+      console.log("dLocal webhook ignorado: payment_id ausente o inválido");
       return new Response(JSON.stringify({ received: true, ignored: "no payment id" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // 2) Estado real consultado directamente a dLocal Go (nunca del body).
     const payment = await fetchPayment(paymentId);
     const status = String(payment.status || "").toUpperCase();
+    const ALLOWED_STATUS = ["PAID", "PENDING", "REJECTED", "CANCELLED", "EXPIRED", "AUTHORIZED", "VERIFIED", "EXPIRED_PARTIAL"];
+    if (!ALLOWED_STATUS.includes(status)) {
+      console.warn("dLocal webhook: estado desconocido", { paymentId, status });
+      return new Response(JSON.stringify({ received: true, ignored: "unknown status" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 3) El pago debe corresponder a una orden creada por nosotros.
+    const expectedOrder = (q.get("order") || "").trim();
+    const remoteOrder = String(payment.order_id || "").trim();
+    if (expectedOrder && remoteOrder && expectedOrder !== remoteOrder) {
+      console.warn("dLocal webhook rechazado: order_id no coincide", { paymentId });
+      return new Response(JSON.stringify({ error: "order mismatch" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     console.log("dLocal webhook:", { paymentId, status, order: payment.order_id });
+
+
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,

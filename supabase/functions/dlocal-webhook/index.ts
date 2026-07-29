@@ -7,7 +7,14 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
-import { verifyDlocalSignature, isSettledStatus, isPendingStatus } from "../_shared/dlocal.ts";
+import {
+  verifyDlocalSignature,
+  isSettledStatus,
+  isPendingStatus,
+  DLOCAL_SETTLED_STATUSES,
+  DLOCAL_PENDING_STATUSES,
+  DLOCAL_FAILED_STATUSES,
+} from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const API_BASE = "https://api.dlocalgo.com/v1";
@@ -93,7 +100,11 @@ Deno.serve(async (req) => {
     // 2) Estado real consultado directamente a dLocal Go (nunca del body).
     const payment = await fetchPayment(paymentId);
     const status = String(payment.status || "").toUpperCase();
-    const ALLOWED_STATUS = ["PAID", "PENDING", "REJECTED", "CANCELLED", "EXPIRED", "AUTHORIZED", "VERIFIED", "EXPIRED_PARTIAL"];
+    const ALLOWED_STATUS: readonly string[] = [
+      ...DLOCAL_SETTLED_STATUSES,
+      ...DLOCAL_PENDING_STATUSES,
+      ...DLOCAL_FAILED_STATUSES,
+    ];
     if (!ALLOWED_STATUS.includes(status)) {
       console.warn("dLocal webhook: estado desconocido", { paymentId, status });
       return new Response(JSON.stringify({ received: true, ignored: "unknown status" }), {
@@ -139,7 +150,7 @@ Deno.serve(async (req) => {
     const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
 
     await supabase.from("funnel_events").insert({
-      event_name: status === "PAID" ? "Purchase" : `dlocal_${status.toLowerCase()}`,
+      event_name: isSettledStatus(status) ? "Purchase" : `dlocal_${status.toLowerCase()}`,
       product_id: skus[0] || orderNumber,
       value: amount ?? null,
       currency,

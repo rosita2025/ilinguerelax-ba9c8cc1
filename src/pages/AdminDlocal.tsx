@@ -8,6 +8,7 @@ import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
+import { DLOCAL_COVERAGE } from "@/lib/dlocalCoverage";
 import { Building2, Banknote, Loader2, RefreshCw, Globe, CheckCircle2 } from "lucide-react";
 
 type Region = {
@@ -27,25 +28,8 @@ const METHOD_KEY: Record<Kind, string> = {
   cash: "dlocal_cash",
 };
 
-/** Países con cobertura dLocal Go (LatAm) + moneda local y rails disponibles. */
-const DLOCAL_COUNTRIES: {
-  code: string; name: string; flag: string; currency: string;
-  transfer: string[]; cash: string[];
-}[] = [
-  { code: "AR", name: "Argentina", flag: "🇦🇷", currency: "ARS", transfer: ["Transferencia CBU", "Mercado Pago"], cash: ["Rapipago", "Pago Fácil"] },
-  { code: "BO", name: "Bolivia", flag: "🇧🇴", currency: "BOB", transfer: ["Transferencia bancaria"], cash: ["Pago en efectivo"] },
-  { code: "BR", name: "Brasil", flag: "🇧🇷", currency: "BRL", transfer: ["Pix", "Transferencia"], cash: ["Boleto"] },
-  { code: "CL", name: "Chile", flag: "🇨🇱", currency: "CLP", transfer: ["Webpay / Transferencia"], cash: ["Servipag", "Multicaja"] },
-  { code: "CO", name: "Colombia", flag: "🇨🇴", currency: "COP", transfer: ["PSE", "Nequi", "Daviplata"], cash: ["Efecty", "Baloto"] },
-  { code: "CR", name: "Costa Rica", flag: "🇨🇷", currency: "CRC", transfer: ["Transferencia bancaria"], cash: ["Pago en efectivo"] },
-  { code: "EC", name: "Ecuador", flag: "🇪🇨", currency: "USD", transfer: ["Transferencia bancaria"], cash: ["Pago en efectivo", "Banco del Barrio"] },
-  { code: "GT", name: "Guatemala", flag: "🇬🇹", currency: "GTQ", transfer: ["Transferencia bancaria"], cash: ["Pago en efectivo"] },
-  { code: "MX", name: "México", flag: "🇲🇽", currency: "MXN", transfer: ["SPEI"], cash: ["OXXO", "7-Eleven"] },
-  { code: "PA", name: "Panamá", flag: "🇵🇦", currency: "USD", transfer: ["Transferencia bancaria"], cash: ["Pago en efectivo"] },
-  { code: "PE", name: "Perú", flag: "🇵🇪", currency: "PEN", transfer: ["Transferencia bancaria", "Yape/Plin"], cash: ["PagoEfectivo", "Agentes"] },
-  { code: "PY", name: "Paraguay", flag: "🇵🇾", currency: "PYG", transfer: ["Transferencia bancaria"], cash: ["Pago Express", "Aquí Pago"] },
-  { code: "UY", name: "Uruguay", flag: "🇺🇾", currency: "UYU", transfer: ["Transferencia bancaria"], cash: ["Abitab", "RedPagos"] },
-];
+/** Países con cobertura dLocal Go (fuente única: src/lib/dlocalCoverage.ts). */
+const DLOCAL_COUNTRIES = DLOCAL_COVERAGE;
 
 const LABELS: Record<Kind, { label: string; note: string; icon: string }> = {
   transfer: {

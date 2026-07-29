@@ -59,7 +59,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["BAC Credomatic", "Banco Nacional (BNCR)", "Banco de Costa Rica", "SINPE"], cash: ["BN Servicios", "PayCash", "PuntoXpress"],
     wallet: ["SINPE Móvil", "Kash", "Tapp"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "EC", name: "Ecuador", flag: "🇪🇨", currency: "USD",
-    transfer: ["Banco Pichincha", "Banco Guayaquil", "Produbanco", "Banco del Pacífico"], cash: ["Pago Efectivo", "Almacenes TIA", "Banco Amazonas", "Facilito"],
+    transfer: ["Banco Pichincha", "Banco Guayaquil", "Banco del Pacífico"], cash: ["Pago Efectivo", "Almacenes TIA", "Banco Amazonas", "Facilito"],
     wallet: ["DeUna", "Peigo", "Bimo"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "GT", name: "Guatemala", flag: "🇬🇹", currency: "GTQ",
     transfer: [], cash: ["PAYCASH (agentes)"],

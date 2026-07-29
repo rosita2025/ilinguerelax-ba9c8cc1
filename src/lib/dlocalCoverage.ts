@@ -258,3 +258,93 @@ export function dlocalBadges(
   });
 }
 
+
+/* ------------------------------------------------------------------
+ * Validación automática del checkout ↔ /admin/dlocal
+ * Garantiza que cada método dLocal mostrado (y sus etiquetas/badges)
+ * corresponda EXACTAMENTE a la cobertura activa del país seleccionado.
+ * ------------------------------------------------------------------ */
+
+export type DlocalMethodId =
+  | "dlocal_transfer"
+  | "dlocal_cash"
+  | "dlocal_wallet"
+  | "dlocal_card";
+
+export const DLOCAL_METHOD_KIND: Record<Exclude<DlocalMethodId, "dlocal_card">, DlocalKind> = {
+  dlocal_transfer: "transfer",
+  dlocal_cash: "cash",
+  dlocal_wallet: "wallet",
+};
+
+export function isDlocalMethodId(id: string): id is DlocalMethodId {
+  return id === "dlocal_transfer" || id === "dlocal_cash" || id === "dlocal_wallet" || id === "dlocal_card";
+}
+
+/** ¿Este rail está marcado como "Muy pronto" en /admin/dlocal? */
+export function dlocalComingSoon(country: string | null | undefined, kind: DlocalKind): boolean {
+  const c = getDlocalCountry(country);
+  if (!c) return false;
+  if (kind === "transfer") return !!c.transferComingSoon;
+  if (kind === "cash") return !!c.cashComingSoon;
+  return !!c.walletComingSoon;
+}
+
+export type DlocalValidation = { ok: boolean; reason?: string };
+
+/**
+ * Valida que un método dLocal pueda usarse en el país seleccionado según la
+ * cobertura activa. Se usa tanto para filtrar la lista como para bloquear el
+ * pago justo antes de crear la orden (defensa en profundidad).
+ */
+export function validateDlocalMethod(
+  country: string | null | undefined,
+  methodId: string,
+): DlocalValidation {
+  if (!isDlocalMethodId(methodId)) return { ok: true };
+  const code = (country || "").toUpperCase();
+  const c = getDlocalCountry(code);
+  if (!c) return { ok: false, reason: `dLocal Go no tiene cobertura activa para ${code || "este país"}.` };
+  if (methodId === "dlocal_card") return { ok: true };
+  const kind = DLOCAL_METHOD_KIND[methodId];
+  if (dlocalRails(code, kind).length === 0) {
+    return { ok: false, reason: `${c.name}: este método no tiene rails activos en la cobertura de dLocal.` };
+  }
+  if (dlocalComingSoon(code, kind)) {
+    return { ok: false, reason: `${c.name}: este método está marcado como "Muy pronto" y aún no acepta pagos.` };
+  }
+  return { ok: true };
+}
+
+/**
+ * Valida que las etiquetas/badges mostradas en el checkout provengan de la
+ * cobertura del país. Devuelve las etiquetas que NO existen en /admin/dlocal.
+ */
+export function findDlocalLabelMismatches(
+  country: string | null | undefined,
+  kind: DlocalKind,
+  labels: string[],
+): string[] {
+  const rails = dlocalRails(country, kind).map(normalize);
+  return labels.filter((l) => !rails.includes(normalize(l)));
+}
+
+/**
+ * Chequeo automático (solo en desarrollo) de que los badges renderizados
+ * coincidan con la cobertura. Avisa por consola si algo se desincroniza.
+ */
+export function auditDlocalCheckout(
+  country: string | null | undefined,
+  shown: { methodId: string; labels: string[] }[],
+): string[] {
+  const problems: string[] = [];
+  for (const m of shown) {
+    const v = validateDlocalMethod(country, m.methodId);
+    if (!v.ok) problems.push(`${m.methodId}: ${v.reason}`);
+    if (isDlocalMethodId(m.methodId) && m.methodId !== "dlocal_card") {
+      const bad = findDlocalLabelMismatches(country, DLOCAL_METHOD_KIND[m.methodId], m.labels);
+      if (bad.length) problems.push(`${m.methodId}: etiquetas fuera de cobertura → ${bad.join(", ")}`);
+    }
+  }
+  return problems;
+}

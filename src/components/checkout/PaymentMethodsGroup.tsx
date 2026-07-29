@@ -21,7 +21,7 @@ import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
-import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry } from "@/lib/dlocalCoverage";
+import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
@@ -550,6 +550,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     const ctry = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
+    // Guardia final: nunca crear una orden con un método fuera de la cobertura
+    // activa de /admin/dlocal para el país real del comprador.
+    const coverage = validateDlocalMethod(ctry, dlMethod);
+    if (!coverage.ok) {
+      setSelected(null);
+      setMethodError({ method: dlMethod, message: coverage.reason || "Método no disponible en tu país." });
+      toast({
+        title: "Método no disponible",
+        description: coverage.reason || "Elige otro método de pago para tu país.",
+        variant: "destructive",
+      });
+      return;
+    }
     const dlCurrency = DLOCAL_CURRENCY_BY_COUNTRY[ctry] ?? "USD";
     const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
     redirectingRef.current = true;
@@ -655,6 +668,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   const handleSelect = (m: Method) => {
     if (!valid) { requestBuyerInfo(); return; }
+    if (isDlocalMethodId(m)) {
+      const v = validateDlocalMethod(country, m);
+      if (!v.ok) {
+        setMethodError({ method: m, message: v.reason || "Método no disponible en tu país." });
+        return;
+      }
+    }
     void captureAbandonedCheckout(m, true);
     if (m !== selected) setShowStripe(false);
     setSelected(m);
@@ -1432,6 +1452,33 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       if (isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
+
+  // Validación automática: el método dLocal seleccionado y sus etiquetas deben
+  // coincidir siempre con la cobertura activa de /admin/dlocal para el país
+  // detectado. Si el país cambia y el método deja de estar cubierto, se
+  // deselecciona automáticamente y se avisa al comprador.
+  useEffect(() => {
+    if (!methodsConfig.loaded) return;
+    const shown = methods
+      .filter((m) => isDlocalMethodId(m.id))
+      .map((m) => ({ methodId: m.id as string, labels: (m.badges ?? []).map((b) => b.label) }));
+    const problems = auditDlocalCheckout(country, shown);
+    if (problems.length && import.meta.env.DEV) {
+      console.warn("[dLocal] Cobertura desincronizada con /admin/dlocal:", problems);
+    }
+    if (selected && isDlocalMethodId(selected)) {
+      const v = validateDlocalMethod(country, selected);
+      const stillVisible = methods.some((m) => m.id === selected);
+      if (!v.ok || !stillVisible) {
+        setSelected(null);
+        setMethodError({
+          method: selected,
+          message: v.reason || "Este método de pago no está disponible para tu país. Elige otro.",
+        });
+      }
+    }
+  }, [country, methods, methodsConfig.loaded, selected]);
+
 
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".

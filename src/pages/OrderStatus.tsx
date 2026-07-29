@@ -195,15 +195,8 @@ export default function OrderStatus() {
                   <div className="text-xs text-muted-foreground">Pedido</div>
                   <div className="font-semibold">{result.orderNumber}</div>
                 </div>
-                {result.amount != null && (
-                  <div className="text-right">
-                    <div className="text-xs text-muted-foreground">Total</div>
-                    <div className="font-semibold">
-                      {result.currency} {Number(result.amount).toFixed(2)}
-                    </div>
-                  </div>
-                )}
               </div>
+
 
               <div className="flex items-center">
                 {STAGES.map((s, i) => {

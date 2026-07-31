@@ -220,6 +220,8 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
       pingSitemap(),
       pingWebSub(),
+      // Google Indexing API (cuenta de servicio GOOGLE_INDEXING_SA_JSON)
+      notifyGoogleIndexing([postUrl], "URL_UPDATED"),
       resubmitSitemapsGSC(),
       inspectUrlGSC(postUrl),
     ]);

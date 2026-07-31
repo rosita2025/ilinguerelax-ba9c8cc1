@@ -161,61 +161,15 @@ export default function CheckoutSuccess() {
 
 
     (async () => {
-      // Client-side fallback for the "Gracias por su compra" + admin "New order"
-      // emails. Primary path is the provider webhook (stripe/paypal/mercadopago
-      // → sendThankYouEmail). If the webhook doesn't fire (missing endpoint,
-      // bad signing secret, network hiccup), the customer would never get the
-      // email. Using the SAME idempotencyKey the webhook uses means:
-      //   - if the webhook already ran, send-transactional-email dedupes and
-      //     this is a no-op (no duplicate email);
-      //   - if the webhook didn't run, this call actually delivers the email.
-      try {
-        const providerKey = String(paymentId || externalRef || paypalToken || orderNumber);
-        const payloadItems = items.map((i) => ({
-          name: i.name,
-          qty: i.quantity,
-          price: itemPrice(i, region.tier),
-        }));
-        const templateData = {
-          orderNumber,
-          customerName: buyer.fullName,
-          customerEmail: buyer.email,
-          customerPhone: buyer.phone,
-          productName: items[0]?.name,
-          items: payloadItems,
-          amount: total,
-          currency: "USD",
-          provider,
-          orderDate: new Date().toISOString(),
-        };
-        await Promise.all([
-          supabase.functions.invoke("send-transactional-email", {
-            body: {
-              templateName: "thank-you",
-              recipientEmail: buyer.email,
-              templateData,
-              idempotencyKey: `thank-you-${providerKey}`,
-              purpose: "transactional",
-            },
-          }),
-          supabase.functions.invoke("send-transactional-email", {
-            body: {
-              templateName: "admin-sale",
-              templateData,
-              idempotencyKey: `admin-sale-${providerKey}`,
-              purpose: "transactional",
-            },
-          }),
-          // La entrega digital ya NO se lanza desde el navegador: la ejecuta el
-          // webhook firmado de la pasarela tras confirmar el pago real.
-
-        ]);
-      } catch (e) {
-        console.error("thank-you fallback failed", e);
-      }
-
+      // Los correos ("Gracias por tu compra" + aviso al admin) y la entrega
+      // digital los envía ÚNICAMENTE el webhook firmado de la pasarela, tras
+      // confirmar el pago real. Desde el navegador ya no se dispara ningún
+      // correo: era un canal abierto que permitía enviar mensajes con la marca
+      // del dominio a cualquier dirección, y además generaba un segundo número
+      // de pedido para la misma compra.
       setTimeout(() => clear(), 1500);
     })();
+
 
     return () => {};
 

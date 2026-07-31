@@ -307,7 +307,8 @@ serve(async (req) => {
           pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
           pingSitemap(),
           pingWebSub(),
-
+          // Indexing API: aviso directo a Google (URL_UPDATED)
+          notifyGoogleIndexing([postUrl], "URL_UPDATED"),
           resubmitSitemapsGSC(),
           inspectUrlGSC(postUrl),
         ]);
@@ -322,13 +323,24 @@ serve(async (req) => {
 
       case "unpublish": {
         if (!body.id) return json({ error: "Missing id" }, 400);
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("generated_blog_posts")
           .update({ published: false })
-          .eq("id", body.id);
+          .eq("id", body.id)
+          .select("slug")
+          .maybeSingle();
         if (error) throw error;
+        // La página deja de existir públicamente: pedimos su retirada.
+        if (data?.slug) {
+          await notifyGoogleIndexing(
+            [`https://ilinguerelax.com/blog/${data.slug}`],
+            "URL_DELETED",
+          );
+        }
         return json({ ok: true });
       }
+
+
 
       case "reject": {
         if (!body.id) return json({ error: "Missing id" }, 400);

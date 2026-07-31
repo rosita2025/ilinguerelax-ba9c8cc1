@@ -97,7 +97,7 @@ export default function OrderStatus() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<OrderStatusResult | null>(null);
 
-  const lookup = async (body: Record<string, string>) => {
+  const lookup = async (body: Record<string, string>): Promise<boolean> => {
     setError(null);
     setResult(null);
     setLoading(true);
@@ -107,7 +107,7 @@ export default function OrderStatus() {
         const ctx = (fnError as { context?: Response }).context;
         if (ctx?.status === 429) {
           setError("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.");
-          return;
+          return false;
         }
         throw fnError;
       }
@@ -116,13 +116,15 @@ export default function OrderStatus() {
         setError(
           body.token
             ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
-            : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
+            : "No encontramos un pedido con ese número (o id de transacción) y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
         );
-      } else {
-        setResult(res);
+        return false;
       }
+      setResult(res);
+      return true;
     } catch {
       setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -136,8 +138,14 @@ export default function OrderStatus() {
 
   const search = async (e: React.FormEvent) => {
     e.preventDefault();
-    await lookup({ orderNumber: orderNumber.trim(), email: email.trim() });
+    const ref = orderNumber.trim();
+    const mail = email.trim();
+    // Un solo campo: aceptamos número de pedido o id de transacción del proveedor.
+    const looksLikeOrder = /^[A-Za-z0-9\-_]+$/.test(ref);
+    const ok = looksLikeOrder ? await lookup({ orderNumber: ref, email: mail }) : false;
+    if (!ok) await lookup({ transactionId: ref, email: mail });
   };
+
 
 
   const stageIndex = result?.stage ? STAGES.findIndex((s) => s.key === result.stage) : -1;
@@ -165,20 +173,20 @@ export default function OrderStatus() {
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Estado de mi pedido</h1>
           <p className="text-sm text-muted-foreground">
-            Ingresa tu número de pedido y el correo que usaste al comprar para ver si tu pago está
-            pendiente, pagado o ya entregado.
+            Ingresa tu número de pedido (o el id de transacción del pago) y el correo que usaste al
+            comprar para ver si tu pago está pendiente, pagado o ya entregado.
           </p>
         </div>
 
         <form onSubmit={search} className="rounded-xl border bg-card p-4 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="order">Número de pedido</Label>
+              <Label htmlFor="order">Número de pedido o id de transacción</Label>
               <Input
                 id="order"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="ILR-DL-XXXXXX"
+                placeholder="ILR-DL-XXXXXX o DP-1234567"
                 required
                 minLength={4}
               />

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { extractEdgeErrorMessage } from "@/lib/edgeError";
 
-import { Download, Loader2, Mail, ShieldCheck, Clock, Ban } from "lucide-react";
+import { Download, Loader2, Mail, ShieldCheck, Clock, Ban, History as HistoryIcon } from "lucide-react";
 
 type Bonus = { index: number; title: string };
 type Item = {
@@ -381,7 +381,7 @@ export default function MiDescarga() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <History className="h-4 w-4 text-primary" /> Historial de descargas
+                  <HistoryIcon className="h-4 w-4 text-primary" /> Historial de descargas
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm">

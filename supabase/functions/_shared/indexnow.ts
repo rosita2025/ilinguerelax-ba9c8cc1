@@ -69,13 +69,26 @@ export function productUrl(sku: string): string {
   return `https://${HOST}/products/${sku}`;
 }
 
+/**
+ * Feed VIVO del blog (Edge Function): refleja el post recién aprobado al
+ * instante, sin esperar el rebuild que regenera /sitemaps/sitemap-blog.xml.
+ */
+export const LIVE_BLOG_SITEMAP =
+  "https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/blog-feed?format=sitemap";
+export const LIVE_BLOG_RSS =
+  "https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/blog-feed?format=rss";
+
 export async function pingSitemap(
   feeds: string[] = [
+    // Primero los feeds vivos: ya contienen el post nuevo.
+    LIVE_BLOG_SITEMAP,
+    LIVE_BLOG_RSS,
     `https://${HOST}/sitemap.xml`,
     `https://${HOST}/sitemaps/sitemap-blog.xml`,
     `https://${HOST}/rss.xml`,
   ],
 ): Promise<void> {
+
   const events: IndexingEvent[] = [];
 
   await Promise.allSettled(

@@ -71,6 +71,9 @@ Crawl-delay: 2
 # Sitemap location
 Sitemap: https://ilinguerelax.com/sitemap.xml
 
+# RSS del blog (se regenera junto al sitemap)
+# https://ilinguerelax.com/rss.xml
+
 # IndexNow verification key (Bing / Yandex / Seznam auto-discovery)
 # Key file: https://ilinguerelax.com/ilinguerelax-indexnow-key.txt
 

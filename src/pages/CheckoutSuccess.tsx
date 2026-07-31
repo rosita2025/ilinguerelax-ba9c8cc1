@@ -11,18 +11,14 @@ import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { useToast } from "@/hooks/use-toast";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
-interface BonusEntry { name?: string; drive_url?: string; access_key?: string }
 interface DeliveryItem {
   sku: string;
   name: string;
-  drive_url: string | null;
-  access_key: string | null;
-  bonus_name: string | null;
-  bonus_drive_url: string | null;
-  bonus_access_key: string | null;
-  bonuses: BonusEntry[] | null;
   cover_image_url: string | null;
+  available: boolean;
+  bonus_count: number;
 }
+
 
 export default function CheckoutSuccess() {
   const [sp] = useSearchParams();

@@ -117,6 +117,8 @@ serve(async (req) => {
       action?: string;
       id?: string;
       startTomorrow?: boolean;
+      force?: boolean;
+      count?: number;
     };
 
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");

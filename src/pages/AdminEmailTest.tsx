@@ -627,8 +627,9 @@ const AdminEmailTest = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4">
-        <div className="max-w-7xl mx-auto space-y-5 md:space-y-6">
+      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto space-y-5 md:space-y-6 min-w-0">
+
           <header className="flex items-start justify-between gap-3 flex-wrap">
             <div className="min-w-0 flex-1">
               <h1 className="text-xl md:text-3xl font-bold flex items-center gap-2">

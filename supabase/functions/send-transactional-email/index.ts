@@ -133,6 +133,26 @@ Deno.serve(async (req) => {
     )
   }
 
+  // Puerta pública: desde el navegador solo se permiten los avisos de pago
+  // manual, y con límite por IP. Todo lo demás exige llamada interna.
+  if (!internal) {
+    if (!PUBLIC_TEMPLATES.has(templateName)) {
+      console.warn('[send-transactional-email] public call blocked', { templateName, callerIp })
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (publicRateLimited(callerIp)) {
+      return new Response(
+        JSON.stringify({ error: 'Too many requests' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
+
+
+
   // 1. Look up template from registry (early — needed to resolve recipient)
   const template = TEMPLATES[templateName]
 

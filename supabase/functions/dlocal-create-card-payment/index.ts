@@ -66,14 +66,16 @@ Deno.serve(async (req) => {
       throw e;
     }
     const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
-    // Si el navegador calculó otro total, NO bloqueamos la venta: cobramos el
-    // total del catálogo y reescalamos el importe en moneda local con la misma
-    // tasa de cambio que mostró la web.
+    // SEGURIDAD: el importe del navegador se descarta por completo.
     const clientUsd = body.expectedTotalUsd ?? null;
     if (clientUsd && Math.abs(calculatedUsd - clientUsd) > 0.01) {
-      console.warn("cart total adjusted", { clientUsd, calculatedUsd });
+      console.warn("cart total mismatch (ignorado)", { clientUsd, calculatedUsd });
     }
-    const fxScale = clientUsd && clientUsd > 0 ? calculatedUsd / clientUsd : 1;
+    const requestedCurrency = body.currency.toUpperCase();
+    const serverLocal = requestedCurrency === "USD" ? null : localAmountFromUsd(calculatedUsd, requestedCurrency);
+    const chargeCurrency = serverLocal == null ? "USD" : requestedCurrency;
+    const chargeAmount = serverLocal == null ? calculatedUsd : serverLocal;
+
 
     const orderId = body.orderId ?? `ILR-DLC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));

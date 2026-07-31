@@ -791,15 +791,15 @@ const AdminEmailTest = () => {
 
                 <tbody>
                   {tokenAccess.slice((tokenPage - 1) * TOKEN_PAGE_SIZE, tokenPage * TOKEN_PAGE_SIZE).map((r) => (
-                    <tr key={r.id} className="border-b last:border-0 hover:bg-muted/40">
-                      <td className="py-1.5 px-2 whitespace-nowrap">
-                        {new Date(r.created_at).toLocaleString("es-PE", { timeZone: "America/Lima" })}
+                    <tr key={r.id} className="border-b last:border-0 hover:bg-muted/40 align-top">
+                      <td className="py-1.5 px-2 break-words">
+                        {new Date(r.created_at).toLocaleString("es-PE", { timeZone: "America/Lima", day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
                       </td>
-                      <td className="py-1.5 px-2 font-mono">{r.order_number ?? "—"}</td>
-                      <td className="py-1.5 px-2 truncate max-w-[180px]">{r.email ?? "—"}</td>
-                      <td className="py-1.5 px-2 capitalize">{r.provider ?? "—"}</td>
+                      <td className="py-1.5 px-2 font-mono break-all">{r.order_number ?? "—"}</td>
+                      <td className="py-1.5 px-2 break-all">{r.email ?? "—"}</td>
+                      <td className="py-1.5 px-2 capitalize break-words">{r.provider ?? "—"}</td>
                       <td className="py-1.5 px-2">
-                        <span className={`px-1.5 py-0.5 rounded border text-[11px] ${
+                        <span className={`inline-block px-1.5 py-0.5 rounded border text-[11px] ${
                           r.action === "download"
                             ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                             : "border-muted bg-muted text-muted-foreground"
@@ -807,11 +807,13 @@ const AdminEmailTest = () => {
                           {r.action === "download" ? "Descarga" : r.action === "view" ? "Apertura" : r.action}
                         </span>
                       </td>
-                      <td className="py-1.5 px-2 truncate max-w-[220px]">{r.sku ?? "—"}</td>
-                      <td className="py-1.5 px-2 whitespace-nowrap">
+                      <td className="py-1.5 px-2 break-all">{r.sku ?? "—"}</td>
+                      <td className="py-1.5 px-2 break-words">
                         {r.download_count ?? 0}/{r.max_downloads ?? "—"}
                         {r.revoked ? <span className="ml-1 text-destructive">(revocado)</span> : null}
                       </td>
+                    </tr>
+
                     </tr>
                   ))}
                   {tokenAccess.length === 0 && (

@@ -66,6 +66,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminReviews = lazy(() => import("./pages/AdminReviews"));
 
 const AdminSEO = lazy(() => import("./pages/AdminSEO"));
+const AdminIndexing = lazy(() => import("./pages/AdminIndexing"));
 
 
 const AdminHome = lazy(() => import("./pages/AdminHome"));

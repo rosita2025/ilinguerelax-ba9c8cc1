@@ -924,6 +924,92 @@ export type Database = {
         }
         Relationships: []
       }
+      download_token_access: {
+        Row: {
+          action: string
+          created_at: string
+          id: number
+          ip: string | null
+          sku: string | null
+          token_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: number
+          ip?: string | null
+          sku?: string | null
+          token_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: number
+          ip?: string | null
+          sku?: string | null
+          token_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "download_token_access_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "download_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      download_tokens: {
+        Row: {
+          created_at: string
+          download_count: number
+          email: string
+          expires_at: string
+          id: string
+          last_accessed_at: string | null
+          last_sent_at: string | null
+          max_downloads: number
+          order_number: string
+          revoked: boolean
+          skus: string[]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          download_count?: number
+          email: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          last_sent_at?: string | null
+          max_downloads?: number
+          order_number: string
+          revoked?: boolean
+          skus?: string[]
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          download_count?: number
+          email?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          last_sent_at?: string | null
+          max_downloads?: number
+          order_number?: string
+          revoked?: boolean
+          skus?: string[]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_contacts: {
         Row: {
           created_at: string

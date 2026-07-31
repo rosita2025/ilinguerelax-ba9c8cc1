@@ -7,6 +7,7 @@ import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
+import { dlocalApiBase } from "../_shared/dlocal.ts";
 
 
 // SEGURIDAD: el navegador solo aporta id y cantidad; precio, nombre y cupón

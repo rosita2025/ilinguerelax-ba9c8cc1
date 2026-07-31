@@ -6,6 +6,7 @@ import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
+import { dlocalApiBase } from "../_shared/dlocal.ts";
 
 // SEGURIDAD: precio/nombre del cliente se ignoran; se resuelven en servidor.
 const ItemSchema = z.object({

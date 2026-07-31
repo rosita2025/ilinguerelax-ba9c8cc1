@@ -147,6 +147,16 @@ const AdminEmailTest = () => {
   const [auditAlert, setAuditAlert] = useState<{ errors: number; partial: number; last?: string } | null>(null);
   // Catálogo activo (SKUs válidos) para validar antes de reenviar
   const [catalogSkus, setCatalogSkus] = useState<Set<string>>(new Set());
+  const [catalogList, setCatalogList] = useState<ProductMeta[]>([]);
+  // Envío de prueba (material real: principal + upsells + bonos)
+  const [testEmail, setTestEmail] = useState("youtumundial2017@gmail.com");
+  const [testSkus, setTestSkus] = useState<string[]>([
+    "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
+    "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+    "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  ]);
+  const [sendingTest, setSendingTest] = useState(false);
+
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);

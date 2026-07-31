@@ -27,8 +27,10 @@ const BodySchema = z.object({
   payerDocument: z.string().max(30).optional(),
   country: z.string().length(2),
   currency: z.string().length(3).default("USD"),
-  amount: z.number().positive().max(200000),
+  // Ignorados: el importe se calcula en el servidor (catálogo + FX propio).
+  amount: z.number().positive().max(200000).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
+
   successUrl: z.string().url(),
   backUrl: z.string().url(),
 });

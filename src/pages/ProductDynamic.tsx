@@ -88,19 +88,11 @@ const ProductDynamic = () => {
       setLoading(false);
     };
     load();
-    const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load });
-    const channel = supabase
-      .channel(`product_dynamic_${slug}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "digital_products", filter: `sku=eq.${slug}` },
-        () => { load(); }
-      )
-      .subscribe();
+    // Realtime desactivado por seguridad: reemplazado por broadcast + sondeo.
+    const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load, pollMs: 60000 });
     return () => {
       cancelled = true;
       unsubscribe();
-      supabase.removeChannel(channel);
     };
   }, [slug]);
 

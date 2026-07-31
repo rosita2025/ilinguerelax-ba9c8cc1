@@ -166,19 +166,31 @@ const PaymentSuccess = () => {
               transition={{ delay: 0.5 }}
             >
               <h2 className="text-2xl font-bold text-foreground mb-4">
-                📚 Download Your eBook
+                📚 Your Download
               </h2>
-              <p className="text-muted-foreground mb-6">
-                Click the button below to access your Spanish Relax - 5,000 Words PDF
-              </p>
-              <Button 
-                onClick={handleDownload}
-                size="lg" 
-                className="bg-green-500 hover:bg-green-600 text-white font-bold text-lg px-8 py-6 h-auto"
-              >
-                <Download className="w-6 h-6 mr-2" />
-                Download Now
-              </Button>
+              {downloadToken ? (
+                <>
+                  <p className="text-muted-foreground mb-6">
+                    Open your private download page to access your files.
+                  </p>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-green-500 hover:bg-green-600 text-white font-bold text-lg px-8 py-6 h-auto"
+                  >
+                    <Link to={`/mi-descarga?t=${encodeURIComponent(downloadToken)}`}>
+                      <Download className="w-6 h-6 mr-2" />
+                      Open My Downloads
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  We've sent your private download link to your email. Please check your
+                  inbox (and spam folder). If you don't receive it, contact us below.
+                </p>
+              )}
+
             </motion.div>
 
             {/* Contact Info Card */}

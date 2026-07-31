@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     let pricing;
     try {
       pricing = await resolveServerPricing({
-        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
         country: body.country,
         couponCode: body.couponCode,
       });
@@ -64,12 +64,14 @@ Deno.serve(async (req) => {
       throw e;
     }
     const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
-    if (body.expectedTotalUsd && Math.abs(calculatedUsd - body.expectedTotalUsd) > 0.01) {
-      return json({ error: "Cart total mismatch" }, 400);
+    // Si el navegador calculó otro total, NO bloqueamos la venta: cobramos el
+    // total del catálogo y reescalamos el importe en moneda local con la misma
+    // tasa de cambio que mostró la web.
+    const clientUsd = body.expectedTotalUsd ?? null;
+    if (clientUsd && Math.abs(calculatedUsd - clientUsd) > 0.01) {
+      console.warn("cart total adjusted", { clientUsd, calculatedUsd });
     }
-    if (body.currency.toUpperCase() !== "USD" && !body.expectedTotalUsd) {
-      return json({ error: "Cart total mismatch" }, 400);
-    }
+    const fxScale = clientUsd && clientUsd > 0 ? calculatedUsd / clientUsd : 1;
 
     const orderId = body.orderId ?? `ILR-DLC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
@@ -97,7 +99,7 @@ Deno.serve(async (req) => {
       // usa el importe ya validado contra expectedTotalUsd.
       amount: body.currency.toUpperCase() === "USD"
         ? calculatedUsd
-        : Number(body.amount.toFixed(2)),
+        : Number((body.amount * fxScale).toFixed(2)),
       currency: body.currency.toUpperCase(),
       country: body.country.toUpperCase(),
       order_id: orderId,

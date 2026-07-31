@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     let pricing;
     try {
       pricing = await resolveServerPricing({
-        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
         country: body.country ?? "PE",
         couponCode: body.couponCode,
       });
@@ -82,10 +82,11 @@ Deno.serve(async (req) => {
     const calculatedTotalUsd = Number(pricing.totalUsd.toFixed(2));
 
     if (body.expectedTotalUsd && Math.abs(calculatedTotalUsd - body.expectedTotalUsd) > 0.01) {
-      return new Response(
-        JSON.stringify({ error: "Cart total mismatch" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      // No bloqueamos la venta: cobramos el total del catálogo y lo registramos.
+      console.warn("cart total adjusted", {
+        clientUsd: body.expectedTotalUsd,
+        calculatedUsd: calculatedTotalUsd,
+      });
     }
 
     // Enviamos precios en USD y dejamos que Mercado Pago aplique el tipo de

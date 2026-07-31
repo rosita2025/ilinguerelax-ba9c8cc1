@@ -143,6 +143,15 @@ const BlogScheduleCard = () => {
           {busy === "run-now" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <PlayCircle className="h-4 w-4 mr-1" />}
           Procesar ahora
         </Button>
+        <Button
+          size="sm"
+          onClick={() => run("run-now", { force: true, count: 2 }, "Generando borradores…")}
+          disabled={busy === "run-now-force"}
+        >
+          {busy === "run-now-force" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Zap className="h-4 w-4 mr-1" />}
+          Generar 2 ahora (borradores)
+        </Button>
+
         <Button size="sm" variant="ghost" onClick={() => run("clear", {}, "Pendientes eliminados")} disabled={busy === "clear"}>
           <Trash2 className="h-4 w-4 mr-1" /> Limpiar pendientes
         </Button>

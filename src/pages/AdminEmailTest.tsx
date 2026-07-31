@@ -727,7 +727,7 @@ const AdminEmailTest = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tokenAccess.map((r) => (
+                  {tokenAccess.slice((tokenPage - 1) * TOKEN_PAGE_SIZE, tokenPage * TOKEN_PAGE_SIZE).map((r) => (
                     <tr key={r.id} className="border-b last:border-0 hover:bg-muted/40">
                       <td className="py-1.5 px-2 whitespace-nowrap">
                         {new Date(r.created_at).toLocaleString("es-PE", { timeZone: "America/Lima" })}

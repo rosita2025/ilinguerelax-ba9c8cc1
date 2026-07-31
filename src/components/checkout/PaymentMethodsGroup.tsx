@@ -1556,26 +1556,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const s = useCheckoutPruebaStore.getState();
     const orderId = `ilr-free-${Date.now()}`;
     try {
-      await supabase.functions.invoke("send-order-confirmation", {
-        body: {
-          customerEmail: s.buyer.email.trim(),
-          customerName: s.buyer.fullName.trim(),
-          orderId,
-          total: 0,
-          currency: "USD",
-          paymentProvider: "free-coupon",
-          items: s.items.map((i) => ({
-            id: i.id, name: i.name, quantity: i.quantity,
-            price: itemPrice(i, region.tier), image: i.image,
-          })),
-        },
-      });
+      // El correo de confirmación/entrega ya NO se dispara desde el navegador:
+      // la página de éxito resuelve el pedido con `order-delivery` (service-role)
+      // y genera el enlace privado /mi-descarga?t=<token>.
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
         source: "checkout-prueba-1",
         metadata: { processor: "free-coupon", coupon: s.coupon ?? "" },
       }, { onConflict: "email,source" }).then(() => {});
+
     } catch (e) {
       console.error("free order confirmation failed", e);
     } finally {

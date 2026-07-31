@@ -63,7 +63,9 @@ export default function CheckoutSuccess() {
   const t = getCheckoutStrings(language);
   const { toast } = useToast();
   const [delivery, setDelivery] = useState<DeliveryItem[]>([]);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [deliveryLoading, setDeliveryLoading] = useState(false);
+
 
   // Build a friendly order number: ILR-<PROVIDER>-<6 chars>
   // Deterministic from the payment reference so the same payment always maps

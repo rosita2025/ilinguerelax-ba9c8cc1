@@ -28,11 +28,14 @@ const BodySchema = z.object({
   country: z.string().length(2),
   paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
   currency: z.string().length(3).default("USD"),
-  amount: z.number().positive().max(200000),
+  // Aceptados por compatibilidad con clientes viejos, pero IGNORADOS: el
+  // importe se calcula siempre en el servidor desde el catálogo + FX propio.
+  amount: z.number().positive().max(200000).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
   successUrl: z.string().url(),
   backUrl: z.string().url(),
 });
+
 
 
 const json = (b: unknown, s = 200) =>

@@ -80,6 +80,7 @@ export default function MiDescarga() {
   const bonusCount = counts?.bonuses ?? items.reduce((n, i) => n + i.bonuses.length, 0);
   const maxDownloads = state.status === "valid" ? state.maxDownloads ?? 0 : 0;
   const usedDownloads = state.status === "valid" ? state.downloadsUsed ?? 0 : 0;
+  const history = state.status === "valid" ? state.history ?? [] : [];
 
 
   const openFile = async (sku: string, kind: "main" | "bonus", index = 0) => {
@@ -96,8 +97,24 @@ export default function MiDescarga() {
       if (data.accessKey) toast.success(`Clave de acceso: ${data.accessKey}`, { duration: 12000 });
       window.open(data.url as string, "_blank", "noopener,noreferrer");
       setState((prev) =>
-        prev.status === "valid" ? { ...prev, downloadsLeft: Number(data.downloadsLeft ?? prev.downloadsLeft) } : prev,
+        prev.status === "valid"
+          ? {
+              ...prev,
+              downloadsLeft: Number(data.downloadsLeft ?? prev.downloadsLeft),
+              downloadsUsed: (prev.downloadsUsed ?? 0) + 1,
+              history: [
+                {
+                  action: "download",
+                  sku,
+                  name: prev.items?.find((i) => i.sku === sku)?.name ?? sku,
+                  at: new Date().toISOString(),
+                },
+                ...(prev.history ?? []),
+              ].slice(0, 30),
+            }
+          : prev,
       );
+
     } finally {
       setBusy(null);
     }

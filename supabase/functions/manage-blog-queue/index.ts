@@ -181,10 +181,33 @@ serve(async (req) => {
       }
 
       case "run-now": {
+        // Con `force`, adelanta los próximos pendientes a "ahora" para que la
+        // cola los genere de inmediato (si no, solo corre lo que ya vencía).
+        let forced = 0;
+        if (body.force) {
+          const take = Math.min(Math.max(Number(body.count ?? 2) || 2, 1), 5);
+          const { data: next } = await supabase
+            .from("blog_post_queue")
+            .select("id")
+            .eq("status", "pending")
+            .order("scheduled_at", { ascending: true })
+            .limit(take);
+          const ids = (next ?? []).map((r) => r.id as string);
+          if (ids.length) {
+            await supabase
+              .from("blog_post_queue")
+              .update({ scheduled_at: new Date().toISOString() })
+              .in("id", ids);
+            forced = ids.length;
+          }
+        }
+
         const res = await invokeInternalFunction("process-blog-queue", {});
         if (res.error) return json({ error: res.error.message }, 502);
-        return json({ ok: true, result: res.data });
+        const result = (res.data ?? {}) as { processed?: number };
+        return json({ ok: true, forced, processed: result.processed ?? 0, result: res.data });
       }
+
 
       // ---- Flujo de aprobación editorial ----
       case "list-drafts": {

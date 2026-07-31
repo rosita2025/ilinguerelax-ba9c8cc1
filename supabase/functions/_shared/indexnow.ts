@@ -16,7 +16,8 @@ const ENDPOINTS = [
   { name: "naver",    url: "https://searchadvisor.naver.com/indexnow" },
 ];
 
-const MAX_ATTEMPTS = 3;
+const MAX_ATTEMPTS = 2;
+const FETCH_TIMEOUT_MS = 4_000;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -32,7 +33,13 @@ async function fetchRetry(
   let lastError = "";
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      const res = await fetch(url, init);
+      // Ningún buscador externo puede mantener viva indefinidamente la Edge
+      // Function. El reintento manual del admin debe responder aun cuando
+      // Yandex/Naver/Baidu estén lentos o caídos.
+      const res = await fetch(url, {
+        ...init,
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
       const ok = res.status === 200 || res.status === 202 || res.ok;
       const retryable = res.status === 429 || res.status >= 500;
       // Consumimos el body para liberar la conexión en Deno.

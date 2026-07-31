@@ -38,6 +38,7 @@ const BATCH_URL = "https://indexing.googleapis.com/batch";
 const DAILY_PUBLISH_QUOTA = 200;
 /** Máximo de llamadas por solicitud batch según la documentación. */
 const MAX_BATCH = 100;
+const FETCH_TIMEOUT_MS = 8_000;
 
 export type NotificationType = "URL_UPDATED" | "URL_DELETED";
 
@@ -126,6 +127,7 @@ async function accessToken(): Promise<string | null> {
         grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
         assertion,
       }),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.access_token) {
@@ -222,6 +224,7 @@ async function publishBatch(
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ url: urls[0], type }),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     const text = await res.text().catch(() => "");
     if (!res.ok) console.warn("[googleIndexing] publish", res.status, text.slice(0, 240));
@@ -266,6 +269,7 @@ async function publishBatch(
       "Content-Type": `multipart/mixed; boundary="${boundary}"`,
     },
     body,
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   const text = await res.text().catch(() => "");
   if (!res.ok) console.warn("[googleIndexing] batch", res.status, text.slice(0, 240));
@@ -351,6 +355,7 @@ export async function getIndexingMetadata(url: string): Promise<unknown | null> 
   try {
     const res = await fetch(`${METADATA_URL}?url=${encodeURIComponent(url)}`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     const data = await res.json().catch(() => null);
     if (!res.ok) {

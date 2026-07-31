@@ -15,7 +15,7 @@ import {
 import type { TemplateEntry } from './registry.ts'
 
 /**
- * Recordatorio de pago pendiente (días 1, 3, 7, 10 y 15).
+ * Recordatorio de pago pendiente (días 1, 2 y 3).
  *
  * Se envía SOLO mientras el pedido siga sin pagar. Cuando el pago se acredita
  * (transferencia, efectivo, billetera digital o aceptación manual del admin)
@@ -58,12 +58,10 @@ const dayMessage = (day?: number, isLast?: boolean) => {
   switch (day) {
     case 1:
       return 'Ayer reservamos tu pedido y todavía no vemos el pago acreditado. Si ya pagaste con transferencia o en efectivo, puede tardar unas horas: envíanos tu comprobante y lo confirmamos al instante.'
+    case 2:
+      return 'Tu pedido continúa pendiente. En pagos por transferencia, efectivo o billetera digital, la acreditación del proveedor puede tardar entre 24 y 72 horas.'
     case 3:
-      return 'Han pasado 3 días y tu pedido sigue pendiente de pago. Tu material está reservado y listo para enviarse apenas confirmemos el pago.'
-    case 7:
-      return 'Ya pasó una semana desde tu pedido. Aún puedes completar el pago con transferencia, efectivo o billetera digital y recibir tu material el mismo día.'
-    case 10:
-      return 'Tu pedido lleva 10 días esperando el pago. Si tuviste algún problema con la transferencia o el pago en efectivo, escríbenos y te ayudamos paso a paso.'
+      return 'Este es el último aviso de tu pedido. Si ya pagaste, envíanos el comprobante por WhatsApp para ayudarte a verificarlo.'
     default:
       return 'Tu pedido sigue pendiente de pago. Complétalo cuando quieras y recibirás tu material digital apenas confirmemos el pago.'
   }
@@ -97,9 +95,8 @@ const Email = ({
           <Text style={hiTitle}>¡Hola {customerName || ''}! 👋</Text>
           <Text style={hiLine}>{dayMessage(day, isLast)}</Text>
           <Text style={hiLine}>
-            Envía tu comprobante a <strong>hola@ilinguerelax.com</strong> indicando tu pedido{' '}
-            <strong>#{orderNumber || '—'}</strong>. Nuestra supervisora <strong>Rosa</strong> lo verifica
-            y te enviamos el enlace de tu material.
+            Si ya pagaste, envía el voucher por WhatsApp al <strong>+1 251 272 4704</strong> e indica:
+            nombre, pedido <strong>#{orderNumber || '—'}</strong>, producto y método de pago. También puedes escribir a <strong>hola@ilinguerelax.com</strong>.
           </Text>
         </Section>
 
@@ -123,6 +120,9 @@ const Email = ({
           <Text style={trackTitle}>📦 Revisa el estado de tu pedido</Text>
           <Text style={{ textAlign: 'center' as const, margin: '12px 0' }}>
             <a href={trackingUrl(orderNumber, customerEmail)} style={trackBtn}>Ver estado de mi pedido</a>
+          </Text>
+          <Text style={{ textAlign: 'center' as const, margin: '12px 0' }}>
+            <a href={`https://wa.me/12512724704?text=${encodeURIComponent(`Hola, ya pagué el pedido ${orderNumber || ''}. Adjunto mi comprobante.`)}`} style={whatsappBtn}>Enviar comprobante por WhatsApp</a>
           </Text>
           <Text style={trackHint}>
             www.ilinguerelax.com/mi-pedido — ingresa tu pedido <strong>#{orderNumber || '—'}</strong> y tu correo.
@@ -174,4 +174,5 @@ const footer = { textAlign: 'center' as const, color: '#9ca3af', fontSize: '12px
 const trackBox = { backgroundColor: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: '10px', padding: '16px', margin: '18px 0' }
 const trackTitle = { margin: '0 0 6px', fontSize: '15px', fontWeight: 'bold' as const, color: '#0f766e' }
 const trackBtn = { backgroundColor: '#0d9488', color: '#ffffff', textDecoration: 'none', padding: '11px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
+const whatsappBtn = { backgroundColor: '#15803d', color: '#ffffff', textDecoration: 'none', padding: '11px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
 const trackHint = { margin: '6px 0 0', fontSize: '12px', color: '#0f766e', textAlign: 'center' as const }

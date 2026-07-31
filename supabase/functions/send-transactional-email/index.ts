@@ -189,6 +189,37 @@ Deno.serve(async (req) => {
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // Idempotencia común para todos los correos. Webhook, conciliación y barrido
+  // pueden descubrir el mismo pago casi al mismo tiempo; todos comparten esta
+  // clave y solo el primer envío continúa. Un pending reciente también reserva
+  // la clave mientras Brevo responde, evitando la carrera más habitual.
+  if (idempotencyKey) {
+    messageId = idempotencyKey
+    const recentCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+    const { data: priorSend, error: priorSendError } = await supabase
+      .from('email_send_log')
+      .select('status, created_at')
+      .eq('message_id', idempotencyKey)
+      .in('status', ['pending', 'sent'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (priorSendError) {
+      console.error('Idempotency check failed — refusing to risk duplicate email', priorSendError)
+      return new Response(
+        JSON.stringify({ error: 'Failed to verify email idempotency' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
+    if (priorSend && (priorSend.status === 'sent' || priorSend.created_at >= recentCutoff)) {
+      return new Response(
+        JSON.stringify({ success: true, sent: false, duplicate: true }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
+  }
+
   // 1.b Anti-duplicados del aviso de venta al admin.
   // Un mismo cliente puede generar 2 pedidos en la pasarela (reintento, doble
   // clic, webhook + página de éxito) con los mismos productos. El admin solo

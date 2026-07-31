@@ -23,7 +23,7 @@ interface Args {
   bonuses?: string[];
   amount?: number;
   currency?: string;
-  provider: "stripe" | "paypal" | "mercadopago";
+  provider: "stripe" | "paypal" | "mercadopago" | "dlocalgo" | string;
   orderNumber?: string;
   idempotencyKey?: string;
   couponCode?: string;
@@ -42,7 +42,7 @@ function buildOrderNumber(provider: string, seed?: string): string {
   const d = new Date();
   const ymd = `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`;
   const suffix = (seed || crypto.randomUUID()).replace(/[^a-zA-Z0-9]/g, "").slice(-6).toUpperCase();
-  const prefix = provider === "stripe" ? "ILR-ST" : provider === "paypal" ? "ILR-PP" : "ILR-MP";
+  const prefix = provider === "stripe" ? "ILR-ST" : provider === "paypal" ? "ILR-PP" : provider === "dlocalgo" ? "ILR-DL" : "ILR-MP";
   return `${prefix}-${ymd}-${suffix}`;
 }
 

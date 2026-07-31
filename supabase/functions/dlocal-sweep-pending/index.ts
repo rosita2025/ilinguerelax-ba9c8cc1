@@ -178,9 +178,9 @@ Deno.serve(async (req) => {
                 skus,
                 amount,
                 currency,
-                provider: "mercadopago",
+                provider: "dlocalgo",
                 orderNumber,
-                idempotencyKey: `sweep-paid-${orderNumber}`,
+                idempotencyKey: `dlocal-paid-${orderNumber}`,
               });
             } catch (e) {
               console.error("[dlocal-sweep] thank-you falló:", e instanceof Error ? e.message : String(e));

@@ -208,9 +208,9 @@ export default function CheckoutSuccess() {
               purpose: "transactional",
             },
           }),
-          // Digital delivery: send immediately (no 90s delay) so it goes out
-          // even if the buyer closes the tab. Idempotency key dedupes retries.
-          sendDigitalEmail().catch((e) => console.error("send-digital-ilinguerelax failed", e)),
+          // La entrega digital ya NO se lanza desde el navegador: la ejecuta el
+          // webhook firmado de la pasarela tras confirmar el pago real.
+
         ]);
       } catch (e) {
         console.error("thank-you fallback failed", e);

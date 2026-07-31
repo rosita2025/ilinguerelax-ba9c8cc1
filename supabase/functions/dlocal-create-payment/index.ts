@@ -180,7 +180,34 @@ Deno.serve(async (req) => {
     const payerName = cleanName.includes(" ") ? cleanName : `${cleanName} .`;
     const rawPhone = (body.payerPhone ?? "").replace(/[^\d+]/g, "");
     const payerPhone = rawPhone.replace(/\+/g, "").length >= 8 ? rawPhone : undefined;
-    const payerDocument = (body.payerDocument ?? "").replace(/[^\dA-Za-z]/g, "") || undefined;
+    const rawDocument = (body.payerDocument ?? "").replace(/[^\dA-Za-z]/g, "").toUpperCase();
+    // dLocal exige documento del pagador para transferencia/efectivo en LatAm.
+    // Si el número no cumple el formato del país lo descartamos: es preferible
+    // que dLocal se lo pida en su checkout a enviar un "documento inválido"
+    // que hace que la transacción nunca se apruebe.
+    const DOC_RULES: Record<string, RegExp> = {
+      AR: /^\d{7,11}$/,          // DNI / CUIT
+      BO: /^\d{5,12}$/,          // CI
+      BR: /^(\d{11}|\d{14})$/,   // CPF / CNPJ
+      CL: /^\d{7,8}[0-9K]$/,     // RUT con dígito verificador
+      CO: /^\d{6,12}$/,          // CC / NIT
+      CR: /^\d{9,12}$/,
+      EC: /^\d{10,13}$/,
+      GT: /^\d{8,13}$/,
+      MX: /^[A-Z0-9]{10,18}$/,   // CURP / RFC
+      PA: /^[A-Z0-9]{6,20}$/,
+      PE: /^(\d{8}|\d{11})$/,    // DNI / RUC
+      PY: /^\d{5,12}$/,
+      UY: /^\d{7,8}$/,           // CI
+    };
+    const docRule = DOC_RULES[body.country.toUpperCase()];
+    const payerDocument = rawDocument && (!docRule || docRule.test(rawDocument))
+      ? rawDocument
+      : undefined;
+
+    // Vencimiento corto para transferencia/efectivo: dLocal por defecto deja
+    // 15-20 días, lo que congela el pedido. 3 días acelera la conciliación.
+    const EXPIRATION_DAYS = 3;
 
     type PayloadOpts = { minimal?: boolean };
     const payloadFor = (amount: number, currency: string, opts: PayloadOpts = {}): Record<string, unknown> => ({
@@ -191,6 +218,8 @@ Deno.serve(async (req) => {
       description,
       success_url: body.successUrl,
       back_url: body.backUrl,
+      expiration_type: "DAYS",
+      expiration_value: EXPIRATION_DAYS,
       ...(notificationUrl ? { notification_url: notificationUrl } : {}),
       payer: {
         name: payerName,
@@ -202,6 +231,7 @@ Deno.serve(async (req) => {
         ...(!opts.minimal && payerDocument ? { document: payerDocument } : {}),
       },
     });
+
 
     const basePayload = payloadFor(localAmount, localCurrency);
 

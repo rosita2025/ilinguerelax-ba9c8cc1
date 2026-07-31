@@ -18,6 +18,10 @@ import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { isSettledStatus } from "../_shared/dlocal.ts";
+import { randomToken } from "../_shared/downloadToken.ts";
+
+const SITE = "https://www.ilinguerelax.com";
+
 
 const API_BASE = "https://api.dlocalgo.com/v1";
 

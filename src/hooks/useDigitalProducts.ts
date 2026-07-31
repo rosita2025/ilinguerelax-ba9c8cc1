@@ -94,21 +94,15 @@ export function useDigitalProducts() {
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
 
-    // Live-refresh via Supabase realtime whenever the admin edits a product.
-    const channel = supabase
-      .channel("digital_products_public_feed")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "digital_products" },
-        () => { fetchAll(); }
-      )
-      .subscribe();
+    // Realtime sobre `digital_products` fue desactivado por seguridad
+    // (enviaba la fila completa, con enlaces de descarga, al navegador).
+    const poll = window.setInterval(() => { fetchAll(); }, 60000);
 
     return () => {
       cancelled = true;
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
-      supabase.removeChannel(channel);
+      window.clearInterval(poll);
     };
   }, []);
 

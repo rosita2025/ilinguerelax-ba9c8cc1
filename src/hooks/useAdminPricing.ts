@@ -109,23 +109,13 @@ export function useAdminPricing(sku: string): AdminPricing {
 
     fetchOne();
 
-    // Refetch when the admin publishes an edit (cross-tab broadcast, focus, bfcache, etc.)
-    const unsubscribeLocal = subscribeCatalogUpdates({ sku, onUpdate: fetchOne });
-
-    // Realtime: any change to this row in Supabase updates the detail page live.
-    const channel = supabase
-      .channel(`admin_pricing_${sku}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "digital_products", filter: `sku=eq.${sku}` },
-        () => { fetchOne(); }
-      )
-      .subscribe();
+    // Refetch when the admin publishes an edit (cross-tab broadcast, focus, bfcache, poll).
+    // Realtime fue desactivado por seguridad: la fila completa incluía los enlaces.
+    const unsubscribeLocal = subscribeCatalogUpdates({ sku, onUpdate: fetchOne, pollMs: 60000 });
 
     return () => {
       cancelled = true;
       unsubscribeLocal();
-      supabase.removeChannel(channel);
     };
   }, [sku]);
 

@@ -138,26 +138,18 @@ export async function pingSitemap(
 
       await Promise.allSettled(
         endpoints.map(async ({ name, url }) => {
-          try {
-            const res = await fetch(url, { method: "GET" });
-            console.log(`[sitemap-ping:${name}]`, sitemap, res.status);
-            events.push({
-              url: sitemap,
-              channel: "sitemap_ping",
-              target: name,
-              status: res.ok ? "sent" : "error",
-              http_status: res.status,
-            });
-          } catch (err) {
-            console.warn(`[sitemap-ping:${name}] ${sitemap} failed:`, (err as Error).message);
-            events.push({
-              url: sitemap,
-              channel: "sitemap_ping",
-              target: name,
-              status: "error",
-              detail: (err as Error).message.slice(0, 240),
-            });
-          }
+          const r = await fetchRetry(url, { method: "GET" }, `sitemap-ping:${name}`);
+          console.log(`[sitemap-ping:${name}]`, sitemap, r.status, r.ok ? "OK" : "FALLO");
+          events.push({
+            url: sitemap,
+            channel: "sitemap_ping",
+            target: name,
+            status: r.ok ? "sent" : "error",
+            http_status: r.status || undefined,
+            detail: r.ok
+              ? undefined
+              : `dead_letter after ${r.attempts} attempts${r.error ? `: ${r.error}` : ""}`.slice(0, 240),
+          });
         })
       );
     })
@@ -167,10 +159,55 @@ export async function pingSitemap(
 }
 
 /**
+ * WebSub / PubSubHubbub: notifica a los hubs para que los agregadores y
+ * Google News descubran el post en segundos vía RSS.
+ */
+export async function pingWebSub(
+  feeds: string[] = [`https://${HOST}/rss.xml`, LIVE_BLOG_RSS],
+): Promise<void> {
+  const hubs = [
+    { name: "pubsubhubbub", url: "https://pubsubhubbub.appspot.com/" },
+    { name: "websubhub", url: "https://websubhub.com/hub" },
+  ];
+  const events: IndexingEvent[] = [];
+
+  await Promise.allSettled(
+    feeds.flatMap((feed) =>
+      hubs.map(async ({ name, url }) => {
+        const body = new URLSearchParams({ "hub.mode": "publish", "hub.url": feed }).toString();
+        const r = await fetchRetry(
+          url,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body,
+          },
+          `websub:${name}`,
+        );
+        console.log(`[websub:${name}]`, feed, r.status, r.ok ? "OK" : "FALLO");
+        events.push({
+          url: feed,
+          channel: "sitemap_ping",
+          target: `websub_${name}`,
+          status: r.ok ? "sent" : "error",
+          http_status: r.status || undefined,
+          detail: r.ok
+            ? undefined
+            : `dead_letter after ${r.attempts} attempts${r.error ? `: ${r.error}` : ""}`.slice(0, 240),
+        });
+      })
+    )
+  );
+
+  await logIndexingEvents(events);
+}
+
+/**
  * Notificación completa tras publicar un post del blog:
  * 0) Calienta y verifica el sitemap VIVO (que ya incluye el post nuevo)
- * 1) IndexNow (Bing/Yandex/Seznam/Naver) con la URL del post + índice del blog
+ * 1) IndexNow (Bing/Yandex/Seznam/Naver) con reintentos + dead-letter
  * 2) Ping de sitemap y RSS (vivos + estáticos) a Google y Bing
+ * 3) WebSub para agregadores / Google News
  * Nunca lanza: los fallos se registran en logs / indexing_events.
  */
 export async function pingPostPublished(slug: string): Promise<void> {
@@ -193,11 +230,13 @@ export async function pingPostPublished(slug: string): Promise<void> {
     await Promise.allSettled([
       pingIndexNow([postUrl, `https://${HOST}/blog`]),
       pingSitemap(),
+      pingWebSub(),
     ]);
     console.log("[pingPostPublished] done for", postUrl);
   } catch (err) {
     console.warn("[pingPostPublished] failed:", (err as Error).message);
   }
 }
+
 
 

@@ -34,6 +34,9 @@ interface OrderStatusResult {
   orderNumber?: string;
   stage?: "pending" | "paid" | "delivered";
   outcome?: "approved" | "rejected" | "processing";
+  /** true cuando el cliente abrió la pasarela y nunca completó el pago. */
+  abandoned?: boolean;
+
   provider?: string | null;
   method?: string | null;
   amount?: number | null;

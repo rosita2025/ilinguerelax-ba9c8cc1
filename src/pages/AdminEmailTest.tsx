@@ -156,6 +156,9 @@ const AdminEmailTest = () => {
     "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
   ]);
   const [sendingTest, setSendingTest] = useState(false);
+  // Auditoría: accesos a descargas por token (fecha, proveedor, nº de descarga)
+  const [tokenAccess, setTokenAccess] = useState<TokenAccessRow[]>([]);
+
 
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {

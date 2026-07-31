@@ -361,7 +361,7 @@ const AdminEmailTest = () => {
       setRows(deduped);
       setCounts(dedupedCounts);
       setLastUpdated(new Date());
-      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: merged, counts: perSource })); } catch {}
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: deduped, counts: dedupedCounts })); } catch {}
     } catch (e) {
       if (!silent) toast.error((e as Error).message);
     } finally {

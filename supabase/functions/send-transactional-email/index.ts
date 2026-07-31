@@ -27,15 +27,62 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// Auth: `verify_jwt = true` solo comprueba el JWT anónimo, que es PÚBLICO.
+// Por eso aquí distinguimos dos tipos de llamada:
+//   - interna (webhooks / cron / admin con service-role o CRON_SHARED_SECRET):
+//     puede usar cualquier plantilla y cualquier destinatario.
+//   - pública (navegador del comprador): SOLO puede disparar los avisos de
+//     pago manual (Yape/Plin, Binance, SPEI, transferencia), con límite por IP.
+// Esto impide que un tercero envíe correos con la marca del dominio.
+const PUBLIC_TEMPLATES = new Set([
+  'admin-manual-pending',
+  'customer-manual-pending',
+])
+
+const PUBLIC_MAX_PER_WINDOW = 6
+const PUBLIC_WINDOW_MS = 10 * 60 * 1000
+const publicHits = new Map<string, { n: number; until: number }>()
+
+function safeEqual(a: string, b: string): boolean {
+  if (!a || !b || a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
+
+function isInternalCall(req: Request): boolean {
+  const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const cronSecret = Deno.env.get('CRON_SHARED_SECRET') ?? ''
+  const auth = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
+  const internalKey = (req.headers.get('x-internal-key') ?? '').trim()
+  if (service && safeEqual(auth, service)) return true
+  if (cronSecret && (safeEqual(internalKey, cronSecret) || safeEqual(auth, cronSecret))) return true
+  return false
+}
+
+function publicRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const cur = publicHits.get(ip)
+  if (!cur || cur.until < now) {
+    publicHits.set(ip, { n: 1, until: now + PUBLIC_WINDOW_MS })
+    return false
+  }
+  cur.n += 1
+  return cur.n > PUBLIC_MAX_PER_WINDOW
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
+
+  const internal = isInternalCall(req)
+  const callerIp =
+    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    req.headers.get('cf-connecting-ip') ||
+    'unknown'
+
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -85,6 +132,26 @@ Deno.serve(async (req) => {
       }
     )
   }
+
+  // Puerta pública: desde el navegador solo se permiten los avisos de pago
+  // manual, y con límite por IP. Todo lo demás exige llamada interna.
+  if (!internal) {
+    if (!PUBLIC_TEMPLATES.has(templateName)) {
+      console.warn('[send-transactional-email] public call blocked', { templateName, callerIp })
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (publicRateLimited(callerIp)) {
+      return new Response(
+        JSON.stringify({ error: 'Too many requests' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
+
+
 
   // 1. Look up template from registry (early — needed to resolve recipient)
   const template = TEMPLATES[templateName]

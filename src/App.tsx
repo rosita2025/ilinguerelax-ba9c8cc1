@@ -96,7 +96,6 @@ const LearnCategory = lazy(() => import("./pages/LearnCategory"));
 import { AdminGate } from "@/components/admin/AdminGate";
 const DejarResena = lazy(() => import("./pages/DejarResena"));
 const AmazonRedirect = lazy(() => import("./pages/AmazonRedirect"));
-const CheckoutTest = lazy(() => import("./pages/CheckoutTest"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));

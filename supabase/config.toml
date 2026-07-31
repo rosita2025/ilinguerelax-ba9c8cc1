@@ -7,8 +7,6 @@ project_id = "opyitzdvvurdyyyzkwwv"
     verify_jwt = false
   [functions.create-mercadopago-preference]
     verify_jwt = false
-  [functions.create-test-checkout]
-    verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false
   [functions.handle-email-unsubscribe]

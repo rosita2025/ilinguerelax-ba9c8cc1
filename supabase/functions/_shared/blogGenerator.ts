@@ -6,6 +6,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { pingIndexNow, pingSitemap, pingWebSub } from "./indexnow.ts";
+import { notifyGoogleIndexing } from "./googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";

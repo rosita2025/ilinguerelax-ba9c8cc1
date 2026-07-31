@@ -813,8 +813,6 @@ const AdminEmailTest = () => {
                         {r.revoked ? <span className="ml-1 text-destructive">(revocado)</span> : null}
                       </td>
                     </tr>
-
-                    </tr>
                   ))}
                   {tokenAccess.length === 0 && (
                     <tr>

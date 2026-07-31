@@ -258,6 +258,18 @@ Deno.serve(async (req) => {
 
     if (action === "inspect") return json({ ok: true, summary });
 
+    // Reintento de entrega: vuelve a enviar el material sin tocar el estado.
+    if (action === "retry_delivery") {
+      if (!email) return json({ error: "El pedido no tiene correo del comprador", summary }, 400);
+      const res = await deliver({
+        orderNumber, email, name, country, skus, amount, currency, provider,
+        productName: "Pedido ILINGUE RELAX", reference,
+      });
+      if (!res.delivered) return json({ error: res.detail, summary }, 422);
+      return json({ ok: true, applied: "delivery_retried", delivery: res, summary });
+    }
+
+
     if (action === "reject") {
       if (alreadyPaid) return json({ error: "El pedido ya está pagado: no se puede marcar como rechazado" }, 409);
       await logOrderEvent({

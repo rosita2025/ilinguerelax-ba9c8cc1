@@ -10,12 +10,13 @@
 export type DlocalKind = "transfer" | "cash" | "wallet";
 
 /**
- * dLocal Go quedó habilitado SOLO para transferencia bancaria y pago en
- * efectivo en todos los países de LATAM. Tarjetas (SmartFields) y billetera
- * digital están desactivadas por decisión del negocio.
+ * dLocal Go: la TARJETA (SmartFields) está desactivada. Siguen activas la
+ * transferencia bancaria, el pago en efectivo y la BILLETERA DIGITAL
+ * (Yape/Plin, Nequi, MACH, Pix wallets…) en todos los países de LATAM.
  */
 export const DLOCAL_CARD_ENABLED = false;
-export const DLOCAL_WALLET_ENABLED = false;
+export const DLOCAL_WALLET_ENABLED = true;
+
 
 
 export type DlocalCountry = {

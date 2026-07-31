@@ -6,6 +6,8 @@ import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
+import { localAmountFromUsd } from "../_shared/fxRates.ts";
+
 
 // SEGURIDAD: el navegador solo aporta id y cantidad; precio, nombre y cupón
 // se resuelven en el servidor desde el catálogo.
@@ -28,11 +30,14 @@ const BodySchema = z.object({
   country: z.string().length(2),
   paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
   currency: z.string().length(3).default("USD"),
-  amount: z.number().positive().max(200000),
+  // Aceptados por compatibilidad con clientes viejos, pero IGNORADOS: el
+  // importe se calcula siempre en el servidor desde el catálogo + FX propio.
+  amount: z.number().positive().max(200000).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
   successUrl: z.string().url(),
   backUrl: z.string().url(),
 });
+
 
 
 const json = (b: unknown, s = 200) =>
@@ -66,20 +71,18 @@ Deno.serve(async (req) => {
       throw e;
     }
     const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
-    // Si el navegador calculó otro total, NO bloqueamos la venta: cobramos el
-    // total del catálogo y reescalamos el importe en moneda local con la misma
-    // tasa de cambio que mostró la web.
+    // SEGURIDAD: el navegador NO influye en el importe. Si mandó otro total,
+    // solo lo registramos; el cobro usa el total del catálogo y la tasa FX
+    // del servidor.
     const clientUsd = body.expectedTotalUsd ?? null;
     if (clientUsd && Math.abs(calculatedUsd - clientUsd) > 0.01) {
-      console.warn("cart total adjusted", { clientUsd, calculatedUsd });
+      console.warn("cart total mismatch (ignorado)", { clientUsd, calculatedUsd });
     }
-    const fxScale = clientUsd && clientUsd > 0 ? calculatedUsd / clientUsd : 1;
-    // Cobro en moneda local: exigimos el total USD esperado y que coincida con
-    // el catálogo, para que el importe local no pueda alterarse desde el navegador.
 
     const orderId = body.orderId ?? `ILR-DL-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
     const description = pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ").slice(0, 250);
+
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     // Los datos de entrega viajan en la URL de notificación: dLocal Go la llama
@@ -152,19 +155,18 @@ Deno.serve(async (req) => {
       EC: "USD", GT: "GTQ", MX: "MXN", PA: "USD", PE: "PEN", PY: "PYG", UY: "UYU",
     };
     const countryCode = body.country.toUpperCase();
-    // Monedas sin decimales: dLocal rechaza montos con centavos.
-    const ZERO_DECIMAL = new Set(["CLP", "PYG", "COP", "ARS", "CRC", "GTQ"]);
     const requested = body.currency.toUpperCase();
     const expected = DLOCAL_CURRENCY[countryCode];
     // Si la moneda enviada no es la del país (ni USD), no intentamos en local.
-    const localCurrency = !expected || requested === expected || requested === "USD"
+    const wantedCurrency = !expected || requested === expected || requested === "USD"
       ? requested
       : "USD";
-    const localAmount = localCurrency === "USD" && requested !== "USD"
-      ? calculatedUsd
-      : ZERO_DECIMAL.has(localCurrency)
-      ? Math.round(body.amount * fxScale)
-      : Number((body.amount * fxScale).toFixed(2));
+    // Importe local calculado 100% en el servidor (total del catálogo × tasa
+    // propia). Si no hay tasa autorizada para esa moneda, cobramos en USD.
+    const serverLocal = wantedCurrency === "USD" ? null : localAmountFromUsd(calculatedUsd, wantedCurrency);
+    const localCurrency = wantedCurrency === "USD" || serverLocal == null ? "USD" : wantedCurrency;
+    const localAmount = localCurrency === "USD" ? calculatedUsd : (serverLocal as number);
+
 
 
     // dLocal rechaza el pago en su checkout ("la transacción no pudo ser

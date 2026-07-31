@@ -5,6 +5,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
+import { localAmountFromUsd } from "../_shared/fxRates.ts";
 
 // SEGURIDAD: precio/nombre del cliente se ignoran; se resuelven en servidor.
 const ItemSchema = z.object({
@@ -27,8 +28,10 @@ const BodySchema = z.object({
   payerDocument: z.string().max(30).optional(),
   country: z.string().length(2),
   currency: z.string().length(3).default("USD"),
-  amount: z.number().positive().max(200000),
+  // Ignorados: el importe se calcula en el servidor (catálogo + FX propio).
+  amount: z.number().positive().max(200000).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
+
   successUrl: z.string().url(),
   backUrl: z.string().url(),
 });
@@ -64,14 +67,16 @@ Deno.serve(async (req) => {
       throw e;
     }
     const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
-    // Si el navegador calculó otro total, NO bloqueamos la venta: cobramos el
-    // total del catálogo y reescalamos el importe en moneda local con la misma
-    // tasa de cambio que mostró la web.
+    // SEGURIDAD: el importe del navegador se descarta por completo.
     const clientUsd = body.expectedTotalUsd ?? null;
     if (clientUsd && Math.abs(calculatedUsd - clientUsd) > 0.01) {
-      console.warn("cart total adjusted", { clientUsd, calculatedUsd });
+      console.warn("cart total mismatch (ignorado)", { clientUsd, calculatedUsd });
     }
-    const fxScale = clientUsd && clientUsd > 0 ? calculatedUsd / clientUsd : 1;
+    const requestedCurrency = body.currency.toUpperCase();
+    const serverLocal = requestedCurrency === "USD" ? null : localAmountFromUsd(calculatedUsd, requestedCurrency);
+    const chargeCurrency = serverLocal == null ? "USD" : requestedCurrency;
+    const chargeAmount = serverLocal == null ? calculatedUsd : serverLocal;
+
 
     const orderId = body.orderId ?? `ILR-DLC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
@@ -95,12 +100,10 @@ Deno.serve(async (req) => {
       : undefined;
 
     const payload: Record<string, unknown> = {
-      // En USD cobramos exactamente el total del catálogo; en moneda local se
-      // usa el importe ya validado contra expectedTotalUsd.
-      amount: body.currency.toUpperCase() === "USD"
-        ? calculatedUsd
-        : Number((body.amount * fxScale).toFixed(2)),
-      currency: body.currency.toUpperCase(),
+      // Importe autoritativo del servidor (catálogo + tasa FX propia).
+      amount: chargeAmount,
+      currency: chargeCurrency,
+
       country: body.country.toUpperCase(),
       order_id: orderId,
       description,

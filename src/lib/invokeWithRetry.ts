@@ -43,7 +43,22 @@ const DEFAULT_RETRYABLE = (err: unknown): boolean => {
   );
 };
 
+/** Adjunta el mensaje real de la Edge Function (body JSON) al error. */
+async function withEdgeDetail(error: unknown): Promise<unknown> {
+  if (!error || typeof error !== "object") return error;
+  try {
+    const detail = await extractEdgeErrorMessage(error);
+    if (detail) {
+      (error as { edgeDetail?: string }).edgeDetail = detail;
+    }
+    const status = edgeErrorStatus(error);
+    if (status != null) (error as { status?: number }).status = status;
+  } catch { /* ignore */ }
+  return error;
+}
+
 const sleep = (ms: number, signal?: AbortSignal) =>
+
 
   new Promise<void>((resolve, reject) => {
     const t = setTimeout(resolve, ms);

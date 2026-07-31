@@ -133,7 +133,7 @@ serve(async (req) => {
       case "list": {
         const { data, error } = await supabase
           .from("blog_post_queue")
-          .select("id,topic,keyword,language,category,scheduled_at,status,attempts,error,post_slug")
+          .select("id,topic,keyword,language,category,scheduled_at,status,attempts,error,post_id,post_slug")
           .order("scheduled_at", { ascending: true })
           .limit(200);
         if (error) throw error;

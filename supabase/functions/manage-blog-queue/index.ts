@@ -9,6 +9,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { pingIndexNow, pingSitemap, pingWebSub } from "../_shared/indexnow.ts";
+import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { BlogGenError, generateAndStorePost } from "../_shared/blogGenerator.ts";
 
@@ -344,12 +345,20 @@ serve(async (req) => {
 
       case "reject": {
         if (!body.id) return json({ error: "Missing id" }, 400);
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("generated_blog_posts")
           .delete()
           .eq("id", body.id)
-          .eq("published", false);
+          .eq("published", false)
+          .select("slug")
+          .maybeSingle();
         if (error) throw error;
+        if (data?.slug) {
+          await notifyGoogleIndexing(
+            [`https://ilinguerelax.com/blog/${data.slug}`],
+            "URL_DELETED",
+          );
+        }
         return json({ ok: true });
       }
 

@@ -28,7 +28,8 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-async function resolveFile(admin: ReturnType<typeof createClient>, sku: string, kind: string, index: number) {
+// deno-lint-ignore no-explicit-any
+async function resolveFile(admin: any, sku: string, kind: string, index: number) {
   const { data: p } = await admin
     .from("digital_products")
     .select("sku,name,drive_url,access_key,bonus_name,bonus_drive_url,bonus_access_key,bonuses")
@@ -63,8 +64,24 @@ Deno.serve(async (req) => {
       const [tokenId, sku, kind, idxRaw, expRaw] = atob(data.replace(/-/g, "+").replace(/_/g, "/")).split("|");
       if (Number(expRaw) < Date.now()) return new Response("Enlace caducado, vuelve a tu página de descarga", { status: 410 });
 
+      // Revalidar el pedido en el momento del canje: un ticket firmado no puede
+      // sobrevivir a una revocación, caducidad o a un SKU que ya no pertenece al pedido.
+      const { data: tok } = await admin
+        .from("download_tokens")
+        .select("id, skus, expires_at, revoked")
+        .eq("id", tokenId)
+        .maybeSingle();
+      if (!tok || tok.revoked) return new Response("Enlace inválido", { status: 403 });
+      if (new Date(String(tok.expires_at)).getTime() < Date.now()) {
+        return new Response("Enlace caducado, vuelve a tu página de descarga", { status: 410 });
+      }
+      if (!((tok.skus as string[]) ?? []).map((s) => String(s).toLowerCase()).includes(String(sku).toLowerCase())) {
+        return new Response("Enlace inválido", { status: 403 });
+      }
+
       const file = await resolveFile(admin, sku, kind, Number(idxRaw) || 0);
       if (!file?.url) return new Response("Archivo no disponible", { status: 404 });
+
 
       await admin.from("download_token_access").insert({
         token_id: tokenId, action: "download", sku,
@@ -111,10 +128,30 @@ Deno.serve(async (req) => {
     const sig = await sign(data);
     const base = `${Deno.env.get("SUPABASE_URL")}/functions/v1/get-download-link`;
 
-    await admin
-      .from("download_tokens")
-      .update({ download_count: (row.download_count ?? 0) + 1, last_accessed_at: new Date().toISOString() })
-      .eq("id", row.id);
+    // El cupo se cobra UNA sola vez por archivo distinto (producto, upsell o bono):
+    // volver a abrir el mismo archivo no gasta descargas y no mezcla los ítems del pedido.
+    const fileKey = `${sku}#${kind}#${index}`;
+    const { data: prior } = await admin
+      .from("download_token_access")
+      .select("id")
+      .eq("token_id", row.id)
+      .eq("action", "ticket")
+      .eq("sku", fileKey)
+      .limit(1);
+    const alreadyCharged = (prior ?? []).length > 0;
+
+    if (!alreadyCharged) {
+      await admin.from("download_token_access").insert({ token_id: row.id, action: "ticket", sku: fileKey });
+      await admin
+        .from("download_tokens")
+        .update({ download_count: (row.download_count ?? 0) + 1, last_accessed_at: new Date().toISOString() })
+        .eq("id", row.id);
+    } else {
+      await admin
+        .from("download_tokens")
+        .update({ last_accessed_at: new Date().toISOString() })
+        .eq("id", row.id);
+    }
 
     return dlJson({
       status: "ok",
@@ -122,8 +159,9 @@ Deno.serve(async (req) => {
       accessKey: file.accessKey,
       url: `${base}?d=${data}&s=${sig}`,
       expiresIn: TTL_MS / 1000,
-      downloadsLeft: Math.max(0, (row.max_downloads ?? 0) - (row.download_count ?? 0) - 1),
+      downloadsLeft: Math.max(0, (row.max_downloads ?? 0) - (row.download_count ?? 0) - (alreadyCharged ? 0 : 1)),
     });
+
   } catch (e) {
     console.error("[get-download-link]", e);
     return dlJson({ error: "Error interno" }, 500);

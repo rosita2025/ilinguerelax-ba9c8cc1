@@ -16,8 +16,8 @@ import type { TemplateEntry } from './registry.ts'
 
 interface Material {
   productName: string
+  /** Siempre la URL privada /mi-descarga?t=<token>. Nunca enlaces de Drive. */
   downloadUrl: string
-  accessKey?: string
 }
 
 interface Props {
@@ -60,15 +60,7 @@ const Email = ({ customerName, orderNumber, materials }: Props) => {
           {list.map((m, i) => (
             <Section key={i} style={itemCard}>
               <Text style={itemName}>📘 {m.productName}</Text>
-              <Button href={m.downloadUrl} style={btn}>Acceder al material</Button>
-              {m.accessKey && (
-                <Text style={keyLine}>
-                  Clave de acceso: <strong style={keyValue}>{m.accessKey}</strong>
-                </Text>
-              )}
-              <Text style={link}>
-                <Link href={m.downloadUrl} style={linkA}>{m.downloadUrl}</Link>
-              </Text>
+              <Button href={m.downloadUrl} style={btn}>Abrir mis descargas</Button>
             </Section>
           ))}
 
@@ -97,8 +89,7 @@ export const template = {
     materials: [
       {
         productName: 'Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés',
-        downloadUrl: 'https://ilinguerelax.com/descarga/patrones-ingles',
-        accessKey: '123A',
+        downloadUrl: 'https://ilinguerelax.com/mi-descarga?t=TOKEN_PRIVADO',
       },
     ],
   },
@@ -115,9 +106,6 @@ const hr = { borderColor: '#e5e7eb', margin: '24px 0' }
 const itemCard = { padding: '16px', backgroundColor: '#f9fafb', borderRadius: '10px', border: '1px solid #e5e7eb', marginBottom: '12px' }
 const itemName = { margin: '0 0 12px', fontSize: '16px', fontWeight: 'bold' as const, color: '#111827' }
 const btn = { backgroundColor: '#0f766e', color: '#ffffff', padding: '12px 20px', borderRadius: '8px', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
-const keyLine = { margin: '12px 0 0', fontSize: '14px', color: '#4b5563' }
-const keyValue = { color: '#0f766e', fontFamily: 'monospace' as const, fontSize: '15px' }
-const link = { margin: '8px 0 0', fontSize: '12px', color: '#6b7280', wordBreak: 'break-all' as const }
 const linkA = { color: '#0f766e', textDecoration: 'underline' }
 const support = { fontSize: '14px', color: '#4b5563', lineHeight: '1.6', margin: '0 0 16px' }
 const footer = { textAlign: 'center' as const, color: '#9ca3af', fontSize: '12px', margin: '16px 0 0' }

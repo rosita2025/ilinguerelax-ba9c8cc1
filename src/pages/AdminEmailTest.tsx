@@ -64,7 +64,10 @@ interface ProductMeta {
   name: string;
   bonusCount: number;
   hasBonus: boolean;
+  hasDrive?: boolean;
+  updatedAt?: string | null;
 }
+
 
 const fmt = (iso: string | null) => {
   if (!iso) return "—";

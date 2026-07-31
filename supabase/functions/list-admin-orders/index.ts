@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const [manual, shopify, hotmart, digital, funnel, emailLog, products] = await Promise.all([
+    const [manual, shopify, hotmart, digital, funnel, emailLog, products, access] = await Promise.all([
       admin.from("manual_payments").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("shopify_sales").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("hotmart_purchases").select("*").order("created_at", { ascending: false }).limit(200),
@@ -32,7 +32,53 @@ Deno.serve(async (req) => {
       admin.from("funnel_events").select("*").in("event_name", ["Purchase", "purchase", "mp_pending", "mp_in_process"]).order("created_at", { ascending: false }).limit(300),
       admin.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(300),
       admin.from("digital_products").select("sku,name,bonus_name,bonus_drive_url,bonuses").limit(500),
+      admin.from("download_token_access").select("id,token_id,action,sku,ip,created_at").order("created_at", { ascending: false }).limit(300),
     ]);
+
+    // Historial de acceso por token (auditoría): nunca se expone el token ni el
+    // enlace de Drive, sólo pedido, correo, acción, SKU y contador de descargas.
+    const accessRows = access.data ?? [];
+    const tokenIds = [...new Set(accessRows.map((r: { token_id: string }) => r.token_id))];
+    let tokenMap = new Map<string, {
+      order_number: string; email: string; download_count: number; max_downloads: number;
+      expires_at: string; revoked: boolean;
+    }>();
+    if (tokenIds.length) {
+      const { data: toks } = await admin
+        .from("download_tokens")
+        .select("id,order_number,email,download_count,max_downloads,expires_at,revoked")
+        .in("id", tokenIds);
+      tokenMap = new Map((toks ?? []).map((t: { id: string }) => [t.id, t as never]));
+    }
+    const providerByOrder = new Map<string, string>();
+    for (const d of (digital.data ?? []) as { order_id: string | null; provider: string | null }[]) {
+      if (d.order_id && d.provider) providerByOrder.set(String(d.order_id).toUpperCase(), d.provider);
+    }
+    for (const m of (manual.data ?? []) as { order_number: string | null; method: string | null }[]) {
+      if (m.order_number && !providerByOrder.has(String(m.order_number).toUpperCase())) {
+        providerByOrder.set(String(m.order_number).toUpperCase(), m.method || "manual");
+      }
+    }
+    const tokenAccess = accessRows.map((r: {
+      id: number; token_id: string; action: string; sku: string | null; ip: string | null; created_at: string;
+    }) => {
+      const tok = tokenMap.get(r.token_id);
+      const order = tok?.order_number ?? null;
+      return {
+        id: r.id,
+        created_at: r.created_at,
+        action: r.action,
+        sku: r.sku,
+        ip: r.ip,
+        order_number: order,
+        email: tok?.email ?? null,
+        provider: order ? (providerByOrder.get(order.toUpperCase()) ?? null) : null,
+        download_count: tok?.download_count ?? null,
+        max_downloads: tok?.max_downloads ?? null,
+        expires_at: tok?.expires_at ?? null,
+        revoked: tok?.revoked ?? null,
+      };
+    });
 
     return new Response(
       JSON.stringify({
@@ -43,9 +89,11 @@ Deno.serve(async (req) => {
         funnel: funnel.data ?? [],
         emailLog: emailLog.data ?? [],
         products: products.data ?? [],
+        tokenAccess,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
+
   } catch (e) {
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500,

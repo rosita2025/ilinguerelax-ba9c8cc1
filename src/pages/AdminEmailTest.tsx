@@ -14,6 +14,21 @@ import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
 
+interface TokenAccessRow {
+  id: number;
+  created_at: string;
+  action: string;
+  sku: string | null;
+  ip: string | null;
+  order_number: string | null;
+  email: string | null;
+  provider: string | null;
+  download_count: number | null;
+  max_downloads: number | null;
+  revoked: boolean | null;
+}
+
+
 
 
 
@@ -156,6 +171,9 @@ const AdminEmailTest = () => {
     "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
   ]);
   const [sendingTest, setSendingTest] = useState(false);
+  // Auditoría: accesos a descargas por token (fecha, proveedor, nº de descarga)
+  const [tokenAccess, setTokenAccess] = useState<TokenAccessRow[]>([]);
+
 
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
@@ -188,6 +206,8 @@ const AdminEmailTest = () => {
       });
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
       setCatalogList(Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+      setTokenAccess(((data as any)?.tokenAccess ?? []) as TokenAccessRow[]);
+
 
 
       const digitalByEmail = new Map<string, any>();
@@ -678,6 +698,68 @@ const AdminEmailTest = () => {
               )}
             </div>
           </Card>
+
+          <Card className="p-3 md:p-4 space-y-3 border-l-4 border-l-emerald-500/60">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <h2 className="text-sm md:text-base font-semibold">Historial de acceso seguro (tokens de descarga)</h2>
+              <span className="ml-auto text-[11px] text-muted-foreground">{tokenAccess.length} registro(s)</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Auditoría de <code className="px-1 rounded bg-muted">/mi-descarga?t=</code>: fecha (hora Perú), pedido, proveedor de pago,
+              acción y número de descarga usada. Nunca se muestran tokens ni enlaces de Drive.
+            </p>
+            <div className="overflow-x-auto -mx-1">
+              <table className="w-full text-xs min-w-[720px]">
+                <thead>
+                  <tr className="text-left text-muted-foreground border-b">
+                    <th className="py-2 px-2 font-medium">Fecha (PE)</th>
+                    <th className="py-2 px-2 font-medium">Pedido</th>
+                    <th className="py-2 px-2 font-medium">Correo</th>
+                    <th className="py-2 px-2 font-medium">Proveedor</th>
+                    <th className="py-2 px-2 font-medium">Acción</th>
+                    <th className="py-2 px-2 font-medium">Producto</th>
+                    <th className="py-2 px-2 font-medium">Descargas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tokenAccess.map((r) => (
+                    <tr key={r.id} className="border-b last:border-0 hover:bg-muted/40">
+                      <td className="py-1.5 px-2 whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleString("es-PE", { timeZone: "America/Lima" })}
+                      </td>
+                      <td className="py-1.5 px-2 font-mono">{r.order_number ?? "—"}</td>
+                      <td className="py-1.5 px-2 truncate max-w-[180px]">{r.email ?? "—"}</td>
+                      <td className="py-1.5 px-2 capitalize">{r.provider ?? "—"}</td>
+                      <td className="py-1.5 px-2">
+                        <span className={`px-1.5 py-0.5 rounded border text-[11px] ${
+                          r.action === "download"
+                            ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                            : "border-muted bg-muted text-muted-foreground"
+                        }`}>
+                          {r.action === "download" ? "Descarga" : r.action === "view" ? "Apertura" : r.action}
+                        </span>
+                      </td>
+                      <td className="py-1.5 px-2 truncate max-w-[220px]">{r.sku ?? "—"}</td>
+                      <td className="py-1.5 px-2 whitespace-nowrap">
+                        {r.download_count ?? 0}/{r.max_downloads ?? "—"}
+                        {r.revoked ? <span className="ml-1 text-destructive">(revocado)</span> : null}
+                      </td>
+                    </tr>
+                  ))}
+                  {tokenAccess.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="py-3 px-2 text-muted-foreground">
+                        Aún no hay accesos registrados.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+
 
 
 

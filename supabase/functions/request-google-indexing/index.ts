@@ -20,7 +20,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    const requestedList: string[] = Array.isArray(urls) ? urls.filter((u) => typeof u === 'string') : [];
+    // Cap per request: cada URL dispara varias llamadas externas (IndexNow,
+    // Indexing API, inspección). Sin tope la función excede el tiempo límite y
+    // el cliente ve "Failed to send a request to the Edge Function".
+    const MAX_URLS = 25;
+    const requestedList: string[] = (Array.isArray(urls) ? urls.filter((u) => typeof u === 'string') : [])
+      .slice(0, MAX_URLS);
     const admin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -59,19 +64,22 @@ Deno.serve(async (req) => {
     }
 
     // 1) IndexNow (Bing/Yandex/Seznam/Naver) — accelerates discovery.
-    await pingIndexNow(list);
-    // 2) Resubmit sitemap so Google re-checks the canonical set.
-    await pingSitemap();
-    // 2b) Google Indexing API oficial (cuenta de servicio) — funciona para
-    //     cualquier URL del sitio: blog, productos y páginas.
-    await notifyGoogleIndexing(list, 'URL_UPDATED');
+    // Fallos externos no deben tumbar la respuesta al admin.
+    await Promise.allSettled([
+      pingIndexNow(list),
+      // 2) Resubmit sitemap so Google re-checks the canonical set.
+      pingSitemap(),
+      // 2b) Google Indexing API oficial (cuenta de servicio) — funciona para
+      //     cualquier URL del sitio: blog, productos y páginas.
+      notifyGoogleIndexing(list, 'URL_UPDATED'),
+    ]);
 
     // 3) Attempt Google Indexing API through the gateway. Officially it
     //    only accepts JobPosting/BroadcastEvent but many sites use it as
     //    a nudge. Failures are non-fatal.
     const indexingResults: Array<{ url: string; status: number; ok: boolean; body?: string }> = [];
     if (LOVABLE_API_KEY && GSC_KEY) {
-      for (const url of list.slice(0, 100)) {
+      for (const url of list) {
         try {
           const res = await fetch(`${GATEWAY}/v3/urlNotifications:publish`, {
             method: 'POST',
@@ -81,6 +89,7 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ url, type: 'URL_UPDATED' }),
+            signal: AbortSignal.timeout(10_000),
           });
           const bodyText = await res.text().catch(() => '');
           indexingResults.push({ url, status: res.status, ok: res.ok, body: res.ok ? undefined : bodyText.slice(0, 300) });
@@ -117,6 +126,7 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ inspectionUrl: url, siteUrl }),
+            signal: AbortSignal.timeout(10_000),
           });
           if (res.ok) {
             const data = await res.json();
@@ -131,6 +141,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       ok: true,
       sent: list.length,
+      truncated: Array.isArray(urls) ? Math.max(0, urls.length - MAX_URLS) : 0,
       skipped,
       indexnow: 'sent',
       sitemap: 'resubmitted',

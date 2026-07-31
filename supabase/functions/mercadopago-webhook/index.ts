@@ -378,18 +378,16 @@ Deno.serve(async (req) => {
             const skus = getPaymentSkus(payment);
             if (skus.length > 0) {
               const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
-                {
-                  customerEmail: payerEmail,
-                  customerName,
-                  customerPhone: payment.metadata?.customer_phone || undefined,
-                  customerCountry: payment.payer?.address?.country_id || undefined,
-                  orderId: orderNumber,
-                  skus,
-                  amount: payment.transaction_amount ?? undefined,
-                  currency: payment.currency_id || "PEN",
-                  provider: "mercadopago",
-                  idempotencyKey: `digital:mp:${payment.id}`,
-                },
+                customerEmail: payerEmail,
+                customerName,
+                customerPhone: payment.metadata?.customer_phone || undefined,
+                customerCountry: payment.payer?.address?.country_id || undefined,
+                orderId: orderNumber,
+                skus,
+                amount: payment.transaction_amount ?? undefined,
+                currency: payment.currency_id || "PEN",
+                provider: "mercadopago",
+                idempotencyKey: `digital:mp:${payment.id}`,
               });
               await logOrderEvent({
                 orderNumber,

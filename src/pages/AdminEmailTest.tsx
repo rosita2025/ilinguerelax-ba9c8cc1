@@ -835,25 +835,25 @@ const AdminEmailTest = () => {
                 className="pl-9 h-10"
               />
             </div>
-            <div className="flex flex-wrap gap-1.5 md:gap-2 w-full md:w-auto">
+            <div className="grid grid-cols-3 gap-1.5 md:flex md:flex-wrap md:gap-2 w-full md:w-auto">
               {(["all", "manual", "stripe", "paypal", "mercadopago", "digital"] as const).map((s) => (
                 <Button
                   key={s}
                   size="sm"
-                  className="h-9 px-3 text-xs"
+                  className="h-9 px-2 text-[11px] md:text-xs md:px-3 w-full md:w-auto"
                   variant={sourceFilter === s ? "default" : "outline"}
                   onClick={() => setSourceFilter(s)}
                 >
-                  {s === "all" ? "Todos" : sourceLabel[s as Source]}
+                  <span className="truncate">{s === "all" ? "Todos" : sourceLabel[s as Source]}</span>
                 </Button>
               ))}
               <Button
                 size="sm"
-                className="h-9 px-3 text-xs"
+                className="h-9 px-2 text-[11px] md:text-xs md:px-3 col-span-3 md:col-auto w-full md:w-auto"
                 variant={onlyProblems ? "destructive" : "outline"}
                 onClick={() => setOnlyProblems((v) => !v)}
               >
-                <AlertTriangle className="w-3 h-3 mr-1" />
+                <AlertTriangle className="w-3 h-3 mr-1 shrink-0" />
                 Problemas ({problemCount})
               </Button>
             </div>

@@ -51,8 +51,8 @@ function buildDigitalPreview() {
         <td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>
         <td valign="top"><div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name)}</div><div style="font-size:12px;color:${BRAND.muted};margin-top:2px;">USD ${p.price_usd.toFixed(2)}</div></td>
       </tr></table>
-      <div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">⬇ Descargar / Ver en Drive</a></div>
-      <div style="margin-top:10px;font-size:13px;color:#374151;"><strong>Clave de acceso:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>
+      <div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">⬇ Abrir mis descargas</a></div>
+
       ${bonusHtml}
     </div>`
   }).join('')

@@ -660,12 +660,38 @@ serve(async (req) => {
     });
 
     // Aviso de venta al administrador (todas las pasarelas). Nunca bloquea la entrega.
+    // Solo UN aviso por cliente y día: si el mismo comprador genera dos pedidos
+    // seguidos, el admin recibe un único correo.
     try {
       const adminEmail = Deno.env.get("ADMIN_2FA_EMAIL") || BRAND.supportEmail;
       const adminRecipients = Array.from(new Set([adminEmail, BRAND.supportEmail].filter(Boolean)));
+      const noticeKey = `admin-sale:${customerEmail.trim().toLowerCase()}:${new Date().toISOString().slice(0, 10)}`;
+      const { data: priorNotice } = await supabase
+        .from("email_send_log")
+        .select("id, created_at")
+        .eq("message_id", noticeKey)
+        .in("status", ["pending", "sent"])
+        .limit(1)
+        .maybeSingle();
+
+      if (priorNotice) {
+        console.log("[send-digital-ilinguerelax] admin sale notice deduped", {
+          noticeKey, priorAt: priorNotice.created_at,
+        });
+        throw new DedupedAdminNotice();
+      }
+
+      await supabase.from("email_send_log").insert({
+        message_id: noticeKey,
+        template_name: "admin-sale",
+        recipient_email: adminRecipients[0],
+        status: "sent",
+      });
+
       const productList = products.map((p) => `<li>${escapeHtml(p.name || prettifySlug(p.sku))}</li>`).join("");
       const amountLine = amount ? `${amount} ${currency || "USD"}` : "—";
       const adminSale = await resend.emails.send({
+
         from: `Ventas iLingue Relax <${BRAND.supportEmail}>`,
         to: adminRecipients,
         reply_to: BRAND.supportEmail,

@@ -1598,6 +1598,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_webhook_events: {
+        Row: {
+          created_at: string
+          event_key: string
+          id: string
+          order_number: string | null
+          payload: Json | null
+          provider: string
+          reference: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_key: string
+          id?: string
+          order_number?: string | null
+          payload?: Json | null
+          provider: string
+          reference?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_key?: string
+          id?: string
+          order_number?: string | null
+          payload?: Json | null
+          provider?: string
+          reference?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       paypal_webhook_events: {
         Row: {
           correlation_id: string | null

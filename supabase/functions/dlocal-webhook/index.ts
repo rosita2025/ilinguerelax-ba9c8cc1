@@ -149,6 +149,78 @@ Deno.serve(async (req) => {
     const couponPctRaw = Number(q.get("coupon_pct"));
     const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
 
+    // 3.b) Sin firma válida exigimos, además del order_id coincidente, que el
+    // pedido exista realmente en nuestro historial (lo crea dlocal-create-payment).
+    // Así una notificación falsa no puede inventar un pedido nuevo.
+    if (!signatureOk) {
+      const { count } = await supabase
+        .from("order_events")
+        .select("id", { count: "exact", head: true })
+        .eq("order_number", orderNumber)
+        .eq("provider", "dlocalgo");
+      if (!count) {
+        console.warn("dLocal webhook rechazado: sin firma y pedido desconocido", { orderNumber });
+        return new Response(JSON.stringify({ error: "unknown order" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+
+    // 4) IDEMPOTENCIA: dLocal reintenta la misma notificación varias veces
+    // (y a veces la envía duplicada). Reclamamos el evento una sola vez con un
+    // índice único (provider, event_key). Si ya existe, salimos con 200 sin
+    // volver a cobrar, registrar, notificar ni entregar el producto.
+    const eventKey = `${paymentId}:${status}`;
+    const { error: claimErr } = await supabase
+      .from("payment_webhook_events")
+      .insert({
+        provider: "dlocalgo",
+        event_key: eventKey,
+        order_number: orderNumber,
+        reference: paymentId,
+        status,
+        payload: { amount: amount ?? null, currency, country: country ?? null, skus, signed: signatureOk },
+      });
+    if (claimErr) {
+      // 23505 = índice único → notificación repetida.
+      if ((claimErr as { code?: string }).code === "23505") {
+        console.log("dLocal webhook duplicado ignorado", { paymentId, status });
+        return new Response(JSON.stringify({ received: true, duplicate: true, status }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      console.error("dLocal webhook: no se pudo registrar la idempotencia:", claimErr.message);
+    }
+
+    // 5) VALIDACIÓN DE ESTADO: el pedido nunca puede retroceder. Si ya está
+    // pagado y entregado, una notificación posterior de pendiente/rechazo no
+    // debe reescribir su estado ni volver a enviar correos, y un PAID repetido
+    // (con otro payment_id) no debe entregar dos veces el producto.
+    const { data: priorEvents } = await supabase
+      .from("order_events")
+      .select("event")
+      .eq("order_number", orderNumber)
+      .in("event", ["payment_paid", "delivery_sent"]);
+    const alreadyPaid = (priorEvents ?? []).some((e) => e.event === "payment_paid");
+    const alreadyDelivered = (priorEvents ?? []).some((e) => e.event === "delivery_sent");
+    if (alreadyPaid && !isSettledStatus(status)) {
+      console.warn("dLocal webhook ignorado: el pedido ya estaba pagado", { orderNumber, status });
+      return new Response(JSON.stringify({ received: true, ignored: "already paid", status }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (alreadyPaid && alreadyDelivered && isSettledStatus(status)) {
+      console.log("dLocal webhook: pedido ya pagado y entregado, sin acción", { orderNumber });
+      return new Response(JSON.stringify({ received: true, ignored: "already delivered", status }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     await supabase.from("funnel_events").insert({
       event_name: isSettledStatus(status) ? "Purchase" : `dlocal_${status.toLowerCase()}`,
       product_id: skus[0] || orderNumber,
@@ -157,6 +229,8 @@ Deno.serve(async (req) => {
       country: country ?? null,
       provider: "dlocalgo",
     }).then(({ error }) => { if (error) console.error("dLocal funnel log failed:", error.message); });
+
+
 
     if (!isSettledStatus(status)) {
       // Transferencia / efectivo: dLocal deja el pago en PENDING mientras el

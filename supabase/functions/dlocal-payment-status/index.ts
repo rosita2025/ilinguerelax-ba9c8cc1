@@ -126,7 +126,17 @@ Deno.serve(async (req) => {
     const statusDetail = raw.status_detail ? String(raw.status_detail).slice(0, 200) : null;
     const status = normalize(rawStatus);
 
+    // Validación de estado: el pago consultado debe pertenecer a ESTE pedido.
+    // Si dLocal devuelve otro order_id, no mostramos ni registramos nada.
+    const remoteOrder = String((raw as { order_id?: unknown }).order_id ?? "").trim().toUpperCase();
+    if (remoteOrder && remoteOrder !== orderNumber) {
+      console.warn("[dlocal-payment-status] order_id no coincide", { orderNumber });
+      return json({ found: true, status: "pending", rawStatus: "UNKNOWN", method });
+    }
+
     // Deja el rechazo/expiración en el historial del pedido para /mi-pedido.
+    // Idempotente: solo se registra la primera vez (arriba salimos temprano si
+    // ya existe payment_paid o payment_failed para este pedido).
     if (status === "rejected") {
       await logOrderEvent({
         orderNumber,
@@ -139,6 +149,7 @@ Deno.serve(async (req) => {
         customerEmail: parsed.data.email,
       });
     }
+
 
     return json({ found: true, status, rawStatus, statusDetail, method });
   } catch (err) {

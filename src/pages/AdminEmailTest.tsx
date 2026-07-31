@@ -735,8 +735,38 @@ const AdminEmailTest = () => {
               Auditoría de <code className="px-1 rounded bg-muted">/mi-descarga?t=</code>: fecha (hora Perú), pedido, proveedor de pago,
               acción y número de descarga usada. Nunca se muestran tokens ni enlaces de Drive.
             </p>
-            <div className="overflow-x-auto -mx-1">
-              <table className="w-full text-xs min-w-[720px]">
+            {/* Móvil: tarjetas compactas (sin scroll horizontal) */}
+            <div className="md:hidden space-y-2">
+              {tokenAccess.slice((tokenPage - 1) * TOKEN_PAGE_SIZE, tokenPage * TOKEN_PAGE_SIZE).map((r) => (
+                <div key={r.id} className="rounded-lg border p-2 text-xs space-y-1 min-w-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="font-mono text-[11px] break-all min-w-0">{r.order_number ?? "—"}</span>
+                    <span className={`shrink-0 px-1.5 py-0.5 rounded border text-[10px] ${
+                      r.action === "download"
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                        : "border-muted bg-muted text-muted-foreground"
+                    }`}>
+                      {r.action === "download" ? "Descarga" : r.action === "view" ? "Apertura" : r.action}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground break-all">{r.email ?? "—"}</div>
+                  <div className="text-[11px] text-muted-foreground break-words line-clamp-1">{r.sku ?? "—"}</div>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
+                    <span>{new Date(r.created_at).toLocaleString("es-PE", { timeZone: "America/Lima", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                    <span className="capitalize">· {r.provider ?? "—"}</span>
+                    <span>· {r.download_count ?? 0}/{r.max_downloads ?? "—"}</span>
+                    {r.revoked ? <span className="text-destructive">· revocado</span> : null}
+                  </div>
+                </div>
+              ))}
+              {tokenAccess.length === 0 && (
+                <p className="text-xs text-muted-foreground">Aún no hay accesos registrados.</p>
+              )}
+            </div>
+
+            {/* Escritorio: tabla completa */}
+            <div className="hidden md:block overflow-x-auto -mx-1">
+              <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-muted-foreground border-b">
                     <th className="py-2 px-2 font-medium">Fecha (PE)</th>

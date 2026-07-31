@@ -12,9 +12,6 @@ import pdfAsset from "@/assets/100-mapas-mentales-coreano-completado.pdf.asset.j
 import bono1Asset from "@/assets/bono-1-alfabeto-hangul-coreano.pdf.asset.json";
 import bono2Asset from "@/assets/bono-2-guia-completa-hangul.pdf.asset.json";
 
-const ACCESS_KEY = "123456";
-const MAX_ATTEMPTS = 5;
-
 const FILE_NAME = "+100 Mapas Mentales de Coreano";
 const BONO1_NAME = "Bono 1 - Guía Alfabético Hangul con Manos Escritura";
 const BONO2_NAME = "Bono 2 - Guía Completa Hangul (Explicativo + Notas)";
@@ -99,9 +96,7 @@ const DescargaCoreano = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Lock className="w-7 h-7 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                Área privada de descarga
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">Área privada de descarga</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
                 Ingresa la clave que recibiste en tu correo de compra para acceder al material.
               </p>
@@ -124,9 +119,7 @@ const DescargaCoreano = () => {
                 />
               </div>
 
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
+              {error && <p className="text-sm text-destructive">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={blocked}>
                 Desbloquear descarga
@@ -139,7 +132,8 @@ const DescargaCoreano = () => {
                 <div>
                   <p className="font-semibold">Aviso importante</p>
                   <p className="mt-1 text-pretty">
-                    No compartas tu clave ni el material con personas desconocidas. El contenido es de uso personal y está protegido por derechos de autor.
+                    No compartas tu clave ni el material con personas desconocidas. El contenido es de uso personal y
+                    está protegido por derechos de autor.
                   </p>
                 </div>
               </div>
@@ -155,9 +149,7 @@ const DescargaCoreano = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Mail className="w-7 h-7 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                Último paso: confirma tu correo
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">Último paso: confirma tu correo</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
                 Guardaremos tu correo para enviarte respaldo del material y avisos de nuevos productos de ILINGUE RELAX.
               </p>
@@ -201,15 +193,9 @@ const DescargaCoreano = () => {
             </form>
           </motion.div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                ¡Descarga desbloqueada! 🎉
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">¡Descarga desbloqueada! 🎉</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
                 Guarda estos archivos en tu dispositivo. Son de uso personal.
               </p>

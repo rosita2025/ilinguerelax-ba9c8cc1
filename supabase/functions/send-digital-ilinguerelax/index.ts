@@ -26,6 +26,10 @@ interface Body {
   force?: boolean;
 }
 
+/** Señal interna: el aviso de venta al admin ya se envió hoy para este cliente. */
+class DedupedAdminNotice extends Error {}
+
+
 interface Bonus { name?: string | null; drive_url?: string | null; access_key?: string | null }
 interface Product {
   sku: string;
@@ -440,6 +444,57 @@ serve(async (req) => {
       throw claimError;
     }
 
+    // Re-verificación tras reservar: dos pedidos del MISMO cliente creados a la
+    // vez (dos cargos en la pasarela con los mismos productos) pasaban la
+    // comprobación previa porque ninguno había escrito todavía. Aquí, con la
+    // fila ya insertada, gana la reserva más antigua y la otra se descarta.
+    if (!body.force) {
+      const skuFp = [...normalizedSkus].map((s) => s.toLowerCase()).sort().join(",");
+      const sinceRace = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: raceRows } = await supabase
+        .from("digital_email_sends")
+        .select("id, created_at, order_id, skus, status, idempotency_key")
+        .ilike("customer_email", customerEmail)
+        .gte("created_at", sinceRace)
+        .order("created_at", { ascending: true })
+        .limit(100);
+
+      const earlier = (raceRows ?? []).find((row: {
+        idempotency_key: string | null; order_id: string | null; skus: string[] | null; status: string | null; created_at: string;
+      }) => {
+        if (row.idempotency_key === idemKey) return false;
+        if (String(row.status || "").toLowerCase() === "failed") return false;
+        const fp = (Array.isArray(row.skus) ? row.skus : [])
+          .map((s) => String(s || "").toLowerCase()).sort().join(",");
+        const sameOrder = !!orderId && !!row.order_id &&
+          String(row.order_id).toLowerCase() === String(orderId).toLowerCase();
+        return sameOrder || (!!skuFp && fp === skuFp);
+      });
+
+      if (earlier) {
+        await supabase.from("digital_email_sends").update({
+          status: "duplicate", last_event: "duplicate", last_event_at: new Date().toISOString(),
+        }).eq("idempotency_key", idemKey);
+        console.log("[send-digital] duplicate order collapsed", {
+          customerEmail, orderId, keptOrder: earlier.order_id,
+        });
+        await writeAudit({
+          customer_email: customerEmail, customer_name: customerName || null,
+          order_id: orderId || null, idempotency_key: idemKey,
+          requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+          resolved_skus: [], missing_skus: [], items: [],
+          status: "duplicate", provider: provider || null,
+          error: `duplicate of order ${earlier.order_id ?? "-"} @ ${earlier.created_at}`,
+        });
+        return new Response(
+          JSON.stringify({ success: true, duplicate: true, reason: "duplicate_order" }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+        );
+      }
+    }
+
+
+
     // Detect language from body → country → IP
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim()
       || req.headers.get("cf-connecting-ip") || "";
@@ -609,12 +664,38 @@ serve(async (req) => {
     });
 
     // Aviso de venta al administrador (todas las pasarelas). Nunca bloquea la entrega.
+    // Solo UN aviso por cliente y día: si el mismo comprador genera dos pedidos
+    // seguidos, el admin recibe un único correo.
     try {
       const adminEmail = Deno.env.get("ADMIN_2FA_EMAIL") || BRAND.supportEmail;
       const adminRecipients = Array.from(new Set([adminEmail, BRAND.supportEmail].filter(Boolean)));
+      const noticeKey = `admin-sale:${customerEmail.trim().toLowerCase()}:${new Date().toISOString().slice(0, 10)}`;
+      const { data: priorNotice } = await supabase
+        .from("email_send_log")
+        .select("id, created_at")
+        .eq("message_id", noticeKey)
+        .in("status", ["pending", "sent"])
+        .limit(1)
+        .maybeSingle();
+
+      if (priorNotice) {
+        console.log("[send-digital-ilinguerelax] admin sale notice deduped", {
+          noticeKey, priorAt: priorNotice.created_at,
+        });
+        throw new DedupedAdminNotice();
+      }
+
+      await supabase.from("email_send_log").insert({
+        message_id: noticeKey,
+        template_name: "admin-sale",
+        recipient_email: adminRecipients[0],
+        status: "sent",
+      });
+
       const productList = products.map((p) => `<li>${escapeHtml(p.name || prettifySlug(p.sku))}</li>`).join("");
       const amountLine = amount ? `${amount} ${currency || "USD"}` : "—";
       const adminSale = await resend.emails.send({
+
         from: `Ventas iLingue Relax <${BRAND.supportEmail}>`,
         to: adminRecipients,
         reply_to: BRAND.supportEmail,
@@ -639,8 +720,13 @@ serve(async (req) => {
       });
 
     } catch (adminSaleError) {
-      console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
+      if (adminSaleError instanceof DedupedAdminNotice) {
+        // Aviso ya enviado hoy para este cliente: nada que hacer.
+      } else {
+        console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
+      }
     }
+
 
 
 

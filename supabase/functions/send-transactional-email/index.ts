@@ -122,6 +122,38 @@ Deno.serve(async (req) => {
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // 1.b Anti-duplicados del aviso de venta al admin.
+  // Un mismo cliente puede generar 2 pedidos en la pasarela (reintento, doble
+  // clic, webhook + página de éxito) con los mismos productos. El admin solo
+  // debe recibir UN aviso por cliente y día.
+  if (templateName === 'admin-sale') {
+    const buyer = String(
+      templateData?.customerEmail || templateData?.customer_email || recipientEmail || ''
+    ).trim().toLowerCase()
+    if (buyer) {
+      const dayKey = new Date().toISOString().slice(0, 10)
+      const dedupeId = `admin-sale:${buyer}:${dayKey}`
+      const { data: priorNotice } = await supabase
+        .from('email_send_log')
+        .select('id, status, created_at')
+        .eq('message_id', dedupeId)
+        .in('status', ['pending', 'sent'])
+        .limit(1)
+        .maybeSingle()
+
+      if (priorNotice) {
+        console.log('Admin sale notice deduped', { buyer, dedupeId, priorAt: priorNotice.created_at })
+        return new Response(
+          JSON.stringify({ success: true, sent: false, duplicate: true, reason: 'admin_sale_already_notified' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      // Reservamos la clave del día: los siguientes intentos ven este registro.
+      messageId = dedupeId
+    }
+  }
+
+
   // 2. Check suppression list (fail-closed: if we can't verify, don't send)
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')

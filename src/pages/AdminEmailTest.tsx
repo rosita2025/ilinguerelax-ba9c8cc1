@@ -1041,40 +1041,37 @@ const AdminEmailTest = () => {
             </div>
 
 
-            {/* Desktop table */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-sm">
+            {/* Desktop table (sin scroll horizontal) */}
+            <div className="hidden lg:block w-full max-w-full overflow-hidden">
+              <table className="w-full table-fixed text-sm">
+                <colgroup>
+                  <col className="w-[16%]" />
+                  <col className="w-[24%]" />
+                  <col className="w-[16%]" />
+                  <col className="w-[14%]" />
+                  <col className="w-[18%]" />
+                  <col className="w-[12%]" />
+                </colgroup>
                 <thead className="text-xs uppercase text-muted-foreground border-b">
                   <tr>
-                    <th className="text-left py-2 pr-4">
+                    <th className="text-left py-2 pr-3">
                       <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("order_ref")}>
                         Orden <ArrowUpDown className="w-3 h-3" />
                         {sortKey === "order_ref" && <span className="text-[10px]">{sortDir}</span>}
                       </button>
                     </th>
-                    <th className="text-left py-2 pr-4">
+                    <th className="text-left py-2 pr-3">
                       <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("principal_sku")}>
-                        SKU principal <ArrowUpDown className="w-3 h-3" />
+                        Productos / SKUs <ArrowUpDown className="w-3 h-3" />
                         {sortKey === "principal_sku" && <span className="text-[10px]">{sortDir}</span>}
                       </button>
                     </th>
-                    <th className="text-left py-2 pr-4">
-                      <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("upsell_sku")}>
-                        SKU upsell / bono <ArrowUpDown className="w-3 h-3" />
-                        {sortKey === "upsell_sku" && <span className="text-[10px]">{sortDir}</span>}
-                      </button>
-                    </th>
-                    <th className="text-left py-2 pr-4">Detalle producto</th>
                     <th className="text-left py-2 pr-3">Validación</th>
-                    <th className="text-left py-2 pr-3">Entrega digital</th>
-                    <th className="text-left py-2 pr-3">Estado pago</th>
-                    <th className="text-left py-2 pr-3">Origen</th>
+                    <th className="text-left py-2 pr-3">Entrega / Estado</th>
                     <th className="text-left py-2 pr-3">Cliente</th>
-                    <th className="text-left py-2 pr-3">Email</th>
-                    <th className="text-left py-2 pr-3">Monto</th>
                     <th className="text-left py-2">
                       <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("date")}>
-                        Fecha <ArrowUpDown className="w-3 h-3" />
+                        Monto / Fecha <ArrowUpDown className="w-3 h-3" />
                         {sortKey === "date" && <span className="text-[10px]">{sortDir}</span>}
                       </button>
                     </th>
@@ -1087,25 +1084,26 @@ const AdminEmailTest = () => {
                     const v = validateRow(r);
                     return (
                     <tr key={r.id} className="border-b last:border-0 align-top">
-                      <td className="py-3 pr-4 font-mono text-sm font-bold whitespace-nowrap">{r.order_ref}</td>
-                      <td className="py-3 pr-4 font-mono text-xs whitespace-nowrap">
-                        {pSku ? <span className="px-2 py-0.5 rounded bg-primary/10 text-primary">{pSku}</span> : <span className="text-muted-foreground">—</span>}
+                      <td className="py-3 pr-3 font-mono text-xs font-bold break-all">{r.order_ref}</td>
+                      <td className="py-3 pr-3 text-xs space-y-1 break-words">
+                        <div className="flex flex-wrap gap-1">
+                          {pSku ? <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono text-[10px] break-all">{pSku}</span> : <span className="text-muted-foreground text-[11px]">sin SKU</span>}
+                          {uSku ? <span className="px-1.5 py-0.5 rounded bg-accent/10 text-accent-foreground font-mono text-[10px] break-all">{uSku}</span> : <span className="text-muted-foreground text-[11px]">sin upsell</span>}
+                        </div>
+                        <div className="break-words">{renderProducts(r)}</div>
                       </td>
-                      <td className="py-3 pr-4 font-mono text-xs">
-                        {uSku ? <span className="px-2 py-0.5 rounded bg-accent/10 text-accent-foreground">{uSku}</span> : <span className="text-muted-foreground">sin upsell</span>}
-                      </td>
-                      <td className="py-3 pr-4 text-xs">{renderProducts(r)}</td>
                       <td className="py-3 pr-3">
                         <div className="flex flex-col gap-1">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${v.ok ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
+                          <span className={`inline-flex w-fit items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${v.ok ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
                             {v.ok ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
                             {v.ok ? "OK" : "Revisar"}
                           </span>
                           <span className={`inline-flex items-center gap-1 text-[11px] ${v.hasSkus ? "text-emerald-700" : "text-red-700"}`}>
                             {v.hasSkus ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} SKUs
                           </span>
-                          <span className={`inline-flex items-center gap-1 text-[11px] ${v.emailSent ? "text-emerald-700" : v.shouldDeliver ? "text-red-700" : "text-muted-foreground"}`}>
-                            {v.emailSent ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Email {v.shouldDeliver ? "" : "(pago pendiente)"}
+                          <span className={`inline-flex items-start gap-1 text-[11px] break-words ${v.emailSent ? "text-emerald-700" : v.shouldDeliver ? "text-red-700" : "text-muted-foreground"}`}>
+                            {v.emailSent ? <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0" /> : <XCircle className="w-3 h-3 mt-0.5 shrink-0" />}
+                            <span>Email {v.shouldDeliver ? "" : "(pago pendiente)"}</span>
                           </span>
                           {!v.ok && v.shouldDeliver && v.hasSkus && !v.emailSent && (
                             <Button
@@ -1116,55 +1114,59 @@ const AdminEmailTest = () => {
                               disabled={retrying.has(r.id)}
                             >
                               <Send className={`w-3 h-3 mr-1 ${retrying.has(r.id) ? "animate-pulse" : ""}`} />
-                              {retrying.has(r.id) ? "Reenviando…" : "Reintentar envío"}
+                              {retrying.has(r.id) ? "Reenviando…" : "Reintentar"}
                             </Button>
                           )}
                         </div>
                       </td>
                       <td className="py-3 pr-3 text-xs">
-                        {r.delivery ? (
-                          <div className="space-y-1">
-                            <span className="inline-flex items-center gap-1">
-                              <Mail className="w-3 h-3 text-primary" />
-                              <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${statusColor(r.delivery.status || "")}`}>
-                                {r.delivery.last_event || r.delivery.status || "—"}
+                        <div className="space-y-1">
+                          {r.delivery ? (
+                            <>
+                              <span className="inline-flex items-center gap-1 flex-wrap">
+                                <Mail className="w-3 h-3 text-primary shrink-0" />
+                                <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium break-words ${statusColor(r.delivery.status || "")}`}>
+                                  {r.delivery.last_event || r.delivery.status || "—"}
+                                </span>
+                                {r.delivery.message_id ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <XCircle className="w-3 h-3 text-muted-foreground" />}
                               </span>
-                              {r.delivery.message_id ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <XCircle className="w-3 h-3 text-muted-foreground" />}
+                              <div className="text-[10px] text-muted-foreground">{fmt(r.delivery.last_event_at)}</div>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground text-[11px]">sin envío</span>
+                          )}
+                          <div className="flex flex-wrap gap-1 pt-0.5">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium break-words ${statusColor(r.status)}`}>
+                              {r.status}
                             </span>
-                            <div className="text-[11px] text-muted-foreground">{fmt(r.delivery.last_event_at)}</div>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${sourceColor[r.source]}`}>
+                              {sourceLabel[r.source]}
+                            </span>
                           </div>
-                        ) : (
-                          <span className="text-muted-foreground">pendiente / sin envío</span>
-                        )}
+                        </div>
                       </td>
-                      <td className="py-3 pr-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(r.status)}`}>
-                          {r.status}
-                        </span>
+                      <td className="py-3 pr-3 text-xs break-words">
+                        <div className="font-medium break-words">{r.customer}</div>
+                        <div className="text-[11px] text-muted-foreground break-all">{r.email}</div>
                       </td>
-                      <td className="py-3 pr-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sourceColor[r.source]}`}>
-                          {sourceLabel[r.source]}
-                        </span>
+                      <td className="py-3 text-xs">
+                        <div className="font-medium break-words">{r.amount}</div>
+                        <div className="text-[11px] text-muted-foreground break-words">{fmt(r.created_at)}</div>
                       </td>
-                      <td className="py-3 pr-3">{r.customer}</td>
-                      <td className="py-3 pr-3 text-xs">{r.email}</td>
-                      <td className="py-3 pr-3 text-xs whitespace-nowrap">{r.amount}</td>
-                      <td className="py-3 whitespace-nowrap text-xs">{fmt(r.created_at)}</td>
                     </tr>
                     );
                   })}
                   {visibleRows.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-10 text-center text-muted-foreground">
+                      <td colSpan={6} className="py-10 text-center text-muted-foreground">
                         {loading ? "Cargando pedidos…" : rows.length === 0 ? "Aún no hay pedidos registrados en ninguna fuente." : "Sin resultados para el filtro actual."}
                       </td>
-
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+
 
             {visibleRows.length > pageSize && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4 mt-4 border-t">

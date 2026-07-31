@@ -206,6 +206,8 @@ const AdminEmailTest = () => {
       });
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
       setCatalogList(Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+      setTokenAccess(((data as any)?.tokenAccess ?? []) as TokenAccessRow[]);
+
 
 
       const digitalByEmail = new Map<string, any>();

@@ -10,7 +10,8 @@ export type IndexingChannel =
   | "sitemap_ping"
   | "gsc_sitemap"
   | "gsc_inspect"
-  | "gsc_request";
+  | "gsc_request"
+  | "google_indexing";
 
 export type IndexingStatus = "pending" | "sent" | "validated" | "error";
 

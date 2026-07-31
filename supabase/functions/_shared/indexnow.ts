@@ -3,6 +3,7 @@
  * Failures are swallowed — SEO pings must never block the caller.
  */
 import { logIndexingEvents, type IndexingEvent } from "./indexingLog.ts";
+import { notifyGoogleIndexing } from "./googleIndexing.ts";
 
 const INDEXNOW_KEY = "ilr7k3n9x2q8w5m4v6b1p0d3s7z4h2y8";
 const HOST = "ilinguerelax.com";
@@ -231,6 +232,8 @@ export async function pingPostPublished(slug: string): Promise<void> {
       pingIndexNow([postUrl, `https://${HOST}/blog`]),
       pingSitemap(),
       pingWebSub(),
+      // 4) Google Indexing API (si hay cuenta de servicio configurada)
+      notifyGoogleIndexing([postUrl], "URL_UPDATED"),
     ]);
     console.log("[pingPostPublished] done for", postUrl);
   } catch (err) {

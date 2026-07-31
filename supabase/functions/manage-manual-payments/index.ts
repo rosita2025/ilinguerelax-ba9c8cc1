@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 import { markAbandonedCartConverted, sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSku } from "../_shared/digitalSku.ts";
+import { ensureDownloadUrl } from "../_shared/downloadToken.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -228,11 +229,21 @@ Deno.serve(async (req) => {
           orderNumber: order.order_number,
           idempotencyKey: `manual-thankyou-${order.order_number}`,
         }),
-        sendTemplate(admin, "material-delivery", order.buyer_email, deliveryIdemKey, {
-          customerName: order.buyer_name,
-          orderNumber: order.order_number,
-          materials,
-        }).then(() => upsertDelivery({ status: "sent", last_event: "material-delivery" })),
+        (async () => {
+          // Nunca enviamos enlaces de Drive por correo: solo la URL privada
+          // /mi-descarga?t=<token>, con límites de descarga y auditoría.
+          const downloadUrl = await ensureDownloadUrl(
+            admin, order.order_number, order.buyer_email, resolvedSkus,
+          );
+          return sendTemplate(admin, "material-delivery", order.buyer_email, deliveryIdemKey, {
+            customerName: order.buyer_name,
+            orderNumber: order.order_number,
+            materials: materials.map((m) => ({
+              productName: m.productName,
+              downloadUrl: downloadUrl ?? "https://ilinguerelax.com/mi-pedido",
+            })),
+          });
+        })().then(() => upsertDelivery({ status: "sent", last_event: "material-delivery" })),
         upsertBrevoContact({
           email: order.buyer_email,
           name: order.buyer_name,

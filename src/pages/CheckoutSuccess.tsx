@@ -384,72 +384,42 @@ export default function CheckoutSuccess() {
               <p className="text-sm text-muted-foreground">Cargando enlaces…</p>
             )}
             <div className="space-y-3">
-              {delivery.map((d) => {
-                const bonusList: BonusEntry[] = [
-                  ...(d.bonus_drive_url ? [{ name: d.bonus_name || "Bonus", drive_url: d.bonus_drive_url, access_key: d.bonus_access_key || "" }] : []),
-                  ...((d.bonuses ?? []).filter((b) => b?.drive_url)),
-                ];
-                return (
-                  <div key={d.sku} className="rounded-lg border bg-card p-4 space-y-3">
-                    <div className="flex items-center gap-3">
-                      {d.cover_image_url && (
-                        <img src={d.cover_image_url} alt={d.name} className="w-12 h-12 rounded object-cover" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">{d.name}</div>
-                      </div>
-                    </div>
-                    {d.drive_url ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Button asChild size="sm" className="gap-1.5">
-                          <a href={d.drive_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="w-4 h-4" /> Descargar / Ver en Drive
-                          </a>
-                        </Button>
-                        {d.access_key && (
-                          <button
-                            type="button"
-                            onClick={() => copyKey(d.access_key!)}
-                            className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md border bg-background hover:bg-muted"
-                            title="Copiar clave"
-                          >
-                            <Copy className="w-3.5 h-3.5" /> Clave: <code className="font-mono">{d.access_key}</code>
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        Te enviaremos el enlace de descarga a <strong>{buyer.email}</strong> en unos minutos.
-                      </p>
+              {delivery.map((d) => (
+                <div key={d.sku} className="rounded-lg border bg-card p-4 space-y-2">
+                  <div className="flex items-center gap-3">
+                    {d.cover_image_url && (
+                      <img src={d.cover_image_url} alt={d.name} className="w-12 h-12 rounded object-cover" />
                     )}
-                    {bonusList.length > 0 && (
-                      <div className="pt-2 border-t space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-                          <Gift className="w-3.5 h-3.5" /> Bonos incluidos
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">{d.name}</div>
+                      {d.bonus_count > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs text-primary">
+                          <Gift className="w-3.5 h-3.5" />
+                          {d.bonus_count} {d.bonus_count === 1 ? "bono incluido" : "bonos incluidos"}
                         </div>
-                        {bonusList.map((b, idx) => (
-                          <div key={idx} className="flex flex-wrap items-center gap-2 text-xs">
-                            <span className="font-medium">{b.name || `Bonus ${idx + 1}`}:</span>
-                            <a href={b.drive_url} target="_blank" rel="noopener noreferrer" className="text-primary underline inline-flex items-center gap-1">
-                              <Download className="w-3 h-3" /> Descargar
-                            </a>
-                            {b.access_key && (
-                              <button
-                                type="button"
-                                onClick={() => copyKey(b.access_key!)}
-                                className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-                              >
-                                <Copy className="w-3 h-3" /> <code className="font-mono">{b.access_key}</code>
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                );
-              })}
+                  {!d.available && (
+                    <p className="text-xs text-muted-foreground">
+                      Te enviaremos el enlace de descarga a <strong>{buyer.email}</strong> en unos minutos.
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
+            {downloadUrl && (
+              <Button asChild size="sm" className="gap-1.5">
+                <a href={downloadUrl}>
+                  <Download className="w-4 h-4" /> Abrir mis descargas
+                </a>
+              </Button>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Por seguridad los archivos se abren desde tu página privada de descargas; el enlace es
+              personal, tiene caducidad y queda registrado.
+            </p>
+
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Button size="sm" variant="outline" onClick={resendDigital} disabled={resending} className="gap-1.5">
                 <Mail className="w-4 h-4" /> {resending ? "Reenviando…" : "Reenviar enlaces a mi correo"}

@@ -23,6 +23,9 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
+import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+import { normalizeSkus } from "../_shared/digitalSku.ts";
 import {
   dlocalApiBase,
   isSettledStatus,
@@ -100,7 +103,7 @@ Deno.serve(async (req) => {
     }
 
     const now = Date.now();
-    let checked = 0, abandoned = 0, rejected = 0, recovered = 0, stillPending = 0;
+    let checked = 0, abandoned = 0, rejected = 0, recovered = 0, stillPending = 0, delivered = 0, deliveryFailed = 0;
 
     for (const [orderNumber, events] of byOrder) {
       // Ya resuelto: no se toca (jamás se sobrescribe un pedido cerrado).
@@ -252,7 +255,7 @@ Deno.serve(async (req) => {
       abandoned++;
     }
 
-    const result = { ok: true, orders: byOrder.size, checked, abandoned, rejected, recovered, stillPending };
+    const result = { ok: true, orders: byOrder.size, checked, abandoned, rejected, recovered, delivered, deliveryFailed, stillPending };
     console.log("[dlocal-sweep]", JSON.stringify(result));
     return json(result);
   } catch (err) {

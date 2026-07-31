@@ -184,6 +184,79 @@ serve(async (req) => {
         return json({ ok: true, result: res.data });
       }
 
+      // ---- Flujo de aprobación editorial ----
+      case "list-drafts": {
+        const { data, error } = await supabase
+          .from("generated_blog_posts")
+          .select("id,slug,title,excerpt,category,keyword,read_time,published,created_at")
+          .eq("published", false)
+          .order("created_at", { ascending: false })
+          .limit(100);
+        if (error) throw error;
+        return json({ drafts: data ?? [] });
+      }
+
+      case "preview": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { data, error } = await supabase
+          .from("generated_blog_posts")
+          .select("id,slug,title,excerpt,content,category,keyword,published")
+          .eq("id", body.id)
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) return json({ error: "Artículo no encontrado" }, 404);
+        return json({ post: data });
+      }
+
+      case "approve": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { data, error } = await supabase
+          .from("generated_blog_posts")
+          .update({ published: true })
+          .eq("id", body.id)
+          .eq("published", false)
+          .select("id,slug")
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) return json({ error: "El artículo no existe o ya está publicado" }, 409);
+
+        const postUrl = `https://ilinguerelax.com/blog/${data.slug}`;
+        await Promise.allSettled([
+          pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
+          pingSitemap(),
+          resubmitSitemapsGSC(),
+        ]);
+        await supabase
+          .from("generated_blog_posts")
+          .update({ google_index_requested_at: new Date().toISOString() })
+          .eq("id", data.id)
+          .is("google_index_requested_at", null);
+
+        return json({ ok: true, slug: data.slug });
+      }
+
+      case "unpublish": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { error } = await supabase
+          .from("generated_blog_posts")
+          .update({ published: false })
+          .eq("id", body.id);
+        if (error) throw error;
+        return json({ ok: true });
+      }
+
+      case "reject": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { error } = await supabase
+          .from("generated_blog_posts")
+          .delete()
+          .eq("id", body.id)
+          .eq("published", false);
+        if (error) throw error;
+        return json({ ok: true });
+      }
+
+
       default:
         return json({ error: "Acción no válida" }, 400);
     }

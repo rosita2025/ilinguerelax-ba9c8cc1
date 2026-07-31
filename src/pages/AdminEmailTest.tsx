@@ -976,8 +976,9 @@ const AdminEmailTest = () => {
 
 
           <Card className="p-2.5 sm:p-4 md:p-6">
-            {/* Mobile card list */}
-            <div className="md:hidden space-y-3">
+            {/* Mobile + iPad card list */}
+            <div className="lg:hidden space-y-3">
+
               {pagedRows.map((r) => {
                 const pSku = principalSkuOf(r);
                 const uSku = upsellSkusOf(r);

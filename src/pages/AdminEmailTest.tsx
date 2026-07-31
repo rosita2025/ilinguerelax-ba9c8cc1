@@ -147,6 +147,16 @@ const AdminEmailTest = () => {
   const [auditAlert, setAuditAlert] = useState<{ errors: number; partial: number; last?: string } | null>(null);
   // Catálogo activo (SKUs válidos) para validar antes de reenviar
   const [catalogSkus, setCatalogSkus] = useState<Set<string>>(new Set());
+  const [catalogList, setCatalogList] = useState<ProductMeta[]>([]);
+  // Envío de prueba (material real: principal + upsells + bonos)
+  const [testEmail, setTestEmail] = useState("youtumundial2017@gmail.com");
+  const [testSkus, setTestSkus] = useState<string[]>([
+    "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
+    "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+    "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  ]);
+  const [sendingTest, setSendingTest] = useState(false);
+
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);
@@ -177,6 +187,8 @@ const AdminEmailTest = () => {
         }
       });
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
+      setCatalogList(Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+
 
       const digitalByEmail = new Map<string, any>();
       const digitalByOrder = new Map<string, any>();
@@ -344,6 +356,53 @@ const AdminEmailTest = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
+
+  // Envío de prueba: manda el material real (producto principal + upsells + sus
+  // bonos) al correo indicado, usando el mismo camino que una compra verificada.
+  const toggleTestSku = (sku: string) =>
+    setTestSkus((prev) => (prev.includes(sku) ? prev.filter((s) => s !== sku) : [...prev, sku]));
+
+  const sendTest = async () => {
+    const email = testEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) {
+      toast.error("Correo de prueba inválido");
+      return;
+    }
+    if (testSkus.length === 0) {
+      toast.error("Selecciona al menos un producto");
+      return;
+    }
+    setSendingTest(true);
+    try {
+      const { data, error } = await adminInvoke<{ ok?: boolean; error?: string; details?: string }>(
+        "manage-delivery-retry",
+        {
+          body: {
+            adminKey,
+            action: "resend_order",
+            customerEmail: email,
+            customerName: "Prueba iLingue Relax",
+            orderId: `ILR-TEST-${Date.now().toString(36).toUpperCase()}`,
+            skus: testSkus,
+            provider: "admin-test",
+          },
+        },
+      );
+      if (error) {
+        const ctx = (error as unknown as { context?: { text?: () => Promise<string> } })?.context;
+        const detail = ctx?.text ? await ctx.text().catch(() => "") : "";
+        throw new Error(detail || error.message);
+      }
+      if (data?.error) throw new Error(data.details || data.error);
+      toast.success(`Correo de prueba enviado a ${email} con ${testSkus.length} producto(s)`);
+      scheduleReload();
+    } catch (e) {
+      toast.error(`No se pudo enviar la prueba: ${(e as Error).message}`);
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
 
   const retryDelivery = async (r: OrderRow) => {
     // 1) Email válido
@@ -574,6 +633,53 @@ const AdminEmailTest = () => {
               </Button>
             </div>
           </header>
+
+          <Card className="p-3 md:p-4 space-y-3 border-l-4 border-l-primary/60">
+            <div className="flex items-center gap-2">
+              <Send className="w-4 h-4 text-primary" />
+              <h2 className="text-sm md:text-base font-semibold">Envío de prueba (material real)</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Envía el correo de entrega igual que una compra verificada: producto principal, upsells y sus bonos.
+              El primer producto marcado se envía como principal.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Input
+                type="email"
+                value={testEmail}
+                onChange={(e) => setTestEmail(e.target.value)}
+                placeholder="correo@ejemplo.com"
+                className="h-9"
+              />
+              <Button onClick={sendTest} disabled={sendingTest} className="h-9 shrink-0">
+                <Mail className={`w-4 h-4 mr-1.5 ${sendingTest ? "animate-pulse" : ""}`} />
+                {sendingTest ? "Enviando…" : "Enviar prueba"}
+              </Button>
+            </div>
+            <div className="grid gap-1.5 sm:grid-cols-2">
+              {catalogList.map((p) => (
+                <label key={p.sku} className="flex items-start gap-2 text-xs cursor-pointer rounded border p-2 hover:bg-muted/50">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5"
+                    checked={testSkus.includes(p.sku)}
+                    onChange={() => toggleTestSku(p.sku)}
+                  />
+                  <span className="min-w-0">
+                    <span className="block font-medium truncate">{p.name}</span>
+                    <span className="text-muted-foreground">
+                      {p.bonusCount > 0 ? `🎁 ${p.bonusCount} bono(s)` : "Sin bonos"}
+                    </span>
+                  </span>
+                </label>
+              ))}
+              {catalogList.length === 0 && (
+                <span className="text-xs text-muted-foreground">Cargando catálogo…</span>
+              )}
+            </div>
+          </Card>
+
+
 
           {(() => {
             const totalIssues = (auditAlert?.errors ?? 0) + (auditAlert?.partial ?? 0);

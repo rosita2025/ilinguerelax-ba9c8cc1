@@ -134,3 +134,24 @@ export function isFailedStatus(status: unknown): boolean {
   return (DLOCAL_FAILED_STATUSES as readonly string[])
     .includes(String(status ?? "").trim().toUpperCase());
 }
+
+// ---------------------------------------------------------------------------
+// Entorno (sandbox / producción).
+//
+// dLocal Go tiene dos hosts distintos y las credenciales NO son intercambiables:
+// una llave de sandbox contra el host de producción devuelve 401 y el pago
+// "desaparece". `DLOCAL_GO_ENV=sandbox` conmuta todo el flujo (crear pago,
+// webhook y consulta de estado) al host de pruebas; por defecto: producción.
+// ---------------------------------------------------------------------------
+export type DlocalEnv = "sandbox" | "live";
+
+export function dlocalEnv(): DlocalEnv {
+  const raw = (Deno.env.get("DLOCAL_GO_ENV") ?? "").trim().toLowerCase();
+  return raw === "sandbox" || raw === "sbx" || raw === "test" ? "sandbox" : "live";
+}
+
+export function dlocalApiBase(): string {
+  return dlocalEnv() === "sandbox"
+    ? "https://api-sbx.dlocalgo.com/v1"
+    : "https://api.dlocalgo.com/v1";
+}

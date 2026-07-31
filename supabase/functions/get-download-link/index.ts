@@ -127,10 +127,30 @@ Deno.serve(async (req) => {
     const sig = await sign(data);
     const base = `${Deno.env.get("SUPABASE_URL")}/functions/v1/get-download-link`;
 
-    await admin
-      .from("download_tokens")
-      .update({ download_count: (row.download_count ?? 0) + 1, last_accessed_at: new Date().toISOString() })
-      .eq("id", row.id);
+    // El cupo se cobra UNA sola vez por archivo distinto (producto, upsell o bono):
+    // volver a abrir el mismo archivo no gasta descargas y no mezcla los ítems del pedido.
+    const fileKey = `${sku}#${kind}#${index}`;
+    const { data: prior } = await admin
+      .from("download_token_access")
+      .select("id")
+      .eq("token_id", row.id)
+      .eq("action", "ticket")
+      .eq("sku", fileKey)
+      .limit(1);
+    const alreadyCharged = (prior ?? []).length > 0;
+
+    if (!alreadyCharged) {
+      await admin.from("download_token_access").insert({ token_id: row.id, action: "ticket", sku: fileKey });
+      await admin
+        .from("download_tokens")
+        .update({ download_count: (row.download_count ?? 0) + 1, last_accessed_at: new Date().toISOString() })
+        .eq("id", row.id);
+    } else {
+      await admin
+        .from("download_tokens")
+        .update({ last_accessed_at: new Date().toISOString() })
+        .eq("id", row.id);
+    }
 
     return dlJson({
       status: "ok",
@@ -138,8 +158,9 @@ Deno.serve(async (req) => {
       accessKey: file.accessKey,
       url: `${base}?d=${data}&s=${sig}`,
       expiresIn: TTL_MS / 1000,
-      downloadsLeft: Math.max(0, (row.max_downloads ?? 0) - (row.download_count ?? 0) - 1),
+      downloadsLeft: Math.max(0, (row.max_downloads ?? 0) - (row.download_count ?? 0) - (alreadyCharged ? 0 : 1)),
     });
+
   } catch (e) {
     console.error("[get-download-link]", e);
     return dlJson({ error: "Error interno" }, 500);

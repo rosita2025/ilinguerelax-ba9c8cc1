@@ -323,6 +323,21 @@ export default function MiDescarga() {
               </Card>
             ))}
 
+            {(state.missingSkus?.length ?? 0) > 0 && (
+              <Card>
+                <CardContent className="py-5 text-sm text-muted-foreground">
+                  Hay {state.missingSkus!.length} artículo(s) de tu pedido que aún no están listos para descargar.
+                  Escríbenos a{" "}
+                  <a className="text-primary underline" href="mailto:hola@ilinguerelax.com">
+                    hola@ilinguerelax.com
+                  </a>{" "}
+                  con tu número de pedido y los enviamos enseguida.
+                </CardContent>
+              </Card>
+            )}
+
+
+
             <Card>
               <CardContent className="space-y-3 py-6">
                 <p className="text-sm text-muted-foreground">

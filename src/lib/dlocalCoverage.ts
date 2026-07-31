@@ -9,6 +9,15 @@
  */
 export type DlocalKind = "transfer" | "cash" | "wallet";
 
+/**
+ * dLocal Go quedó habilitado SOLO para transferencia bancaria y pago en
+ * efectivo en todos los países de LATAM. Tarjetas (SmartFields) y billetera
+ * digital están desactivadas por decisión del negocio.
+ */
+export const DLOCAL_CARD_ENABLED = false;
+export const DLOCAL_WALLET_ENABLED = false;
+
+
 export type DlocalCountry = {
   code: string;
   name: string;

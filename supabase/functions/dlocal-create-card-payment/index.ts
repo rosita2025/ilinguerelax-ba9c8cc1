@@ -93,7 +93,11 @@ Deno.serve(async (req) => {
       : undefined;
 
     const payload: Record<string, unknown> = {
-      amount: Number(body.amount.toFixed(2)),
+      // En USD cobramos exactamente el total del catálogo; en moneda local se
+      // usa el importe ya validado contra expectedTotalUsd.
+      amount: body.currency.toUpperCase() === "USD"
+        ? calculatedUsd
+        : Number(body.amount.toFixed(2)),
       currency: body.currency.toUpperCase(),
       country: body.country.toUpperCase(),
       order_id: orderId,

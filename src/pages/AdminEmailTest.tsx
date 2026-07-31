@@ -819,8 +819,8 @@ const AdminEmailTest = () => {
                 className={`p-3 md:p-4 cursor-pointer transition active:scale-95 ${sourceFilter === s ? "ring-2 ring-primary" : ""}`}
                 onClick={() => setSourceFilter(sourceFilter === s ? "all" : s)}
               >
-                <div className="text-[11px] md:text-xs text-muted-foreground">{sourceLabel[s]}</div>
-                <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1">{counts[s]}</div>
+                <div className="text-[10px] md:text-xs text-muted-foreground leading-tight truncate">{sourceLabel[s]}</div>
+                <div className="text-lg md:text-2xl font-bold mt-0.5 md:mt-1">{counts[s]}</div>
               </Card>
             ))}
           </div>

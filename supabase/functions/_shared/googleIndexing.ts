@@ -180,10 +180,34 @@ export async function indexingApiQuota(): Promise<{
 
 // ---------------------------------------------------------------- publish
 
-function parseBatchStatuses(body: string, expected: number): number[] {
-  const codes = Array.from(body.matchAll(/^HTTP\/[\d.]+ (\d{3})/gm)).map((m) => Number(m[1]));
-  while (codes.length < expected) codes.push(0);
-  return codes.slice(0, expected);
+function parseBatchStatuses(body: string, expected: number, batchId?: string): number[] {
+  const codes = new Array<number>(expected).fill(0);
+
+  // Google responde con las partes en cualquier orden, pero cada una repite el
+  // Content-ID que enviamos (prefijado con "response-"). Mapeamos por índice.
+  if (batchId) {
+    const re = new RegExp(
+      `Content-ID:\\s*<[^>]*${batchId}\\+(\\d+)>[\\s\\S]*?HTTP/[\\d.]+ (\\d{3})`,
+      "gi",
+    );
+    let m: RegExpExecArray | null;
+    let matched = 0;
+    while ((m = re.exec(body)) !== null) {
+      const idx = Number(m[1]);
+      if (idx >= 0 && idx < expected) {
+        codes[idx] = Number(m[2]);
+        matched++;
+      }
+    }
+    if (matched === expected) return codes;
+  }
+
+  // Fallback: orden secuencial de los códigos de estado.
+  const seq = Array.from(body.matchAll(/^HTTP\/[\d.]+ (\d{3})/gm)).map((x) => Number(x[1]));
+  for (let i = 0; i < expected; i++) {
+    if (!codes[i]) codes[i] = seq[i] ?? 0;
+  }
+  return codes;
 }
 
 async function publishBatch(
@@ -211,14 +235,27 @@ async function publishBatch(
     }];
   }
 
-  const boundary = `idx-${crypto.randomUUID()}`;
+  // Formato exacto de la doc: cada parte es una petición HTTP completa con
+  // Content-Type: application/http, Content-Transfer-Encoding: binary,
+  // Content-ID único y content-length del cuerpo JSON.
+  const boundary = `===============${crypto.randomUUID()}==`;
+  const batchId = crypto.randomUUID();
+  const encoder = new TextEncoder();
   const parts = urls
-    .map(
-      (u) =>
-        `--${boundary}\r\nContent-Type: application/http\r\n\r\n` +
-        `POST /v3/urlNotifications:publish\r\nContent-Type: application/json\r\n\r\n` +
-        `${JSON.stringify({ url: u, type })}\r\n`,
-    )
+    .map((u, i) => {
+      const payload = JSON.stringify({ url: u, type });
+      return (
+        `--${boundary}\r\n` +
+        `Content-Type: application/http\r\n` +
+        `Content-Transfer-Encoding: binary\r\n` +
+        `Content-ID: <${batchId}+${i}>\r\n\r\n` +
+        `POST /v3/urlNotifications:publish\r\n` +
+        `Content-Type: application/json\r\n` +
+        `accept: application/json\r\n` +
+        `content-length: ${encoder.encode(payload).length}\r\n\r\n` +
+        `${payload}\r\n`
+      );
+    })
     .join("");
   const body = `${parts}--${boundary}--\r\n`;
 
@@ -226,13 +263,15 @@ async function publishBatch(
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": `multipart/mixed; boundary=${boundary}`,
+      "Content-Type": `multipart/mixed; boundary="${boundary}"`,
     },
     body,
   });
   const text = await res.text().catch(() => "");
   if (!res.ok) console.warn("[googleIndexing] batch", res.status, text.slice(0, 240));
-  const codes = res.ok ? parseBatchStatuses(text, urls.length) : urls.map(() => res.status);
+  const codes = res.ok
+    ? parseBatchStatuses(text, urls.length, batchId)
+    : urls.map(() => res.status);
   return urls.map((u, i) => {
     const code = codes[i] || res.status;
     const ok = code >= 200 && code < 300;

@@ -519,7 +519,7 @@ const AdminEmailTest = () => {
             <div className="flex items-start gap-2">
               <PackageCheck className="w-4 h-4 text-primary mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
-                <div className="font-semibold leading-snug">{p.name}</div>
+                <div className="font-semibold leading-snug break-words">{p.name}</div>
                 {p.sku && <div className="font-mono text-[11px] text-muted-foreground break-all mt-0.5">SKU: {p.sku}</div>}
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                   <span className="px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium capitalize">{p.role}</span>

@@ -603,6 +603,7 @@ const AdminSEO = () => {
 
           <GscKeywordsMultilangCard />
           <GoogleSuggestCard />
+          <BlogScheduleCard />
 
 
 

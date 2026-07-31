@@ -812,15 +812,15 @@ const AdminEmailTest = () => {
 
 
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card
                 key={s}
                 className={`p-3 md:p-4 cursor-pointer transition active:scale-95 ${sourceFilter === s ? "ring-2 ring-primary" : ""}`}
                 onClick={() => setSourceFilter(sourceFilter === s ? "all" : s)}
               >
-                <div className="text-[11px] md:text-xs text-muted-foreground">{sourceLabel[s]}</div>
-                <div className="text-xl md:text-2xl font-bold mt-0.5 md:mt-1">{counts[s]}</div>
+                <div className="text-[10px] md:text-xs text-muted-foreground leading-tight truncate">{sourceLabel[s]}</div>
+                <div className="text-lg md:text-2xl font-bold mt-0.5 md:mt-1">{counts[s]}</div>
               </Card>
             ))}
           </div>
@@ -835,25 +835,25 @@ const AdminEmailTest = () => {
                 className="pl-9 h-10"
               />
             </div>
-            <div className="flex flex-wrap gap-1.5 md:gap-2 w-full md:w-auto">
+            <div className="grid grid-cols-3 gap-1.5 md:flex md:flex-wrap md:gap-2 w-full md:w-auto">
               {(["all", "manual", "stripe", "paypal", "mercadopago", "digital"] as const).map((s) => (
                 <Button
                   key={s}
                   size="sm"
-                  className="h-9 px-3 text-xs"
+                  className="h-9 px-2 text-[11px] md:text-xs md:px-3 w-full md:w-auto"
                   variant={sourceFilter === s ? "default" : "outline"}
                   onClick={() => setSourceFilter(s)}
                 >
-                  {s === "all" ? "Todos" : sourceLabel[s as Source]}
+                  <span className="truncate">{s === "all" ? "Todos" : sourceLabel[s as Source]}</span>
                 </Button>
               ))}
               <Button
                 size="sm"
-                className="h-9 px-3 text-xs"
+                className="h-9 px-2 text-[11px] md:text-xs md:px-3 col-span-3 md:col-auto w-full md:w-auto"
                 variant={onlyProblems ? "destructive" : "outline"}
                 onClick={() => setOnlyProblems((v) => !v)}
               >
-                <AlertTriangle className="w-3 h-3 mr-1" />
+                <AlertTriangle className="w-3 h-3 mr-1 shrink-0" />
                 Problemas ({problemCount})
               </Button>
             </div>
@@ -875,7 +875,7 @@ const AdminEmailTest = () => {
           </Card>
 
 
-          <Card className="p-4 md:p-6">
+          <Card className="p-2.5 sm:p-4 md:p-6">
             {/* Mobile card list */}
             <div className="md:hidden space-y-3">
               {pagedRows.map((r) => {
@@ -1066,15 +1066,15 @@ const AdminEmailTest = () => {
             </div>
 
             {visibleRows.length > pageSize && (
-              <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t flex-wrap">
-                <div className="text-xs text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4 mt-4 border-t">
+                <div className="text-xs text-muted-foreground text-center sm:text-left">
                   Página {currentPage} de {totalPages}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(1)} disabled={currentPage === 1}>« Inicio</Button>
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Anterior</Button>
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente ›</Button>
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Final »</Button>
+                <div className="grid grid-cols-4 gap-1.5 sm:flex sm:items-center">
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage(1)} disabled={currentPage === 1}>« Inicio</Button>
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Ant.</Button>
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Sig. ›</Button>
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Final »</Button>
                 </div>
               </div>
             )}

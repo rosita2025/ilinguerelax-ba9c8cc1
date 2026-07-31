@@ -180,10 +180,34 @@ export async function indexingApiQuota(): Promise<{
 
 // ---------------------------------------------------------------- publish
 
-function parseBatchStatuses(body: string, expected: number): number[] {
-  const codes = Array.from(body.matchAll(/^HTTP\/[\d.]+ (\d{3})/gm)).map((m) => Number(m[1]));
-  while (codes.length < expected) codes.push(0);
-  return codes.slice(0, expected);
+function parseBatchStatuses(body: string, expected: number, batchId?: string): number[] {
+  const codes = new Array<number>(expected).fill(0);
+
+  // Google responde con las partes en cualquier orden, pero cada una repite el
+  // Content-ID que enviamos (prefijado con "response-"). Mapeamos por índice.
+  if (batchId) {
+    const re = new RegExp(
+      `Content-ID:\\s*<[^>]*${batchId}\\+(\\d+)>[\\s\\S]*?HTTP/[\\d.]+ (\\d{3})`,
+      "gi",
+    );
+    let m: RegExpExecArray | null;
+    let matched = 0;
+    while ((m = re.exec(body)) !== null) {
+      const idx = Number(m[1]);
+      if (idx >= 0 && idx < expected) {
+        codes[idx] = Number(m[2]);
+        matched++;
+      }
+    }
+    if (matched === expected) return codes;
+  }
+
+  // Fallback: orden secuencial de los códigos de estado.
+  const seq = Array.from(body.matchAll(/^HTTP\/[\d.]+ (\d{3})/gm)).map((x) => Number(x[1]));
+  for (let i = 0; i < expected; i++) {
+    if (!codes[i]) codes[i] = seq[i] ?? 0;
+  }
+  return codes;
 }
 
 async function publishBatch(

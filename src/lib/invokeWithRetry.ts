@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { reportClientError } from "@/lib/errorReporter";
+import { edgeErrorStatus, extractEdgeErrorMessage } from "@/lib/edgeError";
 
 export interface InvokeRetryOptions {
   /** Max attempts including the first. Default 3. */
@@ -27,8 +28,10 @@ const DEFAULT_RETRYABLE = (err: unknown): boolean => {
   const anyErr = err as { status?: number; message?: string; name?: string };
   // Network / abort / timeout / 5xx / 408 / 429 → retry
   if (anyErr.name === "AbortError") return false;
-  if (typeof anyErr.status === "number") {
-    return anyErr.status >= 500 || anyErr.status === 408 || anyErr.status === 429;
+  // FunctionsHttpError expone el status real en context.status
+  const httpStatus = edgeErrorStatus(err) ?? (typeof anyErr.status === "number" ? anyErr.status : null);
+  if (typeof httpStatus === "number") {
+    return httpStatus >= 500 || httpStatus === 408 || httpStatus === 429;
   }
   const msg = String(anyErr.message ?? err).toLowerCase();
   return (
@@ -40,7 +43,23 @@ const DEFAULT_RETRYABLE = (err: unknown): boolean => {
   );
 };
 
+/** Adjunta el mensaje real de la Edge Function (body JSON) al error. */
+async function withEdgeDetail(error: unknown): Promise<unknown> {
+  if (!error || typeof error !== "object") return error;
+  try {
+    const detail = await extractEdgeErrorMessage(error);
+    if (detail) {
+      (error as { edgeDetail?: string }).edgeDetail = detail;
+    }
+    const status = edgeErrorStatus(error);
+    if (status != null) (error as { status?: number }).status = status;
+  } catch { /* ignore */ }
+  return error;
+}
+
 const sleep = (ms: number, signal?: AbortSignal) =>
+
+
   new Promise<void>((resolve, reject) => {
     const t = setTimeout(resolve, ms);
     if (signal) {
@@ -81,12 +100,12 @@ export async function invokeWithRetry<T = unknown>(
       lastError = error;
       if (!error) return { data: data as T, error: null };
       if (attempt >= attempts || !isRetryable(error, data)) {
-        return { data: data as T, error };
+        return { data: data as T, error: await withEdgeDetail(error) };
       }
     } catch (err) {
       lastError = err;
       if (attempt >= attempts || !isRetryable(err, null)) {
-        return { data: null, error: err };
+        return { data: null, error: await withEdgeDetail(err) };
       }
     }
     const jitter = Math.floor(Math.random() * 150);

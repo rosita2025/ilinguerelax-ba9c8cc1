@@ -735,8 +735,9 @@ const AdminEmailTest = () => {
               Auditoría de <code className="px-1 rounded bg-muted">/mi-descarga?t=</code>: fecha (hora Perú), pedido, proveedor de pago,
               acción y número de descarga usada. Nunca se muestran tokens ni enlaces de Drive.
             </p>
-            {/* Móvil: tarjetas compactas (sin scroll horizontal) */}
-            <div className="md:hidden space-y-2">
+            {/* Móvil / iPad: tarjetas compactas (sin scroll horizontal) */}
+            <div className="lg:hidden space-y-2">
+
               {tokenAccess.slice((tokenPage - 1) * TOKEN_PAGE_SIZE, tokenPage * TOKEN_PAGE_SIZE).map((r) => (
                 <div key={r.id} className="rounded-lg border p-2 text-xs space-y-1 min-w-0 overflow-hidden">
                   <div className="flex items-center justify-between gap-2 min-w-0">

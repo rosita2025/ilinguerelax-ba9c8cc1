@@ -79,14 +79,30 @@ Deno.serve(async (req) => {
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
 
-    const orderNumber = parsed.data.orderNumber.toUpperCase();
-    const email = canonicalEmail(parsed.data.email);
-    if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    let orderNumber: string;
+    let email: string | null = null;
+
+    if ("token" in parsed.data) {
+      // El token de descarga ya prueba la propiedad del pedido.
+      const { data: tk } = await supabase
+        .from("download_tokens")
+        .select("order_number, email, revoked")
+        .eq("token", parsed.data.token)
+        .maybeSingle();
+      if (!tk || tk.revoked) return json({ found: false }, 200);
+      orderNumber = String(tk.order_number).toUpperCase();
+      email = canonicalEmail(tk.email);
+    } else {
+      orderNumber = parsed.data.orderNumber.toUpperCase();
+      email = canonicalEmail(parsed.data.email);
+      if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
+    }
+
 
     const [{ data: events }, { data: manual }, { data: sends }] = await Promise.all([
       supabase

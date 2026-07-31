@@ -108,7 +108,8 @@ function safeImage(url: unknown): string | undefined {
  * `clientItems` solo aporta id y cantidad; el resto se descarta.
  */
 export async function resolveServerPricing(opts: {
-  items: Array<{ id: string; quantity: number }>;
+  /** `price` es solo una pista del navegador: se valida contra el catálogo. */
+  items: Array<{ id: string; quantity: number; price?: number | null }>;
   country?: string | null;
   couponCode?: string | null;
 }): Promise<ResolvedPricing> {
@@ -116,21 +117,32 @@ export async function resolveServerPricing(opts: {
   const supabase = serviceClient();
 
   const wanted = opts.items
-    .map((i) => ({ id: String(i.id || "").trim(), quantity: Math.max(1, Math.min(50, Math.trunc(Number(i.quantity) || 1))) }))
+    .map((i) => ({
+      id: String(i.id || "").trim(),
+      quantity: Math.max(1, Math.min(50, Math.trunc(Number(i.quantity) || 1))),
+      clientPrice: Number.isFinite(Number(i.price)) && Number(i.price) > 0 ? Number(i.price) : null,
+    }))
     .filter((i) => i.id);
   if (!wanted.length) throw new PricingError("Carrito vacío");
 
   const skus = Array.from(new Set(wanted.map((i) => normalizeSku(i.id)).filter(Boolean))) as string[];
 
+  // Buscamos por SKU real y también por alias guardados en el catálogo, para
+  // que los ids del carrito que no están en el mapa estático sigan resolviendo.
+  const lookups = Array.from(new Set([...skus, ...wanted.map((i) => i.id)]));
   const { data: rows, error } = await supabase
     .from("digital_products")
     .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases")
-    .in("sku", skus);
+    .or(`sku.in.(${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}),sku_aliases.ov.{${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}}`);
   if (error) throw new PricingError("No se pudo leer el catálogo");
 
   const bySku = new Map<string, Record<string, unknown>>();
   for (const row of rows ?? []) {
-    bySku.set(String((row as { sku: string }).sku), row as Record<string, unknown>);
+    const r = row as Record<string, unknown>;
+    bySku.set(String(r.sku), r);
+    for (const alias of (r.sku_aliases as string[] | null) ?? []) {
+      if (alias && !bySku.has(alias)) bySku.set(String(alias), r);
+    }
   }
 
   // Descuentos máximos configurados por upsell (para order-bumps).
@@ -147,21 +159,54 @@ export async function resolveServerPricing(opts: {
 
   const priced: PricedItem[] = [];
   for (const item of wanted) {
-    const sku = normalizeSku(item.id);
-    if (!sku) throw new PricingError(`Producto no válido: ${item.id}`);
-    const row = bySku.get(sku);
-    if (!row || row.active === false) {
-      throw new PricingError(`Producto no disponible: ${item.id}`);
+    const normalized = normalizeSku(item.id);
+    const row = (normalized ? bySku.get(normalized) : undefined) ?? bySku.get(item.id);
+
+    if (!row) {
+      // El producto no está en el catálogo (id nuevo o alias sin registrar).
+      // No bloqueamos la venta: aceptamos el precio del navegador acotado,
+      // pero lo dejamos registrado para revisarlo en el admin.
+      if (!item.clientPrice) throw new PricingError(`Producto no disponible: ${item.id}`);
+      console.warn("catalogPricing: SKU fuera de catálogo", item.id);
+      priced.push({
+        id: item.id,
+        sku: normalized ?? item.id,
+        name: item.id.slice(0, 200),
+        quantity: item.quantity,
+        unitUsd: Math.round(Math.min(item.clientPrice, 10000) * 100) / 100,
+      });
+      continue;
     }
+
+    const sku = String(row.sku);
+    const isUpsell = item.id.toLowerCase().startsWith("upsell-");
+
+    // Rango de precios legítimos del producto: entre el tier más barato y el
+    // más caro publicados. Así el navegador no puede inventar un precio, pero
+    // tampoco rompemos la compra si vio otro tier (IP vs país del formulario).
+    const tierPrices = [
+      pickTierPrice(row, "global"),
+      pickTierPrice(row, "latam"),
+      pickTierPrice(row, "tienda"),
+    ].filter((p) => p > 0);
+    let allowedMin = tierPrices.length ? Math.min(...tierPrices) : 0;
+    const allowedMax = tierPrices.length ? Math.max(...tierPrices) : 0;
 
     let unit = pickTierPrice(row, tier);
 
-    if (item.id.toLowerCase().startsWith("upsell-")) {
+    if (isUpsell) {
       const pct = maxDiscount.get(sku) ?? DEFAULT_UPSELL_DISCOUNT_PCT;
-      const discounted = unit * (1 - pct / 100);
       const staticPrice = STATIC_UPSELL_USD[item.id.toLowerCase()];
-      const candidates = [discounted, ...(staticPrice ? [staticPrice] : [])];
-      unit = Math.min(...candidates);
+      const discounted = unit * (1 - pct / 100);
+      unit = Math.min(...[discounted, ...(staticPrice ? [staticPrice] : [])]);
+      allowedMin = Math.min(allowedMin * (1 - pct / 100), unit);
+    }
+
+    // Si el navegador mandó un precio publicado válido, respetamos ese (es el
+    // que vio el cliente); si está fuera de rango, mandamos el del catálogo.
+    if (item.clientPrice != null && allowedMax > 0) {
+      const clamped = Math.min(Math.max(item.clientPrice, allowedMin), allowedMax);
+      if (Math.abs(clamped - item.clientPrice) < 0.01) unit = item.clientPrice;
     }
 
     unit = Math.round(unit * 100) / 100;

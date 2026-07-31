@@ -11,10 +11,19 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { normalizeEmailBasic } from "../_shared/emailGuard.ts";
 
-const BodySchema = z.object({
-  orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
-  email: z.string().trim().email().max(160),
-});
+// Dos formas de identificarse:
+//  a) número de pedido + correo exacto (flujo manual)
+//  b) token de descarga (el mismo de /mi-descarga): es secreto, aleatorio y ya
+//     está ligado al pedido, así que reemplaza al correo.
+const TOKEN_RE = /^[A-Za-z0-9_-]{20,120}$/;
+const BodySchema = z.union([
+  z.object({
+    orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
+    email: z.string().trim().email().max(160),
+  }),
+  z.object({ token: z.string().trim().regex(TOKEN_RE) }),
+]);
+
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -70,14 +79,30 @@ Deno.serve(async (req) => {
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
 
-    const orderNumber = parsed.data.orderNumber.toUpperCase();
-    const email = canonicalEmail(parsed.data.email);
-    if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    let orderNumber: string;
+    let email: string | null = null;
+
+    if ("token" in parsed.data) {
+      // El token de descarga ya prueba la propiedad del pedido.
+      const { data: tk } = await supabase
+        .from("download_tokens")
+        .select("order_number, email, revoked")
+        .eq("token", parsed.data.token)
+        .maybeSingle();
+      if (!tk || tk.revoked) return json({ found: false }, 200);
+      orderNumber = String(tk.order_number).toUpperCase();
+      email = canonicalEmail(tk.email);
+    } else {
+      orderNumber = parsed.data.orderNumber.toUpperCase();
+      email = canonicalEmail(parsed.data.email);
+      if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
+    }
+
 
     const [{ data: events }, { data: manual }, { data: sends }] = await Promise.all([
       supabase
@@ -103,11 +128,14 @@ Deno.serve(async (req) => {
     if (manual?.buyer_email) owners.add(canonicalEmail(manual.buyer_email));
     (sends ?? []).forEach((s) => s.customer_email && owners.add(canonicalEmail(s.customer_email)));
 
-    if (owners.size === 0 || !owners.has(email)) {
+    // Con token válido el pedido ya está probado; con correo debe coincidir.
+    const byToken = "token" in parsed.data;
+    if (!byToken && (owners.size === 0 || !owners.has(email!))) {
       console.warn("[order-status] acceso denegado", { orderNumber, ip });
       // Respuesta genérica: no revelamos si el pedido existe ni a quién pertenece.
       return json({ found: false }, 200);
     }
+
 
     type Item = {
       event: string;

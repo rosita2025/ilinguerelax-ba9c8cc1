@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -90,21 +90,19 @@ function formatDate(value?: string | null) {
 
 export default function OrderStatus() {
   const [sp] = useSearchParams();
+  const token = (sp.get("t") ?? "").trim();
   const [orderNumber, setOrderNumber] = useState(sp.get("order") ?? "");
   const [email, setEmail] = useState(sp.get("email") ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<OrderStatusResult | null>(null);
 
-  const search = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const lookup = async (body: Record<string, string>) => {
     setError(null);
     setResult(null);
     setLoading(true);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("order-status", {
-        body: { orderNumber: orderNumber.trim(), email: email.trim() },
-      });
+      const { data, error: fnError } = await supabase.functions.invoke("order-status", { body });
       if (fnError) {
         const ctx = (fnError as { context?: Response }).context;
         if (ctx?.status === 429) {
@@ -116,18 +114,31 @@ export default function OrderStatus() {
       const res = data as OrderStatusResult;
       if (!res?.found) {
         setError(
-          "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
+          body.token
+            ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
+            : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
         );
       } else {
         setResult(res);
       }
     } catch {
-
       setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Acceso directo con el token del correo de entrega: /mi-pedido?t=<token>
+  useEffect(() => {
+    if (token) void lookup({ token });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  const search = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await lookup({ orderNumber: orderNumber.trim(), email: email.trim() });
+  };
+
 
   const stageIndex = result?.stage ? STAGES.findIndex((s) => s.key === result.stage) : -1;
 

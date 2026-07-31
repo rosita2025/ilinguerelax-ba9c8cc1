@@ -14,6 +14,21 @@ import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
 
+interface TokenAccessRow {
+  id: number;
+  created_at: string;
+  action: string;
+  sku: string | null;
+  ip: string | null;
+  order_number: string | null;
+  email: string | null;
+  provider: string | null;
+  download_count: number | null;
+  max_downloads: number | null;
+  revoked: boolean | null;
+}
+
+
 
 
 

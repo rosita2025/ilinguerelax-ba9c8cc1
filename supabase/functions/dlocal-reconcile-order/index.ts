@@ -238,10 +238,11 @@ Deno.serve(async (req) => {
 
     // Estado real en el proveedor (solo dLocal tiene consulta directa aquí).
     let remoteStatus: string | null = null;
-    if (provider === "dlocalgo" && reference && reference !== orderNumber) {
+    if (action !== "retry_delivery" && provider === "dlocalgo" && reference && reference !== orderNumber) {
       const payment = await fetchDlocalPayment(reference);
       if (payment) remoteStatus = String(payment.status ?? "").toUpperCase() || null;
     }
+
 
     const summary = {
       orderNumber,

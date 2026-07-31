@@ -28,7 +28,9 @@ const BodySchema = z.object({
   payerPhone: z.string().max(30).optional(),
   payerDocument: z.string().max(30).optional(),
   country: z.string().length(2),
-  paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
+  // Solo transferencia y efectivo: billetera/tarjeta dLocal desactivadas.
+  paymentType: z.enum(["transfer", "cash"]).optional(),
+
   currency: z.string().length(3).default("USD"),
   // Aceptados por compatibilidad con clientes viejos, pero IGNORADOS: el
   // importe se calcula siempre en el servidor desde el catálogo + FX propio.

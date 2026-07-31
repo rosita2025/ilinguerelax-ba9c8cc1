@@ -62,9 +62,8 @@ const PaymentSuccess = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleDownload = () => {
-    window.open("https://drive.google.com/file/d/1KA1IQ-WEB7a_dw3BKVWaU0pImfGsdV3i/view?usp=sharing", "_blank");
-  };
+  const downloadToken = new URLSearchParams(window.location.search).get("t");
+
 
   const handleWhatsApp = () => {
     window.open("https://wa.me/112512724704?text=Hello!%20I%20just%20purchased%20Spanish%20Relax%205,000%20Words", "_blank");

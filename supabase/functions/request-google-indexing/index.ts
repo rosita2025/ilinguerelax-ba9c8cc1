@@ -2,6 +2,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { pingIndexNow, pingSitemap } from '../_shared/indexnow.ts';
 import { logIndexingEvents, type IndexingEvent } from '../_shared/indexingLog.ts';
+import { notifyGoogleIndexing } from '../_shared/googleIndexing.ts';
 
 const ADMIN_REVIEW_KEY = Deno.env.get('ADMIN_REVIEW_KEY') ?? '';
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY') ?? '';
@@ -61,6 +62,9 @@ Deno.serve(async (req) => {
     await pingIndexNow(list);
     // 2) Resubmit sitemap so Google re-checks the canonical set.
     await pingSitemap();
+    // 2b) Google Indexing API oficial (cuenta de servicio) — funciona para
+    //     cualquier URL del sitio: blog, productos y páginas.
+    await notifyGoogleIndexing(list, 'URL_UPDATED');
 
     // 3) Attempt Google Indexing API through the gateway. Officially it
     //    only accepts JobPosting/BroadcastEvent but many sites use it as

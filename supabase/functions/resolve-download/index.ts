@@ -46,25 +46,31 @@ Deno.serve(async (req) => {
         .from("digital_products")
         .select("sku,name,cover_image_url,is_upsell,drive_url,bonus_name,bonus_drive_url,bonus_access_key,bonuses")
         .in("sku", skus);
-      items = (products ?? []).map((p: Record<string, unknown>) => ({
-        sku: p.sku,
-        name: p.name,
-        cover: p.cover_image_url ?? null,
-        isUpsell: Boolean(p.is_upsell),
-        // Nunca se envía la URL real: solo si el archivo está disponible.
-        available: Boolean(p.drive_url),
-        bonuses: bonusList(p).map((b, i) => ({
-          index: i,
-          title: b.title ?? b.name ?? `Bono ${i + 1}`,
-        })),
-      }));
-      // Orden estable: primero los productos principales, luego los upsells,
-      // así el comprador nunca ve mezclados producto principal y complementos.
+      // El flag is_upsell del catálogo no sirve para distinguir aquí (casi todos
+      // los productos pueden venderse como upsell). Lo que manda es el pedido:
+      // el primer SKU comprado es el producto principal y el resto son complementos.
+      items = (products ?? []).map((p: Record<string, unknown>) => {
+        const sku = String(p.sku).toLowerCase();
+        return {
+          sku: p.sku,
+          name: p.name,
+          cover: p.cover_image_url ?? null,
+          isUpsell: skus.indexOf(sku) > 0,
+          // Nunca se envía la URL real: solo si el archivo está disponible.
+          available: Boolean(p.drive_url),
+          bonuses: bonusList(p).map((b, i) => ({
+            index: i,
+            title: b.title ?? b.name ?? `Bono ${i + 1}`,
+          })),
+        };
+      });
+      // Orden igual al del pedido: primero el principal, luego los complementos.
       items.sort((a, b) =>
-        Number(a.isUpsell) - Number(b.isUpsell) || String(a.name).localeCompare(String(b.name))
+        skus.indexOf(String(a.sku).toLowerCase()) - skus.indexOf(String(b.sku).toLowerCase())
       );
       const found = new Set((products ?? []).map((p: Record<string, unknown>) => String(p.sku).toLowerCase()));
       missingSkus = skus.filter((s: string) => !found.has(s));
+
 
     }
 

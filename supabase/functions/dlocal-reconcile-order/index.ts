@@ -113,19 +113,16 @@ async function deliver(order: {
     return { delivered: false, detail: "El pedido no tiene materiales digitales asociados" };
   }
 
-  const { error } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-    body: {
-      customerEmail: order.email,
-      customerName: order.name,
-      customerCountry: order.country,
-      orderId: order.orderNumber,
-      skus: order.skus,
-      amount: order.amount,
-      currency: order.currency,
-      provider: order.provider,
-      idempotencyKey: `digital:${order.provider}:${order.orderNumber}`,
-    },
+  // Mismo camino que /admin/pagos-manuales (token /mi-descarga + plantilla
+  // material-delivery): es el que sí llega al cliente.
+  const res = await deliverLikeManual(supabase, {
+    orderNumber: order.orderNumber,
+    email: order.email,
+    name: order.name,
+    skus: order.skus,
   });
+  const error = res.delivered ? null : { message: res.detail };
+
 
   await logOrderEvent({
     orderNumber: order.orderNumber,

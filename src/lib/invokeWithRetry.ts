@@ -27,8 +27,10 @@ const DEFAULT_RETRYABLE = (err: unknown): boolean => {
   const anyErr = err as { status?: number; message?: string; name?: string };
   // Network / abort / timeout / 5xx / 408 / 429 → retry
   if (anyErr.name === "AbortError") return false;
-  if (typeof anyErr.status === "number") {
-    return anyErr.status >= 500 || anyErr.status === 408 || anyErr.status === 429;
+  // FunctionsHttpError expone el status real en context.status
+  const httpStatus = edgeErrorStatus(err) ?? (typeof anyErr.status === "number" ? anyErr.status : null);
+  if (typeof httpStatus === "number") {
+    return httpStatus >= 500 || httpStatus === 408 || httpStatus === 429;
   }
   const msg = String(anyErr.message ?? err).toLowerCase();
   return (

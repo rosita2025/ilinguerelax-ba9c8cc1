@@ -61,6 +61,13 @@ export default function MiDescarga() {
   }, [token]);
 
   const items = useMemo(() => (state.status === "valid" ? state.items ?? [] : []), [state]);
+  const counts = state.status === "valid" ? state.counts : undefined;
+  const mainCount = counts?.main ?? items.filter((i) => !i.isUpsell).length;
+  const upsellCount = counts?.upsells ?? items.filter((i) => i.isUpsell).length;
+  const bonusCount = counts?.bonuses ?? items.reduce((n, i) => n + i.bonuses.length, 0);
+  const maxDownloads = state.status === "valid" ? state.maxDownloads ?? 0 : 0;
+  const usedDownloads = state.status === "valid" ? state.downloadsUsed ?? 0 : 0;
+
 
   const openFile = async (sku: string, kind: "main" | "bonus", index = 0) => {
     const key = `${sku}:${kind}:${index}`;

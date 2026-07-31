@@ -101,11 +101,17 @@ const VALID_COUPONS: Record<string, number> = {
   NEW10: 10,
   PRUEBA20: 20,
   RELAX15: 15,
-  TEST100: 100,
-  GRATIS100: 100,
-  DOLAR1: 90,
-  PRUEBA1: 90,
 };
+
+/**
+ * Cupones de prueba con total fijo en USD (espejo de
+ * supabase/functions/_shared/catalogPricing.ts). El servidor es la fuente
+ * autoritativa: aquí solo se calcula el descuento equivalente para mostrarlo.
+ */
+const FIXED_TOTAL_COUPONS: Record<string, number> = {
+  DLTEST1: 1,
+};
+
 
 interface PersistedCheckoutState {
   items?: PruebaItem[];

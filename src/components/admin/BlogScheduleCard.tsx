@@ -115,15 +115,25 @@ const BlogScheduleCard = () => {
     }
   };
 
-  /** Vista previa de cualquier post de la agenda: si aún no existe, se genera al momento. */
+  /** Vista previa de cualquier post de la agenda: si aún no existe, se genera al momento.
+   *  Se cachea el borrador (10 min) para no volver a generarlo ni re-consultarlo. */
   const openPreview = async (it: QueueItem) => {
+    const cached = readPreviewCache(it.id);
+    if (cached) {
+      setPreview(cached);
+      toast.info("Vista previa en caché");
+      return;
+    }
+
     setBusy("preview" + it.id);
     const toastId = it.post_id ? undefined : toast.loading("Generando el artículo con IA… puede tardar 20–40 s");
     try {
       const res = it.post_id
         ? await call({ action: "preview", id: it.post_id })
         : await call({ action: "generate-one", id: it.id });
-      setPreview(res.post as PreviewPost);
+      const post = res.post as PreviewPost;
+      setPreview(post);
+      writePreviewCache(it.id, post);
       if (toastId) toast.success("Borrador listo", { id: toastId });
       if (!it.post_id) await load();
     } catch (e) {
@@ -141,6 +151,7 @@ const BlogScheduleCard = () => {
     try {
       await call({ action, id: postId });
       toast.success(okMsg);
+      clearPreviewCacheByPost(postId);
       setPreview(null);
       await load();
     } catch (e) {
@@ -149,6 +160,7 @@ const BlogScheduleCard = () => {
       setBusy(null);
     }
   };
+
 
   const pending = items.filter((i) => i.status === "pending").length;
   const done = items.filter((i) => i.status === "done").length;

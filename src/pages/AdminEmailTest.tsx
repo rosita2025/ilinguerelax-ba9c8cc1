@@ -1066,15 +1066,15 @@ const AdminEmailTest = () => {
             </div>
 
             {visibleRows.length > pageSize && (
-              <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t flex-wrap">
-                <div className="text-xs text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4 mt-4 border-t">
+                <div className="text-xs text-muted-foreground text-center sm:text-left">
                   Página {currentPage} de {totalPages}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(1)} disabled={currentPage === 1}>« Inicio</Button>
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Anterior</Button>
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente ›</Button>
-                  <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Final »</Button>
+                <div className="grid grid-cols-4 gap-1.5 sm:flex sm:items-center">
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage(1)} disabled={currentPage === 1}>« Inicio</Button>
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Ant.</Button>
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Sig. ›</Button>
+                  <Button size="sm" variant="outline" className="h-9 px-1 text-[11px] sm:text-xs sm:px-2" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Final »</Button>
                 </div>
               </div>
             )}

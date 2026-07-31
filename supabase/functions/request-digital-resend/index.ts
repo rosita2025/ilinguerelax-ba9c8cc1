@@ -55,17 +55,16 @@ serve(async (req) => {
     if (skus.length === 0) return json({ success: true, sent: false });
 
     const { error } = await invokeInternalFunction("send-digital-ilinguerelax", {
-        customerEmail: prior.customer_email,
-        customerName: prior.customer_name || undefined,
-        orderId: prior.order_id,
-        skus,
-        amount: prior.amount ?? undefined,
-        currency: prior.currency ?? undefined,
-        provider: prior.provider ?? undefined,
-        idempotencyKey: `resend:${prior.order_id}:${Date.now()}`,
-        force: true,
-      },
-      headers: { "x-delivery-source": "request-digital-resend" },
+      customerEmail: prior.customer_email,
+      customerName: prior.customer_name || undefined,
+      orderId: prior.order_id,
+      skus,
+      amount: prior.amount ?? undefined,
+      currency: prior.currency ?? undefined,
+      provider: prior.provider ?? undefined,
+      idempotencyKey: `resend:${prior.order_id}:${Date.now()}`,
+      force: true,
+      deliverySource: "request-digital-resend",
     });
 
     if (error) {

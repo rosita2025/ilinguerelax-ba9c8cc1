@@ -321,6 +321,7 @@ Deno.serve(async (req) => {
       return json({ error: "Respuesta inválida de dLocal. Intenta de nuevo." }, 502);
     }
 
+    console.log(`dLocal pago creado ${String(data.id ?? "")} · vencimiento solicitado ${EXPIRATION_DAYS} días · expiration_date=${String((data as any).expiration_date ?? "n/d")}`);
     const redirectUrl = (data.redirect_url || (data as any).redirectUrl) as string | undefined;
     if (!redirectUrl) {
       console.error("dLocal Go response without redirect_url:", attempt.text.slice(0, 500));
@@ -358,7 +359,10 @@ Deno.serve(async (req) => {
               localAmount: usedUsdFallback ? calculatedUsd : localAmount,
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
+              expirationDays: EXPIRATION_DAYS,
+              expiresAt: (data as any).expiration_date ?? new Date(Date.now() + EXPIRATION_DAYS * 86400000).toISOString(),
             },
+
           }),
           logOrderEvent({
             orderNumber: orderId,
@@ -367,7 +371,7 @@ Deno.serve(async (req) => {
             status: "AWAITING_PAYMENT",
             method: methodLabel,
             reference: data.id ? String(data.id) : null,
-            detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
+            detail: `Cupón / QR / instrucciones de pago generados en dLocal Go · vence en ${EXPIRATION_DAYS} días`,
             customerEmail: body.payerEmail,
             currency: usedUsdFallback ? "USD" : localCurrency,
             amount: usedUsdFallback ? calculatedUsd : localAmount,

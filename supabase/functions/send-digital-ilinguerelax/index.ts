@@ -584,12 +584,15 @@ serve(async (req) => {
       const catLine = catParts.length
         ? `<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:600;color:${BRAND.primaryDark};background:#ecfdf5;border:1px solid #a7f3d0;border-radius:999px;padding:2px 10px;letter-spacing:.3px;">${escapeHtml(t.categoryLabel)}: ${escapeHtml(catParts.join(" → "))}</div>`
         : "";
+      // Nunca se envían enlaces de Drive ni claves por correo: sólo el enlace
+      // privado del comprador (/mi-descarga?t=…) que resuelve el archivo con
+      // una redirección firmada de 15 minutos.
+      const secureLink = downloadUrl || `${SITE}/mi-pedido`;
       const mainBtn = p.drive_url
-        ? `<div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">${escapeHtml(t.downloadBtn)}</a></div>`
+        ? `<div style="margin-top:12px;"><a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">${escapeHtml(t.downloadBtn)}</a></div>`
         : `<div style="margin-top:10px;color:${BRAND.muted};font-size:13px;">${escapeHtml(t.pending)}</div>`;
-      const keyLine = p.access_key
-        ? `<div style="margin-top:10px;font-size:13px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>`
-        : "";
+      const keyLine = "";
+
       const productTitle = p.name || prettifySlug(p.sku);
       const checklistItems = [
         `<li style="margin:4px 0;"><span style="color:#16a34a;font-weight:bold;">✓</span> <strong>${escapeHtml(t.mainLabel)}:</strong> ${escapeHtml(productTitle)}</li>`,

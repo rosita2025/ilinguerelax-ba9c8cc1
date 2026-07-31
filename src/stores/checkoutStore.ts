@@ -207,6 +207,15 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
 
       applyCoupon: (code) => {
         const upper = code.trim().toUpperCase();
+        const fixedTotal = FIXED_TOTAL_COUPONS[upper];
+        if (fixedTotal) {
+          const subtotal = get().items.reduce((s, i) => s + i.price * i.quantity, 0);
+          const percent = subtotal > fixedTotal
+            ? Math.round((1 - fixedTotal / subtotal) * 10000) / 100
+            : 0;
+          set({ coupon: upper, couponPercent: percent });
+          return true;
+        }
         const percent = VALID_COUPONS[upper];
         if (percent) {
           set({ coupon: upper, couponPercent: percent });
@@ -214,6 +223,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
         }
         return false;
       },
+
 
       removeCoupon: () => set({ coupon: null, couponPercent: 0 }),
 

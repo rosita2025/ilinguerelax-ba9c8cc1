@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, BookOpen, Tag } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
@@ -47,10 +47,46 @@ const BlogPost = () => {
     };
   }, [slug, staticPost]);
 
-  if (loading) return null;
-  if (!post) {
-    return <Navigate to="/blog" replace />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-24 text-center text-muted-foreground">
+          Cargando artículo…
+        </div>
+        <Footer />
+      </div>
+    );
   }
+  if (!post) {
+    // No redirigimos en silencio: el artículo puede estar sin publicar o el
+    // enlace estar mal escrito. Mostramos un aviso claro (sin indexar).
+    return (
+      <div className="min-h-screen bg-background">
+        <Helmet>
+          <meta name="robots" content="noindex,follow" />
+          <title>Artículo no disponible | iLingue Relax</title>
+        </Helmet>
+        <Navbar />
+        <div className="container mx-auto px-4 py-24 max-w-xl text-center space-y-4">
+          <BookOpen className="h-10 w-10 mx-auto text-primary" />
+          <h1 className="text-2xl font-bold">Este artículo aún no está disponible</h1>
+          <p className="text-muted-foreground break-words">
+            El enlace <span className="font-mono text-sm">/blog/{slug}</span> no corresponde a ningún
+            artículo publicado. Puede que esté pendiente de aprobación o que la dirección sea incorrecta.
+          </p>
+          <Button asChild>
+            <Link to="/blog">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Ver todos los artículos
+            </Link>
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
 
   // Merge static + generated posts for internal linking (prev/next/related)
   const allPosts: BlogPostType[] = [...generatedAll, ...blogPosts];

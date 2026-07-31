@@ -5,9 +5,14 @@ import { notifyGoogleIndexing } from '../_shared/googleIndexing.ts';
 const ADMIN_REVIEW_KEY = Deno.env.get('ADMIN_REVIEW_KEY') ?? '';
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'method_not_allowed' }), {
+      status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
-    const { adminKey, urls, siteUrl } = await req.json();
+    const { adminKey, urls } = await req.json();
     if (!adminKey || adminKey !== ADMIN_REVIEW_KEY) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), {
         status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },

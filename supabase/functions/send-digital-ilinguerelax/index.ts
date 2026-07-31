@@ -22,6 +22,8 @@ interface Body {
   provider?: string;
   idempotencyKey?: string;
   lang?: string;
+  /** Only true for deliberate admin re-sends (retry / email correction). */
+  force?: boolean;
 }
 
 interface Bonus { name?: string | null; drive_url?: string | null; access_key?: string | null }

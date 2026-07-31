@@ -27,19 +27,32 @@ const VALID_COUPONS: Record<string, number> = {
   NEW10: 10,
   PRUEBA20: 20,
   RELAX15: 15,
-  TEST100: 100,
-  GRATIS100: 100,
-  DOLAR1: 90,
-  PRUEBA1: 90,
 };
+
+/**
+ * Cupones de prueba con TOTAL FIJO en USD (para validar pasarelas en vivo).
+ * Nunca llegan a 0: siempre se cobra un importe real mínimo.
+ * SEGURIDAD: no existen cupones del 100% (regalarían el producto a cualquiera
+ * que adivine el código).
+ */
+export const FIXED_TOTAL_COUPONS: Record<string, number> = {
+  DLTEST1: 1,
+};
+
+export function fixedTotalForCoupon(code: string | null | undefined): number | null {
+  const upper = String(code || "").trim().toUpperCase();
+  const total = FIXED_TOTAL_COUPONS[upper];
+  return typeof total === "number" && total > 0 ? total : null;
+}
 
 export function resolveCouponPercent(code: string | null | undefined): number {
   const upper = String(code || "").trim().toUpperCase();
   if (!upper) return 0;
   const pct = VALID_COUPONS[upper];
   if (typeof pct !== "number") return 0;
-  return Math.min(pct, 100);
+  return Math.min(pct, 90);
 }
+
 
 /** Precios promocionales de order-bumps conocidos (no superan el precio base). */
 const STATIC_UPSELL_USD: Record<string, number> = {

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, RefreshCw, ShieldCheck, XCircle, Search } from "lucide-react";
+import { Loader2, RefreshCw, ShieldCheck, XCircle, Search, ListChecks } from "lucide-react";
 import { adminInvoke } from "@/lib/adminInvoke";
 
 /**

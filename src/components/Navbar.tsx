@@ -8,7 +8,9 @@ import { useI18n } from "@/i18n/I18nContext";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const myOrderLabel =
+    { es: "Mi Pedido", en: "My Order", fr: "Ma Commande", pt: "Meu Pedido" }[language] ?? "Mi Pedido";
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -70,6 +72,12 @@ export const Navbar = () => {
               className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               {t.nav.blog}
+            </Link>
+            <Link
+              to="/mi-pedido"
+              className="text-sm xl:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              {myOrderLabel}
             </Link>
           </div>
 
@@ -146,6 +154,13 @@ export const Navbar = () => {
                 className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
               >
                 {t.nav.blog}
+              </Link>
+              <Link
+                to="/mi-pedido"
+                onClick={handleLinkClick}
+                className="px-4 py-3 text-foreground hover:bg-secondary rounded-xl transition-colors font-medium"
+              >
+                {myOrderLabel}
               </Link>
               <div className="pt-2 border-t border-border mt-2">
                 <Link to="/products" onClick={handleLinkClick}>

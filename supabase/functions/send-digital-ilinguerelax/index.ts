@@ -440,6 +440,57 @@ serve(async (req) => {
       throw claimError;
     }
 
+    // Re-verificación tras reservar: dos pedidos del MISMO cliente creados a la
+    // vez (dos cargos en la pasarela con los mismos productos) pasaban la
+    // comprobación previa porque ninguno había escrito todavía. Aquí, con la
+    // fila ya insertada, gana la reserva más antigua y la otra se descarta.
+    if (!body.force) {
+      const skuFp = [...normalizedSkus].map((s) => s.toLowerCase()).sort().join(",");
+      const sinceRace = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: raceRows } = await supabase
+        .from("digital_email_sends")
+        .select("id, created_at, order_id, skus, status, idempotency_key")
+        .ilike("customer_email", customerEmail)
+        .gte("created_at", sinceRace)
+        .order("created_at", { ascending: true })
+        .limit(100);
+
+      const earlier = (raceRows ?? []).find((row: {
+        idempotency_key: string | null; order_id: string | null; skus: string[] | null; status: string | null; created_at: string;
+      }) => {
+        if (row.idempotency_key === idemKey) return false;
+        if (String(row.status || "").toLowerCase() === "failed") return false;
+        const fp = (Array.isArray(row.skus) ? row.skus : [])
+          .map((s) => String(s || "").toLowerCase()).sort().join(",");
+        const sameOrder = !!orderId && !!row.order_id &&
+          String(row.order_id).toLowerCase() === String(orderId).toLowerCase();
+        return sameOrder || (!!skuFp && fp === skuFp);
+      });
+
+      if (earlier) {
+        await supabase.from("digital_email_sends").update({
+          status: "duplicate", last_event: "duplicate", last_event_at: new Date().toISOString(),
+        }).eq("idempotency_key", idemKey);
+        console.log("[send-digital] duplicate order collapsed", {
+          customerEmail, orderId, keptOrder: earlier.order_id,
+        });
+        await writeAudit({
+          customer_email: customerEmail, customer_name: customerName || null,
+          order_id: orderId || null, idempotency_key: idemKey,
+          requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+          resolved_skus: [], missing_skus: [], items: [],
+          status: "duplicate", provider: provider || null,
+          error: `duplicate of order ${earlier.order_id ?? "-"} @ ${earlier.created_at}`,
+        });
+        return new Response(
+          JSON.stringify({ success: true, duplicate: true, reason: "duplicate_order" }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+        );
+      }
+    }
+
+
+
     // Detect language from body → country → IP
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim()
       || req.headers.get("cf-connecting-ip") || "";

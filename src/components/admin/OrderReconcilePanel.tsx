@@ -36,17 +36,8 @@ type PendingOrder = {
   lastAt: string;
 };
 
-function storedAdminKey(): string {
-  try {
-    return localStorage.getItem("ilr_admin_key") || sessionStorage.getItem("ilr_admin_key") || "";
-  } catch { return ""; }
-}
-
 export default function OrderReconcilePanel() {
   const [orderNumber, setOrderNumber] = useState("");
-  // Reutiliza la clave con la que ya entraste al panel: evita el error
-  // "No autorizado" por escribirla de nuevo con un error de tipeo.
-  const [adminKey, setAdminKey] = useState(storedAdminKey);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -54,11 +45,10 @@ export default function OrderReconcilePanel() {
 
 
   async function loadPending() {
-    if (!adminKey.trim()) { toast.error("Falta la clave de admin"); return; }
     setBusy("list");
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
-        body: { action: "list_pending", adminKey: adminKey.trim() },
+        body: { action: "list_pending" },
       });
       if (error || data?.error) {
         toast.error(data?.error || error?.message || "No se pudo cargar la lista");
@@ -76,15 +66,10 @@ export default function OrderReconcilePanel() {
   async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery") {
     const order = orderNumber.trim().toUpperCase();
     if (!order) { toast.error("Escribe el número de pedido"); return; }
-    if (!adminKey.trim()) { toast.error("Falta la clave de admin"); return; }
-    if (action === "approve" && reason.trim().length < 4) {
-      toast.error("Indica el motivo o comprobante de la aceptación manual");
-      return;
-    }
     setBusy(action);
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
-        body: { action, orderNumber: order, adminKey: adminKey.trim(), reason: reason.trim() || undefined },
+        body: { action, orderNumber: order, reason: reason.trim() || undefined },
       });
       if (error || data?.error) {
         toast.error(data?.error || error?.message || "No se pudo procesar");
@@ -122,21 +107,14 @@ export default function OrderReconcilePanel() {
         </p>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-2">
-        <Input
-          placeholder="Número de pedido (ej. ILR-DL-XXXX)"
-          value={orderNumber}
-          onChange={(e) => setOrderNumber(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="Clave de admin"
-          value={adminKey}
-          onChange={(e) => setAdminKey(e.target.value)}
-        />
-      </div>
       <Input
-        placeholder="Motivo / comprobante (obligatorio para aceptar manualmente)"
+        placeholder="Número de pedido (ej. ILR-DL-XXXX)"
+        value={orderNumber}
+        onChange={(e) => setOrderNumber(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter" && !busy) run("inspect"); }}
+      />
+      <Input
+        placeholder="Motivo / comprobante (opcional)"
         value={reason}
         onChange={(e) => setReason(e.target.value)}
       />

@@ -6,6 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
+import OrderReconcilePanel from "@/components/admin/OrderReconcilePanel";
+
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
 import { toast } from "sonner";
 import { DLOCAL_COVERAGE } from "@/lib/dlocalCoverage";
@@ -211,7 +213,10 @@ export default function AdminDlocal() {
             </p>
           </header>
 
+          <OrderReconcilePanel />
+
           <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+
             <div className="flex-1">
               <Input
                 placeholder="Buscar país o moneda…"

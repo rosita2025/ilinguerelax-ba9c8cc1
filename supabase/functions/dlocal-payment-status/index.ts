@@ -12,10 +12,10 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
-import { isSettledStatus, isPendingStatus, isFailedStatus } from "../_shared/dlocal.ts";
+import { isSettledStatus, isPendingStatus, isFailedStatus, dlocalApiBase } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
-const API_BASE = "https://api.dlocalgo.com/v1";
+const API_BASE = dlocalApiBase();
 
 const BodySchema = z.object({
   orderId: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),

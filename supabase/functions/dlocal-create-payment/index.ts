@@ -7,6 +7,7 @@ import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
+import { dlocalApiBase } from "../_shared/dlocal.ts";
 
 
 // SEGURIDAD: el navegador solo aporta id y cantidad; precio, nombre y cupón
@@ -119,7 +120,7 @@ Deno.serve(async (req) => {
       railLookupDone = true;
       try {
         const pmResp = await fetch(
-          `https://api.dlocalgo.com/v1/payment-methods?country=${body.country.toUpperCase()}`,
+          `${dlocalApiBase()}/payment-methods?country=${body.country.toUpperCase()}`,
           { headers: { Authorization: `Bearer ${apiKey}:${secretKey}` } },
         );
         if (pmResp.ok) {
@@ -205,7 +206,7 @@ Deno.serve(async (req) => {
     const basePayload = payloadFor(localAmount, localCurrency);
 
     const createPayment = async (payload: Record<string, unknown>) => {
-      const resp = await fetch("https://api.dlocalgo.com/v1/payments", {
+      const resp = await fetch(`${dlocalApiBase()}/payments`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}:${secretKey}`,

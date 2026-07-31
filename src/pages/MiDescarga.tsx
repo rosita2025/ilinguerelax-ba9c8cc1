@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { extractEdgeErrorMessage } from "@/lib/edgeError";
+
 import { Download, Loader2, Mail, ShieldCheck, Clock, Ban } from "lucide-react";
 
 type Bonus = { index: number; title: string };

@@ -163,8 +163,8 @@ Deno.serve(async (req) => {
     const localAmount = localCurrency === "USD" && requested !== "USD"
       ? calculatedUsd
       : ZERO_DECIMAL.has(localCurrency)
-      ? Math.round(body.amount)
-      : Number(body.amount.toFixed(2));
+      ? Math.round(body.amount * fxScale)
+      : Number((body.amount * fxScale).toFixed(2));
 
 
     // dLocal rechaza el pago en su checkout ("la transacción no pudo ser

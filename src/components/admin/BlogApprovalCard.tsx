@@ -55,6 +55,13 @@ const BlogApprovalCard = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  // Recarga cuando la tarjeta de agenda genera nuevos borradores.
+  useEffect(() => {
+    const onUpdate = () => { load(); };
+    window.addEventListener("blog-drafts-updated", onUpdate);
+    return () => window.removeEventListener("blog-drafts-updated", onUpdate);
+  }, [load]);
+
   const act = async (action: string, id: string, okMsg: string) => {
     setBusy(action + id);
     try {

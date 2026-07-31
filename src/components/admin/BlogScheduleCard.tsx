@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarClock, Loader2, PlayCircle, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
+import { CalendarClock, Loader2, PlayCircle, RefreshCw, RotateCcw, Trash2, Zap } from "lucide-react";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";

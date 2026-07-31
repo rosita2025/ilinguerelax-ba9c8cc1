@@ -2,13 +2,17 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
+import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 
+// SEGURIDAD: solo se aceptan id y cantidad. El precio, el nombre y el
+// descuento se resuelven en el servidor desde el catálogo; los valores que
+// mande el navegador se ignoran.
 const ItemSchema = z.object({
   id: z.string().min(1).max(180),
-  name: z.string().min(1).max(200),
-  price: z.number().positive().max(10000),
+  name: z.string().max(200).optional(),
+  price: z.number().optional(),
   quantity: z.number().int().min(1).max(50),
-  image: z.string().url().optional(),
+  image: z.string().max(500).optional(),
   description: z.string().max(500).optional(),
 });
 
@@ -17,7 +21,7 @@ const BodySchema = z.object({
   items: z.array(ItemSchema).min(1).max(20),
   currency: z.string().length(3).default("usd"),
   stripePaymentMethod: z.enum(["card", "us_bank_account", "cashapp", "klarna", "afterpay_clearpay", "affirm"]).default("card"),
-  couponPercent: z.number().min(0).max(90).default(0),
+  couponPercent: z.number().min(0).max(100).optional(),
   couponCode: z.string().max(20).optional(),
   contact: z.object({
     email: z.string().email().max(255),
@@ -52,10 +56,29 @@ Deno.serve(async (req) => {
     const stripe = createStripeClient(env);
 
     const currency = body.currency.toLowerCase();
-    const discountMultiplier = 1 - body.couponPercent / 100;
 
-    const line_items = body.items.map((item) => {
-      const unit_amount = Math.round(item.price * discountMultiplier * 100);
+    // Precio autoritativo del servidor (ignora price/couponPercent del cliente).
+    let pricing;
+    try {
+      pricing = await resolveServerPricing({
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        country: body.contact.country,
+        couponCode: body.couponCode,
+      });
+    } catch (e) {
+      if (e instanceof PricingError) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw e;
+    }
+
+    const discountMultiplier = 1 - pricing.couponPercent / 100;
+
+    const line_items = pricing.items.map((item) => {
+      const unit_amount = Math.round(item.unitUsd * discountMultiplier * 100);
       return {
         price_data: {
           currency,
@@ -70,10 +93,7 @@ Deno.serve(async (req) => {
       };
     });
 
-    const total = body.items.reduce(
-      (s, i) => s + Math.round(i.price * discountMultiplier * 100) * i.quantity,
-      0,
-    );
+    const total = Math.round(pricing.totalUsd * 100);
 
     if (total < 50) {
       return new Response(
@@ -87,20 +107,20 @@ Deno.serve(async (req) => {
     // buyer email directly on the Checkout Session.
     const fullName = `${body.contact.firstName} ${body.contact.lastName}`.trim().slice(0, 100);
 
-    const productSummary = body.items
+    const productSummary = pricing.items
       .map((i) => `${i.quantity}x ${i.name}`)
       .join(" · ")
       .slice(0, 300);
-    const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
+    const deliverySkus = normalizeSkus(pricing.items.map((i) => i.sku)).join(",").slice(0, 490);
     const checkoutMetadata = {
       source: "checkout-prueba-1",
       customer_email: body.contact.email,
       customer_name: fullName,
       customer_phone: body.contact.phone,
       customer_country: body.contact.country,
-      coupon_code: body.couponCode ?? "",
-      coupon_percent: String(body.couponPercent),
-      items_count: String(body.items.length),
+      coupon_code: pricing.couponCode ?? "",
+      coupon_percent: String(pricing.couponPercent),
+      items_count: String(pricing.items.length),
       items_summary: productSummary,
       skus: deliverySkus,
     };
@@ -132,9 +152,10 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("create-checkout-prueba error:", err);
+    // No exponemos el detalle interno de la pasarela al navegador.
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ error: "No se pudo iniciar el pago. Intenta nuevamente." }),
+      { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });

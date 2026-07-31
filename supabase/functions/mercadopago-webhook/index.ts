@@ -6,6 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
+import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const encoder = new TextEncoder();
@@ -377,19 +378,17 @@ Deno.serve(async (req) => {
           try {
             const skus = getPaymentSkus(payment);
             if (skus.length > 0) {
-              const { error: digitalErr } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-                body: {
-                  customerEmail: payerEmail,
-                  customerName,
-                  customerPhone: payment.metadata?.customer_phone || undefined,
-                  customerCountry: payment.payer?.address?.country_id || undefined,
-                  orderId: orderNumber,
-                  skus,
-                  amount: payment.transaction_amount ?? undefined,
-                  currency: payment.currency_id || "PEN",
-                  provider: "mercadopago",
-                  idempotencyKey: `digital:mp:${payment.id}`,
-                },
+              const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
+                customerEmail: payerEmail,
+                customerName,
+                customerPhone: payment.metadata?.customer_phone || undefined,
+                customerCountry: payment.payer?.address?.country_id || undefined,
+                orderId: orderNumber,
+                skus,
+                amount: payment.transaction_amount ?? undefined,
+                currency: payment.currency_id || "PEN",
+                provider: "mercadopago",
+                idempotencyKey: `digital:mp:${payment.id}`,
               });
               await logOrderEvent({
                 orderNumber,

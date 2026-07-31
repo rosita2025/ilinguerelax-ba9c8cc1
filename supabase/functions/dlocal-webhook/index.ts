@@ -19,6 +19,7 @@ import {
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
+import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 
 const API_BASE = dlocalApiBase();
 
@@ -376,19 +377,17 @@ Deno.serve(async (req) => {
     }
 
     if (skus.length > 0) {
-      const { error: digitalErr } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-        body: {
-          customerEmail,
-          customerName,
-          customerPhone: phone,
-          customerCountry: country,
-          orderId: orderNumber,
-          skus,
-          amount,
-          currency,
-          provider: "dlocalgo",
-          idempotencyKey: `digital:dlocal:${paymentId}`,
-        },
+      const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
+        customerEmail,
+        customerName,
+        customerPhone: phone,
+        customerCountry: country,
+        orderId: orderNumber,
+        skus,
+        amount,
+        currency,
+        provider: "dlocalgo",
+        idempotencyKey: `digital:dlocal:${paymentId}`,
       });
 
       // Respaldo: si la entrega automática falla, usamos el mismo camino que

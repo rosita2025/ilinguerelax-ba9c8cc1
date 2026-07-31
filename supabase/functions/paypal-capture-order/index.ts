@@ -2,6 +2,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
+import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
@@ -162,10 +163,10 @@ Deno.serve(async (req) => {
           idempotencyKey: `digital:paypal:${captureId || orderId}:${skus.slice().sort().join(",")}`,
         };
         // Un reintento inmediato (la entrega es idempotente por idempotencyKey).
-        let digitalErr = (await digitalClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+        let digitalErr = (await invokeInternalFunction("send-digital-ilinguerelax", deliveryBody)).error;
         if (digitalErr) {
           console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_retry", error: digitalErr.message }));
-          digitalErr = (await digitalClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+          digitalErr = (await invokeInternalFunction("send-digital-ilinguerelax", deliveryBody)).error;
         }
         if (digitalErr) {
           console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_error", error: digitalErr.message, skuCount: skus.length }));

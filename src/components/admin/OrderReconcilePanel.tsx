@@ -144,7 +144,46 @@ export default function OrderReconcilePanel() {
           {busy === "reject" ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-1" />}
           Marcar rechazado
         </Button>
+        <Button size="sm" variant="outline" disabled={!!busy} onClick={loadPending}>
+          {busy === "list" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
+          Ver pendientes
+        </Button>
       </div>
+
+      {pending && (
+        <div className="rounded-lg border border-border p-3 space-y-2">
+          <p className="text-xs font-medium">
+            Pendientes de dLocal Go ({pending.length}) — elige uno y acéptalo o recházalo
+          </p>
+          {pending.length === 0 && (
+            <p className="text-xs text-muted-foreground">No hay pedidos pendientes en los últimos 30 días.</p>
+          )}
+          <ul className="space-y-1.5 max-h-72 overflow-y-auto">
+            {pending.map((o) => (
+              <li
+                key={o.orderNumber}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-muted/40 px-2 py-1.5 text-xs break-words"
+              >
+                <span className="min-w-0">
+                  <strong>{o.orderNumber}</strong> · {o.email || "sin correo"} ·{" "}
+                  {o.amount ?? "—"} {o.currency} · {o.method || "sin método"} ·{" "}
+                  {new Date(o.lastAt).toLocaleString()}
+                </span>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-7 px-2"
+                  disabled={!!busy}
+                  onClick={() => { setOrderNumber(o.orderNumber); setSummary(null); }}
+                >
+                  Seleccionar
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
 
       {summary && (
         <div className="rounded-lg border border-border p-3 text-xs space-y-2 break-words">

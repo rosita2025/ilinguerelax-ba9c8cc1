@@ -1,0 +1,1 @@
+UPDATE public.generated_blog_posts SET published = true, updated_at = now() WHERE slug = 'como-estudiar-coreano-guia-paso-a-paso';

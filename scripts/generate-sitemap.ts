@@ -189,6 +189,75 @@ function xmlEscape(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/** Descarta items inválidos (slug/link/fecha/título) y reporta el motivo. */
+function sanitizeFeedItems(items: FeedItem[]): { items: FeedItem[]; errors: string[] } {
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  const ok: FeedItem[] = [];
+
+  for (const i of items) {
+    const path = (i.path ?? "").trim();
+    const title = (i.title ?? "").trim();
+    if (!/^\/blog\/[a-z0-9][a-z0-9\-_/]*$/i.test(path)) {
+      errors.push(`item con path inválido: "${path}"`);
+      continue;
+    }
+    let link: string;
+    try {
+      link = new URL(`${BASE_URL}${path}`).toString();
+    } catch {
+      errors.push(`item con URL inválida: "${BASE_URL}${path}"`);
+      continue;
+    }
+    if (!title) {
+      errors.push(`item sin título: ${link}`);
+      continue;
+    }
+    const date = new Date(i.date ?? "");
+    if (Number.isNaN(date.getTime())) {
+      errors.push(`item con fecha inválida (${i.date}): ${link}`);
+      continue;
+    }
+    if (seen.has(link)) {
+      errors.push(`item duplicado omitido: ${link}`);
+      continue;
+    }
+    seen.add(link);
+    ok.push({ path, title, description: i.description ?? "", date: date.toISOString() });
+  }
+
+  return { items: ok, errors };
+}
+
+/** Validación estructural del XML antes de escribirlo a disco. */
+function validateRssXml(xml: string, expectedItems: number): string[] {
+  const errors: string[] = [];
+  if (!xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')) errors.push("falta la declaración XML");
+  if (!xml.includes("<rss version=\"2.0\"")) errors.push("falta el elemento <rss version=\"2.0\">");
+  for (const tag of ["channel", "title", "link", "description"]) {
+    if (!xml.includes(`<${tag}>`)) errors.push(`falta <${tag}> en el canal`);
+  }
+  if (!xml.trimEnd().endsWith("</rss>")) errors.push("el documento no cierra con </rss>");
+
+  const opens = (xml.match(/<item>/g) ?? []).length;
+  const closes = (xml.match(/<\/item>/g) ?? []).length;
+  if (opens !== closes) errors.push(`etiquetas <item> desbalanceadas (${opens} abiertas / ${closes} cerradas)`);
+  if (opens !== expectedItems) errors.push(`se esperaban ${expectedItems} items y hay ${opens}`);
+
+  // Ampersands sin escapar rompen el parseo en la mayoría de lectores.
+  if (/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/.test(xml)) {
+    errors.push("hay '&' sin escapar en el XML");
+  }
+  // Todos los <link> deben ser absolutos y del dominio canónico.
+  for (const m of xml.matchAll(/<link>([^<]*)<\/link>/g)) {
+    if (!m[1].startsWith(`${BASE_URL}/`)) errors.push(`link no canónico: "${m[1]}"`);
+  }
+  for (const m of xml.matchAll(/<guid[^>]*>([^<]*)<\/guid>/g)) {
+    if (!m[1].startsWith(`${BASE_URL}/blog/`)) errors.push(`guid inválido: "${m[1]}"`);
+  }
+  return errors;
+}
+
 function rssXml(items: FeedItem[]): string {
   const sorted = [...items]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -221,6 +290,7 @@ function rssXml(items: FeedItem[]): string {
     "",
   ].join("\n");
 }
+
 
 
 

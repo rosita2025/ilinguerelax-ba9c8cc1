@@ -146,7 +146,11 @@ async function recordStripePurchase(params: {
     return { alreadyRecorded: true };
   }
 
-  await adminClient.from("funnel_events").insert({
+  // Inserción idempotente: el índice único parcial
+  // funnel_events_stripe_purchase_unique impide que dos eventos simultáneos
+  // (checkout.session.completed + payment_intent.succeeded, o un reintento de
+  // Stripe) registren el mismo cobro dos veces y disparen correos duplicados.
+  const { error: insertError } = await adminClient.from("funnel_events").insert({
     event_name: "Purchase",
     product_id: purchase.product_id,
     value: purchase.value,
@@ -167,6 +171,15 @@ async function recordStripePurchase(params: {
       status: "approved",
     }).slice(0, 2000),
   });
+
+  if (insertError) {
+    if ((insertError as any).code === "23505") {
+      console.log("[stripe-webhook] concurrent duplicate purchase discarded", { eventKey });
+      return { alreadyRecorded: true };
+    }
+    throw insertError;
+  }
+
 
   // Meta Conversions API (server-side) so the sale shows up in Facebook Ads
   // even if the buyer never lands back on the success page.

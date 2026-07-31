@@ -281,6 +281,8 @@ const App = () => (
                   <Route path="/admin/reviews" element={<AdminGate><AdminReviews /></AdminGate>} />
                   
                   <Route path="/admin/seo" element={<AdminGate><AdminSEO /></AdminGate>} />
+                  <Route path="/admin/indexing" element={<AdminGate><AdminIndexing /></AdminGate>} />
+
                   
                   
                   <Route path="/admin/checkout-methods" element={<AdminGate><AdminCheckoutMethods /></AdminGate>} />

@@ -5,7 +5,7 @@
 //   - process-blog-queue   → cola programada (10 posts/día durante 5 días)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-import { pingIndexNow, pingSitemap } from "./indexnow.ts";
+import { pingIndexNow, pingSitemap, pingWebSub } from "./indexnow.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -218,6 +218,7 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     await Promise.allSettled([
       pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
       pingSitemap(),
+      pingWebSub(),
       resubmitSitemapsGSC(),
       inspectUrlGSC(postUrl),
     ]);

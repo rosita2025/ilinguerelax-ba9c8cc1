@@ -8,7 +8,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
-import { pingIndexNow, pingSitemap } from "../_shared/indexnow.ts";
+import { pingIndexNow, pingSitemap, pingWebSub } from "../_shared/indexnow.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { BlogGenError, generateAndStorePost } from "../_shared/blogGenerator.ts";
 
@@ -306,6 +306,8 @@ serve(async (req) => {
         await Promise.allSettled([
           pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
           pingSitemap(),
+          pingWebSub(),
+
           resubmitSitemapsGSC(),
           inspectUrlGSC(postUrl),
         ]);

@@ -64,15 +64,62 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
+User-agent: Applebot-Extended
+Allow: /
+
+# --- Crawlers de IA / AI search (acceso explicito) ---
+# OpenAI (ChatGPT / SearchGPT)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google Gemini / AI Overviews
+User-agent: Google-Extended
+Allow: /
+
+# Meta AI, Amazon, Apple Intelligence, Common Crawl
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 User-agent: *
 Allow: /
 Crawl-delay: 2
 
 # Sitemap location
 Sitemap: https://ilinguerelax.com/sitemap.xml
+Sitemap: https://ilinguerelax.com/sitemaps/sitemap-blog.xml
 
-# RSS del blog (se regenera junto al sitemap)
+# RSS del blog (se regenera junto al sitemap y se notifica por WebSub)
 # https://ilinguerelax.com/rss.xml
+
 
 # IndexNow verification key (Bing / Yandex / Seznam auto-discovery)
 # Key file: https://ilinguerelax.com/ilinguerelax-indexnow-key.txt

@@ -173,6 +173,8 @@ const AdminEmailTest = () => {
   const [sendingTest, setSendingTest] = useState(false);
   // Auditoría: accesos a descargas por token (fecha, proveedor, nº de descarga)
   const [tokenAccess, setTokenAccess] = useState<TokenAccessRow[]>([]);
+  const [tokenPage, setTokenPage] = useState(1);
+  const TOKEN_PAGE_SIZE = 5;
 
 
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrderUnlock } from "@/hooks/useOrderUnlock";
 
 // Enlaces de Google Drive (actualiza estas URLs cuando tengas los enlaces finales)
 const FILE_MAIN_URL = "https://drive.google.com/file/d/1OpOLhD1QflcCqk9oay9IxpasgzMfV9-Z/view?usp=sharing";
@@ -16,12 +17,20 @@ const FILE_MAIN_NAME = "8.000 Palabras en Inglés con Pronunciación en Español
 const BONO_URL = "";
 const BONO_NAME = "";
 
+const WHATSAPP_URL = "https://wa.me/12512724704";
+
 const DescargaIngles8000 = () => {
-  const [key, setKey] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-  const [error, setError] = useState("");
-  const [attempts, setAttempts] = useState(0);
-  const [blocked, setBlocked] = useState(false);
+  const {
+    orderId,
+    setOrderId,
+    buyerEmail,
+    setBuyerEmail,
+    unlocked,
+    error,
+    checking,
+    verify,
+    restore,
+  } = useOrderUnlock("ingles8000_unlocked");
 
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState("");
@@ -30,30 +39,11 @@ const DescargaIngles8000 = () => {
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("ingles8000_unlocked");
-    if (stored === "yes") setUnlocked(true);
+    restore();
     const emailDone = localStorage.getItem("ingles8000_email_captured");
     if (emailDone === "yes") setEmailCaptured(true);
-  }, []);
+  }, [restore]);
 
-  const handleUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (blocked) return;
-    if (key.trim() === ACCESS_KEY) {
-      setUnlocked(true);
-      setError("");
-      sessionStorage.setItem("ingles8000_unlocked", "yes");
-    } else {
-      const next = attempts + 1;
-      setAttempts(next);
-      if (next >= MAX_ATTEMPTS) {
-        setBlocked(true);
-        setError("Demasiados intentos. Recarga la página o contáctanos por WhatsApp.");
-      } else {
-        setError(`Clave incorrecta. Intentos restantes: ${MAX_ATTEMPTS - next}`);
-      }
-    }
-  };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -743,7 +743,12 @@ const AdminEmailTest = () => {
                     <span className="block font-medium leading-snug break-words line-clamp-2">{p.name}</span>
                     <span className="block text-muted-foreground truncate">
                       {p.bonusCount > 0 ? `🎁 ${p.bonusCount} bono(s)` : "Sin bonos"}
+                      {p.updatedAt ? ` · v. ${fmt(p.updatedAt)}` : ""}
                     </span>
+                    {p.hasDrive === false && (
+                      <span className="block text-[10px] text-destructive">Sin enlace de material</span>
+                    )}
+
                   </span>
                 </label>
               ))}

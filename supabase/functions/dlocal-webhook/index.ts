@@ -17,6 +17,7 @@ import {
   dlocalApiBase,
 } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 
 const API_BASE = dlocalApiBase();
 

@@ -146,6 +146,57 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_post_queue: {
+        Row: {
+          attempts: number
+          batch: string | null
+          category: string
+          created_at: string
+          error: string | null
+          id: string
+          keyword: string
+          language: string
+          post_id: string | null
+          post_slug: string | null
+          scheduled_at: string
+          status: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          batch?: string | null
+          category?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          keyword: string
+          language?: string
+          post_id?: string | null
+          post_slug?: string | null
+          scheduled_at: string
+          status?: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          batch?: string | null
+          category?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          keyword?: string
+          language?: string
+          post_id?: string | null
+          post_slug?: string | null
+          scheduled_at?: string
+          status?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bot_filters: {
         Row: {
           created_at: string

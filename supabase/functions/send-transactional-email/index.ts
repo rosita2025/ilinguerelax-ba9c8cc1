@@ -35,7 +35,7 @@ function generateToken(): string {
 //     pago manual (Yape/Plin, Binance, SPEI, transferencia), con límite por IP.
 // Esto impide que un tercero envíe correos con la marca del dominio.
 const PUBLIC_TEMPLATES = new Set([
-  'manual-pending',
+  'admin-manual-pending',
   'customer-manual-pending',
 ])
 

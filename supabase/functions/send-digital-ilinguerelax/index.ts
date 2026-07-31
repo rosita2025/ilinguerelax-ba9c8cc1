@@ -474,6 +474,7 @@ serve(async (req) => {
 
     // Enlace personal de descarga del pedido (/mi-descarga?t=<token>). Nunca
     // falla la entrega por esto: si algo sale mal, seguimos con el correo.
+    let downloadUrl: string | null = null;
     if (orderId) {
       try {
         const emailKey = String(customerEmail).trim().toLowerCase();
@@ -486,22 +487,25 @@ serve(async (req) => {
         if (existingTok) {
           const merged = [...new Set([...(existingTok.skus ?? []), ...normalizedSkus])];
           await supabase.from("download_tokens").update({ skus: merged }).eq("token", existingTok.token);
+          downloadUrl = `${SITE}/mi-descarga?t=${existingTok.token}`;
         } else {
           const bytes = new Uint8Array(32);
           crypto.getRandomValues(bytes);
           const token = btoa(String.fromCharCode(...bytes))
             .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-          await supabase.from("download_tokens").insert({
+          const { error: tokErr } = await supabase.from("download_tokens").insert({
             token,
             order_number: String(orderId).toUpperCase(),
             email: emailKey,
             skus: normalizedSkus,
           });
+          if (!tokErr) downloadUrl = `${SITE}/mi-descarga?t=${token}`;
         }
       } catch (e) {
         console.warn("[send-digital] download token skipped:", e instanceof Error ? e.message : String(e));
       }
     }
+
 
 
 
@@ -580,12 +584,15 @@ serve(async (req) => {
       const catLine = catParts.length
         ? `<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:600;color:${BRAND.primaryDark};background:#ecfdf5;border:1px solid #a7f3d0;border-radius:999px;padding:2px 10px;letter-spacing:.3px;">${escapeHtml(t.categoryLabel)}: ${escapeHtml(catParts.join(" → "))}</div>`
         : "";
+      // Nunca se envían enlaces de Drive ni claves por correo: sólo el enlace
+      // privado del comprador (/mi-descarga?t=…) que resuelve el archivo con
+      // una redirección firmada de 15 minutos.
+      const secureLink = downloadUrl || `${SITE}/mi-pedido`;
       const mainBtn = p.drive_url
-        ? `<div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">${escapeHtml(t.downloadBtn)}</a></div>`
+        ? `<div style="margin-top:12px;"><a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">${escapeHtml(t.downloadBtn)}</a></div>`
         : `<div style="margin-top:10px;color:${BRAND.muted};font-size:13px;">${escapeHtml(t.pending)}</div>`;
-      const keyLine = p.access_key
-        ? `<div style="margin-top:10px;font-size:13px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>`
-        : "";
+      const keyLine = "";
+
       const productTitle = p.name || prettifySlug(p.sku);
       const checklistItems = [
         `<li style="margin:4px 0;"><span style="color:#16a34a;font-weight:bold;">✓</span> <strong>${escapeHtml(t.mainLabel)}:</strong> ${escapeHtml(productTitle)}</li>`,
@@ -601,8 +608,8 @@ serve(async (req) => {
             ${bonusList.map((b, i) => `
               <div style="margin:10px 0;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;">
                 <div style="font-size:14px;font-weight:bold;color:#78350f;margin-bottom:8px;">🎁 ${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}</div>
-                <a href="${escapeHtml(b.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-size:13px;">${escapeHtml(t.bonusBtn)}</a>
-                ${b.access_key ? `<div style="margin-top:8px;font-size:12px;color:#374151;"><strong>${escapeHtml(t.keyLabel)}:</strong> <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;">${escapeHtml(b.access_key)}</code></div>` : ""}
+                <a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-size:13px;">${escapeHtml(t.bonusBtn)}</a>
+
               </div>`).join("")}
           </div>`
         : `<div style="margin-top:12px;font-size:12px;color:${BRAND.muted};font-style:italic;">${escapeHtml(t.noBonuses)}</div>`;

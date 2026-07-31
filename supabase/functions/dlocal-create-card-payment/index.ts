@@ -99,12 +99,10 @@ Deno.serve(async (req) => {
       : undefined;
 
     const payload: Record<string, unknown> = {
-      // En USD cobramos exactamente el total del catálogo; en moneda local se
-      // usa el importe ya validado contra expectedTotalUsd.
-      amount: body.currency.toUpperCase() === "USD"
-        ? calculatedUsd
-        : Number((body.amount * fxScale).toFixed(2)),
-      currency: body.currency.toUpperCase(),
+      // Importe autoritativo del servidor (catálogo + tasa FX propia).
+      amount: chargeAmount,
+      currency: chargeCurrency,
+
       country: body.country.toUpperCase(),
       order_id: orderId,
       description,

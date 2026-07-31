@@ -765,9 +765,18 @@ const AdminEmailTest = () => {
               )}
             </div>
 
-            {/* Escritorio: tabla completa */}
-            <div className="hidden md:block overflow-x-auto -mx-1">
-              <table className="w-full text-xs">
+            {/* Escritorio: tabla completa (sin scroll horizontal) */}
+            <div className="hidden lg:block w-full max-w-full overflow-hidden">
+              <table className="w-full table-fixed text-xs">
+                <colgroup>
+                  <col className="w-[15%]" />
+                  <col className="w-[14%]" />
+                  <col className="w-[20%]" />
+                  <col className="w-[11%]" />
+                  <col className="w-[11%]" />
+                  <col className="w-[19%]" />
+                  <col className="w-[10%]" />
+                </colgroup>
                 <thead>
                   <tr className="text-left text-muted-foreground border-b">
                     <th className="py-2 px-2 font-medium">Fecha (PE)</th>
@@ -779,6 +788,7 @@ const AdminEmailTest = () => {
                     <th className="py-2 px-2 font-medium">Descargas</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {tokenAccess.slice((tokenPage - 1) * TOKEN_PAGE_SIZE, tokenPage * TOKEN_PAGE_SIZE).map((r) => (
                     <tr key={r.id} className="border-b last:border-0 hover:bg-muted/40">

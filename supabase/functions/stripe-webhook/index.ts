@@ -213,6 +213,24 @@ async function sendStripePurchaseEmails(params: {
   couponAmount?: number;
 }) {
   const { adminClient, customerEmail, customerName, customerPhone, customerCountry, purchase, orderNumber, paymentKey, skus, couponCode, couponPercent, couponAmount } = params;
+  // Historial visible en /mi-pedido: dejamos el pago aprobado en order_events
+  // igual que dLocal/Mercado Pago para que el cliente vea el mismo detalle.
+  try {
+    await adminClient.from("order_events").insert({
+      order_number: orderNumber,
+      customer_email: customerEmail,
+      provider: "stripe",
+      event: "payment_paid",
+      status: "paid",
+      method: "card",
+      reference: paymentKey,
+      amount: purchase.value,
+      currency: purchase.currency,
+      metadata: { skus, source: "stripe-webhook" },
+    });
+  } catch (e) {
+    console.error("[stripe-webhook] order_events payment_paid insert failed:", e);
+  }
   // Siempre enviamos "Gracias por tu compra" (con producto y precio).
   // Si además hay SKUs digitales, luego se dispara la entrega de materiales.
   await sendThankYouEmail({

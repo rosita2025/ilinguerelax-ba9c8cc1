@@ -33,6 +33,8 @@ interface OrderStatusResult {
   found: boolean;
   orderNumber?: string;
   stage?: "pending" | "paid" | "delivered";
+  outcome?: "approved" | "rejected" | "processing";
+  provider?: string | null;
   method?: string | null;
   amount?: number | null;
   currency?: string | null;
@@ -63,6 +65,74 @@ const EVENT_META: Record<
   delivery_sent: { icon: PackageCheck, tone: "text-primary", ring: "border-primary bg-primary/10" },
   delivery_failed: { icon: AlertCircle, tone: "text-destructive", ring: "border-destructive/50 bg-destructive/10" },
 };
+
+// Nombre claro del método/pasarela para el cliente: Stripe, Mercado Pago,
+// dLocal (transferencia / efectivo / billetera), Yape, Plin, SPEI México,
+// transferencia bancaria, Binance Pay y PayPal.
+const METHOD_RULES: Array<[RegExp, string]> = [
+  [/yape/i, "Yape"],
+  [/plin/i, "Plin"],
+  [/yape_plin|yape\s*\/\s*plin/i, "Yape / Plin"],
+  [/binance/i, "Binance Pay (USDT)"],
+  [/spei|clabe/i, "Transferencia SPEI (México)"],
+  [/oxxo/i, "Pago en efectivo OXXO (México)"],
+  [/pix/i, "PIX (Brasil)"],
+  [/nequi/i, "Nequi (Colombia)"],
+  [/pse/i, "PSE (Colombia)"],
+  [/paypal/i, "PayPal"],
+  [/stripe|card|tarjeta|credit|debit|visa|master/i, "Tarjeta de crédito o débito (Stripe)"],
+  [/mercado[\s_-]?pago|mercadopago|^mp_/i, "Mercado Pago"],
+  [/dlocal.*(transfer|bank)|transfer.*dlocal/i, "Transferencia bancaria (dLocal Go)"],
+  [/dlocal.*(cash|efectivo)|cash.*dlocal|ticket/i, "Pago en efectivo (dLocal Go)"],
+  [/dlocal.*(wallet|billetera)|wallet/i, "Billetera digital (dLocal Go)"],
+  [/dlocal/i, "dLocal Go"],
+  [/bank_transfer|transferencia|transfer/i, "Transferencia bancaria"],
+  [/efectivo|cash/i, "Pago en efectivo"],
+  [/manual/i, "Pago manual verificado por el equipo"],
+  [/email/i, "Entrega por correo"],
+];
+
+function methodLabel(raw?: string | null): string | null {
+  if (!raw) return null;
+  const value = String(raw).trim();
+  if (!value) return null;
+  for (const [re, label] of METHOD_RULES) if (re.test(value)) return label;
+  return value.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatAmount(amount?: number | null, currency?: string | null): string | null {
+  if (amount == null || Number.isNaN(Number(amount))) return null;
+  const cur = (currency || "USD").toUpperCase();
+  try {
+    return new Intl.NumberFormat("es-PE", { style: "currency", currency: cur }).format(Number(amount));
+  } catch {
+    return `${cur} ${Number(amount).toFixed(2)}`;
+  }
+}
+
+const OUTCOME_UI = {
+  approved: {
+    label: "Pago aprobado",
+    text: "Tu pago fue confirmado. Si tu compra es digital, revisa tu correo (incluida la carpeta de spam o promociones).",
+    box: "border-primary/40 bg-primary/5",
+    tone: "text-primary",
+    icon: CheckCircle2,
+  },
+  rejected: {
+    label: "Pago rechazado",
+    text: "El pago no se completó y no se te cobró nada. Puedes volver a intentarlo con otro método o escribirnos.",
+    box: "border-destructive/40 bg-destructive/5",
+    tone: "text-destructive",
+    icon: AlertCircle,
+  },
+  processing: {
+    label: "Pago en proceso",
+    text: "Estamos esperando la confirmación del pago (transferencias, efectivo y pagos manuales pueden tardar unas horas). Esta página se actualiza sola.",
+    box: "border-amber-400/50 bg-amber-100/40",
+    tone: "text-amber-600",
+    icon: Clock,
+  },
+} as const;
 
 const STAGES = [
   { key: "pending", label: "Pendiente", icon: Clock },
@@ -96,37 +166,43 @@ export default function OrderStatus() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<OrderStatusResult | null>(null);
+  const [lastBody, setLastBody] = useState<Record<string, string> | null>(null);
 
-  const lookup = async (body: Record<string, string>): Promise<boolean> => {
-    setError(null);
-    setResult(null);
-    setLoading(true);
+  const lookup = async (body: Record<string, string>, silent = false): Promise<boolean> => {
+    if (!silent) {
+      setError(null);
+      setResult(null);
+      setLoading(true);
+    }
     try {
       const { data, error: fnError } = await supabase.functions.invoke("order-status", { body });
       if (fnError) {
         const ctx = (fnError as { context?: Response }).context;
         if (ctx?.status === 429) {
-          setError("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.");
+          if (!silent) setError("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.");
           return false;
         }
         throw fnError;
       }
       const res = data as OrderStatusResult;
       if (!res?.found) {
-        setError(
-          body.token
-            ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
-            : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
-        );
+        if (!silent) {
+          setError(
+            body.token
+              ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
+              : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
+          );
+        }
         return false;
       }
       setResult(res);
+      setLastBody(body);
       return true;
     } catch {
-      setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
+      if (!silent) setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
       return false;
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -135,6 +211,15 @@ export default function OrderStatus() {
     if (token) void lookup({ token });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Transferencias, efectivo y pagos manuales se confirman más tarde por webhook:
+  // mientras el pago esté en proceso refrescamos solos cada 15 s.
+  useEffect(() => {
+    if (!lastBody || result?.outcome !== "processing") return;
+    const id = setInterval(() => void lookup(lastBody, true), 15000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastBody, result?.outcome]);
 
   const search = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,6 +230,7 @@ export default function OrderStatus() {
     const ok = looksLikeOrder ? await lookup({ orderNumber: ref, email: mail }) : false;
     if (!ok) await lookup({ transactionId: ref, email: mail });
   };
+
 
 
 
@@ -234,6 +320,20 @@ export default function OrderStatus() {
               </div>
 
 
+              {result.outcome && (() => {
+                const ui = OUTCOME_UI[result.outcome];
+                const Icon = ui.icon;
+                return (
+                  <div className={`rounded-lg border p-3 flex gap-3 ${ui.box}`}>
+                    <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${ui.tone}`} />
+                    <div className="min-w-0">
+                      <div className={`text-sm font-semibold ${ui.tone}`}>{ui.label}</div>
+                      <p className="text-xs text-muted-foreground mt-0.5 break-words">{ui.text}</p>
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div className="flex items-center">
                 {STAGES.map((s, i) => {
                   const Icon = s.icon;
@@ -264,13 +364,22 @@ export default function OrderStatus() {
                 })}
               </div>
 
-              {result.method && (
-                <div className="flex items-center gap-2 text-sm rounded-lg bg-muted/40 p-3">
-                  <CreditCard className="w-4 h-4 text-primary shrink-0" />
-                  <span className="text-muted-foreground">Método de pago:</span>
-                  <span className="font-medium">{result.method}</span>
-                </div>
-              )}
+              <div className="grid gap-2 sm:grid-cols-2">
+                {methodLabel(result.method) && (
+                  <div className="flex items-center gap-2 text-sm rounded-lg bg-muted/40 p-3">
+                    <CreditCard className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-muted-foreground shrink-0">Método:</span>
+                    <span className="font-medium break-words">{methodLabel(result.method)}</span>
+                  </div>
+                )}
+                {formatAmount(result.amount, result.currency) && (
+                  <div className="flex items-center gap-2 text-sm rounded-lg bg-muted/40 p-3">
+                    <Package className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-muted-foreground shrink-0">Importe:</span>
+                    <span className="font-medium">{formatAmount(result.amount, result.currency)}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="rounded-xl border bg-card p-5">
@@ -312,7 +421,7 @@ export default function OrderStatus() {
                         {t.detail && <div className="text-xs text-muted-foreground mt-1">{t.detail}</div>}
                         {(t.method || t.reference) && (
                           <div className="text-[11px] text-muted-foreground mt-1 flex flex-wrap gap-x-3">
-                            {t.method && <span>Método: {t.method}</span>}
+                            {t.method && <span>Método: {methodLabel(t.method)}</span>}
                             {t.reference && <span>Ref: {t.reference}</span>}
                           </div>
                         )}

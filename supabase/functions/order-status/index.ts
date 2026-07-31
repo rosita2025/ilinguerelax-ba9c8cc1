@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
         .maybeSingle(),
       supabase
         .from("digital_email_sends")
-        .select("order_id, customer_email, status, created_at, last_event, last_event_at")
+        .select("order_id, customer_email, status, created_at, last_event, last_event_at, provider, amount, currency")
         .eq("order_id", orderNumber)
         .order("created_at", { ascending: true }),
     ]);
@@ -241,6 +241,39 @@ Deno.serve(async (req) => {
           currency: manual.currency_local ?? "USD",
           provider: "manual",
           createdAt: manual.verified_at,
+        });
+      }
+    }
+
+    // Pedidos automáticos (Stripe, Mercado Pago, PayPal, dLocal): si el webhook
+    // no dejó eventos, reconstruimos "creado" y "pagado" desde la entrega digital
+    // para que /mi-pedido muestre lo mismo en todas las pasarelas.
+    const firstSend = (sends ?? [])[0];
+    if (firstSend) {
+      if (!has("order_created")) {
+        push({
+          event: "order_created",
+          status: "paid",
+          method: firstSend.provider ? String(firstSend.provider) : null,
+          reference: null,
+          detail: null,
+          amount: null,
+          currency: null,
+          provider: firstSend.provider ? String(firstSend.provider) : null,
+          createdAt: firstSend.created_at,
+        });
+      }
+      if (!has("payment_paid")) {
+        push({
+          event: "payment_paid",
+          status: "paid",
+          method: firstSend.provider ? String(firstSend.provider) : null,
+          reference: null,
+          detail: null,
+          amount: firstSend.amount ?? null,
+          currency: firstSend.currency ?? null,
+          provider: firstSend.provider ? String(firstSend.provider) : null,
+          createdAt: firstSend.created_at,
         });
       }
     }

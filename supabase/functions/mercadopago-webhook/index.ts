@@ -377,8 +377,8 @@ Deno.serve(async (req) => {
           try {
             const skus = getPaymentSkus(payment);
             if (skus.length > 0) {
-              const { error: digitalErr } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-                body: {
+              const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
+                {
                   customerEmail: payerEmail,
                   customerName,
                   customerPhone: payment.metadata?.customer_phone || undefined,

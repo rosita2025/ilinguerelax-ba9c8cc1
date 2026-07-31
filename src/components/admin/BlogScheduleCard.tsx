@@ -46,7 +46,7 @@ const BlogScheduleCard = () => {
 
   const call = useCallback(
     async (payload: Record<string, unknown>) => {
-      const { data, error } = await adminInvoke("manage-blog-queue", { adminKey, ...payload });
+      const { data, error } = await adminInvoke("manage-blog-queue", { body: { adminKey, ...payload } });
       if (error) throw new Error(error.message);
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
       return data as Record<string, unknown>;

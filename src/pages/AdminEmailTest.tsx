@@ -187,6 +187,8 @@ const AdminEmailTest = () => {
         }
       });
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
+      setCatalogList(Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+
 
       const digitalByEmail = new Map<string, any>();
       const digitalByOrder = new Map<string, any>();

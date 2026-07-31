@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     if (new Date(row.expires_at).getTime() < Date.now()) return dlJson({ status: "expired", ...base });
     if ((row.download_count ?? 0) >= (row.max_downloads ?? 0)) return dlJson({ status: "exhausted", ...base });
 
-    const skus = [...new Set((row.skus ?? []).map((s: string) => String(s).toLowerCase()))];
+    const skus: string[] = [...new Set(((row.skus ?? []) as string[]).map((s) => String(s).toLowerCase()))];
     let items: Record<string, unknown>[] = [];
     let missingSkus: string[] = [];
     if (skus.length) {

@@ -26,6 +26,10 @@ interface Body {
   force?: boolean;
 }
 
+/** Señal interna: el aviso de venta al admin ya se envió hoy para este cliente. */
+class DedupedAdminNotice extends Error {}
+
+
 interface Bonus { name?: string | null; drive_url?: string | null; access_key?: string | null }
 interface Product {
   sku: string;

@@ -2,20 +2,23 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 
+// SEGURIDAD: precio/nombre del cliente se ignoran; se resuelven en servidor.
 const ItemSchema = z.object({
   id: z.string().min(1).max(200),
-  name: z.string().min(1).max(300),
-  price: z.number().positive().max(10000),
+  name: z.string().max(300).optional(),
+  price: z.number().optional(),
   quantity: z.number().int().min(1).max(50),
-  image: z.string().url().optional(),
+  image: z.string().max(500).optional(),
   description: z.string().max(500).optional(),
 });
 
 const BodySchema = z.object({
   orderId: z.string().min(1).max(80).optional(),
   items: z.array(ItemSchema).min(1).max(20),
-  couponPercent: z.number().min(0).max(90).default(0),
+  couponPercent: z.number().min(0).max(100).optional(),
+  country: z.string().length(2).optional(),
   couponCode: z.string().max(20).optional(),
   payerEmail: z.string().email().optional(),
   payerName: z.string().max(120).optional(),
@@ -59,12 +62,24 @@ Deno.serve(async (req) => {
       );
     }
     const body = parsed.data;
-    const discountMultiplier = 1 - body.couponPercent / 100;
-    const calculatedTotalUsd = Number(
-      body.items
-        .reduce((sum, item) => sum + item.price * item.quantity * discountMultiplier, 0)
-        .toFixed(2),
-    );
+    let pricing;
+    try {
+      pricing = await resolveServerPricing({
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        country: body.country ?? "PE",
+        couponCode: body.couponCode,
+      });
+    } catch (e) {
+      if (e instanceof PricingError) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw e;
+    }
+    const discountMultiplier = 1 - pricing.couponPercent / 100;
+    const calculatedTotalUsd = Number(pricing.totalUsd.toFixed(2));
 
     if (body.expectedTotalUsd && Math.abs(calculatedTotalUsd - body.expectedTotalUsd) > 0.01) {
       return new Response(
@@ -75,20 +90,20 @@ Deno.serve(async (req) => {
 
     // Enviamos precios en USD y dejamos que Mercado Pago aplique el tipo de
     // cambio local del comprador automáticamente (no hacemos conversión manual).
-    const mpItems = body.items.map((item) => ({
+    const mpItems = pricing.items.map((item) => ({
       id: item.id,
       title: item.name.slice(0, 250),
       description: item.description?.slice(0, 250) ?? undefined,
       picture_url: item.image ?? undefined,
       quantity: item.quantity,
       currency_id: "USD",
-      unit_price: Number((item.price * discountMultiplier).toFixed(2)),
+      unit_price: Number((item.unitUsd * discountMultiplier).toFixed(2)),
     }));
-    const productSummary = body.items
+    const productSummary = pricing.items
       .map((i) => `${i.quantity}x ${i.name}`)
       .join(" · ")
       .slice(0, 300);
-    const deliverySkus = normalizeSkus(body.items.map((i) => i.id)).join(",").slice(0, 490);
+    const deliverySkus = normalizeSkus(pricing.items.map((i) => i.sku)).join(",").slice(0, 490);
 
     // Número de pedido legible (ILR-MP-XXXXXX). Es la referencia que ve el
     // cliente en /mi-pedido y la que usa soporte junto con su correo.
@@ -123,10 +138,10 @@ Deno.serve(async (req) => {
       metadata: {
         source: "checkout-prueba-1",
         order_id: orderNumber,
-        coupon_code: body.couponCode ?? "",
-        coupon_percent: body.couponPercent,
+        coupon_code: pricing.couponCode ?? "",
+        coupon_percent: pricing.couponPercent,
         total_usd: calculatedTotalUsd,
-        item_count: body.items.reduce((sum, item) => sum + item.quantity, 0),
+        item_count: pricing.items.reduce((sum, item) => sum + item.quantity, 0),
         items_summary: productSummary,
         skus: deliverySkus,
         customer_email: body.payerEmail ?? "",

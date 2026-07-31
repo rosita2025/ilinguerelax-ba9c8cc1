@@ -10,6 +10,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { Card } from "@/components/ui/card";
@@ -124,13 +125,11 @@ export default function AdminIndexing() {
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("indexing_events")
-      .select("id, url, channel, target, status, http_status, detail, created_at")
-      .order("created_at", { ascending: false })
-      .limit(5000);
+    const { data, error } = await adminInvoke<{ rows?: Row[] }>("list-indexing-events", {
+      body: { days: 90, limit: 5000 },
+    });
     if (error) toast.error("No se pudo cargar el historial de indexación");
-    setRows((data ?? []) as Row[]);
+    setRows((data?.rows ?? []) as Row[]);
     setLoading(false);
   }
 

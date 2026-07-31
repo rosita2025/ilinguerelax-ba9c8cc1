@@ -8,7 +8,7 @@
  * cada vez que notifican a un buscador.
  */
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,12 +55,10 @@ export default function IndexingEventsCard() {
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase
-      .from("indexing_events")
-      .select("id, url, channel, target, status, http_status, detail, created_at")
-      .order("created_at", { ascending: false })
-      .limit(2000);
-    setRows((data ?? []) as Row[]);
+    const { data } = await adminInvoke<{ rows?: Row[] }>("list-indexing-events", {
+      body: { days: 90, limit: 2000 },
+    });
+    setRows((data?.rows ?? []) as Row[]);
     setLoading(false);
   }
 

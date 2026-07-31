@@ -9,6 +9,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
+import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -48,6 +49,7 @@ Deno.serve(async (req) => {
     const urls = skus.map(productUrl);
     await Promise.allSettled([
       pingIndexNow(urls),
+      notifyGoogleIndexing(urls, "URL_UPDATED"),
       pingSitemap(),
       resubmitSitemapsGSC(),
       ...urls.slice(0, 5).map((u) => inspectUrlGSC(u)),

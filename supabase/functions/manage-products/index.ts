@@ -1,6 +1,7 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
+import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -280,6 +281,7 @@ Deno.serve(async (req) => {
       // Bing/Yandex/Seznam (IndexNow) and pings sitemap for Google.
       if (p.active !== false) {
         await pingIndexNow([productUrl(p.sku)]);
+        notifyGoogleIndexing([productUrl(p.sku)], "URL_UPDATED").catch(() => {});
         pingSitemap().catch(() => {});
         resubmitSitemapsGSC().catch(() => {});
         inspectUrlGSC(productUrl(p.sku)).catch(() => {});
@@ -303,6 +305,8 @@ Deno.serve(async (req) => {
       await admin.from("product_upsells").update({ upsell_sku: newSku }).eq("upsell_sku", oldSku);
       // Announce both old (now 404) and new URLs so search engines refresh.
       await pingIndexNow([productUrl(oldSku), productUrl(newSku)]);
+      notifyGoogleIndexing([productUrl(newSku)], "URL_UPDATED").catch(() => {});
+      notifyGoogleIndexing([productUrl(oldSku)], "URL_DELETED").catch(() => {});
       pingSitemap().catch(() => {});
       resubmitSitemapsGSC().catch(() => {});
       inspectUrlGSC(productUrl(newSku)).catch(() => {});
@@ -316,6 +320,7 @@ Deno.serve(async (req) => {
       if (error) throw error;
       // Product removed — tell IndexNow so it drops the URL from indexes.
       await pingIndexNow([productUrl(sku)]);
+      notifyGoogleIndexing([productUrl(sku)], "URL_DELETED").catch(() => {});
       pingSitemap().catch(() => {});
       resubmitSitemapsGSC().catch(() => {});
       return json({ success: true });
@@ -329,6 +334,7 @@ Deno.serve(async (req) => {
       if (error) throw error;
       // Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
       await pingIndexNow([productUrl(sku)]);
+      notifyGoogleIndexing([productUrl(sku)], active ? "URL_UPDATED" : "URL_DELETED").catch(() => {});
       pingSitemap().catch(() => {});
       resubmitSitemapsGSC().catch(() => {});
       inspectUrlGSC(productUrl(sku)).catch(() => {});

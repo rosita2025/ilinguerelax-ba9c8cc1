@@ -116,7 +116,7 @@ export default function OrderStatus() {
         setError(
           body.token
             ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
-            : "No encontramos un pedido con ese número (o id de transacción) y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
+            : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
         );
         return false;
       }
@@ -140,7 +140,7 @@ export default function OrderStatus() {
     e.preventDefault();
     const ref = orderNumber.trim();
     const mail = email.trim();
-    // Un solo campo: aceptamos número de pedido o id de transacción del proveedor.
+    // Un solo campo visible: probamos como número de pedido y, si no, como referencia del pago.
     const looksLikeOrder = /^[A-Za-z0-9\-_]+$/.test(ref);
     const ok = looksLikeOrder ? await lookup({ orderNumber: ref, email: mail }) : false;
     if (!ok) await lookup({ transactionId: ref, email: mail });
@@ -173,20 +173,20 @@ export default function OrderStatus() {
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Estado de mi pedido</h1>
           <p className="text-sm text-muted-foreground">
-            Ingresa tu número de pedido (o el id de transacción del pago) y el correo que usaste al
-            comprar para ver si tu pago está pendiente, pagado o ya entregado.
+            Ingresa tu número de pedido y el correo que usaste al comprar para ver si tu pago está
+            pendiente, pagado o ya entregado.
           </p>
         </div>
 
         <form onSubmit={search} className="rounded-xl border bg-card p-4 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="order">Número de pedido o id de transacción</Label>
+              <Label htmlFor="order">Número de pedido</Label>
               <Input
                 id="order"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="ILR-DL-XXXXXX o DP-1234567"
+                placeholder="ILR-DL-XXXXXX"
                 required
                 minLength={4}
               />

@@ -84,7 +84,7 @@ export async function invokeWithRetry<T = unknown>(
       lastError = error;
       if (!error) return { data: data as T, error: null };
       if (attempt >= attempts || !isRetryable(error, data)) {
-        return { data: data as T, error };
+        return { data: data as T, error: await withEdgeDetail(error) };
       }
     } catch (err) {
       lastError = err;

@@ -68,7 +68,10 @@ async function fetchDlocalPayment(paymentId: string) {
   try {
     const r = await fetch(`${dlocalApiBase()}/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: `Bearer ${apiKey}:${secretKey}` },
+      // Evita que el panel se quede cargando si dLocal tarda.
+      signal: AbortSignal.timeout(6000),
     });
+
     if (!r.ok) {
       console.warn("[dlocal-reconcile] dLocal respondió", r.status, "env", dlocalEnv());
       return null;

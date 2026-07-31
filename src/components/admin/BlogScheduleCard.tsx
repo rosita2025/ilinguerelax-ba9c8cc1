@@ -61,7 +61,63 @@ function peruTime(iso: string) {
   });
 }
 
+/* ---- Caché de vistas previas (sessionStorage, 10 min) ---- */
+const PREVIEW_CACHE_KEY = "ilr-blog-preview-cache-v1";
+const PREVIEW_TTL_MS = 10 * 60 * 1000;
+
+type PreviewCache = Record<string, { at: number; post: PreviewPost }>;
+
+function readCacheRaw(): PreviewCache {
+  try {
+    const raw = sessionStorage.getItem(PREVIEW_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as PreviewCache) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeCacheRaw(cache: PreviewCache) {
+  try {
+    sessionStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    /* cuota llena: la caché es opcional */
+  }
+}
+
+function readPreviewCache(queueId: string): PreviewPost | null {
+  const cache = readCacheRaw();
+  const hit = cache[queueId];
+  if (!hit) return null;
+  if (Date.now() - hit.at > PREVIEW_TTL_MS) {
+    delete cache[queueId];
+    writeCacheRaw(cache);
+    return null;
+  }
+  return hit.post;
+}
+
+function writePreviewCache(queueId: string, post: PreviewPost) {
+  const cache = readCacheRaw();
+  // limpia entradas vencidas para no crecer indefinidamente
+  const now = Date.now();
+  for (const [k, v] of Object.entries(cache)) {
+    if (now - v.at > PREVIEW_TTL_MS) delete cache[k];
+  }
+  cache[queueId] = { at: now, post };
+  writeCacheRaw(cache);
+}
+
+function clearPreviewCacheByPost(postId: string) {
+  const cache = readCacheRaw();
+  let changed = false;
+  for (const [k, v] of Object.entries(cache)) {
+    if (v.post?.id === postId) { delete cache[k]; changed = true; }
+  }
+  if (changed) writeCacheRaw(cache);
+}
+
 const BlogScheduleCard = () => {
+
   const { adminKey } = useAdminKey();
   const [items, setItems] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -115,15 +171,25 @@ const BlogScheduleCard = () => {
     }
   };
 
-  /** Vista previa de cualquier post de la agenda: si aún no existe, se genera al momento. */
+  /** Vista previa de cualquier post de la agenda: si aún no existe, se genera al momento.
+   *  Se cachea el borrador (10 min) para no volver a generarlo ni re-consultarlo. */
   const openPreview = async (it: QueueItem) => {
+    const cached = readPreviewCache(it.id);
+    if (cached) {
+      setPreview(cached);
+      toast.info("Vista previa en caché");
+      return;
+    }
+
     setBusy("preview" + it.id);
     const toastId = it.post_id ? undefined : toast.loading("Generando el artículo con IA… puede tardar 20–40 s");
     try {
       const res = it.post_id
         ? await call({ action: "preview", id: it.post_id })
         : await call({ action: "generate-one", id: it.id });
-      setPreview(res.post as PreviewPost);
+      const post = res.post as PreviewPost;
+      setPreview(post);
+      writePreviewCache(it.id, post);
       if (toastId) toast.success("Borrador listo", { id: toastId });
       if (!it.post_id) await load();
     } catch (e) {
@@ -141,6 +207,7 @@ const BlogScheduleCard = () => {
     try {
       await call({ action, id: postId });
       toast.success(okMsg);
+      clearPreviewCacheByPost(postId);
       setPreview(null);
       await load();
     } catch (e) {
@@ -149,6 +216,7 @@ const BlogScheduleCard = () => {
       setBusy(null);
     }
   };
+
 
   const pending = items.filter((i) => i.status === "pending").length;
   const done = items.filter((i) => i.status === "done").length;

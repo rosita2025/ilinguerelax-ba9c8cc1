@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { resend } from "../_shared/brevo.ts";
-import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
+import { assertInternalCall } from "../_shared/internalAuth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

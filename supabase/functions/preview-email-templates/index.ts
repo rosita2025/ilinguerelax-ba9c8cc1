@@ -3,7 +3,7 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 import { BRAND, escapeHtml, renderBrandedEmail, formatLocalFromUsd } from '../_shared/emailBrand.ts'
-import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
+import { assertInternalCall } from "../_shared/internalAuth.ts";
 
 // -------- Sample data (mirrors production) --------
 const SAMPLE_PRODUCT = {
@@ -21,19 +21,19 @@ function buildDigitalPreview() {
     {
       name: SAMPLE_PRODUCT.name,
       price_usd: 22,
-      drive_url: 'https://drive.google.com/file/d/EXAMPLE/view',
-      access_key: '123A',
+      drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO',
+      access_key: null,
       cover: SAMPLE_PRODUCT.cover,
       bonuses: [
-        { name: 'Bonus 1 — Guía de pronunciación UK/USA', drive_url: 'https://drive.google.com/example-bonus-1', access_key: 'B1X' },
-        { name: 'Bonus 2 — Diccionario básico PDF', drive_url: 'https://drive.google.com/example-bonus-2', access_key: null },
+        { name: 'Bonus 1 — Guía de pronunciación UK/USA', drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO', access_key: null },
+        { name: 'Bonus 2 — Diccionario básico PDF', drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO', access_key: null },
       ],
     },
     {
       name: '500 Preguntas en Inglés (adicional)',
       price_usd: 7,
-      drive_url: 'https://drive.google.com/file/d/EXAMPLE2/view',
-      access_key: '456B',
+      drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO',
+      access_key: null,
       cover: SAMPLE_PRODUCT.cover,
       bonuses: [],
     },

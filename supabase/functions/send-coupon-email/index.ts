@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { resend } from "../_shared/brevo.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
+import { assertInternalCall } from "../_shared/internalAuth.ts";
 
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL")!,

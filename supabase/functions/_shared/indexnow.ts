@@ -135,8 +135,9 @@ export async function pingSitemap(
 
 /**
  * Notificación completa tras publicar un post del blog:
+ * 0) Calienta y verifica el sitemap VIVO (que ya incluye el post nuevo)
  * 1) IndexNow (Bing/Yandex/Seznam/Naver) con la URL del post + índice del blog
- * 2) Ping de sitemap y RSS a Google y Bing
+ * 2) Ping de sitemap y RSS (vivos + estáticos) a Google y Bing
  * Nunca lanza: los fallos se registran en logs / indexing_events.
  */
 export async function pingPostPublished(slug: string): Promise<void> {
@@ -144,6 +145,18 @@ export async function pingPostPublished(slug: string): Promise<void> {
   if (!clean) return;
   const postUrl = `https://${HOST}/blog/${clean}`;
   try {
+    // 0) El feed vivo se genera desde la base de datos: confirmamos que el
+    //    post ya aparece antes de avisar a los buscadores.
+    try {
+      const res = await fetch(`${LIVE_BLOG_SITEMAP}&t=${Date.now()}`, { cache: "no-store" });
+      const xml = await res.text();
+      console.log(
+        `[pingPostPublished] live sitemap ${res.status}, contiene el post: ${xml.includes(postUrl)}`,
+      );
+    } catch (err) {
+      console.warn("[pingPostPublished] no se pudo verificar el feed vivo:", (err as Error).message);
+    }
+
     await Promise.allSettled([
       pingIndexNow([postUrl, `https://${HOST}/blog`]),
       pingSitemap(),
@@ -153,4 +166,5 @@ export async function pingPostPublished(slug: string): Promise<void> {
     console.warn("[pingPostPublished] failed:", (err as Error).message);
   }
 }
+
 

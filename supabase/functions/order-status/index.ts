@@ -21,8 +21,15 @@ const BodySchema = z.union([
     orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
     email: z.string().trim().email().max(160),
   }),
+  // c) id de transacción del proveedor (Stripe, dLocal, Mercado Pago, PayPal)
+  //    + correo del comprador. El id solo no basta: siempre validamos el correo.
+  z.object({
+    transactionId: z.string().trim().min(4).max(120).regex(/^[A-Za-z0-9\-_:.]+$/),
+    email: z.string().trim().email().max(160),
+  }),
   z.object({ token: z.string().trim().regex(TOKEN_RE) }),
 ]);
+
 
 
 const json = (b: unknown, s = 200) =>

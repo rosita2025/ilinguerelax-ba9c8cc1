@@ -232,6 +232,7 @@ export default function CheckoutSuccess() {
       .then(({ data, error }) => {
         if (error) throw error;
         setDelivery((data?.items ?? []) as DeliveryItem[]);
+        setDownloadUrl((data?.downloadUrl ?? null) as string | null);
       })
       .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));
@@ -239,12 +240,6 @@ export default function CheckoutSuccess() {
   }, []);
 
 
-  const copyKey = (val: string) => {
-    navigator.clipboard.writeText(val).then(
-      () => toast({ title: "Clave copiada", description: val }),
-      () => {},
-    );
-  };
 
   // Localized copy for the public / unverified screen (IP-based via useI18n)
   const publicCopy = {

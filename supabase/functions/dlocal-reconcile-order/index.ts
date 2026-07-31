@@ -37,7 +37,7 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 
 const BodySchema = z.object({
-  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending"]),
+  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery"]),
   orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
   adminKey: z.string().min(4).max(200),
   reason: z.string().trim().max(300).optional(),

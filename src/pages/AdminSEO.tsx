@@ -18,6 +18,7 @@ import IndexingEventsCard from "@/components/admin/IndexingEventsCard";
 import BacklinksCard from "@/components/admin/BacklinksCard";
 import GscKeywordsMultilangCard from "@/components/admin/GscKeywordsMultilangCard";
 import GoogleSuggestCard from "@/components/admin/GoogleSuggestCard";
+import BlogScheduleCard from "@/components/admin/BlogScheduleCard";
 
 
 interface GscRow {

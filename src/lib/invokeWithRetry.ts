@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { reportClientError } from "@/lib/errorReporter";
+import { edgeErrorStatus, extractEdgeErrorMessage } from "@/lib/edgeError";
 
 export interface InvokeRetryOptions {
   /** Max attempts including the first. Default 3. */

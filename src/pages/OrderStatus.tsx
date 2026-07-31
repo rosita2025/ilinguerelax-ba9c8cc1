@@ -34,6 +34,9 @@ interface OrderStatusResult {
   orderNumber?: string;
   stage?: "pending" | "paid" | "delivered";
   outcome?: "approved" | "rejected" | "processing";
+  /** true cuando el cliente abrió la pasarela y nunca completó el pago. */
+  abandoned?: boolean;
+
   provider?: string | null;
   method?: string | null;
   amount?: number | null;
@@ -125,6 +128,13 @@ const OUTCOME_UI = {
     tone: "text-destructive",
     icon: AlertCircle,
   },
+  abandoned: {
+    label: "Pago no completado",
+    text: "Abriste la pasarela de pago pero no llegaste a completarla, así que no se te cobró nada. Puedes volver a comprar cuando quieras o escribirnos si necesitas ayuda.",
+    box: "border-destructive/30 bg-muted",
+    tone: "text-muted-foreground",
+    icon: AlertCircle,
+  },
   processing: {
     label: "Pago en proceso",
     text: "Estamos esperando la confirmación del pago (transferencias, efectivo y pagos manuales pueden tardar unas horas). Esta página se actualiza sola.",
@@ -133,6 +143,7 @@ const OUTCOME_UI = {
     icon: Clock,
   },
 } as const;
+
 
 const STAGES = [
   { key: "pending", label: "Pendiente", icon: Clock },
@@ -321,7 +332,9 @@ export default function OrderStatus() {
 
 
               {result.outcome && (() => {
-                const ui = OUTCOME_UI[result.outcome];
+                const key = result.outcome === "rejected" && result.abandoned ? "abandoned" : result.outcome;
+                const ui = OUTCOME_UI[key];
+
                 const Icon = ui.icon;
                 return (
                   <div className={`rounded-lg border p-3 flex gap-3 ${ui.box}`}>

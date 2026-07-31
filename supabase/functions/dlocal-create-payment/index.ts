@@ -358,7 +358,10 @@ Deno.serve(async (req) => {
               localAmount: usedUsdFallback ? calculatedUsd : localAmount,
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
+              expirationDays: EXPIRATION_DAYS,
+              expiresAt: (data as any).expiration_date ?? new Date(Date.now() + EXPIRATION_DAYS * 86400000).toISOString(),
             },
+
           }),
           logOrderEvent({
             orderNumber: orderId,

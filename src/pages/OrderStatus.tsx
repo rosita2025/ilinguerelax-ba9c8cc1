@@ -329,7 +329,9 @@ export default function OrderStatus() {
 
 
               {result.outcome && (() => {
-                const ui = OUTCOME_UI[result.outcome];
+                const key = result.outcome === "rejected" && result.abandoned ? "abandoned" : result.outcome;
+                const ui = OUTCOME_UI[key];
+
                 const Icon = ui.icon;
                 return (
                   <div className={`rounded-lg border p-3 flex gap-3 ${ui.box}`}>

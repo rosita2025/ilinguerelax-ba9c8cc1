@@ -157,6 +157,7 @@ Deno.serve(async (req) => {
     const DLOCAL_CURRENCY: Record<string, string> = {
       AR: "ARS", BO: "BOB", BR: "BRL", CL: "CLP", CO: "COP", CR: "CRC",
       EC: "USD", GT: "GTQ", MX: "MXN", PA: "USD", PE: "PEN", PY: "PYG", UY: "UYU",
+      DO: "DOP", SV: "USD", HN: "HNL", NI: "NIO",
     };
     const countryCode = body.country.toUpperCase();
     const requested = body.currency.toUpperCase();
@@ -199,6 +200,10 @@ Deno.serve(async (req) => {
       PE: /^(\d{8}|\d{11})$/,    // DNI / RUC
       PY: /^\d{5,12}$/,
       UY: /^\d{7,8}$/,           // CI
+      DO: /^\d{9,11}$/,          // Cédula / RNC
+      SV: /^\d{8,14}$/,          // DUI / NIT
+      HN: /^\d{13,14}$/,         // Identidad / RTN
+      NI: /^[A-Z0-9]{13,14}$/,   // Cédula
     };
     const docRule = DOC_RULES[body.country.toUpperCase()];
     const payerDocument = rawDocument && (!docRule || docRule.test(rawDocument))

@@ -63,8 +63,24 @@ Deno.serve(async (req) => {
       const [tokenId, sku, kind, idxRaw, expRaw] = atob(data.replace(/-/g, "+").replace(/_/g, "/")).split("|");
       if (Number(expRaw) < Date.now()) return new Response("Enlace caducado, vuelve a tu página de descarga", { status: 410 });
 
+      // Revalidar el pedido en el momento del canje: un ticket firmado no puede
+      // sobrevivir a una revocación, caducidad o a un SKU que ya no pertenece al pedido.
+      const { data: tok } = await admin
+        .from("download_tokens")
+        .select("id, skus, expires_at, revoked")
+        .eq("id", tokenId)
+        .maybeSingle();
+      if (!tok || tok.revoked) return new Response("Enlace inválido", { status: 403 });
+      if (new Date(String(tok.expires_at)).getTime() < Date.now()) {
+        return new Response("Enlace caducado, vuelve a tu página de descarga", { status: 410 });
+      }
+      if (!((tok.skus as string[]) ?? []).map((s) => String(s).toLowerCase()).includes(String(sku).toLowerCase())) {
+        return new Response("Enlace inválido", { status: 403 });
+      }
+
       const file = await resolveFile(admin, sku, kind, Number(idxRaw) || 0);
       if (!file?.url) return new Response("Archivo no disponible", { status: 404 });
+
 
       await admin.from("download_token_access").insert({
         token_id: tokenId, action: "download", sku,

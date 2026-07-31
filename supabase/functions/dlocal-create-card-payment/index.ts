@@ -134,7 +134,7 @@ Deno.serve(async (req) => {
       },
     };
 
-    const resp = await fetch("https://api.dlocalgo.com/v1/payments", {
+    const resp = await fetch(`${dlocalApiBase()}/payments`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}:${secretKey}`,

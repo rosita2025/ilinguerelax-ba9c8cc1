@@ -14,10 +14,11 @@ import {
   DLOCAL_SETTLED_STATUSES,
   DLOCAL_PENDING_STATUSES,
   DLOCAL_FAILED_STATUSES,
+  dlocalApiBase,
 } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
-const API_BASE = "https://api.dlocalgo.com/v1";
+const API_BASE = dlocalApiBase();
 
 function authHeader(): string {
   const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");

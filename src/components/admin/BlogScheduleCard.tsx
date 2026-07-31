@@ -61,7 +61,63 @@ function peruTime(iso: string) {
   });
 }
 
+/* ---- Caché de vistas previas (sessionStorage, 10 min) ---- */
+const PREVIEW_CACHE_KEY = "ilr-blog-preview-cache-v1";
+const PREVIEW_TTL_MS = 10 * 60 * 1000;
+
+type PreviewCache = Record<string, { at: number; post: PreviewPost }>;
+
+function readCacheRaw(): PreviewCache {
+  try {
+    const raw = sessionStorage.getItem(PREVIEW_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as PreviewCache) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeCacheRaw(cache: PreviewCache) {
+  try {
+    sessionStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    /* cuota llena: la caché es opcional */
+  }
+}
+
+function readPreviewCache(queueId: string): PreviewPost | null {
+  const cache = readCacheRaw();
+  const hit = cache[queueId];
+  if (!hit) return null;
+  if (Date.now() - hit.at > PREVIEW_TTL_MS) {
+    delete cache[queueId];
+    writeCacheRaw(cache);
+    return null;
+  }
+  return hit.post;
+}
+
+function writePreviewCache(queueId: string, post: PreviewPost) {
+  const cache = readCacheRaw();
+  // limpia entradas vencidas para no crecer indefinidamente
+  const now = Date.now();
+  for (const [k, v] of Object.entries(cache)) {
+    if (now - v.at > PREVIEW_TTL_MS) delete cache[k];
+  }
+  cache[queueId] = { at: now, post };
+  writeCacheRaw(cache);
+}
+
+function clearPreviewCacheByPost(postId: string) {
+  const cache = readCacheRaw();
+  let changed = false;
+  for (const [k, v] of Object.entries(cache)) {
+    if (v.post?.id === postId) { delete cache[k]; changed = true; }
+  }
+  if (changed) writeCacheRaw(cache);
+}
+
 const BlogScheduleCard = () => {
+
   const { adminKey } = useAdminKey();
   const [items, setItems] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(false);

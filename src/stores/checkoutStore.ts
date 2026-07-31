@@ -101,11 +101,17 @@ const VALID_COUPONS: Record<string, number> = {
   NEW10: 10,
   PRUEBA20: 20,
   RELAX15: 15,
-  TEST100: 100,
-  GRATIS100: 100,
-  DOLAR1: 90,
-  PRUEBA1: 90,
 };
+
+/**
+ * Cupones de prueba con total fijo en USD (espejo de
+ * supabase/functions/_shared/catalogPricing.ts). El servidor es la fuente
+ * autoritativa: aquí solo se calcula el descuento equivalente para mostrarlo.
+ */
+const FIXED_TOTAL_COUPONS: Record<string, number> = {
+  DLTEST1: 1,
+};
+
 
 interface PersistedCheckoutState {
   items?: PruebaItem[];
@@ -201,6 +207,15 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
 
       applyCoupon: (code) => {
         const upper = code.trim().toUpperCase();
+        const fixedTotal = FIXED_TOTAL_COUPONS[upper];
+        if (fixedTotal) {
+          const subtotal = get().items.reduce((s, i) => s + i.price * i.quantity, 0);
+          const percent = subtotal > fixedTotal
+            ? Math.round((1 - fixedTotal / subtotal) * 10000) / 100
+            : 0;
+          set({ coupon: upper, couponPercent: percent });
+          return true;
+        }
         const percent = VALID_COUPONS[upper];
         if (percent) {
           set({ coupon: upper, couponPercent: percent });
@@ -208,6 +223,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
         }
         return false;
       },
+
 
       removeCoupon: () => set({ coupon: null, couponPercent: 0 }),
 

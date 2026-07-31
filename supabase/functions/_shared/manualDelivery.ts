@@ -8,6 +8,7 @@
 // cualquier pedido (dLocal, conciliación manual, reintentos).
 import { ensureDownloadUrl } from "./downloadToken.ts";
 import { normalizeSku } from "./digitalSku.ts";
+import { sendInternalEmail } from "./sendInternalEmail.ts";
 
 type BonusRow = { name?: string | null; drive_url?: string | null; access_key?: string | null };
 
@@ -86,45 +87,21 @@ export async function deliverLikeManual(admin: any, order: {
 
   const downloadUrl = await ensureDownloadUrl(admin, order.orderNumber, order.email, resolvedSkus);
 
-  // Llamada directa por HTTP (en vez de admin.functions.invoke) para poder
-  // enviar TODAS las credenciales internas y leer el motivo real del error:
-  // invoke solo devuelve "non-2xx status code" y perdíamos el diagnóstico.
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  const cronSecret = Deno.env.get("CRON_SHARED_SECRET") ?? "";
-  let error: { message: string } | null = null;
-  try {
-    const res = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-transactional-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        ...(cronSecret ? { "x-internal-key": cronSecret } : {}),
-      },
-      body: JSON.stringify({
-        templateName: "material-delivery",
-        recipientEmail: order.email,
-        idempotencyKey: `manual-material-${order.orderNumber}`,
-        templateData: {
-          customerName: order.name || order.email.split("@")[0],
-          orderNumber: order.orderNumber,
-          materials: materials.map((m) => ({
-            productName: m.productName,
-            downloadUrl: downloadUrl ?? "https://ilinguerelax.com/mi-pedido",
-          })),
-        },
-      }),
-    });
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      let detail = text;
-      try { detail = JSON.parse(text)?.error ?? text; } catch { /* texto plano */ }
-      error = { message: `Correo de material (${res.status}): ${detail || "sin detalle"}` };
-    }
-  } catch (e) {
-    error = { message: e instanceof Error ? e.message : String(e) };
-  }
-
+  // Helper interno: envía apikey + Authorization + x-internal-key y devuelve
+  // el motivo real si falla (antes solo veíamos "non-2xx status code").
+  const { error } = await sendInternalEmail({
+    templateName: "material-delivery",
+    recipientEmail: order.email,
+    idempotencyKey: `manual-material-${order.orderNumber}`,
+    templateData: {
+      customerName: order.name || order.email.split("@")[0],
+      orderNumber: order.orderNumber,
+      materials: materials.map((m) => ({
+        productName: m.productName,
+        downloadUrl: downloadUrl ?? "https://ilinguerelax.com/mi-pedido",
+      })),
+    },
+  });
 
   if (error) {
     return { delivered: false, missing, resolvedSkus, detail: error.message || "Fallo al enviar el correo de material" };

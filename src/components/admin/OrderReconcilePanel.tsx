@@ -27,12 +27,42 @@ type Summary = {
   timeline: Array<{ event: string; status: string | null; at: string }>;
 };
 
+type PendingOrder = {
+  orderNumber: string;
+  email: string;
+  method: string | null;
+  amount: number | null;
+  currency: string;
+  lastAt: string;
+};
+
 export default function OrderReconcilePanel() {
   const [orderNumber, setOrderNumber] = useState("");
   const [adminKey, setAdminKey] = useState("");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [pending, setPending] = useState<PendingOrder[] | null>(null);
+
+  async function loadPending() {
+    if (!adminKey.trim()) { toast.error("Falta la clave de admin"); return; }
+    setBusy("list");
+    try {
+      const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
+        body: { action: "list_pending", adminKey: adminKey.trim() },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || error?.message || "No se pudo cargar la lista");
+        return;
+      }
+      setPending(data.pending ?? []);
+      toast.success(`${(data.pending ?? []).length} pedido(s) pendiente(s)`);
+    } catch (e) {
+      toast.error((e as Error).message || "Error inesperado");
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function run(action: "inspect" | "sync" | "approve" | "reject") {
     const order = orderNumber.trim().toUpperCase();
@@ -56,7 +86,9 @@ export default function OrderReconcilePanel() {
       if (action === "inspect") toast.success("Estado consultado");
       else if (data.applied === "paid" || data.applied === "manual_approved") {
         toast.success(data.delivery?.delivered ? "Pago aplicado y entrega enviada" : "Pago aplicado");
+        setPending((p) => (p ? p.filter((o) => o.orderNumber !== order) : p));
       } else toast.success(`Resultado: ${data.applied}`);
+      if (action === "reject") setPending((p) => (p ? p.filter((o) => o.orderNumber !== order) : p));
     } catch (e) {
       toast.error((e as Error).message || "Error inesperado");
     } finally {

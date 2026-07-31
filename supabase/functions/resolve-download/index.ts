@@ -31,25 +31,35 @@ Deno.serve(async (req) => {
       emailMasked: maskEmail(row.email),
       expiresAt: row.expires_at,
       downloadsLeft: Math.max(0, (row.max_downloads ?? 0) - (row.download_count ?? 0)),
+      maxDownloads: row.max_downloads ?? 0,
+      downloadsUsed: row.download_count ?? 0,
     };
 
     if (new Date(row.expires_at).getTime() < Date.now()) return dlJson({ status: "expired", ...base });
     if ((row.download_count ?? 0) >= (row.max_downloads ?? 0)) return dlJson({ status: "exhausted", ...base });
 
     const skus = [...new Set((row.skus ?? []).map((s: string) => String(s).toLowerCase()))];
-    let items: unknown[] = [];
+    let items: Record<string, unknown>[] = [];
+    let missingSkus: string[] = [];
     if (skus.length) {
       const { data: products } = await admin
         .from("digital_products")
-        .select("sku,name,cover_image_url,is_upsell,bonus_name,bonus_drive_url,bonus_access_key,bonuses")
+        .select("sku,name,cover_image_url,is_upsell,drive_url,bonus_name,bonus_drive_url,bonus_access_key,bonuses")
         .in("sku", skus);
       items = (products ?? []).map((p: Record<string, unknown>) => ({
         sku: p.sku,
         name: p.name,
         cover: p.cover_image_url ?? null,
         isUpsell: Boolean(p.is_upsell),
-        bonuses: bonusList(p).map((b, i) => ({ index: i, title: b.title ?? b.name ?? `Bono ${i + 1}` })),
+        // Nunca se envía la URL real: solo si el archivo está disponible.
+        available: Boolean(p.drive_url),
+        bonuses: bonusList(p).map((b, i) => ({
+          index: i,
+          title: b.title ?? b.name ?? `Bono ${i + 1}`,
+        })),
       }));
+      const found = new Set((products ?? []).map((p: Record<string, unknown>) => String(p.sku).toLowerCase()));
+      missingSkus = skus.filter((s: string) => !found.has(s));
     }
 
     await admin.from("download_tokens").update({ last_accessed_at: new Date().toISOString() }).eq("id", row.id);
@@ -60,7 +70,18 @@ Deno.serve(async (req) => {
       user_agent: req.headers.get("user-agent")?.slice(0, 300) ?? null,
     });
 
-    return dlJson({ status: "valid", ...base, items });
+    return dlJson({
+      status: "valid",
+      ...base,
+      items,
+      missingSkus,
+      counts: {
+        total: items.length,
+        main: items.filter((i) => !i.isUpsell).length,
+        upsells: items.filter((i) => i.isUpsell).length,
+        bonuses: items.reduce((n, i) => n + ((i.bonuses as unknown[])?.length ?? 0), 0),
+      },
+    });
   } catch (e) {
     console.error("[resolve-download]", e);
     return dlJson({ error: "Error interno" }, 500);

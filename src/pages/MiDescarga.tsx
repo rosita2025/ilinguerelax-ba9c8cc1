@@ -10,7 +10,15 @@ import { extractEdgeErrorMessage } from "@/lib/edgeError";
 import { Download, Loader2, Mail, ShieldCheck, Clock, Ban } from "lucide-react";
 
 type Bonus = { index: number; title: string };
-type Item = { sku: string; name: string; cover: string | null; isUpsell: boolean; bonuses: Bonus[] };
+type Item = {
+  sku: string;
+  name: string;
+  cover: string | null;
+  isUpsell: boolean;
+  available?: boolean;
+  bonuses: Bonus[];
+};
+type Counts = { total: number; main: number; upsells: number; bonuses: number };
 type State =
   | { status: "loading" }
   | { status: "invalid" }
@@ -20,8 +28,13 @@ type State =
       emailMasked: string;
       expiresAt: string;
       downloadsLeft: number;
+      maxDownloads?: number;
+      downloadsUsed?: number;
       items?: Item[];
+      missingSkus?: string[];
+      counts?: Counts;
     };
+
 
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
@@ -48,6 +61,13 @@ export default function MiDescarga() {
   }, [token]);
 
   const items = useMemo(() => (state.status === "valid" ? state.items ?? [] : []), [state]);
+  const counts = state.status === "valid" ? state.counts : undefined;
+  const mainCount = counts?.main ?? items.filter((i) => !i.isUpsell).length;
+  const upsellCount = counts?.upsells ?? items.filter((i) => i.isUpsell).length;
+  const bonusCount = counts?.bonuses ?? items.reduce((n, i) => n + i.bonuses.length, 0);
+  const maxDownloads = state.status === "valid" ? state.maxDownloads ?? 0 : 0;
+  const usedDownloads = state.status === "valid" ? state.downloadsUsed ?? 0 : 0;
+
 
   const openFile = async (sku: string, kind: "main" | "bonus", index = 0) => {
     const key = `${sku}:${kind}:${index}`;
@@ -180,13 +200,51 @@ export default function MiDescarga() {
                   <ShieldCheck className="h-5 w-5 text-primary" /> Tu descarga está lista
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-1 text-sm text-muted-foreground">
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>
                   Pedido <strong className="text-foreground">{state.orderNumber}</strong> · {state.emailMasked}
                 </p>
-                <p>
-                  Válido hasta el {fmtDate(state.expiresAt)} · {state.downloadsLeft} descargas disponibles
-                </p>
+                <p>Válido hasta el {fmtDate(state.expiresAt)}</p>
+
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                    {mainCount} producto{mainCount === 1 ? "" : "s"} habilitado{mainCount === 1 ? "" : "s"}
+                  </span>
+                  {upsellCount > 0 && (
+                    <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-accent">
+                      {upsellCount} complemento{upsellCount === 1 ? "" : "s"}
+                    </span>
+                  )}
+                  {bonusCount > 0 && (
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">
+                      🎁 {bonusCount} bono{bonusCount === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span>
+                      Descargas restantes:{" "}
+                      <strong className="text-foreground">{state.downloadsLeft}</strong>
+                      {maxDownloads ? ` de ${maxDownloads}` : ""}
+                    </span>
+                    {maxDownloads > 0 && <span>{usedDownloads} usadas</span>}
+                  </div>
+                  {maxDownloads > 0 && (
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all"
+                        style={{ width: `${Math.min(100, Math.round((state.downloadsLeft / maxDownloads) * 100))}%` }}
+                      />
+                    </div>
+                  )}
+                  {state.downloadsLeft <= 3 && (
+                    <p className="text-xs text-destructive">
+                      Te quedan pocas descargas. Guarda los archivos en tu dispositivo al abrirlos.
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -201,26 +259,50 @@ export default function MiDescarga() {
             {items.map((item) => (
               <Card key={item.sku}>
                 <CardHeader>
-                  <CardTitle className="text-base">
-                    {item.name}
-                    {item.isUpsell && (
-                      <span className="ml-2 rounded-full bg-accent/15 px-2 py-0.5 text-xs text-accent">Complemento</span>
+                  <div className="flex items-start gap-3">
+                    {item.cover && (
+                      <img
+                        src={item.cover}
+                        alt={item.name}
+                        loading="lazy"
+                        className="h-16 w-12 flex-shrink-0 rounded object-cover"
+                      />
                     )}
-                  </CardTitle>
+                    <div className="space-y-1">
+                      <CardTitle className="text-base">{item.name}</CardTitle>
+                      <div className="flex flex-wrap gap-2">
+                        <span
+                          className={
+                            item.isUpsell
+                              ? "rounded-full bg-accent/15 px-2 py-0.5 text-xs text-accent"
+                              : "rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                          }
+                        >
+                          {item.isUpsell ? "Complemento" : "Producto principal"}
+                        </span>
+                        {item.bonuses.length > 0 && (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                            🎁 {item.bonuses.length} bono{item.bonuses.length === 1 ? "" : "s"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button
                     className="w-full"
                     onClick={() => openFile(item.sku, "main")}
-                    disabled={busy === `${item.sku}:main:0`}
+                    disabled={busy === `${item.sku}:main:0` || item.available === false || state.downloadsLeft <= 0}
                   >
                     {busy === `${item.sku}:main:0` ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       <Download className="mr-2 h-4 w-4" />
                     )}
-                    Descargar
+                    {item.available === false ? "Archivo en preparación" : "Descargar"}
                   </Button>
+
                   {item.bonuses.map((b) => (
                     <Button
                       key={b.index}
@@ -240,6 +322,21 @@ export default function MiDescarga() {
                 </CardContent>
               </Card>
             ))}
+
+            {(state.missingSkus?.length ?? 0) > 0 && (
+              <Card>
+                <CardContent className="py-5 text-sm text-muted-foreground">
+                  Hay {state.missingSkus!.length} artículo(s) de tu pedido que aún no están listos para descargar.
+                  Escríbenos a{" "}
+                  <a className="text-primary underline" href="mailto:hola@ilinguerelax.com">
+                    hola@ilinguerelax.com
+                  </a>{" "}
+                  con tu número de pedido y los enviamos enseguida.
+                </CardContent>
+              </Card>
+            )}
+
+
 
             <Card>
               <CardContent className="space-y-3 py-6">

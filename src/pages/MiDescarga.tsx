@@ -19,6 +19,7 @@ type Item = {
   bonuses: Bonus[];
 };
 type Counts = { total: number; main: number; upsells: number; bonuses: number };
+type HistoryEntry = { action: string; sku: string | null; name: string | null; at: string };
 type State =
   | { status: "loading" }
   | { status: "invalid" }
@@ -33,11 +34,23 @@ type State =
       items?: Item[];
       missingSkus?: string[];
       counts?: Counts;
+      history?: HistoryEntry[];
     };
 
 
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
+
+const fmtDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Lima",
+  });
+
 
 export default function MiDescarga() {
   const [params] = useSearchParams();

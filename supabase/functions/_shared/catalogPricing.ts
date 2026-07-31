@@ -181,17 +181,7 @@ export async function resolveServerPricing(opts: {
     const sku = String(row.sku);
     const isUpsell = item.id.toLowerCase().startsWith("upsell-");
 
-    // Rango de precios legítimos del producto: entre el tier más barato y el
-    // más caro publicados. Así el navegador no puede inventar un precio, pero
-    // tampoco rompemos la compra si vio otro tier (IP vs país del formulario).
-    const tierPrices = [
-      pickTierPrice(row, "global"),
-      pickTierPrice(row, "latam"),
-      pickTierPrice(row, "tienda"),
-    ].filter((p) => p > 0);
-    let allowedMin = tierPrices.length ? Math.min(...tierPrices) : 0;
-    const allowedMax = tierPrices.length ? Math.max(...tierPrices) : 0;
-
+    // Precio mínimo autoritativo del catálogo para este país.
     let unit = pickTierPrice(row, tier);
 
     if (isUpsell) {
@@ -199,14 +189,13 @@ export async function resolveServerPricing(opts: {
       const staticPrice = STATIC_UPSELL_USD[item.id.toLowerCase()];
       const discounted = unit * (1 - pct / 100);
       unit = Math.min(...[discounted, ...(staticPrice ? [staticPrice] : [])]);
-      allowedMin = Math.min(allowedMin * (1 - pct / 100), unit);
     }
 
-    // Si el navegador mandó un precio publicado válido, respetamos ese (es el
-    // que vio el cliente); si está fuera de rango, mandamos el del catálogo.
-    if (item.clientPrice != null && allowedMax > 0) {
-      const clamped = Math.min(Math.max(item.clientPrice, allowedMin), allowedMax);
-      if (Math.abs(clamped - item.clientPrice) < 0.01) unit = item.clientPrice;
+    // Si el navegador mandó un precio IGUAL O MAYOR (el que vio el cliente en
+    // la web), lo respetamos; nunca aceptamos uno menor al del catálogo, que
+    // es lo que impide manipular el carrito desde el navegador.
+    if (item.clientPrice != null && item.clientPrice > unit && item.clientPrice <= 10000) {
+      unit = item.clientPrice;
     }
 
     unit = Math.round(unit * 100) / 100;

@@ -3,6 +3,7 @@
 // (send-transactional-email → queued → process-email-queue).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { upsertBrevoContact } from "./brevoContact.ts";
+import { sendInternalEmail } from "./sendInternalEmail.ts";
 
 interface Item {
   name: string;
@@ -59,7 +60,7 @@ async function invokeTemplate(
     purpose: "transactional",
   };
   if (recipientEmail) body.recipientEmail = recipientEmail;
-  const { error } = await supabase.functions.invoke("send-transactional-email", { body });
+  const { error } = await sendInternalEmail(body as any);
   if (error) console.error(`[thankyou-email] ${templateName} failed:`, error);
 }
 

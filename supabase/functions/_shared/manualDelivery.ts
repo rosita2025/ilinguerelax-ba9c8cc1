@@ -8,6 +8,7 @@
 // cualquier pedido (dLocal, conciliación manual, reintentos).
 import { ensureDownloadUrl } from "./downloadToken.ts";
 import { normalizeSku } from "./digitalSku.ts";
+import { sendInternalEmail } from "./sendInternalEmail.ts";
 
 type BonusRow = { name?: string | null; drive_url?: string | null; access_key?: string | null };
 
@@ -86,19 +87,19 @@ export async function deliverLikeManual(admin: any, order: {
 
   const downloadUrl = await ensureDownloadUrl(admin, order.orderNumber, order.email, resolvedSkus);
 
-  const { error } = await admin.functions.invoke("send-transactional-email", {
-    body: {
-      templateName: "material-delivery",
-      recipientEmail: order.email,
-      idempotencyKey: `manual-material-${order.orderNumber}`,
-      templateData: {
-        customerName: order.name || order.email.split("@")[0],
-        orderNumber: order.orderNumber,
-        materials: materials.map((m) => ({
-          productName: m.productName,
-          downloadUrl: downloadUrl ?? "https://ilinguerelax.com/mi-pedido",
-        })),
-      },
+  // Helper interno: envía apikey + Authorization + x-internal-key y devuelve
+  // el motivo real si falla (antes solo veíamos "non-2xx status code").
+  const { error } = await sendInternalEmail({
+    templateName: "material-delivery",
+    recipientEmail: order.email,
+    idempotencyKey: `manual-material-${order.orderNumber}`,
+    templateData: {
+      customerName: order.name || order.email.split("@")[0],
+      orderNumber: order.orderNumber,
+      materials: materials.map((m) => ({
+        productName: m.productName,
+        downloadUrl: downloadUrl ?? "https://ilinguerelax.com/mi-pedido",
+      })),
     },
   });
 

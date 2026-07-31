@@ -39,10 +39,13 @@ const json = (b: unknown, s = 200) =>
 const BodySchema = z.object({
   action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery"]),
   orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
-  adminKey: z.string().min(4).max(200),
+  // Opcional: el acceso ya está protegido por origen + CSRF + 2FA (assertAdminCsrf).
+  // Si se envía, debe coincidir; si no se envía, no se pide.
+  adminKey: z.string().min(4).max(200).optional(),
   reason: z.string().trim().max(300).optional(),
   operator: z.string().trim().max(120).optional(),
 });
+
 
 type OrderEvent = {
   event: string;
@@ -69,7 +72,7 @@ async function fetchDlocalPayment(paymentId: string) {
     const r = await fetch(`${dlocalApiBase()}/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: `Bearer ${apiKey}:${secretKey}` },
       // Evita que el panel se quede cargando si dLocal tarda.
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!r.ok) {
@@ -157,10 +160,14 @@ Deno.serve(async (req) => {
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
     const { action, reason, operator } = parsed.data;
 
+    // La autenticación fuerte ya la hizo assertAdminCsrf (origen + CSRF + 2FA
+    // por correo). ADMIN_REVIEW_KEY solo se valida si el cliente la envía, para
+    // no bloquear el flujo "número de pedido y listo" del panel.
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
-    if (!expectedKey || parsed.data.adminKey !== expectedKey) {
+    if (parsed.data.adminKey && parsed.data.adminKey !== expectedKey) {
       return json({ error: "No autorizado" }, 401);
     }
+
 
     const supabase = admin();
 
@@ -337,9 +344,12 @@ Deno.serve(async (req) => {
     }
 
     // action === "approve": aceptación manual del admin ("yo acepto").
-    if (!reason || reason.length < 4) {
-      return json({ error: "Indica el motivo/comprobante de la aceptación manual" }, 400);
-    }
+    // El motivo es opcional: si no se indica, se audita como aceptación directa
+    // desde el panel para que baste con el número de pedido.
+    const approvalReason = reason && reason.length >= 4
+      ? reason
+      : "Aceptación manual del admin desde /admin/dlocal";
+
     if (remoteStatus && isFailedStatus(remoteStatus)) {
       return json({ error: `dLocal reporta el pago como ${remoteStatus}: no se puede aceptar manualmente`, summary }, 409);
     }
@@ -354,7 +364,7 @@ Deno.serve(async (req) => {
         status: remoteStatus ?? "MANUAL_APPROVED",
         method: method ?? "Aprobación manual del admin",
         reference,
-        detail: `Pago aceptado manualmente por el admin: ${reason}`,
+        detail: `Pago aceptado manualmente por el admin: ${approvalReason}`,
         customerEmail: email,
         amount: amount ?? null,
         currency,

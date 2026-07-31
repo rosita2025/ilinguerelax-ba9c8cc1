@@ -13,6 +13,7 @@
 // Seguridad: solo llamadas internas (service role o CRON_SHARED_SECRET).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
+import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
 const cors = internalCors;
 const json = (b: unknown, s = 200) =>
@@ -197,8 +198,8 @@ Deno.serve(async (req) => {
       const day = STEP_DAYS[stepIndex];
       const isLast = stepIndex === STEP_DAYS.length - 1;
 
-      const { error } = await supabase.functions.invoke("send-transactional-email", {
-        body: {
+      const { error } = await sendInternalEmail({
+        ...{
           templateName: "customer-pending-reminder",
           recipientEmail: r.customer_email,
           idempotencyKey: `pending-reminder-${r.order_number}-d${day}`,

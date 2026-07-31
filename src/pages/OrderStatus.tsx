@@ -173,20 +173,20 @@ export default function OrderStatus() {
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Estado de mi pedido</h1>
           <p className="text-sm text-muted-foreground">
-            Ingresa tu número de pedido y el correo que usaste al comprar para ver si tu pago está
-            pendiente, pagado o ya entregado.
+            Ingresa tu número de pedido (o el id de transacción del pago) y el correo que usaste al
+            comprar para ver si tu pago está pendiente, pagado o ya entregado.
           </p>
         </div>
 
         <form onSubmit={search} className="rounded-xl border bg-card p-4 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="order">Número de pedido</Label>
+              <Label htmlFor="order">Número de pedido o id de transacción</Label>
               <Input
                 id="order"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="ILR-DL-XXXXXX"
+                placeholder="ILR-DL-XXXXXX o DP-1234567"
                 required
                 minLength={4}
               />

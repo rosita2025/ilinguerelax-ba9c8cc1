@@ -105,7 +105,6 @@ const CheckoutPending = lazy(() => import("./pages/CheckoutPending"));
 const CheckoutPendienteManual = lazy(() => import("./pages/CheckoutPendienteManual"));
 const RecoverCart = lazy(() => import("./pages/RecoverCart"));
 const OrderStatus = lazy(() => import("./pages/OrderStatus"));
-const TransactionStatus = lazy(() => import("./pages/TransactionStatus"));
 
 const queryClient = new QueryClient();
 
@@ -318,8 +317,9 @@ const App = () => (
                   <Route path="/recuperar-carrito" element={<RecoverCart />} />
                   <Route path="/mi-pedido" element={<OrderStatus />} />
                   <Route path="/order-status" element={<OrderStatus />} />
-                  <Route path="/mi-transaccion" element={<TransactionStatus />} />
-                  <Route path="/transaction-status" element={<TransactionStatus />} />
+                  {/* Unificado: todo el seguimiento vive en /mi-pedido */}
+                  <Route path="/mi-transaccion" element={<Navigate to="/mi-pedido" replace />} />
+                  <Route path="/transaction-status" element={<Navigate to="/mi-pedido" replace />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* Dynamic product page — catches any /products/:slug not matched above (products created in /admin/productos). */}
                   <Route path="/products/:slug" element={<ProductDynamic />} />

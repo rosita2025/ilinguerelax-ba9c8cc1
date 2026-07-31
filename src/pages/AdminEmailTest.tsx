@@ -181,6 +181,9 @@ const AdminEmailTest = () => {
 
 
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // sku -> updated_at, para detectar productos nuevos o material actualizado
+  const catalogSnapshot = useRef<Map<string, string> | null>(null);
+
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);
     reloadTimer.current = setTimeout(() => load(true), 1200);

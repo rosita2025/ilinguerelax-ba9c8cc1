@@ -118,18 +118,23 @@ const BlogScheduleCard = () => {
   /** Vista previa de cualquier post de la agenda: si aún no existe, se genera al momento. */
   const openPreview = async (it: QueueItem) => {
     setBusy("preview" + it.id);
+    const toastId = it.post_id ? undefined : toast.loading("Generando el artículo con IA… puede tardar 20–40 s");
     try {
       const res = it.post_id
         ? await call({ action: "preview", id: it.post_id })
         : await call({ action: "generate-one", id: it.id });
       setPreview(res.post as PreviewPost);
+      if (toastId) toast.success("Borrador listo", { id: toastId });
       if (!it.post_id) await load();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error");
+      const msg = e instanceof Error ? e.message : "Error";
+      if (toastId) toast.error(msg, { id: toastId });
+      else toast.error(msg);
     } finally {
       setBusy(null);
     }
   };
+
 
   const decide = async (action: "approve" | "reject", postId: string, okMsg: string) => {
     setBusy(action + postId);

@@ -3,6 +3,7 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 import { BRAND, escapeHtml, renderBrandedEmail, formatLocalFromUsd } from '../_shared/emailBrand.ts'
+import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
 
 // -------- Sample data (mirrors production) --------
 const SAMPLE_PRODUCT = {
@@ -153,6 +154,9 @@ async function renderTemplate(name: string): Promise<{ subject: string; html: st
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
+
+  const __blocked = assertInternalCall(req);
+  if (__blocked) return __blocked;
   try {
     const url = new URL(req.url)
     const kind = url.searchParams.get('kind') || 'order'

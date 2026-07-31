@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package, Download, Gift, Copy } from "lucide-react";
+import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package, Download, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";

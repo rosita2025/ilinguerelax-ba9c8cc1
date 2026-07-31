@@ -4,6 +4,7 @@ import { upsertBrevoContact } from "../_shared/brevoContact.ts";
 import { markAbandonedCartConverted, sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSku } from "../_shared/digitalSku.ts";
 import { ensureDownloadUrl } from "../_shared/downloadToken.ts";
+import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -108,9 +109,7 @@ async function resolveMaterials(
 
 async function sendTemplate(admin: any, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>) {
   try {
-    const { error } = await admin.functions.invoke("send-transactional-email", {
-      body: { templateName, recipientEmail, idempotencyKey, templateData },
-    });
+    const { error } = await sendInternalEmail({ templateName, recipientEmail, idempotencyKey, templateData });
     if (error) console.error(`[manual-payments] ${templateName} failed`, error);
   } catch (e) {
     console.error(`[manual-payments] ${templateName} exception`, e);

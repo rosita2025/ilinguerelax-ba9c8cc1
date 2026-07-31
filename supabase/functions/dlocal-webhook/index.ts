@@ -18,6 +18,7 @@ import {
 } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
 const API_BASE = dlocalApiBase();
 
@@ -294,25 +295,21 @@ Deno.serve(async (req) => {
         });
 
         await Promise.allSettled([
-          supabase.functions.invoke("send-transactional-email", {
-            body: {
-              templateName: "customer-manual-pending",
-              recipientEmail: customerEmail,
-              idempotencyKey: `${idemBase}-customer`,
-              templateData,
-            },
+          sendInternalEmail({
+            templateName: "customer-manual-pending",
+            recipientEmail: customerEmail,
+            idempotencyKey: `${idemBase}-customer`,
+            templateData,
           }),
-          supabase.functions.invoke("send-transactional-email", {
-            body: {
-              templateName: "admin-manual-pending",
-              recipientEmail: "hola@ilinguerelax.com",
-              idempotencyKey: `${idemBase}-admin`,
-              templateData: {
-                ...templateData,
-                customerEmail,
-                customerWhatsapp: phone ?? "",
-                country: country ?? "",
-              },
+          sendInternalEmail({
+            templateName: "admin-manual-pending",
+            recipientEmail: "hola@ilinguerelax.com",
+            idempotencyKey: `${idemBase}-admin`,
+            templateData: {
+              ...templateData,
+              customerEmail,
+              customerWhatsapp: phone ?? "",
+              country: country ?? "",
             },
           }),
         ]).catch((e) => console.error("dLocal pending emails failed:", e));

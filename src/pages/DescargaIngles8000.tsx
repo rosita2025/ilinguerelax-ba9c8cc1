@@ -89,34 +89,51 @@ const DescargaIngles8000 = () => {
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-balance">Área privada de descarga</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
-                Ingresa la clave que recibiste en tu correo de compra para acceder a 8.000 Palabras en Inglés con
+                Ingresa el número de pedido y el correo de tu compra para acceder a 8.000 Palabras en Inglés con
                 Pronunciación.
               </p>
             </div>
 
-            <form onSubmit={handleUnlock} className="space-y-4">
+            <form onSubmit={verify} className="space-y-4">
               <div>
-                <Label htmlFor="key" className="flex items-center gap-2">
-                  <KeyRound className="w-4 h-4" /> Clave de acceso
+                <Label htmlFor="order-id" className="flex items-center gap-2">
+                  <KeyRound className="w-4 h-4" /> Número de pedido
                 </Label>
                 <Input
-                  id="key"
-                  type="password"
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
-                  placeholder="Ingresa tu clave"
+                  id="order-id"
+                  type="text"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  placeholder="Ej. ILR-ST-0VPSK7LS"
                   className="mt-2"
                   autoComplete="off"
-                  disabled={blocked}
+                  disabled={checking}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="order-email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" /> Correo de la compra
+                </Label>
+                <Input
+                  id="order-email"
+                  type="email"
+                  value={buyerEmail}
+                  onChange={(e) => setBuyerEmail(e.target.value)}
+                  placeholder="tucorreo@ejemplo.com"
+                  className="mt-2"
+                  autoComplete="email"
+                  disabled={checking}
                 />
               </div>
 
               {error && <p className="text-sm text-destructive">{error}</p>}
 
-              <Button type="submit" className="w-full" disabled={blocked}>
-                Desbloquear descarga
+              <Button type="submit" className="w-full" disabled={checking}>
+                {checking ? "Verificando compra..." : "Desbloquear descarga"}
               </Button>
             </form>
+
 
             <div className="mt-6 rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-900 dark:text-amber-200">
               <div className="flex items-start gap-2">

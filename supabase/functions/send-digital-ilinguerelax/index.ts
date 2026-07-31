@@ -259,14 +259,42 @@ async function resolveLang(
   return { lang: "es", country: cc || undefined };
 }
 
+/**
+ * Solo pueden pedir una entrega digital los llamadores internos:
+ *  - webhooks de pasarela (stripe / dlocal / mercadopago / paypal / hotmart),
+ *    que invocan con la service-role key tras verificar la firma del pago
+ *  - trabajos internos (reintentos, corrección de correo) con CRON_SHARED_SECRET
+ * Sin esto, cualquiera podía enviarse por POST el producto, los bonos y los
+ * upsells a su propio correo sin haber pagado.
+ */
+function isInternalCaller(req: Request): boolean {
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const cronSecret = Deno.env.get("CRON_SHARED_SECRET") || "";
+  const bearer = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  const internalHeader = (req.headers.get("x-internal-secret") || "").trim();
+  if (serviceKey && bearer === serviceKey) return true;
+  if (cronSecret && (internalHeader === cronSecret || bearer === cronSecret)) return true;
+  return false;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  if (!isInternalCaller(req)) {
+    console.warn("[send-digital] rejected non-internal caller", {
+      ip: (req.headers.get("x-forwarded-for") || "").split(",")[0].trim(),
+    });
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403, headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
   const source = req.headers.get("x-delivery-source") || "send-digital-ilinguerelax";
+
   async function writeAudit(row: Record<string, unknown>) {
     try { await supabase.from("digital_delivery_audit").insert({ source, ...row }); }
     catch (e) { console.error("[audit] insert failed", e); }

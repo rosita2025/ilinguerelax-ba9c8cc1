@@ -98,40 +98,31 @@ export default function CheckoutSuccess() {
 
   const idemKey = `digital:${(orderNumber || paymentId || externalRef || buyer.email || "").toLowerCase()}`;
 
-  const sendDigitalEmail = async (opts?: { force?: boolean }) => {
-    const skus = items.map((i) => i.id);
-    if (!buyer.email || skus.length === 0) return { skipped: true };
-    return supabase.functions.invoke("send-digital-ilinguerelax", {
-      body: {
-        customerEmail: buyer.email,
-        customerName: buyer.fullName,
-        customerPhone: buyer.phone,
-        customerCountry: (buyer as any).country || region.country || undefined,
-        orderId: orderNumber,
-        skus,
-        amount: total,
-        currency: "USD",
-        provider,
-        idempotencyKey: idemKey,
-        force: opts?.force === true,
-      },
-    });
-
-  };
-
+  // La entrega digital la dispara SOLO el webhook firmado de la pasarela.
+  // Desde el navegador únicamente se puede pedir un reenvío del pedido ya
+  // pagado y entregado, al mismo correo registrado.
   const resendDigital = async () => {
     setResending(true);
     try {
-      // Manual resend: bypass idempotency
-      const res = await sendDigitalEmail({ force: true });
-      if ((res as any)?.error) throw (res as any).error;
-      toast({ title: "Email reenviado", description: `Enviado a ${buyer.email}` });
+      const { data, error } = await supabase.functions.invoke("request-digital-resend", {
+        body: { orderId: orderNumber, email: buyer.email },
+      });
+      if (error) throw error;
+      if ((data as any)?.sent === false) {
+        toast({
+          title: "Aún no disponible",
+          description: "Estamos confirmando tu pago. Recibirás los enlaces en unos minutos.",
+        });
+      } else {
+        toast({ title: "Email reenviado", description: `Enviado a ${buyer.email}` });
+      }
     } catch (e: any) {
       toast({ title: "No se pudo reenviar", description: e?.message || "Intenta más tarde", variant: "destructive" });
     } finally {
       setResending(false);
     }
   };
+
 
   // Global Meta Pixel: fire Purchase once per order (dedupe via sessionStorage).
   // Uses trackHotmartEvent so it goes to Pixel 24959578143733255 (browser)
@@ -217,9 +208,9 @@ export default function CheckoutSuccess() {
               purpose: "transactional",
             },
           }),
-          // Digital delivery: send immediately (no 90s delay) so it goes out
-          // even if the buyer closes the tab. Idempotency key dedupes retries.
-          sendDigitalEmail().catch((e) => console.error("send-digital-ilinguerelax failed", e)),
+          // La entrega digital ya NO se lanza desde el navegador: la ejecuta el
+          // webhook firmado de la pasarela tras confirmar el pago real.
+
         ]);
       } catch (e) {
         console.error("thank-you fallback failed", e);

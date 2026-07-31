@@ -474,39 +474,64 @@ serve(async (req) => {
       throw claimError;
     }
 
-    // Enlace personal de descarga del pedido (/mi-descarga?t=<token>). Nunca
-    // falla la entrega por esto: si algo sale mal, seguimos con el correo.
+    // Enlace personal de descarga del pedido (/mi-descarga?t=<token>). Siempre
+    // se genera automáticamente para cada cliente nuevo: si el pedido no trae
+    // número, se crea una referencia interna para poder emitir el token igual.
+    // Si el token existente está vencido, revocado o sin descargas, se emite
+    // uno NUEVO. Nunca falla la entrega por esto.
     let downloadUrl: string | null = null;
-    if (orderId) {
+    {
+      const newToken = () => {
+        const bytes = new Uint8Array(32);
+        crypto.getRandomValues(bytes);
+        return btoa(String.fromCharCode(...bytes))
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      };
+      const orderRefForToken = String(
+        orderId || `ILR-AUTO-${idemKey.slice(0, 10).toUpperCase()}`,
+      ).toUpperCase();
       try {
         const emailKey = String(customerEmail).trim().toLowerCase();
         const { data: existingTok } = await supabase
           .from("download_tokens")
-          .select("token, skus")
-          .eq("order_number", String(orderId).toUpperCase())
+          .select("token, skus, revoked, expires_at, max_downloads, download_count")
+          .eq("order_number", orderRefForToken)
           .eq("email", emailKey)
           .maybeSingle();
-        if (existingTok) {
+
+        const usable = existingTok
+          && existingTok.revoked !== true
+          && (!existingTok.expires_at || new Date(existingTok.expires_at).getTime() > Date.now())
+          && (existingTok.max_downloads == null
+            || (existingTok.download_count ?? 0) < existingTok.max_downloads);
+
+        if (usable && existingTok) {
           const merged = [...new Set([...(existingTok.skus ?? []), ...normalizedSkus])];
           await supabase.from("download_tokens").update({ skus: merged }).eq("token", existingTok.token);
           downloadUrl = `${SITE}/mi-descarga?t=${existingTok.token}`;
         } else {
-          const bytes = new Uint8Array(32);
-          crypto.getRandomValues(bytes);
-          const token = btoa(String.fromCharCode(...bytes))
-            .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+          if (existingTok) {
+            // Token viejo inservible: se reemplaza por uno nuevo.
+            await supabase.from("download_tokens")
+              .update({ revoked: true })
+              .eq("token", existingTok.token);
+          }
+          const token = newToken();
+          const merged = [...new Set([...(existingTok?.skus ?? []), ...normalizedSkus])];
           const { error: tokErr } = await supabase.from("download_tokens").insert({
             token,
-            order_number: String(orderId).toUpperCase(),
+            order_number: existingTok ? `${orderRefForToken}-R${Date.now().toString(36).toUpperCase()}` : orderRefForToken,
             email: emailKey,
-            skus: normalizedSkus,
+            skus: merged,
           });
           if (!tokErr) downloadUrl = `${SITE}/mi-descarga?t=${token}`;
+          else console.warn("[send-digital] token insert failed:", tokErr.message);
         }
       } catch (e) {
         console.warn("[send-digital] download token skipped:", e instanceof Error ? e.message : String(e));
       }
     }
+
 
 
 

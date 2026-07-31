@@ -9,7 +9,6 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { supabase } from "@/integrations/supabase/client";
 import { adminInvoke } from "@/lib/adminInvoke";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";

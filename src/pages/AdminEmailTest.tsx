@@ -812,7 +812,7 @@ const AdminEmailTest = () => {
 
 
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
             {(["manual", "stripe", "paypal", "mercadopago", "digital"] as Source[]).map((s) => (
               <Card
                 key={s}

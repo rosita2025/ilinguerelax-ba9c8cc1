@@ -211,14 +211,27 @@ async function publishBatch(
     }];
   }
 
-  const boundary = `idx-${crypto.randomUUID()}`;
+  // Formato exacto de la doc: cada parte es una petición HTTP completa con
+  // Content-Type: application/http, Content-Transfer-Encoding: binary,
+  // Content-ID único y content-length del cuerpo JSON.
+  const boundary = `===============${crypto.randomUUID()}==`;
+  const batchId = crypto.randomUUID();
+  const encoder = new TextEncoder();
   const parts = urls
-    .map(
-      (u) =>
-        `--${boundary}\r\nContent-Type: application/http\r\n\r\n` +
-        `POST /v3/urlNotifications:publish\r\nContent-Type: application/json\r\n\r\n` +
-        `${JSON.stringify({ url: u, type })}\r\n`,
-    )
+    .map((u, i) => {
+      const payload = JSON.stringify({ url: u, type });
+      return (
+        `--${boundary}\r\n` +
+        `Content-Type: application/http\r\n` +
+        `Content-Transfer-Encoding: binary\r\n` +
+        `Content-ID: <${batchId}+${i}>\r\n\r\n` +
+        `POST /v3/urlNotifications:publish\r\n` +
+        `Content-Type: application/json\r\n` +
+        `accept: application/json\r\n` +
+        `content-length: ${encoder.encode(payload).length}\r\n\r\n` +
+        `${payload}\r\n`
+      );
+    })
     .join("");
   const body = `${parts}--${boundary}--\r\n`;
 
@@ -226,13 +239,15 @@ async function publishBatch(
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": `multipart/mixed; boundary=${boundary}`,
+      "Content-Type": `multipart/mixed; boundary="${boundary}"`,
     },
     body,
   });
   const text = await res.text().catch(() => "");
   if (!res.ok) console.warn("[googleIndexing] batch", res.status, text.slice(0, 240));
-  const codes = res.ok ? parseBatchStatuses(text, urls.length) : urls.map(() => res.status);
+  const codes = res.ok
+    ? parseBatchStatuses(text, urls.length, batchId)
+    : urls.map(() => res.status);
   return urls.map((u, i) => {
     const code = codes[i] || res.status;
     const ok = code >= 200 && code < 300;

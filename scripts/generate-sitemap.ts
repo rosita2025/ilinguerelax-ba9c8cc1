@@ -92,19 +92,35 @@ const hardcodedProductSlugs: string[] = [
 // --------------------------------------------------------------------------
 // Blog posts (static data file)
 // --------------------------------------------------------------------------
+interface FeedItem {
+  path: string;
+  title: string;
+  description: string;
+  date: string; // ISO
+}
+
+const feedItems: FeedItem[] = [];
+
 async function getBlogEntries(): Promise<SitemapEntry[]> {
   const entries: SitemapEntry[] = [];
 
   // Static blog data
   try {
     const mod = await import("../src/data/blogPosts");
-    const posts: Array<{ slug: string; date?: string }> = (mod as any).blogPosts ?? [];
+    const posts: Array<{ slug: string; date?: string; title?: string; excerpt?: string }> =
+      (mod as any).blogPosts ?? [];
     for (const p of posts) {
       entries.push({
         path: `/blog/${p.slug}`,
         lastmod: p.date ?? TODAY,
         changefreq: "monthly",
         priority: "0.7",
+      });
+      feedItems.push({
+        path: `/blog/${p.slug}`,
+        title: p.title ?? p.slug,
+        description: p.excerpt ?? "",
+        date: p.date ?? TODAY,
       });
     }
   } catch (err) {
@@ -119,13 +135,19 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
       const supabase = createClient(url, key);
       const { data, error } = await supabase
         .from("generated_blog_posts")
-        .select("slug, updated_at, created_at, published")
+        .select("slug, title, excerpt, updated_at, created_at, published")
         .eq("published", true);
       if (error) {
         console.warn("[sitemap] generated_blog_posts error:", error.message);
       } else {
         for (const r of data ?? []) {
-          const row = r as { slug: string; updated_at?: string; created_at?: string };
+          const row = r as {
+            slug: string;
+            title?: string;
+            excerpt?: string;
+            updated_at?: string;
+            created_at?: string;
+          };
           if (!row.slug) continue;
           const lm = (row.updated_at ?? row.created_at ?? TODAY).slice(0, 10);
           entries.push({
@@ -133,6 +155,12 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
             lastmod: lm,
             changefreq: "monthly",
             priority: "0.7",
+          });
+          feedItems.push({
+            path: `/blog/${row.slug}`,
+            title: row.title ?? row.slug,
+            description: row.excerpt ?? "",
+            date: row.created_at ?? row.updated_at ?? TODAY,
           });
         }
       }
@@ -149,6 +177,52 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
   }
   return Array.from(bySlug.values());
 }
+
+// --------------------------------------------------------------------------
+// RSS feed (public/rss.xml) — se regenera junto al sitemap
+// --------------------------------------------------------------------------
+function xmlEscape(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function rssXml(items: FeedItem[]): string {
+  const sorted = [...items]
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .slice(0, 100);
+  const entries = sorted.map((i) =>
+    [
+      "    <item>",
+      `      <title>${xmlEscape(i.title)}</title>`,
+      `      <link>${BASE_URL}${i.path}</link>`,
+      `      <guid isPermaLink="true">${BASE_URL}${i.path}</guid>`,
+      `      <pubDate>${new Date(i.date).toUTCString()}</pubDate>`,
+      `      <description>${xmlEscape(i.description)}</description>`,
+      "    </item>",
+    ].join("\n"),
+  );
+  const latest = sorted[0]?.date ?? TODAY;
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    "  <channel>",
+    "    <title>Blog iLingue Relax</title>",
+    `    <link>${BASE_URL}/blog</link>`,
+    "    <description>Guías y recursos para aprender idiomas con iLingue Relax.</description>",
+    "    <language>es</language>",
+    `    <lastBuildDate>${new Date(latest).toUTCString()}</lastBuildDate>`,
+    `    <atom:link href="${BASE_URL}/rss.xml" rel="self" type="application/rss+xml" />`,
+    ...entries,
+    "  </channel>",
+    "</rss>",
+    "",
+  ].join("\n");
+}
+
+
 
 // --------------------------------------------------------------------------
 // Dynamic products from Supabase

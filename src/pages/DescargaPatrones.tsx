@@ -8,48 +8,37 @@ import { Label } from "@/components/ui/label";
 import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrderUnlock } from "@/hooks/useOrderUnlock";
 import patronesAsset from "@/assets/patrones-especiales-v1.1.pdf.asset.json";
 import palabrasAsset from "@/assets/1000-palabras-ingles-vip-v1.3.pdf.asset.json";
 
 const FILE_1_NAME = "Patrones Especiales del Alfabeto · Combinaciones Secretas (Inglés) v1.1";
 const FILE_2_NAME = "1.000 Palabras en Inglés con Pronunciación en Español · VIP v1.3";
+const WHATSAPP_URL = "https://wa.me/12512724704";
 
 const DescargaPatrones = () => {
-  const [key, setKey] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-  const [error, setError] = useState("");
-  const [attempts, setAttempts] = useState(0);
-  const [blocked, setBlocked] = useState(false);
+  const {
+    orderId,
+    setOrderId,
+    buyerEmail,
+    setBuyerEmail,
+    unlocked,
+    error,
+    checking,
+    verify,
+    restore,
+  } = useOrderUnlock("patrones_unlocked");
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("patrones_unlocked");
-    if (stored === "yes") setUnlocked(true);
+    restore();
     const emailDone = localStorage.getItem("patrones_email_captured");
     if (emailDone === "yes") setEmailCaptured(true);
-  }, []);
+  }, [restore]);
 
-  const handleUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (blocked) return;
-    if (key.trim() === ACCESS_KEY) {
-      setUnlocked(true);
-      setError("");
-      sessionStorage.setItem("patrones_unlocked", "yes");
-    } else {
-      const next = attempts + 1;
-      setAttempts(next);
-      if (next >= MAX_ATTEMPTS) {
-        setBlocked(true);
-        setError("Demasiados intentos. Recarga la página o contáctanos por WhatsApp.");
-      } else {
-        setError(`Clave incorrecta. Intentos restantes: ${MAX_ATTEMPTS - next}`);
-      }
-    }
-  };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();

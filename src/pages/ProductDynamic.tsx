@@ -299,7 +299,7 @@ const ProductDynamic = () => {
                   <ul className="space-y-1 text-sm">
                     {bonusList.map((b, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" /> {b.name}
+                        <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" /> {b}
                       </li>
                     ))}
                   </ul>

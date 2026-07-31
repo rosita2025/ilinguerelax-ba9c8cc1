@@ -190,26 +190,46 @@ export default function AdminIndexing() {
 
   async function retry(urls: string[], label: string) {
     const key = urls.length === 1 ? urls[0] : "__bulk__";
+    if (!adminKey) {
+      toast.error("Falta la clave de admin", {
+        description: "Ingresa la clave de administrador antes de reintentar.",
+      });
+      return;
+    }
     setRetrying((s) => ({ ...s, [key]: true }));
     try {
-      const { data, error } = await supabase.functions.invoke("request-google-indexing", {
-        body: { adminKey, urls },
-      });
-      if (error) throw error;
+      // Se envía en lotes pequeños: un lote grande hace que la función edge
+      // consulte cientos de URLs contra Google y la petición muera por timeout
+      // ("Failed to send a request to the Edge Function").
+      const CHUNK = 15;
+      let sent = 0;
+      let already = false;
+      for (let i = 0; i < urls.length; i += CHUNK) {
+        const chunk = urls.slice(i, i + CHUNK);
+        const { data, error } = await adminInvoke<{
+          sent?: number;
+          alreadyRequested?: boolean;
+        }>("request-google-indexing", { body: { adminKey, urls: chunk } });
+        if (error) throw new Error(error.message);
+        sent += data?.sent ?? 0;
+        if (data?.alreadyRequested) already = true;
+      }
       toast.success(`Reintento enviado (${label})`, {
-        description: `URLs: ${urls.length}${
-          (data as { alreadyRequested?: boolean } | null)?.alreadyRequested
-            ? " · ya solicitadas antes"
-            : ""
-        }`,
+        description: `URLs enviadas: ${sent}/${urls.length}${already ? " · algunas ya solicitadas antes" : ""}`,
       });
       setTimeout(load, 1500);
     } catch (e) {
-      toast.error("Fallo el reintento", { description: (e as Error).message });
+      const msg = (e as Error).message || "Error desconocido";
+      toast.error("Fallo el reintento", {
+        description: /Failed to send|fetch/i.test(msg)
+          ? "La función tardó demasiado o no respondió. Intenta con menos URLs."
+          : msg,
+      });
     } finally {
       setRetrying((s) => ({ ...s, [key]: false }));
     }
   }
+
 
   const failedUrls = groups
     .filter((g) => g.state === "failed" || g.state === "retrying")

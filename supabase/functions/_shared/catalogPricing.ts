@@ -225,6 +225,39 @@ export async function resolveServerPricing(opts: {
     });
   }
 
+  const fixedTotal = fixedTotalForCoupon(opts.couponCode);
+
+  if (fixedTotal !== null) {
+    // Cupón de prueba con total fijo: reescribimos los precios unitarios para
+    // que la suma sea exactamente el importe fijo (mínimo 1 centavo por ítem).
+    const code = String(opts.couponCode).trim().toUpperCase();
+    const subtotalCents = priced.reduce(
+      (sum, i) => sum + Math.round(i.unitUsd * 100) * i.quantity,
+      0,
+    );
+    const targetCents = Math.round(fixedTotal * 100);
+    const units = priced.reduce((sum, i) => sum + i.quantity, 0);
+    let assigned = 0;
+    priced.forEach((item, idx) => {
+      const share = subtotalCents > 0
+        ? Math.round((Math.round(item.unitUsd * 100) * item.quantity / subtotalCents) * targetCents)
+        : Math.round(targetCents / Math.max(1, units));
+      const perUnit = Math.max(1, Math.floor(share / item.quantity));
+      item.unitUsd = perUnit / 100;
+      assigned += perUnit * item.quantity;
+      if (idx === priced.length - 1 && assigned !== targetCents) {
+        const fix = Math.max(1, perUnit + Math.trunc((targetCents - assigned) / item.quantity));
+        item.unitUsd = fix / 100;
+        assigned += (fix - perUnit) * item.quantity;
+      }
+    });
+    const totalUsd = Math.max(
+      0.01,
+      Math.round(priced.reduce((s, i) => s + Math.round(i.unitUsd * 100) * i.quantity, 0)) / 100,
+    );
+    return { items: priced, couponPercent: 0, couponCode: code, totalUsd };
+  }
+
   const couponPercent = resolveCouponPercent(opts.couponCode);
   const couponCode = couponPercent > 0 ? String(opts.couponCode).trim().toUpperCase() : null;
 
@@ -240,3 +273,4 @@ export async function resolveServerPricing(opts: {
     totalUsd: Math.round(totalCents) / 100,
   };
 }
+

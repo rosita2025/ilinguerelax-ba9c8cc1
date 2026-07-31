@@ -70,11 +70,34 @@ Deno.serve(async (req) => {
       user_agent: req.headers.get("user-agent")?.slice(0, 300) ?? null,
     });
 
+    // Historial del pedido (todos sus tokens): descargas y reenvíos, sin IP ni user agent.
+    const nameBySku = new Map(items.map((i) => [String(i.sku).toLowerCase(), String(i.name)]));
+    const { data: orderTokens } = await admin
+      .from("download_tokens")
+      .select("id")
+      .eq("order_number", row.order_number);
+    const tokenIds = (orderTokens ?? []).map((t: { id: string }) => t.id);
+    const { data: log } = await admin
+      .from("download_token_access")
+      .select("action, sku, created_at")
+      .in("token_id", tokenIds.length ? tokenIds : [row.id])
+      .in("action", ["download", "resend"])
+      .order("created_at", { ascending: false })
+      .limit(30);
+
+    const history = (log ?? []).map((h: { action: string; sku: string | null; created_at: string }) => ({
+      action: h.action,
+      sku: h.sku,
+      name: h.sku ? nameBySku.get(String(h.sku).toLowerCase()) ?? h.sku : null,
+      at: h.created_at,
+    }));
+
     return dlJson({
       status: "valid",
       ...base,
       items,
       missingSkus,
+      history,
       counts: {
         total: items.length,
         main: items.filter((i) => !i.isUpsell).length,
@@ -82,6 +105,7 @@ Deno.serve(async (req) => {
         bonuses: items.reduce((n, i) => n + ((i.bonuses as unknown[])?.length ?? 0), 0),
       },
     });
+
   } catch (e) {
     console.error("[resolve-download]", e);
     return dlJson({ error: "Error interno" }, 500);

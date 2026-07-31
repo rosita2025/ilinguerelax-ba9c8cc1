@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { extractEdgeErrorMessage } from "@/lib/edgeError";
 
-import { Download, Loader2, Mail, ShieldCheck, Clock, Ban } from "lucide-react";
+import { Download, Loader2, Mail, ShieldCheck, Clock, Ban, History as HistoryIcon } from "lucide-react";
 
 type Bonus = { index: number; title: string };
 type Item = {
@@ -19,6 +19,7 @@ type Item = {
   bonuses: Bonus[];
 };
 type Counts = { total: number; main: number; upsells: number; bonuses: number };
+type HistoryEntry = { action: string; sku: string | null; name: string | null; at: string };
 type State =
   | { status: "loading" }
   | { status: "invalid" }
@@ -33,11 +34,23 @@ type State =
       items?: Item[];
       missingSkus?: string[];
       counts?: Counts;
+      history?: HistoryEntry[];
     };
 
 
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
+
+const fmtDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Lima",
+  });
+
 
 export default function MiDescarga() {
   const [params] = useSearchParams();
@@ -67,6 +80,7 @@ export default function MiDescarga() {
   const bonusCount = counts?.bonuses ?? items.reduce((n, i) => n + i.bonuses.length, 0);
   const maxDownloads = state.status === "valid" ? state.maxDownloads ?? 0 : 0;
   const usedDownloads = state.status === "valid" ? state.downloadsUsed ?? 0 : 0;
+  const history = state.status === "valid" ? state.history ?? [] : [];
 
 
   const openFile = async (sku: string, kind: "main" | "bonus", index = 0) => {
@@ -83,8 +97,24 @@ export default function MiDescarga() {
       if (data.accessKey) toast.success(`Clave de acceso: ${data.accessKey}`, { duration: 12000 });
       window.open(data.url as string, "_blank", "noopener,noreferrer");
       setState((prev) =>
-        prev.status === "valid" ? { ...prev, downloadsLeft: Number(data.downloadsLeft ?? prev.downloadsLeft) } : prev,
+        prev.status === "valid"
+          ? {
+              ...prev,
+              downloadsLeft: Number(data.downloadsLeft ?? prev.downloadsLeft),
+              downloadsUsed: (prev.downloadsUsed ?? 0) + 1,
+              history: [
+                {
+                  action: "download",
+                  sku,
+                  name: prev.items?.find((i) => i.sku === sku)?.name ?? sku,
+                  at: new Date().toISOString(),
+                },
+                ...(prev.history ?? []),
+              ].slice(0, 30),
+            }
+          : prev,
       );
+
     } finally {
       setBusy(null);
     }
@@ -113,6 +143,18 @@ export default function MiDescarga() {
               ? `Te quedan ${left} reenvío(s) hoy.`
               : "Es tu último reenvío de hoy; mañana se renueva el límite.",
       });
+      setState((prev) =>
+        prev.status === "valid"
+          ? {
+              ...prev,
+              history: [
+                { action: "resend", sku: null, name: null, at: new Date().toISOString() },
+                ...(prev.history ?? []),
+              ].slice(0, 30),
+            }
+          : prev,
+      );
+
     } finally {
       setSending(false);
     }
@@ -336,6 +378,42 @@ export default function MiDescarga() {
               </Card>
             )}
 
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <HistoryIcon className="h-4 w-4 text-primary" /> Historial de descargas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm">
+                {history.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    Todavía no registramos descargas para este pedido. Aparecerán aquí con su fecha y hora.
+                  </p>
+                ) : (
+                  <ul className="divide-y">
+                    {history.map((h, i) => (
+                      <li key={`${h.at}-${i}`} className="flex items-start justify-between gap-3 py-2">
+                        <span className="text-foreground">
+                          {h.action === "resend" ? (
+                            <>
+                              <Mail className="mr-1 inline h-3.5 w-3.5 text-muted-foreground" />
+                              Reenvío del enlace al correo
+                            </>
+                          ) : (
+                            <>
+                              <Download className="mr-1 inline h-3.5 w-3.5 text-muted-foreground" />
+                              {h.name ?? "Archivo"}
+                            </>
+                          )}
+                        </span>
+                        <span className="whitespace-nowrap text-xs text-muted-foreground">{fmtDateTime(h.at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="mt-3 text-xs text-muted-foreground">Horario de Perú (UTC−5).</p>
+              </CardContent>
+            </Card>
 
 
             <Card>

@@ -357,6 +357,53 @@ const AdminEmailTest = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
 
+  // Envío de prueba: manda el material real (producto principal + upsells + sus
+  // bonos) al correo indicado, usando el mismo camino que una compra verificada.
+  const toggleTestSku = (sku: string) =>
+    setTestSkus((prev) => (prev.includes(sku) ? prev.filter((s) => s !== sku) : [...prev, sku]));
+
+  const sendTest = async () => {
+    const email = testEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) {
+      toast.error("Correo de prueba inválido");
+      return;
+    }
+    if (testSkus.length === 0) {
+      toast.error("Selecciona al menos un producto");
+      return;
+    }
+    setSendingTest(true);
+    try {
+      const { data, error } = await adminInvoke<{ ok?: boolean; error?: string; details?: string }>(
+        "manage-delivery-retry",
+        {
+          body: {
+            adminKey,
+            action: "resend_order",
+            customerEmail: email,
+            customerName: "Prueba iLingue Relax",
+            orderId: `ILR-TEST-${Date.now().toString(36).toUpperCase()}`,
+            skus: testSkus,
+            provider: "admin-test",
+          },
+        },
+      );
+      if (error) {
+        const ctx = (error as unknown as { context?: { text?: () => Promise<string> } })?.context;
+        const detail = ctx?.text ? await ctx.text().catch(() => "") : "";
+        throw new Error(detail || error.message);
+      }
+      if (data?.error) throw new Error(data.details || data.error);
+      toast.success(`Correo de prueba enviado a ${email} con ${testSkus.length} producto(s)`);
+      scheduleReload();
+    } catch (e) {
+      toast.error(`No se pudo enviar la prueba: ${(e as Error).message}`);
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
+
   const retryDelivery = async (r: OrderRow) => {
     // 1) Email válido
     const email = (r.email || "").trim().toLowerCase();

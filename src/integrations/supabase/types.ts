@@ -1661,6 +1661,72 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_payment_reminders: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string
+          customer_email: string
+          customer_name: string | null
+          id: string
+          last_sent_at: string | null
+          metadata: Json
+          method: string | null
+          next_at: string
+          order_created_at: string
+          order_number: string
+          product_name: string | null
+          provider: string
+          resolved: boolean
+          resolved_at: string | null
+          resolved_reason: string | null
+          step: number
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string
+          customer_email: string
+          customer_name?: string | null
+          id?: string
+          last_sent_at?: string | null
+          metadata?: Json
+          method?: string | null
+          next_at?: string
+          order_created_at?: string
+          order_number: string
+          product_name?: string | null
+          provider?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_reason?: string | null
+          step?: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string
+          customer_email?: string
+          customer_name?: string | null
+          id?: string
+          last_sent_at?: string | null
+          metadata?: Json
+          method?: string | null
+          next_at?: string
+          order_created_at?: string
+          order_number?: string
+          product_name?: string | null
+          provider?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_reason?: string | null
+          step?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       persistent_carts: {
         Row: {
           buyer: Json

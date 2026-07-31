@@ -152,10 +152,14 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("create-checkout-prueba error:", err);
-    // No exponemos el detalle interno de la pasarela al navegador.
+    // No exponemos el detalle interno de la pasarela, pero sí un código corto
+    // (tipo/código de Stripe) para poder diagnosticar en /admin/payment-errors.
+    const e = err as { type?: string; code?: string; statusCode?: number };
+    const reason = [e?.type, e?.code].filter(Boolean).join(":").slice(0, 60) || "gateway_error";
     return new Response(
-      JSON.stringify({ error: "No se pudo iniciar el pago. Intenta nuevamente." }),
+      JSON.stringify({ error: "No se pudo iniciar el pago. Intenta nuevamente.", reason }),
       { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
+

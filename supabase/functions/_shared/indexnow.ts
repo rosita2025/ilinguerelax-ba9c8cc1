@@ -15,6 +15,42 @@ const ENDPOINTS = [
   { name: "naver",    url: "https://searchadvisor.naver.com/indexnow" },
 ];
 
+const MAX_ATTEMPTS = 3;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * fetch con reintentos y backoff exponencial (2^n * 500ms) para 429 / 5xx y
+ * errores de red. Devuelve el último resultado o el último error.
+ */
+async function fetchRetry(
+  url: string,
+  init: RequestInit,
+  label: string,
+): Promise<{ status: number; ok: boolean; attempts: number; error?: string }> {
+  let lastError = "";
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(url, init);
+      const ok = res.status === 200 || res.status === 202 || res.ok;
+      const retryable = res.status === 429 || res.status >= 500;
+      // Consumimos el body para liberar la conexión en Deno.
+      await res.text().catch(() => "");
+      if (ok || !retryable || attempt === MAX_ATTEMPTS) {
+        return { status: res.status, ok, attempts: attempt };
+      }
+      console.warn(`[${label}] ${res.status} reintento ${attempt}/${MAX_ATTEMPTS}`);
+      lastError = `HTTP ${res.status}`;
+    } catch (err) {
+      lastError = (err as Error).message;
+      console.warn(`[${label}] error de red (${lastError}) intento ${attempt}/${MAX_ATTEMPTS}`);
+      if (attempt === MAX_ATTEMPTS) break;
+    }
+    await sleep(Math.min(2 ** attempt * 500, 4000));
+  }
+  return { status: 0, ok: false, attempts: MAX_ATTEMPTS, error: lastError };
+}
+
 export async function pingIndexNow(urls: string[]): Promise<void> {
   const clean = Array.from(new Set(urls.filter(Boolean)));
   if (clean.length === 0) return;
@@ -30,34 +66,30 @@ export async function pingIndexNow(urls: string[]): Promise<void> {
 
   await Promise.allSettled(
     ENDPOINTS.map(async ({ name, url }) => {
-      try {
-        const res = await fetch(url, {
+      const r = await fetchRetry(
+        url,
+        {
           method: "POST",
           headers: { "Content-Type": "application/json; charset=utf-8" },
           body,
+        },
+        `indexnow:${name}`,
+      );
+      console.log(`[indexnow:${name}]`, r.status, r.ok ? "OK" : `FALLO tras ${r.attempts} intentos`);
+      // Dead-letter: si tras 3 intentos sigue fallando, queda registrado con
+      // detalle para poder reintentar manualmente desde /admin/seo.
+      const detail = r.ok
+        ? undefined
+        : `dead_letter after ${r.attempts} attempts${r.error ? `: ${r.error}` : ""}`.slice(0, 240);
+      for (const u of clean) {
+        events.push({
+          url: u,
+          channel: "indexnow",
+          target: name,
+          status: r.ok ? "sent" : "error",
+          http_status: r.status || undefined,
+          detail,
         });
-        const ok = res.status === 200 || res.status === 202;
-        console.log(`[indexnow:${name}]`, res.status, ok ? "OK" : "");
-        for (const u of clean) {
-          events.push({
-            url: u,
-            channel: "indexnow",
-            target: name,
-            status: ok ? "sent" : "error",
-            http_status: res.status,
-          });
-        }
-      } catch (err) {
-        console.warn(`[indexnow:${name}] fetch failed:`, (err as Error).message);
-        for (const u of clean) {
-          events.push({
-            url: u,
-            channel: "indexnow",
-            target: name,
-            status: "error",
-            detail: (err as Error).message.slice(0, 240),
-          });
-        }
       }
     })
   );
@@ -68,6 +100,7 @@ export async function pingIndexNow(urls: string[]): Promise<void> {
 export function productUrl(sku: string): string {
   return `https://${HOST}/products/${sku}`;
 }
+
 
 /**
  * Feed VIVO del blog (Edge Function): refleja el post recién aprobado al

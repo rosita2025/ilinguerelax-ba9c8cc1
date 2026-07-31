@@ -318,6 +318,13 @@ Deno.serve(async (req) => {
         ? "rejected"
         : "processing";
 
+    // Checkout abandonado: el comprador abrió la pasarela pero nunca completó
+    // el pago. Se marca así (y no como "rechazado") para poder decirle que
+    // puede volver a intentarlo sin haber pagado nada.
+    const abandoned = rejected && [...timeline].reverse()
+      .some((t) => t.event === "payment_failed" && String(t.status ?? "").toUpperCase() === "ABANDONED");
+
+
     const method =
       [...timeline].reverse().find((t) => t.method)?.method ??
       (manual?.method ? String(manual.method) : null);

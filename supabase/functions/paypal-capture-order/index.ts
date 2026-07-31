@@ -126,25 +126,53 @@ Deno.serve(async (req) => {
           Deno.env.get("SUPABASE_URL")!,
           Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
         );
-        const { error: digitalErr } = await digitalClient.functions.invoke("send-digital-ilinguerelax", {
-          body: {
-            customerEmail,
-            customerName: payerName,
-            customerPhone: checkoutPhone,
-            customerCountry,
-            orderId: captureId || orderId,
-            skus,
-            amount: capturedAmount ? Number(capturedAmount) : undefined,
-            currency: capturedCurrency ?? "USD",
-            provider: "paypal",
-            idempotencyKey: `digital:paypal:${captureId || orderId}:${skus.slice().sort().join(",")}`,
-          },
-        });
+        const orderNumber = captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : String(orderId);
+        const deliveryBody = {
+          customerEmail,
+          customerName: payerName,
+          customerPhone: checkoutPhone,
+          customerCountry,
+          orderId: captureId || orderId,
+          skus,
+          amount: capturedAmount ? Number(capturedAmount) : undefined,
+          currency: capturedCurrency ?? "USD",
+          provider: "paypal",
+          idempotencyKey: `digital:paypal:${captureId || orderId}:${skus.slice().sort().join(",")}`,
+        };
+        // Un reintento inmediato (la entrega es idempotente por idempotencyKey).
+        let digitalErr = (await digitalClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+        if (digitalErr) {
+          console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_retry", error: digitalErr.message }));
+          digitalErr = (await digitalClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+        }
         if (digitalErr) {
           console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_error", error: digitalErr.message, skuCount: skus.length }));
+          try {
+            await digitalClient.from("order_events").insert({
+              order_number: orderNumber,
+              customer_email: customerEmail,
+              provider: "paypal",
+              event: "digital_delivery_error",
+              status: "error",
+              detail: String(digitalErr.message ?? digitalErr).slice(0, 500),
+              amount: capturedAmount ? Number(capturedAmount) : null,
+              currency: capturedCurrency ?? "USD",
+              metadata: { skus, correlationId, trace: traceId },
+            });
+            await digitalClient.from("digital_delivery_alerts").insert({
+              source: "paypal-capture-order",
+              source_ref: orderNumber,
+              customer_email: customerEmail,
+              reason: "delivery_invoke_failed",
+              details: { error: String(digitalErr.message ?? digitalErr).slice(0, 500), skus },
+            });
+          } catch (logErr) {
+            console.error("paypal delivery error logging failed:", logErr);
+          }
         } else {
           console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "digital_delivery_sent", skuCount: skus.length }));
         }
+
       }
     }
     return new Response(JSON.stringify({

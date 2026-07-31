@@ -236,22 +236,53 @@ async function sendStripePurchaseEmails(params: {
     return;
   }
 
-  const { error: digitalErr } = await adminClient.functions.invoke("send-digital-ilinguerelax", {
-    body: {
-      customerEmail,
-      customerName,
-      customerPhone,
-      customerCountry,
-      orderId: orderNumber,
-      skus,
-      amount: purchase.value,
-      currency: purchase.currency,
-      provider: "stripe",
-      idempotencyKey: `digital:stripe:${paymentKey}`,
-    },
-  });
-  if (digitalErr) console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);
+  const deliveryBody = {
+    customerEmail,
+    customerName,
+    customerPhone,
+    customerCountry,
+    orderId: orderNumber,
+    skus,
+    amount: purchase.value,
+    currency: purchase.currency,
+    provider: "stripe",
+    idempotencyKey: `digital:stripe:${paymentKey}`,
+  };
+
+  // Un reintento inmediato: el token de descarga es idempotente por idempotencyKey.
+  let digitalErr = (await adminClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+  if (digitalErr) {
+    console.error("send-digital-ilinguerelax webhook invoke failed (retrying):", digitalErr);
+    digitalErr = (await adminClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+  }
+  if (digitalErr) {
+    console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);
+    // Registro persistente para /admin (no bloquea el 200 al webhook).
+    try {
+      await adminClient.from("order_events").insert({
+        order_number: orderNumber,
+        customer_email: customerEmail,
+        provider: "stripe",
+        event: "digital_delivery_error",
+        status: "error",
+        detail: String(digitalErr.message ?? digitalErr).slice(0, 500),
+        amount: purchase.value,
+        currency: purchase.currency,
+        metadata: { skus },
+      });
+      await adminClient.from("digital_delivery_alerts").insert({
+        source: "stripe-webhook",
+        source_ref: orderNumber,
+        customer_email: customerEmail,
+        reason: "delivery_invoke_failed",
+        details: { error: String(digitalErr.message ?? digitalErr).slice(0, 500), skus },
+      });
+    } catch (logErr) {
+      console.error("stripe delivery error logging failed:", logErr);
+    }
+  }
 }
+
 
 // Extrae info de cupón desde session.metadata (checkout propio) o total_details (Stripe promo codes)
 function extractStripeCoupon(source: any): { couponCode?: string; couponPercent?: number; couponAmount?: number } {

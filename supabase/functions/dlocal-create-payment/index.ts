@@ -69,20 +69,18 @@ Deno.serve(async (req) => {
       throw e;
     }
     const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
-    // Si el navegador calculó otro total, NO bloqueamos la venta: cobramos el
-    // total del catálogo y reescalamos el importe en moneda local con la misma
-    // tasa de cambio que mostró la web.
+    // SEGURIDAD: el navegador NO influye en el importe. Si mandó otro total,
+    // solo lo registramos; el cobro usa el total del catálogo y la tasa FX
+    // del servidor.
     const clientUsd = body.expectedTotalUsd ?? null;
     if (clientUsd && Math.abs(calculatedUsd - clientUsd) > 0.01) {
-      console.warn("cart total adjusted", { clientUsd, calculatedUsd });
+      console.warn("cart total mismatch (ignorado)", { clientUsd, calculatedUsd });
     }
-    const fxScale = clientUsd && clientUsd > 0 ? calculatedUsd / clientUsd : 1;
-    // Cobro en moneda local: exigimos el total USD esperado y que coincida con
-    // el catálogo, para que el importe local no pueda alterarse desde el navegador.
 
     const orderId = body.orderId ?? `ILR-DL-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
     const description = pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ").slice(0, 250);
+
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     // Los datos de entrega viajan en la URL de notificación: dLocal Go la llama

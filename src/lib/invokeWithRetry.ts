@@ -105,7 +105,7 @@ export async function invokeWithRetry<T = unknown>(
     } catch (err) {
       lastError = err;
       if (attempt >= attempts || !isRetryable(err, null)) {
-        return { data: null, error: err };
+        return { data: null, error: await withEdgeDetail(err) };
       }
     }
     const jitter = Math.floor(Math.random() * 150);

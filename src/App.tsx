@@ -43,6 +43,7 @@ const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
 const DescargaCoreano = lazy(() => import("./pages/DescargaCoreano"));
 const DescargaPatrones = lazy(() => import("./pages/DescargaPatrones"));
 const DescargaIngles8000 = lazy(() => import("./pages/DescargaIngles8000"));
+const MiDescarga = lazy(() => import("./pages/MiDescarga"));
 const ProductEstructurasGramaticalesIngles = lazy(() => import("./pages/ProductEstructurasGramaticalesIngles"));
 const VistaPreviaPatrones = lazy(() => import("./pages/VistaPreviaPatrones"));
 const VistaPreviaCoreano = lazy(() => import("./pages/VistaPreviaCoreano"));

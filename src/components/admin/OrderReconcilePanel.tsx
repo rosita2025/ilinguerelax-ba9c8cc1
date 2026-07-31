@@ -36,13 +36,22 @@ type PendingOrder = {
   lastAt: string;
 };
 
+function storedAdminKey(): string {
+  try {
+    return localStorage.getItem("ilr_admin_key") || sessionStorage.getItem("ilr_admin_key") || "";
+  } catch { return ""; }
+}
+
 export default function OrderReconcilePanel() {
   const [orderNumber, setOrderNumber] = useState("");
-  const [adminKey, setAdminKey] = useState("");
+  // Reutiliza la clave con la que ya entraste al panel: evita el error
+  // "No autorizado" por escribirla de nuevo con un error de tipeo.
+  const [adminKey, setAdminKey] = useState(storedAdminKey);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [pending, setPending] = useState<PendingOrder[] | null>(null);
+
 
   async function loadPending() {
     if (!adminKey.trim()) { toast.error("Falta la clave de admin"); return; }

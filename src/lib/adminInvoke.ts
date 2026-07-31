@@ -159,12 +159,31 @@ type InvokeOptions = Parameters<typeof supabase.functions.invoke>[1] & {
   headers?: Record<string, string>;
 };
 
-export function adminInvoke<T = unknown>(fn: string, options: InvokeOptions = {}) {
+export async function adminInvoke<T = unknown>(fn: string, options: InvokeOptions = {}) {
   const twofa = getAdmin2FAToken();
   const headers: Record<string, string> = {
     ...(options.headers || {}),
     "x-admin-csrf": getAdminCsrfToken(),
   };
   if (twofa) headers["x-admin-2fa"] = twofa;
-  return supabase.functions.invoke<T>(fn, { ...options, headers });
+
+  const res = await supabase.functions.invoke<T>(fn, { ...options, headers });
+  if (!res.error) return res;
+
+  // supabase-js swallows the response body on non-2xx ("Edge Function returned
+  // a non-2xx status code"). Read it so the admin sees the real reason
+  // ("No autorizado", "2FA required", "Pedido no encontrado"…).
+  let detail: any = null;
+  try {
+    const ctx: any = (res.error as any)?.context;
+    if (ctx && typeof ctx.json === "function") detail = await ctx.clone().json();
+  } catch { /* body not JSON */ }
+
+  if (detail?.code === "TWO_FA_REQUIRED" || detail?.error === "2FA required") {
+    resetAdmin2FAToken();
+  }
+
+  const message = detail?.error || detail?.detail || res.error.message;
+  return { data: (detail as T) ?? null, error: { ...res.error, message } as typeof res.error };
 }
+

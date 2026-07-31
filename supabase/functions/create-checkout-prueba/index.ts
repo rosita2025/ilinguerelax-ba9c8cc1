@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     let pricing;
     try {
       pricing = await resolveServerPricing({
-        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
         country: body.contact.country,
         couponCode: body.couponCode,
       });

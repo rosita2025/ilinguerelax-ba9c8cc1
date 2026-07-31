@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
       admin.from("digital_email_sends").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("funnel_events").select("*").in("event_name", ["Purchase", "purchase", "mp_pending", "mp_in_process"]).order("created_at", { ascending: false }).limit(300),
       admin.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(300),
-      admin.from("digital_products").select("sku,name,bonus_name,bonus_drive_url,bonuses").limit(500),
+      admin.from("digital_products").select("sku,name,bonus_name,bonus_drive_url,bonuses,active,drive_url,updated_at").limit(500),
       admin.from("download_token_access").select("id,token_id,action,sku,ip,created_at").order("created_at", { ascending: false }).limit(300),
     ]);
 

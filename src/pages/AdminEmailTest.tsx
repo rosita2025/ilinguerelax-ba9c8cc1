@@ -875,7 +875,7 @@ const AdminEmailTest = () => {
           </Card>
 
 
-          <Card className="p-4 md:p-6">
+          <Card className="p-2.5 sm:p-4 md:p-6">
             {/* Mobile card list */}
             <div className="md:hidden space-y-3">
               {pagedRows.map((r) => {

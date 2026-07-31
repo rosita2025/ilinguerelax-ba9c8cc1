@@ -5,18 +5,21 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 
+// SEGURIDAD: el navegador solo aporta id y cantidad; precio, nombre y cupón
+// se resuelven en el servidor desde el catálogo.
 const ItemSchema = z.object({
   id: z.string().min(1).max(200),
-  name: z.string().min(1).max(300),
-  price: z.number().positive().max(10000),
+  name: z.string().max(300).optional(),
+  price: z.number().optional(),
   quantity: z.number().int().min(1).max(50),
 });
 
 const BodySchema = z.object({
   orderId: z.string().min(1).max(80).optional(),
   items: z.array(ItemSchema).min(1).max(20),
-  couponPercent: z.number().min(0).max(90).default(0),
+  couponPercent: z.number().min(0).max(100).optional(),
   couponCode: z.string().max(20).optional(),
   payerEmail: z.string().email(),
   payerName: z.string().min(1).max(120),
@@ -50,18 +53,31 @@ Deno.serve(async (req) => {
     }
     const body = parsed.data;
 
-    // Validación server-side del total en USD (evita manipulación del carrito).
-    const discount = 1 - body.couponPercent / 100;
-    const calculatedUsd = Number(
-      body.items.reduce((sum, i) => sum + i.price * i.quantity * discount, 0).toFixed(2),
-    );
+    // Precio autoritativo del servidor (ignora price/couponPercent del cliente).
+    let pricing;
+    try {
+      pricing = await resolveServerPricing({
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        country: body.country,
+        couponCode: body.couponCode,
+      });
+    } catch (e) {
+      if (e instanceof PricingError) return json({ error: e.message }, 400);
+      throw e;
+    }
+    const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
     if (body.expectedTotalUsd && Math.abs(calculatedUsd - body.expectedTotalUsd) > 0.01) {
+      return json({ error: "Cart total mismatch" }, 400);
+    }
+    // Cobro en moneda local: exigimos el total USD esperado y que coincida con
+    // el catálogo, para que el importe local no pueda alterarse desde el navegador.
+    if (body.currency.toUpperCase() !== "USD" && !body.expectedTotalUsd) {
       return json({ error: "Cart total mismatch" }, 400);
     }
 
     const orderId = body.orderId ?? `ILR-DL-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
-    const skus = normalizeSkus(body.items.map((i) => i.id));
-    const description = body.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ").slice(0, 250);
+    const skus = normalizeSkus(pricing.items.map((i) => i.sku));
+    const description = pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ").slice(0, 250);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     // Los datos de entrega viajan en la URL de notificación: dLocal Go la llama
@@ -74,8 +90,8 @@ Deno.serve(async (req) => {
       skus: skus.join(","),
       summary: description,
       usd: String(calculatedUsd),
-      ...(body.couponCode ? { coupon: body.couponCode } : {}),
-      ...(body.couponPercent ? { coupon_pct: String(body.couponPercent) } : {}),
+      ...(pricing.couponCode ? { coupon: pricing.couponCode } : {}),
+      ...(pricing.couponPercent ? { coupon_pct: String(pricing.couponPercent) } : {}),
       ...(body.payerPhone ? { phone: body.payerPhone } : {}),
       ...(body.paymentType ? { ptype: body.paymentType } : {}),
 

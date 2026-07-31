@@ -125,6 +125,13 @@ const OUTCOME_UI = {
     tone: "text-destructive",
     icon: AlertCircle,
   },
+  abandoned: {
+    label: "Pago no completado",
+    text: "Abriste la pasarela de pago pero no llegaste a completarla, así que no se te cobró nada. Puedes volver a comprar cuando quieras o escribirnos si necesitas ayuda.",
+    box: "border-destructive/30 bg-muted",
+    tone: "text-muted-foreground",
+    icon: AlertCircle,
+  },
   processing: {
     label: "Pago en proceso",
     text: "Estamos esperando la confirmación del pago (transferencias, efectivo y pagos manuales pueden tardar unas horas). Esta página se actualiza sola.",
@@ -133,6 +140,7 @@ const OUTCOME_UI = {
     icon: Clock,
   },
 } as const;
+
 
 const STAGES = [
   { key: "pending", label: "Pendiente", icon: Clock },

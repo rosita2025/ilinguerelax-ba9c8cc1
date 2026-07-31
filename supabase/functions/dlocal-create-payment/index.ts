@@ -153,19 +153,18 @@ Deno.serve(async (req) => {
       EC: "USD", GT: "GTQ", MX: "MXN", PA: "USD", PE: "PEN", PY: "PYG", UY: "UYU",
     };
     const countryCode = body.country.toUpperCase();
-    // Monedas sin decimales: dLocal rechaza montos con centavos.
-    const ZERO_DECIMAL = new Set(["CLP", "PYG", "COP", "ARS", "CRC", "GTQ"]);
     const requested = body.currency.toUpperCase();
     const expected = DLOCAL_CURRENCY[countryCode];
     // Si la moneda enviada no es la del país (ni USD), no intentamos en local.
-    const localCurrency = !expected || requested === expected || requested === "USD"
+    const wantedCurrency = !expected || requested === expected || requested === "USD"
       ? requested
       : "USD";
-    const localAmount = localCurrency === "USD" && requested !== "USD"
-      ? calculatedUsd
-      : ZERO_DECIMAL.has(localCurrency)
-      ? Math.round(body.amount * fxScale)
-      : Number((body.amount * fxScale).toFixed(2));
+    // Importe local calculado 100% en el servidor (total del catálogo × tasa
+    // propia). Si no hay tasa autorizada para esa moneda, cobramos en USD.
+    const serverLocal = wantedCurrency === "USD" ? null : localAmountFromUsd(calculatedUsd, wantedCurrency);
+    const localCurrency = wantedCurrency === "USD" || serverLocal == null ? "USD" : wantedCurrency;
+    const localAmount = localCurrency === "USD" ? calculatedUsd : (serverLocal as number);
+
 
 
     // dLocal rechaza el pago en su checkout ("la transacción no pudo ser

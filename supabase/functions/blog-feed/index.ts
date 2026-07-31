@@ -45,7 +45,33 @@ Deno.serve(async (req) => {
       .limit(500);
     if (error) throw error;
 
-    const rows = ((data ?? []) as Row[]).filter((r) => !!r.slug);
+    // --- Validación de entrada: descarta filas rotas y las registra en el log ---
+    const problems: string[] = [];
+    const seen = new Set<string>();
+    const rows: Row[] = [];
+    for (const r of (data ?? []) as Row[]) {
+      const slug = (r.slug ?? "").trim();
+      if (!/^[a-z0-9][a-z0-9\-_]*$/i.test(slug)) {
+        problems.push(`slug inválido: "${slug}"`);
+        continue;
+      }
+      if (seen.has(slug)) {
+        problems.push(`slug duplicado omitido: "${slug}"`);
+        continue;
+      }
+      const when = r.created_at ?? r.updated_at ?? "";
+      if (when && Number.isNaN(new Date(when).getTime())) {
+        problems.push(`fecha inválida en "${slug}": ${when}`);
+        continue;
+      }
+      if (!((r.title ?? "").trim())) {
+        problems.push(`post sin título: "${slug}"`);
+        continue;
+      }
+      seen.add(slug);
+      rows.push({ ...r, slug });
+    }
+    for (const p of problems) console.error(`[blog-feed] ERROR ${p}`);
 
     let xml: string;
     if (format === "sitemap") {
@@ -93,6 +119,39 @@ Deno.serve(async (req) => {
       ].join("\n");
     }
 
+    // --- Validación estructural de salida: nunca servimos un feed roto ---
+    const structural: string[] = [];
+    if (!xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')) structural.push("falta declaración XML");
+    if (/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/.test(xml)) structural.push("'&' sin escapar");
+    if (format === "rss") {
+      if (!xml.includes('<rss version="2.0"')) structural.push("falta <rss version=\"2.0\">");
+      if (!xml.trimEnd().endsWith("</rss>")) structural.push("no cierra con </rss>");
+      const o = (xml.match(/<item>/g) ?? []).length;
+      const c = (xml.match(/<\/item>/g) ?? []).length;
+      if (o !== c) structural.push(`items desbalanceados (${o}/${c})`);
+      for (const m of xml.matchAll(/<link>([^<]*)<\/link>/g)) {
+        if (!m[1].startsWith(`${BASE_URL}/`)) structural.push(`link no canónico: ${m[1]}`);
+      }
+    } else {
+      if (!xml.trimEnd().endsWith("</urlset>")) structural.push("no cierra con </urlset>");
+      for (const m of xml.matchAll(/<loc>([^<]*)<\/loc>/g)) {
+        if (!m[1].startsWith(`${BASE_URL}/blog/`)) structural.push(`loc no canónico: ${m[1]}`);
+      }
+    }
+
+    if (structural.length > 0) {
+      for (const s of structural) console.error(`[blog-feed] ERROR estructura: ${s}`);
+      return new Response(
+        JSON.stringify({ error: "feed_invalid", issues: structural.slice(0, 10) }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    console.log(
+      `[blog-feed] ${format} OK (${rows.length} posts` +
+        `${problems.length ? `, ${problems.length} descartados` : ""}).`,
+    );
+
     return new Response(xml, {
       headers: {
         ...corsHeaders,
@@ -100,6 +159,7 @@ Deno.serve(async (req) => {
         "Cache-Control": "public, max-age=300",
       },
     });
+
   } catch (e) {
     return new Response(
       JSON.stringify({ error: (e as Error).message }),

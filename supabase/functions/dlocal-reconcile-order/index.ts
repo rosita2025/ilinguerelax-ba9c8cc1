@@ -22,6 +22,8 @@ import { assertAdminCsrf, adminCorsHeaders } from "../_shared/adminCsrf.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
+import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+
 import {
   dlocalApiBase,
   dlocalEnv,

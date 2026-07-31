@@ -28,7 +28,8 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-async function resolveFile(admin: ReturnType<typeof createClient>, sku: string, kind: string, index: number) {
+// deno-lint-ignore no-explicit-any
+async function resolveFile(admin: any, sku: string, kind: string, index: number) {
   const { data: p } = await admin
     .from("digital_products")
     .select("sku,name,drive_url,access_key,bonus_name,bonus_drive_url,bonus_access_key,bonuses")

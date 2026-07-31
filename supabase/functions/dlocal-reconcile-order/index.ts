@@ -109,9 +109,9 @@ async function deliver(order: {
       skus: order.skus,
       amount: order.amount,
       currency: order.currency,
-      provider: order.provider as "stripe" | "paypal" | "mercadopago",
+      provider: "dlocalgo",
       orderNumber: order.orderNumber,
-      idempotencyKey: `reconcile-paid-${order.orderNumber}`,
+      idempotencyKey: `dlocal-paid-${order.orderNumber}`,
     });
   } catch (e) {
     console.error("[dlocal-reconcile] thank-you failed:", e);

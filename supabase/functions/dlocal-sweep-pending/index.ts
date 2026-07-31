@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
                 skus,
                 amount,
                 currency,
-                provider: "mercadopago",
+                provider: "dlocalgo",
                 orderNumber,
                 idempotencyKey: `dlocal-paid-${orderNumber}`,
               });

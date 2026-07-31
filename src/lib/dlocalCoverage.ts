@@ -305,6 +305,12 @@ export function validateDlocalMethod(
   const code = (country || "").toUpperCase();
   const c = getDlocalCountry(code);
   if (!c) return { ok: false, reason: `dLocal Go no tiene cobertura activa para ${code || "este país"}.` };
+  if (methodId === "dlocal_card" && !DLOCAL_CARD_ENABLED) {
+    return { ok: false, reason: "dLocal Go: el cobro con tarjeta está desactivado." };
+  }
+  if (methodId === "dlocal_wallet" && !DLOCAL_WALLET_ENABLED) {
+    return { ok: false, reason: "dLocal Go: la billetera digital está desactivada." };
+  }
   if (methodId === "dlocal_card") return { ok: true };
   const kind = DLOCAL_METHOD_KIND[methodId];
   if (dlocalRails(code, kind).length === 0) {
@@ -315,6 +321,7 @@ export function validateDlocalMethod(
   }
   return { ok: true };
 }
+
 
 /**
  * Valida que las etiquetas/badges mostradas en el checkout provengan de la

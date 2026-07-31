@@ -58,8 +58,14 @@ Deno.serve(async (req) => {
           title: b.title ?? b.name ?? `Bono ${i + 1}`,
         })),
       }));
+      // Orden estable: primero los productos principales, luego los upsells,
+      // así el comprador nunca ve mezclados producto principal y complementos.
+      items.sort((a, b) =>
+        Number(a.isUpsell) - Number(b.isUpsell) || String(a.name).localeCompare(String(b.name))
+      );
       const found = new Set((products ?? []).map((p: Record<string, unknown>) => String(p.sku).toLowerCase()));
       missingSkus = skus.filter((s: string) => !found.has(s));
+
     }
 
     await admin.from("download_tokens").update({ last_accessed_at: new Date().toISOString() }).eq("id", row.id);

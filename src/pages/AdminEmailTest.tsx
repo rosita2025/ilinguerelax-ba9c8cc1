@@ -519,7 +519,7 @@ const AdminEmailTest = () => {
             <div className="flex items-start gap-2">
               <PackageCheck className="w-4 h-4 text-primary mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
-                <div className="font-semibold leading-snug">{p.name}</div>
+                <div className="font-semibold leading-snug break-words">{p.name}</div>
                 {p.sku && <div className="font-mono text-[11px] text-muted-foreground break-all mt-0.5">SKU: {p.sku}</div>}
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                   <span className="px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium capitalize">{p.role}</span>
@@ -627,8 +627,9 @@ const AdminEmailTest = () => {
   return (
     <>
       <AdminNav />
-      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4">
-        <div className="max-w-7xl mx-auto space-y-5 md:space-y-6">
+      <main className="min-h-dvh bg-background py-6 md:py-10 px-3 md:px-4 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto space-y-5 md:space-y-6 min-w-0">
+
           <header className="flex items-start justify-between gap-3 flex-wrap">
             <div className="min-w-0 flex-1">
               <h1 className="text-xl md:text-3xl font-bold flex items-center gap-2">
@@ -678,21 +679,22 @@ const AdminEmailTest = () => {
             </div>
             <div className="grid gap-1.5 sm:grid-cols-2">
               {catalogList.map((p) => (
-                <label key={p.sku} className="flex items-start gap-2 text-xs cursor-pointer rounded border p-2 hover:bg-muted/50">
+                <label key={p.sku} className="flex items-start gap-2 text-xs cursor-pointer rounded border p-2 hover:bg-muted/50 min-w-0 w-full overflow-hidden">
                   <input
                     type="checkbox"
-                    className="mt-0.5"
+                    className="mt-0.5 shrink-0"
                     checked={testSkus.includes(p.sku)}
                     onChange={() => toggleTestSku(p.sku)}
                   />
-                  <span className="min-w-0">
-                    <span className="block font-medium truncate">{p.name}</span>
-                    <span className="text-muted-foreground">
+                  <span className="min-w-0 flex-1 block">
+                    <span className="block font-medium leading-snug break-words line-clamp-2">{p.name}</span>
+                    <span className="block text-muted-foreground truncate">
                       {p.bonusCount > 0 ? `🎁 ${p.bonusCount} bono(s)` : "Sin bonos"}
                     </span>
                   </span>
                 </label>
               ))}
+
               {catalogList.length === 0 && (
                 <span className="text-xs text-muted-foreground">Cargando catálogo…</span>
               )}

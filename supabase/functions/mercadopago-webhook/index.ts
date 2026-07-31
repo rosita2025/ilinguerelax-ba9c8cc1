@@ -37,9 +37,12 @@ function parseSignatureHeader(header: string | null): { ts?: string; v1?: string
 async function verifySignature(req: Request, dataId: string): Promise<boolean> {
   const secret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
   if (!secret) {
-    console.warn("MERCADOPAGO_WEBHOOK_SECRET not set — skipping signature verification");
-    return true; // allow while user configures secret; MP still requires it in prod
+    // Fail-closed: sin secreto NO se acepta ninguna notificación. Aceptarla
+    // permitiría a cualquiera inyectar un data.id y generar pedidos/correos.
+    console.error("MERCADOPAGO_WEBHOOK_SECRET not set — rejecting webhook (fail-closed)");
+    return false;
   }
+
   const sigHeader = req.headers.get("x-signature");
   const requestId = req.headers.get("x-request-id") ?? "";
   const { ts, v1 } = parseSignatureHeader(sigHeader);

@@ -480,10 +480,13 @@ serve(async (req) => {
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
+    // El detalle queda solo en los logs del servidor; al cliente/Stripe se le
+    // devuelve un mensaje genérico para no filtrar internals.
     console.error("Webhook error:", errorMessage);
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
 });

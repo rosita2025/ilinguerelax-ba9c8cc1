@@ -133,7 +133,7 @@ serve(async (req) => {
       case "list": {
         const { data, error } = await supabase
           .from("blog_post_queue")
-          .select("id,topic,keyword,language,category,scheduled_at,status,attempts,error,post_slug")
+          .select("id,topic,keyword,language,category,scheduled_at,status,attempts,error,post_id,post_slug")
           .order("scheduled_at", { ascending: true })
           .limit(200);
         if (error) throw error;
@@ -208,6 +208,42 @@ serve(async (req) => {
         if (res.error) return json({ error: res.error.message }, 502);
         const result = (res.data ?? {}) as { processed?: number };
         return json({ ok: true, forced, processed: result.processed ?? 0, result: res.data });
+      }
+
+      // Genera al instante un item concreto de la agenda y devuelve el borrador.
+      case "generate-one": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { data: item, error: itemErr } = await supabase
+          .from("blog_post_queue")
+          .select("id,status,post_id")
+          .eq("id", body.id)
+          .maybeSingle();
+        if (itemErr) throw itemErr;
+        if (!item) return json({ error: "Item no encontrado" }, 404);
+
+        if (!item.post_id) {
+          await supabase
+            .from("blog_post_queue")
+            .update({ status: "pending", attempts: 0, error: null, scheduled_at: new Date(Date.now() - 60_000).toISOString() })
+            .eq("id", body.id);
+          const res = await invokeInternalFunction("process-blog-queue", {});
+          if (res.error) return json({ error: res.error.message }, 502);
+        }
+
+        const { data: fresh } = await supabase
+          .from("blog_post_queue")
+          .select("post_id,status,error")
+          .eq("id", body.id)
+          .maybeSingle();
+        if (!fresh?.post_id) return json({ error: fresh?.error || "No se pudo generar el artículo" }, 500);
+
+        const { data: post } = await supabase
+          .from("generated_blog_posts")
+          .select("id,slug,title,excerpt,content,category,keyword,read_time,published")
+          .eq("id", fresh.post_id)
+          .maybeSingle();
+        if (!post) return json({ error: "Borrador no encontrado" }, 404);
+        return json({ post });
       }
 
 

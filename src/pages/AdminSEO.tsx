@@ -19,7 +19,6 @@ import BacklinksCard from "@/components/admin/BacklinksCard";
 import GscKeywordsMultilangCard from "@/components/admin/GscKeywordsMultilangCard";
 import GoogleSuggestCard from "@/components/admin/GoogleSuggestCard";
 import BlogScheduleCard from "@/components/admin/BlogScheduleCard";
-import BlogApprovalCard from "@/components/admin/BlogApprovalCard";
 
 
 interface GscRow {
@@ -605,7 +604,6 @@ const AdminSEO = () => {
           <GscKeywordsMultilangCard />
           <GoogleSuggestCard />
           <BlogScheduleCard />
-          <BlogApprovalCard />
 
 
 

@@ -2,7 +2,18 @@ import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarClock, Loader2, PlayCircle, RefreshCw, RotateCcw, Trash2, Zap } from "lucide-react";
+import {
+  CalendarClock,
+  Check,
+  Eye,
+  Loader2,
+  PlayCircle,
+  RefreshCw,
+  RotateCcw,
+  Trash2,
+  X,
+  Zap,
+} from "lucide-react";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
@@ -17,7 +28,19 @@ interface QueueItem {
   status: "pending" | "processing" | "done" | "failed";
   attempts: number;
   error: string | null;
+  post_id: string | null;
   post_slug: string | null;
+}
+
+interface PreviewPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  keyword: string | null;
+  published: boolean;
 }
 
 const STATUS_LABEL: Record<QueueItem["status"], { text: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -43,6 +66,7 @@ const BlogScheduleCard = () => {
   const [items, setItems] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [preview, setPreview] = useState<PreviewPost | null>(null);
 
   const call = useCallback(
     async (payload: Record<string, unknown>) => {
@@ -79,11 +103,9 @@ const BlogScheduleCard = () => {
         const processed = Number(res.processed ?? 0);
         toast.info(
           processed
-            ? `${processed} borrador(es) generados · revísalos abajo en "Revisión de artículos"`
-            : "No había artículos vencidos. Usa \"Generar 2 ahora\" para adelantar los próximos.",
+            ? `${processed} borrador(es) generados · ábrelos con "Vista previa"`
+            : 'No había artículos vencidos. Usa "Generar 2 ahora" para adelantar los próximos.',
         );
-        // Avisa a la tarjeta de aprobación para que recargue los borradores.
-        window.dispatchEvent(new CustomEvent("blog-drafts-updated"));
       }
       await load();
     } catch (e) {
@@ -93,6 +115,35 @@ const BlogScheduleCard = () => {
     }
   };
 
+  /** Vista previa de cualquier post de la agenda: si aún no existe, se genera al momento. */
+  const openPreview = async (it: QueueItem) => {
+    setBusy("preview" + it.id);
+    try {
+      const res = it.post_id
+        ? await call({ action: "preview", id: it.post_id })
+        : await call({ action: "generate-one", id: it.id });
+      setPreview(res.post as PreviewPost);
+      if (!it.post_id) await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const decide = async (action: "approve" | "reject", postId: string, okMsg: string) => {
+    setBusy(action + postId);
+    try {
+      await call({ action, id: postId });
+      toast.success(okMsg);
+      setPreview(null);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const pending = items.filter((i) => i.status === "pending").length;
   const done = items.filter((i) => i.status === "done").length;
@@ -108,7 +159,7 @@ const BlogScheduleCard = () => {
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
             5 turnos diarios (08:00, 09:00, 11:00, 13:00 y 20:00 hora Perú) × 2 artículos = 10 al día.
-            Durante 5 días son 50 artículos con las palabras clave reales de Search Console.
+            Usa “Vista previa” en cualquier post para revisarlo, aprobarlo o rechazarlo.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -151,7 +202,6 @@ const BlogScheduleCard = () => {
           {busy === "run-now-force" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Zap className="h-4 w-4 mr-1" />}
           Generar 2 ahora (borradores)
         </Button>
-
         <Button size="sm" variant="ghost" onClick={() => run("clear", {}, "Pendientes eliminados")} disabled={busy === "clear"}>
           <Trash2 className="h-4 w-4 mr-1" /> Limpiar pendientes
         </Button>
@@ -162,31 +212,78 @@ const BlogScheduleCard = () => {
           <div className="text-sm text-muted-foreground py-4">Sin artículos programados todavía.</div>
         )}
         {items.map((it) => (
-          <div key={it.id} className="py-2 flex items-start gap-2">
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium break-words">{it.topic}</div>
-              <div className="text-[11px] text-muted-foreground break-words">
-                {peruTime(it.scheduled_at)} · {it.keyword} · {it.language.toUpperCase()}
-                {it.post_slug ? ` · /blog/${it.post_slug}` : ""}
+          <div key={it.id} className="py-2 space-y-2">
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium break-words">{it.topic}</div>
+                <div className="text-[11px] text-muted-foreground break-words">
+                  {peruTime(it.scheduled_at)} · {it.keyword} · {it.language.toUpperCase()}
+                  {it.post_slug ? ` · /blog/${it.post_slug}` : ""}
+                </div>
+                {it.error && <div className="text-[11px] text-destructive break-words">{it.error}</div>}
               </div>
-              {it.error && <div className="text-[11px] text-destructive break-words">{it.error}</div>}
+              <Badge variant={STATUS_LABEL[it.status].variant} className="shrink-0">
+                {STATUS_LABEL[it.status].text}
+              </Badge>
+              {it.status === "failed" && (
+                <Button variant="ghost" size="icon" onClick={() => run("retry", { id: it.id }, "Reprogramado")}>
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              )}
+              {it.status !== "done" && (
+                <Button variant="ghost" size="icon" onClick={() => run("delete", { id: it.id }, "Eliminado")}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              )}
             </div>
-            <Badge variant={STATUS_LABEL[it.status].variant} className="shrink-0">
-              {STATUS_LABEL[it.status].text}
-            </Badge>
-            {it.status === "failed" && (
-              <Button variant="ghost" size="icon" onClick={() => run("retry", { id: it.id }, "Reprogramado")}>
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-            )}
-            {it.status !== "done" && (
-              <Button variant="ghost" size="icon" onClick={() => run("delete", { id: it.id }, "Eliminado")}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            )}
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => openPreview(it)}
+              disabled={busy === "preview" + it.id}
+            >
+              {busy === "preview" + it.id ? (
+                <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+              ) : (
+                <Eye className="h-3.5 w-3.5 mr-1" />
+              )}
+              {it.post_id ? "Vista previa" : "Vista previa (genera al momento)"}
+            </Button>
           </div>
         ))}
       </div>
+
+      {preview && (
+        <div className="rounded-lg border p-3 space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-sm font-semibold break-words">{preview.title}</div>
+              <div className="text-[11px] text-muted-foreground break-words">
+                /blog/{preview.slug} · {preview.category}
+                {preview.published ? " · publicado" : " · borrador"}
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setPreview(null)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <pre className="text-[11px] whitespace-pre-wrap break-words max-h-[360px] overflow-y-auto text-muted-foreground">
+            {preview.content}
+          </pre>
+          {!preview.published && (
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => decide("approve", preview.id, "Artículo aprobado y publicado")} disabled={busy === "approve" + preview.id}>
+                {busy === "approve" + preview.id ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Check className="h-4 w-4 mr-1" />}
+                Aprobar y publicar
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => decide("reject", preview.id, "Borrador descartado")} disabled={busy === "reject" + preview.id}>
+                <Trash2 className="h-4 w-4 mr-1 text-destructive" /> Rechazar
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 };

@@ -716,8 +716,13 @@ serve(async (req) => {
       });
 
     } catch (adminSaleError) {
-      console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
+      if (adminSaleError instanceof DedupedAdminNotice) {
+        // Aviso ya enviado hoy para este cliente: nada que hacer.
+      } else {
+        console.error("[send-digital-ilinguerelax] admin sale notice failed", adminSaleError);
+      }
     }
+
 
 
 

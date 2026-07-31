@@ -154,7 +154,6 @@ Deno.serve(async (req) => {
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
     const { action, reason, operator } = parsed.data;
-    const orderNumber = parsed.data.orderNumber.toUpperCase();
 
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expectedKey || parsed.data.adminKey !== expectedKey) {
@@ -162,6 +161,50 @@ Deno.serve(async (req) => {
     }
 
     const supabase = admin();
+
+    // Lista de pedidos dLocal que siguen pendientes (sin pago ni rechazo posterior).
+    if (action === "list_pending") {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: rows } = await supabase
+        .from("order_events")
+        .select("order_number, event, status, method, customer_email, amount, currency, provider, created_at")
+        .gte("created_at", since)
+        .order("created_at", { ascending: true })
+        .limit(4000);
+
+      const byOrder = new Map<string, {
+        orderNumber: string; provider: string; email: string; method: string | null;
+        amount: number | null; currency: string; createdAt: string; lastAt: string;
+        paid: boolean; failed: boolean; pending: boolean;
+      }>();
+      for (const r of (rows ?? []) as Array<Record<string, any>>) {
+        const on = String(r.order_number);
+        const cur = byOrder.get(on) ?? {
+          orderNumber: on, provider: r.provider ?? "dlocalgo", email: "", method: null,
+          amount: null, currency: "USD", createdAt: r.created_at, lastAt: r.created_at,
+          paid: false, failed: false, pending: false,
+        };
+        if (r.provider) cur.provider = r.provider;
+        if (r.customer_email) cur.email = r.customer_email;
+        if (r.method) cur.method = r.method;
+        if (typeof r.amount === "number") cur.amount = r.amount;
+        if (r.currency) cur.currency = r.currency;
+        cur.lastAt = r.created_at;
+        if (r.event === "payment_paid" || r.event === "delivery_sent") cur.paid = true;
+        if (r.event === "payment_failed") cur.failed = true;
+        if (r.event === "payment_pending" || r.event === "checkout_created") cur.pending = true;
+        byOrder.set(on, cur);
+      }
+      const pending = [...byOrder.values()]
+        .filter((o) => o.provider === "dlocalgo" && o.pending && !o.paid && !o.failed)
+        .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1))
+        .slice(0, 100);
+      return json({ ok: true, pending });
+    }
+
+    if (!parsed.data.orderNumber) return json({ error: "Falta el número de pedido" }, 400);
+    const orderNumber = parsed.data.orderNumber.toUpperCase();
+
     const { data: rawEvents } = await supabase
       .from("order_events")
       .select("event, status, method, reference, customer_email, amount, currency, provider, metadata, created_at")

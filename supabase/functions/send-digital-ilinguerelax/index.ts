@@ -472,6 +472,39 @@ serve(async (req) => {
       throw claimError;
     }
 
+    // Enlace personal de descarga del pedido (/mi-descarga?t=<token>). Nunca
+    // falla la entrega por esto: si algo sale mal, seguimos con el correo.
+    if (orderId) {
+      try {
+        const emailKey = String(customerEmail).trim().toLowerCase();
+        const { data: existingTok } = await supabase
+          .from("download_tokens")
+          .select("token, skus")
+          .eq("order_number", String(orderId).toUpperCase())
+          .eq("email", emailKey)
+          .maybeSingle();
+        if (existingTok) {
+          const merged = [...new Set([...(existingTok.skus ?? []), ...normalizedSkus])];
+          await supabase.from("download_tokens").update({ skus: merged }).eq("token", existingTok.token);
+        } else {
+          const bytes = new Uint8Array(32);
+          crypto.getRandomValues(bytes);
+          const token = btoa(String.fromCharCode(...bytes))
+            .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+          await supabase.from("download_tokens").insert({
+            token,
+            order_number: String(orderId).toUpperCase(),
+            email: emailKey,
+            skus: normalizedSkus,
+          });
+        }
+      } catch (e) {
+        console.warn("[send-digital] download token skipped:", e instanceof Error ? e.message : String(e));
+      }
+    }
+
+
+
     // Re-verificación tras reservar: dos pedidos del MISMO cliente creados a la
     // vez (dos cargos en la pasarela con los mismos productos) pasaban la
     // comprobación previa porque ninguno había escrito todavía. Aquí, con la

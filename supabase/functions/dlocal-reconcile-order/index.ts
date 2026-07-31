@@ -364,7 +364,7 @@ Deno.serve(async (req) => {
         status: remoteStatus ?? "MANUAL_APPROVED",
         method: method ?? "Aprobación manual del admin",
         reference,
-        detail: `Pago aceptado manualmente por el admin: ${reason}`,
+        detail: `Pago aceptado manualmente por el admin: ${approvalReason}`,
         customerEmail: email,
         amount: amount ?? null,
         currency,

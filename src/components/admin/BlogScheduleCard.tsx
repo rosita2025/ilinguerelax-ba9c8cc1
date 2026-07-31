@@ -70,11 +70,21 @@ const BlogScheduleCard = () => {
   useEffect(() => { load(); }, [load]);
 
   const run = async (action: string, extra: Record<string, unknown> = {}, okMsg?: string) => {
-    setBusy(action + (extra.id ?? ""));
+    setBusy(action + (extra.force ? "-force" : "") + (extra.id ?? ""));
     try {
       const res = await call({ action, ...extra });
       toast.success(okMsg ?? "Listo");
       if (action === "seed") toast.info(`${res.created} artículos programados`);
+      if (action === "run-now") {
+        const processed = Number(res.processed ?? 0);
+        toast.info(
+          processed
+            ? `${processed} borrador(es) generados · revísalos abajo en "Revisión de artículos"`
+            : "No había artículos vencidos. Usa \"Generar 2 ahora\" para adelantar los próximos.",
+        );
+        // Avisa a la tarjeta de aprobación para que recargue los borradores.
+        window.dispatchEvent(new CustomEvent("blog-drafts-updated"));
+      }
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");
@@ -82,6 +92,7 @@ const BlogScheduleCard = () => {
       setBusy(null);
     }
   };
+
 
   const pending = items.filter((i) => i.status === "pending").length;
   const done = items.filter((i) => i.status === "done").length;

@@ -18,6 +18,10 @@ import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { isSettledStatus } from "../_shared/dlocal.ts";
+import { randomToken } from "../_shared/downloadToken.ts";
+
+const SITE = "https://www.ilinguerelax.com";
+
 
 const API_BASE = "https://api.dlocalgo.com/v1";
 
@@ -224,13 +228,64 @@ Deno.serve(async (req) => {
       if (aliasMap.size) skus = skus.map((s) => aliasMap.get(s.toLowerCase()) ?? s);
     } catch (_) { /* alias opcional */ }
 
+    // Los enlaces de Drive NUNCA salen al navegador: devolvemos solo metadatos
+    // y un token de descarga (/mi-descarga?t=…) que resuelve el archivo real
+    // mediante redirecciones firmadas de corta duración.
+    const uniqueSkus = [...new Set(skus)];
     const { data: products, error } = await admin
       .from("digital_products")
-      .select("sku,name,drive_url,access_key,bonus_name,bonus_drive_url,bonus_access_key,bonuses,cover_image_url")
-      .in("sku", [...new Set(skus)]);
+      .select("sku,name,cover_image_url,drive_url,bonus_name,bonus_drive_url,bonuses")
+      .in("sku", uniqueSkus);
     if (error) throw error;
 
-    return json({ found: true, paid: true, items: products ?? [] });
+    type Row = {
+      sku: string; name: string; cover_image_url: string | null;
+      drive_url: string | null; bonus_name: string | null;
+      bonus_drive_url: string | null; bonuses: unknown;
+    };
+    const rows = (products ?? []) as Row[];
+    const items = rows.map((p) => {
+      const extra = Array.isArray(p.bonuses)
+        ? (p.bonuses as { drive_url?: string; url?: string }[]).filter((b) => b?.drive_url || b?.url).length
+        : 0;
+      return {
+        sku: p.sku,
+        name: p.name,
+        cover_image_url: p.cover_image_url,
+        available: Boolean(p.drive_url),
+        bonus_count: extra + (p.bonus_drive_url ? 1 : 0),
+      };
+    });
+
+    // Token de descarga por pedido (se reutiliza si ya existe).
+    let downloadUrl: string | null = null;
+    try {
+      const { data: existing } = await admin
+        .from("download_tokens")
+        .select("token, skus, revoked")
+        .eq("order_number", orderNumber)
+        .eq("email", email)
+        .maybeSingle();
+
+      if (existing && !existing.revoked) {
+        const merged = [...new Set([...(existing.skus ?? []), ...uniqueSkus])];
+        if (merged.length !== (existing.skus ?? []).length) {
+          await admin.from("download_tokens").update({ skus: merged }).eq("token", existing.token);
+        }
+        downloadUrl = `${SITE}/mi-descarga?t=${existing.token}`;
+      } else if (!existing) {
+        const token = randomToken();
+        const { error: insErr } = await admin.from("download_tokens").insert({
+          token, order_number: orderNumber, email, skus: uniqueSkus,
+        });
+        if (!insErr) downloadUrl = `${SITE}/mi-descarga?t=${token}`;
+      }
+    } catch (e) {
+      console.warn("[order-delivery] token:", e instanceof Error ? e.message : String(e));
+    }
+
+    return json({ found: true, paid: true, items, downloadUrl });
+
   } catch (err) {
     console.error("order-delivery error:", err);
     return json({ error: "No pudimos recuperar tu entrega." }, 500);

@@ -211,7 +211,10 @@ export default function AdminDlocal() {
             </p>
           </header>
 
+          <OrderReconcilePanel />
+
           <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+
             <div className="flex-1">
               <Input
                 placeholder="Buscar país o moneda…"

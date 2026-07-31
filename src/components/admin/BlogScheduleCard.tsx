@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarClock, Loader2, PlayCircle, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
+import { CalendarClock, Loader2, PlayCircle, RefreshCw, RotateCcw, Trash2, Zap } from "lucide-react";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
@@ -70,11 +70,21 @@ const BlogScheduleCard = () => {
   useEffect(() => { load(); }, [load]);
 
   const run = async (action: string, extra: Record<string, unknown> = {}, okMsg?: string) => {
-    setBusy(action + (extra.id ?? ""));
+    setBusy(action + (extra.force ? "-force" : "") + (extra.id ?? ""));
     try {
       const res = await call({ action, ...extra });
       toast.success(okMsg ?? "Listo");
       if (action === "seed") toast.info(`${res.created} artículos programados`);
+      if (action === "run-now") {
+        const processed = Number(res.processed ?? 0);
+        toast.info(
+          processed
+            ? `${processed} borrador(es) generados · revísalos abajo en "Revisión de artículos"`
+            : "No había artículos vencidos. Usa \"Generar 2 ahora\" para adelantar los próximos.",
+        );
+        // Avisa a la tarjeta de aprobación para que recargue los borradores.
+        window.dispatchEvent(new CustomEvent("blog-drafts-updated"));
+      }
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");
@@ -82,6 +92,7 @@ const BlogScheduleCard = () => {
       setBusy(null);
     }
   };
+
 
   const pending = items.filter((i) => i.status === "pending").length;
   const done = items.filter((i) => i.status === "done").length;
@@ -132,6 +143,15 @@ const BlogScheduleCard = () => {
           {busy === "run-now" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <PlayCircle className="h-4 w-4 mr-1" />}
           Procesar ahora
         </Button>
+        <Button
+          size="sm"
+          onClick={() => run("run-now", { force: true, count: 2 }, "Generando borradores…")}
+          disabled={busy === "run-now-force"}
+        >
+          {busy === "run-now-force" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Zap className="h-4 w-4 mr-1" />}
+          Generar 2 ahora (borradores)
+        </Button>
+
         <Button size="sm" variant="ghost" onClick={() => run("clear", {}, "Pendientes eliminados")} disabled={busy === "clear"}>
           <Trash2 className="h-4 w-4 mr-1" /> Limpiar pendientes
         </Button>

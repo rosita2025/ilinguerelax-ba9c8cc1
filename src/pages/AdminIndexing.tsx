@@ -200,7 +200,9 @@ export default function AdminIndexing() {
       // Se envía en lotes pequeños: un lote grande hace que la función edge
       // consulte cientos de URLs contra Google y la petición muera por timeout
       // ("Failed to send a request to the Edge Function").
-      const CHUNK = 15;
+      // La función procesa como máximo 10, pero usamos lotes de 5 para que el
+      // panel responda rápido incluso si algún motor externo está lento.
+      const CHUNK = 5;
       let sent = 0;
       let already = false;
       for (let i = 0; i < urls.length; i += CHUNK) {
@@ -221,7 +223,7 @@ export default function AdminIndexing() {
       const msg = (e as Error).message || "Error desconocido";
       toast.error("Fallo el reintento", {
         description: /Failed to send|fetch/i.test(msg)
-          ? "La función tardó demasiado o no respondió. Intenta con menos URLs."
+          ? "No se pudo contactar el servicio de indexación. Vuelve a intentarlo en unos segundos."
           : msg,
       });
     } finally {

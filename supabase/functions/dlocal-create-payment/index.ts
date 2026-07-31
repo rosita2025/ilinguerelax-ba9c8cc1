@@ -8,6 +8,7 @@ import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
 import { dlocalApiBase } from "../_shared/dlocal.ts";
+import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
 
 // SEGURIDAD: el navegador solo aporta id y cantidad; precio, nombre y cupón
@@ -346,6 +347,17 @@ Deno.serve(async (req) => {
     // segundo plano con waitUntil (la función sigue viva hasta terminarlo).
     const audit = (async () => {
       try {
+        const paymentId = data.id ? String(data.id) : orderId;
+        const pendingTemplateData = {
+          orderNumber: orderId,
+          customerName: body.payerName,
+          customerEmail: body.payerEmail,
+          productName: description,
+          amount: usedUsdFallback ? calculatedUsd : localAmount,
+          currency: usedUsdFallback ? "USD" : localCurrency,
+          method: methodLabel,
+          orderDate: new Date().toISOString(),
+        };
         await Promise.all([
           logOrderEvent({
             orderNumber: orderId,
@@ -361,6 +373,7 @@ Deno.serve(async (req) => {
             metadata: {
               country: body.country.toUpperCase(),
               skus,
+              productName: description,
               localAmount: usedUsdFallback ? calculatedUsd : localAmount,
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
@@ -380,6 +393,24 @@ Deno.serve(async (req) => {
             customerEmail: body.payerEmail,
             currency: usedUsdFallback ? "USD" : localCurrency,
             amount: usedUsdFallback ? calculatedUsd : localAmount,
+          }),
+          // Un solo aviso propio al crear las instrucciones. La misma clave se
+          // usa en el webhook PENDING para que un callback repetido no duplique.
+          sendInternalEmail({
+            templateName: "customer-manual-pending",
+            recipientEmail: body.payerEmail,
+            idempotencyKey: `dlocal-pending-${paymentId}-customer`,
+            templateData: pendingTemplateData,
+          }),
+          sendInternalEmail({
+            templateName: "admin-manual-pending",
+            recipientEmail: "hola@ilinguerelax.com",
+            idempotencyKey: `dlocal-pending-${paymentId}-admin`,
+            templateData: {
+              ...pendingTemplateData,
+              customerWhatsapp: body.payerPhone ?? "",
+              country: body.country.toUpperCase(),
+            },
           }),
         ]);
       } catch (e) {

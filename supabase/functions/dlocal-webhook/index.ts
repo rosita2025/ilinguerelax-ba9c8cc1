@@ -19,7 +19,6 @@ import {
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
-import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 
 const API_BASE = dlocalApiBase();
 
@@ -273,6 +272,7 @@ Deno.serve(async (req) => {
         const templateData = {
           orderNumber,
           customerName,
+          customerEmail,
           productName: summary,
           amount: amount ?? null,
           currency,
@@ -368,7 +368,9 @@ Deno.serve(async (req) => {
         currency,
         provider: "dlocalgo",
         orderNumber,
-        idempotencyKey: `dlocal-paid-${paymentId}`,
+        // Basado en pedido (no paymentId): webhook, barrido y reintentos
+        // comparten la misma llave y jamás generan otra confirmación.
+        idempotencyKey: `dlocal-paid-${orderNumber}`,
         couponCode,
         couponPercent,
       });
@@ -377,32 +379,18 @@ Deno.serve(async (req) => {
     }
 
     if (skus.length > 0) {
-      const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
-        customerEmail,
-        customerName,
-        customerPhone: phone,
-        customerCountry: country,
-        orderId: orderNumber,
-        skus,
-        amount,
-        currency,
-        provider: "dlocalgo",
-        idempotencyKey: `digital:dlocal:${paymentId}`,
-      });
-
-      // Respaldo: si la entrega automática falla, usamos el mismo camino que
-      // los pagos manuales (token /mi-descarga + plantilla material-delivery).
-      let fallback: { delivered: boolean; detail: string } | null = null;
-      if (digitalErr) {
-        try {
-          fallback = await deliverLikeManual(supabase, {
-            orderNumber, email: customerEmail, name: customerName, skus,
-          });
-        } catch (e) {
-          fallback = { delivered: false, detail: e instanceof Error ? e.message : String(e) };
-        }
+      // Una sola ruta de entrega. Usa `manual-material-<pedido>`, la misma llave
+      // que conciliación y barrido, evitando los dos correos de materiales que
+      // antes salían al competir webhook + sweep.
+      let delivery: { delivered: boolean; detail: string };
+      try {
+        delivery = await deliverLikeManual(supabase, {
+          orderNumber, email: customerEmail, name: customerName, skus,
+        });
+      } catch (e) {
+        delivery = { delivered: false, detail: e instanceof Error ? e.message : String(e) };
       }
-      const delivered = !digitalErr || !!fallback?.delivered;
+      const delivered = delivery.delivered;
 
       await logOrderEvent({
         orderNumber,
@@ -411,12 +399,12 @@ Deno.serve(async (req) => {
         status: delivered ? "SENT" : "ERROR",
         reference: paymentId,
         detail: delivered
-          ? `Entrega digital enviada a ${customerEmail} (${skus.join(", ")})${fallback?.delivered ? " [respaldo manual]" : ""}`
-          : `Fallo al enviar la entrega digital: ${digitalErr?.message}${fallback ? ` · respaldo: ${fallback.detail}` : ""}`,
+          ? `Entrega digital enviada a ${customerEmail} (${skus.join(", ")})`
+          : `Fallo al enviar la entrega digital: ${delivery.detail}`,
         customerEmail,
         metadata: { skus },
       });
-      if (!delivered) console.error("dLocal digital delivery failed:", digitalErr, fallback);
+      if (!delivered) console.error("dLocal digital delivery failed:", delivery.detail);
 
     } else {
       console.warn("dLocal PAID sin SKUs de entrega", { paymentId, orderNumber });

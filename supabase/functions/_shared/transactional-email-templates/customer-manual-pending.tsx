@@ -72,29 +72,28 @@ const Email = ({
   <Html lang="es" dir="ltr">
     <Head />
     <Preview>
-      ⏳ Recibimos tu pedido {orderNumber || ''} — revisaremos tu pago en máximo 24 horas
+      Tu pedido {orderNumber || ''} sigue pendiente — la acreditación puede tardar entre 24 y 72 horas
     </Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
           <Text style={brand}>ILINGUE RELAX</Text>
-          <Heading style={h1}>⏳ Tu pedido está en revisión</Heading>
+          <Heading style={h1}>⏳ Tu pago sigue pendiente</Heading>
           <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
         </Section>
 
         <Section style={cardHi}>
           <Text style={hiTitle}>¡Hola {customerName || ''}! 👋</Text>
           <Text style={hiLine}>
-            Recibimos tu pedido con pago por <strong>{method || 'Yape / Plin / Binance Pay / SPEI (CLABE)'}</strong>.
-            Para completar la verificación, por favor <strong>envíanos tu comprobante de pago</strong> (captura o PDF) al correo{' '}
-            <strong>hola@ilinguerelax.com</strong> indicando tu número de pedido <strong>#{orderNumber || '—'}</strong>.
+            Recibimos tu pedido con <strong>{method || 'transferencia, efectivo o billetera digital'}</strong>.
+            El pago todavía figura pendiente. La acreditación del proveedor puede tardar entre <strong>24 y 72 horas</strong>; no necesitas volver a pagar.
           </Text>
           <Text style={hiLine}>
-            Nuestra supervisora <strong>Rosa</strong> lo revisará y confirmará en un plazo{' '}
-            <strong>máximo de 24 horas</strong>. Una vez validado, te enviaremos el enlace de descarga de tu material digital.
+            Si ya pagaste, envía el voucher o comprobante por WhatsApp al <strong>+1 251 272 4704</strong> con tu nombre,
+            pedido <strong>#{orderNumber || '—'}</strong>, producto y método de pago. También puedes enviarlo a <strong>hola@ilinguerelax.com</strong>.
           </Text>
           <Text style={hiLine}>
-            Métodos aceptados: <strong>Yape</strong>, <strong>Plin</strong>, <strong>Binance Pay</strong> y <strong>SPEI / CLABE (México)</strong>.
+            Cuando el pago sea confirmado, recibirás exactamente dos correos: la confirmación de compra y el acceso privado a tus materiales.
           </Text>
           <Text style={hiLine}>
             Guarda este correo — es tu comprobante en caso de que se cierre la página o tu batería se apague. No necesitas hacer nada más aparte de enviarnos tu captura.
@@ -181,6 +180,9 @@ const Email = ({
           <Text style={{ textAlign: 'center' as const, margin: '12px 0' }}>
             <a href={trackingUrl(orderNumber, customerEmail)} style={trackBtn}>Ver estado de mi pedido</a>
           </Text>
+          <Text style={{ textAlign: 'center' as const, margin: '12px 0' }}>
+            <a href={`https://wa.me/12512724704?text=${encodeURIComponent(`Hola, ya pagué el pedido ${orderNumber || ''}. Adjunto mi comprobante.`)}`} style={whatsappBtn}>Enviar comprobante por WhatsApp</a>
+          </Text>
           <Text style={trackHint}>
             www.ilinguerelax.com/mi-pedido — ingresa tu pedido <strong>#{orderNumber || '—'}</strong> y el correo con el que compraste.
           </Text>
@@ -188,8 +190,8 @@ const Email = ({
 
         <Section style={nextBox}>
           <Text style={nextTitle}>¿Qué sigue?</Text>
-          <Text style={nextLine}>1️⃣ Envíanos tu comprobante de pago a <strong>hola@ilinguerelax.com</strong> con tu pedido <strong>#{orderNumber || '—'}</strong>.</Text>
-          <Text style={nextLine}>2️⃣ Rosa verifica tu pago (Yape, Plin, Binance o SPEI) — máximo 24 h.</Text>
+          <Text style={nextLine}>1️⃣ Si ya pagaste, envía tu comprobante por WhatsApp o a <strong>hola@ilinguerelax.com</strong>.</Text>
+          <Text style={nextLine}>2️⃣ La acreditación de transferencia, efectivo o billetera puede tardar de 24 a 72 h.</Text>
           <Text style={nextLine}>3️⃣ Recibirás un correo con el enlace de descarga de tu material digital.</Text>
           <Text style={nextLine}>4️⃣ Revisa el estado cuando quieras en <a href={trackingUrl(orderNumber, customerEmail)} style={inlineLink}>www.ilinguerelax.com/mi-pedido</a>.</Text>
           <Text style={nextLine}>5️⃣ Si necesitas ayuda urgente, escríbenos a hola@ilinguerelax.com.</Text>
@@ -207,7 +209,7 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (d: Props) =>
-    `⏳ Recibimos tu pedido #${d.orderNumber || 'ILR'} — revisión en máximo 24h`,
+    `⏳ Tu pedido #${d.orderNumber || 'ILR'} sigue pendiente de pago`,
   displayName: 'Confirmación pedido pendiente (cliente)',
   previewData: {
     orderNumber: 'ILR-YP-1234',
@@ -249,5 +251,6 @@ const trackBox = { backgroundColor: '#f0fdfa', border: '1px solid #99f6e4', bord
 const trackTitle = { margin: '0 0 6px', fontSize: '15px', fontWeight: 'bold' as const, color: '#0f766e' }
 const trackLine = { margin: '0', fontSize: '14px', color: '#134e4a', lineHeight: '1.6' }
 const trackBtn = { backgroundColor: '#0d9488', color: '#ffffff', textDecoration: 'none', padding: '11px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
+const whatsappBtn = { backgroundColor: '#15803d', color: '#ffffff', textDecoration: 'none', padding: '11px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' as const, display: 'inline-block' }
 const trackHint = { margin: '4px 0 0', fontSize: '12px', color: '#0f766e', textAlign: 'center' as const }
 const inlineLink = { color: '#0d9488', fontWeight: 'bold' as const, textDecoration: 'underline' }

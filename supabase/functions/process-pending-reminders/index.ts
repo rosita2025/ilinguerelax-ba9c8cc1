@@ -5,7 +5,7 @@
 //    Mercado Pago, Yape/Plin, Binance, SPEI) el pedido queda PENDIENTE. Antes solo
 //    el admin recibía el aviso y el cliente se olvidaba de pagar.
 //  · Esta tarea inscribe esos pedidos y les envía recordatorios en los
-//    días 1, 3, 7, 10 y 15 mientras sigan sin pagar.
+//    días 1, 2 y 3 mientras sigan sin pagar.
 //  · La secuencia se DETIENE automáticamente cuando el pago se acredita
 //    (webhook del proveedor) o cuando el admin lo acepta manualmente
 //    ("yo acepto"), y también si el pedido se rechaza/abandona.
@@ -20,10 +20,10 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 
 /** Días del recordatorio, en orden. */
-const STEP_DAYS = [1, 3, 7, 10, 15] as const;
+const STEP_DAYS = [1, 2, 3] as const;
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** Solo miramos pedidos recientes: nada más viejo que 20 días entra a la secuencia. */
-const ENROLL_WINDOW_MS = 20 * DAY_MS;
+/** El cupón de dLocal vence en 3 días; no inscribimos pedidos viejos. */
+const ENROLL_WINDOW_MS = 4 * DAY_MS;
 
 type Reminder = {
   id: string;
@@ -103,7 +103,9 @@ async function enroll(supabase: ReturnType<typeof admin>) {
     if (r.method) cur.data.method = r.method;
     if (typeof r.amount === "number") cur.data.amount = r.amount;
     if (r.currency) cur.data.currency = r.currency;
-    if (r.event === "payment_pending") cur.pending = true;
+    if (r.event === "payment_pending" || r.event === "payment_instructions") cur.pending = true;
+    const meta = r.metadata as Record<string, unknown> | null;
+    if (typeof meta?.productName === "string") cur.data.product_name = meta.productName;
     if (r.event === "payment_paid" || r.event === "delivery_sent" || r.event === "payment_failed") cur.closed = true;
     byOrder.set(on, cur);
   }

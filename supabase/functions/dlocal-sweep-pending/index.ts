@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
                 currency,
                 provider: "mercadopago",
                 orderNumber,
-                idempotencyKey: `sweep-paid-${orderNumber}`,
+                idempotencyKey: `dlocal-paid-${orderNumber}`,
               });
             } catch (e) {
               console.error("[dlocal-sweep] thank-you falló:", e instanceof Error ? e.message : String(e));

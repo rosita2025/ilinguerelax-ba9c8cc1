@@ -108,6 +108,28 @@ Deno.serve(async (req) => {
       const customerEmail = checkoutEmail || payerEmail;
       const customerCountry = checkoutCountry || payerCountry || undefined;
       const productName = pu?.description || pu?.items?.[0]?.name || "Pedido ILINGUE RELAX";
+      const paidOrderNumber = captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : String(orderId);
+      // Historial visible en /mi-pedido (mismo formato que Stripe/dLocal/MP).
+      try {
+        const eventsClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        await eventsClient.from("order_events").insert({
+          order_number: paidOrderNumber,
+          customer_email: customerEmail,
+          provider: "paypal",
+          event: "payment_paid",
+          status: "paid",
+          method: "paypal",
+          reference: captureId ?? String(orderId),
+          amount: capturedAmount ? Number(capturedAmount) : null,
+          currency: capturedCurrency ?? "USD",
+          metadata: { skus, correlationId },
+        });
+      } catch (e) {
+        console.error("[paypal-capture-order] order_events payment_paid insert failed:", e);
+      }
       // Siempre enviamos "Gracias por tu compra" (con producto y precio).
       // Si además hay SKUs digitales, luego se dispara la entrega de materiales.
       await sendThankYouEmail({

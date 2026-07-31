@@ -105,6 +105,7 @@ const CheckoutPending = lazy(() => import("./pages/CheckoutPending"));
 const CheckoutPendienteManual = lazy(() => import("./pages/CheckoutPendienteManual"));
 const RecoverCart = lazy(() => import("./pages/RecoverCart"));
 const OrderStatus = lazy(() => import("./pages/OrderStatus"));
+const TransactionStatus = lazy(() => import("./pages/TransactionStatus"));
 
 const queryClient = new QueryClient();
 

@@ -133,7 +133,7 @@ async function recordStripePurchase(params: {
   itemsSummary?: string;
   skus?: string;
   eventType: string;
-}) {
+}): Promise<{ alreadyRecorded: boolean }> {
   const { adminClient, eventKey, sourceId, paymentIntentId, customerEmail, customerName, customerCountry, purchase, itemsSummary, skus, eventType } = params;
   const { data: existing } = await adminClient
     .from("funnel_events")
@@ -141,7 +141,10 @@ async function recordStripePurchase(params: {
     .eq("event_name", "Purchase")
     .eq("session_id", eventKey)
     .maybeSingle();
-  if (existing) return;
+  if (existing) {
+    console.log("[stripe-webhook] purchase already recorded; skipping re-processing", { eventKey });
+    return { alreadyRecorded: true };
+  }
 
   await adminClient.from("funnel_events").insert({
     event_name: "Purchase",
@@ -178,6 +181,8 @@ async function recordStripePurchase(params: {
     contentName: purchase.content_name,
     orderId,
   });
+
+  return { alreadyRecorded: false };
 }
 
 async function sendStripePurchaseEmails(params: {
@@ -274,8 +279,9 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
   const orderNumber = `ILR-ST-${String(paymentKey).slice(-8).toUpperCase()}`;
   const skus = normalizeSkus(splitSkuList(session.metadata?.skus));
 
+  let alreadyRecorded = false;
   try {
-    await recordStripePurchase({
+    const rec = await recordStripePurchase({
       adminClient,
       eventKey: paymentKey,
       sourceId: session.id,
@@ -288,8 +294,16 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
       skus: session.metadata?.skus,
       eventType,
     });
+    alreadyRecorded = rec.alreadyRecorded;
   } catch (trackingError) {
     console.error("purchase tracking error:", trackingError);
+  }
+
+  // Reproceso de un evento antiguo (reintento/reenvío manual de Stripe, o el
+  // mismo pago llegando por checkout.session.* y payment_intent.succeeded):
+  // el cobro ya se procesó, así que NO se reenvían correos ni la entrega.
+  if (alreadyRecorded) {
+    return { delivered: false, reason: "already_processed" };
   }
 
   const coupon = extractStripeCoupon(session);
@@ -338,8 +352,9 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
   const orderNumber = `ILR-ST-${String(paymentKey).slice(-8).toUpperCase()}`;
   const skus = normalizeSkus(splitSkuList(metadata.skus));
 
+  let alreadyRecordedPi = false;
   try {
-    await recordStripePurchase({
+    const rec = await recordStripePurchase({
       adminClient,
       eventKey: paymentKey,
       sourceId: paymentIntent.id,
@@ -352,8 +367,13 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
       skus: metadata.skus,
       eventType,
     });
+    alreadyRecordedPi = rec.alreadyRecorded;
   } catch (trackingError) {
     console.error("purchase tracking error:", trackingError);
+  }
+
+  if (alreadyRecordedPi) {
+    return { delivered: false, reason: "already_processed" };
   }
 
   const coupon = extractStripeCoupon(paymentIntent);
@@ -394,7 +414,22 @@ serve(async (req) => {
 
     const event = JSON.parse(body);
 
-    console.log("Webhook event received:", event.type);
+    console.log("Webhook event received:", event.type, event.id);
+
+    // Eventos rancios: Stripe reintenta hasta 3 días y el panel permite reenviar
+    // eventos a mano. Un pago de ayer NO debe volver a disparar correos hoy.
+    const eventCreated = Number(event?.created);
+    if (Number.isFinite(eventCreated)) {
+      const ageHours = (Date.now() / 1000 - eventCreated) / 3600;
+      if (ageHours > 24) {
+        console.warn("[stripe-webhook] stale event ignored (no emails/delivery)", {
+          eventId: event.id, type: event.type, ageHours: Math.round(ageHours),
+        });
+        return new Response(JSON.stringify({ received: true, ignored: "stale_event" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as any;

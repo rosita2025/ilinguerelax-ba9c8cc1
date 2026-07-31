@@ -688,6 +688,7 @@ serve(async (req) => {
       reply_to: BRAND.supportEmail,
       subject: t.subject(orderRef, hasMultiple),
       html,
+      entityRef: orderRef || idemKey,
     });
 
     const itemsAudit = products.map((p) => {

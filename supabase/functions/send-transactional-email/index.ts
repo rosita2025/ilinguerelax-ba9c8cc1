@@ -447,6 +447,7 @@ Deno.serve(async (req) => {
     subject: resolvedSubject,
     html,
     replyTo: 'hola@ilinguerelax.com',
+    entityRef: messageId,
   })
 
   if (sendResult.error) {

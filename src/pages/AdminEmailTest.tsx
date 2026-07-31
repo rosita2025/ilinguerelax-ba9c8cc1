@@ -761,6 +761,39 @@ const AdminEmailTest = () => {
                 </tbody>
               </table>
             </div>
+            {tokenAccess.length > TOKEN_PAGE_SIZE && (
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                <span className="text-[11px] text-muted-foreground">
+                  {Math.min((tokenPage - 1) * TOKEN_PAGE_SIZE + 1, tokenAccess.length)}–
+                  {Math.min(tokenPage * TOKEN_PAGE_SIZE, tokenAccess.length)} de {tokenAccess.length}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs"
+                    disabled={tokenPage <= 1}
+                    onClick={() => setTokenPage((p) => Math.max(1, p - 1))}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="text-[11px] text-muted-foreground">
+                    {tokenPage}/{Math.max(1, Math.ceil(tokenAccess.length / TOKEN_PAGE_SIZE))}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs"
+                    disabled={tokenPage >= Math.ceil(tokenAccess.length / TOKEN_PAGE_SIZE)}
+                    onClick={() =>
+                      setTokenPage((p) => Math.min(Math.ceil(tokenAccess.length / TOKEN_PAGE_SIZE), p + 1))
+                    }
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
 
 

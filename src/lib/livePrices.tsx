@@ -163,21 +163,14 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
 
     load();
 
-    const unsubscribe = subscribeCatalogUpdates({ onUpdate: load });
-
-    const channel = supabase
-      .channel("live_prices_all")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "digital_products" },
-        () => load(),
-      )
-      .subscribe();
+    // Realtime sobre `digital_products` fue desactivado por seguridad (enviaba
+    // la fila completa, con los enlaces de descarga, a cualquier visitante).
+    // La frescura se mantiene con broadcast entre pestañas + sondeo ligero.
+    const unsubscribe = subscribeCatalogUpdates({ onUpdate: load, pollMs: 60000 });
 
     return () => {
       cancelled = true;
       unsubscribe();
-      supabase.removeChannel(channel);
     };
   }, []);
 

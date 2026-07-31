@@ -337,6 +337,8 @@ Deno.serve(async (req) => {
       orderNumber,
       stage,
       outcome,
+      abandoned,
+
 
       method,
       amount,

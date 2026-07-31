@@ -104,11 +104,40 @@ Deno.serve(async (req) => {
       if (!tk || tk.revoked) return json({ found: false }, 200);
       orderNumber = String(tk.order_number).toUpperCase();
       email = canonicalEmail(tk.email);
+    } else if ("transactionId" in parsed.data) {
+      // Búsqueda por id de transacción del proveedor: resolvemos el pedido y
+      // luego el correo se valida igual que en el flujo normal (más abajo).
+      const txId = parsed.data.transactionId;
+      email = canonicalEmail(parsed.data.email);
+      if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
+
+      const [{ data: byEvent }, { data: byWebhook }] = await Promise.all([
+        supabase
+          .from("order_events")
+          .select("order_number")
+          .eq("reference", txId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("payment_webhook_events")
+          .select("order_number")
+          .eq("reference", txId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      const resolved = byEvent?.order_number ?? byWebhook?.order_number ?? null;
+      // Aceptamos también que el cliente pegue directamente su número de pedido.
+      const fallback = /^ILR-/i.test(txId) ? txId : null;
+      if (!resolved && !fallback) return json({ found: false }, 200);
+      orderNumber = String(resolved ?? fallback).toUpperCase();
     } else {
       orderNumber = parsed.data.orderNumber.toUpperCase();
       email = canonicalEmail(parsed.data.email);
       if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
     }
+
 
 
     const [{ data: events }, { data: manual }, { data: sends }] = await Promise.all([

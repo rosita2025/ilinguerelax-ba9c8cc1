@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Lock, Download, ShieldAlert, FileText, KeyRound, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrderUnlock } from "@/hooks/useOrderUnlock";
 import pdfAsset from "@/assets/100-mapas-mentales-coreano-completado.pdf.asset.json";
 import bono1Asset from "@/assets/bono-1-alfabeto-hangul-coreano.pdf.asset.json";
 import bono2Asset from "@/assets/bono-2-guia-completa-hangul.pdf.asset.json";
@@ -17,41 +18,28 @@ const BONO1_NAME = "Bono 1 - Guía Alfabético Hangul con Manos Escritura";
 const BONO2_NAME = "Bono 2 - Guía Completa Hangul (Explicativo + Notas)";
 
 const DescargaCoreano = () => {
-  const [key, setKey] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-  const [error, setError] = useState("");
-  const [attempts, setAttempts] = useState(0);
-  const [blocked, setBlocked] = useState(false);
+  const {
+    orderId,
+    setOrderId,
+    buyerEmail,
+    setBuyerEmail,
+    unlocked,
+    error,
+    checking,
+    verify,
+    restore,
+  } = useOrderUnlock("coreano_unlocked");
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("coreano_unlocked");
-    if (stored === "yes") setUnlocked(true);
+    restore();
     const emailDone = localStorage.getItem("coreano_email_captured");
     if (emailDone === "yes") setEmailCaptured(true);
-  }, []);
+  }, [restore]);
 
-  const handleUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (blocked) return;
-    if (key.trim() === ACCESS_KEY) {
-      setUnlocked(true);
-      setError("");
-      sessionStorage.setItem("coreano_unlocked", "yes");
-    } else {
-      const next = attempts + 1;
-      setAttempts(next);
-      if (next >= MAX_ATTEMPTS) {
-        setBlocked(true);
-        setError("Demasiados intentos. Recarga la página o contáctanos por WhatsApp.");
-      } else {
-        setError(`Clave incorrecta. Intentos restantes: ${MAX_ATTEMPTS - next}`);
-      }
-    }
-  };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();

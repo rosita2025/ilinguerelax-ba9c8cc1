@@ -54,8 +54,7 @@ serve(async (req) => {
     const skus = Array.isArray(prior.skus) ? prior.skus.filter(Boolean) : [];
     if (skus.length === 0) return json({ success: true, sent: false });
 
-    const { error } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-      body: {
+    const { error } = await invokeInternalFunction("send-digital-ilinguerelax", {
         customerEmail: prior.customer_email,
         customerName: prior.customer_name || undefined,
         orderId: prior.order_id,

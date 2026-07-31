@@ -4,6 +4,7 @@ import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
+import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 
 // NOTE: We do NOT instantiate the Stripe SDK here. There is no STRIPE_SECRET_KEY
 // in this project; API keys are opaque gateway connection IDs. Webhook signature
@@ -268,10 +269,10 @@ async function sendStripePurchaseEmails(params: {
   };
 
   // Un reintento inmediato: el token de descarga es idempotente por idempotencyKey.
-  let digitalErr = (await adminClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+  let digitalErr = (await invokeInternalFunction("send-digital-ilinguerelax", deliveryBody)).error;
   if (digitalErr) {
     console.error("send-digital-ilinguerelax webhook invoke failed (retrying):", digitalErr);
-    digitalErr = (await adminClient.functions.invoke("send-digital-ilinguerelax", { body: deliveryBody })).error;
+    digitalErr = (await invokeInternalFunction("send-digital-ilinguerelax", deliveryBody)).error;
   }
   if (digitalErr) {
     console.error("send-digital-ilinguerelax webhook invoke failed:", digitalErr);

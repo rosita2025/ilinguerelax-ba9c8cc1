@@ -6,6 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
+import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 const encoder = new TextEncoder();

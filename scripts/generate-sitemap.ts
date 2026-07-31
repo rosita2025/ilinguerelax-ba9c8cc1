@@ -422,11 +422,29 @@ async function main() {
     children.push({ file: "sitemap-blog.xml", lastmod: latest });
   }
 
-  // RSS feed (blog) — siempre en sync con el sitemap de blog
+  // RSS feed (blog) — validado antes de escribirse: nunca publicamos un feed roto.
   if (feedItems.length > 0) {
-    writeFileSync(join(PUBLIC_DIR, "rss.xml"), rssXml(feedItems));
-    console.log(`[sitemap] rss.xml written (${Math.min(feedItems.length, 100)} items).`);
+    const { items: validItems, errors: itemErrors } = sanitizeFeedItems(feedItems);
+    for (const e of itemErrors) console.error(`[rss] ERROR ${e}`);
+
+    if (validItems.length === 0) {
+      console.error("[rss] ERROR no hay items válidos; se conserva el rss.xml anterior.");
+    } else {
+      const xml = rssXml(validItems);
+      const xmlErrors = validateRssXml(xml, Math.min(validItems.length, 100));
+      if (xmlErrors.length > 0) {
+        for (const e of xmlErrors) console.error(`[rss] ERROR estructura: ${e}`);
+        console.error("[rss] ERROR feed inválido; NO se sobrescribe public/rss.xml.");
+      } else {
+        writeFileSync(join(PUBLIC_DIR, "rss.xml"), xml);
+        console.log(
+          `[rss] rss.xml escrito y validado (${Math.min(validItems.length, 100)} items` +
+            `${itemErrors.length ? `, ${itemErrors.length} descartados` : ""}).`,
+        );
+      }
+    }
   }
+
 
 
   // Regional subdomains disabled — single canonical domain only.

@@ -69,40 +69,75 @@ export function productUrl(sku: string): string {
   return `https://${HOST}/products/${sku}`;
 }
 
-export async function pingSitemap(): Promise<void> {
-  const sitemap = `https://${HOST}/sitemap.xml`;
-  const encoded = encodeURIComponent(sitemap);
-  const endpoints: Array<{ name: string; url: string }> = [
-    { name: "google", url: `https://www.google.com/ping?sitemap=${encoded}` },
-    { name: "bing",   url: `https://www.bing.com/ping?sitemap=${encoded}` },
-    { name: "google_blogs", url: `https://blogsearch.google.com/ping/RPC2?name=iLingueRelax&url=${encoded}` },
-    { name: "yandex", url: `https://ping.blogs.yandex.ru/RPC2?sitemap=${encoded}` },
-    { name: "baidu",  url: `http://ping.baidu.com/ping/RPC2?sitemap=${encoded}` },
-    { name: "naver",  url: `https://searchadvisor.naver.com/indexnow?url=${encoded}&keyLocation=${encodeURIComponent(KEY_LOCATION)}&key=${INDEXNOW_KEY}` },
-  ];
-
+export async function pingSitemap(
+  feeds: string[] = [
+    `https://${HOST}/sitemap.xml`,
+    `https://${HOST}/sitemaps/sitemap-blog.xml`,
+    `https://${HOST}/rss.xml`,
+  ],
+): Promise<void> {
   const events: IndexingEvent[] = [];
+
   await Promise.allSettled(
-    endpoints.map(async ({ name, url }) => {
-      try {
-        const res = await fetch(url, { method: "GET" });
-        events.push({
-          url: sitemap,
-          channel: "sitemap_ping",
-          target: name,
-          status: res.ok ? "sent" : "error",
-          http_status: res.status,
-        });
-      } catch (err) {
-        events.push({
-          url: sitemap,
-          channel: "sitemap_ping",
-          target: name,
-          status: "error",
-          detail: (err as Error).message.slice(0, 240),
-        });
-      }
+    feeds.map(async (sitemap) => {
+      const encoded = encodeURIComponent(sitemap);
+      const endpoints: Array<{ name: string; url: string }> = [
+        { name: "google", url: `https://www.google.com/ping?sitemap=${encoded}` },
+        { name: "bing",   url: `https://www.bing.com/ping?sitemap=${encoded}` },
+        { name: "google_blogs", url: `https://blogsearch.google.com/ping/RPC2?name=iLingueRelax&url=${encoded}` },
+        { name: "yandex", url: `https://ping.blogs.yandex.ru/RPC2?sitemap=${encoded}` },
+        { name: "baidu",  url: `http://ping.baidu.com/ping/RPC2?sitemap=${encoded}` },
+        { name: "naver",  url: `https://searchadvisor.naver.com/indexnow?url=${encoded}&keyLocation=${encodeURIComponent(KEY_LOCATION)}&key=${INDEXNOW_KEY}` },
+      ];
+
+      await Promise.allSettled(
+        endpoints.map(async ({ name, url }) => {
+          try {
+            const res = await fetch(url, { method: "GET" });
+            console.log(`[sitemap-ping:${name}]`, sitemap, res.status);
+            events.push({
+              url: sitemap,
+              channel: "sitemap_ping",
+              target: name,
+              status: res.ok ? "sent" : "error",
+              http_status: res.status,
+            });
+          } catch (err) {
+            console.warn(`[sitemap-ping:${name}] ${sitemap} failed:`, (err as Error).message);
+            events.push({
+              url: sitemap,
+              channel: "sitemap_ping",
+              target: name,
+              status: "error",
+              detail: (err as Error).message.slice(0, 240),
+            });
+          }
+        })
+      );
     })
   );
+
   await logIndexingEvents(events);
 }
+
+/**
+ * Notificación completa tras publicar un post del blog:
+ * 1) IndexNow (Bing/Yandex/Seznam/Naver) con la URL del post + índice del blog
+ * 2) Ping de sitemap y RSS a Google y Bing
+ * Nunca lanza: los fallos se registran en logs / indexing_events.
+ */
+export async function pingPostPublished(slug: string): Promise<void> {
+  const clean = String(slug || "").replace(/^\/+|\/+$/g, "");
+  if (!clean) return;
+  const postUrl = `https://${HOST}/blog/${clean}`;
+  try {
+    await Promise.allSettled([
+      pingIndexNow([postUrl, `https://${HOST}/blog`]),
+      pingSitemap(),
+    ]);
+    console.log("[pingPostPublished] done for", postUrl);
+  } catch (err) {
+    console.warn("[pingPostPublished] failed:", (err as Error).message);
+  }
+}
+

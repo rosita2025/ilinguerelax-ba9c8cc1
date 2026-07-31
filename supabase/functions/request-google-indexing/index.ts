@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
       } catch {
         return false;
       }
-    }))));
+    })));
     const skipped = requestedList.length - list.length;
     if (list.length === 0) {
       return new Response(JSON.stringify({ ok: true, sent: 0, skipped }), {

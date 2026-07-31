@@ -336,6 +336,54 @@ serve(async (req) => {
       });
     }
 
+    // ── Segunda barrera anti-duplicados ───────────────────────────────────────
+    // La clave de idempotencia solo protege reintentos con la MISMA clave. Si un
+    // webhook se reprocesa o alguien vuelve a lanzar la entrega con otra clave,
+    // el cliente recibía el mismo producto otra vez. Aquí bloqueamos:
+    //   1) mismo email + mismo pedido ya entregado (aunque cambie la clave), y
+    //   2) mismo email + mismos SKUs entregados en los últimos 30 días.
+    // `force: true` (reenvío manual desde el admin) salta ambas reglas.
+    if (!body.force) {
+      const skuFingerprint = [...normalizedSkus].map((s) => s.toLowerCase()).sort().join(",");
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: priorSends } = await supabase
+        .from("digital_email_sends")
+        .select("id, created_at, order_id, skus, status")
+        .ilike("customer_email", customerEmail)
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      const prior = (priorSends ?? []).find((row: {
+        order_id: string | null; skus: string[] | null; status: string | null; created_at: string;
+      }) => {
+        if (String(row.status || "").toLowerCase() === "failed") return false;
+        const sameOrder = !!orderId && !!row.order_id &&
+          String(row.order_id).toLowerCase() === String(orderId).toLowerCase();
+        const rowFingerprint = (Array.isArray(row.skus) ? row.skus : [])
+          .map((s) => String(s || "").toLowerCase()).sort().join(",");
+        return sameOrder || (!!skuFingerprint && rowFingerprint === skuFingerprint);
+      });
+
+      if (prior) {
+        console.log("[send-digital] blocked repeat delivery", {
+          customerEmail, orderId, priorOrderId: prior.order_id, priorAt: prior.created_at,
+        });
+        await writeAudit({
+          customer_email: customerEmail, customer_name: customerName || null,
+          order_id: orderId || null, idempotency_key: idemKey,
+          requested_skus: requestedSkus, normalized_skus: normalizedSkus,
+          resolved_skus: [], missing_skus: [], items: [],
+          status: "duplicate", provider: provider || null,
+          error: `already delivered (order ${prior.order_id ?? "-"} @ ${prior.created_at})`,
+        });
+        return new Response(
+          JSON.stringify({ success: true, duplicate: true, reason: "already_delivered", sentAt: prior.created_at }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+        );
+      }
+    }
+
     const { data, error } = await supabase
       .from("digital_products")
       .select("sku,name,price_usd,drive_url,access_key,bonus_name,bonus_drive_url,bonus_access_key,bonuses,cover_image_url,learner_language,target_language")

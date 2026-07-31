@@ -335,11 +335,33 @@ const AdminEmailTest = () => {
 
 
 
-      merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-      setRows(merged);
-      setCounts(perSource);
+      // Dedupe: un mismo pedido puede llegar por varias fuentes (funnel + digital_email_sends
+      // + manual) o repetirse en digital_email_sends. Se conserva una sola fila por pedido:
+      // la que tenga entrega confirmada (message_id) y, en empate, la más reciente.
+      const byRef = new Map<string, OrderRow>();
+      const uniqueRows: OrderRow[] = [];
+      const score = (r: OrderRow) => (r.delivery?.message_id ? 2 : r.delivery ? 1 : 0);
+      merged.forEach((r) => {
+        const key = String(r.order_ref || "").trim().toLowerCase();
+        if (!key || key === "—") { uniqueRows.push(r); return; }
+        const prev = byRef.get(key);
+        if (!prev) { byRef.set(key, r); return; }
+        const better =
+          score(r) > score(prev) ||
+          (score(r) === score(prev) && String(r.created_at) > String(prev.created_at));
+        if (better) byRef.set(key, r);
+      });
+      const deduped = [...uniqueRows, ...byRef.values()];
+
+      // Recalcular contadores por fuente tras el dedupe
+      const dedupedCounts: Record<Source, number> = { manual: 0, stripe: 0, paypal: 0, mercadopago: 0, digital: 0 };
+      deduped.forEach((r) => { dedupedCounts[r.source] = (dedupedCounts[r.source] ?? 0) + 1; });
+
+      deduped.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+      setRows(deduped);
+      setCounts(dedupedCounts);
       setLastUpdated(new Date());
-      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: merged, counts: perSource })); } catch {}
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ rows: deduped, counts: dedupedCounts })); } catch {}
     } catch (e) {
       if (!silent) toast.error((e as Error).message);
     } finally {

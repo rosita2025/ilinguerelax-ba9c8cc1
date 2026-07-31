@@ -166,37 +166,43 @@ export default function OrderStatus() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<OrderStatusResult | null>(null);
+  const [lastBody, setLastBody] = useState<Record<string, string> | null>(null);
 
-  const lookup = async (body: Record<string, string>): Promise<boolean> => {
-    setError(null);
-    setResult(null);
-    setLoading(true);
+  const lookup = async (body: Record<string, string>, silent = false): Promise<boolean> => {
+    if (!silent) {
+      setError(null);
+      setResult(null);
+      setLoading(true);
+    }
     try {
       const { data, error: fnError } = await supabase.functions.invoke("order-status", { body });
       if (fnError) {
         const ctx = (fnError as { context?: Response }).context;
         if (ctx?.status === 429) {
-          setError("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.");
+          if (!silent) setError("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.");
           return false;
         }
         throw fnError;
       }
       const res = data as OrderStatusResult;
       if (!res?.found) {
-        setError(
-          body.token
-            ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
-            : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
-        );
+        if (!silent) {
+          setError(
+            body.token
+              ? "Este enlace de pedido ya no es válido. Busca el correo de entrega o escríbenos por WhatsApp."
+              : "No encontramos un pedido con ese número y correo. El estado solo se muestra al correo exacto usado en la compra. Revisa tu correo de confirmación o escríbenos por WhatsApp.",
+          );
+        }
         return false;
       }
       setResult(res);
+      setLastBody(body);
       return true;
     } catch {
-      setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
+      if (!silent) setError("No pudimos consultar el pedido. Intenta de nuevo en unos segundos.");
       return false;
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -205,6 +211,15 @@ export default function OrderStatus() {
     if (token) void lookup({ token });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Transferencias, efectivo y pagos manuales se confirman más tarde por webhook:
+  // mientras el pago esté en proceso refrescamos solos cada 15 s.
+  useEffect(() => {
+    if (!lastBody || result?.outcome !== "processing") return;
+    const id = setInterval(() => void lookup(lastBody, true), 15000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastBody, result?.outcome]);
 
   const search = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,6 +230,7 @@ export default function OrderStatus() {
     const ok = looksLikeOrder ? await lookup({ orderNumber: ref, email: mail }) : false;
     if (!ok) await lookup({ transactionId: ref, email: mail });
   };
+
 
 
 

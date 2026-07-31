@@ -149,6 +149,25 @@ Deno.serve(async (req) => {
     const couponPctRaw = Number(q.get("coupon_pct"));
     const couponPercent = Number.isFinite(couponPctRaw) && couponPctRaw > 0 ? couponPctRaw : undefined;
 
+    // 3.b) Sin firma válida exigimos, además del order_id coincidente, que el
+    // pedido exista realmente en nuestro historial (lo crea dlocal-create-payment).
+    // Así una notificación falsa no puede inventar un pedido nuevo.
+    if (!signatureOk) {
+      const { count } = await supabase
+        .from("order_events")
+        .select("id", { count: "exact", head: true })
+        .eq("order_number", orderNumber)
+        .eq("provider", "dlocalgo");
+      if (!count) {
+        console.warn("dLocal webhook rechazado: sin firma y pedido desconocido", { orderNumber });
+        return new Response(JSON.stringify({ error: "unknown order" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+
     // 4) IDEMPOTENCIA: dLocal reintenta la misma notificación varias veces
     // (y a veces la envía duplicada). Reclamamos el evento una sola vez con un
     // índice único (provider, event_key). Si ya existe, salimos con 200 sin

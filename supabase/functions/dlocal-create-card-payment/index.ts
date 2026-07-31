@@ -39,9 +39,17 @@ const BodySchema = z.object({
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+// Cobro con tarjeta vía dLocal DESACTIVADO: solo transferencia y efectivo.
+const DLOCAL_CARD_ENABLED = false;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (!DLOCAL_CARD_ENABLED) {
+    return json({ error: "El pago con tarjeta por dLocal está desactivado. Usa transferencia bancaria o pago en efectivo." }, 403);
+  }
+
+
 
   const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");
   const secretKey = Deno.env.get("DLOCAL_GO_SECRET_KEY");

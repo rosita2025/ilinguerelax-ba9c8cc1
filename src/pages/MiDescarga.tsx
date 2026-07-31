@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { extractEdgeErrorMessage } from "@/lib/edgeError";
+
 import { Download, Loader2, Mail, ShieldCheck, Clock, Ban } from "lucide-react";
 
 type Bonus = { index: number; title: string };
@@ -72,15 +74,30 @@ export default function MiDescarga() {
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke("resend-download-link", { body: { token } });
-      if (error || !data || (data as { status?: string }).status !== "sent") {
-        toast.error("No pudimos reenviar ahora mismo. Intenta de nuevo en unos minutos.");
+      if (error) {
+        const msg = await extractEdgeErrorMessage(error);
+        toast.error(msg || "No pudimos reenviar ahora mismo. Intenta de nuevo en unos minutos.");
         return;
       }
-      toast.success(`Te reenviamos el enlace a ${(data as { emailMasked?: string }).emailMasked ?? "tu correo"}.`);
+      const res = (data ?? {}) as { status?: string; emailMasked?: string; error?: string; remainingToday?: number };
+      if (res.status !== "sent") {
+        toast.error(res.error || "No pudimos reenviar ahora mismo. Intenta de nuevo en unos minutos.");
+        return;
+      }
+      const left = typeof res.remainingToday === "number" ? res.remainingToday : null;
+      toast.success(`Te reenviamos el enlace a ${res.emailMasked ?? "tu correo"}.`, {
+        description:
+          left === null
+            ? undefined
+            : left > 0
+              ? `Te quedan ${left} reenvío(s) hoy.`
+              : "Es tu último reenvío de hoy; mañana se renueva el límite.",
+      });
     } finally {
       setSending(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">

@@ -10,7 +10,15 @@ import { extractEdgeErrorMessage } from "@/lib/edgeError";
 import { Download, Loader2, Mail, ShieldCheck, Clock, Ban } from "lucide-react";
 
 type Bonus = { index: number; title: string };
-type Item = { sku: string; name: string; cover: string | null; isUpsell: boolean; bonuses: Bonus[] };
+type Item = {
+  sku: string;
+  name: string;
+  cover: string | null;
+  isUpsell: boolean;
+  available?: boolean;
+  bonuses: Bonus[];
+};
+type Counts = { total: number; main: number; upsells: number; bonuses: number };
 type State =
   | { status: "loading" }
   | { status: "invalid" }
@@ -20,8 +28,13 @@ type State =
       emailMasked: string;
       expiresAt: string;
       downloadsLeft: number;
+      maxDownloads?: number;
+      downloadsUsed?: number;
       items?: Item[];
+      missingSkus?: string[];
+      counts?: Counts;
     };
+
 
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });

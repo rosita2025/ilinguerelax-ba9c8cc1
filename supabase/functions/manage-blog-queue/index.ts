@@ -10,6 +10,7 @@ import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { pingIndexNow, pingSitemap } from "../_shared/indexnow.ts";
 import { resubmitSitemapsGSC } from "../_shared/gsc.ts";
+import { BlogGenError, generateAndStorePost } from "../_shared/blogGenerator.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

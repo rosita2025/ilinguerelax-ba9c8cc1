@@ -110,20 +110,28 @@ Deno.serve(async (req) => {
       const age = now - new Date(last.created_at).getTime();
       const method = (events.find((e) => e.method)?.method ?? null) as string | null;
       const window = isSlowRail(method, last.status) ? SLOW_WINDOW_MS : FAST_WINDOW_MS;
-      if (age < window) continue;
 
-      checked++;
       const reference = events.map((e) => e.reference).filter(Boolean).pop() as string | null;
       const email = events.map((e) => e.customer_email).filter(Boolean).pop() as string | null;
       const amount = events.map((e) => e.amount).filter((v) => typeof v === "number").pop() as number | undefined;
       const currency = (events.map((e) => e.currency).filter(Boolean).pop() as string | null) ?? "USD";
-      const skus = (events
+      const rawSkus = (events
         .map((e) => (Array.isArray((e.metadata as Record<string, unknown> | null)?.skus)
           ? (e.metadata as { skus: string[] }).skus
           : []))
         .filter((a) => a.length > 0)
         .pop()) ?? [];
+      const skus = normalizeSkus(rawSkus);
+      const country = events
+        .map((e) => (typeof (e.metadata as Record<string, unknown> | null)?.country === "string"
+          ? (e.metadata as { country: string }).country
+          : null))
+        .filter(Boolean)
+        .pop() ?? undefined;
 
+      // El estado real SIEMPRE se consulta en dLocal, sin esperar la ventana:
+      // el efectivo/transferencia se acredita a los minutos y dLocal muchas
+      // veces no manda webhook. Así el cliente recibe su entrega enseguida.
       let remote: string | null = null;
       if (reference && reference !== orderNumber) {
         const payment = await fetchDlocalPayment(reference);
@@ -133,10 +141,12 @@ Deno.serve(async (req) => {
           remote = String(payment.status ?? "").toUpperCase() || null;
         }
       }
+      checked++;
 
       if (remote && isSettledStatus(remote)) {
-        // Webhook perdido con dinero acreditado: lo dejamos registrado como
-        // pagado para que el admin lo vea y dispare la entrega desde /admin/dlocal.
+        // Webhook perdido con dinero acreditado: registramos el pago y
+        // ENTREGAMOS automáticamente (gracias por tu compra + materiales),
+        // sin esperar a que el admin lo haga a mano.
         await logOrderEvent({
           orderNumber,
           event: "payment_paid",
@@ -148,11 +158,53 @@ Deno.serve(async (req) => {
           customerEmail: email,
           amount: amount ?? null,
           currency,
-          metadata: { skus, source: "sweep", needsDelivery: true },
+          metadata: { skus, source: "sweep", autoDelivery: true },
         });
         recovered++;
+
+        if (email) {
+          const alreadyDelivered = events.some((e) => e.event === "delivery_sent");
+          if (!alreadyDelivered) {
+            const name = email.split("@")[0];
+            try {
+              await sendThankYouEmail({
+                customerEmail: email,
+                customerName: name,
+                customerCountry: country,
+                productName: skus.join(", ") || "Materiales iLingue Relax",
+                skus,
+                amount,
+                currency,
+                provider: "mercadopago",
+                orderNumber,
+                idempotencyKey: `sweep-paid-${orderNumber}`,
+              });
+            } catch (e) {
+              console.error("[dlocal-sweep] thank-you falló:", e instanceof Error ? e.message : String(e));
+            }
+
+            if (skus.length > 0) {
+              const res = await deliverLikeManual(supabase, { orderNumber, email, name, skus });
+              await logOrderEvent({
+                orderNumber,
+                event: res.delivered ? "delivery_sent" : "delivery_failed",
+                provider: "dlocalgo",
+                status: res.delivered ? "SENT" : "ERROR",
+                reference,
+                detail: res.delivered
+                  ? `Entrega digital automática enviada a ${email} (${skus.join(", ")})`
+                  : `Fallo al enviar la entrega automática: ${res.detail}`,
+                customerEmail: email,
+                metadata: { skus, source: "sweep-auto" },
+              });
+              if (res.delivered) delivered++;
+              else deliveryFailed++;
+            }
+          }
+        }
         continue;
       }
+
 
       if (remote && isFailedStatus(remote)) {
         await logOrderEvent({

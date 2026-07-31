@@ -344,9 +344,12 @@ Deno.serve(async (req) => {
     }
 
     // action === "approve": aceptación manual del admin ("yo acepto").
-    if (!reason || reason.length < 4) {
-      return json({ error: "Indica el motivo/comprobante de la aceptación manual" }, 400);
-    }
+    // El motivo es opcional: si no se indica, se audita como aceptación directa
+    // desde el panel para que baste con el número de pedido.
+    const approvalReason = reason && reason.length >= 4
+      ? reason
+      : "Aceptación manual del admin desde /admin/dlocal";
+
     if (remoteStatus && isFailedStatus(remoteStatus)) {
       return json({ error: `dLocal reporta el pago como ${remoteStatus}: no se puede aceptar manualmente`, summary }, 409);
     }

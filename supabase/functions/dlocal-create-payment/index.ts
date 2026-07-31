@@ -370,7 +370,7 @@ Deno.serve(async (req) => {
             status: "AWAITING_PAYMENT",
             method: methodLabel,
             reference: data.id ? String(data.id) : null,
-            detail: "Cupón / QR / instrucciones de pago generados en dLocal Go",
+            detail: `Cupón / QR / instrucciones de pago generados en dLocal Go · vence en ${EXPIRATION_DAYS} días`,
             customerEmail: body.payerEmail,
             currency: usedUsdFallback ? "USD" : localCurrency,
             amount: usedUsdFallback ? calculatedUsd : localAmount,

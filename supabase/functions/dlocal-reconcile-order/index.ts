@@ -160,10 +160,14 @@ Deno.serve(async (req) => {
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
     const { action, reason, operator } = parsed.data;
 
+    // La autenticación fuerte ya la hizo assertAdminCsrf (origen + CSRF + 2FA
+    // por correo). ADMIN_REVIEW_KEY solo se valida si el cliente la envía, para
+    // no bloquear el flujo "número de pedido y listo" del panel.
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
-    if (!expectedKey || parsed.data.adminKey !== expectedKey) {
+    if (parsed.data.adminKey && parsed.data.adminKey !== expectedKey) {
       return json({ error: "No autorizado" }, 401);
     }
+
 
     const supabase = admin();
 

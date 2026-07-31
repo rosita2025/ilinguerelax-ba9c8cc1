@@ -21,8 +21,15 @@ const BodySchema = z.union([
     orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
     email: z.string().trim().email().max(160),
   }),
+  // c) id de transacción del proveedor (Stripe, dLocal, Mercado Pago, PayPal)
+  //    + correo del comprador. El id solo no basta: siempre validamos el correo.
+  z.object({
+    transactionId: z.string().trim().min(4).max(120).regex(/^[A-Za-z0-9\-_:.]+$/),
+    email: z.string().trim().email().max(160),
+  }),
   z.object({ token: z.string().trim().regex(TOKEN_RE) }),
 ]);
+
 
 
 const json = (b: unknown, s = 200) =>
@@ -97,11 +104,40 @@ Deno.serve(async (req) => {
       if (!tk || tk.revoked) return json({ found: false }, 200);
       orderNumber = String(tk.order_number).toUpperCase();
       email = canonicalEmail(tk.email);
+    } else if ("transactionId" in parsed.data) {
+      // Búsqueda por id de transacción del proveedor: resolvemos el pedido y
+      // luego el correo se valida igual que en el flujo normal (más abajo).
+      const txId = parsed.data.transactionId;
+      email = canonicalEmail(parsed.data.email);
+      if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
+
+      const [{ data: byEvent }, { data: byWebhook }] = await Promise.all([
+        supabase
+          .from("order_events")
+          .select("order_number")
+          .eq("reference", txId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("payment_webhook_events")
+          .select("order_number")
+          .eq("reference", txId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      const resolved = byEvent?.order_number ?? byWebhook?.order_number ?? null;
+      // Aceptamos también que el cliente pegue directamente su número de pedido.
+      const fallback = /^ILR-/i.test(txId) ? txId : null;
+      if (!resolved && !fallback) return json({ found: false }, 200);
+      orderNumber = String(resolved ?? fallback).toUpperCase();
     } else {
       orderNumber = parsed.data.orderNumber.toUpperCase();
       email = canonicalEmail(parsed.data.email);
       if (!email.includes("@")) return json({ error: "Datos inválidos" }, 400);
     }
+
 
 
     const [{ data: events }, { data: manual }, { data: sends }] = await Promise.all([
@@ -237,6 +273,18 @@ Deno.serve(async (req) => {
 
     const stage: "pending" | "paid" | "delivered" = delivered ? "delivered" : paid ? "paid" : "pending";
 
+    // Resultado de la transacción para la pantalla de estado de pago.
+    // El rechazo solo cuenta si el pedido no terminó pagado (un intento fallido
+    // seguido de un pago aprobado sigue siendo "aprobado").
+    const rejected = !paid && (
+      timeline.some((t) => t.event === "payment_failed") || manual?.status === "rejected"
+    );
+    const outcome: "approved" | "rejected" | "processing" = paid
+      ? "approved"
+      : rejected
+        ? "rejected"
+        : "processing";
+
     const method =
       [...timeline].reverse().find((t) => t.method)?.method ??
       (manual?.method ? String(manual.method) : null);
@@ -248,6 +296,8 @@ Deno.serve(async (req) => {
       found: true,
       orderNumber,
       stage,
+      outcome,
+
       method,
       amount,
       currency,

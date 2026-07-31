@@ -3,6 +3,7 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 import { BRAND, escapeHtml, renderBrandedEmail, formatLocalFromUsd } from '../_shared/emailBrand.ts'
+import { assertInternalCall } from "../_shared/internalAuth.ts";
 
 // -------- Sample data (mirrors production) --------
 const SAMPLE_PRODUCT = {
@@ -20,19 +21,19 @@ function buildDigitalPreview() {
     {
       name: SAMPLE_PRODUCT.name,
       price_usd: 22,
-      drive_url: 'https://drive.google.com/file/d/EXAMPLE/view',
-      access_key: '123A',
+      drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO',
+      access_key: null,
       cover: SAMPLE_PRODUCT.cover,
       bonuses: [
-        { name: 'Bonus 1 — Guía de pronunciación UK/USA', drive_url: 'https://drive.google.com/example-bonus-1', access_key: 'B1X' },
-        { name: 'Bonus 2 — Diccionario básico PDF', drive_url: 'https://drive.google.com/example-bonus-2', access_key: null },
+        { name: 'Bonus 1 — Guía de pronunciación UK/USA', drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO', access_key: null },
+        { name: 'Bonus 2 — Diccionario básico PDF', drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO', access_key: null },
       ],
     },
     {
       name: '500 Preguntas en Inglés (adicional)',
       price_usd: 7,
-      drive_url: 'https://drive.google.com/file/d/EXAMPLE2/view',
-      access_key: '456B',
+      drive_url: 'https://www.ilinguerelax.com/mi-descarga?t=EJEMPLO',
+      access_key: null,
       cover: SAMPLE_PRODUCT.cover,
       bonuses: [],
     },
@@ -50,8 +51,8 @@ function buildDigitalPreview() {
         <td width="72" valign="top" style="padding-right:12px;"><img src="${escapeHtml(p.cover)}" alt="" width="64" height="64" style="border-radius:8px;object-fit:cover;display:block;"></td>
         <td valign="top"><div style="font-size:16px;font-weight:bold;color:${BRAND.text};">${escapeHtml(p.name)}</div><div style="font-size:12px;color:${BRAND.muted};margin-top:2px;">USD ${p.price_usd.toFixed(2)}</div></td>
       </tr></table>
-      <div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">⬇ Descargar / Ver en Drive</a></div>
-      <div style="margin-top:10px;font-size:13px;color:#374151;"><strong>Clave de acceso:</strong> <code style="background:#f3f4f6;padding:3px 8px;border-radius:4px;font-family:monospace;">${escapeHtml(p.access_key)}</code></div>
+      <div style="margin-top:12px;"><a href="${escapeHtml(p.drive_url)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">⬇ Abrir mis descargas</a></div>
+
       ${bonusHtml}
     </div>`
   }).join('')
@@ -153,6 +154,9 @@ async function renderTemplate(name: string): Promise<{ subject: string; html: st
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
+
+  const __blocked = assertInternalCall(req);
+  if (__blocked) return __blocked;
   try {
     const url = new URL(req.url)
     const kind = url.searchParams.get('kind') || 'order'

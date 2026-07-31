@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { resend } from "../_shared/brevo.ts";
+import { assertInternalCall } from "../_shared/internalAuth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -83,6 +84,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const __blocked = assertInternalCall(req);
+  if (__blocked) return __blocked;
 
   try {
     const supabaseAdmin = createClient(

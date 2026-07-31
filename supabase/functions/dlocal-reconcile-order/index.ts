@@ -101,7 +101,7 @@ async function deliver(order: {
       skus: order.skus,
       amount: order.amount,
       currency: order.currency,
-      provider: order.provider,
+      provider: order.provider as "stripe" | "paypal" | "mercadopago",
       orderNumber: order.orderNumber,
       idempotencyKey: `reconcile-paid-${order.orderNumber}`,
     });

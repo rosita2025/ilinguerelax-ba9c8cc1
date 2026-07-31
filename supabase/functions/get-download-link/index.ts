@@ -1,10 +1,11 @@
-// Entrega un enlace firmado y de corta duración (60 min) para un archivo del
+// Entrega un enlace firmado y de duración amplia (7 días) para un archivo del
 // pedido. El drive_url nunca viaja al navegador en la respuesta JSON: se pide
 // un ticket firmado (HMAC) y la propia función redirige al archivo.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { dlCors, dlJson, TOKEN_RE, bonusList } from "../_shared/downloadToken.ts";
 
-const TTL_MS = 60 * 60 * 1000;
+const TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 
 
 const b64url = (bytes: Uint8Array) =>

@@ -39,10 +39,13 @@ const json = (b: unknown, s = 200) =>
 const BodySchema = z.object({
   action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery"]),
   orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
-  adminKey: z.string().min(4).max(200),
+  // Opcional: el acceso ya está protegido por origen + CSRF + 2FA (assertAdminCsrf).
+  // Si se envía, debe coincidir; si no se envía, no se pide.
+  adminKey: z.string().min(4).max(200).optional(),
   reason: z.string().trim().max(300).optional(),
   operator: z.string().trim().max(120).optional(),
 });
+
 
 type OrderEvent = {
   event: string;

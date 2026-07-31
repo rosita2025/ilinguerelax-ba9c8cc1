@@ -306,8 +306,8 @@ serve(async (req) => {
         await Promise.allSettled([
           pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
           pingSitemap(),
-      pingWebSub(),
           pingWebSub(),
+
           resubmitSitemapsGSC(),
           inspectUrlGSC(postUrl),
         ]);

@@ -9,11 +9,6 @@ import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail } 
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
-
-const ACCESS_KEY = "1234";
-const MAX_ATTEMPTS = 5;
-const WHATSAPP_URL = "https://wa.me/12512724704";
-
 // Enlaces de Google Drive (actualiza estas URLs cuando tengas los enlaces finales)
 const FILE_MAIN_URL = "https://drive.google.com/file/d/1OpOLhD1QflcCqk9oay9IxpasgzMfV9-Z/view?usp=sharing";
 const FILE_MAIN_NAME = "8.000 Palabras en Inglés con Pronunciación en Español · Fonética UK/USA";
@@ -83,8 +78,6 @@ const DescargaIngles8000 = () => {
     setEmailCaptured(true);
   };
 
-
-
   return (
     <div className="min-h-screen flex flex-col">
       <SEO
@@ -104,12 +97,10 @@ const DescargaIngles8000 = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Lock className="w-7 h-7 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                Área privada de descarga
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">Área privada de descarga</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
-                Ingresa la clave que recibiste en tu correo de compra para acceder a
-                8.000 Palabras en Inglés con Pronunciación.
+                Ingresa la clave que recibiste en tu correo de compra para acceder a 8.000 Palabras en Inglés con
+                Pronunciación.
               </p>
             </div>
 
@@ -143,9 +134,8 @@ const DescargaIngles8000 = () => {
                 <div>
                   <p className="font-semibold">Aviso importante</p>
                   <p className="mt-1 text-pretty">
-                    No compartas la clave con nadie. Si ya pagaste por PayPal, Stripe,
-                    Yape o Plin, escríbeme por WhatsApp y envíame el comprobante para
-                    validar tu acceso.
+                    No compartas la clave con nadie. Si ya pagaste por PayPal, Stripe, Yape o Plin, escríbeme por
+                    WhatsApp y envíame el comprobante para validar tu acceso.
                   </p>
                   <a
                     href={WHATSAPP_URL}
@@ -169,12 +159,10 @@ const DescargaIngles8000 = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Mail className="w-7 h-7 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                Último paso: confirma tu correo
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">Último paso: confirma tu correo</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
-                Te enviaremos por correo enlaces de respaldo y avisos cuando publiquemos
-                nuevos materiales o mejoras de este producto. Sin spam.
+                Te enviaremos por correo enlaces de respaldo y avisos cuando publiquemos nuevos materiales o mejoras de
+                este producto. Sin spam.
               </p>
             </div>
 
@@ -211,24 +199,17 @@ const DescargaIngles8000 = () => {
                 Continuar a la descarga
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Al continuar aceptas recibir avisos ocasionales de ILINGUE RELAX.
-                Puedes darte de baja en cualquier momento.
+                Al continuar aceptas recibir avisos ocasionales de ILINGUE RELAX. Puedes darte de baja en cualquier
+                momento.
               </p>
             </form>
           </motion.div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                ¡Descarga desbloqueada! 🎉
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">¡Descarga desbloqueada! 🎉</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
-                Abre los enlaces de Google Drive y descarga los archivos a tu dispositivo.
-                Son de uso personal.
+                Abre los enlaces de Google Drive y descarga los archivos a tu dispositivo. Son de uso personal.
               </p>
             </div>
 
@@ -271,9 +252,8 @@ const DescargaIngles8000 = () => {
                 <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-pretty">
-                    <strong>No compartas la clave</strong> con personas desconocidas.
-                    Si tienes problemas para acceder, escríbeme por WhatsApp con tu
-                    comprobante de compra.
+                    <strong>No compartas la clave</strong> con personas desconocidas. Si tienes problemas para acceder,
+                    escríbeme por WhatsApp con tu comprobante de compra.
                   </p>
                   <a
                     href={WHATSAPP_URL}

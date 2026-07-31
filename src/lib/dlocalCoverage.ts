@@ -9,6 +9,15 @@
  */
 export type DlocalKind = "transfer" | "cash" | "wallet";
 
+/**
+ * dLocal Go quedó habilitado SOLO para transferencia bancaria y pago en
+ * efectivo en todos los países de LATAM. Tarjetas (SmartFields) y billetera
+ * digital están desactivadas por decisión del negocio.
+ */
+export const DLOCAL_CARD_ENABLED = false;
+export const DLOCAL_WALLET_ENABLED = false;
+
+
 export type DlocalCountry = {
   code: string;
   name: string;
@@ -62,7 +71,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["Banco Pichincha", "Banco Guayaquil", "Banco del Pacífico"], cash: ["Pago Efectivo", "Almacenes TIA", "Banco Amazonas", "Facilito"],
     wallet: ["DeUna", "Peigo", "Bimo"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "GT", name: "Guatemala", flag: "🇬🇹", currency: "GTQ",
-    transfer: [], cash: ["PAYCASH (agentes)"],
+    transfer: ["Banco Industrial", "Banrural", "BAM"], cash: ["PAYCASH (agentes)"],
     wallet: ["Tigo Money", "Zigi"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
     walletComingSoon: true },
   { code: "MX", name: "México", flag: "🇲🇽", currency: "MXN",
@@ -71,10 +80,11 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     wallet: ["Mercado Pago", "Spin by OXXO"],
     walletLabel: "Billetera digital", walletKey: "dlocal_mercadopago" },
   { code: "PA", name: "Panamá", flag: "🇵🇦", currency: "USD",
-    transfer: ["Banco General", "Banistmo", "BAC Credomatic", "Global Bank"], transferComingSoon: true,
-    cash: ["Punto Pago"], cashComingSoon: true,
+    transfer: ["Banco General", "Banistmo", "BAC Credomatic", "Global Bank"],
+    cash: ["Punto Pago"],
     wallet: ["Yappy", "Nequi Panamá"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
     walletComingSoon: true },
+
   { code: "PE", name: "Perú", flag: "🇵🇪", currency: "PEN",
     transfer: ["BCP", "Interbank", "BBVA", "Scotiabank"],
     cash: ["PagoEfectivo", "Agentes / bodegas"],
@@ -305,6 +315,12 @@ export function validateDlocalMethod(
   const code = (country || "").toUpperCase();
   const c = getDlocalCountry(code);
   if (!c) return { ok: false, reason: `dLocal Go no tiene cobertura activa para ${code || "este país"}.` };
+  if (methodId === "dlocal_card" && !DLOCAL_CARD_ENABLED) {
+    return { ok: false, reason: "dLocal Go: el cobro con tarjeta está desactivado." };
+  }
+  if (methodId === "dlocal_wallet" && !DLOCAL_WALLET_ENABLED) {
+    return { ok: false, reason: "dLocal Go: la billetera digital está desactivada." };
+  }
   if (methodId === "dlocal_card") return { ok: true };
   const kind = DLOCAL_METHOD_KIND[methodId];
   if (dlocalRails(code, kind).length === 0) {
@@ -315,6 +331,7 @@ export function validateDlocalMethod(
   }
   return { ok: true };
 }
+
 
 /**
  * Valida que las etiquetas/badges mostradas en el checkout provengan de la

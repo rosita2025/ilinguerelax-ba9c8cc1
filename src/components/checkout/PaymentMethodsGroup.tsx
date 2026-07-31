@@ -1443,8 +1443,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
         if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon;
-        if (m.id === "dlocal_card") return methodsConfig.dlocalCard && DLOCAL_COUNTRY_CODES.includes(country);
-        if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon;
+        // Tarjeta y billetera dLocal DESACTIVADAS: solo transferencia y efectivo.
+        if (m.id === "dlocal_card") return false;
+        if (m.id === "dlocal_wallet") return false;
+
 
         if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
 

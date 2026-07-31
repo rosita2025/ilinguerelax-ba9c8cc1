@@ -46,3 +46,48 @@ export function bonusList(row: Record<string, unknown>): BonusLike[] {
   }
   return out;
 }
+
+/**
+ * Crea (o reutiliza) el token de descarga de un pedido y devuelve la URL privada
+ * `/mi-descarga?t=<token>`. Nunca devuelve enlaces de Drive.
+ */
+// deno-lint-ignore no-explicit-any
+export async function ensureDownloadUrl(
+  admin: any,
+  orderNumber: string,
+  email: string,
+  skus: string[],
+  site = "https://ilinguerelax.com",
+): Promise<string | null> {
+  try {
+    const mail = canonicalEmail(email);
+    if (!orderNumber || !mail) return null;
+    const clean = [...new Set((skus ?? []).filter(Boolean))];
+
+    const { data: existing } = await admin
+      .from("download_tokens")
+      .select("token, skus, revoked")
+      .eq("order_number", orderNumber)
+      .eq("email", mail)
+      .maybeSingle();
+
+    if (existing && !existing.revoked) {
+      const merged = [...new Set([...(existing.skus ?? []), ...clean])];
+      if (merged.length !== (existing.skus ?? []).length) {
+        await admin.from("download_tokens").update({ skus: merged }).eq("token", existing.token);
+      }
+      return `${site}/mi-descarga?t=${existing.token}`;
+    }
+
+    if (!clean.length) return null;
+    const token = randomToken();
+    const { error } = await admin.from("download_tokens").insert({
+      token, order_number: orderNumber, email: mail, skus: clean,
+    });
+    if (error) throw error;
+    return `${site}/mi-descarga?t=${token}`;
+  } catch (e) {
+    console.error("[downloadToken] ensureDownloadUrl failed", e);
+    return null;
+  }
+}

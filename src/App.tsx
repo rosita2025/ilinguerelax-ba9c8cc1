@@ -40,9 +40,8 @@ const Product500Preguntas = lazy(() => import("./pages/Product500Preguntas"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
-const DescargaCoreano = lazy(() => import("./pages/DescargaCoreano"));
-const DescargaPatrones = lazy(() => import("./pages/DescargaPatrones"));
-const DescargaIngles8000 = lazy(() => import("./pages/DescargaIngles8000"));
+// Páginas de descarga heredadas eliminadas: ahora todo pasa por /mi-descarga?t=<token>
+
 const MiDescarga = lazy(() => import("./pages/MiDescarga"));
 const ProductEstructurasGramaticalesIngles = lazy(() => import("./pages/ProductEstructurasGramaticalesIngles"));
 const VistaPreviaPatrones = lazy(() => import("./pages/VistaPreviaPatrones"));
@@ -245,9 +244,10 @@ const App = () => (
                   
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
                  <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreanoRelax />} />
-                 <Route path="/descarga/coreano-100-mapas" element={<DescargaCoreano />} />
-                <Route path="/descarga/patrones-ingles" element={<DescargaPatrones />} />
-                 <Route path="/descarga/8000-ingles" element={<DescargaIngles8000 />} />
+                 <Route path="/descarga/coreano-100-mapas" element={<Navigate to="/mi-descarga" replace />} />
+                <Route path="/descarga/patrones-ingles" element={<Navigate to="/mi-descarga" replace />} />
+                 <Route path="/descarga/8000-ingles" element={<Navigate to="/mi-descarga" replace />} />
+
                  <Route path="/mi-descarga" element={<MiDescarga />} />
                   <Route path="/products/estructuras-gramaticales-ingles-a1-c1" element={<ProductEstructurasGramaticalesIngles />} />
                   <Route path="/vista-previa/patrones-especiales" element={<VistaPreviaPatrones />} />

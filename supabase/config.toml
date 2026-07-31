@@ -53,3 +53,6 @@ project_id = "opyitzdvvurdyyyzkwwv"
     verify_jwt = false
   [functions.dlocal-webhook]
     verify_jwt = false
+  [functions.dlocal-sweep-pending]
+    verify_jwt = false
+

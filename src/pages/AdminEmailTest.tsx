@@ -206,11 +206,22 @@ const AdminEmailTest = () => {
             name: p.name || String(p.sku),
             bonusCount,
             hasBonus: bonusCount > 0,
+            hasDrive: Boolean(p.drive_url),
+            updatedAt: p.updated_at ?? null,
           });
         }
       });
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
-      setCatalogList(Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+      const nextCatalog = Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      setCatalogList(nextCatalog);
+      // Los SKUs marcados para la prueba se sincronizan con el catálogo vivo:
+      // si un producto se elimina/desactiva, deja de estar seleccionado.
+      const validSkus = new Set(nextCatalog.map((p) => p.sku));
+      setTestSkus((prev) => {
+        const filtered = prev.filter((s) => validSkus.has(s));
+        return filtered.length === prev.length ? prev : filtered;
+      });
+
       setTokenAccess(((data as any)?.tokenAccess ?? []) as TokenAccessRow[]);
 
 

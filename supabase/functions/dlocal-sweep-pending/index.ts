@@ -225,10 +225,15 @@ Deno.serve(async (req) => {
       }
 
       const stillOpen = remote ? isPendingStatus(remote) : false;
-      if (stillOpen && age < HARD_WINDOW_MS) {
+      // Solo se declara abandonado cuando venció la ventana del rail (6 h en
+      // pagos inmediatos, 72 h en efectivo/transferencia). Antes de eso el
+      // pedido sigue vivo y se vuelve a consultar en el próximo barrido.
+      if (age < window || (stillOpen && age < HARD_WINDOW_MS)) {
         stillPending++;
         continue;
       }
+
+
 
       // Sin pago creado en dLocal, o pendiente pasado el tope: checkout abandonado.
       await logOrderEvent({

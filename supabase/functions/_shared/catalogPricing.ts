@@ -33,9 +33,6 @@ const VALID_COUPONS: Record<string, number> = {
   PRUEBA1: 90,
 };
 
-/** Solo cupones de prueba internos pueden pasar del 30 %. */
-const PUBLIC_COUPON_MAX = 30;
-
 export function resolveCouponPercent(code: string | null | undefined): number {
   const upper = String(code || "").trim().toUpperCase();
   if (!upper) return 0;
@@ -114,7 +111,6 @@ export async function resolveServerPricing(opts: {
   items: Array<{ id: string; quantity: number }>;
   country?: string | null;
   couponCode?: string | null;
-  allowTestCoupons?: boolean;
 }): Promise<ResolvedPricing> {
   const tier = tierForCountry(opts.country);
   const supabase = serviceClient();
@@ -182,8 +178,7 @@ export async function resolveServerPricing(opts: {
     });
   }
 
-  let couponPercent = resolveCouponPercent(opts.couponCode);
-  if (!opts.allowTestCoupons) couponPercent = Math.min(couponPercent, PUBLIC_COUPON_MAX);
+  const couponPercent = resolveCouponPercent(opts.couponCode);
   const couponCode = couponPercent > 0 ? String(opts.couponCode).trim().toUpperCase() : null;
 
   const totalCents = priced.reduce(

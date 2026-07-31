@@ -11,10 +11,19 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { normalizeEmailBasic } from "../_shared/emailGuard.ts";
 
-const BodySchema = z.object({
-  orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
-  email: z.string().trim().email().max(160),
-});
+// Dos formas de identificarse:
+//  a) número de pedido + correo exacto (flujo manual)
+//  b) token de descarga (el mismo de /mi-descarga): es secreto, aleatorio y ya
+//     está ligado al pedido, así que reemplaza al correo.
+const TOKEN_RE = /^[A-Za-z0-9_-]{20,120}$/;
+const BodySchema = z.union([
+  z.object({
+    orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
+    email: z.string().trim().email().max(160),
+  }),
+  z.object({ token: z.string().trim().regex(TOKEN_RE) }),
+]);
+
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });

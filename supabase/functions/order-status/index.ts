@@ -128,11 +128,14 @@ Deno.serve(async (req) => {
     if (manual?.buyer_email) owners.add(canonicalEmail(manual.buyer_email));
     (sends ?? []).forEach((s) => s.customer_email && owners.add(canonicalEmail(s.customer_email)));
 
-    if (owners.size === 0 || !owners.has(email)) {
+    // Con token válido el pedido ya está probado; con correo debe coincidir.
+    const byToken = "token" in parsed.data;
+    if (!byToken && (owners.size === 0 || !owners.has(email!))) {
       console.warn("[order-status] acceso denegado", { orderNumber, ip });
       // Respuesta genérica: no revelamos si el pedido existe ni a quién pertenece.
       return json({ found: false }, 200);
     }
+
 
     type Item = {
       event: string;

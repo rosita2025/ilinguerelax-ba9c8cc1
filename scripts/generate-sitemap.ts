@@ -352,6 +352,13 @@ async function main() {
     children.push({ file: "sitemap-blog.xml", lastmod: latest });
   }
 
+  // RSS feed (blog) — siempre en sync con el sitemap de blog
+  if (feedItems.length > 0) {
+    writeFileSync(join(PUBLIC_DIR, "rss.xml"), rssXml(feedItems));
+    console.log(`[sitemap] rss.xml written (${Math.min(feedItems.length, 100)} items).`);
+  }
+
+
   // Regional subdomains disabled — single canonical domain only.
 
 

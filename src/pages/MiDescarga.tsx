@@ -85,17 +85,32 @@ export default function MiDescarga() {
 
   const openFile = async (sku: string, kind: "main" | "bonus", index = 0) => {
     const key = `${sku}:${kind}:${index}`;
+    // iOS Safari bloquea window.open cuando se ejecuta después de esperar una
+    // petición. Abrimos la pestaña durante el gesto del usuario y la dirigimos
+    // al ticket seguro cuando el backend responde.
+    const downloadWindow = window.open("about:blank", "_blank");
+    if (downloadWindow) {
+      downloadWindow.opener = null;
+      downloadWindow.document.title = "Preparando descarga…";
+      downloadWindow.document.body.textContent = "Preparando tu descarga segura…";
+    }
     setBusy(key);
     try {
       const { data, error } = await supabase.functions.invoke("get-download-link", {
         body: { token, sku, kind, index },
       });
       if (error || !data?.url) {
+        downloadWindow?.close();
         toast.error("No pudimos abrir el archivo. Recarga la página o pide el reenvío por correo.");
         return;
       }
       if (data.accessKey) toast.success(`Clave de acceso: ${data.accessKey}`, { duration: 12000 });
-      window.open(data.url as string, "_blank", "noopener,noreferrer");
+      if (downloadWindow) {
+        downloadWindow.location.replace(data.url as string);
+      } else {
+        // Respaldo para navegadores con bloqueo total de ventanas emergentes.
+        window.location.assign(data.url as string);
+      }
       setState((prev) =>
         prev.status === "valid"
           ? {
@@ -162,14 +177,14 @@ export default function MiDescarga() {
 
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
+    <div className="min-h-screen overflow-x-hidden bg-background px-3 py-6 sm:px-4 sm:py-12">
       <Helmet>
         <title>Mi descarga | iLingue Relax</title>
         <meta name="description" content="Accede a los archivos digitales de tu pedido en iLingue Relax." />
         <meta name="robots" content="noindex,nofollow" />
       </Helmet>
 
-      <div className="mx-auto w-full max-w-2xl space-y-6">
+      <div className="mx-auto w-full max-w-2xl space-y-4 sm:space-y-6">
         {state.status === "loading" && (
           <Card>
             <CardContent className="flex items-center gap-3 py-10">
@@ -236,14 +251,14 @@ export default function MiDescarga() {
 
         {state.status === "valid" && (
           <>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-primary" /> Tu descarga está lista
+            <Card className="overflow-hidden">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <ShieldCheck className="h-5 w-5 shrink-0 text-primary" /> Tu descarga está lista
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>
+              <CardContent className="space-y-3 px-4 pb-4 text-sm text-muted-foreground sm:px-6 sm:pb-6">
+                <p className="break-words">
                   Pedido <strong className="text-foreground">{state.orderNumber}</strong> · {state.emailMasked}
                 </p>
                 <p>Válido hasta el {fmtDate(state.expiresAt)}</p>
@@ -299,9 +314,9 @@ export default function MiDescarga() {
             )}
 
             {items.map((item) => (
-              <Card key={item.sku}>
-                <CardHeader>
-                  <div className="flex items-start gap-3">
+              <Card key={item.sku} className="overflow-hidden">
+                <CardHeader className="p-4 sm:p-6">
+                  <div className="flex min-w-0 items-start gap-3">
                     {item.cover && (
                       <img
                         src={item.cover}
@@ -310,8 +325,8 @@ export default function MiDescarga() {
                         className="h-16 w-12 flex-shrink-0 rounded object-cover"
                       />
                     )}
-                    <div className="space-y-1">
-                      <CardTitle className="text-base">{item.name}</CardTitle>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <CardTitle className="break-words text-base leading-snug">{item.name}</CardTitle>
                       <div className="flex flex-wrap gap-2">
                         <span
                           className={
@@ -331,7 +346,7 @@ export default function MiDescarga() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-2 px-4 pb-4 sm:px-6 sm:pb-6">
                   <Button
                     className="w-full"
                     onClick={() => openFile(item.sku, "main")}
@@ -349,7 +364,7 @@ export default function MiDescarga() {
                     <Button
                       key={b.index}
                       variant="outline"
-                      className="w-full"
+                      className="h-auto min-h-10 w-full whitespace-normal px-3 py-2 text-center leading-snug"
                       onClick={() => openFile(item.sku, "bonus", b.index)}
                       disabled={busy === `${item.sku}:bonus:${b.index}`}
                     >
@@ -358,7 +373,7 @@ export default function MiDescarga() {
                       ) : (
                         <Download className="mr-2 h-4 w-4" />
                       )}
-                      🎁 {b.title}
+                      <span className="min-w-0 break-words">🎁 {b.title}</span>
                     </Button>
                   ))}
                 </CardContent>

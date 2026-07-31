@@ -214,6 +214,20 @@ const AdminEmailTest = () => {
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
       const nextCatalog = Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name));
       setCatalogList(nextCatalog);
+      // Aviso automático: producto nuevo en el catálogo o material actualizado
+      // (cambio de enlace de Drive / nueva versión) desde /admin/products.
+      const prevSnap = catalogSnapshot.current;
+      if (prevSnap) {
+        nextCatalog.forEach((p) => {
+          const before = prevSnap.get(p.sku);
+          if (!before) {
+            toast.success(`Producto nuevo en el catálogo: ${p.name}`);
+          } else if (before !== (p.updatedAt ?? "")) {
+            toast.success(`Material actualizado (nueva versión): ${p.name}`);
+          }
+        });
+      }
+      catalogSnapshot.current = new Map(nextCatalog.map((p) => [p.sku, p.updatedAt ?? ""]));
       // Los SKUs marcados para la prueba se sincronizan con el catálogo vivo:
       // si un producto se elimina/desactiva, deja de estar seleccionado.
       const validSkus = new Set(nextCatalog.map((p) => p.sku));
@@ -221,6 +235,7 @@ const AdminEmailTest = () => {
         const filtered = prev.filter((s) => validSkus.has(s));
         return filtered.length === prev.length ? prev : filtered;
       });
+
 
       setTokenAccess(((data as any)?.tokenAccess ?? []) as TokenAccessRow[]);
 

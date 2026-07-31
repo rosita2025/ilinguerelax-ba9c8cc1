@@ -9,7 +9,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { pingIndexNow, pingSitemap } from "../_shared/indexnow.ts";
-import { resubmitSitemapsGSC } from "../_shared/gsc.ts";
+import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { BlogGenError, generateAndStorePost } from "../_shared/blogGenerator.ts";
 
 const corsHeaders = {
@@ -307,6 +307,7 @@ serve(async (req) => {
           pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
           pingSitemap(),
           resubmitSitemapsGSC(),
+          inspectUrlGSC(postUrl),
         ]);
         await supabase
           .from("generated_blog_posts")

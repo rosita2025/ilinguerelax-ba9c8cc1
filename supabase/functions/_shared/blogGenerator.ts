@@ -6,7 +6,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { pingIndexNow, pingSitemap } from "./indexnow.ts";
-import { resubmitSitemapsGSC } from "./gsc.ts";
+import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
@@ -219,6 +219,7 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       pingIndexNow([postUrl, "https://ilinguerelax.com/blog"]),
       pingSitemap(),
       resubmitSitemapsGSC(),
+      inspectUrlGSC(postUrl),
     ]);
     await supabase
       .from("generated_blog_posts")

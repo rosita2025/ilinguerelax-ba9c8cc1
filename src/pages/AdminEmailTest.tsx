@@ -396,6 +396,21 @@ const AdminEmailTest = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "email_send_log" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "funnel_events" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => { setLiveOn(true); scheduleReload(); })
+      // Catálogo vivo: producto nuevo, renombrado, desactivado o con enlace de
+      // Drive actualizado (nueva versión del material) se refleja sin recargar.
+      .on("postgres_changes", { event: "*", schema: "public", table: "digital_products" }, (payload: any) => {
+        setLiveOn(true);
+        const oldDrive = (payload?.old as any)?.drive_url;
+        const newDrive = (payload?.new as any)?.drive_url;
+        if (payload?.eventType === "INSERT") {
+          toast.success(`Producto nuevo en el catálogo: ${(payload?.new as any)?.name ?? ""}`);
+        } else if (payload?.eventType === "UPDATE" && oldDrive && newDrive && oldDrive !== newDrive) {
+          toast.success(`Material actualizado (nueva versión): ${(payload?.new as any)?.name ?? ""}`);
+        }
+        scheduleReload();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "digital_product_changes" }, () => { setLiveOn(true); scheduleReload(); })
+
       
       .subscribe((status) => setLiveOn(status === "SUBSCRIBED"));
 

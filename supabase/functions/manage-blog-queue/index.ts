@@ -1,0 +1,194 @@
+// Administración de la cola programada del blog (/admin/seo).
+//
+// Acciones: list | seed | delete | clear | run-now
+// La agenda por defecto: 5 días × 5 turnos (08:00, 09:00, 11:00, 13:00, 20:00
+// hora de Perú, UTC-5) × 2 artículos por turno = 10 al día = 50 en total.
+
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa",
+};
+
+/** Turnos diarios en hora de Perú (UTC-5). */
+export const SLOTS_PERU = [8, 9, 11, 13, 20];
+const POSTS_PER_SLOT = 2;
+const DAYS = 5;
+const PERU_OFFSET_HOURS = 5;
+
+/** Palabras clave reales de Search Console (con su idioma objetivo). */
+const KEYWORDS: Array<{ kw: string; lang: string; category: string }> = [
+  { kw: "aprender coreano", lang: "es", category: "Coreano" },
+  { kw: "como estudiar coreano", lang: "es", category: "Coreano" },
+  { kw: "easiest and quickest way to learn spanish", lang: "en", category: "Spanish" },
+  { kw: "easiest way to learn spanish fast", lang: "en", category: "Spanish" },
+  { kw: "fast learner in spanish", lang: "en", category: "Spanish" },
+  { kw: "fastest way to learn spanish", lang: "en", category: "Spanish" },
+  { kw: "fastest way to speak spanish", lang: "en", category: "Spanish" },
+  { kw: "how to learn spanish effectively", lang: "en", category: "Spanish" },
+  { kw: "how to learn spanish fast", lang: "en", category: "Spanish" },
+  { kw: "how to learn spanish fast for beginners", lang: "en", category: "Spanish" },
+  { kw: "how to learn spanish quickly", lang: "en", category: "Spanish" },
+  { kw: "how to talk spanish fast", lang: "en", category: "Spanish" },
+  { kw: "ilingue", lang: "es", category: "Marca" },
+  { kw: "learn basic spanish fast", lang: "en", category: "Spanish" },
+  { kw: "learn spanish fast", lang: "en", category: "Spanish" },
+  { kw: "learn spanish the fast and fun way", lang: "en", category: "Spanish" },
+  { kw: "most efficient way to learn spanish", lang: "en", category: "Spanish" },
+  { kw: "the fastest way to learn spanish", lang: "en", category: "Spanish" },
+  { kw: "what is the best way to learn spanish fluently", lang: "en", category: "Spanish" },
+  { kw: "what is the fastest way to learn spanish", lang: "en", category: "Spanish" },
+  { kw: "whats the fastest way to learn spanish", lang: "en", category: "Spanish" },
+];
+
+/** Ángulos editoriales para que 50 artículos no se repitan entre sí. */
+const ANGLES: Record<string, string[]> = {
+  es: [
+    "Guía completa 2026: {kw} paso a paso desde cero",
+    "{kw}: método de 30 días con rutina diaria realista",
+    "Errores más comunes al {kw} y cómo evitarlos",
+    "{kw} con pronunciación: técnicas que sí funcionan",
+    "Plan de estudio semanal para {kw} trabajando o estudiando",
+  ],
+  en: [
+    "{kw}: the complete step-by-step 2026 guide",
+    "{kw} in 30 days: a realistic daily routine that works",
+    "Common mistakes when trying {kw} (and how to fix them)",
+    "{kw} with pronunciation: proven techniques for real conversations",
+    "A weekly study plan for {kw} when you have a full-time job",
+  ],
+};
+
+function titleCaseFirst(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Construye 50 tareas repartidas en la agenda, empezando el día indicado. */
+function buildSchedule(startFrom: Date) {
+  const items: Array<{ topic: string; keyword: string; language: string; category: string; scheduled_at: string }> = [];
+  let idx = 0;
+
+  for (let day = 0; day < DAYS; day++) {
+    for (const hourPeru of SLOTS_PERU) {
+      for (let n = 0; n < POSTS_PER_SLOT; n++) {
+        const k = KEYWORDS[idx % KEYWORDS.length];
+        const angles = ANGLES[k.lang] ?? ANGLES.es;
+        const angle = angles[Math.floor(idx / KEYWORDS.length) % angles.length];
+        const topic = titleCaseFirst(angle.replace("{kw}", k.kw));
+
+        // hora Perú → UTC
+        const d = new Date(startFrom);
+        d.setUTCDate(d.getUTCDate() + day);
+        d.setUTCHours(hourPeru + PERU_OFFSET_HOURS, n * 20, 0, 0);
+
+        items.push({
+          topic,
+          keyword: k.kw,
+          language: k.lang,
+          category: k.category,
+          scheduled_at: d.toISOString(),
+        });
+        idx++;
+      }
+    }
+  }
+  return items;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const csrfBlock = await assertAdminCsrf(req);
+  if (csrfBlock) return csrfBlock;
+
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+  try {
+    const body = await req.json().catch(() => ({})) as {
+      adminKey?: string;
+      action?: string;
+      id?: string;
+      startTomorrow?: boolean;
+    };
+
+    const expected = Deno.env.get("ADMIN_REVIEW_KEY");
+    if (!expected || body.adminKey !== expected) return json({ error: "Unauthorized" }, 401);
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    switch (body.action) {
+      case "list": {
+        const { data, error } = await supabase
+          .from("blog_post_queue")
+          .select("id,topic,keyword,language,category,scheduled_at,status,attempts,error,post_slug")
+          .order("scheduled_at", { ascending: true })
+          .limit(200);
+        if (error) throw error;
+        return json({ items: data ?? [] });
+      }
+
+      case "seed": {
+        const start = new Date();
+        start.setUTCHours(0, 0, 0, 0);
+        if (body.startTomorrow !== false) start.setUTCDate(start.getUTCDate() + 1);
+
+        const batch = `lote-${new Date().toISOString().slice(0, 16)}`;
+        const rows = buildSchedule(start).map((r) => ({ ...r, batch }));
+
+        const { data, error } = await supabase
+          .from("blog_post_queue")
+          .insert(rows)
+          .select("id");
+        if (error) throw error;
+        return json({ created: data?.length ?? 0, batch });
+      }
+
+      case "delete": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { error } = await supabase.from("blog_post_queue").delete().eq("id", body.id);
+        if (error) throw error;
+        return json({ ok: true });
+      }
+
+      case "clear": {
+        const { error } = await supabase
+          .from("blog_post_queue")
+          .delete()
+          .in("status", ["pending", "failed"]);
+        if (error) throw error;
+        return json({ ok: true });
+      }
+
+      case "retry": {
+        if (!body.id) return json({ error: "Missing id" }, 400);
+        const { error } = await supabase
+          .from("blog_post_queue")
+          .update({ status: "pending", attempts: 0, error: null })
+          .eq("id", body.id);
+        if (error) throw error;
+        return json({ ok: true });
+      }
+
+      case "run-now": {
+        const res = await invokeInternalFunction("process-blog-queue", {});
+        if (res.error) return json({ error: res.error.message }, 502);
+        return json({ ok: true, result: res.data });
+      }
+
+      default:
+        return json({ error: "Acción no válida" }, 400);
+    }
+  } catch (err) {
+    console.error("manage-blog-queue error:", err);
+    return json({ error: String((err as Error).message ?? err) }, 500);
+  }
+});

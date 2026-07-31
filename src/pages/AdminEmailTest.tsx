@@ -64,7 +64,10 @@ interface ProductMeta {
   name: string;
   bonusCount: number;
   hasBonus: boolean;
+  hasDrive?: boolean;
+  updatedAt?: string | null;
 }
+
 
 const fmt = (iso: string | null) => {
   if (!iso) return "—";
@@ -178,6 +181,9 @@ const AdminEmailTest = () => {
 
 
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // sku -> updated_at, para detectar productos nuevos o material actualizado
+  const catalogSnapshot = useRef<Map<string, string> | null>(null);
+
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);
     reloadTimer.current = setTimeout(() => load(true), 1200);
@@ -203,11 +209,37 @@ const AdminEmailTest = () => {
             name: p.name || String(p.sku),
             bonusCount,
             hasBonus: bonusCount > 0,
+            hasDrive: Boolean(p.drive_url),
+            updatedAt: p.updated_at ?? null,
           });
         }
       });
       setCatalogSkus(new Set(Array.from(productMap.keys()).map((s) => s.toLowerCase())));
-      setCatalogList(Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+      const nextCatalog = Array.from(productMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      setCatalogList(nextCatalog);
+      // Aviso automático: producto nuevo en el catálogo o material actualizado
+      // (cambio de enlace de Drive / nueva versión) desde /admin/products.
+      const prevSnap = catalogSnapshot.current;
+      if (prevSnap) {
+        nextCatalog.forEach((p) => {
+          const before = prevSnap.get(p.sku);
+          if (!before) {
+            toast.success(`Producto nuevo en el catálogo: ${p.name}`);
+          } else if (before !== (p.updatedAt ?? "")) {
+            toast.success(`Material actualizado (nueva versión): ${p.name}`);
+          }
+        });
+      }
+      catalogSnapshot.current = new Map(nextCatalog.map((p) => [p.sku, p.updatedAt ?? ""]));
+      // Los SKUs marcados para la prueba se sincronizan con el catálogo vivo:
+      // si un producto se elimina/desactiva, deja de estar seleccionado.
+      const validSkus = new Set(nextCatalog.map((p) => p.sku));
+      setTestSkus((prev) => {
+        const filtered = prev.filter((s) => validSkus.has(s));
+        return filtered.length === prev.length ? prev : filtered;
+      });
+
+
       setTokenAccess(((data as any)?.tokenAccess ?? []) as TokenAccessRow[]);
 
 
@@ -382,6 +414,12 @@ const AdminEmailTest = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "email_send_log" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "funnel_events" }, () => { setLiveOn(true); scheduleReload(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "manual_payments" }, () => { setLiveOn(true); scheduleReload(); })
+      // El catálogo (digital_products) no se escucha por realtime a propósito:
+      // expondría los enlaces de Drive. Se refresca por el sondeo cada 15s y la
+      // comparación en load() avisa de productos nuevos o material actualizado.
+
+
+
       
       .subscribe((status) => setLiveOn(status === "SUBSCRIBED"));
 
@@ -714,7 +752,12 @@ const AdminEmailTest = () => {
                     <span className="block font-medium leading-snug break-words line-clamp-2">{p.name}</span>
                     <span className="block text-muted-foreground truncate">
                       {p.bonusCount > 0 ? `🎁 ${p.bonusCount} bono(s)` : "Sin bonos"}
+                      {p.updatedAt ? ` · v. ${fmt(p.updatedAt)}` : ""}
                     </span>
+                    {p.hasDrive === false && (
+                      <span className="block text-[10px] text-destructive">Sin enlace de material</span>
+                    )}
+
                   </span>
                 </label>
               ))}

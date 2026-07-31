@@ -181,7 +181,8 @@ Deno.serve(async (req) => {
     const payerPhone = rawPhone.replace(/\+/g, "").length >= 8 ? rawPhone : undefined;
     const payerDocument = (body.payerDocument ?? "").replace(/[^\dA-Za-z]/g, "") || undefined;
 
-    const payloadFor = (amount: number, currency: string): Record<string, unknown> => ({
+    type PayloadOpts = { minimal?: boolean };
+    const payloadFor = (amount: number, currency: string, opts: PayloadOpts = {}): Record<string, unknown> => ({
       amount,
       currency,
       country: body.country.toUpperCase(),
@@ -194,8 +195,10 @@ Deno.serve(async (req) => {
         name: payerName,
         email: body.payerEmail,
         user_reference: body.payerEmail.toLowerCase(),
-        ...(payerPhone ? { phone: payerPhone } : {}),
-        ...(payerDocument ? { document: payerDocument } : {}),
+        // En el intento "mínimo" quitamos teléfono y documento: dLocal rechaza
+        // el pago (5000/5010) cuando el formato no coincide con el del país.
+        ...(!opts.minimal && payerPhone ? { phone: payerPhone } : {}),
+        ...(!opts.minimal && payerDocument ? { document: payerDocument } : {}),
       },
     });
 
@@ -213,14 +216,28 @@ Deno.serve(async (req) => {
       return { ok: resp.ok, status: resp.status, text: await resp.text() };
     };
 
+    const errorCodeOf = (text: string): number | null => {
+      try {
+        const c = Number(JSON.parse(text)?.code);
+        return Number.isFinite(c) ? c : null;
+      } catch {
+        return null;
+      }
+    };
+
     // Cadena de intentos. El checkout hospedado va primero: fijar un
     // payment_method_id con flow REDIRECT hacía que dLocal creara el pago pero
     // luego lo rechazara en su página ("no pudo ser aprobada") cuando ese rail
     // exige datos extra. El rail fijo queda como respaldo y solo entonces
     // consultamos /payment-methods.
-    // 1) checkout completo + moneda local · 2) rail elegido · 3) USD.
+    // 1) checkout local · 2) local sin teléfono/documento · 3) rail ·
+    // 4) USD · 5) USD mínimo. Así Perú y Chile nunca quedan sin salida por un
+    // dato del pagador o un rail puntual.
     const buildAttempts = async (): Promise<Array<{ label: string; payload: Record<string, unknown> }>> => {
       const rest: Array<{ label: string; payload: Record<string, unknown> }> = [];
+      if (payerPhone || payerDocument) {
+        rest.push({ label: `checkout ${localCurrency} mínimo`, payload: payloadFor(localAmount, localCurrency, { minimal: true }) });
+      }
       const rail = await resolveRail();
       if (rail) {
         rest.push({
@@ -230,35 +247,39 @@ Deno.serve(async (req) => {
       }
       if (localCurrency !== "USD") {
         rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
+        rest.push({ label: "checkout USD mínimo", payload: payloadFor(calculatedUsd, "USD", { minimal: true }) });
       }
       return rest;
     };
 
     let attempt = await createPayment(basePayload);
     let usedUsdFallback = false;
+    const failures: string[] = [];
     if (!attempt.ok) {
+      failures.push(`checkout ${localCurrency} [${attempt.status}] ${attempt.text.slice(0, 160)}`);
       console.warn(`dLocal intento "checkout ${localCurrency}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
       for (const next of await buildAttempts()) {
         attempt = await createPayment(next.payload);
         if (attempt.ok) {
-          usedUsdFallback = next.label === "checkout USD";
+          usedUsdFallback = next.label.startsWith("checkout USD");
           break;
         }
+        failures.push(`${next.label} [${attempt.status}] ${attempt.text.slice(0, 160)}`);
         console.warn(`dLocal intento "${next.label}" falló [${attempt.status}]: ${attempt.text.slice(0, 200)}`);
       }
     }
 
     if (!attempt.ok) {
-      console.error(`dLocal Go create payment failed [${attempt.status}]: ${attempt.text}`);
-      let msg = "No pudimos iniciar el pago con dLocal. Intenta de nuevo o elige otro método.";
-      try {
-        const code = Number(JSON.parse(attempt.text)?.code);
-        if (code === 5016) msg = "El monto es menor al mínimo permitido por dLocal para tu país. Agrega otro producto o elige otro método de pago.";
-        else if (code === 5000) msg = "dLocal no está disponible en tu país. Por favor elige otro método de pago.";
-        else if (code === 5010) msg = "Ese método no está disponible ahora en tu país. Por favor elige otro método de pago.";
-      } catch { /* respuesta no JSON */ }
-      return json({ error: msg }, 502);
+      console.error(`dLocal Go create payment failed [${attempt.status}] (${failures.length} intentos): ${failures.join(" | ")}`);
+      const code = errorCodeOf(attempt.text);
+      let msg = "No pudimos iniciar el pago con dLocal. Intenta de nuevo en unos segundos o elige otro método.";
+      if (code === 5016) msg = "El monto es menor al mínimo permitido por dLocal para tu país. Agrega otro producto o elige otro método de pago.";
+      else if (code === 5000 || code === 5010) msg = "Ese método no está disponible ahora mismo en tu país. Elige otro método de pago (transferencia, efectivo o billetera) y lo procesamos al instante.";
+      // Devolvemos también el código real de dLocal para que /admin/payment-errors
+      // muestre el motivo exacto en vez de un genérico "non-2xx".
+      return json({ error: msg, code, provider_status: attempt.status, attempts: failures.length }, 502);
     }
+
 
 
     let data: Record<string, unknown>;

@@ -10,6 +10,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const SITE = (Deno.env.get("SITE_URL") || "https://www.ilinguerelax.com").replace(/\/+$/, "");
+
 interface Body {
   customerEmail: string;
   customerName?: string;

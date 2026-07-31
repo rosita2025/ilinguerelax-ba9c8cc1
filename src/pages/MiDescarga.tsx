@@ -143,6 +143,18 @@ export default function MiDescarga() {
               ? `Te quedan ${left} reenvío(s) hoy.`
               : "Es tu último reenvío de hoy; mañana se renueva el límite.",
       });
+      setState((prev) =>
+        prev.status === "valid"
+          ? {
+              ...prev,
+              history: [
+                { action: "resend", sku: null, name: null, at: new Date().toISOString() },
+                ...(prev.history ?? []),
+              ].slice(0, 30),
+            }
+          : prev,
+      );
+
     } finally {
       setSending(false);
     }

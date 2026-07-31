@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Lock, Download, ShieldAlert, FileText, KeyRound, MessageCircle, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrderUnlock } from "@/hooks/useOrderUnlock";
 
 // Enlaces de Google Drive (actualiza estas URLs cuando tengas los enlaces finales)
 const FILE_MAIN_URL = "https://drive.google.com/file/d/1OpOLhD1QflcCqk9oay9IxpasgzMfV9-Z/view?usp=sharing";
@@ -16,12 +17,20 @@ const FILE_MAIN_NAME = "8.000 Palabras en Inglés con Pronunciación en Español
 const BONO_URL = "";
 const BONO_NAME = "";
 
+const WHATSAPP_URL = "https://wa.me/12512724704";
+
 const DescargaIngles8000 = () => {
-  const [key, setKey] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-  const [error, setError] = useState("");
-  const [attempts, setAttempts] = useState(0);
-  const [blocked, setBlocked] = useState(false);
+  const {
+    orderId,
+    setOrderId,
+    buyerEmail,
+    setBuyerEmail,
+    unlocked,
+    error,
+    checking,
+    verify,
+    restore,
+  } = useOrderUnlock("ingles8000_unlocked");
 
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState("");
@@ -30,30 +39,11 @@ const DescargaIngles8000 = () => {
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("ingles8000_unlocked");
-    if (stored === "yes") setUnlocked(true);
+    restore();
     const emailDone = localStorage.getItem("ingles8000_email_captured");
     if (emailDone === "yes") setEmailCaptured(true);
-  }, []);
+  }, [restore]);
 
-  const handleUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (blocked) return;
-    if (key.trim() === ACCESS_KEY) {
-      setUnlocked(true);
-      setError("");
-      sessionStorage.setItem("ingles8000_unlocked", "yes");
-    } else {
-      const next = attempts + 1;
-      setAttempts(next);
-      if (next >= MAX_ATTEMPTS) {
-        setBlocked(true);
-        setError("Demasiados intentos. Recarga la página o contáctanos por WhatsApp.");
-      } else {
-        setError(`Clave incorrecta. Intentos restantes: ${MAX_ATTEMPTS - next}`);
-      }
-    }
-  };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,34 +89,51 @@ const DescargaIngles8000 = () => {
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-balance">Área privada de descarga</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
-                Ingresa la clave que recibiste en tu correo de compra para acceder a 8.000 Palabras en Inglés con
+                Ingresa el número de pedido y el correo de tu compra para acceder a 8.000 Palabras en Inglés con
                 Pronunciación.
               </p>
             </div>
 
-            <form onSubmit={handleUnlock} className="space-y-4">
+            <form onSubmit={verify} className="space-y-4">
               <div>
-                <Label htmlFor="key" className="flex items-center gap-2">
-                  <KeyRound className="w-4 h-4" /> Clave de acceso
+                <Label htmlFor="order-id" className="flex items-center gap-2">
+                  <KeyRound className="w-4 h-4" /> Número de pedido
                 </Label>
                 <Input
-                  id="key"
-                  type="password"
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
-                  placeholder="Ingresa tu clave"
+                  id="order-id"
+                  type="text"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  placeholder="Ej. ILR-ST-0VPSK7LS"
                   className="mt-2"
                   autoComplete="off"
-                  disabled={blocked}
+                  disabled={checking}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="order-email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" /> Correo de la compra
+                </Label>
+                <Input
+                  id="order-email"
+                  type="email"
+                  value={buyerEmail}
+                  onChange={(e) => setBuyerEmail(e.target.value)}
+                  placeholder="tucorreo@ejemplo.com"
+                  className="mt-2"
+                  autoComplete="email"
+                  disabled={checking}
                 />
               </div>
 
               {error && <p className="text-sm text-destructive">{error}</p>}
 
-              <Button type="submit" className="w-full" disabled={blocked}>
-                Desbloquear descarga
+              <Button type="submit" className="w-full" disabled={checking}>
+                {checking ? "Verificando compra..." : "Desbloquear descarga"}
               </Button>
             </form>
+
 
             <div className="mt-6 rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-900 dark:text-amber-200">
               <div className="flex items-start gap-2">

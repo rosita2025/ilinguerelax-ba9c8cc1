@@ -11,10 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import patronesAsset from "@/assets/patrones-especiales-v1.1.pdf.asset.json";
 import palabrasAsset from "@/assets/1000-palabras-ingles-vip-v1.3.pdf.asset.json";
 
-const ACCESS_KEY = "123A";
-const MAX_ATTEMPTS = 5;
-const WHATSAPP_URL = "https://wa.link/5uwmm7";
-
 const FILE_1_NAME = "Patrones Especiales del Alfabeto · Combinaciones Secretas (Inglés) v1.1";
 const FILE_2_NAME = "1.000 Palabras en Inglés con Pronunciación en Español · VIP v1.3";
 
@@ -98,9 +94,7 @@ const DescargaPatrones = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Lock className="w-7 h-7 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                Área privada de descarga
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">Área privada de descarga</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
                 Ingresa la clave que recibiste en tu correo de compra para acceder al material.
               </p>
@@ -136,9 +130,8 @@ const DescargaPatrones = () => {
                 <div>
                   <p className="font-semibold">Aviso importante</p>
                   <p className="mt-1 text-pretty">
-                    No compartas la clave con nadie. Si ya pagaste por PayPal o Stripe,
-                    escríbeme por WhatsApp y envíame tu comprobante de pago (captura) para
-                    validar tu acceso.
+                    No compartas la clave con nadie. Si ya pagaste por PayPal o Stripe, escríbeme por WhatsApp y envíame
+                    tu comprobante de pago (captura) para validar tu acceso.
                   </p>
                   <a
                     href={WHATSAPP_URL}
@@ -162,9 +155,7 @@ const DescargaPatrones = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Mail className="w-7 h-7 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                Último paso: confirma tu correo
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">Último paso: confirma tu correo</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
                 Guardaremos tu correo para enviarte respaldo del material y avisos de nuevos productos de ILINGUE RELAX.
               </p>
@@ -208,15 +199,9 @@ const DescargaPatrones = () => {
             </form>
           </motion.div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-balance">
-                ¡Descarga desbloqueada! 🎉
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-balance">¡Descarga desbloqueada! 🎉</h1>
               <p className="text-muted-foreground mt-2 text-pretty">
                 Guarda estos archivos en tu dispositivo. Son de uso personal.
               </p>
@@ -259,9 +244,8 @@ const DescargaPatrones = () => {
                 <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-pretty">
-                    <strong>No compartas la clave</strong> con personas desconocidas. Si pagaste por
-                    PayPal o Stripe, escríbeme por WhatsApp y envíame la captura del comprobante de
-                    pago para confirmar tu compra.
+                    <strong>No compartas la clave</strong> con personas desconocidas. Si pagaste por PayPal o Stripe,
+                    escríbeme por WhatsApp y envíame la captura del comprobante de pago para confirmar tu compra.
                   </p>
                   <a
                     href={WHATSAPP_URL}

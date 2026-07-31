@@ -17,6 +17,7 @@ import {
   dlocalApiBase,
 } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 
 const API_BASE = dlocalApiBase();
 
@@ -392,19 +393,35 @@ Deno.serve(async (req) => {
           idempotencyKey: `digital:dlocal:${paymentId}`,
         },
       });
+
+      // Respaldo: si la entrega automática falla, usamos el mismo camino que
+      // los pagos manuales (token /mi-descarga + plantilla material-delivery).
+      let fallback: { delivered: boolean; detail: string } | null = null;
+      if (digitalErr) {
+        try {
+          fallback = await deliverLikeManual(supabase, {
+            orderNumber, email: customerEmail, name: customerName, skus,
+          });
+        } catch (e) {
+          fallback = { delivered: false, detail: e instanceof Error ? e.message : String(e) };
+        }
+      }
+      const delivered = !digitalErr || !!fallback?.delivered;
+
       await logOrderEvent({
         orderNumber,
-        event: digitalErr ? "delivery_failed" : "delivery_sent",
+        event: delivered ? "delivery_sent" : "delivery_failed",
         provider: "dlocalgo",
-        status: digitalErr ? "ERROR" : "SENT",
+        status: delivered ? "SENT" : "ERROR",
         reference: paymentId,
-        detail: digitalErr
-          ? `Fallo al enviar la entrega digital: ${digitalErr.message}`
-          : `Entrega digital enviada a ${customerEmail} (${skus.join(", ")})`,
+        detail: delivered
+          ? `Entrega digital enviada a ${customerEmail} (${skus.join(", ")})${fallback?.delivered ? " [respaldo manual]" : ""}`
+          : `Fallo al enviar la entrega digital: ${digitalErr?.message}${fallback ? ` · respaldo: ${fallback.detail}` : ""}`,
         customerEmail,
         metadata: { skus },
       });
-      if (digitalErr) console.error("dLocal digital delivery failed:", digitalErr);
+      if (!delivered) console.error("dLocal digital delivery failed:", digitalErr, fallback);
+
     } else {
       console.warn("dLocal PAID sin SKUs de entrega", { paymentId, orderNumber });
     }

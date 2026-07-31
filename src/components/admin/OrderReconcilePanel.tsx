@@ -64,7 +64,7 @@ export default function OrderReconcilePanel() {
     }
   }
 
-  async function run(action: "inspect" | "sync" | "approve" | "reject") {
+  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery") {
     const order = orderNumber.trim().toUpperCase();
     if (!order) { toast.error("Escribe el número de pedido"); return; }
     if (!adminKey.trim()) { toast.error("Falta la clave de admin"); return; }
@@ -84,8 +84,12 @@ export default function OrderReconcilePanel() {
       }
       setSummary(data.summary ?? null);
       if (action === "inspect") toast.success("Estado consultado");
+      else if (action === "retry_delivery") toast.success("Material reenviado al cliente");
       else if (data.applied === "paid" || data.applied === "manual_approved") {
         toast.success(data.delivery?.delivered ? "Pago aplicado y entrega enviada" : "Pago aplicado");
+        if (data.delivery && data.delivery.delivered === false) {
+          toast.error(`No se envió el material: ${data.delivery.detail}`);
+        }
         setPending((p) => (p ? p.filter((o) => o.orderNumber !== order) : p));
       } else toast.success(`Resultado: ${data.applied}`);
       if (action === "reject") setPending((p) => (p ? p.filter((o) => o.orderNumber !== order) : p));
@@ -95,6 +99,7 @@ export default function OrderReconcilePanel() {
       setBusy(null);
     }
   }
+
 
   return (
     <Card className="p-3 sm:p-4 space-y-3">
@@ -144,10 +149,15 @@ export default function OrderReconcilePanel() {
           {busy === "reject" ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-1" />}
           Marcar rechazado
         </Button>
+        <Button size="sm" variant="secondary" disabled={!!busy} onClick={() => run("retry_delivery")}>
+          {busy === "retry_delivery" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
+          Reintentar entrega
+        </Button>
         <Button size="sm" variant="outline" disabled={!!busy} onClick={loadPending}>
           {busy === "list" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
           Ver pendientes
         </Button>
+
       </div>
 
       {pending && (

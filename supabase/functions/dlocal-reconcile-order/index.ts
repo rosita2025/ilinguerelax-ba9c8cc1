@@ -22,6 +22,8 @@ import { assertAdminCsrf, adminCorsHeaders } from "../_shared/adminCsrf.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
+import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+
 import {
   dlocalApiBase,
   dlocalEnv,
@@ -35,7 +37,7 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 
 const BodySchema = z.object({
-  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending"]),
+  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery"]),
   orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
   adminKey: z.string().min(4).max(200),
   reason: z.string().trim().max(300).optional(),
@@ -66,7 +68,10 @@ async function fetchDlocalPayment(paymentId: string) {
   try {
     const r = await fetch(`${dlocalApiBase()}/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: `Bearer ${apiKey}:${secretKey}` },
+      // Evita que el panel se quede cargando si dLocal tarda.
+      signal: AbortSignal.timeout(6000),
     });
+
     if (!r.ok) {
       console.warn("[dlocal-reconcile] dLocal respondió", r.status, "env", dlocalEnv());
       return null;
@@ -113,19 +118,16 @@ async function deliver(order: {
     return { delivered: false, detail: "El pedido no tiene materiales digitales asociados" };
   }
 
-  const { error } = await supabase.functions.invoke("send-digital-ilinguerelax", {
-    body: {
-      customerEmail: order.email,
-      customerName: order.name,
-      customerCountry: order.country,
-      orderId: order.orderNumber,
-      skus: order.skus,
-      amount: order.amount,
-      currency: order.currency,
-      provider: order.provider,
-      idempotencyKey: `digital:${order.provider}:${order.orderNumber}`,
-    },
+  // Mismo camino que /admin/pagos-manuales (token /mi-descarga + plantilla
+  // material-delivery): es el que sí llega al cliente.
+  const res = await deliverLikeManual(supabase, {
+    orderNumber: order.orderNumber,
+    email: order.email,
+    name: order.name,
+    skus: order.skus,
   });
+  const error = res.delivered ? null : { message: res.detail };
+
 
   await logOrderEvent({
     orderNumber: order.orderNumber,
@@ -236,10 +238,11 @@ Deno.serve(async (req) => {
 
     // Estado real en el proveedor (solo dLocal tiene consulta directa aquí).
     let remoteStatus: string | null = null;
-    if (provider === "dlocalgo" && reference && reference !== orderNumber) {
+    if (action !== "retry_delivery" && provider === "dlocalgo" && reference && reference !== orderNumber) {
       const payment = await fetchDlocalPayment(reference);
       if (payment) remoteStatus = String(payment.status ?? "").toUpperCase() || null;
     }
+
 
     const summary = {
       orderNumber,
@@ -258,6 +261,18 @@ Deno.serve(async (req) => {
     };
 
     if (action === "inspect") return json({ ok: true, summary });
+
+    // Reintento de entrega: vuelve a enviar el material sin tocar el estado.
+    if (action === "retry_delivery") {
+      if (!email) return json({ error: "El pedido no tiene correo del comprador", summary }, 400);
+      const res = await deliver({
+        orderNumber, email, name, country, skus, amount, currency, provider,
+        productName: "Pedido ILINGUE RELAX", reference,
+      });
+      if (!res.delivered) return json({ error: res.detail, summary }, 422);
+      return json({ ok: true, applied: "delivery_retried", delivery: res, summary });
+    }
+
 
     if (action === "reject") {
       if (alreadyPaid) return json({ error: "El pedido ya está pagado: no se puede marcar como rechazado" }, 409);

@@ -321,6 +321,7 @@ Deno.serve(async (req) => {
       return json({ error: "Respuesta inválida de dLocal. Intenta de nuevo." }, 502);
     }
 
+    console.log(`dLocal pago creado ${String(data.id ?? "")} · vencimiento solicitado ${EXPIRATION_DAYS} días · expiration_date=${String((data as any).expiration_date ?? "n/d")}`);
     const redirectUrl = (data.redirect_url || (data as any).redirectUrl) as string | undefined;
     if (!redirectUrl) {
       console.error("dLocal Go response without redirect_url:", attempt.text.slice(0, 500));

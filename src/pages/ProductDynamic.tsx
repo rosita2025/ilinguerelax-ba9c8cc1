@@ -29,7 +29,8 @@ interface DBProduct {
   cover_image_url: string | null;
   is_upsell: boolean;
   active: boolean;
-  bonuses: unknown;
+  /** Solo los títulos de los bonos. Los enlaces/claves nunca salen del servidor. */
+  bonus_titles: unknown;
   hotmart_url: string | null;
   store_enabled: boolean;
   excluded_countries: string[] | null;
@@ -72,7 +73,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, is_upsell, active, bonuses, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
           .eq("sku", slug)
           .eq("active", true)
           .maybeSingle();
@@ -87,19 +88,11 @@ const ProductDynamic = () => {
       setLoading(false);
     };
     load();
-    const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load });
-    const channel = supabase
-      .channel(`product_dynamic_${slug}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "digital_products", filter: `sku=eq.${slug}` },
-        () => { load(); }
-      )
-      .subscribe();
+    // Realtime desactivado por seguridad: reemplazado por broadcast + sondeo.
+    const unsubscribe = subscribeCatalogUpdates({ sku: slug, onUpdate: load, pollMs: 60000 });
     return () => {
       cancelled = true;
       unsubscribe();
-      supabase.removeChannel(channel);
     };
   }, [slug]);
 
@@ -144,8 +137,10 @@ const ProductDynamic = () => {
     : local.formatted;
 
   const cover = product.cover_image_url || "/placeholder.svg";
-  const bonusList = Array.isArray(product.bonuses)
-    ? (product.bonuses as Array<{ name?: string }>).filter((b) => b?.name)
+  const bonusList = Array.isArray(product.bonus_titles)
+    ? (product.bonus_titles as unknown[])
+        .map((n) => (typeof n === "string" ? n.trim() : ""))
+        .filter((n) => n.length > 0)
     : [];
   const canonical = `https://ilinguerelax.com/products/${product.sku}`;
 
@@ -296,7 +291,7 @@ const ProductDynamic = () => {
                   <ul className="space-y-1 text-sm">
                     {bonusList.map((b, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" /> {b.name}
+                        <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" /> {b}
                       </li>
                     ))}
                   </ul>

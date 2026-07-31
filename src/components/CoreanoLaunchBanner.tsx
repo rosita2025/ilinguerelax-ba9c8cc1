@@ -53,18 +53,12 @@ export const CoreanoLaunchBanner = () => {
     };
     load();
 
-    const channel = supabase
-      .channel("launch-banner-products")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "digital_products" },
-        () => load(),
-      )
-      .subscribe();
+    // Realtime desactivado por seguridad (la fila completa incluía los enlaces).
+    const poll = window.setInterval(() => { load(); }, 120000);
 
     return () => {
       cancelled = true;
-      supabase.removeChannel(channel);
+      window.clearInterval(poll);
     };
   }, []);
 

@@ -273,6 +273,18 @@ Deno.serve(async (req) => {
 
     const stage: "pending" | "paid" | "delivered" = delivered ? "delivered" : paid ? "paid" : "pending";
 
+    // Resultado de la transacción para la pantalla de estado de pago.
+    // El rechazo solo cuenta si el pedido no terminó pagado (un intento fallido
+    // seguido de un pago aprobado sigue siendo "aprobado").
+    const rejected = !paid && (
+      timeline.some((t) => t.event === "payment_failed") || manual?.status === "rejected"
+    );
+    const outcome: "approved" | "rejected" | "processing" = paid
+      ? "approved"
+      : rejected
+        ? "rejected"
+        : "processing";
+
     const method =
       [...timeline].reverse().find((t) => t.method)?.method ??
       (manual?.method ? String(manual.method) : null);
@@ -284,6 +296,8 @@ Deno.serve(async (req) => {
       found: true,
       orderNumber,
       stage,
+      outcome,
+
       method,
       amount,
       currency,

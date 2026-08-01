@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
         }],
         ...(buyerEmail && { payer: { email_address: buyerEmail } }),
         application_context: {
-          brand_name: "ILINGUE RELAX",
+          brand_name: "iLingue Relax",
           shipping_preference: "NO_SHIPPING",
           user_action: "PAY_NOW",
         },

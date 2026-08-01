@@ -155,8 +155,12 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
           </div>
 
           <div className="space-y-1">
-            <Label className="text-xs">Escribe el SKU para confirmar el envío</Label>
-            <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={sku} className="font-mono" />
+            <Label className="text-xs">SKU de destino (fijo)</Label>
+            <div className="relative">
+              <Input value={sku} readOnly disabled className="font-mono pr-9 bg-muted cursor-not-allowed" />
+              <Lock className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            </div>
+            <p className="text-[11px] text-muted-foreground">🔒 No se puede cambiar: el aviso siempre se envía solo a los compradores de este SKU.</p>
           </div>
 
           <div className="space-y-2">

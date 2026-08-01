@@ -182,6 +182,13 @@ Deno.serve(async (req) => {
           verified_at: new Date().toISOString(),
           verified_by: "admin",
           notes: notes ?? order.notes ?? null,
+          ...(typeof paymentReference === "string" && paymentReference.trim()
+            ? {
+                payment_reference: paymentReference.trim().slice(0, 64),
+                payment_reference_source: (typeof paymentReferenceSource === "string" && paymentReferenceSource.trim()) || "Manual",
+                payment_reference_at: new Date().toISOString(),
+              }
+            : {}),
         })
         .eq("id", orderId);
       if (updErr) throw updErr;

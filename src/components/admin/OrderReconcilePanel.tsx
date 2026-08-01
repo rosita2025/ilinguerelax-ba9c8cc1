@@ -149,7 +149,7 @@ export default function OrderReconcilePanel() {
           {busy === "retry_delivery" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
           Reintentar entrega
         </Button>
-        <Button size="sm" variant="outline" disabled={!!busy} onClick={loadPending}>
+        <Button size="sm" variant="outline" disabled={!!busy} onClick={() => loadPending()}>
           {busy === "list" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
           Ver pendientes
         </Button>

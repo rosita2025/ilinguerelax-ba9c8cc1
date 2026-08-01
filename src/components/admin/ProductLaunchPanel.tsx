@@ -103,22 +103,37 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
     if (!launchKey.trim()) return toast({ title: "Falta la etiqueta del lanzamiento", variant: "destructive" });
     if (audiences.length === 0) return toast({ title: "Elige al menos una audiencia", variant: "destructive" });
     setSending(true);
+    let sent = 0, skipped = 0, failed = 0, total = 0;
+    const allErrors: string[] = [];
     try {
-      const data = await call({
-        action: "send",
-        launchKey: launchKey.trim(),
-        pitch: pitch.trim() || undefined,
-        coupon: coupon.trim() || undefined,
-      }) as { sent: number; skipped: number; failed: number; total: number };
+      // Envío por lotes: la función manda como máximo 25 correos por llamada y
+      // avisa cuántos quedan. Repetimos hasta terminar, así nunca se corta.
+      for (let round = 0; round < 60; round++) {
+        const data = await call({
+          action: "send",
+          launchKey: launchKey.trim(),
+          pitch: pitch.trim() || undefined,
+          coupon: coupon.trim() || undefined,
+        }) as { sent: number; skipped: number; failed: number; total: number; remaining: number; done: boolean; errors?: string[] };
+        sent += data.sent; skipped += data.skipped; failed += data.failed; total = data.total;
+        if (data.errors?.length) allErrors.push(...data.errors);
+        setProgress({ sent, total });
+        if (data.done || (data.sent === 0 && data.failed === 0 && data.skipped === 0)) break;
+      }
       toast({
-        title: `Lanzamiento enviado a ${data.sent} persona(s)`,
-        description: `Ya avisados antes: ${data.skipped} · Fallidos: ${data.failed} · Total audiencia: ${data.total}`,
+        title: `Lanzamiento enviado a ${sent} persona(s)`,
+        description: `Ya avisados antes: ${skipped} · Fallidos: ${failed} · Total audiencia: ${total}${allErrors.length ? ` · ${allErrors[0]}` : ""}`,
       });
       await loadPreview();
     } catch (e) {
-      toast({ title: "Error al enviar", description: e instanceof Error ? e.message : "Error", variant: "destructive" });
-    } finally { setSending(false); }
+      toast({
+        title: "Error al enviar",
+        description: `${e instanceof Error ? e.message : "Error"}${sent ? ` · Ya se enviaron ${sent}; vuelve a presionar Enviar para continuar.` : ""}`,
+        variant: "destructive",
+      });
+    } finally { setSending(false); setProgress(null); }
   };
+
 
   const toggle = (key: AudienceKey) =>
     setAudiences((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));

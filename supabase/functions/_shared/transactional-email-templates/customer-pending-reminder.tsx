@@ -86,7 +86,7 @@ const Email = ({
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
-          <Text style={brand}>ILINGUE RELAX</Text>
+          <Text style={brand}>iLingue Relax</Text>
           <Heading style={h1}>⏳ Tu pago sigue pendiente</Heading>
           <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
         </Section>
@@ -103,7 +103,7 @@ const Email = ({
         <Section style={card}>
           <Row>
             <Column><Text style={label}>Producto</Text></Column>
-            <Column align="right"><Text style={value}>{productName || 'Tu pedido ILINGUE RELAX'}</Text></Column>
+            <Column align="right"><Text style={value}>{productName || 'Tu pedido iLingue Relax'}</Text></Column>
           </Row>
           <Hr style={hr} />
           <Row>

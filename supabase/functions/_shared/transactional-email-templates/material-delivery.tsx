@@ -30,15 +30,15 @@ const Email = ({ customerName, orderNumber, materials }: Props) => {
   const name = customerName?.trim() || 'Cliente'
   const list: Material[] = materials && materials.length > 0
     ? materials
-    : [{ productName: 'Tu producto ILINGUE RELAX', downloadUrl: 'https://ilinguerelax.com' }]
+    : [{ productName: 'Tu producto iLingue Relax', downloadUrl: 'https://ilinguerelax.com' }]
   return (
     <Html lang="es" dir="ltr">
       <Head />
-      <Preview>Tus materiales de {orderNumber || 'ILINGUE RELAX'} están listos</Preview>
+      <Preview>Tus materiales de {orderNumber || 'iLingue Relax'} están listos</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar}>
-            <Text style={brand}>ILINGUE RELAX</Text>
+            <Text style={brand}>iLingue Relax</Text>
             <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
           </Section>
 
@@ -72,7 +72,7 @@ const Email = ({ customerName, orderNumber, materials }: Props) => {
             · WhatsApp{' '}
             <Link href="https://wa.me/12512724704" style={linkA}>+1 251 272 4704</Link>.
           </Text>
-          <Text style={footer}>© {new Date().getFullYear()} ILINGUE RELAX · ilinguerelax.com</Text>
+          <Text style={footer}>© {new Date().getFullYear()} iLingue Relax · ilinguerelax.com</Text>
         </Container>
       </Body>
     </Html>
@@ -81,7 +81,7 @@ const Email = ({ customerName, orderNumber, materials }: Props) => {
 
 export const template = {
   component: Email,
-  subject: (d: Props) => `📥 Tus materiales de ILINGUE RELAX — Pedido #${d.orderNumber || 'ILR'}`,
+  subject: (d: Props) => `📥 Tus materiales de iLingue Relax — Pedido #${d.orderNumber || 'ILR'}`,
   displayName: 'Entrega de materiales digitales',
   previewData: {
     customerName: 'María Pérez',

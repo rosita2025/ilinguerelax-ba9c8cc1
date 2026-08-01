@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
       if (readErr || !order) throw readErr ?? new Error("Order not found");
 
       const items = Array.isArray(order.items) ? order.items : [];
-      const productNames = items.map((i: any) => i?.name).filter(Boolean).join(" + ") || "Tu pedido ILINGUE RELAX";
+      const productNames = items.map((i: any) => i?.name).filter(Boolean).join(" + ") || "Tu pedido iLingue Relax";
       const { materials, missing, resolvedSkus } = await resolveMaterials(admin, items);
       if (materials.length === 0 || missing.length > 0) {
         return new Response(JSON.stringify({

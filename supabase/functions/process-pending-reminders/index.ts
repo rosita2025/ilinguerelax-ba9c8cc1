@@ -271,7 +271,7 @@ Deno.serve(async (req) => {
             orderNumber: r.order_number,
             customerName: r.customer_name ?? "",
             customerEmail: r.customer_email,
-            productName: r.product_name ?? "Tu pedido ILINGUE RELAX",
+            productName: r.product_name ?? "Tu pedido iLingue Relax",
             amount: r.amount,
             currency: r.currency,
             method: r.method ?? "",

@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
             customerEmail: payerEmail,
             customerName: payerName,
             customerCountry: payer.address?.country_code || undefined,
-            productName: pu.description || pu.items?.[0]?.name || "Pedido ILINGUE RELAX",
+            productName: pu.description || pu.items?.[0]?.name || "Pedido iLingue Relax",
             amount: Number.isFinite(amt) ? amt : undefined,
             currency: resource.amount?.currency_code ?? "USD",
             provider: "paypal",

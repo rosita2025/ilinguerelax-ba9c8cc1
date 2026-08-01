@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
       },
       auto_return: body.autoReturn,
       ...(notificationUrl ? { notification_url: notificationUrl } : {}),
-      statement_descriptor: "ILINGUE RELAX",
+      statement_descriptor: "iLingue Relax",
       external_reference: orderNumber,
       binary_mode: false,
       metadata: {

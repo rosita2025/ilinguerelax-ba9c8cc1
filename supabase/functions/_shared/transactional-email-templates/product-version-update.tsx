@@ -29,7 +29,7 @@ interface Props {
 
 const Email = ({ customerName, productName, versionLabel, changes, downloadUrl, bonusNote }: Props) => {
   const name = customerName?.trim() || 'Cliente'
-  const product = productName?.trim() || 'Tu material ILINGUE RELAX'
+  const product = productName?.trim() || 'Tu material iLingue Relax'
   const version = versionLabel?.trim() || ''
   const list = (changes ?? []).filter((c) => !!c && String(c).trim().length > 0)
   const url = downloadUrl || 'https://ilinguerelax.com/mi-pedido'
@@ -41,7 +41,7 @@ const Email = ({ customerName, productName, versionLabel, changes, downloadUrl, 
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar}>
-            <Text style={brand}>ILINGUE RELAX</Text>
+            <Text style={brand}>iLingue Relax</Text>
             <Text style={orderTag}>ACTUALIZACIÓN DE MATERIAL{version ? ` · ${version}` : ''}</Text>
           </Section>
 
@@ -84,7 +84,7 @@ const Email = ({ customerName, productName, versionLabel, changes, downloadUrl, 
             · WhatsApp{' '}
             <Link href="https://wa.me/12512724704" style={linkA}>+1 251 272 4704</Link>.
           </Text>
-          <Text style={footer}>© {new Date().getFullYear()} ILINGUE RELAX · ilinguerelax.com</Text>
+          <Text style={footer}>© {new Date().getFullYear()} iLingue Relax · ilinguerelax.com</Text>
         </Container>
       </Body>
     </Html>
@@ -94,7 +94,7 @@ const Email = ({ customerName, productName, versionLabel, changes, downloadUrl, 
 export const template = {
   component: Email,
   subject: (d: Props) =>
-    `📘 Tu material se actualizó${d.versionLabel ? ` a la ${d.versionLabel}` : ''} — ${d.productName || 'ILINGUE RELAX'}`,
+    `📘 Tu material se actualizó${d.versionLabel ? ` a la ${d.versionLabel}` : ''} — ${d.productName || 'iLingue Relax'}`,
   displayName: 'Actualización de material comprado',
   previewData: {
     customerName: 'María Pérez',

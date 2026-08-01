@@ -55,7 +55,7 @@ const Email = ({
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
-          <Text style={brand}>ILINGUE RELAX · ADMIN</Text>
+          <Text style={brand}>iLingue Relax · ADMIN</Text>
           <Heading style={h1}>🛒 Nueva venta</Heading>
           <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
         </Section>

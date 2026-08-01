@@ -916,7 +916,10 @@ serve(async (req) => {
         .filter(Boolean),
     );
     const abandonedRecovered = recoveredEmails.size;
+    // Carritos que siguen abiertos = clientes identificados que aún no compraron.
+    const abandonedOpen = Math.max(0, abandonedTotal - abandonedRecovered);
     const abandonedValue = 0;
+
 
 
 
@@ -1087,14 +1090,18 @@ serve(async (req) => {
         },
         abandoned: {
           total: abandonedTotal,
+          open: abandonedOpen,
           newCustomers: abandonedNew,
           returningCustomers: abandonedReturning,
           recovered: abandonedRecovered,
+          // Sesiones que llegaron al checkout y no compraron (incluye anónimos sin correo)
+          checkoutNoPurchase: Math.max(0, totals.checkout - totals.purchases),
           openValue: Number(abandonedValue.toFixed(2)),
           recoveryRatePct: abandonedTotal
             ? Number(((abandonedRecovered / abandonedTotal) * 100).toFixed(2))
             : 0,
         },
+
 
         series,
         byProduct,

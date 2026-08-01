@@ -124,7 +124,7 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
+        "@type": ["Organization", "EducationalOrganization"],
         "@id": "https://ilinguerelax.com/#organization",
         "name": "iLingue Relax",
         "alternateName": "Inglés Relax",
@@ -186,6 +186,7 @@
           }
         ],
 
+        "mainEntityOfPage": { "@id": "https://ilinguerelax.com/#website" },
         "areaServed": {
           "@type": "GeoCircle",
           "geoMidpoint": {
@@ -245,26 +246,8 @@
       }
     </script>
 
-    <!-- Structured Data - EducationalOrganization -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "@id": "https://ilinguerelax.com/#educationalorg",
-        "name": "iLingue Relax",
-        "description": "Plataforma educativa especializada en enseñanza de idiomas: libros digitales y físicos, pronunciación, fonética y vocabulario aplicado a carreras profesionales",
-        "url": "https://ilinguerelax.com",
-        "logo": "https://ilinguerelax.com/og-image.png",
-        "sameAs": [
-          "https://www.youtube.com/@ilinguerelax",
-          "https://www.instagram.com/ilinguerelax",
-          "https://www.facebook.com/ilinguerelax",
-          "https://www.tiktok.com/@ilinguerelax",
-          "https://www.pinterest.com/ilinguerelax",
-          "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF"
-        ]
-      }
-    </script>
+    <!-- EducationalOrganization está fusionada en #organization (una sola entidad para el Knowledge Panel) -->
+
 
 
     <!-- Meta Pixel Code -->

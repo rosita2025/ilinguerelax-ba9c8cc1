@@ -252,8 +252,6 @@ export default function OrderReconcilePanel() {
               </li>
             ))}
           </ul>
-
-          </ul>
         </div>
       )}
 

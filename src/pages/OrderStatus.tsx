@@ -261,7 +261,7 @@ export default function OrderStatus() {
             className="text-xl font-bold tracking-tight"
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
-            ILINGUE <span className="text-primary">RELAX</span>
+            iLingue <span className="text-primary">Relax</span>
           </Link>
         </div>
       </header>

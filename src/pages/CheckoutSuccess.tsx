@@ -230,7 +230,7 @@ export default function CheckoutSuccess() {
         <header className="border-b bg-background/95">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <Link to="/" className="text-xl font-bold tracking-tight" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-              ILINGUE <span className="text-primary">RELAX</span>
+              iLingue <span className="text-primary">Relax</span>
             </Link>
           </div>
         </header>
@@ -264,7 +264,7 @@ export default function CheckoutSuccess() {
             className="text-xl font-bold tracking-tight"
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
-            ILINGUE <span className="text-primary">RELAX</span>
+            iLingue <span className="text-primary">Relax</span>
           </Link>
         </div>
       </header>

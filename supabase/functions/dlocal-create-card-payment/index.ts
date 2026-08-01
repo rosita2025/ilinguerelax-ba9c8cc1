@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
 
     const orderId = body.orderId ?? `ILR-DLC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
-    const description = pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ").slice(0, 250);
+    const description = `iLingue Relax · ${pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ")}`.slice(0, 250);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const notifyParams = new URLSearchParams({

@@ -637,7 +637,11 @@ serve(async (req) => {
         pending: isPending,
       });
       // Make this webhook sale visible to the pixel dedupe pass below.
-      alreadyIngested.push({ at: new Date(ev.created_at).getTime(), productId: pid });
+      alreadyIngested.push({
+        at: new Date(ev.created_at).getTime(),
+        productId: pid,
+        country: String(ev.country || "").toUpperCase(),
+      });
     }
 
     // Respaldo para pagos cuyo webhook no llegó: CheckoutSuccess solo emite
@@ -651,9 +655,16 @@ serve(async (req) => {
       if (!pid || pid === "0" || !Number.isFinite(rawAmount) || rawAmount <= 0) continue;
 
       const eventAt = new Date(ev.created_at).getTime();
-      const duplicatedByWebhook = alreadyIngested.some((known) =>
-        known.productId === pid && Math.abs(known.at - eventAt) <= 30 * 60 * 1000
-      );
+      const evCountry = String(ev.country || "").toUpperCase();
+      // El píxel del navegador usa el slug del producto y el webhook usa el SKU
+      // real (p. ej. "5000-palabras-ingles" vs "product-spanish-5000-physical"),
+      // así que la deduplicación NO puede depender del product_id: una venta ya
+      // registrada por webhook en el mismo país y dentro de 30 min es la misma.
+      const duplicatedByWebhook = alreadyIngested.some((known) => {
+        if (Math.abs(known.at - eventAt) > 30 * 60 * 1000) return false;
+        if (known.productId === pid) return true;
+        return !!evCountry && !!known.country && known.country === evCountry;
+      });
       if (duplicatedByWebhook) continue;
 
       const currency = String(ev.currency || "USD").toUpperCase();
@@ -665,8 +676,9 @@ serve(async (req) => {
         source: "store",
         pending: false,
       });
-      alreadyIngested.push({ at: eventAt, productId: pid });
+      alreadyIngested.push({ at: eventAt, productId: pid, country: evCountry });
     }
+
 
     console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 

@@ -52,23 +52,37 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
     html: string; subject: string; sampleEmail: string | null; sampleAudience: string | null; isSample: boolean; productUrl: string;
   } | null>(null);
 
-  const call = async (body: Record<string, unknown>) => {
+  const audiencesKey = audiences.join(",");
+
+  const call = useCallback(async (body: Record<string, unknown>) => {
     const { data, error } = await supabase.functions.invoke("notify-product-launch", {
       body: { adminKey, sku, audiences, ...body },
     });
     if (error) throw new Error(error.message);
     if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
     return data;
-  };
+  }, [adminKey, sku, audiences]);
 
-  const loadPreview = async (key = launchKey) => {
+  const loadPreview = useCallback(async (key = launchKey, silent = false) => {
     setLoading(true);
     try {
       setPreview(await call({ action: "preview", launchKey: key.trim() }) as PreviewData);
     } catch (e) {
-      toast({ title: "No se pudo calcular", description: e instanceof Error ? e.message : "Error", variant: "destructive" });
+      if (!silent) toast({ title: "No se pudo calcular", description: e instanceof Error ? e.message : "Error", variant: "destructive" });
     } finally { setLoading(false); }
-  };
+  }, [call, launchKey, toast]);
+
+  // Recalcula la audiencia automáticamente al abrir el panel y cada vez que
+  // cambian las audiencias marcadas, el SKU o la etiqueta de lanzamiento.
+  const timer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    if (!open) return;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => { void loadPreview(launchKey, true); }, 400);
+    return () => clearTimeout(timer.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, sku, audiencesKey, launchKey]);
+
 
   const renderEmail = async () => {
     setRendering(true);

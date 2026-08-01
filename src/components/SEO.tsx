@@ -126,13 +126,8 @@ export const SEO = ({
     "image": [image],
     "url": canonicalUrl,
     "sku": sku || title.toLowerCase().replace(/\s+/g, '-').substring(0, 50),
-    "mpn": sku || "ILINGUE-" + (sku || "PROD"),
-    "gtin13": undefined,
     "brand": {
-      "@type": "Brand",
-      "name": "iLingue Relax",
-      "url": "https://ilinguerelax.com",
-      "logo": "https://ilinguerelax.com/og-image.png"
+      "@id": "https://ilinguerelax.com/#brand"
     },
     "category": "Libros > Educación > Idiomas",
     "offers": {
@@ -140,10 +135,7 @@ export const SEO = ({
       "url": canonicalUrl,
       "priceCurrency": "USD",
       "price": price,
-      ...(originalPrice && { 
-        "priceValidUntil": "2026-12-31",
-        "highPrice": originalPrice,
-      }),
+      "priceValidUntil": "2026-12-31",
       "availability": `https://schema.org/${availability}`,
       "itemCondition": "https://schema.org/NewCondition",
       "seller": {

@@ -130,7 +130,7 @@ export default function AdminPaymentErrors() {
               {o.label}
             </Button>
           ))}
-          <span className="w-px bg-border mx-1" />
+          <span className="hidden sm:block w-px bg-border mx-1" />
           <Button size="sm" variant={provider === "" ? "default" : "outline"} onClick={() => setProvider("")}>
             Todos
           </Button>

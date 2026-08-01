@@ -916,7 +916,10 @@ serve(async (req) => {
         .filter(Boolean),
     );
     const abandonedRecovered = recoveredEmails.size;
+    // Carritos que siguen abiertos = clientes identificados que aún no compraron.
+    const abandonedOpen = Math.max(0, abandonedTotal - abandonedRecovered);
     const abandonedValue = 0;
+
 
 
 

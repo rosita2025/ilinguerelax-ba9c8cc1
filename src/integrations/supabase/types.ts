@@ -1829,6 +1829,42 @@ export type Database = {
         }
         Relationships: []
       }
+      product_launch_notices: {
+        Row: {
+          audience: string
+          created_at: string
+          email: string
+          error: string | null
+          id: string
+          launch_key: string
+          metadata: Json
+          sku: string
+          status: string
+        }
+        Insert: {
+          audience: string
+          created_at?: string
+          email: string
+          error?: string | null
+          id?: string
+          launch_key: string
+          metadata?: Json
+          sku: string
+          status?: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          email?: string
+          error?: string | null
+          id?: string
+          launch_key?: string
+          metadata?: Json
+          sku?: string
+          status?: string
+        }
+        Relationships: []
+      }
       product_upsells: {
         Row: {
           created_at: string

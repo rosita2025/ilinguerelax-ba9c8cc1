@@ -413,7 +413,7 @@ export const SEO = ({
 
   // Organization structured data (for homepage/general pages)
   const BRAND_DESCRIPTION =
-    "iLingue Relax es una marca educativa especializada en el aprendizaje de idiomas para estudiantes, profesionales y público en general. Ofrece libros digitales y físicos, guías de pronunciación, fonética y vocabulario aplicado a diferentes carreras profesionales, facilitando el aprendizaje de idiomas de forma sencilla y efectiva.";
+    "iLingue Relax es una marca educativa especializada en el aprendizaje de idiomas para estudiantes, profesionales y público en general. Ofrece libros digitales y físicos, guías de pronunciación, fonética y vocabulario aplicados a diferentes carreras profesionales, facilitando el aprendizaje de idiomas de forma sencilla y efectiva, Aprende sin estres.";
 
   const BRAND_SAME_AS = [
     "https://www.youtube.com/@ilinguerelax",

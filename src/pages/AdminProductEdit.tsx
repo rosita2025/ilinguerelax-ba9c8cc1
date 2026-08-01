@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Unlock as UnlockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -327,7 +327,7 @@ const AdminProductEdit = () => {
                     disabled={!isNew}
                     className={!isNew ? "font-mono bg-muted cursor-not-allowed" : "font-mono"}
                   />
-                  {!isNew && <LockIcon className="w-4 h-4 mt-3 shrink-0 text-muted-foreground" />}
+                  {!isNew && <UnlockIcon className="w-4 h-4 mt-3 shrink-0 text-muted-foreground" />}
                 </div>
                 {isNew && (
                   <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Este SKU será permanente: no se podrá cambiar después.</p>
@@ -353,7 +353,7 @@ const AdminProductEdit = () => {
             </div>
             <div>
               <Label className="flex items-center gap-2">
-                Alias cortos del checkout {!isNew && <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />}
+                Alias cortos del checkout {!isNew && <UnlockIcon className="w-3.5 h-3.5 text-muted-foreground" />}
               </Label>
               <div className="flex gap-2">
                 <Input

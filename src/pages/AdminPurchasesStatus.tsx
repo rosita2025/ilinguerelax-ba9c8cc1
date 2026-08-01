@@ -67,6 +67,26 @@ const AdminPurchasesStatus = () => {
   const [emailDraft, setEmailDraft] = useState("");
   const [resendOnSave, setResendOnSave] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [statusSaving, setStatusSaving] = useState<string | null>(null);
+
+  const changeStatus = async (id: string, next: Mapped) => {
+    setStatusSaving(id);
+    try {
+      const { data, error } = await adminInvoke("update-purchase-status", {
+        body: { adminKey, rowId: id, status: next },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setRows((prev) => prev.map((r) => (r.id === id ? { ...r, mapped_status: next, raw_status: next } : r)));
+      toast.success("Estado actualizado", { description: `Ahora: ${STATUS_META[next].label}` });
+      load();
+    } catch (e) {
+      toast.error("No se pudo cambiar el estado", { description: (e as Error).message });
+    } finally {
+      setStatusSaving(null);
+    }
+  };
+
 
   const startEdit = (id: string, current: string | null) => {
     setEditing(id); setEmailDraft(current ?? ""); setResendOnSave(true);

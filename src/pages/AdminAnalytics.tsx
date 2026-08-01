@@ -29,6 +29,28 @@ import { mergeProductRows, canonicalProductId } from "@/lib/productSkuAliases";
 
 type Granularity = "hour" | "day";
 
+// Etiquetas legibles para cada pasarela/método de pago del desglose de compras.
+const PROVIDER_LABELS: Record<string, string> = {
+  stripe: "Stripe (tarjeta)",
+  paypal: "PayPal",
+  mercadopago: "Mercado Pago",
+  mercado_pago: "Mercado Pago",
+  mp: "Mercado Pago",
+  dlocal: "dLocal Go",
+  dlocalgo: "dLocal Go",
+  dlocal_go: "dLocal Go",
+  yape_plin: "Yape / Plin",
+  yape: "Yape",
+  plin: "Plin",
+  binance_pay: "Binance Pay",
+  binance: "Binance Pay",
+  clabe_mx: "Transferencia MX (SPEI)",
+  spei: "Transferencia MX (SPEI)",
+  hotmart: "Hotmart",
+  manual: "Manual",
+  otros: "Otros",
+};
+
 interface AnalyticsData {
   range: { from: string; to: string; granularity: Granularity };
   totals: {
@@ -43,6 +65,7 @@ interface AnalyticsData {
     checkoutSessions: number;
     cartSessions: number;
   };
+  providers: Array<{ provider: string; count: number; pending: number; revenue: number }>;
   conversion: {
     globalPct: number;
     viewToCartPct: number;
@@ -201,6 +224,12 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       checkoutSessions: toNumber(totals.checkoutSessions),
       cartSessions: toNumber(totals.cartSessions),
     },
+    providers: toArray(value?.providers).slice(0, 30).map((p) => ({
+      provider: toText(p?.provider, "otros"),
+      count: toNumber(p?.count),
+      pending: toNumber(p?.pending),
+      revenue: toNumber(p?.revenue),
+    })),
     conversion: {
       globalPct: toNumber(conversion.globalPct),
       viewToCartPct: toNumber(conversion.viewToCartPct),
@@ -610,6 +639,31 @@ const AdminAnalytics = () => {
                 <Kpi icon={<CreditCard className="w-4 h-4" />} label="Checkouts iniciados" value={data.totals.checkout.toLocaleString()} sub={`${data.conversion.cartToCheckoutPct}% del carrito`} />
                 <Kpi icon={<DollarSign className="w-4 h-4" />} label="Compras" value={data.totals.purchases.toLocaleString()} sub={money(data.totals.revenue)} highlight />
               </div>
+
+              {/* Desglose de compras por método de pago */}
+              <Card className="p-4">
+                <div className="flex items-center justify-between mb-3 gap-2">
+                  <h2 className="font-semibold text-sm md:text-base">Compras por método de pago</h2>
+                  <span className="text-xs text-muted-foreground">Stripe · Mercado Pago · PayPal · dLocal Go · Yape/Plin · Binance · SPEI MX · Hotmart</span>
+                </div>
+                {data.providers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Sin compras en este rango.</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {data.providers.map((p) => (
+                      <div key={p.provider} className="rounded-lg border p-3">
+                        <div className="text-xs text-muted-foreground truncate">{PROVIDER_LABELS[p.provider] ?? p.provider}</div>
+                        <div className="text-xl font-bold tabular-nums">{p.count.toLocaleString()}</div>
+                        <div className="text-xs text-muted-foreground tabular-nums">
+                          {money(p.revenue)}{p.pending > 0 ? ` · ${p.pending} pendiente${p.pending > 1 ? "s" : ""}` : ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+
+
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub="compra / sesión" />

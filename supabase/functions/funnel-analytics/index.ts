@@ -395,9 +395,11 @@ serve(async (req) => {
         .lte("purchased_at", toDate.toISOString()),
       supabase
         .from("manual_payments")
-        .select("items, amount_usd, buyer_country, created_at, status, verified_at")
+        .select("items, amount_usd, buyer_country, created_at, status, verified_at, method")
         .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
-        .gte("created_at", fromDate.toISOString())
+        // Ventana ampliada: un pago creado antes puede verificarse dentro del
+        // rango; abajo se filtra por la fecha efectiva (verified_at || created_at).
+        .gte("created_at", new Date(fromDate.getTime() - 45 * 24 * 60 * 60 * 1000).toISOString())
         .lte("created_at", toDate.toISOString()),
       supabase.from("digital_products").select("sku, name, sku_aliases"),
       supabase
@@ -491,8 +493,18 @@ serve(async (req) => {
     };
 
     type PurchaseSource = "hotmart" | "store";
-    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
+    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean; provider: string };
     const realPurchases: RealPurchase[] = [];
+    // Conteo/monto por pasarela real (stripe, mercadopago, paypal, dlocalgo,
+    // yape_plin, binance_pay, clabe_mx/spei, hotmart...) para el panel.
+    const byProviderAgg = new Map<string, { count: number; revenue: number; pending: number }>();
+    const addProvider = (provider: string, usd: number, pending: boolean) => {
+      const key = provider || "otros";
+      const agg = byProviderAgg.get(key) || { count: 0, revenue: 0, pending: 0 };
+      if (pending) agg.pending++;
+      else { agg.count++; agg.revenue += usd; }
+      byProviderAgg.set(key, agg);
+    };
     let hotmartPendingCount = 0;
     let storePendingCount = 0;
 
@@ -555,6 +567,7 @@ serve(async (req) => {
         usd: isPending ? 0 : usdAmount,
         source: "hotmart",
         pending: isPending,
+        provider: "hotmart",
       });
     }
     for (const m of (manualRes.data ?? []) as any[]) {
@@ -563,6 +576,10 @@ serve(async (req) => {
       const nameKey = String(first.name || "").trim().toLowerCase();
       const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
       const isPending = !APPROVED_STORE.has(String(m.status || "").toLowerCase());
+      // Fecha efectiva: si ya fue verificado, la venta cuenta el día de la
+      // verificación; si sigue pendiente, el día de creación.
+      const effectiveAt = new Date(m.verified_at || m.created_at);
+      if (!(effectiveAt >= fromDate && effectiveAt <= toDate)) continue;
       if (isPending) {
         storePendingCount++;
         // manual_payments already store amount_usd (USD-normalized)
@@ -570,12 +587,13 @@ serve(async (req) => {
         if (amt > 0) addPending("USD", "store", amt);
       }
       realPurchases.push({
-        at: m.verified_at || m.created_at,
+        at: effectiveAt.toISOString(),
         productId: firstSku,
         country: m.buyer_country || "??",
         usd: isPending ? 0 : Number(m.amount_usd || 0),
         source: "store",
         pending: isPending,
+        provider: String(m.method || "manual").toLowerCase(),
       });
     }
 
@@ -596,7 +614,10 @@ serve(async (req) => {
     const pixelEvents: any[] = [];
     // Proveedores con webhook verificado. dLocal Go escribe la compra con la
     // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
-    const GATEWAY_PROVIDERS = ["stripe", "paypal", "mercadopago", "mp", "dlocal", "dlocalgo"];
+    const GATEWAY_PROVIDERS = [
+      "stripe", "paypal", "mercadopago", "mercado_pago", "mp",
+      "dlocal", "dlocalgo", "dlocal_go",
+    ];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
       try { m = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
@@ -635,6 +656,7 @@ serve(async (req) => {
         usd: isPending ? 0 : usdAmount,
         source: "store",
         pending: isPending,
+        provider,
       });
       // Make this webhook sale visible to the pixel dedupe pass below.
       alreadyIngested.push({
@@ -675,6 +697,7 @@ serve(async (req) => {
         usd: currency === "USD" ? rawAmount : toUsd(rawAmount, currency),
         source: "store",
         pending: false,
+        provider: "otros",
       });
       alreadyIngested.push({ at: eventAt, productId: pid, country: evCountry });
     }
@@ -706,6 +729,8 @@ serve(async (req) => {
       const k = bucketKey(p.at);
       const b = ensure(k);
       const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
+      addProvider(p.provider, p.usd, p.pending);
+
 
       if (p.pending) {
         pAgg.pending++;
@@ -942,6 +967,16 @@ serve(async (req) => {
           storePending: storePendingCount,
           pending: hotmartPendingCount + storePendingCount,
         },
+        // Desglose real por pasarela: stripe, mercadopago, paypal, dlocalgo,
+        // yape_plin, binance_pay, clabe_mx (SPEI), hotmart, etc.
+        providers: Array.from(byProviderAgg.entries())
+          .map(([provider, v]) => ({
+            provider,
+            count: v.count,
+            pending: v.pending,
+            revenue: Number(v.revenue.toFixed(2)),
+          }))
+          .sort((a, b) => b.count - a.count || b.revenue - a.revenue),
 
         conversion: {
           globalPct: Number(globalConversion.toFixed(2)),

@@ -154,7 +154,7 @@ export default function OrderReconcilePanel() {
         onChange={(e) => setOrderNumber(e.target.value)}
         onKeyDown={(e) => { if (e.key === "Enter" && !busy) run("inspect"); }}
       />
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           placeholder="Pega aquí el voucher del banco / motivo (opcional)"
           value={reason}
@@ -163,7 +163,7 @@ export default function OrderReconcilePanel() {
         <Button
           size="sm"
           variant="outline"
-          className="shrink-0"
+          className="w-full shrink-0 sm:w-auto"
           onClick={() => {
             const found = extractPaymentReference(reason);
             if (!found) { toast.error("No se detectó un N° de operación en el texto"); return; }
@@ -175,33 +175,33 @@ export default function OrderReconcilePanel() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" disabled={!!busy} onClick={() => run("inspect")}>
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+        <Button size="sm" variant="outline" className="w-full justify-center sm:w-auto" disabled={!!busy} onClick={() => run("inspect")}>
           {busy === "inspect" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4 mr-1" />}
           Consultar
         </Button>
-        <Button size="sm" disabled={!!busy} onClick={() => run("sync")}>
+        <Button size="sm" className="w-full justify-center sm:w-auto" disabled={!!busy} onClick={() => run("sync")}>
           {busy === "sync" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
-          Sincronizar con dLocal
+          <span className="truncate">Sincronizar</span>
         </Button>
-        <Button size="sm" variant="secondary" disabled={!!busy} onClick={() => run("approve")}>
+        <Button size="sm" variant="secondary" className="w-full justify-center sm:w-auto" disabled={!!busy} onClick={() => run("approve")}>
           {busy === "approve" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4 mr-1" />}
-          Aceptar manualmente
+          <span className="truncate">Aceptar</span>
         </Button>
-        <Button size="sm" variant="ghost" disabled={!!busy} onClick={() => run("reject")}>
+        <Button size="sm" variant="ghost" className="w-full justify-center border border-border sm:w-auto sm:border-0" disabled={!!busy} onClick={() => run("reject")}>
           {busy === "reject" ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-1" />}
-          Marcar rechazado
+          <span className="truncate">Rechazar</span>
         </Button>
-        <Button size="sm" variant="secondary" disabled={!!busy} onClick={() => run("retry_delivery")}>
+        <Button size="sm" variant="secondary" className="w-full justify-center sm:w-auto" disabled={!!busy} onClick={() => run("retry_delivery")}>
           {busy === "retry_delivery" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
-          Reintentar entrega
+          <span className="truncate">Reintentar</span>
         </Button>
-        <Button size="sm" variant="outline" disabled={!!busy} onClick={() => loadPending()}>
+        <Button size="sm" variant="outline" className="w-full justify-center sm:w-auto" disabled={!!busy} onClick={() => loadPending()}>
           {busy === "list" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
-          Ver pendientes
+          <span className="truncate">Pendientes</span>
         </Button>
-
       </div>
+
 
       {pending && (
         <div className="rounded-lg border border-border p-3 space-y-2">

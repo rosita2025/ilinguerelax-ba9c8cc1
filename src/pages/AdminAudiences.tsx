@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, Loader2, RefreshCw, Search } from "lucide-react";
+import { Users, Loader2, RefreshCw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +68,8 @@ export default function AdminAudiences() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
-  const [limit, setLimit] = useState(50);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 5;
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -126,7 +127,11 @@ export default function AdminAudiences() {
     });
   }, [people, filter, q]);
 
-  useEffect(() => setLimit(50), [filter, q]);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const pageItems = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+
+  useEffect(() => setPage(1), [filter, q, people]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -193,7 +198,7 @@ export default function AdminAudiences() {
             <p className="text-sm font-semibold">
               Personas {filter !== "all" && <span className="text-muted-foreground">· filtrado</span>}
             </p>
-            <Badge variant="secondary">{filtered.length} mostradas</Badge>
+            <Badge variant="secondary">{filtered.length} en total · 5 por página</Badge>
           </div>
           <div className="flex flex-wrap gap-2 mb-3">
             <Button
@@ -225,7 +230,7 @@ export default function AdminAudiences() {
           </div>
 
           <div className="space-y-2">
-            {filtered.slice(0, limit).map((p) => (
+            {pageItems.map((p) => (
               <div
                 key={`${p.audience}-${p.email}`}
                 className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
@@ -248,10 +253,28 @@ export default function AdminAudiences() {
             )}
           </div>
 
-          {filtered.length > limit && (
-            <Button variant="outline" size="sm" className="mt-3" onClick={() => setLimit((n) => n + 100)}>
-              Ver más ({filtered.length - limit} restantes)
-            </Button>
+          {filtered.length > 0 && (
+            <div className="flex items-center justify-between gap-2 mt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={current <= 1}
+                onClick={() => setPage((n) => Math.max(1, n - 1))}
+              >
+                <ChevronLeft className="w-4 h-4" /> Anterior
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Página {current} de {pageCount} · {filtered.length} personas
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={current >= pageCount}
+                onClick={() => setPage((n) => Math.min(pageCount, n + 1))}
+              >
+                Siguiente <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           )}
         </Card>
       </div>

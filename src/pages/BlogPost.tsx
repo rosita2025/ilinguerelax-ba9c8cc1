@@ -5,6 +5,7 @@ import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, BookOpen, Tag } from "l
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { PinterestSave } from "@/components/PinterestSave";
 import { getBlogPostBySlug, getRelatedPosts, blogPosts, type BlogPost as BlogPostType } from "@/data/blogPosts";
 import { fetchGeneratedBlogPostBySlug, fetchGeneratedBlogPosts } from "@/hooks/useGeneratedBlogPosts";
 

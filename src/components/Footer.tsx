@@ -250,11 +250,12 @@ export const Footer = () => {
             <CountryPicker lang={language === "en" ? "en" : "es"} className="!text-primary-foreground/70 hover:!text-primary-foreground hover:!bg-primary-foreground/5" />
           </div>
           <p className="text-sm text-primary-foreground/50">
-            © {year} Youtumundial LLC. All rights reserved.
+            © {year} iLingue Relax. All rights reserved.
           </p>
           <p className="text-xs text-primary-foreground/40">
-            iLingue Relax™ is a trademark of Youtumundial LLC.
+            iLingue Relax™ is a registered trademark.
           </p>
+
         </div>
 
       </div>

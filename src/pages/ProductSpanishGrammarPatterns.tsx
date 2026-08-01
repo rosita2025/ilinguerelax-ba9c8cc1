@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
 import coverImage from "@/assets/product-grammar-patterns-a1c1.webp";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const COVER_IMAGE_PUBLIC = "/images/product-grammar-patterns-a1c1.webp";
 
@@ -604,6 +605,7 @@ const ProductSpanishGrammarPatterns = () => {
       <Footer />
       <ScrollToTop />
       <WhatsAppButton />
+      <PinterestSave floating />
       <StickyBuyBar
         lang="en"
         productName="Grammar Patterns A1-C1 Mastery"

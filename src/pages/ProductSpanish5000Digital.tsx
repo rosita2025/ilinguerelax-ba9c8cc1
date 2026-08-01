@@ -38,6 +38,7 @@ import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
@@ -552,6 +553,7 @@ const ProductSpanish5000Digital = () => {
         <Footer />
       </Suspense>
 
+      <PinterestSave floating />
       <StickyBuyBar
         productName="Spanish 5,000 Words — Digital PDF"
         price={tier.priceLabel}

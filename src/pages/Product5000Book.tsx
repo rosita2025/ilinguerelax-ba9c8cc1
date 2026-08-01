@@ -42,6 +42,7 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
 import { toast } from "sonner";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const features = [
   "5,000 palabras esenciales del inglés",
@@ -505,6 +506,7 @@ const Product5000Book = () => {
       />
 
       <Footer />
+      <PinterestSave floating />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"

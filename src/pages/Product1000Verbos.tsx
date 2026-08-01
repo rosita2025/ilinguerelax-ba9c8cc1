@@ -27,6 +27,7 @@ import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
 const ADMIN_SKU_1000_VERBOS = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
@@ -311,6 +312,7 @@ const Product1000Verbos = () => {
 
       <Footer />
 
+      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

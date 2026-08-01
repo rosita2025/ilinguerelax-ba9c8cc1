@@ -36,6 +36,7 @@ import { Eye } from "lucide-react";
 import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCoreano";
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
 const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
@@ -386,6 +387,7 @@ const ProductCoreanoRelax = () => {
       <ScrollToTop showAfter={500} />
 
       {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
+      <PinterestSave floating />
       <StickyBuyBar
         price={displayPrice}
         originalPrice={tier.originalLabel}

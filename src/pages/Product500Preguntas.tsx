@@ -26,6 +26,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const HOTMART_URL = "https://pay.hotmart.com/M102992330L";
 
@@ -289,6 +290,7 @@ const Product500Preguntas = () => {
 
       <Footer />
 
+      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

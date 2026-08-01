@@ -13,6 +13,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const productImage = "/images/product-spanish-500-questions.webp";
 const ORIGINAL_PRICE = 40;
@@ -163,6 +164,7 @@ const ProductSpanish500Questions = () => {
 
       <Footer />
 
+      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

@@ -62,6 +62,7 @@ import bonus2Verbos from "@/assets/bonus-2-1000-verbos-esenciales.webp";
 import bonus3Frases from "@/assets/bonus-3-100-frases-nativos.webp";
 import bonus4Preguntas from "@/assets/bonus-4-500-preguntas-frecuentes.webp";
 import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const bonuses8000 = [
   {
@@ -659,6 +660,7 @@ const Product8000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar — 4-tier routing */}
+      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

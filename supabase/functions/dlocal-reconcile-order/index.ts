@@ -211,6 +211,7 @@ Deno.serve(async (req) => {
       const isTestEmail = (e: string) => {
         const v = (e || "").toLowerCase().trim();
         if (!v || !v.includes("@")) return true;
+        if (v === "t@e.com") return true;
         const dom = v.split("@")[1] ?? "";
         if (dom === "example.com" || dom === "test.com" || dom.endsWith(".test") || dom.endsWith(".local")) return true;
         if (dom === "ilinguerelax.com" || dom === "notify.ilinguerelax.com") return true; // correos internos de prueba

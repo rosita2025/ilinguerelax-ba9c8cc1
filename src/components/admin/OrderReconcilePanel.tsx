@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, RefreshCw, ShieldCheck, XCircle, Search, ListChecks } from "lucide-react";
+import { Loader2, RefreshCw, ShieldCheck, XCircle, Search, ListChecks, Copy, ScanLine } from "lucide-react";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { extractPaymentReference, methodLabel } from "@/lib/paymentReference";
 
 /**
  * Conciliación de pedidos: re-consulta el estado real en el proveedor
@@ -21,6 +22,7 @@ type Summary = {
   amount: number | null;
   currency: string;
   skus: string[];
+  reference: string | null;
   alreadyPaid: boolean;
   alreadyDelivered: boolean;
   remoteStatus: string | null;
@@ -33,8 +35,17 @@ type PendingOrder = {
   method: string | null;
   amount: number | null;
   currency: string;
+  reference?: string | null;
+  provider?: string;
   lastAt: string;
 };
+
+function copy(text: string) {
+  navigator.clipboard.writeText(text).then(
+    () => toast.success(`Copiado: ${text}`),
+    () => toast.error("No se pudo copiar"),
+  );
+}
 
 export default function OrderReconcilePanel() {
   const [orderNumber, setOrderNumber] = useState("");
@@ -143,11 +154,26 @@ export default function OrderReconcilePanel() {
         onChange={(e) => setOrderNumber(e.target.value)}
         onKeyDown={(e) => { if (e.key === "Enter" && !busy) run("inspect"); }}
       />
-      <Input
-        placeholder="Motivo / comprobante (opcional)"
-        value={reason}
-        onChange={(e) => setReason(e.target.value)}
-      />
+      <div className="flex gap-2">
+        <Input
+          placeholder="Pega aquí el voucher del banco / motivo (opcional)"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          className="shrink-0"
+          onClick={() => {
+            const found = extractPaymentReference(reason);
+            if (!found) { toast.error("No se detectó un N° de operación en el texto"); return; }
+            setReason(`${found.source}: ${found.reference}`);
+            toast.success(`ID detectado (${found.source}): ${found.reference}`);
+          }}
+        >
+          <ScanLine className="h-4 w-4 mr-1" /> Detectar ID
+        </Button>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={!!busy} onClick={() => run("inspect")}>
@@ -196,9 +222,22 @@ export default function OrderReconcilePanel() {
               >
                 <span className="min-w-0">
                   <strong>{o.orderNumber}</strong> · {o.email || "sin correo"} ·{" "}
-                  {o.amount ?? "—"} {o.currency} · {o.method || "sin método"} ·{" "}
-                  {(o as any).provider || "dlocalgo"} ·{" "}
+                  {o.amount ?? "—"} {o.currency} · {o.method ? methodLabel(o.method) : "sin método"} ·{" "}
+                  {o.provider || "dlocalgo"} ·{" "}
                   {new Date(o.lastAt).toLocaleString()}
+                  {o.reference && (
+                    <>
+                      {" · "}
+                      <button
+                        type="button"
+                        onClick={() => copy(o.reference!)}
+                        className="underline decoration-dotted"
+                        title="Copiar ID de pago"
+                      >
+                        ID pago: {o.reference}
+                      </button>
+                    </>
+                  )}
                 </span>
 
                 <Button
@@ -226,7 +265,21 @@ export default function OrderReconcilePanel() {
             {summary.alreadyPaid && <Badge variant="secondary">pagado</Badge>}
             {summary.alreadyDelivered && <Badge variant="secondary">entregado</Badge>}
           </div>
-          <p><strong>{summary.orderNumber}</strong> · {summary.email || "sin correo"} · {summary.method || "sin método"}</p>
+          <p className="flex flex-wrap items-center gap-1.5">
+            <strong>{summary.orderNumber}</strong>
+            <Button size="sm" variant="ghost" className="h-5 px-1" onClick={() => copy(summary.orderNumber)}>
+              <Copy className="h-3 w-3" />
+            </Button>
+            · {summary.email || "sin correo"} · {summary.method ? methodLabel(summary.method) : "sin método"}
+          </p>
+          {summary.reference && summary.reference !== summary.orderNumber && (
+            <p className="flex flex-wrap items-center gap-1.5">
+              Comprobante / ID de pago: <strong>{summary.reference}</strong>
+              <Button size="sm" variant="ghost" className="h-5 px-1" onClick={() => copy(summary.reference!)}>
+                <Copy className="h-3 w-3" />
+              </Button>
+            </p>
+          )}
           <p>{summary.amount ?? "—"} {summary.currency} · SKUs: {summary.skus.length ? summary.skus.join(", ") : "ninguno"}</p>
           <ul className="space-y-0.5 text-muted-foreground">
             {summary.timeline.map((t, i) => (

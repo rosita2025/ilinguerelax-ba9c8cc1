@@ -389,13 +389,13 @@ serve(async (req) => {
     const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
-        .select("product_id, purchased_at, raw_payload, status, email, transaction_code")
+        .select("product_id, purchased_at, updated_at, raw_payload, status, email, transaction_code")
         .in("status", ["approved", "pending"])
         .gte("purchased_at", fromDate.toISOString())
         .lte("purchased_at", toDate.toISOString()),
       supabase
         .from("manual_payments")
-        .select("items, amount_usd, buyer_country, created_at, status, verified_at, method")
+        .select("order_number, items, amount_usd, amount_local, currency_local, buyer_country, buyer_email, created_at, updated_at, status, verified_at, method")
         .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
         // Ventana ampliada: un pago creado antes puede verificarse dentro del
         // rango; abajo se filtra por la fecha efectiva (verified_at || created_at).
@@ -508,6 +508,25 @@ serve(async (req) => {
     let hotmartPendingCount = 0;
     let storePendingCount = 0;
 
+    // Detalle de compras PENDIENTES (no cuentan como venta hasta aprobarse).
+    // Se muestran en /admin/analytics con proveedor, estado y último intento
+    // de verificación para revisarlas una por una.
+    type PendingDetail = {
+      orderNumber: string;
+      provider: string;
+      source: PurchaseSource;
+      status: string;
+      email: string;
+      country: string;
+      product: string;
+      amount: number;
+      currency: string;
+      amountUsd: number;
+      createdAt: string;
+      lastCheckAt: string | null;
+    };
+    const pendingDetails: PendingDetail[] = [];
+
     // Aggregate pending amounts per currency for the FX transparency card
     const pendingByCurrencyAgg = new Map<string, { source: PurchaseSource; amount: number; count: number }[]>();
     const addPending = (currency: string, source: PurchaseSource, amount: number) => {
@@ -559,6 +578,20 @@ serve(async (req) => {
       if (isPending) {
         hotmartPendingCount++;
         if (usdAmount > 0) addPending(usdCurrency, "hotmart", usdAmount);
+        pendingDetails.push({
+          orderNumber: txn || String(h.transaction_code || "-"),
+          provider: "hotmart",
+          source: "hotmart",
+          status: String(h.status || "pending"),
+          email: buyerEmail,
+          country: String(buyerCountry || "??"),
+          product: String(h.raw_payload?.data?.product?.name || rawPid),
+          amount: amount || usdAmount,
+          currency,
+          amountUsd: usdAmount,
+          createdAt: h.purchased_at,
+          lastCheckAt: h.updated_at ?? null,
+        });
       }
       realPurchases.push({
         at: h.purchased_at,
@@ -585,6 +618,20 @@ serve(async (req) => {
         // manual_payments already store amount_usd (USD-normalized)
         const amt = Number(m.amount_usd || 0);
         if (amt > 0) addPending("USD", "store", amt);
+        pendingDetails.push({
+          orderNumber: String(m.order_number || "-"),
+          provider: String(m.method || "manual").toLowerCase(),
+          source: "store",
+          status: String(m.status || "pending").toLowerCase(),
+          email: String(m.buyer_email || ""),
+          country: String(m.buyer_country || "??"),
+          product: String(first.name || firstSku),
+          amount: Number(m.amount_local || m.amount_usd || 0),
+          currency: String(m.currency_local || "USD").toUpperCase(),
+          amountUsd: amt,
+          createdAt: new Date(m.created_at).toISOString(),
+          lastCheckAt: m.updated_at ?? null,
+        });
       }
       realPurchases.push({
         at: effectiveAt.toISOString(),
@@ -648,6 +695,20 @@ serve(async (req) => {
       if (isPending && usdAmount > 0) {
         storePendingCount++;
         addPending(currency, "store", rawAmount);
+        pendingDetails.push({
+          orderNumber: String(meta.order_number || meta.external_reference || txn || "-"),
+          provider,
+          source: "store",
+          status,
+          email: String(meta.email || meta.customer_email || ""),
+          country: String(ev.country || "??"),
+          product: String(meta.product_name || pid),
+          amount: rawAmount,
+          currency,
+          amountUsd: usdAmount,
+          createdAt: ev.created_at,
+          lastCheckAt: ev.created_at,
+        });
       }
       realPurchases.push({
         at: ev.created_at,
@@ -705,6 +766,36 @@ serve(async (req) => {
 
     console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 
+
+    // Último intento de verificación por pedido (order_events registra cada
+    // consulta/webhook del proveedor). Enriquece el detalle de pendientes.
+    if (pendingDetails.length > 0) {
+      const orderNumbers = Array.from(
+        new Set(pendingDetails.map((p) => p.orderNumber).filter((o) => o && o !== "-")),
+      ).slice(0, 200);
+      if (orderNumbers.length > 0) {
+        const { data: evRows } = await supabase
+          .from("order_events")
+          .select("order_number, created_at, event, status")
+          .in("order_number", orderNumbers)
+          .order("created_at", { ascending: false })
+          .limit(1000);
+        const lastByOrder = new Map<string, { at: string; event: string; status: string | null }>();
+        for (const r of (evRows ?? []) as any[]) {
+          if (!lastByOrder.has(r.order_number)) {
+            lastByOrder.set(r.order_number, { at: r.created_at, event: r.event, status: r.status ?? null });
+          }
+        }
+        for (const p of pendingDetails) {
+          const last = lastByOrder.get(p.orderNumber);
+          if (last) {
+            p.lastCheckAt = last.at;
+            if (last.status) p.status = String(last.status).toLowerCase();
+          }
+        }
+      }
+      pendingDetails.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
 
     const pendingByCurrency = Array.from(pendingByCurrencyAgg.entries()).map(([currency, breakdown]) => {
       const totalAmount = breakdown.reduce((s, x) => s + x.amount, 0);
@@ -977,6 +1068,15 @@ serve(async (req) => {
             revenue: Number(v.revenue.toFixed(2)),
           }))
           .sort((a, b) => b.count - a.count || b.revenue - a.revenue),
+
+        // Compras pendientes (no cuentan como venta hasta aprobarse), con
+        // proveedor, estado y último intento de verificación.
+        pendingOrders: pendingDetails.slice(0, 100).map((p) => ({
+          ...p,
+          amount: Number((p.amount || 0).toFixed(2)),
+          amountUsd: Number((p.amountUsd || 0).toFixed(2)),
+        })),
+
 
         conversion: {
           globalPct: Number(globalConversion.toFixed(2)),

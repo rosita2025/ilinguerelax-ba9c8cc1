@@ -327,7 +327,7 @@ const AdminProductEdit = () => {
                     disabled={!isNew}
                     className={!isNew ? "font-mono bg-muted cursor-not-allowed" : "font-mono"}
                   />
-                  {!isNew && <Lock className="w-4 h-4 mt-3 shrink-0 text-muted-foreground" />}
+                  {!isNew && <LockIcon className="w-4 h-4 mt-3 shrink-0 text-muted-foreground" />}
                 </div>
                 {isNew ? (
                   <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Este SKU será permanente: no se podrá cambiar después.</p>

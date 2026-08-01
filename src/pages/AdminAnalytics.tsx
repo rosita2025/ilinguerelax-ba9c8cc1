@@ -202,6 +202,12 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       checkoutSessions: toNumber(totals.checkoutSessions),
       cartSessions: toNumber(totals.cartSessions),
     },
+    providers: toArray(value?.providers).slice(0, 30).map((p) => ({
+      provider: toText(p?.provider, "otros"),
+      count: toNumber(p?.count),
+      pending: toNumber(p?.pending),
+      revenue: toNumber(p?.revenue),
+    })),
     conversion: {
       globalPct: toNumber(conversion.globalPct),
       viewToCartPct: toNumber(conversion.viewToCartPct),

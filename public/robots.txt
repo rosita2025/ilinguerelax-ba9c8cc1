@@ -25,6 +25,15 @@ Allow: /
 User-agent: Pinterest
 Allow: /
 
+User-agent: Pinterestbot
+Allow: /
+
+User-agent: Pinterest/0.2
+Allow: /
+
+User-agent: Pinterest/0.1
+Allow: /
+
 User-agent: Slurp
 Allow: /
 

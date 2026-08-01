@@ -417,7 +417,6 @@ const AdminProductEdit = () => {
                 )}
               </p>
             </div>
-            </div>
 
             {/* Mapa de aliases + destinos: auditoría en un solo vistazo */}
             <div className="rounded-md border bg-muted/30 p-3">

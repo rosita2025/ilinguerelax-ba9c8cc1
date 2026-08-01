@@ -5,6 +5,7 @@ import { template as adminManualPending } from './admin-manual-pending.tsx'
 import { template as customerManualPending } from './customer-manual-pending.tsx'
 import { template as customerPendingReminder } from './customer-pending-reminder.tsx'
 import { template as productVersionUpdate } from './product-version-update.tsx'
+import { template as productLaunch } from './product-launch.tsx'
 
 export interface TemplateEntry {
   component: (props: any) => any
@@ -22,4 +23,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'customer-manual-pending': customerManualPending,
   'customer-pending-reminder': customerPendingReminder,
   'product-version-update': productVersionUpdate,
+  'product-launch': productLaunch,
 }

@@ -618,6 +618,20 @@ serve(async (req) => {
         // manual_payments already store amount_usd (USD-normalized)
         const amt = Number(m.amount_usd || 0);
         if (amt > 0) addPending("USD", "store", amt);
+        pendingDetails.push({
+          orderNumber: String(m.order_number || "-"),
+          provider: String(m.method || "manual").toLowerCase(),
+          source: "store",
+          status: String(m.status || "pending").toLowerCase(),
+          email: String(m.buyer_email || ""),
+          country: String(m.buyer_country || "??"),
+          product: String(first.name || firstSku),
+          amount: Number(m.amount_local || m.amount_usd || 0),
+          currency: String(m.currency_local || "USD").toUpperCase(),
+          amountUsd: amt,
+          createdAt: new Date(m.created_at).toISOString(),
+          lastCheckAt: m.updated_at ?? null,
+        });
       }
       realPurchases.push({
         at: effectiveAt.toISOString(),

@@ -166,8 +166,16 @@ const AdminManualPayments = () => {
 
   const runAction = async (action: "verify" | "reject" | "reset", orderId: string) => {
     try {
+      // Al verificar, adjunta el comprobante escrito (si el admin lo dejó sin guardar)
+      const draft = (refDraft[orderId] ?? "").trim();
+      const hit = action === "verify" && draft ? extractPaymentReference(draft) : null;
       const { error } = await adminInvoke("manage-manual-payments", {
-        body: { action, orderId, adminKey },
+        body: {
+          action,
+          orderId,
+          adminKey,
+          ...(hit ? { paymentReference: hit.reference, paymentReferenceSource: hit.source } : {}),
+        },
       });
       if (error) throw error;
       toast({

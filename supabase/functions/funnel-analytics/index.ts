@@ -697,6 +697,7 @@ serve(async (req) => {
         usd: currency === "USD" ? rawAmount : toUsd(rawAmount, currency),
         source: "store",
         pending: false,
+        provider: "otros",
       });
       alreadyIngested.push({ at: eventAt, productId: pid, country: evCountry });
     }

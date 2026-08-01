@@ -267,7 +267,7 @@ const ProductDynamic = () => {
                       <div className="flex flex-wrap gap-1.5">
                         {storeOn ? (
                           <span className="px-2 py-1 rounded bg-primary/10 text-primary border border-primary/30">
-                            ✅ Botón Tienda ILINGUE RELAX (checkout interno con Hotmart 1 clic como opción)
+                            ✅ Botón Tienda iLingue Relax (checkout interno con Hotmart 1 clic como opción)
                           </span>
                         ) : (
                           <span className="px-2 py-1 rounded bg-destructive/10 text-destructive border border-destructive/30">

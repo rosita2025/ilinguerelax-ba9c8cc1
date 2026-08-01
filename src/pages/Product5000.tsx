@@ -614,7 +614,7 @@ const Product5000 = () => {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-foreground">
-                      Material PDF de marca ILINGUE RELAX — NO es basura
+                      Material PDF de marca iLingue Relax — NO es basura
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Máxima calidad garantizada. Satisfacción 100% asegurada.
@@ -833,7 +833,7 @@ const Product5000 = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <img
                 src={aboutIlingueRelax}
-                alt="Acerca del ILINGUE RELAX - Autora Crady by iLingue Relax"
+                alt="Acerca del iLingue Relax - Autora Crady by iLingue Relax"
                 loading="lazy"
                 decoding="async"
                 className="w-full h-auto"
@@ -844,7 +844,7 @@ const Product5000 = () => {
             <div className="mt-8 text-center">
               <p className="text-white/80 text-lg md:text-xl max-w-3xl mx-auto">
                 <span className="font-semibold text-white">Autora Crady by iLingue Relax</span> - Creadora del método
-                ILINGUE RELAX para aprender idiomas de forma simple, visual y relajada.
+                iLingue Relax para aprender idiomas de forma simple, visual y relajada.
               </p>
             </div>
           </motion.div>

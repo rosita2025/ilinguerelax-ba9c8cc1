@@ -41,7 +41,7 @@ export default function CheckoutPendienteManual() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
       <Helmet>
-        <title>Pago manual en revisión · ILINGUE RELAX</title>
+        <title>Pago manual en revisión · iLingue Relax</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <div className="max-w-lg w-full text-center space-y-5">

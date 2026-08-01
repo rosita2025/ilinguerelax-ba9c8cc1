@@ -86,7 +86,9 @@ Deno.serve(async (req) => {
 
     const orderId = body.orderId ?? `ILR-DL-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
-    const description = pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ").slice(0, 250);
+    // Public brand always visible on the dLocal Go payment / bank voucher.
+    const description = `iLingue Relax · ${pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ")}`.slice(0, 250);
+
 
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";

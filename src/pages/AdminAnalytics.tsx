@@ -769,9 +769,15 @@ const AdminAnalytics = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub="compra / sesión" />
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Checkout → Compra" value={`${data.conversion.checkoutToPurchasePct}%`} sub={`${data.totals.purchases} de ${data.totals.checkout}`} />
-                <Kpi icon={<PackageX className="w-4 h-4" />} label="Abandono checkout" value={`${data.conversion.abandonedCheckoutPct}%`} sub={`${Math.max(0, data.totals.checkout - data.totals.purchases)} sin comprar`} />
-                <Kpi icon={<PackageX className="w-4 h-4" />} label="Clientes con carrito abandonado" value={data.abandoned.total.toLocaleString()} sub={`${data.abandoned.newCustomers} nuevos · ${data.abandoned.returningCustomers} recurrentes · ${data.abandoned.recovered} recuperados`} />
+                <Kpi icon={<PackageX className="w-4 h-4" />} label="Checkouts iniciados sin compra" value={`${Math.max(0, data.totals.checkout - data.totals.purchases)}`} sub={`${data.conversion.abandonedCheckoutPct}% de abandono · incluye visitas sin correo`} />
+                <Kpi icon={<PackageX className="w-4 h-4" />} label="Carritos con correo (identificados)" value={(data.abandoned.open || Math.max(0, data.abandoned.total - data.abandoned.recovered)).toLocaleString()} sub={`sin recuperar · ${data.abandoned.total} en total: ${data.abandoned.newCustomers} nuevos · ${data.abandoned.returningCustomers} recurrentes · ${data.abandoned.recovered} recuperados`} />
               </div>
+
+              <p className="text-[11px] text-muted-foreground -mt-1">
+                Los dos números miden cosas distintas: <strong>Checkouts iniciados sin compra</strong> cuenta sesiones que llegaron al checkout y no pagaron (aunque el cliente no haya dejado su correo);
+                <strong> Carritos con correo</strong> solo cuenta personas identificadas (dejaron nombre/correo), que son las que reciben los correos de recuperación.
+              </p>
+
 
               {/* Funnel evolution */}
               <Card className="p-4">

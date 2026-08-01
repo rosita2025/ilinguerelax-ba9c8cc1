@@ -132,7 +132,7 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
             Compradores, Hotmart, reseñas, lista de espera, carritos abandonados y newsletter. Cada persona recibe un solo correo.
           </p>
         </div>
-        <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => { setOpen((o) => !o); if (!open) loadPreview(); }}>
+        <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setOpen((o) => !o)}>
           {open ? "Ocultar" : "Abrir"}
         </Button>
       </div>

@@ -101,22 +101,23 @@ export default function AdminPaymentErrors() {
     <div className="min-h-screen bg-background">
       <AdminNav />
       <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-destructive shrink-0" />
               Fallos de pago · tiempo real
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Motivo exacto de cada rechazo (Stripe, PayPal, etc.) con país e IP del intento.
               Actualiza cada 20 s{updatedAt ? ` · ${updatedAt.toLocaleTimeString()}` : ""}.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => void load()} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refrescar
           </Button>
         </div>
+
 
         <div className="flex flex-wrap gap-2">
           {HOURS_OPTIONS.map((o) => (

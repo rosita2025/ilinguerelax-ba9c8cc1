@@ -229,6 +229,12 @@ export const SEO = ({
         "description": product.description,
         "image": product.image,
         "url": product.url,
+        "brand": {
+          "@type": "Brand",
+          "name": "iLingue Relax",
+          "@id": "https://ilinguerelax.com/#brand"
+        },
+
         "offers": {
           "@type": "Offer",
           "priceCurrency": "USD",
@@ -320,11 +326,17 @@ export const SEO = ({
       "@type": "Person",
       "name": book.author || "Crady",
     },
+    "brand": {
+      "@type": "Brand",
+      "name": "iLingue Relax",
+      "@id": "https://ilinguerelax.com/#brand",
+    },
     "publisher": {
       "@type": "Organization",
       "name": "iLingue Relax",
       "@id": "https://ilinguerelax.com/#organization",
     },
+
     ...(book.isbn && { "isbn": book.isbn }),
     ...(book.numberOfPages && { "numberOfPages": book.numberOfPages }),
     ...(book.datePublished && { "datePublished": book.datePublished }),

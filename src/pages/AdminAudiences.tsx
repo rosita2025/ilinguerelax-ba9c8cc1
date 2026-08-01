@@ -102,10 +102,23 @@ export default function AdminAudiences() {
     }
   }, [adminKey, toast]);
 
+  // Auto-refresco: al entrar, cada 30 s (solo si la pestaña está visible),
+  // al volver a la pestaña y al recuperar la conexión.
   useEffect(() => {
-    load();
-    const t = setInterval(() => load(true), 60_000);
-    return () => clearInterval(t);
+    void load();
+    const tick = () => {
+      if (document.visibilityState === "visible") void load(true);
+    };
+    const t = setInterval(tick, 30_000);
+    window.addEventListener("focus", tick);
+    window.addEventListener("online", tick);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener("focus", tick);
+      window.removeEventListener("online", tick);
+      document.removeEventListener("visibilitychange", tick);
+    };
   }, [load]);
 
   const cards = useMemo(
@@ -169,7 +182,7 @@ export default function AdminAudiences() {
           </p>
           {updatedAt && (
             <p className="text-xs text-muted-foreground mt-2">
-              Actualizado: {new Date(updatedAt).toLocaleString("es-PE")} · se refresca solo cada minuto
+              Actualizado: {new Date(updatedAt).toLocaleString("es-PE")} · se refresca solo cada 30 s
             </p>
           )}
         </Card>

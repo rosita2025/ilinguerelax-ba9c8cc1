@@ -50,14 +50,23 @@ export default function AdminLaunches() {
     }
   }, [adminKey, toast]);
 
-  // La lista se actualiza sola: al entrar, cada 60 s y al volver a la pestaña,
-  // así los productos nuevos aparecen aquí sin recargar la página.
+  // La lista se actualiza sola: al entrar, cada 30 s (si la pestaña está visible),
+  // al volver a la pestaña y al recuperar la conexión.
   useEffect(() => {
     void loadProducts();
-    const t = setInterval(() => void loadProducts(true), 60_000);
-    const onFocus = () => void loadProducts(true);
-    window.addEventListener("focus", onFocus);
-    return () => { clearInterval(t); window.removeEventListener("focus", onFocus); };
+    const tick = () => {
+      if (document.visibilityState === "visible") void loadProducts(true);
+    };
+    const t = setInterval(tick, 30_000);
+    window.addEventListener("focus", tick);
+    window.addEventListener("online", tick);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener("focus", tick);
+      window.removeEventListener("online", tick);
+      document.removeEventListener("visibilitychange", tick);
+    };
   }, [loadProducts]);
 
   const filtered = useMemo(() => {

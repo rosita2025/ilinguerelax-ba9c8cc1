@@ -691,6 +691,62 @@ const AdminAnalytics = () => {
                 )}
               </Card>
 
+              {/* Compras pendientes por proveedor */}
+              <Card className="p-4">
+                <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+                  <h2 className="font-semibold text-sm md:text-base">Compras pendientes por proveedor</h2>
+                  <span className="text-xs text-muted-foreground">
+                    No cuentan como venta hasta aprobarse · {data.pendingOrders.length} pendiente{data.pendingOrders.length === 1 ? "" : "s"}
+                  </span>
+                </div>
+                {data.pendingOrders.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Sin pagos pendientes en este rango. </p>
+                ) : (
+                  <div className="overflow-x-auto -mx-4 px-4">
+                    <table className="w-full text-xs md:text-sm min-w-[720px]">
+                      <thead>
+                        <tr className="text-left text-muted-foreground border-b">
+                          <th className="py-2 pr-3 font-medium">Pedido</th>
+                          <th className="py-2 pr-3 font-medium">Proveedor</th>
+                          <th className="py-2 pr-3 font-medium">Estado</th>
+                          <th className="py-2 pr-3 font-medium">Cliente</th>
+                          <th className="py-2 pr-3 font-medium text-right">Monto</th>
+                          <th className="py-2 pr-3 font-medium">Creado</th>
+                          <th className="py-2 font-medium">Último intento</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.pendingOrders.map((p, i) => (
+                          <tr key={`${p.orderNumber}-${i}`} className="border-b last:border-0 align-top">
+                            <td className="py-2 pr-3 font-mono">{p.orderNumber}</td>
+                            <td className="py-2 pr-3">{PROVIDER_LABELS[p.provider] ?? p.provider}</td>
+                            <td className="py-2 pr-3">
+                              <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] capitalize">
+                                {p.status}
+                              </span>
+                            </td>
+                            <td className="py-2 pr-3">
+                              <div className="truncate max-w-[200px]">{p.email || "—"}</div>
+                              <div className="text-[11px] text-muted-foreground truncate max-w-[200px]">
+                                {p.country} · {p.product}
+                              </div>
+                            </td>
+                            <td className="py-2 pr-3 text-right tabular-nums whitespace-nowrap">
+                              {p.amount.toLocaleString()} {p.currency}
+                              {p.amountUsd > 0 && p.currency !== "USD" ? (
+                                <div className="text-[11px] text-muted-foreground">≈ {money(p.amountUsd)}</div>
+                              ) : null}
+                            </td>
+                            <td className="py-2 pr-3 whitespace-nowrap">{peruDateTime(p.createdAt)}</td>
+                            <td className="py-2 whitespace-nowrap">{peruDateTime(p.lastCheckAt)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </Card>
+
 
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

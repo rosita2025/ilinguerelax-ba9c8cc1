@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 
 interface SEOProps {
@@ -378,6 +379,40 @@ export const SEO = ({
   const organizationData = null;
   void BRAND_DESCRIPTION;
   void BRAND_SAME_AS;
+
+  // Al navegar o al pasar de "cargando" a "cargado", react-helmet-async puede
+  // dejar bloques JSON-LD antiguos en el <head>. Eso genera entidades
+  // duplicadas y contradictorias (mismo @id, datos distintos) para los bots.
+  // Limpiamos después de cada render, conservando siempre el último bloque
+  // inyectado y sin tocar el JSON-LD estático de index.html (Organization,
+  // Brand, WebSite, EducationalOrganization), que no lleva data-rh.
+  useEffect(() => {
+    const cleanup = () => {
+      const nodes = Array.from(
+        document.querySelectorAll<HTMLScriptElement>(
+          'script[type="application/ld+json"][data-rh="true"]',
+        ),
+      );
+      const seen = new Set<string>();
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const node = nodes[i];
+        let key = node.textContent || "";
+        try {
+          const parsed = JSON.parse(key);
+          key = `${parsed["@type"] ?? ""}|${parsed["@id"] ?? parsed.name ?? ""}`;
+        } catch {
+          /* si no parsea, deduplicamos por contenido exacto */
+        }
+        if (seen.has(key)) node.remove();
+        else seen.add(key);
+      }
+    };
+    cleanup();
+    const raf = requestAnimationFrame(cleanup);
+    return () => cancelAnimationFrame(raf);
+  });
+
+
 
 
 

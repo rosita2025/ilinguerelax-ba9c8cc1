@@ -1466,6 +1466,9 @@ export type Database = {
           method: string
           notes: string | null
           order_number: string
+          payment_reference: string | null
+          payment_reference_at: string | null
+          payment_reference_source: string | null
           status: string
           updated_at: string
           verified_at: string | null
@@ -1485,6 +1488,9 @@ export type Database = {
           method?: string
           notes?: string | null
           order_number: string
+          payment_reference?: string | null
+          payment_reference_at?: string | null
+          payment_reference_source?: string | null
           status?: string
           updated_at?: string
           verified_at?: string | null
@@ -1504,6 +1510,9 @@ export type Database = {
           method?: string
           notes?: string | null
           order_number?: string
+          payment_reference?: string | null
+          payment_reference_at?: string | null
+          payment_reference_source?: string | null
           status?: string
           updated_at?: string
           verified_at?: string | null

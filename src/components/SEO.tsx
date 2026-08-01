@@ -324,9 +324,13 @@ export const SEO = ({
     segments.forEach((segment, index) => {
       const isLast = index === segments.length - 1;
       const url = `https://ilinguerelax.com/${segments.slice(0, index + 1).join("/")}`;
-      const name = isLast
-        ? pageTitle || SEGMENT_LABELS[segment] || humanize(segment)
-        : SEGMENT_LABELS[segment] || humanize(segment);
+      // En secciones conocidas usamos la etiqueta corta (mejor para Google);
+      // en fichas de libros/ebooks y artículos usamos el título de la página.
+      const name = SEGMENT_LABELS[segment]
+        ? SEGMENT_LABELS[segment]
+        : isLast
+          ? pageTitle || humanize(segment)
+          : humanize(segment);
       items.push({
         "@type": "ListItem",
         "position": items.length + 1,

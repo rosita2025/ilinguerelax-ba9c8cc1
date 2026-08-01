@@ -240,7 +240,16 @@ Deno.serve(async (req) => {
         recovered++;
         await resolveReminders(supabase, orderNumber, "paid");
 
+        if (check.underpaid) {
+          // Pago incompleto o en otra moneda: se retiene la entrega hasta que
+          // el admin lo revise en /admin/dlocal.
+          console.warn("[dlocal-sweep] entrega retenida por discrepancia:", orderNumber, check.reason);
+          heldForReview++;
+          continue;
+        }
+
         if (email) {
+
           const alreadyDelivered = events.some((e) => e.event === "delivery_sent");
           if (!alreadyDelivered) {
             const name = email.split("@")[0];

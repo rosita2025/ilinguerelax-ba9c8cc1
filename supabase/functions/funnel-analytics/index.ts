@@ -402,7 +402,7 @@ serve(async (req) => {
       supabase.from("digital_products").select("sku, name, sku_aliases"),
       supabase
         .from("funnel_events")
-        .select("id, created_at, product_id, value, currency, country, session_id, referrer, page_path, is_bot")
+        .select("id, created_at, product_id, value, currency, country, session_id, referrer, page_path, is_bot, provider")
         .in("event_name", ["Purchase", "purchase"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
@@ -585,25 +585,32 @@ serve(async (req) => {
     const seenGatewayKeys = new Set<string>();
     // Snapshot of purchases already ingested (hotmart + manual) used to avoid
     // double-counting the browser-side Purchase pixel for the same sale.
-    const alreadyIngested = realPurchases.map((p) => ({ at: new Date(p.at).getTime(), productId: p.productId }));
+    const alreadyIngested = realPurchases.map((p) => ({
+      at: new Date(p.at).getTime(),
+      productId: p.productId,
+      country: String(p.country || "").toUpperCase(),
+    }));
     // Process webhook (gateway) events FIRST, then browser pixels, so a pixel
     // never double-counts a sale a webhook already reported.
     const gatewayEvents: any[] = [];
     const pixelEvents: any[] = [];
+    // Proveedores con webhook verificado. dLocal Go escribe la compra con la
+    // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
+    const GATEWAY_PROVIDERS = ["stripe", "paypal", "mercadopago", "mp", "dlocal", "dlocalgo"];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
       try { m = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
-      const p = String(m.provider || "").toLowerCase();
-      if (["stripe", "paypal", "mercadopago", "mp"].includes(p)) gatewayEvents.push(ev);
+      const p = String(m.provider || ev.provider || "").toLowerCase();
+      if (GATEWAY_PROVIDERS.includes(p)) gatewayEvents.push(ev);
       else pixelEvents.push(ev);
     }
-    // Solo webhooks verificados (Stripe, PayPal, Mercado Pago) + Hotmart y manual.
+    // Solo webhooks verificados (Stripe, PayPal, Mercado Pago, dLocal Go) + Hotmart y manual.
     // Los píxeles del navegador NO cuentan como compra.
     for (const ev of gatewayEvents) {
 
       let meta: any = {};
       try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
-      const provider = String(meta.provider || "").toLowerCase();
+      const provider = String(meta.provider || ev.provider || "").toLowerCase();
 
       const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
       if (/test|sandbox|prueba/i.test(txn)) continue;
@@ -630,7 +637,11 @@ serve(async (req) => {
         pending: isPending,
       });
       // Make this webhook sale visible to the pixel dedupe pass below.
-      alreadyIngested.push({ at: new Date(ev.created_at).getTime(), productId: pid });
+      alreadyIngested.push({
+        at: new Date(ev.created_at).getTime(),
+        productId: pid,
+        country: String(ev.country || "").toUpperCase(),
+      });
     }
 
     // Respaldo para pagos cuyo webhook no llegó: CheckoutSuccess solo emite
@@ -644,9 +655,16 @@ serve(async (req) => {
       if (!pid || pid === "0" || !Number.isFinite(rawAmount) || rawAmount <= 0) continue;
 
       const eventAt = new Date(ev.created_at).getTime();
-      const duplicatedByWebhook = alreadyIngested.some((known) =>
-        known.productId === pid && Math.abs(known.at - eventAt) <= 30 * 60 * 1000
-      );
+      const evCountry = String(ev.country || "").toUpperCase();
+      // El píxel del navegador usa el slug del producto y el webhook usa el SKU
+      // real (p. ej. "5000-palabras-ingles" vs "product-spanish-5000-physical"),
+      // así que la deduplicación NO puede depender del product_id: una venta ya
+      // registrada por webhook en el mismo país y dentro de 30 min es la misma.
+      const duplicatedByWebhook = alreadyIngested.some((known) => {
+        if (Math.abs(known.at - eventAt) > 30 * 60 * 1000) return false;
+        if (known.productId === pid) return true;
+        return !!evCountry && !!known.country && known.country === evCountry;
+      });
       if (duplicatedByWebhook) continue;
 
       const currency = String(ev.currency || "USD").toUpperCase();
@@ -658,8 +676,9 @@ serve(async (req) => {
         source: "store",
         pending: false,
       });
-      alreadyIngested.push({ at: eventAt, productId: pid });
+      alreadyIngested.push({ at: eventAt, productId: pid, country: evCountry });
     }
+
 
     console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 

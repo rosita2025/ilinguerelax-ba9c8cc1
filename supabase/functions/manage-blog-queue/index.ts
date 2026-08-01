@@ -313,6 +313,8 @@ serve(async (req) => {
           notifyGoogleIndexing([postUrl], "URL_UPDATED"),
           resubmitSitemapsGSC(),
           inspectUrlGSC(postUrl),
+          // Pinterest (refresco de feeds + re-scrape) y webhook del CMS
+          pingPinterestAndCms({ url: postUrl, type: "blog" }),
         ]);
         await supabase
           .from("generated_blog_posts")

@@ -182,6 +182,9 @@ export default function OrderReconcilePanel() {
           <p className="text-xs font-medium">
             Pendientes de dLocal Go ({pending.length}) — elige uno y acéptalo o recházalo
           </p>
+          <p className="text-[11px] text-muted-foreground">
+            Actualización automática cada minuto{lastCheck ? ` · última revisión ${lastCheck.toLocaleTimeString()}` : ""}
+          </p>
           {pending.length === 0 && (
             <p className="text-xs text-muted-foreground">No hay pedidos pendientes en los últimos 30 días.</p>
           )}

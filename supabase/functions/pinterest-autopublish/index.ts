@@ -59,9 +59,12 @@ Deno.serve(async (req) => {
 
 
   try {
+    // Solo los pines realmente creados bloquean el reintento: si quedó
+    // "skipped" (faltaba token/imagen) o "error", se vuelve a intentar.
     const { data: done } = await supabase
       .from("pinterest_publications")
       .select("url")
+      .eq("status", "created")
       .limit(5000);
     const published = new Set((done ?? []).map((r: { url: string }) => r.url));
 

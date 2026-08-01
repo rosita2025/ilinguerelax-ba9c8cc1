@@ -5,6 +5,35 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nContext";
+import { useLocation } from "react-router-dom";
+
+/** Rutas donde NUNCA debe aparecer ningún popup (checkout / pago / descargas / admin). */
+const BLOCKED_PREFIXES = [
+  "/admin",
+  "/checkout",
+  "/checkouts",
+  "/carrito",
+  "/cart",
+  "/pago",
+  "/pagos",
+  "/pay",
+  "/success",
+  "/gracias",
+  "/thank",
+  "/descarga",
+  "/mi-descarga",
+  "/mi-pedido",
+  "/order",
+];
+
+function isBlockedPath(pathname: string): boolean {
+  const p = (pathname || "").toLowerCase();
+  return (
+    BLOCKED_PREFIXES.some((b) => p.startsWith(b)) ||
+    p.includes("checkout") ||
+    p.includes("success")
+  );
+}
 
 const STORAGE_KEY = "ilr_newsletter_popup_v2";
 const COOKIE_KEY = "ilr_newsletter_popup";

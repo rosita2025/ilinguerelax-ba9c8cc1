@@ -104,9 +104,10 @@ Deno.serve(async (req) => {
       const email = String(sub.email || '').trim().toLowerCase();
       if (!email) continue;
 
-      // Opt-out / marketing off
-      if (sub.unsubscribed === true) { stats.skipped++; continue; }
-      if (sub.marketing_opt_in === false) { stats.skipped++; continue; }
+      // Opt-out / marketing off (viven dentro de metadata)
+      const meta = (sub.metadata ?? {}) as Record<string, unknown>;
+      if (meta.unsubscribed === true) { stats.skipped++; continue; }
+      if (meta.marketing_opt_in === false) { stats.skipped++; continue; }
 
       // Suppression list
       try {

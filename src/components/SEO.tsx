@@ -417,12 +417,13 @@ export const SEO = ({
 
   const BRAND_SAME_AS = [
     "https://www.youtube.com/@ilinguerelax",
-    "https://www.instagram.com/ilinguerelax",
-    "https://www.facebook.com/ilinguerelax",
+    "https://www.instagram.com/ilinguerelax/",
+    "https://web.facebook.com/ilinguerelax",
     "https://www.tiktok.com/@ilinguerelax",
-    "https://www.pinterest.com/ilinguerelax",
+    "https://es.pinterest.com/ilinguerelax/",
     "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF",
   ];
+
 
   // Organization/Brand/WebSite ya se emiten de forma estática en index.html
   // (mismo @id). No se duplican aquí para evitar avisos en los validadores.

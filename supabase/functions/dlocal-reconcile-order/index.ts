@@ -31,6 +31,13 @@ import {
   isPendingStatus,
   isFailedStatus,
 } from "../_shared/dlocal.ts";
+import {
+  checkAmount,
+  describeAmountCheck,
+  extractRemoteAmount,
+  type AmountCheck,
+  type DlocalRemoteAmount,
+} from "../_shared/dlocalAmounts.ts";
 
 const cors = { ...adminCorsHeaders };
 const json = (b: unknown, s = 200) =>
@@ -292,10 +299,17 @@ Deno.serve(async (req) => {
 
     // Estado real en el proveedor (solo dLocal tiene consulta directa aquí).
     let remoteStatus: string | null = null;
+    let remoteAmount: DlocalRemoteAmount = { amount: null, currency: null };
     if (action !== "retry_delivery" && provider === "dlocalgo" && reference && reference !== orderNumber) {
       const payment = await fetchDlocalPayment(reference);
-      if (payment) remoteStatus = String(payment.status ?? "").toUpperCase() || null;
+      if (payment) {
+        remoteStatus = String(payment.status ?? "").toUpperCase() || null;
+        remoteAmount = extractRemoteAmount(payment);
+      }
     }
+    // Validación de montos: comparamos lo que cobramos (16.65, 3.70, …) contra
+    // lo que dLocal dice que se acreditó. Un pago de menos nunca se entrega.
+    const amountCheck: AmountCheck = checkAmount(amount ?? null, currency, remoteAmount);
 
 
     const summary = {
@@ -311,6 +325,8 @@ Deno.serve(async (req) => {
       alreadyPaid,
       alreadyDelivered,
       remoteStatus,
+      remoteAmount,
+      amountCheck,
       timeline: events.map((e) => ({ event: e.event, status: e.status, at: e.created_at })),
     };
 
@@ -372,7 +388,22 @@ Deno.serve(async (req) => {
       if (!isSettledStatus(remoteStatus)) {
         return json({ ok: true, applied: "unknown_status", remoteStatus, summary });
       }
-      // PAID confirmado por la API.
+      // PAID confirmado por la API: antes de entregar, el monto debe cuadrar.
+      if (amountCheck.mismatch) {
+        await logOrderEvent({
+          orderNumber,
+          event: "payment_mismatch",
+          provider,
+          status: amountCheck.underpaid ? "AMOUNT_MISMATCH" : "AMOUNT_OVERPAID",
+          method,
+          reference,
+          detail: describeAmountCheck(amountCheck),
+          customerEmail: email || null,
+          amount: amountCheck.paid ?? amount ?? null,
+          currency: amountCheck.paidCurrency ?? currency,
+          metadata: { skus, source: "admin-reconcile", amountCheck },
+        });
+      }
       if (alreadyPaid && alreadyDelivered) return json({ ok: true, applied: "already_delivered", summary });
       if (!alreadyPaid) {
         await logOrderEvent({
@@ -381,6 +412,18 @@ Deno.serve(async (req) => {
           customerEmail: email || null, amount: amount ?? null, currency,
           metadata: { skus, source: "admin-reconcile" },
         });
+      }
+      if (amountCheck.underpaid) {
+        // El dinero acreditado no coincide: se deja registrado el pago pero la
+        // entrega queda retenida para revisión manual del admin.
+        return json({
+          ok: true,
+          applied: "amount_mismatch_hold",
+          remoteStatus,
+          amountCheck,
+          message: describeAmountCheck(amountCheck),
+          summary,
+        }, 200);
       }
       if (!email) return json({ ok: true, applied: "paid_no_email", summary });
       const res = await deliver({

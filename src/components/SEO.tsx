@@ -362,23 +362,12 @@ export const SEO = ({
     "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF",
   ];
 
-  const organizationData = type === "website" ? {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": "https://ilinguerelax.com/#organization",
-    "name": "iLingue Relax",
-    "url": "https://ilinguerelax.com",
-    "logo": "https://ilinguerelax.com/og-image.png",
-    "description": BRAND_DESCRIPTION,
-    "brand": { "@id": "https://ilinguerelax.com/#brand" },
-    "sameAs": BRAND_SAME_AS,
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "email": "hola@ilinguerelax.com",
-      "availableLanguage": ["Spanish", "English"]
-    }
-  } : null;
+  // Organization/Brand/WebSite ya se emiten de forma estática en index.html
+  // (mismo @id). No se duplican aquí para evitar avisos en los validadores.
+  const organizationData = null;
+  void BRAND_DESCRIPTION;
+  void BRAND_SAME_AS;
+
 
 
   return (

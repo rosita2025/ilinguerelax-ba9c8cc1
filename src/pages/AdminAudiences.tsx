@@ -182,7 +182,7 @@ export default function AdminAudiences() {
           </p>
           {updatedAt && (
             <p className="text-xs text-muted-foreground mt-2">
-              Actualizado: {new Date(updatedAt).toLocaleString("es-PE")} · se refresca solo cada minuto
+              Actualizado: {new Date(updatedAt).toLocaleString("es-PE")} · se refresca solo cada 30 s
             </p>
           )}
         </Card>

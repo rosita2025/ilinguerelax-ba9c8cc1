@@ -939,12 +939,6 @@ const AdminEmailTest = () => {
                     )}
                   </p>
                 </div>
-                <Button asChild size="sm" variant={hasIssues ? "destructive" : "outline"} className="shrink-0 h-8">
-                  <Link to="/admin/delivery-audit">
-                    <FileSearch className="w-3.5 h-3.5 mr-1.5" />
-                    Ver auditoría
-                  </Link>
-                </Button>
               </Card>
             );
           })()}

@@ -578,6 +578,20 @@ serve(async (req) => {
       if (isPending) {
         hotmartPendingCount++;
         if (usdAmount > 0) addPending(usdCurrency, "hotmart", usdAmount);
+        pendingDetails.push({
+          orderNumber: txn || String(h.transaction_code || "-"),
+          provider: "hotmart",
+          source: "hotmart",
+          status: String(h.status || "pending"),
+          email: buyerEmail,
+          country: String(buyerCountry || "??"),
+          product: String(h.raw_payload?.data?.product?.name || rawPid),
+          amount: amount || usdAmount,
+          currency,
+          amountUsd: usdAmount,
+          createdAt: h.purchased_at,
+          lastCheckAt: h.updated_at ?? null,
+        });
       }
       realPurchases.push({
         at: h.purchased_at,

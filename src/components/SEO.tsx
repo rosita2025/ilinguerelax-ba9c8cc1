@@ -537,7 +537,7 @@ export const SEO = ({
       <meta property="og:locale:alternate" content="es_AR" />
       <meta property="og:site_name" content="iLingue Relax" />
 
-      {/* Product-specific OG tags */}
+      {/* Product-specific OG tags (Pinterest Product Rich Pins) */}
       {type === "product" && price && (
         <>
           <meta property="product:price:amount" content={price} />
@@ -545,8 +545,32 @@ export const SEO = ({
           <meta property="product:availability" content="in stock" />
           <meta property="product:condition" content="new" />
           <meta property="product:brand" content="iLingue Relax" />
+          <meta property="og:price:amount" content={price} />
+          <meta property="og:price:currency" content="USD" />
+          <meta property="og:availability" content="instock" />
+          {sku && <meta property="product:retailer_item_id" content={sku} />}
         </>
       )}
+
+      {/* Article tags (Pinterest Article Rich Pins) */}
+      {type === "article" && article && (
+        <>
+          {article.publishedTime && (
+            <meta property="article:published_time" content={article.publishedTime} />
+          )}
+          <meta
+            property="article:modified_time"
+            content={article.modifiedTime || article.publishedTime || ""}
+          />
+          {article.author && <meta property="article:author" content={article.author} />}
+          {article.section && <meta property="article:section" content={article.section} />}
+          {(article.tags ?? []).slice(0, 6).map((t) => (
+            <meta key={t} property="article:tag" content={t} />
+          ))}
+          <meta name="pinterest-rich-pin" content="true" />
+        </>
+      )}
+
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />

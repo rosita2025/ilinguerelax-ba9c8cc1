@@ -48,7 +48,7 @@ function flagOf(cc?: string | null) {
 function Chip({ label, count, total }: { label: string; count: number; total: number }) {
   const pct = total ? Math.round((count / total) * 100) : 0;
   return (
-    <div className="rounded-lg border bg-card px-3 py-2 min-w-[130px]">
+    <div className="rounded-lg border bg-card px-3 py-2 flex-1 min-w-[120px] sm:flex-none sm:min-w-[130px]">
       <p className="text-xs text-muted-foreground truncate" title={label}>{label}</p>
       <p className="text-lg font-semibold">{count} <span className="text-xs font-normal text-muted-foreground">({pct}%)</span></p>
     </div>
@@ -101,22 +101,23 @@ export default function AdminPaymentErrors() {
     <div className="min-h-screen bg-background">
       <AdminNav />
       <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-destructive shrink-0" />
               Fallos de pago · tiempo real
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Motivo exacto de cada rechazo (Stripe, PayPal, etc.) con país e IP del intento.
               Actualiza cada 20 s{updatedAt ? ` · ${updatedAt.toLocaleTimeString()}` : ""}.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => void load()} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refrescar
           </Button>
         </div>
+
 
         <div className="flex flex-wrap gap-2">
           {HOURS_OPTIONS.map((o) => (
@@ -129,7 +130,7 @@ export default function AdminPaymentErrors() {
               {o.label}
             </Button>
           ))}
-          <span className="w-px bg-border mx-1" />
+          <span className="hidden sm:block w-px bg-border mx-1" />
           <Button size="sm" variant={provider === "" ? "default" : "outline"} onClick={() => setProvider("")}>
             Todos
           </Button>
@@ -187,43 +188,76 @@ export default function AdminPaymentErrors() {
               No hay fallos de pago en este período. 🎉
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/20 text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="text-left p-2">Fecha</th>
-                    <th className="text-left p-2">Motivo</th>
-                    <th className="text-left p-2">Proveedor</th>
-                    <th className="text-left p-2">País</th>
-                    <th className="text-left p-2">IP</th>
-                    <th className="text-left p-2">Producto</th>
-                    <th className="text-left p-2">Monto</th>
-                    <th className="text-left p-2">Página</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.id} className="border-t align-top">
-                      <td className="p-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
-                      <td className="p-2 max-w-[240px]">
-                        <span className="font-medium">
-                          {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
-                        </span>
-                      </td>
-                      <td className="p-2 whitespace-nowrap">{r.provider || "—"}</td>
-                      <td className="p-2 whitespace-nowrap">{flagOf(r.country)} {r.country || "—"}</td>
-                      <td className="p-2 font-mono text-xs whitespace-nowrap">{r.ip || "—"}</td>
-                      <td className="p-2 max-w-[180px] truncate" title={r.product_id || ""}>{r.product_id || "—"}</td>
-                      <td className="p-2 whitespace-nowrap">
-                        {r.value != null ? `${r.value} ${r.currency || ""}` : "—"}
-                      </td>
-                      <td className="p-2 max-w-[200px] truncate" title={r.page_path || ""}>{r.page_path || "—"}</td>
+            <>
+              {/* Móvil: tarjetas legibles en lugar de tabla comprimida */}
+              <ul className="divide-y md:hidden">
+                {rows.map((r) => (
+                  <li key={r.id} className="p-3 space-y-1 text-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-medium break-words">
+                        {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {r.provider || "—"} · {flagOf(r.country)} {r.country || "—"} ·{" "}
+                      {r.value != null ? `${r.value} ${r.currency || ""}` : "—"}
+                    </p>
+                    <p className="text-xs text-muted-foreground break-all">
+                      IP: <span className="font-mono">{r.ip || "—"}</span>
+                    </p>
+                    {r.product_id && (
+                      <p className="text-xs text-muted-foreground break-all">Producto: {r.product_id}</p>
+                    )}
+                    {r.page_path && (
+                      <p className="text-xs text-muted-foreground break-all">Página: {r.page_path}</p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Escritorio: tabla completa */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/20 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="text-left p-2">Fecha</th>
+                      <th className="text-left p-2">Motivo</th>
+                      <th className="text-left p-2">Proveedor</th>
+                      <th className="text-left p-2">País</th>
+                      <th className="text-left p-2">IP</th>
+                      <th className="text-left p-2">Producto</th>
+                      <th className="text-left p-2">Monto</th>
+                      <th className="text-left p-2">Página</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.id} className="border-t align-top">
+                        <td className="p-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
+                        <td className="p-2 max-w-[240px]">
+                          <span className="font-medium">
+                            {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
+                          </span>
+                        </td>
+                        <td className="p-2 whitespace-nowrap">{r.provider || "—"}</td>
+                        <td className="p-2 whitespace-nowrap">{flagOf(r.country)} {r.country || "—"}</td>
+                        <td className="p-2 font-mono text-xs whitespace-nowrap">{r.ip || "—"}</td>
+                        <td className="p-2 max-w-[180px] truncate" title={r.product_id || ""}>{r.product_id || "—"}</td>
+                        <td className="p-2 whitespace-nowrap">
+                          {r.value != null ? `${r.value} ${r.currency || ""}` : "—"}
+                        </td>
+                        <td className="p-2 max-w-[200px] truncate" title={r.page_path || ""}>{r.page_path || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
+
         </section>
       </div>
     </div>

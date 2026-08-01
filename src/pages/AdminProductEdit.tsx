@@ -358,7 +358,7 @@ const AdminProductEdit = () => {
             </div>
             <div>
               <Label className="flex items-center gap-2">
-                Alias cortos del checkout {!isNew && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                Alias cortos del checkout {!isNew && <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />}
               </Label>
               <div className="flex gap-2">
                 <Input

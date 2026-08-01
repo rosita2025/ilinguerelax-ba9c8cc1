@@ -590,20 +590,23 @@ serve(async (req) => {
     // never double-counts a sale a webhook already reported.
     const gatewayEvents: any[] = [];
     const pixelEvents: any[] = [];
+    // Proveedores con webhook verificado. dLocal Go escribe la compra con la
+    // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
+    const GATEWAY_PROVIDERS = ["stripe", "paypal", "mercadopago", "mp", "dlocal", "dlocalgo"];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
       try { m = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
-      const p = String(m.provider || "").toLowerCase();
-      if (["stripe", "paypal", "mercadopago", "mp"].includes(p)) gatewayEvents.push(ev);
+      const p = String(m.provider || ev.provider || "").toLowerCase();
+      if (GATEWAY_PROVIDERS.includes(p)) gatewayEvents.push(ev);
       else pixelEvents.push(ev);
     }
-    // Solo webhooks verificados (Stripe, PayPal, Mercado Pago) + Hotmart y manual.
+    // Solo webhooks verificados (Stripe, PayPal, Mercado Pago, dLocal Go) + Hotmart y manual.
     // Los píxeles del navegador NO cuentan como compra.
     for (const ev of gatewayEvents) {
 
       let meta: any = {};
       try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
-      const provider = String(meta.provider || "").toLowerCase();
+      const provider = String(meta.provider || ev.provider || "").toLowerCase();
 
       const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
       if (/test|sandbox|prueba/i.test(txn)) continue;

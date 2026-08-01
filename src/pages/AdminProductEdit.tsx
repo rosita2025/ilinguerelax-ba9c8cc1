@@ -327,7 +327,7 @@ const AdminProductEdit = () => {
                         <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs">
-                        <p>No tocar. Este SKU ya está vinculado a pagos de Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias y dLocal. Cambiarlo rompería pagos y entregas existentes.</p>
+                        <p>No tocar. Este SKU ya está vinculado a pagos de Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias, Binance Pay y dLocal Go. Cambiarlo rompería pagos y entregas existentes.</p>
                       </TooltipContent>
                     </Tooltip>
                   )}

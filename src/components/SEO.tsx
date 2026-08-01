@@ -470,12 +470,20 @@ export const SEO = ({
         </script>
       )}
 
+      {/* Book Structured Data */}
+      {bookStructuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(bookStructuredData)}
+        </script>
+      )}
+
       {/* Organization Structured Data */}
       {organizationData && (
         <script type="application/ld+json">
           {JSON.stringify(organizationData)}
         </script>
       )}
+
 
       {/* FAQPage Structured Data */}
       {faqStructuredData && (

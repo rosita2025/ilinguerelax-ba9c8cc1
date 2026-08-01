@@ -158,7 +158,50 @@ Deno.serve(withAdminLogging("notify-product-update", async (req) => {
   }
 
   // ---------- SEND ----------
+  // ---------- RENDER: previsualizar el correo real de UN comprador ----------
+  // Devuelve el HTML exacto que recibiría un comprador de este SKU, con SU
+  // enlace privado /mi-descarga?t=<token> y las novedades escritas. No envía nada.
+  if (action === "render") {
+    const changes = (body.changes ?? [])
+      .map((c) => String(c ?? "").trim())
+      .filter(Boolean)
+      .slice(0, 12)
+      .map((c) => c.slice(0, 200));
+    const bonusNote = String(body.bonusNote ?? "").trim().slice(0, 300);
+
+    const recipients = await collectRecipients(admin, sku);
+    const wanted = canonical(body.sampleEmail);
+    const sample = (wanted ? recipients.find((r) => r.email === wanted) : recipients[0]) ?? null;
+
+    const downloadUrl = sample
+      ? `${SITE}/mi-descarga?t=${sample.token}`
+      : `${SITE}/mi-descarga?t=TOKEN_PRIVADO_DEL_COMPRADOR`;
+
+    const templateData = {
+      productName: product.name,
+      versionLabel: noticeKey || "v1.7",
+      changes: changes.length ? changes : ["(aún no escribiste novedades)"],
+      bonusNote: bonusNote || undefined,
+      downloadUrl,
+    };
+
+    const entry = TEMPLATES["product-version-update"];
+    const html = await renderAsync(React.createElement(entry.component, templateData));
+    const subject = typeof entry.subject === "function" ? entry.subject(templateData) : entry.subject;
+
+    return json({
+      isSample: !!sample,
+      buyers: recipients.length,
+      sampleEmail: sample ? maskEmail(sample.email) : null,
+      orderNumber: sample?.orderNumber || null,
+      downloadUrl,
+      subject,
+      html,
+    });
+  }
+
   if (action === "send") {
+
     if (!noticeKey) return json({ error: "Falta la etiqueta del aviso (ej. v1.7)" }, 400);
     const changes = (body.changes ?? [])
       .map((c) => String(c ?? "").trim())

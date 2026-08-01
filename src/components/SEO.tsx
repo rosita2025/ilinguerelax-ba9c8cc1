@@ -36,6 +36,16 @@ interface SEOProps {
   isPhysical?: boolean;
   /** Custom breadcrumb trail. Overrides the default URL-based inference. */
   breadcrumbs?: Array<{ name: string; url: string }>;
+  /** Emits schema.org Book markup for physical books and ebooks. */
+  book?: {
+    name?: string;
+    author?: string;
+    isbn?: string;
+    inLanguage?: string;
+    numberOfPages?: number;
+    datePublished?: string;
+    format?: "Paperback" | "Hardcover" | "EBook" | "AudiobookFormat";
+  };
 }
 
 export const SEO = ({

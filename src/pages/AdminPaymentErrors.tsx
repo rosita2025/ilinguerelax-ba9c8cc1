@@ -48,7 +48,7 @@ function flagOf(cc?: string | null) {
 function Chip({ label, count, total }: { label: string; count: number; total: number }) {
   const pct = total ? Math.round((count / total) * 100) : 0;
   return (
-    <div className="rounded-lg border bg-card px-3 py-2 min-w-[130px]">
+    <div className="rounded-lg border bg-card px-3 py-2 flex-1 min-w-[120px] sm:flex-none sm:min-w-[130px]">
       <p className="text-xs text-muted-foreground truncate" title={label}>{label}</p>
       <p className="text-lg font-semibold">{count} <span className="text-xs font-normal text-muted-foreground">({pct}%)</span></p>
     </div>

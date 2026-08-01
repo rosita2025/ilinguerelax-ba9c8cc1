@@ -82,7 +82,7 @@ const AdminHotmartAudit = lazy(() => import("./pages/AdminHotmartAudit"));
 const AdminPurchasesStatus = lazy(() => import("./pages/AdminPurchasesStatus"));
 const AdminCheckoutAbuse = lazy(() => import("./pages/AdminCheckoutAbuse"));
 const AdminPaymentErrors = lazy(() => import("./pages/AdminPaymentErrors"));
-const AdminDeliveryAudit = lazy(() => import("./pages/AdminDeliveryAudit"));
+
 const AdminBrevoAbandoned = lazy(() => import("./pages/AdminBrevoAbandoned"));
 const AdminNewsletterDrip = lazy(() => import("./pages/AdminNewsletterDrip"));
 
@@ -297,7 +297,7 @@ const App = () => (
                   <Route path="/admin/checkout-abuse" element={<AdminGate><AdminCheckoutAbuse /></AdminGate>} />
                   <Route path="/admin/payment-errors" element={<AdminGate><AdminPaymentErrors /></AdminGate>} />
                   <Route path="/admin/email-rules" element={<AdminGate><AdminEmailRules /></AdminGate>} />
-                  <Route path="/admin/delivery-audit" element={<AdminGate><AdminDeliveryAudit /></AdminGate>} />
+                  
                   <Route path="/admin/brevo-abandoned" element={<AdminGate><AdminBrevoAbandoned /></AdminGate>} />
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />
                   

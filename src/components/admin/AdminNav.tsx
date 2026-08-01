@@ -69,7 +69,6 @@ const groups: Group[] = [
     label: "Productos",
     items: [
       { to: "/admin/productos", label: "Productos digitales", icon: Package },
-      { to: "/admin/delivery-audit", label: "Entrega digital", icon: ShieldCheck },
     ],
   },
   {

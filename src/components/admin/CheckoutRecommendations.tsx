@@ -143,25 +143,25 @@ export default function CheckoutRecommendations({ rows }: { rows: ErrorRowLite[]
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border">
           {blocks.map((b) => (
-            <div key={b.country} className="bg-card p-4 space-y-3">
-              <div className="flex items-baseline justify-between gap-2">
+            <div key={b.country} className="bg-card p-3 sm:p-4 space-y-3">
+              <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
                 <h3 className="font-semibold text-sm">
                   {flagOf(b.country)} {b.country}
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
                     {b.total} fallo{b.total === 1 ? "" : "s"}
                   </span>
                 </h3>
-                <span className="text-xs rounded-full border px-2 py-0.5 bg-destructive/10 text-destructive border-destructive/30">
+                <span className="self-start text-xs rounded-full border px-2 py-0.5 bg-destructive/10 text-destructive border-destructive/30 break-words">
                   {REASON_LABEL[b.topReason] || b.topReason} · {b.share}%
                 </span>
               </div>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {b.suggestions.map((s, i) => {
                   const meta = KIND_META[s.kind];
                   const Icon = meta.icon;
                   return (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className={`inline-flex items-center gap-1 shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${meta.className}`}>
+                    <li key={i} className="flex flex-col gap-1 text-sm sm:flex-row sm:items-start sm:gap-2">
+                      <span className={`inline-flex w-fit items-center gap-1 shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${meta.className}`}>
                         <Icon className="h-3 w-3" />
                         {meta.label}
                       </span>
@@ -171,6 +171,7 @@ export default function CheckoutRecommendations({ rows }: { rows: ErrorRowLite[]
                 })}
               </ul>
             </div>
+
           ))}
         </div>
       )}

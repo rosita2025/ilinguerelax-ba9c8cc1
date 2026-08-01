@@ -291,7 +291,10 @@ const AdminManualPayments = () => {
                         ? `${o.currency_local} ${Number(o.amount_local).toFixed(2)}`
                         : `USD ${Number(o.amount_usd).toFixed(2)}`}
                     </div>
-                    <div className="text-xs text-muted-foreground">{o.method}</div>
+                    {o.amount_local != null && o.currency_local && (
+                      <div className="text-xs text-muted-foreground">≈ USD {Number(o.amount_usd).toFixed(2)}</div>
+                    )}
+                    <div className="text-xs font-medium text-foreground mt-0.5">{methodLabel(o.method)}</div>
                   </div>
                 </div>
 
@@ -302,6 +305,58 @@ const AdminManualPayments = () => {
                     ))}
                   </ul>
                 )}
+
+                {/* Comprobante / ID de operación del banco */}
+                <div className="border-t border-border pt-3 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
+                      <Hash className="w-3.5 h-3.5" /> Pedido:
+                    </span>
+                    <button onClick={() => copy(o.order_number)} className="font-mono font-semibold hover:text-primary">
+                      {o.order_number}
+                    </button>
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
+                      <Wallet className="w-3.5 h-3.5" /> {methodLabel(o.method)}
+                    </span>
+                    {o.payment_reference ? (
+                      <button
+                        onClick={() => copy(o.payment_reference!)}
+                        className="inline-flex items-center gap-1 font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                        title={o.payment_reference_at ? new Date(o.payment_reference_at).toLocaleString("es-PE") : undefined}
+                      >
+                        <Receipt className="w-3.5 h-3.5" />
+                        {o.payment_reference}
+                        {o.payment_reference_source ? ` · ${o.payment_reference_source}` : ""}
+                        <Copy className="w-3 h-3 opacity-60" />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        <Receipt className="w-3.5 h-3.5" /> Sin comprobante
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      value={refDraft[o.id] ?? ""}
+                      onChange={(e) => onRefChange(o.id, e.target.value)}
+                      placeholder="Pega el voucher o N° de operación (Interbank, BCP, SPEI, Yape, Binance…)"
+                      className="flex-1"
+                    />
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => autoDetect(o.id)} disabled={!((refDraft[o.id] ?? "").trim())}>
+                        <Sparkles className="w-4 h-4 mr-1" /> Detectar ID
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => saveReference(o)} disabled={savingRef === o.id}>
+                        <Save className="w-4 h-4 mr-1" /> {savingRef === o.id ? "Guardando…" : "Guardar"}
+                      </Button>
+                    </div>
+                  </div>
+                  {refSource[o.id] && (
+                    <p className="text-xs text-muted-foreground">Origen detectado: <strong>{refSource[o.id]}</strong></p>
+                  )}
+                </div>
+
 
                 <div className="flex flex-wrap gap-2 justify-end pt-1">
                   {editingId !== o.id && (

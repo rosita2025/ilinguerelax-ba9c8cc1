@@ -546,48 +546,8 @@ export const SEO = ({
       <meta name="twitter:image:alt" content={title} />
       <meta name="twitter:site" content="@ilinguerelax" />
 
-      {/* Structured Data for Products */}
-      {productStructuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(productStructuredData)}
-        </script>
-      )}
-
-      {/* Structured Data for Product List */}
-      {itemListStructuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(itemListStructuredData)}
-        </script>
-      )}
-
-      {/* Breadcrumb Structured Data */}
-      {breadcrumbData && breadcrumbData.itemListElement.length > 1 && (
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbData)}
-        </script>
-      )}
-
-      {/* Book Structured Data */}
-      {bookStructuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(bookStructuredData)}
-        </script>
-      )}
-
-      {/* Organization Structured Data */}
-      {organizationData && (
-        <script type="application/ld+json">
-          {JSON.stringify(organizationData)}
-        </script>
-      )}
-
-
-      {/* FAQPage Structured Data */}
-      {faqStructuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(faqStructuredData)}
-        </script>
-      )}
+      {/* El JSON-LD se inyecta en useLayoutEffect (antes del primer paint),
+          no vía Helmet, que escribe después de pintar. */}
     </Helmet>
   );
 };

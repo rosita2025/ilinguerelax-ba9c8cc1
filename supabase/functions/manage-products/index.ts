@@ -290,6 +290,14 @@ Deno.serve(async (req) => {
     }
 
     if (action === "rename") {
+      // El SKU es inmutable: es la clave que usan Stripe, PayPal, Mercado Pago,
+      // dLocal, Yape/Plin, los tokens de descarga y los avisos a compradores.
+      // Renombrarlo rompe pagos y entregas ya emitidos. Usa los alias de checkout.
+      return json({ error: "El SKU no se puede cambiar. Usa los alias cortos del checkout." }, 400);
+    }
+
+    if (action === "__rename_disabled__") {
+
       const oldSku = (body.oldSku as string || "").trim();
       const newSku = (body.newSku as string || "").trim().toLowerCase();
       if (!oldSku || !newSku) return json({ error: "oldSku y newSku requeridos" }, 400);

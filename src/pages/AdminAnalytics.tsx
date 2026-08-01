@@ -185,6 +185,21 @@ const rangeForPreset = (p: PresetKey, custom: { from?: Date; to?: Date }) => {
 const money = (n: number) =>
   `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
+// Fecha/hora en zona horaria de Perú (UTC-5), igual que el resto del panel.
+const peruDateTime = (iso: string | null | undefined) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString("es-PE", {
+    timeZone: "America/Lima",
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const toArray = <T,>(value: T[] | null | undefined): T[] => (Array.isArray(value) ? value : []);
 const toText = (value: unknown, fallback = "") => {
   if (typeof value === "string") return value.trim() || fallback;

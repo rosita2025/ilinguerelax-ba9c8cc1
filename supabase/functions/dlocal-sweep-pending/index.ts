@@ -262,7 +262,12 @@ Deno.serve(async (req) => {
       // El cupón/CBU de dLocal expira a los 3 días (expiration_value: 3), así que
       // pasada la ventana del rail ya no hay nada que pagar: se cierra. El tope
       // duro solo aplica a rails inmediatos que dLocal deja "PENDING" colgados.
-      const graceWindow = isSlowRail(method, last.status) ? effectiveWindow : HARD_WINDOW_MS;
+      // Tope real: el cupón/link de dLocal expira a los 3 días, así que ningún
+      // pedido puede seguir "pendiente" más allá de esa ventana (antes eran 7 días).
+      const graceWindow = Math.min(
+        isSlowRail(method, last.status) ? effectiveWindow : HARD_WINDOW_MS,
+        SLOW_WINDOW_MS,
+      );
       console.log("[dlocal-sweep] decide", JSON.stringify({ orderNumber, ageH: +(age / HOUR).toFixed(1), remote, dlocalKnowsPayment, effectiveWindowH: effectiveWindow / HOUR, graceWindowH: graceWindow / HOUR, stillOpen }));
       if (age < effectiveWindow || (stillOpen && age < graceWindow)) {
         stillPending++;

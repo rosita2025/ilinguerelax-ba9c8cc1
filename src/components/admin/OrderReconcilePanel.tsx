@@ -42,10 +42,12 @@ export default function OrderReconcilePanel() {
   const [busy, setBusy] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [pending, setPending] = useState<PendingOrder[] | null>(null);
-
+  const [lastCheck, setLastCheck] = useState<Date | null>(null);
+  const knownOrders = useRef<Set<string>>(new Set());
+  const firstLoad = useRef(true);
 
   async function loadPending(silent = false) {
-    setBusy("list");
+    if (!silent) setBusy("list");
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
         body: { action: "list_pending" },
@@ -54,21 +56,40 @@ export default function OrderReconcilePanel() {
         if (!silent) toast.error(data?.error || error?.message || "No se pudo cargar la lista");
         return;
       }
-      setPending(data.pending ?? []);
-      if (!silent) toast.success(`${(data.pending ?? []).length} pedido(s) pendiente(s)`);
+      const list: PendingOrder[] = data.pending ?? [];
+      setPending(list);
+      setLastCheck(new Date());
+
+      // Avisa cuando entra un pedido pendiente nuevo
+      if (!firstLoad.current) {
+        const nuevos = list.filter((o) => !knownOrders.current.has(o.orderNumber));
+        if (nuevos.length === 1) {
+          toast.info(`Nuevo pedido pendiente: ${nuevos[0].orderNumber} · ${nuevos[0].email || "sin correo"}`);
+        } else if (nuevos.length > 1) {
+          toast.info(`${nuevos.length} pedidos pendientes nuevos`);
+        }
+      }
+      knownOrders.current = new Set(list.map((o) => o.orderNumber));
+      firstLoad.current = false;
+
+      if (!silent) toast.success(`${list.length} pedido(s) pendiente(s)`);
     } catch (e) {
-      toast.error((e as Error).message || "Error inesperado");
+      if (!silent) toast.error((e as Error).message || "Error inesperado");
     } finally {
-      setBusy(null);
+      if (!silent) setBusy(null);
     }
   }
 
-  // Muestra la lista de pendientes reales apenas se abre el panel
-  const autoLoaded = useRef(false);
+  // Carga inicial + refresco automático cada 60s para detectar pedidos nuevos
   useEffect(() => {
-    if (autoLoaded.current) return;
-    autoLoaded.current = true;
     loadPending(true);
+    const id = setInterval(() => loadPending(true), 60_000);
+    const onFocus = () => loadPending(true);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("focus", onFocus);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -160,6 +181,9 @@ export default function OrderReconcilePanel() {
         <div className="rounded-lg border border-border p-3 space-y-2">
           <p className="text-xs font-medium">
             Pendientes de dLocal Go ({pending.length}) — elige uno y acéptalo o recházalo
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Actualización automática cada minuto{lastCheck ? ` · última revisión ${lastCheck.toLocaleTimeString()}` : ""}
           </p>
           {pending.length === 0 && (
             <p className="text-xs text-muted-foreground">No hay pedidos pendientes en los últimos 30 días.</p>

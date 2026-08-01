@@ -9,6 +9,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
+import { PinterestSave } from "@/components/PinterestSave";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -230,6 +231,14 @@ const ProductDynamic = () => {
               </div>
 
               <DigitalProductNotice className="mb-6" />
+
+              <PinterestSave
+                className="mb-6"
+                url={canonical}
+                media={cover}
+                description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
+              />
+
 
 
               {(() => {

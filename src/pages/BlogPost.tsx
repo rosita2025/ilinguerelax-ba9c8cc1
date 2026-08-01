@@ -5,6 +5,7 @@ import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, BookOpen, Tag } from "l
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { PinterestSave } from "@/components/PinterestSave";
 import { getBlogPostBySlug, getRelatedPosts, blogPosts, type BlogPost as BlogPostType } from "@/data/blogPosts";
 import { fetchGeneratedBlogPostBySlug, fetchGeneratedBlogPosts } from "@/hooks/useGeneratedBlogPosts";
 
@@ -271,6 +272,14 @@ const BlogPost = () => {
         canonicalUrl={`https://ilinguerelax.com/blog/${post.slug}`}
         keywords={post.tags.join(", ")}
         image={post.image}
+        type="article"
+        article={{
+          publishedTime: new Date(post.date).toISOString(),
+          modifiedTime: new Date(post.updatedAt ?? post.date).toISOString(),
+          author: post.author,
+          section: post.category,
+          tags: post.tags,
+        }}
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
@@ -352,10 +361,17 @@ const BlogPost = () => {
                       {post.author}
                     </span>
                   </div>
-                  <Button variant="outline" size="sm" onClick={handleShare}>
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Compartir
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <PinterestSave
+                      url={`https://ilinguerelax.com/blog/${post.slug}`}
+                      media={post.image}
+                      description={`${post.title} — ${post.excerpt}`}
+                    />
+                    <Button variant="outline" size="sm" onClick={handleShare}>
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Compartir
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

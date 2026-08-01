@@ -204,7 +204,10 @@ function xmlEscape(s: string): string {
 }
 
 /** Descarta items inválidos (slug/link/fecha/título) y reporta el motivo. */
-function sanitizeFeedItems(items: FeedItem[]): { items: FeedItem[]; errors: string[] } {
+function sanitizeFeedItems(
+  items: FeedItem[],
+  pathPrefix: "blog" | "products" = "blog",
+): { items: FeedItem[]; errors: string[] } {
   const errors: string[] = [];
   const seen = new Set<string>();
   const ok: FeedItem[] = [];
@@ -212,7 +215,8 @@ function sanitizeFeedItems(items: FeedItem[]): { items: FeedItem[]; errors: stri
   for (const i of items) {
     const path = (i.path ?? "").trim();
     const title = (i.title ?? "").trim();
-    if (!/^\/blog\/[a-z0-9][a-z0-9\-_/]*$/i.test(path)) {
+    const pathRe = new RegExp(`^/${pathPrefix}/[a-z0-9][a-z0-9\\-_/]*$`, "i");
+    if (!pathRe.test(path)) {
       errors.push(`item con path inválido: "${path}"`);
       continue;
     }
@@ -250,7 +254,7 @@ function sanitizeFeedItems(items: FeedItem[]): { items: FeedItem[]; errors: stri
 }
 
 /** Validación estructural del XML antes de escribirlo a disco. */
-function validateRssXml(xml: string, expectedItems: number): string[] {
+function validateRssXml(xml: string, expectedItems: number, pathPrefix = "blog"): string[] {
   const errors: string[] = [];
   if (!xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')) errors.push("falta la declaración XML");
   if (!xml.includes("<rss version=\"2.0\"")) errors.push("falta el elemento <rss version=\"2.0\">");
@@ -273,12 +277,34 @@ function validateRssXml(xml: string, expectedItems: number): string[] {
     if (!m[1].startsWith(`${BASE_URL}/`)) errors.push(`link no canónico: "${m[1]}"`);
   }
   for (const m of xml.matchAll(/<guid[^>]*>([^<]*)<\/guid>/g)) {
-    if (!m[1].startsWith(`${BASE_URL}/blog/`)) errors.push(`guid inválido: "${m[1]}"`);
+    if (!m[1].startsWith(`${BASE_URL}/${pathPrefix}/`)) errors.push(`guid inválido: "${m[1]}"`);
   }
   return errors;
 }
 
-function rssXml(items: FeedItem[]): string {
+interface ChannelMeta {
+  title: string;
+  link: string;
+  description: string;
+  self: string;
+}
+
+const BLOG_CHANNEL: ChannelMeta = {
+  title: "Blog iLingue Relax",
+  link: `${BASE_URL}/blog`,
+  description: "Guías y recursos para aprender idiomas con iLingue Relax.",
+  self: `${BASE_URL}/rss.xml`,
+};
+
+const PRODUCTS_CHANNEL: ChannelMeta = {
+  title: "Productos iLingue Relax",
+  link: `${BASE_URL}/products`,
+  description:
+    "Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.",
+  self: `${BASE_URL}/rss-productos.xml`,
+};
+
+function rssXml(items: FeedItem[], channel: ChannelMeta = BLOG_CHANNEL): string {
   const sorted = [...items]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 100);
@@ -305,12 +331,12 @@ function rssXml(items: FeedItem[]): string {
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">',
     "  <channel>",
-    "    <title>Blog iLingue Relax</title>",
-    `    <link>${BASE_URL}/blog</link>`,
-    "    <description>Guías y recursos para aprender idiomas con iLingue Relax.</description>",
+    `    <title>${xmlEscape(channel.title)}</title>`,
+    `    <link>${channel.link}</link>`,
+    `    <description>${xmlEscape(channel.description)}</description>`,
     "    <language>es</language>",
     `    <lastBuildDate>${new Date(latest).toUTCString()}</lastBuildDate>`,
-    `    <atom:link href="${BASE_URL}/rss.xml" rel="self" type="application/rss+xml" />`,
+    `    <atom:link href="${channel.self}" rel="self" type="application/rss+xml" />`,
     ...entries,
     "  </channel>",
     "</rss>",
@@ -324,7 +350,14 @@ function rssXml(items: FeedItem[]): string {
 // --------------------------------------------------------------------------
 // Dynamic products from Supabase
 // --------------------------------------------------------------------------
-interface DbProduct { sku: string; updated_at?: string }
+interface DbProduct {
+  sku: string;
+  updated_at?: string;
+  name?: string;
+  description?: string;
+  image?: string;
+  created_at?: string;
+}
 async function getDbProducts(): Promise<DbProduct[]> {
   const url = process.env.VITE_SUPABASE_URL;
   const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -336,7 +369,7 @@ async function getDbProducts(): Promise<DbProduct[]> {
     const supabase = createClient(url, key);
     const { data, error } = await supabase
       .from("digital_products")
-      .select("sku, updated_at, active")
+      .select("sku, updated_at, created_at, name, description, cover_image_url, active")
       .eq("active", true);
     if (error) {
       console.warn("[sitemap] Supabase error:", error.message);
@@ -344,7 +377,14 @@ async function getDbProducts(): Promise<DbProduct[]> {
     }
     return (data ?? [])
       .filter((r: any) => r.sku)
-      .map((r: any) => ({ sku: r.sku, updated_at: r.updated_at }));
+      .map((r: any) => ({
+        sku: r.sku,
+        updated_at: r.updated_at,
+        created_at: r.created_at,
+        name: r.name,
+        description: r.description,
+        image: absoluteImage(r.cover_image_url),
+      }));
   } catch (err) {
     console.warn("[sitemap] Supabase fetch failed:", (err as Error).message);
     return [];
@@ -488,6 +528,38 @@ async function main() {
   }
 
 
+
+  // RSS de PRODUCTOS (public/rss-productos.xml) — pensado para que Pinterest
+  // "Importar contenido > RSS" cree pines automáticamente de cada producto.
+  const productFeedItems: FeedItem[] = dbProducts
+    .filter((p) => p.sku && p.name)
+    .map((p) => ({
+      path: `/products/${p.sku}`,
+      title: p.name as string,
+      description: (p.description ?? p.name ?? "").replace(/\s+/g, " ").trim().slice(0, 480),
+      date: p.updated_at ?? p.created_at ?? TODAY,
+      image: p.image,
+    }));
+
+  if (productFeedItems.length > 0) {
+    const { items: validProducts, errors: prodErrors } = sanitizeFeedItems(productFeedItems, "products");
+    for (const e of prodErrors) console.error(`[rss-productos] ERROR ${e}`);
+    if (validProducts.length === 0) {
+      console.error("[rss-productos] ERROR sin items válidos; se conserva el feed anterior.");
+    } else {
+      const xml = rssXml(validProducts, PRODUCTS_CHANNEL);
+      const xmlErrors = validateRssXml(xml, Math.min(validProducts.length, 100), "products");
+      if (xmlErrors.length > 0) {
+        for (const e of xmlErrors) console.error(`[rss-productos] ERROR estructura: ${e}`);
+      } else {
+        writeFileSync(join(PUBLIC_DIR, "rss-productos.xml"), xml);
+        writeFileSync(join(PUBLIC_DIR, "rss-products.xml"), xml);
+        writeFileSync(join(PUBLIC_DIR, "rss-productos"), xml);
+        writeFileSync(join(PUBLIC_DIR, "rss-products"), xml);
+        console.log(`[rss-productos] feed escrito (${Math.min(validProducts.length, 100)} productos).`);
+      }
+    }
+  }
 
   // Regional subdomains disabled — single canonical domain only.
 

@@ -23,7 +23,10 @@ export const PINTEREST_FEEDS = [
   `https://${HOST}/rss`,
   `https://${HOST}/feed.xml`,
   `${PROJECT_FN}/blog-feed?format=rss`,
+  `https://${HOST}/rss-productos.xml`,
+  `https://${HOST}/rss-products.xml`,
   `${PROJECT_FN}/pinterest-catalog`,
+
 ];
 
 async function safeFetch(

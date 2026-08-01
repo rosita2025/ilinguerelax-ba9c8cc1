@@ -85,6 +85,7 @@ const AdminPaymentErrors = lazy(() => import("./pages/AdminPaymentErrors"));
 
 const AdminBrevoAbandoned = lazy(() => import("./pages/AdminBrevoAbandoned"));
 const AdminNewsletterDrip = lazy(() => import("./pages/AdminNewsletterDrip"));
+const AdminLaunches = lazy(() => import("./pages/AdminLaunches"));
 
 const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
 const AdminBotReport = lazy(() => import("./pages/AdminBotReport"));
@@ -300,6 +301,7 @@ const App = () => (
                   
                   <Route path="/admin/brevo-abandoned" element={<AdminGate><AdminBrevoAbandoned /></AdminGate>} />
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />
+                  <Route path="/admin/lanzamientos" element={<AdminGate><AdminLaunches /></AdminGate>} />
                   
                   <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />
                   <Route path="/admin/bot-report" element={<AdminGate><AdminBotReport /></AdminGate>} />

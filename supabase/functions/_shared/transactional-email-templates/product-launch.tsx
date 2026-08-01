@@ -31,7 +31,7 @@ interface Props {
 }
 
 const AUDIENCE_INTRO: Record<string, string> = {
-  buyers: 'Como ya eres cliente de ILINGUE RELAX, te lo contamos antes que a nadie.',
+  buyers: 'Como ya eres cliente de iLingue Relax, te lo contamos antes que a nadie.',
   hotmart: 'Como ya compraste uno de nuestros materiales, queríamos que lo supieras de primero.',
   reviewers: 'Gracias por dejarnos tu reseña — por eso te avisamos antes que al resto.',
   waitlist: 'Pediste que te avisáramos cuando saliera algo nuevo: aquí está.',
@@ -41,7 +41,7 @@ const AUDIENCE_INTRO: Record<string, string> = {
 
 const Email = ({ customerName, productName, productPitch, imageUrl, productUrl, coupon, audience }: Props) => {
   const name = customerName?.trim() || 'Hola'
-  const product = productName?.trim() || 'Nuevo material ILINGUE RELAX'
+  const product = productName?.trim() || 'Nuevo material iLingue Relax'
   const url = productUrl || 'https://ilinguerelax.com'
   const intro = AUDIENCE_INTRO[audience ?? ''] || AUDIENCE_INTRO.newsletter
 
@@ -52,7 +52,7 @@ const Email = ({ customerName, productName, productPitch, imageUrl, productUrl, 
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar}>
-            <Text style={brand}>ILINGUE RELAX</Text>
+            <Text style={brand}>iLingue Relax</Text>
             <Text style={orderTag}>NUEVO LANZAMIENTO</Text>
           </Section>
 
@@ -93,7 +93,7 @@ const Email = ({ customerName, productName, productPitch, imageUrl, productUrl, 
             · WhatsApp{' '}
             <Link href="https://wa.me/12512724704" style={linkA}>+1 251 272 4704</Link>.
           </Text>
-          <Text style={footer}>© {new Date().getFullYear()} ILINGUE RELAX · ilinguerelax.com</Text>
+          <Text style={footer}>© {new Date().getFullYear()} iLingue Relax · ilinguerelax.com</Text>
         </Container>
       </Body>
     </Html>
@@ -102,7 +102,7 @@ const Email = ({ customerName, productName, productPitch, imageUrl, productUrl, 
 
 export const template = {
   component: Email,
-  subject: (d: Props) => `🚀 Nuevo: ${d.productName || 'material ILINGUE RELAX'} ya está disponible`,
+  subject: (d: Props) => `🚀 Nuevo: ${d.productName || 'material iLingue Relax'} ya está disponible`,
   displayName: 'Lanzamiento de producto nuevo',
   previewData: {
     customerName: 'María',

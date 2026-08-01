@@ -264,7 +264,7 @@ Deno.serve(async (req) => {
           const templateData = {
             orderNumber,
             customerName,
-            productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
+            productName: payment.metadata?.items_summary || payment.description || "Producto iLingue Relax",
             amount: payment.transaction_amount ?? null,
             currency: payment.currency_id || "PEN",
             method,
@@ -362,7 +362,7 @@ Deno.serve(async (req) => {
               customerName,
               customerPhone: payment.metadata?.customer_phone || undefined,
               customerCountry: payment.payer?.address?.country_id || undefined,
-              productName: payment.metadata?.items_summary || payment.description || "Producto ILINGUE RELAX",
+              productName: payment.metadata?.items_summary || payment.description || "Producto iLingue Relax",
               skus: skusForDelivery,
               amount: payment.transaction_amount ?? undefined,
               currency: payment.currency_id || "PEN",

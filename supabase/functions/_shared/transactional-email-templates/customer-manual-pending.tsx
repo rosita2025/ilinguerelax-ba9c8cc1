@@ -77,7 +77,7 @@ const Email = ({
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
-          <Text style={brand}>ILINGUE RELAX</Text>
+          <Text style={brand}>iLingue Relax</Text>
           <Heading style={h1}>⏳ Tu pago sigue pendiente</Heading>
           <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
         </Section>
@@ -198,7 +198,7 @@ const Email = ({
         </Section>
 
 
-        <Text style={footer}>Gracias por tu compra 💛 — Equipo ILINGUE RELAX</Text>
+        <Text style={footer}>Gracias por tu compra 💛 — Equipo iLingue Relax</Text>
         <Text style={footer}>hola@ilinguerelax.com · www.ilinguerelax.com/mi-pedido</Text>
 
       </Container>

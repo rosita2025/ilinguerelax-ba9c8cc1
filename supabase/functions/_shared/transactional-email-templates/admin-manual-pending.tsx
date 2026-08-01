@@ -54,7 +54,7 @@ const Email = ({
 }: Props) => {
   const waNumber = digitsOnly(customerPhone)
   const waText =
-    `Hola ${customerName || ''} 👋 Soy Rosa de ILINGUE RELAX. ` +
+    `Hola ${customerName || ''} 👋 Soy Rosa de iLingue Relax. ` +
     `Recibí tu pedido ${orderNumber || ''} por ${fmtMoney(amount, currency)} (${method || 'Yape/Plin'}). ` +
     `¿Me confirmas la captura del pago para enviarte tu material?`
   const waUrl = waNumber
@@ -68,7 +68,7 @@ const Email = ({
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
-            <Text style={brand}>ILINGUE RELAX · ADMIN</Text>
+            <Text style={brand}>iLingue Relax · ADMIN</Text>
             <Heading style={h1}>⏳ Nuevo pedido pendiente (Yape/Plin)</Heading>
             <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
           </Section>

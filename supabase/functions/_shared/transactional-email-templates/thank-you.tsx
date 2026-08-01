@@ -106,11 +106,11 @@ const Email = ({
   return (
     <Html lang="es" dir="ltr">
       <Head />
-      <Preview>Pedido {orderNumber || ''} confirmado — ILINGUE RELAX</Preview>
+      <Preview>Pedido {orderNumber || ''} confirmado — iLingue Relax</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar}>
-            <Text style={brand}>ILINGUE RELAX</Text>
+            <Text style={brand}>iLingue Relax</Text>
             <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
           </Section>
 
@@ -206,7 +206,7 @@ const Email = ({
               <Link href="https://wa.me/12512724704" style={link}>+1 251 272 4704</Link>.
             </Text>
             <Text style={footer}>
-              © {new Date().getFullYear()} ILINGUE RELAX · ilinguerelax.com
+              © {new Date().getFullYear()} iLingue Relax · ilinguerelax.com
             </Text>
           </Section>
         </Container>
@@ -217,7 +217,7 @@ const Email = ({
 
 export const template = {
   component: Email,
-  subject: (d: Props) => `Pedido #${d.orderNumber || 'ILR'} confirmado — ILINGUE RELAX`,
+  subject: (d: Props) => `Pedido #${d.orderNumber || 'ILR'} confirmado — iLingue Relax`,
   displayName: 'Gracias por tu compra',
   previewData: {
     orderNumber: 'ILR-ST-20260710-ABC123',

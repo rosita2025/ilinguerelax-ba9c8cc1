@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
       const payerName = checkoutName || [data.payer?.name?.given_name, data.payer?.name?.surname].filter(Boolean).join(" ").trim() || undefined;
       const customerEmail = checkoutEmail || payerEmail;
       const customerCountry = checkoutCountry || payerCountry || undefined;
-      const productName = pu?.description || pu?.items?.[0]?.name || "Pedido ILINGUE RELAX";
+      const productName = pu?.description || pu?.items?.[0]?.name || "Pedido iLingue Relax";
       const paidOrderNumber = captureId ? `ILR-PP-${String(captureId).slice(-8).toUpperCase()}` : String(orderId);
       // Historial visible en /mi-pedido (mismo formato que Stripe/dLocal/MP).
       try {

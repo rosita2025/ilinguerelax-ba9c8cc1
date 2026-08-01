@@ -3,7 +3,7 @@
 // digital delivery, and abandoned-cart sequences.
 
 export const BRAND = {
-  name: "ILINGUE RELAX",
+  name: "iLingue Relax",
   primary: "#0f766e",       // teal
   primaryDark: "#0b5f58",
   accent: "#f97316",        // coral / CTA highlight

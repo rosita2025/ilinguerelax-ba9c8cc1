@@ -339,7 +339,7 @@ Deno.serve(async (req) => {
       if (!email) return json({ error: "El pedido no tiene correo del comprador", summary }, 400);
       const res = await deliver({
         orderNumber, email, name, country, skus, amount, currency, provider,
-        productName: "Pedido ILINGUE RELAX", reference,
+        productName: "Pedido iLingue Relax", reference,
       });
       if (!res.delivered) return json({ error: res.detail, summary }, 422);
       return json({ ok: true, applied: "delivery_retried", delivery: res, summary });
@@ -430,7 +430,7 @@ Deno.serve(async (req) => {
       if (!email) return json({ ok: true, applied: "paid_no_email", summary });
       const res = await deliver({
         orderNumber, email, name, country, skus, amount, currency, provider,
-        productName: "Pedido ILINGUE RELAX", reference,
+        productName: "Pedido iLingue Relax", reference,
       });
       return json({ ok: true, applied: "paid", remoteStatus, delivery: res, summary });
     }
@@ -465,7 +465,7 @@ Deno.serve(async (req) => {
     }
     const res = await deliver({
       orderNumber, email, name, country, skus, amount, currency, provider,
-      productName: "Pedido ILINGUE RELAX", reference,
+      productName: "Pedido iLingue Relax", reference,
     });
     return json({ ok: true, applied: "manual_approved", delivery: res, summary });
   } catch (e) {

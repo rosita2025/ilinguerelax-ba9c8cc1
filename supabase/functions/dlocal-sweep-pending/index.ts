@@ -259,13 +259,15 @@ Deno.serve(async (req) => {
       // Nunca se creó el pago en dLocal (o dLocal no lo reconoce): no hay cupón
       // vigente, así que se usa la ventana corta y no se espera 72 h.
       const effectiveWindow = dlocalKnowsPayment ? window : Math.min(window, NO_PAYMENT_WINDOW_MS);
-      // Solo se declara abandonado cuando venció la ventana del rail (6 h en
-      // pagos inmediatos, 72 h en efectivo/transferencia). Antes de eso el
-      // pedido sigue vivo y se vuelve a consultar en el próximo barrido.
-      if (age < effectiveWindow || (stillOpen && age < HARD_WINDOW_MS)) {
+      // El cupón/CBU de dLocal expira a los 3 días (expiration_value: 3), así que
+      // pasada la ventana del rail ya no hay nada que pagar: se cierra. El tope
+      // duro solo aplica a rails inmediatos que dLocal deja "PENDING" colgados.
+      const graceWindow = isSlowRail(method, last.status) ? effectiveWindow : HARD_WINDOW_MS;
+      if (age < effectiveWindow || (stillOpen && age < graceWindow)) {
         stillPending++;
         continue;
       }
+
 
 
 

@@ -585,7 +585,11 @@ serve(async (req) => {
     const seenGatewayKeys = new Set<string>();
     // Snapshot of purchases already ingested (hotmart + manual) used to avoid
     // double-counting the browser-side Purchase pixel for the same sale.
-    const alreadyIngested = realPurchases.map((p) => ({ at: new Date(p.at).getTime(), productId: p.productId }));
+    const alreadyIngested = realPurchases.map((p) => ({
+      at: new Date(p.at).getTime(),
+      productId: p.productId,
+      country: String(p.country || "").toUpperCase(),
+    }));
     // Process webhook (gateway) events FIRST, then browser pixels, so a pixel
     // never double-counts a sale a webhook already reported.
     const gatewayEvents: any[] = [];

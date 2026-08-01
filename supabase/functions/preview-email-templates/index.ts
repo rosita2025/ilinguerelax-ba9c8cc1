@@ -155,7 +155,7 @@ async function renderTemplate(name: string): Promise<{ subject: string; html: st
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
 
-  const __blocked = assertInternalCall(req);
+  const __blocked = await assertInternalCall(req);
   if (__blocked) return __blocked;
   try {
     const url = new URL(req.url)

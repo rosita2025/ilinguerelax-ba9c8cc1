@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
   const expectedAdmin = Deno.env.get("ADMIN_REVIEW_KEY") ?? "";
   const isAdmin = !!expectedAdmin && adminKey === expectedAdmin;
   if (!isAdmin) {
-    const blocked = assertInternalCall(req);
+    const blocked = await assertInternalCall(req);
     if (blocked) return blocked;
   }
 

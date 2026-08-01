@@ -216,8 +216,6 @@ export default function AdminDlocal() {
 
           <OrderReconcilePanel />
 
-          <DlocalTestSimulator />
-
           <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3">
 
             <div className="flex-1">
@@ -364,6 +362,8 @@ export default function AdminDlocal() {
               })}
             </div>
           )}
+
+          <DlocalTestSimulator />
 
           <Card className="p-3 sm:p-4 text-xs text-muted-foreground space-y-1">
             <p><strong>Cómo funciona:</strong> al activar un país se crea (si falta) su región con la moneda local y se agrega el método dLocal Go correspondiente.</p>

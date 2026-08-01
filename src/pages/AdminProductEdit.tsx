@@ -327,7 +327,7 @@ const AdminProductEdit = () => {
                         <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs">
-                        <p>No tocar. Este SKU ya está vinculado a pagos de Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias y dLocal. Cambiarlo rompería pagos y entregas existentes.</p>
+                        <p>No tocar. Este SKU ya está vinculado a pagos de Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias, Binance Pay y dLocal Go. Cambiarlo rompería pagos y entregas existentes.</p>
                       </TooltipContent>
                     </Tooltip>
                   )}
@@ -363,22 +363,22 @@ const AdminProductEdit = () => {
               </div>
             </div>
             <div>
-              <Label className="flex items-center gap-2">
-                Alias cortos del checkout
-                {!isNew && (
-                  <>
-                    <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs">
-                        <p>No tocar. Estos alias ya usan Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias y dLocal. Cambiarlos rompería pagos y entregas ya emitidos.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </>
-                )}
-              </Label>
+                <Label className="flex items-center gap-2">
+                  Alias cortos del checkout
+                  {!isNew && (
+                    <>
+                      <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p>No tocar. Estos alias ya usan Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias, Binance Pay y dLocal Go. Cambiarlos rompería pagos y entregas ya emitidos.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </>
+                  )}
+                </Label>
               <div className="flex gap-2">
                 <Input
                   value={(product.sku_aliases ?? []).join(", ")}

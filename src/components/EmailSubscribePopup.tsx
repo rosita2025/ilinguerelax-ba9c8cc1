@@ -339,7 +339,7 @@ export const EmailSubscribePopup = () => {
     }
   };
 
-  if (!open) return null;
+  if (blocked || !open) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">

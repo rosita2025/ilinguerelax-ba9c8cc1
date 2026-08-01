@@ -160,11 +160,13 @@ Deno.serve(async (req) => {
       // el efectivo/transferencia se acredita a los minutos y dLocal muchas
       // veces no manda webhook. Así el cliente recibe su entrega enseguida.
       let remote: string | null = null;
+      let dlocalKnowsPayment = false;
       if (reference && reference !== orderNumber) {
         const payment = await fetchDlocalPayment(reference);
         const remoteOrder = String(payment?.order_id ?? "").trim().toUpperCase();
         // El pago consultado debe pertenecer a ESTE pedido.
         if (payment && (!remoteOrder || remoteOrder === orderNumber)) {
+          dlocalKnowsPayment = true;
           remote = String(payment.status ?? "").toUpperCase() || null;
         }
       }
@@ -188,6 +190,7 @@ Deno.serve(async (req) => {
           metadata: { skus, source: "sweep", autoDelivery: true },
         });
         recovered++;
+        await resolveReminders(supabase, orderNumber, "paid");
 
         if (email) {
           const alreadyDelivered = events.some((e) => e.event === "delivery_sent");
@@ -248,14 +251,18 @@ Deno.serve(async (req) => {
           metadata: { skus, source: "sweep" },
         });
         rejected++;
+        await resolveReminders(supabase, orderNumber, `dlocal_${remote.toLowerCase()}`);
         continue;
       }
 
       const stillOpen = remote ? isPendingStatus(remote) : false;
+      // Nunca se creó el pago en dLocal (o dLocal no lo reconoce): no hay cupón
+      // vigente, así que se usa la ventana corta y no se espera 72 h.
+      const effectiveWindow = dlocalKnowsPayment ? window : Math.min(window, NO_PAYMENT_WINDOW_MS);
       // Solo se declara abandonado cuando venció la ventana del rail (6 h en
       // pagos inmediatos, 72 h en efectivo/transferencia). Antes de eso el
       // pedido sigue vivo y se vuelve a consultar en el próximo barrido.
-      if (age < window || (stillOpen && age < HARD_WINDOW_MS)) {
+      if (age < effectiveWindow || (stillOpen && age < HARD_WINDOW_MS)) {
         stillPending++;
         continue;
       }
@@ -270,12 +277,15 @@ Deno.serve(async (req) => {
         status: "ABANDONED",
         method,
         reference,
-        detail: "El pago no se completó en dLocal (checkout abandonado o cupón vencido)",
+        detail: dlocalKnowsPayment
+          ? "El pago no se completó en dLocal (cupón vencido sin acreditar)"
+          : "El comprador nunca completó el pago en dLocal (checkout abandonado, sin cupón generado)",
         customerEmail: email,
         amount: amount ?? null,
         currency,
         metadata: { skus, source: "sweep", remoteStatus: remote },
       });
+      await resolveReminders(supabase, orderNumber, "abandoned");
       abandoned++;
     }
 

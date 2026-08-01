@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
 import coverImage from "@/assets/product-spanish-3000-verbs-book.webp";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const COVER_IMAGE_PUBLIC = "/images/product-spanish-3000-verbs-book.webp";
 
@@ -637,6 +638,7 @@ const ProductSpanish3000VerbsBook = () => {
       <Footer />
       <ScrollToTop />
       <WhatsAppButton />
+      <PinterestSave floating />
       <StickyBuyBar
         lang="en"
         productName="3,000 Spanish Verbs Mastery — Pre-Order"

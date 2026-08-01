@@ -3,14 +3,16 @@ import { Button } from "@/components/ui/button";
 interface PinterestSaveProps {
   /** URL absoluta de la página a guardar. Por defecto, la URL actual. */
   url?: string;
-  /** Imagen absoluta que se usará como pin. */
-  media: string;
-  /** Descripción del pin (título + gancho). */
-  description: string;
+  /** Imagen absoluta que se usará como pin. Por defecto, la og:image de la página. */
+  media?: string;
+  /** Descripción del pin. Por defecto, título + meta description. */
+  description?: string;
   className?: string;
   size?: "sm" | "default" | "lg";
   variant?: "outline" | "secondary" | "default" | "ghost";
   label?: string;
+  /** Botón flotante fijo (para páginas de producto estáticas). */
+  floating?: boolean;
 }
 
 const PinterestIcon = ({ className }: { className?: string }) => (
@@ -19,9 +21,15 @@ const PinterestIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const metaContent = (selector: string) =>
+  typeof document !== "undefined"
+    ? document.querySelector<HTMLMetaElement>(selector)?.content ?? ""
+    : "";
+
 /**
  * Botón "Guardar en Pinterest" (Save Button oficial vía pinterest.com/pin/create/button).
  * No requiere el script pinit.js: evita cargar terceros y funciona en móvil y escritorio.
+ * Si no se pasan `media`/`description`, los toma de las etiquetas Open Graph de la página.
  */
 export const PinterestSave = ({
   url,
@@ -31,21 +39,39 @@ export const PinterestSave = ({
   size = "sm",
   variant = "outline",
   label = "Guardar en Pinterest",
+  floating = false,
 }: PinterestSaveProps) => {
   const handleClick = () => {
     const pageUrl =
-      url || (typeof window !== "undefined" ? window.location.href : "https://ilinguerelax.com");
+      url ||
+      metaContent('meta[property="og:url"]') ||
+      (typeof window !== "undefined" ? window.location.href : "https://ilinguerelax.com");
+
+    const pinMedia =
+      media ||
+      metaContent('meta[property="og:image"]') ||
+      "https://ilinguerelax.com/og-image.png";
+
+    const pinDescription =
+      description ||
+      [
+        metaContent('meta[property="og:title"]') ||
+          (typeof document !== "undefined" ? document.title : "iLingue Relax"),
+        metaContent('meta[name="description"]'),
+      ]
+        .filter(Boolean)
+        .join(" — ");
+
     const href =
       "https://www.pinterest.com/pin/create/button/" +
       `?url=${encodeURIComponent(pageUrl)}` +
-      `&media=${encodeURIComponent(media)}` +
-      `&description=${encodeURIComponent(description.slice(0, 480))}`;
+      `&media=${encodeURIComponent(pinMedia)}` +
+      `&description=${encodeURIComponent(pinDescription.slice(0, 480))}`;
 
     if (typeof window !== "undefined") {
       window.open(href, "_blank", "noopener,noreferrer,width=750,height=650");
-      // Meta Pixel / analítica opcional
       (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.("trackCustom", "PinterestSave", {
-        content_name: description.slice(0, 100),
+        content_name: pinDescription.slice(0, 100),
       });
     }
   };
@@ -53,15 +79,20 @@ export const PinterestSave = ({
   return (
     <Button
       type="button"
-      variant={variant}
+      variant={floating ? "secondary" : variant}
       size={size}
       onClick={handleClick}
-      className={className}
+      className={
+        floating
+          ? `fixed left-4 bottom-24 z-40 shadow-lg rounded-full border border-border bg-card/95 backdrop-blur ${className ?? ""}`
+          : className
+      }
       aria-label={label}
       data-pin-do="none"
     >
       <PinterestIcon className="w-4 h-4 mr-2 text-[#E60023]" />
-      {label}
+      <span className={floating ? "hidden sm:inline" : undefined}>{label}</span>
+      <span className={floating ? "sm:hidden" : "hidden"}>Pinterest</span>
     </Button>
   );
 };

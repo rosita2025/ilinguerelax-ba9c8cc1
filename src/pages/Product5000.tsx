@@ -83,6 +83,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { TrustBadges } from "@/components/TrustBadges";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { PinterestSave } from "@/components/PinterestSave";
 
 const partnerLogos = [
   {
@@ -893,6 +894,7 @@ const Product5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
+      <PinterestSave floating />
       <StickyBuyBar
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}

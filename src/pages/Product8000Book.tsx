@@ -55,6 +55,7 @@ import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { PinterestSave } from "@/components/PinterestSave";
 const features = [
   "Más de 8,000 palabras y expresiones en inglés",
   "Pronunciación adaptada para hispanohablantes",
@@ -683,6 +684,7 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
+      <PinterestSave floating />
       <StickyBuyBar
         price="$25.00"
         originalPrice="$45"

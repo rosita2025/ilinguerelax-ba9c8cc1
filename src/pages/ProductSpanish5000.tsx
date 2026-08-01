@@ -64,6 +64,7 @@ import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAna
 import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
 import logoShopify from "@/assets/logo-shopify.png";
+import { PinterestSave } from "@/components/PinterestSave";
 
 // Shopify product info for cart
 const SHOPIFY_VARIANT_ID = "gid://shopify/ProductVariant/42931924795453";
@@ -800,6 +801,7 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
+      <PinterestSave floating />
       <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} />
 
       {/* Spacer for sticky bar */}

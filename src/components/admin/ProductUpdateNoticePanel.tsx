@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, Mail, Send } from "lucide-react";
+import { Eye, Loader2, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +30,10 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
   const [changes, setChanges] = useState("");
   const [bonusNote, setBonusNote] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [rendering, setRendering] = useState(false);
+  const [emailPreview, setEmailPreview] = useState<{
+    html: string; subject: string; sampleEmail: string | null; isSample: boolean; downloadUrl: string; orderNumber: string | null;
+  } | null>(null);
 
   const call = async (body: Record<string, unknown>) => {
     const { data, error } = await supabase.functions.invoke("notify-product-update", {
@@ -48,6 +52,21 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
     } catch (e) {
       toast({ title: "No se pudo calcular", description: e instanceof Error ? e.message : "Error", variant: "destructive" });
     } finally { setLoading(false); }
+  };
+
+  const renderEmail = async () => {
+    setRendering(true);
+    try {
+      const data = await call({
+        action: "render",
+        noticeKey: noticeKey.trim(),
+        changes: changes.split("\n").map((l) => l.trim()).filter(Boolean),
+        bonusNote: bonusNote.trim() || undefined,
+      });
+      setEmailPreview(data as typeof emailPreview);
+    } catch (e) {
+      toast({ title: "No se pudo previsualizar", description: e instanceof Error ? e.message : "Error", variant: "destructive" });
+    } finally { setRendering(false); }
   };
 
   const send = async () => {
@@ -138,6 +157,34 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
           <div className="space-y-1">
             <Label className="text-xs">Escribe el SKU para confirmar el envío</Label>
             <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={sku} className="font-mono" />
+          </div>
+
+          <div className="space-y-2">
+            <Button type="button" variant="outline" onClick={renderEmail} disabled={rendering} className="w-full sm:w-auto">
+              {rendering ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+              Previsualizar correo de un comprador
+            </Button>
+
+            {emailPreview && (
+              <div className="rounded border overflow-hidden">
+                <div className="p-3 text-xs bg-muted space-y-1">
+                  <div><strong>Asunto:</strong> {emailPreview.subject}</div>
+                  <div>
+                    <strong>Para:</strong>{" "}
+                    {emailPreview.isSample
+                      ? <>{emailPreview.sampleEmail} {emailPreview.orderNumber ? `· pedido ${emailPreview.orderNumber}` : ""}</>
+                      : <span className="text-muted-foreground">sin compradores aún — se muestra un ejemplo</span>}
+                  </div>
+                  <div className="break-all"><strong>Su enlace:</strong> {emailPreview.downloadUrl}</div>
+                </div>
+                <iframe
+                  title="Previsualización del correo"
+                  sandbox=""
+                  srcDoc={emailPreview.html}
+                  className="w-full h-[520px] bg-white border-t"
+                />
+              </div>
+            )}
           </div>
 
           <Button onClick={send} disabled={sending} className="w-full sm:w-auto">

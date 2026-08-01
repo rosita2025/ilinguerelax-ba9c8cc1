@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck, Send, Shield } from "lucide-react";
+import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck, Send, Shield, Radar, AlertTriangle, Banknote, MailCheck, Bot } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
 type Category = "Ventas" | "Productos" | "Marketing" | "Analítica" | "Seguridad";
@@ -32,7 +32,13 @@ const panels: Array<{
   { to: "/admin/analytics", icon: LineChart, title: "Analíticas · Funnel", desc: "Embudo estilo Shopify: sesiones, add-to-cart, checkout y compras. Conversiones, top productos por país y tendencias.", color: "text-violet-600", category: "Analítica" },
   { to: "/admin/ga4-compare", icon: GitCompare, title: "GA4 · Comparativa", desc: "Compara datos internos vs Google Analytics 4: usuarios, sesiones, eventos y fuentes de tráfico para detectar desviaciones.", color: "text-rose-500", category: "Analítica" },
   { to: "/admin/checkout-abuse", icon: Shield, title: "Anti-abuso · Checkout", desc: "IPs bloqueadas por rate limit, top IPs con más aperturas del checkout en 24 h y desbloqueo manual.", color: "text-red-500", category: "Seguridad" },
+  { to: "/admin/indexing", icon: Radar, title: "Indexación · Google / IndexNow", desc: "Estado por URL (pendiente, enviado, reintentando, fallido) con historial, timestamps y reintentos por lote.", color: "text-emerald-600", category: "Analítica" },
+  { to: "/admin/payment-errors", icon: AlertTriangle, title: "Errores de pago", desc: "Intentos fallidos de Stripe, PayPal, Mercado Pago y dLocal con motivo del error y recomendaciones de checkout.", color: "text-red-600", category: "Ventas" },
+  { to: "/admin/dlocal", icon: Banknote, title: "dLocal Go · Cobertura y conciliación", desc: "Países activos, transferencias/efectivo/billeteras, pedidos pendientes, conciliación por voucher y modo test.", color: "text-lime-600", category: "Ventas" },
+  { to: "/admin/email-rules", icon: MailCheck, title: "Reglas de correo", desc: "Corrige correos mal escritos, evita duplicados de entrega y controla reglas de envío por dominio.", color: "text-blue-600", category: "Marketing" },
+  { to: "/admin/bot-report", icon: Bot, title: "Reporte de bots", desc: "Tráfico automatizado detectado: user-agents, IPs y páginas afectadas para depurar métricas reales.", color: "text-slate-500", category: "Seguridad" },
 ];
+
 
 const CATEGORIES: Array<"Todos" | Category> = ["Todos", "Ventas", "Productos", "Marketing", "Analítica", "Seguridad"];
 

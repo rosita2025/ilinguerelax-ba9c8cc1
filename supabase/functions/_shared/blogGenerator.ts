@@ -6,6 +6,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { pingIndexNow, pingSitemap, pingWebSub } from "./indexnow.ts";
+import { pingPinterestAndCms } from "./pinterestPing.ts";
 import { notifyGoogleIndexing } from "./googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
@@ -224,6 +225,8 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       notifyGoogleIndexing([postUrl], "URL_UPDATED"),
       resubmitSitemapsGSC(),
       inspectUrlGSC(postUrl),
+      // Pinterest + webhook del CMS
+      pingPinterestAndCms({ url: postUrl, title: parsed.title, type: "blog" }),
     ]);
     await supabase
       .from("generated_blog_posts")

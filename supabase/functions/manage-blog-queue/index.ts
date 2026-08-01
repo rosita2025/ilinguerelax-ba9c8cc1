@@ -9,6 +9,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { pingIndexNow, pingSitemap, pingWebSub } from "../_shared/indexnow.ts";
+import { pingPinterestAndCms } from "../_shared/pinterestPing.ts";
 import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { BlogGenError, generateAndStorePost } from "../_shared/blogGenerator.ts";
@@ -312,6 +313,8 @@ serve(async (req) => {
           notifyGoogleIndexing([postUrl], "URL_UPDATED"),
           resubmitSitemapsGSC(),
           inspectUrlGSC(postUrl),
+          // Pinterest (refresco de feeds + re-scrape) y webhook del CMS
+          pingPinterestAndCms({ url: postUrl, type: "blog" }),
         ]);
         await supabase
           .from("generated_blog_posts")

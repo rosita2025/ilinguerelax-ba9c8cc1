@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe, Pencil, Save } from "lucide-react";
+import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe, Pencil, Save, Receipt, Hash, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+import { extractPaymentReference, methodLabel } from "@/lib/paymentReference";
 
 import { useAdminKey } from "@/components/admin/AdminGate";
 
@@ -25,6 +26,9 @@ interface ManualPayment {
   notes: string | null;
   verified_at: string | null;
   created_at: string;
+  payment_reference?: string | null;
+  payment_reference_source?: string | null;
+  payment_reference_at?: string | null;
 }
 
 type Filter = "pending" | "verified" | "rejected" | "all";

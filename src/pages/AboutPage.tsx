@@ -24,39 +24,21 @@ const AboutPage = () => {
   return (
     <main className="min-h-screen bg-background">
       <Helmet>
+        {/* La entidad Organization/Brand vive una sola vez en index.html (#organization).
+            Aquí solo se referencia por @id para no crear entidades duplicadas que
+            confunden al panel de conocimiento de Google. */}
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "iLingue Relax",
-          "alternateName": "Youtumundial LLC",
-          "url": "https://ilinguerelax.com",
-          "logo": "https://ilinguerelax.com/og-image.png",
-          "description": "Marca educativa para aprender inglés sin estrés. Libros digitales con pronunciación adaptada para hispanohablantes. Operada por Youtumundial LLC, registrada en Nuevo México, Estados Unidos.",
-          "foundingDate": "2025",
-          "sameAs": [
-            "https://www.instagram.com/ilinguerelax/",
-            "https://www.facebook.com/ilinguerelax"
-          ],
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer service",
-            "url": "https://ilinguerelax.com/contacto",
-            "availableLanguage": ["Spanish", "English"]
-          },
-          "areaServed": {
-            "@type": "GeoShape",
-            "name": "Americas"
-          },
-          "knowsAbout": ["English language learning", "Spanish to English", "Language education"],
-          "numberOfEmployees": { "@type": "QuantitativeValue", "value": "1-10" }
-        })}</script>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
+          "@type": "AboutPage",
+          "@id": "https://ilinguerelax.com/sobre-nosotros#webpage",
           "name": "Sobre Nosotros - iLingue Relax",
-          "description": "Conoce la historia de iLingue Relax, marca educativa para aprender inglés sin estrés.",
+          "description": "Conoce la historia de iLingue Relax, marca educativa para aprender idiomas sin estrés.",
           "url": "https://ilinguerelax.com/sobre-nosotros",
-          "isPartOf": { "@type": "WebSite", "name": "iLingue Relax", "url": "https://ilinguerelax.com" },
+          "inLanguage": "es",
+          "isPartOf": { "@id": "https://ilinguerelax.com/#website" },
+          "about": { "@id": "https://ilinguerelax.com/#organization" },
+          "mainEntity": { "@id": "https://ilinguerelax.com/#organization" },
+          "publisher": { "@id": "https://ilinguerelax.com/#organization" },
           "breadcrumb": {
             "@type": "BreadcrumbList",
             "itemListElement": [
@@ -65,6 +47,7 @@ const AboutPage = () => {
             ]
           }
         })}</script>
+
       </Helmet>
       <SEO
         title="Sobre Nosotros - Aprender Idiomas Sin Estrés"

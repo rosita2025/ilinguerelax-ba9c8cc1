@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { Users, Loader2, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Users, Loader2, RefreshCw, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
@@ -15,38 +16,64 @@ interface AudienceRow {
   unique: number;
 }
 
+interface PersonRow {
+  email: string;
+  name: string | null;
+  country: string | null;
+  audience: string;
+  label: string;
+}
+
+const CARD_ORDER = ["buyers", "hotmart", "abandoned", "newsletter", "reviewers", "waitlist"];
+
+const flagOf = (code?: string | null) => {
+  if (!code || code.length !== 2) return "🌐";
+  return String.fromCodePoint(...[...code.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+};
+
 /**
  * Audiencias propias: compradores de la tienda, compradores Hotmart, reseñas,
  * lista de espera, carritos abandonados y newsletter. El total es único
- * (un correo, una sola vez) y se recalcula solo cada 60 segundos.
+ * (un correo, una sola vez) y se muestra persona por persona (nombre, país, correo).
  */
 export default function AdminAudiences() {
   const { adminKey } = useAdminKey();
   const { toast } = useToast();
   const [rows, setRows] = useState<AudienceRow[]>([]);
+  const [people, setPeople] = useState<PersonRow[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>("all");
+  const [q, setQ] = useState("");
+  const [limit, setLimit] = useState(50);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("notify-product-launch", {
+      const { data, error: fnError } = await supabase.functions.invoke("notify-product-launch", {
         body: { action: "audiences", adminKey },
       });
-      if (error) throw new Error(error.message);
-      const res = data as { total?: number; perAudience?: AudienceRow[]; generatedAt?: string; error?: string };
+      if (fnError) throw new Error(fnError.message);
+      const res = data as {
+        total?: number;
+        perAudience?: AudienceRow[];
+        people?: PersonRow[];
+        generatedAt?: string;
+        error?: string;
+      };
       if (res?.error) throw new Error(res.error);
       setRows(res.perAudience ?? []);
+      setPeople(res.people ?? []);
       setTotal(res.total ?? 0);
       setUpdatedAt(res.generatedAt ?? new Date().toISOString());
+      setError(null);
     } catch (e) {
+      const msg = e instanceof Error ? e.message : "Error";
+      setError(msg);
       if (!silent) {
-        toast({
-          title: "No se pudieron cargar las audiencias",
-          description: e instanceof Error ? e.message : "Error",
-          variant: "destructive",
-        });
+        toast({ title: "No se pudieron cargar las audiencias", description: msg, variant: "destructive" });
       }
     } finally {
       setLoading(false);
@@ -59,18 +86,38 @@ export default function AdminAudiences() {
     return () => clearInterval(t);
   }, [load]);
 
+  const cards = useMemo(
+    () => [...rows].sort((a, b) => CARD_ORDER.indexOf(a.audience) - CARD_ORDER.indexOf(b.audience)),
+    [rows],
+  );
+
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return people.filter((p) => {
+      if (filter !== "all" && p.audience !== filter) return false;
+      if (!term) return true;
+      return (
+        p.email.includes(term) ||
+        (p.name ?? "").toLowerCase().includes(term) ||
+        (p.country ?? "").toLowerCase().includes(term)
+      );
+    });
+  }, [people, filter, q]);
+
+  useEffect(() => setLimit(50), [filter, q]);
+
   return (
     <div className="min-h-screen bg-background">
       <AdminNav />
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4">
+      <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2">
               <Users className="w-5 h-5" /> Audiencias · Total único
             </h1>
             <p className="text-sm text-muted-foreground">
-              Compradores de la tienda, compradores Hotmart, reseñas, lista de espera, carritos abandonados y
-              newsletter. Cada correo se cuenta una sola vez y se descuentan las bajas y rebotes.
+              Compradores de la tienda, compradores Hotmart, carritos abandonados, newsletter, reseñas y lista de
+              espera. Cada correo se cuenta una sola vez y se descuentan bajas y rebotes.
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={() => load()} disabled={loading}>
@@ -78,6 +125,15 @@ export default function AdminAudiences() {
             <span className="ml-2">Actualizar</span>
           </Button>
         </div>
+
+        {error && (
+          <Card className="p-4 border-destructive/40">
+            <p className="text-sm text-destructive font-medium">No se pudo actualizar: {error}</p>
+            <Button variant="outline" size="sm" className="mt-2" onClick={() => load()}>
+              Reintentar
+            </Button>
+          </Card>
+        )}
 
         <Card className="p-5">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Personas únicas alcanzables</p>
@@ -91,31 +147,87 @@ export default function AdminAudiences() {
           )}
         </Card>
 
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          {cards.map((r) => (
+            <Card
+              key={r.audience}
+              className={`p-4 cursor-pointer transition-colors ${
+                filter === r.audience ? "border-primary bg-primary/5" : "hover:border-primary/40"
+              }`}
+              onClick={() => setFilter(filter === r.audience ? "all" : r.audience)}
+            >
+              <p className="text-xs text-muted-foreground">{r.label}</p>
+              <p className="text-2xl font-bold mt-1">{r.unique}</p>
+              <p className="text-[11px] text-muted-foreground mt-1">{r.raw} correos en la fuente</p>
+            </Card>
+          ))}
+          {cards.length === 0 && !loading && (
+            <p className="text-sm text-muted-foreground">Sin datos todavía.</p>
+          )}
+        </div>
+
         <Card className="p-4">
-          <p className="text-sm font-semibold mb-3">Desglose por audiencia</p>
-          <div className="space-y-2">
-            {rows.length === 0 && !loading && (
-              <p className="text-sm text-muted-foreground">Sin datos todavía.</p>
-            )}
-            {rows.map((r) => (
-              <div
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <p className="text-sm font-semibold">
+              Personas {filter !== "all" && <span className="text-muted-foreground">· filtrado</span>}
+            </p>
+            <Badge variant="secondary">{filtered.length} mostradas</Badge>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Button
+              size="sm"
+              variant={filter === "all" ? "default" : "outline"}
+              onClick={() => setFilter("all")}
+            >
+              Todas
+            </Button>
+            {cards.map((r) => (
+              <Button
                 key={r.audience}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
+                size="sm"
+                variant={filter === r.audience ? "default" : "outline"}
+                onClick={() => setFilter(r.audience)}
               >
-                <div>
-                  <p className="text-sm font-medium">{r.label}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {r.raw} correos en la fuente
-                  </p>
-                </div>
-                <Badge variant="secondary">{r.unique} nuevos únicos</Badge>
-              </div>
+                {r.label}
+              </Button>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            «Nuevos únicos» = personas que aporta esa audiencia y que no estaban ya contadas en una audiencia
-            anterior. La suma de esa columna es el total de arriba.
-          </p>
+          <div className="relative mb-3">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Buscar por nombre, correo o país…"
+              className="pl-9"
+            />
+          </div>
+
+          <div className="space-y-2">
+            {filtered.slice(0, limit).map((p) => (
+              <div
+                key={`${p.audience}-${p.email}`}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {flagOf(p.country)} {p.name || "Sin nombre"}
+                    {p.country && <span className="text-muted-foreground font-normal"> · {p.country}</span>}
+                  </p>
+                  <p className="text-xs text-muted-foreground break-all">{p.email}</p>
+                </div>
+                <Badge variant="outline">{p.label}</Badge>
+              </div>
+            ))}
+            {filtered.length === 0 && !loading && (
+              <p className="text-sm text-muted-foreground">Nadie coincide con el filtro.</p>
+            )}
+          </div>
+
+          {filtered.length > limit && (
+            <Button variant="outline" size="sm" className="mt-3" onClick={() => setLimit((n) => n + 100)}>
+              Ver más ({filtered.length - limit} restantes)
+            </Button>
+          )}
         </Card>
       </div>
     </div>

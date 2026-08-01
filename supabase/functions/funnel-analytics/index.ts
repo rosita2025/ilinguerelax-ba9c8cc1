@@ -389,7 +389,7 @@ serve(async (req) => {
     const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("hotmart_purchases")
-        .select("product_id, purchased_at, raw_payload, status, email, transaction_code")
+        .select("product_id, purchased_at, updated_at, raw_payload, status, email, transaction_code")
         .in("status", ["approved", "pending"])
         .gte("purchased_at", fromDate.toISOString())
         .lte("purchased_at", toDate.toISOString()),

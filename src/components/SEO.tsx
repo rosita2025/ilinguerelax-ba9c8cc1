@@ -126,13 +126,8 @@ export const SEO = ({
     "image": [image],
     "url": canonicalUrl,
     "sku": sku || title.toLowerCase().replace(/\s+/g, '-').substring(0, 50),
-    "mpn": sku || "ILINGUE-" + (sku || "PROD"),
-    "gtin13": undefined,
     "brand": {
-      "@type": "Brand",
-      "name": "iLingue Relax",
-      "url": "https://ilinguerelax.com",
-      "logo": "https://ilinguerelax.com/og-image.png"
+      "@id": "https://ilinguerelax.com/#brand"
     },
     "category": "Libros > Educación > Idiomas",
     "offers": {
@@ -140,10 +135,7 @@ export const SEO = ({
       "url": canonicalUrl,
       "priceCurrency": "USD",
       "price": price,
-      ...(originalPrice && { 
-        "priceValidUntil": "2026-12-31",
-        "highPrice": originalPrice,
-      }),
+      "priceValidUntil": "2026-12-31",
       "availability": `https://schema.org/${availability}`,
       "itemCondition": "https://schema.org/NewCondition",
       "seller": {
@@ -183,6 +175,7 @@ export const SEO = ({
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "applicableCountry": ["ES", "MX", "AR", "CO", "PE", "CL", "US"],
+        "returnPolicyCountry": ["ES", "MX", "AR", "CO", "PE", "CL", "US"],
         "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
         "merchantReturnDays": 30,
         "returnMethod": "https://schema.org/ReturnByMail",
@@ -219,10 +212,7 @@ export const SEO = ({
     })
   } : null;
 
-  // Remove undefined keys
-  if (productStructuredData) {
-    delete (productStructuredData as Record<string, unknown>).gtin13;
-  }
+
 
   const itemListStructuredData = productList && productList.length > 0 ? {
     "@context": "https://schema.org",
@@ -372,23 +362,12 @@ export const SEO = ({
     "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF",
   ];
 
-  const organizationData = type === "website" ? {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": "https://ilinguerelax.com/#organization",
-    "name": "iLingue Relax",
-    "url": "https://ilinguerelax.com",
-    "logo": "https://ilinguerelax.com/og-image.png",
-    "description": BRAND_DESCRIPTION,
-    "brand": { "@id": "https://ilinguerelax.com/#brand" },
-    "sameAs": BRAND_SAME_AS,
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "email": "hola@ilinguerelax.com",
-      "availableLanguage": ["Spanish", "English"]
-    }
-  } : null;
+  // Organization/Brand/WebSite ya se emiten de forma estática en index.html
+  // (mismo @id). No se duplican aquí para evitar avisos en los validadores.
+  const organizationData = null;
+  void BRAND_DESCRIPTION;
+  void BRAND_SAME_AS;
+
 
 
   return (

@@ -319,7 +319,19 @@ const AdminProductEdit = () => {
             <h2 className="font-semibold">1. Información básica</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label>SKU (identificador único · también es la URL pública /products/{product.sku || "…"})</Label>
+                <Label className="flex items-center gap-2">
+                  SKU (identificador único · también es la URL pública /products/{product.sku || "…"})
+                  {!isNew && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs">
+                        <p>No tocar. Este SKU ya está vinculado a pagos de Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias y dLocal. Cambiarlo rompería pagos y entregas existentes.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </Label>
                 <Input
                   value={product.sku}
                   onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
@@ -352,7 +364,20 @@ const AdminProductEdit = () => {
             </div>
             <div>
               <Label className="flex items-center gap-2">
-                Alias cortos del checkout {!isNew && <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />}
+                Alias cortos del checkout
+                {!isNew && (
+                  <>
+                    <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs">
+                        <p>No tocar. Estos alias ya usan Stripe, Mercado Pago, PayPal, Yape/Plin, transferencias y dLocal. Cambiarlos rompería pagos y entregas ya emitidos.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </>
+                )}
               </Label>
               <div className="flex gap-2">
                 <Input

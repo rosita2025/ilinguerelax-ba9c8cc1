@@ -42,6 +42,7 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [progress, setProgress] = useState<{ sent: number; total: number } | null>(null);
   const [rendering, setRendering] = useState(false);
   const [preview, setPreview] = useState<PreviewData | null>(null);
   const [launchKey, setLaunchKey] = useState("");

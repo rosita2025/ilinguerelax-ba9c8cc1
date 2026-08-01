@@ -66,6 +66,20 @@ interface AnalyticsData {
     cartSessions: number;
   };
   providers: Array<{ provider: string; count: number; pending: number; revenue: number }>;
+  pendingOrders: Array<{
+    orderNumber: string;
+    provider: string;
+    source: string;
+    status: string;
+    email: string;
+    country: string;
+    product: string;
+    amount: number;
+    currency: string;
+    amountUsd: number;
+    createdAt: string;
+    lastCheckAt: string | null;
+  }>;
   conversion: {
     globalPct: number;
     viewToCartPct: number;

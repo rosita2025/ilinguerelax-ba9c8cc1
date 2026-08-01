@@ -357,10 +357,15 @@ const AdminProductEdit = () => {
               </div>
             </div>
             <div>
-              <Label>Alias cortos del checkout (opcional)</Label>
+              <Label className="flex items-center gap-2">
+                Alias cortos del checkout {!isNew && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+              </Label>
               <div className="flex gap-2">
                 <Input
                   value={(product.sku_aliases ?? []).join(", ")}
+                  readOnly={!isNew}
+                  disabled={!isNew}
+                  className={!isNew ? "bg-muted cursor-not-allowed font-mono" : undefined}
                   onChange={(e) =>
                     update(
                       "sku_aliases",
@@ -372,6 +377,7 @@ const AdminProductEdit = () => {
                   }
                   placeholder="ej: 1000-palabras-italiano, upsell-1000-italiano"
                 />
+                {isNew && (
                 <Button
                   type="button"
                   variant="outline"
@@ -401,10 +407,16 @@ const AdminProductEdit = () => {
                 >
                   Auto
                 </Button>
+                )}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Separa por comas. Pulsa <strong>Auto</strong> para generar un alias corto a partir del nombre (ej. "1,000 Palabras Italiano" → <code>1000-italiano</code> + <code>upsell-1000-italiano</code>).
+                {isNew ? (
+                  <>IDs cortos que usa el carrito/checkout y que deben resolverse a este SKU al enviar el material digital (Stripe, PayPal, MP, Yape/Plin). Pulsa <strong>Auto</strong> para generarlos. Después de guardar quedarán bloqueados.</>
+                ) : (
+                  <>🔒 Bloqueado: estos alias ya los usan Stripe, PayPal, Mercado Pago, dLocal y Yape/Plin en pagos y entregas emitidas. Cambiarlos rompería los envíos. El <b>nombre</b> del producto sí se puede cambiar sin riesgo.</>
+                )}
               </p>
+            </div>
             </div>
 
             {/* Mapa de aliases + destinos: auditoría en un solo vistazo */}

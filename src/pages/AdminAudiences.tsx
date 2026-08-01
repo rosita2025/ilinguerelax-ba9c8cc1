@@ -20,6 +20,7 @@ interface PersonRow {
   email: string;
   name: string | null;
   country: string | null;
+  at: string | null;
   audience: string;
   label: string;
 }
@@ -27,8 +28,28 @@ interface PersonRow {
 const CARD_ORDER = ["buyers", "hotmart", "abandoned", "newsletter", "reviewers", "waitlist"];
 
 const flagOf = (code?: string | null) => {
-  if (!code || code.length !== 2) return "🌐";
-  return String.fromCodePoint(...[...code.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+  const c = (code ?? "").trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(c)) return "🌐";
+  try {
+    return String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65));
+  } catch {
+    return "🌐";
+  }
+};
+
+/** Fecha y hora en horario de Perú (UTC-5). */
+const fmtDate = (iso?: string | null) => {
+  if (!iso) return "Sin fecha";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "Sin fecha";
+  return d.toLocaleString("es-PE", {
+    timeZone: "America/Lima",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 /**
@@ -99,7 +120,8 @@ export default function AdminAudiences() {
       return (
         p.email.includes(term) ||
         (p.name ?? "").toLowerCase().includes(term) ||
-        (p.country ?? "").toLowerCase().includes(term)
+        (p.country ?? "").toLowerCase().includes(term) ||
+        fmtDate(p.at).toLowerCase().includes(term)
       );
     });
   }, [people, filter, q]);
@@ -197,7 +219,7 @@ export default function AdminAudiences() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nombre, correo o país…"
+              placeholder="Buscar por nombre, correo, país o fecha…"
               className="pl-9"
             />
           </div>
@@ -214,6 +236,9 @@ export default function AdminAudiences() {
                     {p.country && <span className="text-muted-foreground font-normal"> · {p.country}</span>}
                   </p>
                   <p className="text-xs text-muted-foreground break-all">{p.email}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {fmtDate(p.at)} <span className="opacity-70">(hora Perú)</span>
+                  </p>
                 </div>
                 <Badge variant="outline">{p.label}</Badge>
               </div>

@@ -24,6 +24,7 @@ const DejarResena = () => {
       <SEO
         title={`Deja Tu Reseña - ${productName}`}
         description={`Comparte tu experiencia con ${productName}. Tu opinión nos ayuda a mejorar.`}
+        canonicalUrl="https://ilinguerelax.com/dejar-resena"
       />
       <Navbar />
 

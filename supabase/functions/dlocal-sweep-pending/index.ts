@@ -39,8 +39,14 @@ const json = (b: unknown, s = 200) =>
 const HOUR = 60 * 60 * 1000;
 /** Rails inmediatos (tarjeta, billetera, redirect): si en 6 h no hay pago, se abandonó. */
 const FAST_WINDOW_MS = 6 * HOUR;
-/** Efectivo y transferencia: el cupón/CBU tiene vigencia real de días. */
+/** Efectivo y transferencia: el cupón/CBU tiene vigencia real de días (dLocal expira en 3). */
 const SLOW_WINDOW_MS = 72 * HOUR;
+/**
+ * El comprador ni siquiera llegó a crear el pago en dLocal (no hay referencia
+ * o dLocal no reconoce el pago): no existe cupón que pagar, así que se cierra
+ * en 6 h en vez de dejarlo "pendiente" días mandando recordatorios.
+ */
+const NO_PAYMENT_WINDOW_MS = 6 * HOUR;
 /** Tope absoluto: nada queda pendiente más de 7 días. */
 const HARD_WINDOW_MS = 7 * 24 * HOUR;
 /** No revisamos pedidos más viejos que esto (ya barridos antes). */
@@ -50,6 +56,24 @@ function isSlowRail(method: string | null, status: string | null): boolean {
   const v = `${method ?? ""} ${status ?? ""}`.toUpperCase();
   return /TICKET|CASH|EFECTIVO|TRANSFER|BANK|BOLETO|OXXO|PAGOEFECTIVO|SPEI|PIX/.test(v);
 }
+
+/** Cierra los recordatorios de pago pendiente para que dejen de enviarse correos. */
+async function resolveReminders(
+  supabase: ReturnType<typeof createClient>,
+  orderNumber: string,
+  reason: string,
+) {
+  try {
+    await supabase
+      .from("pending_payment_reminders")
+      .update({ resolved: true, resolved_reason: reason, resolved_at: new Date().toISOString() })
+      .eq("order_number", orderNumber)
+      .eq("resolved", false);
+  } catch (e) {
+    console.warn("[dlocal-sweep] no se pudo cerrar el recordatorio:", e instanceof Error ? e.message : String(e));
+  }
+}
+
 
 async function fetchDlocalPayment(paymentId: string): Promise<Record<string, unknown> | null> {
   const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");
@@ -136,11 +160,13 @@ Deno.serve(async (req) => {
       // el efectivo/transferencia se acredita a los minutos y dLocal muchas
       // veces no manda webhook. Así el cliente recibe su entrega enseguida.
       let remote: string | null = null;
+      let dlocalKnowsPayment = false;
       if (reference && reference !== orderNumber) {
         const payment = await fetchDlocalPayment(reference);
         const remoteOrder = String(payment?.order_id ?? "").trim().toUpperCase();
         // El pago consultado debe pertenecer a ESTE pedido.
         if (payment && (!remoteOrder || remoteOrder === orderNumber)) {
+          dlocalKnowsPayment = true;
           remote = String(payment.status ?? "").toUpperCase() || null;
         }
       }
@@ -164,6 +190,7 @@ Deno.serve(async (req) => {
           metadata: { skus, source: "sweep", autoDelivery: true },
         });
         recovered++;
+        await resolveReminders(supabase, orderNumber, "paid");
 
         if (email) {
           const alreadyDelivered = events.some((e) => e.event === "delivery_sent");
@@ -224,17 +251,29 @@ Deno.serve(async (req) => {
           metadata: { skus, source: "sweep" },
         });
         rejected++;
+        await resolveReminders(supabase, orderNumber, `dlocal_${remote.toLowerCase()}`);
         continue;
       }
 
       const stillOpen = remote ? isPendingStatus(remote) : false;
-      // Solo se declara abandonado cuando venció la ventana del rail (6 h en
-      // pagos inmediatos, 72 h en efectivo/transferencia). Antes de eso el
-      // pedido sigue vivo y se vuelve a consultar en el próximo barrido.
-      if (age < window || (stillOpen && age < HARD_WINDOW_MS)) {
+      // Nunca se creó el pago en dLocal (o dLocal no lo reconoce): no hay cupón
+      // vigente, así que se usa la ventana corta y no se espera 72 h.
+      const effectiveWindow = dlocalKnowsPayment ? window : Math.min(window, NO_PAYMENT_WINDOW_MS);
+      // El cupón/CBU de dLocal expira a los 3 días (expiration_value: 3), así que
+      // pasada la ventana del rail ya no hay nada que pagar: se cierra. El tope
+      // duro solo aplica a rails inmediatos que dLocal deja "PENDING" colgados.
+      // Tope real: el cupón/link de dLocal expira a los 3 días, así que ningún
+      // pedido puede seguir "pendiente" más allá de esa ventana (antes eran 7 días).
+      const graceWindow = Math.min(
+        isSlowRail(method, last.status) ? effectiveWindow : HARD_WINDOW_MS,
+        SLOW_WINDOW_MS,
+      );
+      console.log("[dlocal-sweep] decide", JSON.stringify({ orderNumber, ageH: +(age / HOUR).toFixed(1), remote, dlocalKnowsPayment, effectiveWindowH: effectiveWindow / HOUR, graceWindowH: graceWindow / HOUR, stillOpen }));
+      if (age < effectiveWindow || (stillOpen && age < graceWindow)) {
         stillPending++;
         continue;
       }
+
 
 
 
@@ -246,12 +285,15 @@ Deno.serve(async (req) => {
         status: "ABANDONED",
         method,
         reference,
-        detail: "El pago no se completó en dLocal (checkout abandonado o cupón vencido)",
+        detail: dlocalKnowsPayment
+          ? "El pago no se completó en dLocal (cupón vencido sin acreditar)"
+          : "El comprador nunca completó el pago en dLocal (checkout abandonado, sin cupón generado)",
         customerEmail: email,
         amount: amount ?? null,
         currency,
         metadata: { skus, source: "sweep", remoteStatus: remote },
       });
+      await resolveReminders(supabase, orderNumber, "abandoned");
       abandoned++;
     }
 

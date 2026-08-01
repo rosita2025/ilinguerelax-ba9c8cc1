@@ -172,18 +172,52 @@ Deno.serve(async (req) => {
       // veces no manda webhook. Así el cliente recibe su entrega enseguida.
       let remote: string | null = null;
       let dlocalKnowsPayment = false;
+      let lookupFailed = false;
+      let remoteAmount: DlocalRemoteAmount = { amount: null, currency: null };
       if (reference && reference !== orderNumber) {
-        const payment = await fetchDlocalPayment(reference);
+        const { payment, failed } = await fetchDlocalPayment(reference);
+        lookupFailed = failed;
         const remoteOrder = String(payment?.order_id ?? "").trim().toUpperCase();
         // El pago consultado debe pertenecer a ESTE pedido.
         if (payment && (!remoteOrder || remoteOrder === orderNumber)) {
           dlocalKnowsPayment = true;
           remote = String(payment.status ?? "").toUpperCase() || null;
+          remoteAmount = extractRemoteAmount(payment);
         }
       }
       checked++;
 
+      // No pudimos consultar el estado real: nunca se cierra ni se marca como
+      // no pagado con información incompleta. Se reintenta en el próximo barrido.
+      if (lookupFailed) {
+        stillPending++;
+        lookupErrors++;
+        console.warn("[dlocal-sweep] consulta fallida, se conserva pendiente:", orderNumber);
+        continue;
+      }
+
       if (remote && isSettledStatus(remote)) {
+        // Validación de montos: el dinero acreditado debe coincidir con lo que
+        // cobramos (16.65, 3.70, etc.). Si pagaron de menos o en otra moneda,
+        // se registra la discrepancia y NO se entrega hasta revisión manual.
+        const check = checkAmount(amount ?? null, currency, remoteAmount);
+        if (check.mismatch) {
+          mismatches++;
+          await logOrderEvent({
+            orderNumber,
+            event: "payment_mismatch",
+            provider: "dlocalgo",
+            status: check.underpaid ? "AMOUNT_MISMATCH" : "AMOUNT_OVERPAID",
+            method,
+            reference,
+            detail: describeAmountCheck(check),
+            customerEmail: email,
+            amount: check.paid ?? amount ?? null,
+            currency: check.paidCurrency ?? currency,
+            metadata: { skus, source: "sweep", amountCheck: check },
+          });
+        }
+
         // Webhook perdido con dinero acreditado: registramos el pago y
         // ENTREGAMOS automáticamente (gracias por tu compra + materiales),
         // sin esperar a que el admin lo haga a mano.
@@ -194,10 +228,13 @@ Deno.serve(async (req) => {
           status: remote,
           method,
           reference,
-          detail: "Pago confirmado al reconciliar con la API de dLocal (webhook no recibido)",
+          detail: check.mismatch
+            ? `Pago confirmado en dLocal con discrepancia de monto: ${describeAmountCheck(check)}`
+            : "Pago confirmado al reconciliar con la API de dLocal (webhook no recibido)",
           customerEmail: email,
           amount: amount ?? null,
           currency,
+
           metadata: { skus, source: "sweep", autoDelivery: true },
         });
         recovered++;

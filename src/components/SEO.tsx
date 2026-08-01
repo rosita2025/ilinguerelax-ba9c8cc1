@@ -421,7 +421,7 @@ export const SEO = ({
     "https://web.facebook.com/ilinguerelax",
     "https://www.tiktok.com/@ilinguerelax",
     "https://es.pinterest.com/ilinguerelax/",
-    "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF",
+    "https://www.amazon.com/stores/iLingue-Relax/author/B0GH8SSTG5",
   ];
 
 

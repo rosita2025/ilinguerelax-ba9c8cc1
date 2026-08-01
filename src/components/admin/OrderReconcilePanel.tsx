@@ -44,18 +44,18 @@ export default function OrderReconcilePanel() {
   const [pending, setPending] = useState<PendingOrder[] | null>(null);
 
 
-  async function loadPending() {
+  async function loadPending(silent = false) {
     setBusy("list");
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
         body: { action: "list_pending" },
       });
       if (error || data?.error) {
-        toast.error(data?.error || error?.message || "No se pudo cargar la lista");
+        if (!silent) toast.error(data?.error || error?.message || "No se pudo cargar la lista");
         return;
       }
       setPending(data.pending ?? []);
-      toast.success(`${(data.pending ?? []).length} pedido(s) pendiente(s)`);
+      if (!silent) toast.success(`${(data.pending ?? []).length} pedido(s) pendiente(s)`);
     } catch (e) {
       toast.error((e as Error).message || "Error inesperado");
     } finally {

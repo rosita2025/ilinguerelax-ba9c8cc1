@@ -1069,6 +1069,15 @@ serve(async (req) => {
           }))
           .sort((a, b) => b.count - a.count || b.revenue - a.revenue),
 
+        // Compras pendientes (no cuentan como venta hasta aprobarse), con
+        // proveedor, estado y último intento de verificación.
+        pendingOrders: pendingDetails.slice(0, 100).map((p) => ({
+          ...p,
+          amount: Number((p.amount || 0).toFixed(2)),
+          amountUsd: Number((p.amountUsd || 0).toFixed(2)),
+        })),
+
+
         conversion: {
           globalPct: Number(globalConversion.toFixed(2)),
           viewToCartPct: Number(cartRate.toFixed(2)),

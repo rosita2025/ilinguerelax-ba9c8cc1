@@ -70,17 +70,24 @@ function isRealEmail(email: string): boolean {
 interface Recipient {
   email: string;
   name: string | null;
+  country: string | null;
   audience: Audience;
 }
 
 // deno-lint-ignore no-explicit-any
 type Admin = any;
 
-async function fetchAudience(admin: Admin, audience: Audience): Promise<Array<{ email: string; name: string | null }>> {
-  const out: Array<{ email: string; name: string | null }> = [];
-  const push = (email: unknown, name: unknown) => {
+async function fetchAudience(
+  admin: Admin,
+  audience: Audience,
+): Promise<Array<{ email: string; name: string | null; country: string | null }>> {
+  const out: Array<{ email: string; name: string | null; country: string | null }> = [];
+  const push = (email: unknown, name: unknown, country?: unknown) => {
     const e = canonical(email);
-    if (isRealEmail(e)) out.push({ email: e, name: (String(name ?? "").trim() || null) });
+    const c = String(country ?? "").trim().toUpperCase().slice(0, 2);
+    if (isRealEmail(e)) {
+      out.push({ email: e, name: (String(name ?? "").trim() || null), country: c || null });
+    }
   };
 
   if (audience === "buyers") {
@@ -98,23 +105,23 @@ async function fetchAudience(admin: Admin, audience: Audience): Promise<Array<{ 
 
     const { data: sends } = await admin
       .from("digital_email_sends")
-      .select("customer_email, customer_name")
+      .select("customer_email, customer_name, customer_country")
       .limit(20000);
-    for (const r of sends ?? []) push(r.customer_email, r.customer_name);
+    for (const r of sends ?? []) push(r.customer_email, r.customer_name, r.customer_country);
 
     const { data: audit } = await admin
       .from("digital_delivery_audit")
-      .select("customer_email, customer_name, status")
+      .select("customer_email, customer_name, status, country")
       .eq("status", "sent")
       .limit(20000);
-    for (const r of audit ?? []) push(r.customer_email, r.customer_name);
+    for (const r of audit ?? []) push(r.customer_email, r.customer_name, r.country);
 
     const { data: manual } = await admin
       .from("manual_payments")
-      .select("buyer_email, buyer_name, status")
+      .select("buyer_email, buyer_name, status, buyer_country")
       .eq("status", "verified")
       .limit(20000);
-    for (const r of manual ?? []) push(r.buyer_email, r.buyer_name);
+    for (const r of manual ?? []) push(r.buyer_email, r.buyer_name, r.buyer_country);
   } else if (audience === "hotmart") {
     const { data } = await admin
       .from("hotmart_purchases")
@@ -144,10 +151,10 @@ async function fetchAudience(admin: Admin, audience: Audience): Promise<Array<{ 
     for (const r of ac ?? []) push(r.customer_email, r.customer_name);
     const { data: pc } = await admin
       .from("persistent_carts")
-      .select("email, buyer, converted")
+      .select("email, buyer, converted, country")
       .eq("converted", false)
       .limit(20000);
-    for (const r of pc ?? []) push(r.email, (r.buyer as { name?: string } | null)?.name);
+    for (const r of pc ?? []) push(r.email, (r.buyer as { name?: string } | null)?.name, r.country);
   } else if (audience === "newsletter") {
     const { data } = await admin
       .from("email_contacts")
@@ -176,7 +183,7 @@ async function collectRecipients(admin: Admin, selected: Audience[]): Promise<{
       if (seen.has(r.email)) continue;
       seen.add(r.email);
       if (byEmail.has(r.email)) continue; // ya cubierto por una audiencia de mayor prioridad
-      byEmail.set(r.email, { email: r.email, name: r.name, audience });
+      byEmail.set(r.email, { email: r.email, name: r.name, country: r.country, audience });
       unique++;
     }
     perAudience.push({ audience, label: AUDIENCE_LABEL[audience], raw: seen.size, unique });
@@ -230,9 +237,20 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
   if (body.action === "audiences") {
     const selected = parseAudiences(body.audiences);
     const { recipients, perAudience } = await collectRecipients(admin, selected);
+    const people = recipients
+      .slice(0, 3000)
+      .map((r) => ({
+        email: r.email,
+        name: r.name,
+        country: r.country,
+        audience: r.audience,
+        label: AUDIENCE_LABEL[r.audience],
+      }))
+      .sort((a, b) => a.email.localeCompare(b.email));
     return json({
       total: recipients.length,
       perAudience,
+      people,
       generatedAt: new Date().toISOString(),
     });
   }

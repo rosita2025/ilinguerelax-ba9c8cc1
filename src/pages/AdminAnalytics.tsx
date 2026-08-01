@@ -87,7 +87,15 @@ interface AnalyticsData {
     checkoutToPurchasePct: number;
     abandonedCheckoutPct: number;
   };
-  abandoned: { total: number; open: number; newCustomers: number; returningCustomers: number; recovered: number; checkoutNoPurchase: number; openValue: number; recoveryRatePct: number };
+  abandoned: {
+    total: number; open: number; newCustomers: number; returningCustomers: number; recovered: number; checkoutNoPurchase: number; openValue: number; recoveryRatePct: number;
+    sources: {
+      hotmart: { label: string; total: number; open: number; recovered: number };
+      store: { label: string; total: number; open: number; recovered: number };
+      checkoutVisitors: { label: string; total: number; open: number; withoutEmail: number; recovered: number };
+      unifiedPeople: number;
+    };
+  };
   series: Array<{
     bucket: string;
     pageviews: number;

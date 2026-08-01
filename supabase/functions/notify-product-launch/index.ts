@@ -226,8 +226,20 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
+  // ---------- AUDIENCES: conteo único global, sin producto ----------
+  if (body.action === "audiences") {
+    const selected = parseAudiences(body.audiences);
+    const { recipients, perAudience } = await collectRecipients(admin, selected);
+    return json({
+      total: recipients.length,
+      perAudience,
+      generatedAt: new Date().toISOString(),
+    });
+  }
+
   const sku = canonical(body.sku);
   if (!sku || !SKU_RE.test(sku)) return json({ error: "SKU inválido" }, 400);
+
 
   const { data: product } = await admin
     .from("digital_products")

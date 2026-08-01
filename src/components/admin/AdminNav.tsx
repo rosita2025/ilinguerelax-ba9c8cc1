@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Users } from "lucide-react";
 import AdminPWAMeta from "./AdminPWAMeta";
 import AdminTrustBadge from "./AdminTrustBadge";
 
@@ -51,6 +52,7 @@ const groups: Group[] = [
     items: [
       { to: "/admin", label: "Inicio", icon: LayoutDashboard },
       { to: "/admin/live", label: "Visitas en vivo · Hoy", icon: Globe },
+      { to: "/admin/audiencias", label: "Audiencias · Total único", icon: Users },
     ],
   },
   {

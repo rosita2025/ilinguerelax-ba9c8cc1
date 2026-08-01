@@ -729,6 +729,8 @@ serve(async (req) => {
       const k = bucketKey(p.at);
       const b = ensure(k);
       const pAgg = byProductAgg.get(p.productId) || { views: 0, carts: 0, purchases: 0, revenue: 0, hotmart: 0, store: 0, pending: 0, hotmartPending: 0, storePending: 0 };
+      addProvider(p.provider, p.usd, p.pending);
+
 
       if (p.pending) {
         pAgg.pending++;

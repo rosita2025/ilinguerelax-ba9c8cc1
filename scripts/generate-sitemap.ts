@@ -357,6 +357,9 @@ interface DbProduct {
   description?: string;
   image?: string;
   created_at?: string;
+  price?: number;
+  is_physical?: boolean;
+  target_language?: string;
 }
 async function getDbProducts(): Promise<DbProduct[]> {
   const url = process.env.VITE_SUPABASE_URL;
@@ -367,10 +370,18 @@ async function getDbProducts(): Promise<DbProduct[]> {
   }
   try {
     const supabase = createClient(url, key);
-    const { data, error } = await supabase
-      .from("digital_products")
-      .select("sku, updated_at, created_at, name, description, cover_image_url, active")
-      .eq("active", true);
+    const columns =
+      "sku, updated_at, created_at, name, description, cover_image_url, active, price_usd, price_usd_tienda, is_physical, target_language";
+    let { data, error } = await supabase.from("digital_products").select(columns).eq("active", true);
+    if (error) {
+      // Fallback: si alguna columna comercial no es legible en público,
+      // seguimos generando sitemap/RSS con los campos básicos.
+      console.warn("[sitemap] Supabase error (retry sin precios):", error.message);
+      ({ data, error } = await supabase
+        .from("digital_products")
+        .select("sku, updated_at, created_at, name, description, cover_image_url, active")
+        .eq("active", true));
+    }
     if (error) {
       console.warn("[sitemap] Supabase error:", error.message);
       return [];
@@ -384,11 +395,63 @@ async function getDbProducts(): Promise<DbProduct[]> {
         name: r.name,
         description: r.description,
         image: absoluteImage(r.cover_image_url),
+        price: Number(r.price_usd_tienda ?? r.price_usd ?? 0) || undefined,
+        is_physical: Boolean(r.is_physical),
+        target_language: r.target_language ?? undefined,
       }));
   } catch (err) {
     console.warn("[sitemap] Supabase fetch failed:", (err as Error).message);
     return [];
   }
+}
+
+// --------------------------------------------------------------------------
+// Catálogo de productos para Pinterest (RSS 2.0 + namespace g:)
+// URL para "Catálogos > Fuentes de datos > Proporcione un enlace URL".
+// --------------------------------------------------------------------------
+function catalogXml(products: DbProduct[]): string {
+  const items = products
+    .filter((p) => p.sku && p.name && p.image && p.price && p.price > 0)
+    .slice(0, 1000)
+    .map((p) => {
+      const link = `${BASE_URL}/products/${p.sku}`;
+      const type = p.is_physical
+        ? `Libros > Idiomas > ${p.target_language ?? "Idiomas"}`
+        : `Libros Digitales > Idiomas > ${p.target_language ?? "Idiomas"}`;
+      return [
+        "    <item>",
+        `      <g:id>${xmlEscape(p.sku)}</g:id>`,
+        `      <g:title>${xmlEscape(String(p.name).slice(0, 150))}</g:title>`,
+        `      <g:description>${xmlEscape(
+          String(p.description ?? p.name).replace(/\s+/g, " ").trim().slice(0, 480),
+        )}</g:description>`,
+        `      <g:link>${link}</g:link>`,
+        `      <g:image_link>${xmlEscape(p.image!)}</g:image_link>`,
+        "      <g:condition>new</g:condition>",
+        "      <g:availability>in stock</g:availability>",
+        `      <g:price>${p.price!.toFixed(2)} USD</g:price>`,
+        "      <g:brand>iLingue Relax</g:brand>",
+        `      <g:mpn>${xmlEscape(p.sku)}</g:mpn>`,
+        `      <g:google_product_category>Media &gt; Books${
+          p.is_physical ? "" : " &gt; E-books"
+        }</g:google_product_category>`,
+        `      <g:product_type>${xmlEscape(type)}</g:product_type>`,
+        "    </item>",
+      ].join("\n");
+    });
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
+    "  <channel>",
+    "    <title>iLingue Relax - Catálogo</title>",
+    `    <link>${BASE_URL}</link>`,
+    "    <description>Libros digitales y físicos para aprender idiomas sin estrés.</description>",
+    ...items,
+    "  </channel>",
+    "</rss>",
+    "",
+  ].join("\n");
 }
 
 // --------------------------------------------------------------------------
@@ -560,6 +623,23 @@ async function main() {
       }
     }
   }
+
+  // CATÁLOGO Pinterest (public/catalogo-pinterest.xml): formato de catálogo
+  // minorista (namespace g:) para "Fuentes de datos > Proporcione un enlace URL".
+  {
+    const catalog = catalogXml(dbProducts);
+    const count = (catalog.match(/<item>/g) ?? []).length;
+    if (count === 0) {
+      console.error("[catalogo-pinterest] ERROR sin productos válidos; se conserva el archivo anterior.");
+    } else {
+      writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest.xml"), catalog);
+      writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest"), catalog);
+      writeFileSync(join(PUBLIC_DIR, "pinterest-catalog.xml"), catalog);
+      console.log(`[catalogo-pinterest] catálogo escrito (${count} productos).`);
+    }
+  }
+
+
 
   // Regional subdomains disabled — single canonical domain only.
 

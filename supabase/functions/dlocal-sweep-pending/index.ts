@@ -32,6 +32,12 @@ import {
   isPendingStatus,
   isFailedStatus,
 } from "../_shared/dlocal.ts";
+import {
+  checkAmount,
+  describeAmountCheck,
+  extractRemoteAmount,
+  type DlocalRemoteAmount,
+} from "../_shared/dlocalAmounts.ts";
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...internalCors, "Content-Type": "application/json" } });
@@ -139,6 +145,7 @@ Deno.serve(async (req) => {
 
     const now = Date.now();
     let checked = 0, abandoned = 0, rejected = 0, recovered = 0, stillPending = 0, delivered = 0, deliveryFailed = 0;
+    let mismatches = 0, heldForReview = 0, lookupErrors = 0;
 
     for (const [orderNumber, events] of byOrder) {
       // Ya resuelto: no se toca (jamás se sobrescribe un pedido cerrado).
@@ -354,7 +361,7 @@ Deno.serve(async (req) => {
       abandoned++;
     }
 
-    const result = { ok: true, orders: byOrder.size, checked, abandoned, rejected, recovered, delivered, deliveryFailed, stillPending };
+    const result = { ok: true, orders: byOrder.size, checked, abandoned, rejected, recovered, delivered, deliveryFailed, stillPending, mismatches, heldForReview, lookupErrors };
     console.log("[dlocal-sweep]", JSON.stringify(result));
     return json(result);
   } catch (err) {

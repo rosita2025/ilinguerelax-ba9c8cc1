@@ -32,6 +32,12 @@ import {
   isPendingStatus,
   isFailedStatus,
 } from "../_shared/dlocal.ts";
+import {
+  checkAmount,
+  describeAmountCheck,
+  extractRemoteAmount,
+  type DlocalRemoteAmount,
+} from "../_shared/dlocalAmounts.ts";
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...internalCors, "Content-Type": "application/json" } });
@@ -75,24 +81,35 @@ async function resolveReminders(
 }
 
 
-async function fetchDlocalPayment(paymentId: string): Promise<Record<string, unknown> | null> {
+type Lookup = { payment: Record<string, unknown> | null; failed: boolean };
+
+/**
+ * Consulta el pago en dLocal.
+ *  · `failed: true` → NO pudimos saber el estado real (credenciales, red, 5xx).
+ *    En ese caso jamás se cierra el pedido: se deja para el siguiente barrido.
+ *  · `failed: false, payment: null` → dLocal respondió que ese pago no existe.
+ */
+async function fetchDlocalPayment(paymentId: string): Promise<Lookup> {
   const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");
   const secretKey = Deno.env.get("DLOCAL_GO_SECRET_KEY");
-  if (!apiKey || !secretKey) return null;
+  if (!apiKey || !secretKey) return { payment: null, failed: true };
   try {
     const r = await fetch(`${dlocalApiBase()}/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: `Bearer ${apiKey}:${secretKey}` },
     });
     if (!r.ok) {
       console.warn("[dlocal-sweep] dLocal respondió", r.status, "para", paymentId);
-      return null;
+      // 404 = el pago no existe (respuesta confiable). Cualquier otro error es
+      // un fallo de consulta y no puede interpretarse como "no pagó".
+      return { payment: null, failed: r.status !== 404 };
     }
-    return await r.json() as Record<string, unknown>;
+    return { payment: await r.json() as Record<string, unknown>, failed: false };
   } catch (e) {
     console.warn("[dlocal-sweep] fetch falló:", e instanceof Error ? e.message : String(e));
-    return null;
+    return { payment: null, failed: true };
   }
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: internalCors });
@@ -128,6 +145,7 @@ Deno.serve(async (req) => {
 
     const now = Date.now();
     let checked = 0, abandoned = 0, rejected = 0, recovered = 0, stillPending = 0, delivered = 0, deliveryFailed = 0;
+    let mismatches = 0, heldForReview = 0, lookupErrors = 0;
 
     for (const [orderNumber, events] of byOrder) {
       // Ya resuelto: no se toca (jamás se sobrescribe un pedido cerrado).
@@ -161,18 +179,52 @@ Deno.serve(async (req) => {
       // veces no manda webhook. Así el cliente recibe su entrega enseguida.
       let remote: string | null = null;
       let dlocalKnowsPayment = false;
+      let lookupFailed = false;
+      let remoteAmount: DlocalRemoteAmount = { amount: null, currency: null };
       if (reference && reference !== orderNumber) {
-        const payment = await fetchDlocalPayment(reference);
+        const { payment, failed } = await fetchDlocalPayment(reference);
+        lookupFailed = failed;
         const remoteOrder = String(payment?.order_id ?? "").trim().toUpperCase();
         // El pago consultado debe pertenecer a ESTE pedido.
         if (payment && (!remoteOrder || remoteOrder === orderNumber)) {
           dlocalKnowsPayment = true;
           remote = String(payment.status ?? "").toUpperCase() || null;
+          remoteAmount = extractRemoteAmount(payment);
         }
       }
       checked++;
 
+      // No pudimos consultar el estado real: nunca se cierra ni se marca como
+      // no pagado con información incompleta. Se reintenta en el próximo barrido.
+      if (lookupFailed) {
+        stillPending++;
+        lookupErrors++;
+        console.warn("[dlocal-sweep] consulta fallida, se conserva pendiente:", orderNumber);
+        continue;
+      }
+
       if (remote && isSettledStatus(remote)) {
+        // Validación de montos: el dinero acreditado debe coincidir con lo que
+        // cobramos (16.65, 3.70, etc.). Si pagaron de menos o en otra moneda,
+        // se registra la discrepancia y NO se entrega hasta revisión manual.
+        const check = checkAmount(amount ?? null, currency, remoteAmount);
+        if (check.mismatch) {
+          mismatches++;
+          await logOrderEvent({
+            orderNumber,
+            event: "payment_mismatch",
+            provider: "dlocalgo",
+            status: check.underpaid ? "AMOUNT_MISMATCH" : "AMOUNT_OVERPAID",
+            method,
+            reference,
+            detail: describeAmountCheck(check),
+            customerEmail: email,
+            amount: check.paid ?? amount ?? null,
+            currency: check.paidCurrency ?? currency,
+            metadata: { skus, source: "sweep", amountCheck: check },
+          });
+        }
+
         // Webhook perdido con dinero acreditado: registramos el pago y
         // ENTREGAMOS automáticamente (gracias por tu compra + materiales),
         // sin esperar a que el admin lo haga a mano.
@@ -183,16 +235,28 @@ Deno.serve(async (req) => {
           status: remote,
           method,
           reference,
-          detail: "Pago confirmado al reconciliar con la API de dLocal (webhook no recibido)",
+          detail: check.mismatch
+            ? `Pago confirmado en dLocal con discrepancia de monto: ${describeAmountCheck(check)}`
+            : "Pago confirmado al reconciliar con la API de dLocal (webhook no recibido)",
           customerEmail: email,
           amount: amount ?? null,
           currency,
+
           metadata: { skus, source: "sweep", autoDelivery: true },
         });
         recovered++;
         await resolveReminders(supabase, orderNumber, "paid");
 
+        if (check.underpaid) {
+          // Pago incompleto o en otra moneda: se retiene la entrega hasta que
+          // el admin lo revise en /admin/dlocal.
+          console.warn("[dlocal-sweep] entrega retenida por discrepancia:", orderNumber, check.reason);
+          heldForReview++;
+          continue;
+        }
+
         if (email) {
+
           const alreadyDelivered = events.some((e) => e.event === "delivery_sent");
           if (!alreadyDelivered) {
             const name = email.split("@")[0];
@@ -297,7 +361,7 @@ Deno.serve(async (req) => {
       abandoned++;
     }
 
-    const result = { ok: true, orders: byOrder.size, checked, abandoned, rejected, recovered, delivered, deliveryFailed, stillPending };
+    const result = { ok: true, orders: byOrder.size, checked, abandoned, rejected, recovered, delivered, deliveryFailed, stillPending, mismatches, heldForReview, lookupErrors };
     console.log("[dlocal-sweep]", JSON.stringify(result));
     return json(result);
   } catch (err) {

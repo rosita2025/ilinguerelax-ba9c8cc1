@@ -481,7 +481,7 @@ main().catch((err) => {
     writeFileSync(join(SITEMAPS_DIR, "sitemap-pages.xml"), urlsetXml(staticEntries));
     writeFileSync(
       join(PUBLIC_DIR, "sitemap.xml"),
-      indexXml([{ file: "sitemap-pages.xml", lastmod: TODAY }]),
+      indexXml([{ file: "sitemap-pages.xml" }]),
     );
   } catch {
     /* keep previous file */

@@ -2395,6 +2395,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      verify_cron_key: { Args: { _key: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

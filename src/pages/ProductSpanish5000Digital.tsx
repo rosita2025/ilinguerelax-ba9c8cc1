@@ -270,6 +270,7 @@ const ProductSpanish5000Digital = () => {
                   fetchPriority="high"
                   decoding="async"
                 />
+                <PinterestSave overlay />
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-lg">
                   <Download className="w-3.5 h-3.5" /> DIGITAL PDF — INSTANT ACCESS
                 </div>
@@ -553,7 +554,6 @@ const ProductSpanish5000Digital = () => {
         <Footer />
       </Suspense>
 
-      <PinterestSave floating />
       <StickyBuyBar
         productName="Spanish 5,000 Words — Digital PDF"
         price={tier.priceLabel}

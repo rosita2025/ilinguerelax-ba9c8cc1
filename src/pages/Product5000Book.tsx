@@ -185,6 +185,7 @@ const Product5000Book = () => {
                   >
                     {slide.type === "image" ? (
                       <img src={slide.src} alt={slide.alt} className="w-full h-auto" />
+                      <PinterestSave className="mt-3" />
                     ) : (
                       <video
                         ref={videoRef}
@@ -506,7 +507,6 @@ const Product5000Book = () => {
       />
 
       <Footer />
-      <PinterestSave floating />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"

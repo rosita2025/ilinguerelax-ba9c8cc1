@@ -328,6 +328,7 @@ const Product5000 = () => {
                 alt={previewImages[currentImageIndex]?.title}
                 className="max-h-[70vh] w-auto object-contain rounded-lg"
               />
+              <PinterestSave className="mt-3" />
               <div className="mt-4 text-center">
                 <h3 className="text-xl font-bold text-white">{previewImages[currentImageIndex]?.title}</h3>
                 <p className="text-white/70 mt-1">{previewImages[currentImageIndex]?.subtitle}</p>
@@ -894,7 +895,6 @@ const Product5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <PinterestSave floating />
       <StickyBuyBar
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}

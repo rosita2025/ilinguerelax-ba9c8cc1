@@ -234,6 +234,7 @@ const ProductSpanish5000 = () => {
                     fetchPriority="high"
                     decoding="async"
                   />
+                  <PinterestSave overlay />
                 </picture>
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg">
                   <Package className="w-3.5 h-3.5" /> PHYSICAL + DIGITAL FREE
@@ -801,7 +802,6 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
-      <PinterestSave floating />
       <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} />
 
       {/* Spacer for sticky bar */}

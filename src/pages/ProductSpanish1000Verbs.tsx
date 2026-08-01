@@ -87,6 +87,7 @@ const ProductSpanish1000Verbs = () => {
               <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 to-emerald-500/20 opacity-60 blur-3xl rounded-3xl" />
               <div className="relative">
                 <img src={productImage} alt="Spanish Relax - 1,000 Verbs Digital eBook" className="w-full h-auto rounded-2xl shadow-hero" />
+                <PinterestSave overlay />
               </div>
             </div>
 
@@ -164,7 +165,6 @@ const ProductSpanish1000Verbs = () => {
 
       <Footer />
 
-      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

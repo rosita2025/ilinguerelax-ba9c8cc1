@@ -238,6 +238,7 @@ const ProductPatronesEspeciales = () => {
                   alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
+                <PinterestSave overlay />
               </div>
             </div>
 
@@ -699,7 +700,6 @@ const ProductPatronesEspeciales = () => {
 
       <Footer />
 
-      <PinterestSave floating />
       <StickyBuyBar
         price={priceLabel}
         originalPrice={originalLabel}

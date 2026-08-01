@@ -24,6 +24,13 @@ const STEP_DAYS = [1, 2, 3] as const;
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** El cupón de dLocal vence en 3 días; no inscribimos pedidos viejos. */
 const ENROLL_WINDOW_MS = 4 * DAY_MS;
+/**
+ * Espaciado mínimo real entre dos recordatorios del MISMO pedido.
+ * Sin esto, un pedido inscrito tarde tenía los días 1, 2 y 3 ya vencidos y el
+ * cron (cada 15 min) mandaba un correo por ejecución: el cliente recibía la
+ * secuencia completa en una hora y parecían correos duplicados.
+ */
+const MIN_GAP_MS = 20 * 60 * 60 * 1000; // 20 h
 
 type Reminder = {
   id: string;
@@ -37,7 +44,15 @@ type Reminder = {
   product_name: string | null;
   order_created_at: string;
   step: number;
+  last_sent_at?: string | null;
 };
+
+/** Último envío (ms) de la secuencia, o null si aún no se envió nada. */
+function r_lastSentAt(r: Reminder): number | null {
+  if (!r.last_sent_at) return null;
+  const t = new Date(r.last_sent_at).getTime();
+  return Number.isFinite(t) ? t : null;
+}
 
 function admin() {
   return createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -116,10 +131,14 @@ async function enroll(supabase: ReturnType<typeof admin>) {
 
   if (candidates.size === 0) return 0;
 
+  const now = Date.now();
   const payload = [...candidates.values()].map((c) => ({
     ...c,
     step: 0,
-    next_at: new Date(new Date(c.order_created_at).getTime() + STEP_DAYS[0] * DAY_MS).toISOString(),
+    // Nunca antes de 1 h desde la inscripción, aunque el pedido sea antiguo.
+    next_at: new Date(
+      Math.max(new Date(c.order_created_at).getTime() + STEP_DAYS[0] * DAY_MS, now + 60 * 60 * 1000),
+    ).toISOString(),
   }));
 
   // onConflict order_number → no duplicamos ni reiniciamos secuencias en curso.
@@ -170,7 +189,7 @@ Deno.serve(async (req) => {
 
     const { data: due } = await supabase
       .from("pending_payment_reminders")
-      .select("id, order_number, customer_email, customer_name, provider, method, amount, currency, product_name, order_created_at, step")
+      .select("id, order_number, customer_email, customer_name, provider, method, amount, currency, product_name, order_created_at, step, last_sent_at")
       .eq("resolved", false)
       .lte("next_at", new Date().toISOString())
       .order("next_at", { ascending: true })
@@ -199,6 +218,49 @@ Deno.serve(async (req) => {
 
       const day = STEP_DAYS[stepIndex];
       const isLast = stepIndex === STEP_DAYS.length - 1;
+
+      // Guarda anti-duplicados 1: nunca dos correos del mismo pedido en <20 h,
+      // aunque el cron se solape o el pedido llegue con días vencidos.
+      const lastSent = r_lastSentAt(r);
+      if (lastSent && Date.now() - lastSent < MIN_GAP_MS) {
+        await supabase
+          .from("pending_payment_reminders")
+          .update({ next_at: new Date(lastSent + MIN_GAP_MS).toISOString() })
+          .eq("id", r.id);
+        continue;
+      }
+
+      // Guarda anti-duplicados 2: si ya quedó registrado el envío de este día,
+      // avanzamos el paso sin volver a escribir al cliente.
+      const { data: already } = await supabase
+        .from("order_events")
+        .select("id")
+        .eq("order_number", r.order_number)
+        .eq("event", "reminder_sent")
+        .contains("metadata", { day })
+        .limit(1);
+      if (already && already.length > 0) {
+        await supabase
+          .from("pending_payment_reminders")
+          .update({
+            step: stepIndex + 1,
+            next_at: new Date(Date.now() + MIN_GAP_MS).toISOString(),
+          })
+          .eq("id", r.id);
+        continue;
+      }
+
+      // Reserva del envío: si otra ejecución del cron ya tomó esta fila,
+      // `next_at` cambió y el update no afecta ninguna fila → no enviamos.
+      const { data: claimed } = await supabase
+        .from("pending_payment_reminders")
+        .update({ next_at: new Date(Date.now() + MIN_GAP_MS).toISOString() })
+        .eq("id", r.id)
+        .eq("step", stepIndex)
+        .eq("resolved", false)
+        .lte("next_at", new Date().toISOString())
+        .select("id");
+      if (!claimed || claimed.length === 0) continue;
 
       const { error } = await sendInternalEmail({
         ...{
@@ -269,9 +331,12 @@ Deno.serve(async (req) => {
         .update({
           step: nextStep,
           last_sent_at: sentAt,
-          next_at: nextStep < STEP_DAYS.length
-            ? new Date(base + STEP_DAYS[nextStep] * DAY_MS).toISOString()
-            : new Date(Date.now() + DAY_MS).toISOString(),
+          next_at: new Date(
+            Math.max(
+              nextStep < STEP_DAYS.length ? base + STEP_DAYS[nextStep] * DAY_MS : Date.now() + DAY_MS,
+              Date.now() + MIN_GAP_MS,
+            ),
+          ).toISOString(),
           ...(isLast ? {} : {}),
         })
         .eq("id", r.id);

@@ -17,6 +17,7 @@ import { COUNTRY_INFO } from "@/lib/countryInfo";
 import { publishCatalogUpdate } from "@/lib/catalogSync";
 import ProductImageUploader from "@/components/admin/ProductImageUploader";
 import ProductUpdateNoticePanel from "@/components/admin/ProductUpdateNoticePanel";
+import ProductLaunchPanel from "@/components/admin/ProductLaunchPanel";
 
 interface Product {
   sku: string;

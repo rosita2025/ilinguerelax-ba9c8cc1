@@ -46,7 +46,6 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
   const [preview, setPreview] = useState<PreviewData | null>(null);
   const [launchKey, setLaunchKey] = useState("");
   const [pitch, setPitch] = useState("");
-  const [highlights, setHighlights] = useState("");
   const [coupon, setCoupon] = useState("");
   const [audiences, setAudiences] = useState<AudienceKey[]>(AUDIENCES.map((a) => a.key));
   const [emailPreview, setEmailPreview] = useState<{
@@ -78,7 +77,6 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
         action: "render",
         launchKey: launchKey.trim(),
         pitch: pitch.trim() || undefined,
-        highlights: highlights.split("\n").map((l) => l.trim()).filter(Boolean),
         coupon: coupon.trim() || undefined,
       });
       setEmailPreview(data as typeof emailPreview);
@@ -88,9 +86,7 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
   };
 
   const send = async () => {
-    const list = highlights.split("\n").map((l) => l.trim()).filter(Boolean);
     if (!launchKey.trim()) return toast({ title: "Falta la etiqueta del lanzamiento", variant: "destructive" });
-    if (list.length === 0) return toast({ title: "Escribe al menos un punto destacado", variant: "destructive" });
     if (audiences.length === 0) return toast({ title: "Elige al menos una audiencia", variant: "destructive" });
     setSending(true);
     try {
@@ -98,7 +94,6 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
         action: "send",
         launchKey: launchKey.trim(),
         pitch: pitch.trim() || undefined,
-        highlights: list,
         coupon: coupon.trim() || undefined,
       }) as { sent: number; skipped: number; failed: number; total: number };
       toast({
@@ -184,11 +179,6 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
           <div className="space-y-1">
             <Label className="text-xs">Presentación corta (opcional)</Label>
             <Textarea value={pitch} onChange={(e) => setPitch(e.target.value)} rows={2} maxLength={400} placeholder="Un material práctico para hablar con confianza desde el primer día." />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">Puntos destacados (uno por línea)</Label>
-            <Textarea value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={4} placeholder={"500 frases con pronunciación\nAudios incluidos\nPDF listo para imprimir"} />
           </div>
 
           <div className="space-y-1">

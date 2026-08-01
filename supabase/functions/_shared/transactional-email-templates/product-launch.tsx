@@ -7,6 +7,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -19,8 +20,8 @@ interface Props {
   productName?: string
   /** Texto corto de presentación del producto */
   productPitch?: string
-  /** Puntos destacados (una línea por punto) */
-  highlights?: string[]
+  /** Imagen de portada del producto */
+  imageUrl?: string
   /** URL pública del producto (/products/<sku>) */
   productUrl?: string
   /** Cupón opcional de lanzamiento */
@@ -38,10 +39,9 @@ const AUDIENCE_INTRO: Record<string, string> = {
   newsletter: 'Estás suscrito a nuestras novedades, así que te lo contamos de primera mano.',
 }
 
-const Email = ({ customerName, productName, productPitch, highlights, productUrl, coupon, audience }: Props) => {
+const Email = ({ customerName, productName, productPitch, imageUrl, productUrl, coupon, audience }: Props) => {
   const name = customerName?.trim() || 'Hola'
   const product = productName?.trim() || 'Nuevo material ILINGUE RELAX'
-  const list = (highlights ?? []).filter((h) => !!h && String(h).trim().length > 0)
   const url = productUrl || 'https://ilinguerelax.com'
   const intro = AUDIENCE_INTRO[audience ?? ''] || AUDIENCE_INTRO.newsletter
 
@@ -64,12 +64,11 @@ const Email = ({ customerName, productName, productPitch, highlights, productUrl
             <Text style={introStyle}>{productPitch}</Text>
           )}
 
-          {list.length > 0 && (
-            <Section style={itemCard}>
-              <Text style={itemName}>Qué incluye</Text>
-              {list.map((h, i) => (
-                <Text key={i} style={bullet}>• {h}</Text>
-              ))}
+          {imageUrl && imageUrl.trim().length > 0 && (
+            <Section style={{ textAlign: 'center' as const, margin: '4px 0 18px' }}>
+              <Link href={url}>
+                <Img src={imageUrl} alt={product} width="420" style={cover} />
+              </Link>
             </Section>
           )}
 
@@ -109,7 +108,7 @@ export const template = {
     customerName: 'María',
     productName: '500 Frases de Viaje en Inglés',
     productPitch: 'Un material práctico para hablar con confianza desde el primer día.',
-    highlights: ['500 frases con pronunciación', 'Audios incluidos', 'PDF listo para imprimir'],
+    imageUrl: 'https://ilinguerelax.com/og-image.jpg',
     productUrl: 'https://ilinguerelax.com/products/500-frases-viaje',
     coupon: 'NEW10',
     audience: 'newsletter',
@@ -124,6 +123,7 @@ const orderTag = { margin: '4px 0 0', fontSize: '12px', color: '#6b7280', letter
 const h1 = { fontSize: '23px', color: '#111827', margin: '0 0 12px' }
 const introStyle = { fontSize: '15px', color: '#4b5563', lineHeight: '1.6', margin: '0 0 16px' }
 const hr = { borderColor: '#e5e7eb', margin: '24px 0' }
+const cover = { width: '100%', maxWidth: '420px', height: 'auto', borderRadius: '12px', border: '1px solid #e5e7eb' }
 const itemCard = { padding: '16px', backgroundColor: '#f9fafb', borderRadius: '10px', border: '1px solid #e5e7eb', marginBottom: '12px' }
 const itemName = { margin: '0 0 8px', fontSize: '15px', fontWeight: 'bold' as const, color: '#111827' }
 const bullet = { margin: '0 0 6px', fontSize: '14px', color: '#4b5563', lineHeight: '1.6' }

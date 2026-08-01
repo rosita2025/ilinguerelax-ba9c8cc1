@@ -229,6 +229,12 @@ export const SEO = ({
         "description": product.description,
         "image": product.image,
         "url": product.url,
+        "brand": {
+          "@type": "Brand",
+          "name": "iLingue Relax",
+          "@id": "https://ilinguerelax.com/#brand"
+        },
+
         "offers": {
           "@type": "Offer",
           "priceCurrency": "USD",

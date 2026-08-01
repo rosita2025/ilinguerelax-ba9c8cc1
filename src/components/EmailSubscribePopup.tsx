@@ -5,6 +5,35 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nContext";
+import { useLocation } from "react-router-dom";
+
+/** Rutas donde NUNCA debe aparecer ningún popup (checkout / pago / descargas / admin). */
+const BLOCKED_PREFIXES = [
+  "/admin",
+  "/checkout",
+  "/checkouts",
+  "/carrito",
+  "/cart",
+  "/pago",
+  "/pagos",
+  "/pay",
+  "/success",
+  "/gracias",
+  "/thank",
+  "/descarga",
+  "/mi-descarga",
+  "/mi-pedido",
+  "/order",
+];
+
+function isBlockedPath(pathname: string): boolean {
+  const p = (pathname || "").toLowerCase();
+  return (
+    BLOCKED_PREFIXES.some((b) => p.startsWith(b)) ||
+    p.includes("checkout") ||
+    p.includes("success")
+  );
+}
 
 const STORAGE_KEY = "ilr_newsletter_popup_v2";
 const COOKIE_KEY = "ilr_newsletter_popup";
@@ -243,6 +272,8 @@ function getCopy(lang: string): Copy {
 
 export const EmailSubscribePopup = () => {
   const { language, countryCode } = useI18n();
+  const location = useLocation();
+  const blocked = isBlockedPath(location.pathname);
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -252,16 +283,23 @@ export const EmailSubscribePopup = () => {
   const COUPON = "NEW10";
   const c = getCopy(language);
 
+  // Cierra el popup al instante si el usuario navega al checkout/pago.
+  useEffect(() => {
+    if (blocked) setOpen(false);
+  }, [blocked]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (readState()) return;
-    const p = window.location.pathname.toLowerCase();
-    const BLOCKED = ["/admin", "/checkout", "/checkouts", "/pago", "/pagos", "/pay", "/success", "/gracias", "/thank", "/descarga", "/order"];
-    if (BLOCKED.some((b) => p.startsWith(b)) || p.includes("success") || p.includes("checkout")) return;
+    if (blocked) return;
 
-    const t = setTimeout(() => setOpen(true), DELAY_MS);
+    const t = setTimeout(() => {
+      if (isBlockedPath(window.location.pathname)) return;
+      setOpen(true);
+    }, DELAY_MS);
     return () => clearTimeout(t);
-  }, []);
+  }, [blocked]);
+
 
   const dismiss = () => {
     setOpen(false);
@@ -301,7 +339,7 @@ export const EmailSubscribePopup = () => {
     }
   };
 
-  if (!open) return null;
+  if (blocked || !open) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">

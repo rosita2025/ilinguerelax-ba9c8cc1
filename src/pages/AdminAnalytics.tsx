@@ -43,6 +43,7 @@ interface AnalyticsData {
     checkoutSessions: number;
     cartSessions: number;
   };
+  providers: Array<{ provider: string; count: number; pending: number; revenue: number }>;
   conversion: {
     globalPct: number;
     viewToCartPct: number;

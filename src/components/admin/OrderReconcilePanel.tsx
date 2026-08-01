@@ -63,6 +63,15 @@ export default function OrderReconcilePanel() {
     }
   }
 
+  // Muestra la lista de pendientes reales apenas se abre el panel
+  const autoLoaded = useRef(false);
+  useEffect(() => {
+    if (autoLoaded.current) return;
+    autoLoaded.current = true;
+    loadPending();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery") {
     const order = orderNumber.trim().toUpperCase();
     if (!order) { toast.error("Escribe el número de pedido"); return; }

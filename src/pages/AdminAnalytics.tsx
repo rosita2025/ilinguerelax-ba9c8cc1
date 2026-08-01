@@ -282,13 +282,15 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
     },
     abandoned: {
       total: toNumber(abandoned.total),
+      open: toNumber((abandoned as any).open),
       newCustomers: toNumber(abandoned.newCustomers),
       returningCustomers: toNumber(abandoned.returningCustomers),
-
       recovered: toNumber(abandoned.recovered),
+      checkoutNoPurchase: toNumber((abandoned as any).checkoutNoPurchase),
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
     },
+
     series: toArray(value?.series).slice(0, 500).map((s) => ({
       bucket: toText(s?.bucket, fallbackRange.from.toISOString()),
       sessions: toNumber(s?.sessions),

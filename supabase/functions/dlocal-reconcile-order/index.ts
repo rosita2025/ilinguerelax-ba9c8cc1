@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
       const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const { data: rows } = await supabase
         .from("order_events")
-        .select("order_number, event, status, method, customer_email, amount, currency, provider, created_at")
+        .select("order_number, event, status, method, reference, customer_email, amount, currency, provider, created_at")
         .gte("created_at", since)
         .order("created_at", { ascending: true })
         .limit(4000);
@@ -191,6 +191,7 @@ Deno.serve(async (req) => {
       const byOrder = new Map<string, {
         orderNumber: string; provider: string; email: string; method: string | null;
         amount: number | null; currency: string; createdAt: string; lastAt: string;
+        reference: string | null;
         paid: boolean; failed: boolean; pending: boolean;
       }>();
       for (const r of (rows ?? []) as Array<Record<string, any>>) {
@@ -198,11 +199,12 @@ Deno.serve(async (req) => {
         const cur = byOrder.get(on) ?? {
           orderNumber: on, provider: r.provider ?? "dlocalgo", email: "", method: null,
           amount: null, currency: "USD", createdAt: r.created_at, lastAt: r.created_at,
-          paid: false, failed: false, pending: false,
+          reference: null, paid: false, failed: false, pending: false,
         };
         if (r.provider) cur.provider = r.provider;
         if (r.customer_email) cur.email = r.customer_email;
         if (r.method) cur.method = r.method;
+        if (r.reference && r.reference !== on) cur.reference = String(r.reference);
         if (typeof r.amount === "number") cur.amount = r.amount;
         if (r.currency) cur.currency = r.currency;
         cur.lastAt = r.created_at;
@@ -252,7 +254,7 @@ Deno.serve(async (req) => {
           currency: r.currency ?? "USD",
           createdAt: r.order_created_at ?? r.updated_at,
           lastAt: r.updated_at ?? r.order_created_at,
-          paid: false, failed: false, pending: true,
+          reference: null, paid: false, failed: false, pending: true,
         });
       }
 

@@ -85,6 +85,7 @@ const AdminPaymentErrors = lazy(() => import("./pages/AdminPaymentErrors"));
 
 const AdminBrevoAbandoned = lazy(() => import("./pages/AdminBrevoAbandoned"));
 const AdminNewsletterDrip = lazy(() => import("./pages/AdminNewsletterDrip"));
+const AdminLaunches = lazy(() => import("./pages/AdminLaunches"));
 
 const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
 const AdminBotReport = lazy(() => import("./pages/AdminBotReport"));

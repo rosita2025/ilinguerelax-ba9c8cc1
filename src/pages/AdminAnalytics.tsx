@@ -87,7 +87,15 @@ interface AnalyticsData {
     checkoutToPurchasePct: number;
     abandonedCheckoutPct: number;
   };
-  abandoned: { total: number; open: number; newCustomers: number; returningCustomers: number; recovered: number; checkoutNoPurchase: number; openValue: number; recoveryRatePct: number };
+  abandoned: {
+    total: number; open: number; newCustomers: number; returningCustomers: number; recovered: number; checkoutNoPurchase: number; openValue: number; recoveryRatePct: number;
+    sources: {
+      hotmart: { label: string; total: number; open: number; recovered: number };
+      store: { label: string; total: number; open: number; recovered: number };
+      checkoutVisitors: { label: string; total: number; open: number; withoutEmail: number; recovered: number };
+      unifiedPeople: number;
+    };
+  };
   series: Array<{
     bucket: string;
     pageviews: number;
@@ -289,6 +297,28 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       checkoutNoPurchase: toNumber((abandoned as any).checkoutNoPurchase),
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
+      sources: {
+        hotmart: {
+          label: "Hotmart (carrito abandonado)",
+          total: toNumber((abandoned as any)?.sources?.hotmart?.total),
+          open: toNumber((abandoned as any)?.sources?.hotmart?.open),
+          recovered: toNumber((abandoned as any)?.sources?.hotmart?.recovered),
+        },
+        store: {
+          label: "Tienda propia (checkout interno)",
+          total: toNumber((abandoned as any)?.sources?.store?.total),
+          open: toNumber((abandoned as any)?.sources?.store?.open),
+          recovered: toNumber((abandoned as any)?.sources?.store?.recovered),
+        },
+        checkoutVisitors: {
+          label: "Visitantes del checkout",
+          total: toNumber((abandoned as any)?.sources?.checkoutVisitors?.total),
+          open: toNumber((abandoned as any)?.sources?.checkoutVisitors?.open),
+          withoutEmail: toNumber((abandoned as any)?.sources?.checkoutVisitors?.withoutEmail),
+          recovered: toNumber((abandoned as any)?.sources?.checkoutVisitors?.recovered),
+        },
+        unifiedPeople: toNumber((abandoned as any)?.sources?.unifiedPeople),
+      },
     },
 
     series: toArray(value?.series).slice(0, 500).map((s) => ({
@@ -777,6 +807,43 @@ const AdminAnalytics = () => {
                 Los dos números miden cosas distintas: <strong>Checkouts iniciados sin compra</strong> cuenta sesiones que llegaron al checkout y no pagaron (aunque el cliente no haya dejado su correo);
                 <strong> Carritos con correo</strong> solo cuenta personas identificadas (dejaron nombre/correo), que son las que reciben los correos de recuperación.
               </p>
+
+              {/* Carritos abandonados por fuente (Hotmart + tienda + visitantes checkout) */}
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <PackageX className="w-4 h-4 text-muted-foreground" />
+                  <h3 className="text-sm font-semibold">Carritos abandonados · 3 fuentes</h3>
+                </div>
+                <p className="text-[11px] text-muted-foreground mb-3">
+                  Consolida <strong>/admin/hotmart-audit</strong> (carritos abandonados de Hotmart), la tienda propia (checkout interno) y <strong>/admin/checkouts-abuse</strong> (visitantes del checkout, con o sin correo).
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[data.abandoned.sources.hotmart, data.abandoned.sources.store].map((s) => (
+                    <div key={s.label} className="rounded-lg border p-3">
+                      <div className="text-xs text-muted-foreground">{s.label}</div>
+                      <div className="text-2xl font-bold">{s.open.toLocaleString()}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        sin recuperar · {s.total} en total · {s.recovered} recuperados
+                      </div>
+                    </div>
+                  ))}
+                  <div className="rounded-lg border p-3">
+                    <div className="text-xs text-muted-foreground">{data.abandoned.sources.checkoutVisitors.label}</div>
+                    <div className="text-2xl font-bold">{data.abandoned.sources.checkoutVisitors.open.toLocaleString()}</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      con correo sin comprar · {data.abandoned.sources.checkoutVisitors.withoutEmail} sin llenar el formulario · {data.abandoned.sources.checkoutVisitors.total} visitas
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 rounded-lg bg-muted/50 p-3 text-xs">
+                  <strong>Personas únicas sin comprar (sin duplicar por correo): {data.abandoned.sources.unifiedPeople.toLocaleString()}</strong>
+                  <div className="text-[11px] text-muted-foreground mt-1">
+                    Si un mismo correo abandonó en Hotmart y en la tienda, cuenta una sola vez. Quien ya compró se descuenta automáticamente.
+                  </div>
+                </div>
+              </Card>
+
+
 
 
               {/* Funnel evolution */}

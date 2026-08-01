@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
     // 2) Candidate subscribers
     const { data: subs, error: subsErr } = await admin
       .from('email_contacts')
-      .select('email, name, language, created_at, unsubscribed, marketing_opt_in')
+      .select('email, name, language, created_at, metadata')
       .eq('source', 'newsletter_welcome')
       .gte('created_at', oldestCutoff)
       .lte('created_at', newestCutoff)

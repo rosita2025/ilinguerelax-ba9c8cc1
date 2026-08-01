@@ -45,16 +45,11 @@ Deno.serve(async (req) => {
     // El cron de Postgres firma con la clave guardada en Vault.
     const token = bearer(req);
     if (token) {
-      const { data } = await supabase
-        .schema("vault")
-        .from("decrypted_secrets")
-        .select("decrypted_secret")
-        .eq("name", "email_queue_service_role_key")
-        .maybeSingle();
-      const vaultKey = (data as { decrypted_secret?: string } | null)?.decrypted_secret ?? "";
-      if (vaultKey && token === vaultKey) ok = true;
+      const { data } = await supabase.rpc("verify_cron_key", { _key: token });
+      if (data === true) ok = true;
     }
   }
+
   if (!ok) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401,

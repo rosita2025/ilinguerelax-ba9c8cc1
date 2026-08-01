@@ -6,7 +6,9 @@
 //
 // Audiencias y PRIORIDAD (una persona recibe UN solo correo, con el contexto
 // de la audiencia de mayor prioridad en la que aparezca):
-//   1. buyers      -> compradores del checkout interno (download_tokens)
+//   1. buyers      -> compradores del checkout interno (tokens de descarga,
+//                     entregas digitales, auditoría de entregas y pagos
+//                     manuales verificados: Yape/Plin/transferencias)
 //   2. hotmart     -> compradores vía Hotmart (hotmart_purchases)
 //   3. reviewers   -> clientes que dejaron reseña aprobada (reviews)
 //   4. waitlist    -> lista de espera "avísame cuando salga" (store_subscribers)

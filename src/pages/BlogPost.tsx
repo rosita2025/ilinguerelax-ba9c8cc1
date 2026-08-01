@@ -271,6 +271,14 @@ const BlogPost = () => {
         canonicalUrl={`https://ilinguerelax.com/blog/${post.slug}`}
         keywords={post.tags.join(", ")}
         image={post.image}
+        type="article"
+        article={{
+          publishedTime: new Date(post.date).toISOString(),
+          modifiedTime: new Date(post.updatedAt ?? post.date).toISOString(),
+          author: post.author,
+          section: post.category,
+          tags: post.tags,
+        }}
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>

@@ -75,24 +75,35 @@ async function resolveReminders(
 }
 
 
-async function fetchDlocalPayment(paymentId: string): Promise<Record<string, unknown> | null> {
+type Lookup = { payment: Record<string, unknown> | null; failed: boolean };
+
+/**
+ * Consulta el pago en dLocal.
+ *  · `failed: true` → NO pudimos saber el estado real (credenciales, red, 5xx).
+ *    En ese caso jamás se cierra el pedido: se deja para el siguiente barrido.
+ *  · `failed: false, payment: null` → dLocal respondió que ese pago no existe.
+ */
+async function fetchDlocalPayment(paymentId: string): Promise<Lookup> {
   const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");
   const secretKey = Deno.env.get("DLOCAL_GO_SECRET_KEY");
-  if (!apiKey || !secretKey) return null;
+  if (!apiKey || !secretKey) return { payment: null, failed: true };
   try {
     const r = await fetch(`${dlocalApiBase()}/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: `Bearer ${apiKey}:${secretKey}` },
     });
     if (!r.ok) {
       console.warn("[dlocal-sweep] dLocal respondió", r.status, "para", paymentId);
-      return null;
+      // 404 = el pago no existe (respuesta confiable). Cualquier otro error es
+      // un fallo de consulta y no puede interpretarse como "no pagó".
+      return { payment: null, failed: r.status !== 404 };
     }
-    return await r.json() as Record<string, unknown>;
+    return { payment: await r.json() as Record<string, unknown>, failed: false };
   } catch (e) {
     console.warn("[dlocal-sweep] fetch falló:", e instanceof Error ? e.message : String(e));
-    return null;
+    return { payment: null, failed: true };
   }
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: internalCors });

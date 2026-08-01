@@ -1037,6 +1037,8 @@ const AdminProductEdit = () => {
             </div>
           </Card>
 
+          {!isNew && <ProductUpdateNoticePanel sku={sku!} adminKey={adminKey} />}
+
           {!isNew && <ChangeHistoryPanel sku={sku!} adminKey={adminKey} />}
 
 

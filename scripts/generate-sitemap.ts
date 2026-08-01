@@ -350,10 +350,14 @@ function urlsetXml(entries: SitemapEntry[], hostBase: string = BASE_URL): string
   ].join("\n");
 }
 
-function indexXml(children: Array<{ file: string; lastmod: string }>): string {
+function indexXml(children: Array<{ file: string; lastmod?: string }>): string {
+  // <lastmod> solo se emite cuando viene de un dato real (updated_at / fecha de
+  // publicación). Inventar la fecha de build hace que Google desconfíe de la señal.
   const items = children.map(
     (c) =>
-      `  <sitemap>\n    <loc>${BASE_URL}/sitemaps/${c.file}</loc>\n    <lastmod>${c.lastmod}</lastmod>\n  </sitemap>`,
+      `  <sitemap>\n    <loc>${BASE_URL}/sitemaps/${c.file}</loc>` +
+      (c.lastmod ? `\n    <lastmod>${c.lastmod}</lastmod>` : "") +
+      `\n  </sitemap>`,
   );
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',

@@ -767,6 +767,36 @@ serve(async (req) => {
     console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 
 
+    // Último intento de verificación por pedido (order_events registra cada
+    // consulta/webhook del proveedor). Enriquece el detalle de pendientes.
+    if (pendingDetails.length > 0) {
+      const orderNumbers = Array.from(
+        new Set(pendingDetails.map((p) => p.orderNumber).filter((o) => o && o !== "-")),
+      ).slice(0, 200);
+      if (orderNumbers.length > 0) {
+        const { data: evRows } = await supabase
+          .from("order_events")
+          .select("order_number, created_at, event, status")
+          .in("order_number", orderNumbers)
+          .order("created_at", { ascending: false })
+          .limit(1000);
+        const lastByOrder = new Map<string, { at: string; event: string; status: string | null }>();
+        for (const r of (evRows ?? []) as any[]) {
+          if (!lastByOrder.has(r.order_number)) {
+            lastByOrder.set(r.order_number, { at: r.created_at, event: r.event, status: r.status ?? null });
+          }
+        }
+        for (const p of pendingDetails) {
+          const last = lastByOrder.get(p.orderNumber);
+          if (last) {
+            p.lastCheckAt = last.at;
+            if (last.status) p.status = String(last.status).toLowerCase();
+          }
+        }
+      }
+      pendingDetails.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
     const pendingByCurrency = Array.from(pendingByCurrencyAgg.entries()).map(([currency, breakdown]) => {
       const totalAmount = breakdown.reduce((s, x) => s + x.amount, 0);
       const rate = fxRates[currency] ?? null;

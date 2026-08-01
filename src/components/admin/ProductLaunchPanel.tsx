@@ -250,8 +250,11 @@ export default function ProductLaunchPanel({ sku, adminKey }: { sku: string; adm
 
           <Button onClick={send} disabled={sending} className="w-full sm:w-auto">
             {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Send className="w-4 h-4 mr-1" />}
-            Enviar anuncio de lanzamiento
+            {sending && progress
+              ? `Enviando… ${progress.sent}/${progress.total}`
+              : "Enviar anuncio de lanzamiento"}
           </Button>
+
         </div>
       )}
     </Card>

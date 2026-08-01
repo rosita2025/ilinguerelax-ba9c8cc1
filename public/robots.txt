@@ -128,6 +128,9 @@ Sitemap: https://ilinguerelax.com/sitemaps/sitemap-blog.xml
 
 # RSS del blog (se regenera junto al sitemap y se notifica por WebSub)
 # https://ilinguerelax.com/rss.xml
+# RSS de productos (para importar contenido en Pinterest)
+# https://ilinguerelax.com/rss-productos.xml
+
 
 
 # IndexNow verification key (Bing / Yandex / Seznam auto-discovery)

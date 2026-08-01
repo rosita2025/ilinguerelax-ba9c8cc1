@@ -200,8 +200,11 @@ Deno.serve(async (req) => {
         if (r.currency) cur.currency = r.currency;
         cur.lastAt = r.created_at;
         if (r.event === "payment_paid" || r.event === "delivery_sent") cur.paid = true;
-        if (r.event === "payment_failed") cur.failed = true;
-        if (r.event === "payment_pending" || r.event === "checkout_created") cur.pending = true;
+        if (r.event === "payment_failed" || r.event === "payment_rejected") cur.failed = true;
+        if (
+          r.event === "payment_pending" || r.event === "checkout_created" ||
+          r.event === "order_created" || r.event === "payment_instructions"
+        ) cur.pending = true;
         byOrder.set(on, cur);
       }
       // Solo pedidos con correo real: fuera pruebas internas / QA.
@@ -214,11 +217,43 @@ Deno.serve(async (req) => {
         return /(^|[._+-])(test|prueba|qa|demo|dummy|diag|sandbox|staging)([._+-]|\d|$)/.test(v.split("@")[0]);
       };
 
+      // Refuerzo: recordatorios pendientes activos (fuente de verdad del seguimiento).
+      const { data: reminders } = await supabase
+        .from("pending_payment_reminders")
+        .select("order_number, customer_email, provider, method, amount, currency, order_created_at, updated_at")
+        .eq("resolved", false)
+        .order("order_created_at", { ascending: false })
+        .limit(200);
+
+      for (const r of (reminders ?? []) as Array<Record<string, any>>) {
+        const on = String(r.order_number);
+        const existing = byOrder.get(on);
+        if (existing) {
+          existing.pending = true;
+          if (!existing.email && r.customer_email) existing.email = r.customer_email;
+          if (!existing.method && r.method) existing.method = r.method;
+          if (existing.amount == null && typeof r.amount === "number") existing.amount = r.amount;
+          continue;
+        }
+        byOrder.set(on, {
+          orderNumber: on,
+          provider: r.provider ?? "dlocalgo",
+          email: r.customer_email ?? "",
+          method: r.method ?? null,
+          amount: typeof r.amount === "number" ? r.amount : null,
+          currency: r.currency ?? "USD",
+          createdAt: r.order_created_at ?? r.updated_at,
+          lastAt: r.updated_at ?? r.order_created_at,
+          paid: false, failed: false, pending: true,
+        });
+      }
+
       const pending = [...byOrder.values()]
         .filter((o) => o.pending && !o.paid && !o.failed && !isTestEmail(o.email))
         .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1))
         .slice(0, 200);
       return json({ ok: true, pending });
+
 
     }
 

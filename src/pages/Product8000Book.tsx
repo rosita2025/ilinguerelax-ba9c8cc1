@@ -493,7 +493,7 @@ const Product8000Book = () => {
                 beforeAlt="Diccionario tradicional sin organización por temas"
                 afterAlt="Temas por categorías con pronunciación y fonética UK/US"
                 beforeLabel="DICCIONARIO"
-                afterLabel="iLINGUE RELAX"
+                afterLabel="iLingue Relax"
               />
               <p className="text-xs text-muted-foreground text-center mt-3">
                 👆 Arrastra el control central para ver la comparación antes/después

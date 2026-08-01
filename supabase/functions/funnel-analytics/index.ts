@@ -920,6 +920,96 @@ serve(async (req) => {
     const abandonedOpen = Math.max(0, abandonedTotal - abandonedRecovered);
     const abandonedValue = 0;
 
+    // ---------- Carritos abandonados unificados (3 fuentes) ----------
+    // 1) Hotmart  → abandoned_carts (PURCHASE_OUT_OF_SHOPPING_CART, /admin/hotmart-audit)
+    // 2) Tienda   → persistent_carts (checkout propio)
+    // 3) Checkout → checkout_rate_hits (/admin/checkouts-abuse), incluye visitas sin correo
+    const purchasedEmails = new Set(
+      realPurchases
+        .map((p: any) => String(p.email || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+
+    const [persistentRes, hitsRes] = await Promise.all([
+      supabase
+        .from("persistent_carts")
+        .select("email, converted, country, created_at, last_activity")
+        .gte("created_at", fromDate.toISOString())
+        .lte("created_at", toDate.toISOString()),
+      supabase
+        .from("checkout_rate_hits")
+        .select("email, country, created_at")
+        .gte("created_at", fromDate.toISOString())
+        .lte("created_at", toDate.toISOString()),
+    ]);
+    if (persistentRes.error) console.error("persistent_carts query failed", persistentRes.error);
+    if (hitsRes.error) console.error("checkout_rate_hits query failed", hitsRes.error);
+
+    const norm = (e: unknown) => String(e || "").trim().toLowerCase();
+
+    // Hotmart (abandoned_carts) → abiertos = no convertidos y sin compra registrada
+    const hotmartAbandonedEmails = new Set(
+      Array.from(uniqueEmails).filter(
+        (e) => !recoveredEmails.has(e) && !purchasedEmails.has(e),
+      ),
+    );
+
+    // Tienda propia (persistent_carts)
+    const storeAllEmails = new Set<string>();
+    const storeRecovered = new Set<string>();
+    for (const c of (persistentRes.data ?? []) as any[]) {
+      const e = norm(c.email);
+      if (!e || isTestEmail(e)) continue;
+      storeAllEmails.add(e);
+      if (c.converted === true || purchasedEmails.has(e)) storeRecovered.add(e);
+    }
+    const storeAbandonedEmails = new Set(
+      Array.from(storeAllEmails).filter((e) => !storeRecovered.has(e)),
+    );
+
+    // Visitantes del checkout (checkout_rate_hits)
+    const hitsRows = (hitsRes.data ?? []) as any[];
+    const hitsEmails = new Set<string>();
+    let hitsNoEmail = 0;
+    for (const h of hitsRows) {
+      const e = norm(h.email);
+      if (e && !isTestEmail(e)) hitsEmails.add(e);
+      else if (!e) hitsNoEmail++;
+    }
+    const checkoutAbandonedEmails = new Set(
+      Array.from(hitsEmails).filter((e) => !purchasedEmails.has(e)),
+    );
+
+    // Unificado (una persona = un correo, sin importar la fuente)
+    const unifiedAbandoned = new Set<string>([
+      ...hotmartAbandonedEmails,
+      ...storeAbandonedEmails,
+      ...checkoutAbandonedEmails,
+    ]);
+
+    const abandonedSources = {
+      hotmart: {
+        label: "Hotmart (carrito abandonado)",
+        total: uniqueEmails.size,
+        open: hotmartAbandonedEmails.size,
+        recovered: recoveredEmails.size,
+      },
+      store: {
+        label: "Tienda propia (checkout interno)",
+        total: storeAllEmails.size,
+        open: storeAbandonedEmails.size,
+        recovered: storeRecovered.size,
+      },
+      checkoutVisitors: {
+        label: "Visitantes del checkout",
+        total: hitsEmails.size + hitsNoEmail,
+        open: checkoutAbandonedEmails.size,
+        withoutEmail: hitsNoEmail,
+        recovered: Math.max(0, hitsEmails.size - checkoutAbandonedEmails.size),
+      },
+      unifiedPeople: unifiedAbandoned.size,
+    };
+
 
 
 

@@ -98,9 +98,19 @@ interface FeedItem {
   title: string;
   description: string;
   date: string; // ISO
+  image?: string; // URL absoluta de la imagen (Pinterest / lectores RSS)
 }
 
 const feedItems: FeedItem[] = [];
+
+/** Convierte rutas relativas en URLs absolutas; descarta valores no http. */
+function absoluteImage(src?: string | null): string | undefined {
+  const v = (src ?? "").trim();
+  if (!v) return undefined;
+  if (v.startsWith("http://") || v.startsWith("https://")) return v;
+  if (v.startsWith("/")) return `${BASE_URL}${v}`;
+  return undefined;
+}
 
 async function getBlogEntries(): Promise<SitemapEntry[]> {
   const entries: SitemapEntry[] = [];
@@ -108,7 +118,7 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
   // Static blog data
   try {
     const mod = await import("../src/data/blogPosts");
-    const posts: Array<{ slug: string; date?: string; title?: string; excerpt?: string }> =
+    const posts: Array<{ slug: string; date?: string; title?: string; excerpt?: string; image?: string }> =
       (mod as any).blogPosts ?? [];
     for (const p of posts) {
       entries.push({
@@ -122,6 +132,7 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
         title: p.title ?? p.slug,
         description: p.excerpt ?? "",
         date: p.date ?? TODAY,
+        image: absoluteImage(p.image),
       });
     }
   } catch (err) {
@@ -136,7 +147,7 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
       const supabase = createClient(url, key);
       const { data, error } = await supabase
         .from("generated_blog_posts")
-        .select("slug, title, excerpt, updated_at, created_at, published")
+        .select("slug, title, excerpt, image, updated_at, created_at, published")
         .eq("published", true);
       if (error) {
         console.warn("[sitemap] generated_blog_posts error:", error.message);
@@ -146,6 +157,7 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
             slug: string;
             title?: string;
             excerpt?: string;
+            image?: string;
             updated_at?: string;
             created_at?: string;
           };
@@ -162,6 +174,7 @@ async function getBlogEntries(): Promise<SitemapEntry[]> {
             title: row.title ?? row.slug,
             description: row.excerpt ?? "",
             date: row.created_at ?? row.updated_at ?? TODAY,
+            image: absoluteImage(row.image),
           });
         }
       }
@@ -224,7 +237,13 @@ function sanitizeFeedItems(items: FeedItem[]): { items: FeedItem[]; errors: stri
       continue;
     }
     seen.add(link);
-    ok.push({ path, title, description: i.description ?? "", date: date.toISOString() });
+    ok.push({
+      path,
+      title,
+      description: i.description ?? "",
+      date: date.toISOString(),
+      image: i.image,
+    });
   }
 
   return { items: ok, errors };
@@ -271,13 +290,20 @@ function rssXml(items: FeedItem[]): string {
       `      <guid isPermaLink="true">${BASE_URL}${i.path}</guid>`,
       `      <pubDate>${new Date(i.date).toUTCString()}</pubDate>`,
       `      <description>${xmlEscape(i.description)}</description>`,
+      ...(i.image
+        ? [
+            `      <enclosure url="${xmlEscape(i.image)}" type="image/jpeg" length="0" />`,
+            `      <media:content url="${xmlEscape(i.image)}" medium="image" />`,
+            `      <media:thumbnail url="${xmlEscape(i.image)}" />`,
+          ]
+        : []),
       "    </item>",
     ].join("\n"),
   );
   const latest = sorted[0]?.date ?? TODAY;
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">',
     "  <channel>",
     "    <title>Blog iLingue Relax</title>",
     `    <link>${BASE_URL}/blog</link>`,
@@ -449,6 +475,10 @@ async function main() {
         console.error("[rss] ERROR feed inválido; NO se sobrescribe public/rss.xml.");
       } else {
         writeFileSync(join(PUBLIC_DIR, "rss.xml"), xml);
+        // Alias sin extensión y /feed.xml: Pinterest y otros lectores suelen
+        // pedir /rss o /feed.xml en lugar de /rss.xml.
+        writeFileSync(join(PUBLIC_DIR, "rss"), xml);
+        writeFileSync(join(PUBLIC_DIR, "feed.xml"), xml);
         console.log(
           `[rss] rss.xml escrito y validado (${Math.min(validItems.length, 100)} items` +
             `${itemErrors.length ? `, ${itemErrors.length} descartados` : ""}).`,

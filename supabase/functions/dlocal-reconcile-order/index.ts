@@ -204,11 +204,22 @@ Deno.serve(async (req) => {
         if (r.event === "payment_pending" || r.event === "checkout_created") cur.pending = true;
         byOrder.set(on, cur);
       }
+      // Solo pedidos con correo real: fuera pruebas internas / QA.
+      const isTestEmail = (e: string) => {
+        const v = (e || "").toLowerCase().trim();
+        if (!v || !v.includes("@")) return true;
+        const dom = v.split("@")[1] ?? "";
+        if (dom === "example.com" || dom === "test.com" || dom.endsWith(".test") || dom.endsWith(".local")) return true;
+        if (dom === "ilinguerelax.com" || dom === "notify.ilinguerelax.com") return true; // correos internos de prueba
+        return /(^|[._+-])(test|prueba|qa|demo|dummy|diag|sandbox|staging)([._+-]|\d|$)/.test(v.split("@")[0]);
+      };
+
       const pending = [...byOrder.values()]
-        .filter((o) => o.provider === "dlocalgo" && o.pending && !o.paid && !o.failed)
+        .filter((o) => o.pending && !o.paid && !o.failed && !isTestEmail(o.email))
         .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1))
-        .slice(0, 100);
+        .slice(0, 200);
       return json({ ok: true, pending });
+
     }
 
     if (!parsed.data.orderNumber) return json({ error: "Falta el número de pedido" }, 400);

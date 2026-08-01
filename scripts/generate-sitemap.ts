@@ -403,29 +403,36 @@ async function main() {
     priority: "0.85",
   }));
 
-  const children: Array<{ file: string; lastmod: string }> = [];
+  const children: Array<{ file: string; lastmod?: string }> = [];
 
-  // Pages
+  // Pages (sin lastmod: no hay timestamp real por página)
   writeFileSync(join(SITEMAPS_DIR, "sitemap-pages.xml"), urlsetXml(staticEntries));
-  children.push({ file: "sitemap-pages.xml", lastmod: TODAY });
+  children.push({ file: "sitemap-pages.xml" });
 
-  // Products (chunked)
+  // Products (chunked) — lastmod = updated_at real más reciente del bloque
   const productChunks = chunk(productEntries, URLS_PER_SITEMAP);
   productChunks.forEach((entries, i) => {
     const file = `sitemap-products-${i + 1}.xml`;
     writeFileSync(join(SITEMAPS_DIR, file), urlsetXml(entries));
-    children.push({ file, lastmod: TODAY });
+    const latest = entries
+      .map((e) => e.lastmod)
+      .filter((d): d is string => Boolean(d))
+      .sort()
+      .pop();
+    children.push({ file, lastmod: latest });
   });
 
   // Blog
   if (blogEntries.length > 0) {
     writeFileSync(join(SITEMAPS_DIR, "sitemap-blog.xml"), urlsetXml(blogEntries));
     const latest = blogEntries
-      .map((e) => e.lastmod ?? TODAY)
+      .map((e) => e.lastmod)
+      .filter((d): d is string => Boolean(d))
       .sort()
-      .pop()!;
+      .pop();
     children.push({ file: "sitemap-blog.xml", lastmod: latest });
   }
+
 
   // RSS feed (blog) — validado antes de escribirse: nunca publicamos un feed roto.
   if (feedItems.length > 0) {

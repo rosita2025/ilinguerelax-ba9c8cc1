@@ -42,6 +42,56 @@ const AdminManualPayments = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<{ email: string; name: string; phone: string; country: string }>({ email: "", name: "", phone: "", country: "" });
   const [savingEdit, setSavingEdit] = useState(false);
+  // Comprobante / ID de operación del banco por pedido
+  const [refDraft, setRefDraft] = useState<Record<string, string>>({});
+  const [refSource, setRefSource] = useState<Record<string, string>>({});
+  const [savingRef, setSavingRef] = useState<string | null>(null);
+
+  // Detecta automáticamente el N° de operación desde el texto pegado del banco
+  const onRefChange = (id: string, value: string) => {
+    setRefDraft((d) => ({ ...d, [id]: value }));
+    const hit = extractPaymentReference(value);
+    setRefSource((s) => ({ ...s, [id]: hit?.source ?? "" }));
+  };
+
+  const autoDetect = (id: string) => {
+    const hit = extractPaymentReference(refDraft[id] ?? "");
+    if (!hit) {
+      toast({ title: "No se detectó un ID de pago", description: "Pega el mensaje o voucher del banco.", variant: "destructive" });
+      return;
+    }
+    setRefDraft((d) => ({ ...d, [id]: hit.reference }));
+    setRefSource((s) => ({ ...s, [id]: hit.source }));
+    toast({ title: `🔎 ID detectado (${hit.source})`, description: hit.reference });
+  };
+
+  const saveReference = async (o: ManualPayment) => {
+    const raw = (refDraft[o.id] ?? "").trim();
+    const hit = raw ? extractPaymentReference(raw) : null;
+    const reference = hit?.reference ?? raw;
+    setSavingRef(o.id);
+    try {
+      const { error } = await adminInvoke("manage-manual-payments", {
+        body: {
+          action: "set_reference",
+          orderId: o.id,
+          adminKey,
+          paymentReference: reference,
+          paymentReferenceSource: refSource[o.id] || hit?.source || "Manual",
+        },
+      });
+      if (error) throw error;
+      toast({ title: reference ? "🧾 Comprobante guardado" : "Comprobante borrado" });
+      setRefDraft((d) => ({ ...d, [o.id]: "" }));
+      fetchOrders();
+    } catch (e) {
+      toast({ title: "Error al guardar comprobante", description: (e as Error).message, variant: "destructive" });
+    } finally {
+      setSavingRef(null);
+    }
+  };
+
+
 
   const startEdit = (o: ManualPayment) => {
     setEditingId(o.id);

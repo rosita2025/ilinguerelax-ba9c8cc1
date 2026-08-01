@@ -231,6 +231,14 @@ const ProductDynamic = () => {
 
               <DigitalProductNotice className="mb-6" />
 
+              <PinterestSave
+                className="mb-6"
+                url={canonical}
+                media={cover}
+                description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
+              />
+
+
 
               {(() => {
                 const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";

@@ -61,6 +61,7 @@ const staticEntries: SitemapEntry[] = [
   { path: "/licencias-y-avisos-legales", changefreq: "yearly", priority: "0.3" },
   { path: "/envios-y-entregas", changefreq: "yearly", priority: "0.4" },
   { path: "/devoluciones-y-reembolsos", changefreq: "yearly", priority: "0.4" },
+  { path: "/dejar-resena", changefreq: "monthly", priority: "0.4" },
   { path: "/blog", changefreq: "weekly", priority: "0.8" },
   { path: "/vista-previa/patrones-especiales", changefreq: "monthly", priority: "0.6" },
   { path: "/vista-previa/coreano-100-mapas-mentales", changefreq: "monthly", priority: "0.6" },

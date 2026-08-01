@@ -139,3 +139,49 @@ export async function pingPinterestAndCms(item: ContentPing): Promise<void> {
 
   await logIndexingEvents(events);
 }
+
+/**
+ * Crea un Pin real vía la API v5 de Pinterest.
+ * Requiere los secretos PINTEREST_ACCESS_TOKEN y PINTEREST_BOARD_ID
+ * (opcionalmente PINTEREST_BOARD_ID_PRODUCTS para el tablero de productos).
+ * Si no están configurados devuelve status "skipped" — nunca lanza.
+ */
+export async function createPinterestPin(item: ContentPing & {
+  description?: string;
+}): Promise<{ status: "created" | "skipped" | "error"; pinId?: string; detail?: string }> {
+  const token = Deno.env.get("PINTEREST_ACCESS_TOKEN");
+  const board =
+    (item.type === "product" ? Deno.env.get("PINTEREST_BOARD_ID_PRODUCTS") : null) ||
+    Deno.env.get("PINTEREST_BOARD_ID");
+
+  if (!token || !board) return { status: "skipped", detail: "missing token/board" };
+  if (!item.image) return { status: "skipped", detail: "missing image" };
+
+  try {
+    const res = await fetch("https://api.pinterest.com/v5/pins", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        board_id: board,
+        title: (item.title ?? "").slice(0, 100) || undefined,
+        description: (item.description ?? item.title ?? "").slice(0, 800) || undefined,
+        link: item.url,
+        media_source: { source_type: "image_url", url: item.image },
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return {
+        status: "error",
+        detail: String(body?.message ?? `HTTP ${res.status}`).slice(0, 240),
+      };
+    }
+    return { status: "created", pinId: body?.id ? String(body.id) : undefined };
+  } catch (err) {
+    return { status: "error", detail: (err as Error).message.slice(0, 240) };
+  }
+}

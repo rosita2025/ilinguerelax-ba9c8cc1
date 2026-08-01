@@ -304,23 +304,81 @@ export const SEO = ({
     })),
   } : null;
 
+  // Book structured data (physical books / ebooks)
+  const bookStructuredData = book ? {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    "@id": `${canonicalUrl}#book`,
+    "name": book.name || title.split(" | ")[0],
+    "description": description,
+    "url": canonicalUrl,
+    "image": image,
+    "bookFormat": `https://schema.org/${book.format || (isPhysical ? "Paperback" : "EBook")}`,
+    "inLanguage": book.inLanguage || "es",
+    "author": {
+      "@type": "Person",
+      "name": book.author || "Crady",
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "iLingue Relax",
+      "@id": "https://ilinguerelax.com/#organization",
+    },
+    ...(book.isbn && { "isbn": book.isbn }),
+    ...(book.numberOfPages && { "numberOfPages": book.numberOfPages }),
+    ...(book.datePublished && { "datePublished": book.datePublished }),
+    ...(price && {
+      "offers": {
+        "@type": "Offer",
+        "url": canonicalUrl,
+        "priceCurrency": "USD",
+        "price": price,
+        "availability": `https://schema.org/${availability}`,
+      },
+    }),
+    ...(rating && reviewCount && {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": rating,
+        "reviewCount": reviewCount,
+        "bestRating": "5",
+        "worstRating": "1",
+      },
+    }),
+  } : null;
+
   // Organization structured data (for homepage/general pages)
+  const BRAND_DESCRIPTION =
+    "iLingue Relax es una marca educativa especializada en el aprendizaje de idiomas para estudiantes, profesionales y público en general. Ofrece libros digitales y físicos, guías de pronunciación, fonética y vocabulario aplicado a diferentes carreras profesionales, facilitando el aprendizaje de idiomas de forma sencilla y efectiva.";
+
+  const BRAND_SAME_AS = [
+    "https://www.youtube.com/@ilinguerelax",
+    "https://www.instagram.com/ilinguerelax",
+    "https://www.facebook.com/ilinguerelax",
+    "https://www.tiktok.com/@ilinguerelax",
+    "https://www.linkedin.com/company/ilinguerelax",
+    "https://www.pinterest.com/ilinguerelax",
+    "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF",
+  ];
+
   const organizationData = type === "website" ? {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://ilinguerelax.com/#organization",
     "name": "iLingue Relax",
     "url": "https://ilinguerelax.com",
     "logo": "https://ilinguerelax.com/og-image.png",
-    "description": "Aprende idiomas sin estrés con el método iLingue Relax",
-    "sameAs": [
-      "https://www.amazon.com/stores/iLingue-Relax/author/B0DH8XDVPF"
-    ],
+    "description": BRAND_DESCRIPTION,
+    "brand": { "@id": "https://ilinguerelax.com/#brand" },
+    "sameAs": BRAND_SAME_AS,
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",
+      "email": "hola@ilinguerelax.com",
       "availableLanguage": ["Spanish", "English"]
     }
   } : null;
+
 
   return (
     <Helmet>

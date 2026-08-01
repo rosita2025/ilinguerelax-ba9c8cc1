@@ -624,6 +624,23 @@ async function main() {
     }
   }
 
+  // CATÁLOGO Pinterest (public/catalogo-pinterest.xml): formato de catálogo
+  // minorista (namespace g:) para "Fuentes de datos > Proporcione un enlace URL".
+  {
+    const catalog = catalogXml(dbProducts);
+    const count = (catalog.match(/<item>/g) ?? []).length;
+    if (count === 0) {
+      console.error("[catalogo-pinterest] ERROR sin productos válidos; se conserva el archivo anterior.");
+    } else {
+      writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest.xml"), catalog);
+      writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest"), catalog);
+      writeFileSync(join(PUBLIC_DIR, "pinterest-catalog.xml"), catalog);
+      console.log(`[catalogo-pinterest] catálogo escrito (${count} productos).`);
+    }
+  }
+
+
+
   // Regional subdomains disabled — single canonical domain only.
 
 

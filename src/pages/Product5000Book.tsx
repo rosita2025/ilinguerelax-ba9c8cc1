@@ -178,6 +178,7 @@ const Product5000Book = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative overflow-hidden rounded-2xl shadow-hero">
+                <PinterestSave overlay />
                 {MEDIA_SLIDES.map((slide, i) => (
                   <div
                     key={i}
@@ -185,7 +186,6 @@ const Product5000Book = () => {
                   >
                     {slide.type === "image" ? (
                       <img src={slide.src} alt={slide.alt} className="w-full h-auto" />
-                      <PinterestSave className="mt-3" />
                     ) : (
                       <video
                         ref={videoRef}

@@ -175,6 +175,7 @@ export const SEO = ({
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "applicableCountry": ["ES", "MX", "AR", "CO", "PE", "CL", "US"],
+        "returnPolicyCountry": ["ES", "MX", "AR", "CO", "PE", "CL", "US"],
         "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
         "merchantReturnDays": 30,
         "returnMethod": "https://schema.org/ReturnByMail",
@@ -211,10 +212,7 @@ export const SEO = ({
     })
   } : null;
 
-  // Remove undefined keys
-  if (productStructuredData) {
-    delete (productStructuredData as Record<string, unknown>).gtin13;
-  }
+
 
   const itemListStructuredData = productList && productList.length > 0 ? {
     "@context": "https://schema.org",

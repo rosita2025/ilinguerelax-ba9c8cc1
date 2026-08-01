@@ -180,13 +180,13 @@ export default function OrderReconcilePanel() {
       {pending && (
         <div className="rounded-lg border border-border p-3 space-y-2">
           <p className="text-xs font-medium">
-            Pendientes de dLocal Go ({pending.length}) — elige uno y acéptalo o recházalo
+            Pedidos pendientes con correo real ({pending.length}) — elige uno y acéptalo o recházalo
           </p>
           <p className="text-[11px] text-muted-foreground">
-            Actualización automática cada minuto{lastCheck ? ` · última revisión ${lastCheck.toLocaleTimeString()}` : ""}
+            Se excluyen pruebas internas (test/qa/demo). Actualización automática cada minuto{lastCheck ? ` · última revisión ${lastCheck.toLocaleTimeString()}` : ""}
           </p>
           {pending.length === 0 && (
-            <p className="text-xs text-muted-foreground">No hay pedidos pendientes en los últimos 30 días.</p>
+            <p className="text-xs text-muted-foreground">No hay pedidos pendientes reales en los últimos 30 días.</p>
           )}
           <ul className="space-y-1.5 max-h-72 overflow-y-auto">
             {pending.map((o) => (
@@ -197,8 +197,10 @@ export default function OrderReconcilePanel() {
                 <span className="min-w-0">
                   <strong>{o.orderNumber}</strong> · {o.email || "sin correo"} ·{" "}
                   {o.amount ?? "—"} {o.currency} · {o.method || "sin método"} ·{" "}
+                  {(o as any).provider || "dlocalgo"} ·{" "}
                   {new Date(o.lastAt).toLocaleString()}
                 </span>
+
                 <Button
                   size="sm"
                   variant="secondary"

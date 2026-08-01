@@ -430,37 +430,59 @@ export const SEO = ({
   void BRAND_DESCRIPTION;
   void BRAND_SAME_AS;
 
-  // Al navegar o al pasar de "cargando" a "cargado", react-helmet-async puede
-  // dejar bloques JSON-LD antiguos en el <head>. Eso genera entidades
-  // duplicadas y contradictorias (mismo @id, datos distintos) para los bots.
-  // Limpiamos después de cada render, conservando siempre el último bloque
-  // inyectado y sin tocar el JSON-LD estático de index.html (Organization,
-  // Brand, WebSite, EducationalOrganization), que no lleva data-rh.
-  useEffect(() => {
-    const cleanup = () => {
-      const nodes = Array.from(
-        document.querySelectorAll<HTMLScriptElement>(
-          'script[type="application/ld+json"][data-rh="true"]',
-        ),
-      );
-      const seen = new Set<string>();
-      for (let i = nodes.length - 1; i >= 0; i--) {
-        const node = nodes[i];
-        let key = node.textContent || "";
-        try {
-          const parsed = JSON.parse(key);
-          key = `${parsed["@type"] ?? ""}|${parsed["@id"] ?? parsed.name ?? ""}`;
-        } catch {
-          /* si no parsea, deduplicamos por contenido exacto */
-        }
-        if (seen.has(key)) node.remove();
-        else seen.add(key);
-      }
+  // --------------------------------------------------------------------
+  // JSON-LD antes del primer paint
+  // --------------------------------------------------------------------
+  // react-helmet-async escribe en el <head> en un efecto pasivo, es decir
+  // DESPUÉS del primer paint. En páginas con datos dinámicos (producto,
+  // blog) eso deja una ventana en la que el bot puede leer el HTML sin el
+  // JSON-LD correcto. Inyectamos los bloques nosotros con useLayoutEffect,
+  // que corre de forma síncrona antes de pintar, y dejamos fuera de Helmet
+  // los scripts ld+json para no duplicar entidades.
+  const jsonLdBlocks = [
+    productStructuredData,
+    itemListStructuredData,
+    breadcrumbData && breadcrumbData.itemListElement.length > 1 ? breadcrumbData : null,
+    bookStructuredData,
+    organizationData,
+    faqStructuredData,
+  ].filter(Boolean) as Array<Record<string, unknown>>;
+
+  const jsonLdPayload = JSON.stringify(jsonLdBlocks);
+
+  useLayoutEffect(() => {
+    const blocks: Array<Record<string, unknown>> = JSON.parse(jsonLdPayload);
+
+    // Bloques viejos gestionados por nosotros o restos de Helmet (data-rh):
+    // se retiran en el mismo tick, antes de pintar, para que nunca convivan
+    // dos entidades con el mismo @id y datos distintos.
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-seo-jsonld="true"]')
+      .forEach((n) => n.remove());
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-rh="true"]')
+      .forEach((n) => n.remove());
+
+    const seen = new Set<string>();
+    for (const block of blocks) {
+      const key = `${block["@type"] ?? ""}|${block["@id"] ?? block["name"] ?? ""}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const el = document.createElement("script");
+      el.type = "application/ld+json";
+      el.setAttribute("data-seo-jsonld", "true");
+      el.textContent = JSON.stringify(block);
+      document.head.appendChild(el);
+    }
+
+    return () => {
+      document
+        .querySelectorAll('script[type="application/ld+json"][data-seo-jsonld="true"]')
+        .forEach((n) => n.remove());
     };
-    cleanup();
-    const raf = requestAnimationFrame(cleanup);
-    return () => cancelAnimationFrame(raf);
-  });
+  }, [jsonLdPayload]);
+
+
 
 
 

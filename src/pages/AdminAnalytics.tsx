@@ -618,6 +618,31 @@ const AdminAnalytics = () => {
                 <Kpi icon={<DollarSign className="w-4 h-4" />} label="Compras" value={data.totals.purchases.toLocaleString()} sub={money(data.totals.revenue)} highlight />
               </div>
 
+              {/* Desglose de compras por método de pago */}
+              <Card className="p-4">
+                <div className="flex items-center justify-between mb-3 gap-2">
+                  <h2 className="font-semibold text-sm md:text-base">Compras por método de pago</h2>
+                  <span className="text-xs text-muted-foreground">Stripe · Mercado Pago · PayPal · dLocal Go · Yape/Plin · Binance · SPEI MX · Hotmart</span>
+                </div>
+                {data.providers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Sin compras en este rango.</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {data.providers.map((p) => (
+                      <div key={p.provider} className="rounded-lg border p-3">
+                        <div className="text-xs text-muted-foreground truncate">{PROVIDER_LABELS[p.provider] ?? p.provider}</div>
+                        <div className="text-xl font-bold tabular-nums">{p.count.toLocaleString()}</div>
+                        <div className="text-xs text-muted-foreground tabular-nums">
+                          {money(p.revenue)}{p.pending > 0 ? ` · ${p.pending} pendiente${p.pending > 1 ? "s" : ""}` : ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+
+
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub="compra / sesión" />
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Checkout → Compra" value={`${data.conversion.checkoutToPurchasePct}%`} sub={`${data.totals.purchases} de ${data.totals.checkout}`} />

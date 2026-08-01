@@ -289,6 +289,30 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Guarda el comprobante / N° de operación del banco (Interbank, BCP, SPEI,
+    // Binance, Yape/Plin…) para poder conciliar qué pago corresponde a qué precio.
+    if (action === "set_reference" && orderId) {
+      const ref = typeof paymentReference === "string" ? paymentReference.trim().slice(0, 64) : "";
+      const src = typeof paymentReferenceSource === "string" ? paymentReferenceSource.trim().slice(0, 40) : null;
+      if (ref && !/^[A-Za-z0-9._/-]{4,64}$/.test(ref)) {
+        return new Response(JSON.stringify({ error: "invalid_reference" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await admin
+        .from("manual_payments")
+        .update({
+          payment_reference: ref || null,
+          payment_reference_source: ref ? (src || "Manual") : null,
+          payment_reference_at: ref ? new Date().toISOString() : null,
+        })
+        .eq("id", orderId);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, reference: ref || null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "update_buyer" && orderId) {
       const patch: Record<string, unknown> = {};
       if (typeof buyerEmail === "string") {

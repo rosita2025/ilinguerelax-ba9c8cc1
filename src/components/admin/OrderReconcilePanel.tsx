@@ -68,7 +68,7 @@ export default function OrderReconcilePanel() {
   useEffect(() => {
     if (autoLoaded.current) return;
     autoLoaded.current = true;
-    loadPending();
+    loadPending(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

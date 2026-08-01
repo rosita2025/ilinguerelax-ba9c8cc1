@@ -395,7 +395,7 @@ serve(async (req) => {
         .lte("purchased_at", toDate.toISOString()),
       supabase
         .from("manual_payments")
-        .select("items, amount_usd, buyer_country, created_at, status, verified_at, method")
+        .select("order_number, items, amount_usd, amount_local, currency_local, buyer_country, buyer_email, created_at, updated_at, status, verified_at, method")
         .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
         // Ventana ampliada: un pago creado antes puede verificarse dentro del
         // rango; abajo se filtra por la fecha efectiva (verified_at || created_at).

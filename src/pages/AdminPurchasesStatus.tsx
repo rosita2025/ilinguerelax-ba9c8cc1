@@ -280,6 +280,34 @@ const AdminPurchasesStatus = () => {
                         <code className="bg-muted px-1 rounded">{r.raw_status}</code>
                       </div>
 
+                      {r.provider === "hotmart" && (
+                        <div className="rounded-md border p-2 bg-muted/30 space-y-1">
+                          <label className="block text-[11px] font-medium">Cambiar estado del pago (Hotmart)</label>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={r.mapped_status === "unknown" || r.mapped_status === "blocked" ? "" : r.mapped_status}
+                              disabled={statusSaving === r.id}
+                              onChange={(e) => { const v = e.target.value as Mapped; if (v) changeStatus(r.id, v); }}
+                              className="h-8 rounded-md border bg-background px-2 text-xs"
+                            >
+                              <option value="">Seleccionar…</option>
+                              <option value="approved">Aprobado</option>
+                              <option value="pending">Pendiente</option>
+                              <option value="refused">Rechazado</option>
+                              <option value="refunded">Reembolsado</option>
+                              <option value="chargeback">Chargeback</option>
+                              <option value="cancelled">Cancelado</option>
+                            </select>
+                            {statusSaving === r.id && <span className="text-[11px] text-muted-foreground">Guardando…</span>}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">
+                            El cambio queda registrado en el historial del pedido (auditoría).
+                          </p>
+                        </div>
+                      )}
+
+
+
                       {editing === r.id ? (
                         <div className="rounded-md border p-2 space-y-2 bg-muted/30">
                           <label className="block text-[11px] font-medium">Corregir correo del cliente</label>

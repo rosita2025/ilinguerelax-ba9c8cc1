@@ -126,9 +126,28 @@ const ProductDynamic = () => {
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
     // Sin pantalla de carga: evitamos el flash "Cargando producto…" al
-    // navegar desde la home. Renderizamos nada mientras llega el catálogo.
-    return <div className="min-h-dvh bg-background" />;
+    // navegar desde la home. Aun así emitimos SEO + JSON-LD base con el slug
+    // para que los bots siempre detecten datos estructurados en esta ruta.
+    const fallbackName = (slug ?? "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim() || "Producto";
+    return (
+      <>
+        <SEO
+          title={fallbackName}
+          description={`${fallbackName} en PDF con pronunciación. Descarga digital inmediata en iLingue Relax.`}
+          canonicalUrl={`https://ilinguerelax.com/products/${slug ?? ""}`}
+          type="product"
+          sku={slug}
+          availability="InStock"
+          isPhysical={false}
+        />
+        <div className="min-h-dvh bg-background" />
+      </>
+    );
   }
+
 
   const isPEN = local.country === "PE" && product.price_pen != null;
   const displayPrice = isPEN ? Number(product.price_pen) : local.amount;

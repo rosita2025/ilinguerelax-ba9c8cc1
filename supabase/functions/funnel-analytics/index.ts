@@ -567,6 +567,7 @@ serve(async (req) => {
         usd: isPending ? 0 : usdAmount,
         source: "hotmart",
         pending: isPending,
+        provider: "hotmart",
       });
     }
     for (const m of (manualRes.data ?? []) as any[]) {
@@ -575,6 +576,10 @@ serve(async (req) => {
       const nameKey = String(first.name || "").trim().toLowerCase();
       const firstSku = first.sku || first.product_id || nameToSku.get(nameKey) || "manual";
       const isPending = !APPROVED_STORE.has(String(m.status || "").toLowerCase());
+      // Fecha efectiva: si ya fue verificado, la venta cuenta el día de la
+      // verificación; si sigue pendiente, el día de creación.
+      const effectiveAt = new Date(m.verified_at || m.created_at);
+      if (!(effectiveAt >= fromDate && effectiveAt <= toDate)) continue;
       if (isPending) {
         storePendingCount++;
         // manual_payments already store amount_usd (USD-normalized)
@@ -582,12 +587,13 @@ serve(async (req) => {
         if (amt > 0) addPending("USD", "store", amt);
       }
       realPurchases.push({
-        at: m.verified_at || m.created_at,
+        at: effectiveAt.toISOString(),
         productId: firstSku,
         country: m.buyer_country || "??",
         usd: isPending ? 0 : Number(m.amount_usd || 0),
         source: "store",
         pending: isPending,
+        provider: String(m.method || "manual").toLowerCase(),
       });
     }
 

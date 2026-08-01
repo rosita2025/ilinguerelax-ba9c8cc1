@@ -15,6 +15,7 @@ import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
 import { COUNTRY_INFO } from "@/lib/countryInfo";
 import { publishCatalogUpdate } from "@/lib/catalogSync";
 import ProductImageUploader from "@/components/admin/ProductImageUploader";
+import ProductUpdateNoticePanel from "@/components/admin/ProductUpdateNoticePanel";
 
 interface Product {
   sku: string;
@@ -1036,6 +1037,8 @@ const AdminProductEdit = () => {
               <Switch checked={product.is_upsell} onCheckedChange={(v) => update("is_upsell", v)} />
             </div>
           </Card>
+
+          {!isNew && <ProductUpdateNoticePanel sku={sku!} adminKey={adminKey} />}
 
           {!isNew && <ChangeHistoryPanel sku={sku!} adminKey={adminKey} />}
 

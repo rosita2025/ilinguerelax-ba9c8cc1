@@ -1874,6 +1874,42 @@ export type Database = {
           },
         ]
       }
+      product_version_notices: {
+        Row: {
+          created_at: string
+          email: string
+          error: string | null
+          id: string
+          metadata: Json
+          notice_key: string
+          order_number: string | null
+          sku: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          error?: string | null
+          id?: string
+          metadata?: Json
+          notice_key: string
+          order_number?: string | null
+          sku: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          error?: string | null
+          id?: string
+          metadata?: Json
+          notice_key?: string
+          order_number?: string | null
+          sku?: string
+          status?: string
+        }
+        Relationships: []
+      }
       review_invitations: {
         Row: {
           created_at: string

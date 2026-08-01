@@ -75,6 +75,7 @@ const groups: Group[] = [
     label: "Marketing",
     items: [
       { to: "/admin/reviews", label: "Reseñas", icon: Star },
+      { to: "/admin/lanzamientos", label: "Lanzamientos · Anuncio", icon: Send },
       { to: "/admin/brevo-abandoned", label: "Brevo · Abandonos", icon: Send },
     ],
   },

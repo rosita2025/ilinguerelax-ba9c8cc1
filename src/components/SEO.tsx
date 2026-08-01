@@ -77,6 +77,7 @@ export const SEO = ({
   availability = "InStock",
   isPhysical = false,
   breadcrumbs,
+  article,
   book,
 }: SEOProps) => {
   // Keep combined title under 60 chars to avoid SERP truncation.

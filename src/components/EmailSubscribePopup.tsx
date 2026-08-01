@@ -272,6 +272,8 @@ function getCopy(lang: string): Copy {
 
 export const EmailSubscribePopup = () => {
   const { language, countryCode } = useI18n();
+  const location = useLocation();
+  const blocked = isBlockedPath(location.pathname);
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -281,16 +283,23 @@ export const EmailSubscribePopup = () => {
   const COUPON = "NEW10";
   const c = getCopy(language);
 
+  // Cierra el popup al instante si el usuario navega al checkout/pago.
+  useEffect(() => {
+    if (blocked) setOpen(false);
+  }, [blocked]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (readState()) return;
-    const p = window.location.pathname.toLowerCase();
-    const BLOCKED = ["/admin", "/checkout", "/checkouts", "/pago", "/pagos", "/pay", "/success", "/gracias", "/thank", "/descarga", "/order"];
-    if (BLOCKED.some((b) => p.startsWith(b)) || p.includes("success") || p.includes("checkout")) return;
+    if (blocked) return;
 
-    const t = setTimeout(() => setOpen(true), DELAY_MS);
+    const t = setTimeout(() => {
+      if (isBlockedPath(window.location.pathname)) return;
+      setOpen(true);
+    }, DELAY_MS);
     return () => clearTimeout(t);
-  }, []);
+  }, [blocked]);
+
 
   const dismiss = () => {
     setOpen(false);

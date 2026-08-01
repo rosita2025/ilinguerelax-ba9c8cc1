@@ -216,8 +216,6 @@ export default function AdminDlocal() {
 
           <OrderReconcilePanel />
 
-          <DlocalTestSimulator />
-
           <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3">
 
             <div className="flex-1">

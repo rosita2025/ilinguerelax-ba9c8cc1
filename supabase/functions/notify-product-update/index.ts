@@ -11,7 +11,10 @@
 //  - `product_version_notices` con índice único (sku, notice_key, lower(email))
 //    garantiza un correo por comprador y por aviso aunque se pulse dos veces.
 //  - Se excluyen correos suprimidos (rebotes/quejas) y dominios de prueba.
+import * as React from "npm:react@18.3.1";
+import { renderAsync } from "npm:@react-email/components@0.0.22";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { TEMPLATES } from "../_shared/transactional-email-templates/registry.ts";
 import { assertAdminCsrf, adminCorsHeaders, withAdminLogging, adminLog } from "../_shared/adminCsrf.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
@@ -28,6 +31,13 @@ const TEST_DOMAINS = new Set([
   "yopmail.com", "tempmail.com", "sandbox.com", "localhost",
 ]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function maskEmail(email: string): string {
+  const [user, domain] = email.split("@");
+  if (!domain) return "***";
+  const head = user.slice(0, 2);
+  return `${head}${"*".repeat(Math.max(1, user.length - 2))}@${domain}`;
+}
 
 const canonical = (v: unknown) => String(v ?? "").trim().toLowerCase();
 
@@ -100,6 +110,7 @@ Deno.serve(withAdminLogging("notify-product-update", async (req) => {
     noticeKey?: string;
     changes?: string[];
     bonusNote?: string;
+    sampleEmail?: string;
   };
 
   const expected = Deno.env.get("ADMIN_REVIEW_KEY");

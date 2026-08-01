@@ -967,6 +967,16 @@ serve(async (req) => {
           storePending: storePendingCount,
           pending: hotmartPendingCount + storePendingCount,
         },
+        // Desglose real por pasarela: stripe, mercadopago, paypal, dlocalgo,
+        // yape_plin, binance_pay, clabe_mx (SPEI), hotmart, etc.
+        providers: Array.from(byProviderAgg.entries())
+          .map(([provider, v]) => ({
+            provider,
+            count: v.count,
+            pending: v.pending,
+            revenue: Number(v.revenue.toFixed(2)),
+          }))
+          .sort((a, b) => b.count - a.count || b.revenue - a.revenue),
 
         conversion: {
           globalPct: Number(globalConversion.toFixed(2)),

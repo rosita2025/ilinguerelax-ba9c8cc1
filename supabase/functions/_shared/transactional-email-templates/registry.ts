@@ -23,4 +23,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'customer-manual-pending': customerManualPending,
   'customer-pending-reminder': customerPendingReminder,
   'product-version-update': productVersionUpdate,
+  'product-launch': productLaunch,
 }

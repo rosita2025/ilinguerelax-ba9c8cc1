@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Unlock as UnlockIcon } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -318,17 +318,14 @@ const AdminProductEdit = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label>SKU (identificador único · también es la URL pública /products/{product.sku || "…"})</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={product.sku}
-                    onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
-                    placeholder="ej: coreano-100-mapas"
-                    readOnly={!isNew}
-                    disabled={!isNew}
-                    className={!isNew ? "font-mono bg-muted cursor-not-allowed" : "font-mono"}
-                  />
-                  {!isNew && <UnlockIcon className="w-4 h-4 mt-3 shrink-0 text-muted-foreground" />}
-                </div>
+                <Input
+                  value={product.sku}
+                  onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+                  placeholder="ej: coreano-100-mapas"
+                  readOnly={!isNew}
+                  disabled={!isNew}
+                  className={!isNew ? "font-mono bg-muted cursor-not-allowed" : "font-mono"}
+                />
                 {isNew && (
                   <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Este SKU será permanente: no se podrá cambiar después.</p>
                 )}
@@ -353,7 +350,7 @@ const AdminProductEdit = () => {
             </div>
             <div>
               <Label className="flex items-center gap-2">
-                Alias cortos del checkout {!isNew && <UnlockIcon className="w-3.5 h-3.5 text-muted-foreground" />}
+                Alias cortos del checkout {!isNew && <LockIcon className="w-3.5 h-3.5 text-muted-foreground" />}
               </Label>
               <div className="flex gap-2">
                 <Input

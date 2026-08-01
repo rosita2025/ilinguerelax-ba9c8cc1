@@ -73,7 +73,7 @@ async function buildDownloadUrl(admin: any, orderNumber: string, email: string, 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const blocked = assertInternalCall(req);
+  const blocked = await assertInternalCall(req);
   if (blocked) return blocked;
 
   try {

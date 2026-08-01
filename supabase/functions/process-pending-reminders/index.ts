@@ -159,7 +159,7 @@ async function resolutionReason(
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
-  const blocked = assertInternalCall(req);
+  const blocked = await assertInternalCall(req);
   if (blocked) return blocked;
 
   const supabase = admin();

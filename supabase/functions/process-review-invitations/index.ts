@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const __blocked = assertInternalCall(req);
+  const __blocked = await assertInternalCall(req);
   if (__blocked) return __blocked;
 
   try {

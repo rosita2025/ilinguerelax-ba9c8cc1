@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: internalCors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
-  const blocked = assertInternalCall(req);
+  const blocked = await assertInternalCall(req);
   if (blocked) return blocked;
 
   try {

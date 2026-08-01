@@ -169,6 +169,15 @@ Deno.serve(withAdminLogging("notify-product-update", async (req) => {
     const bonusNote = String(body.bonusNote ?? "").trim().slice(0, 300);
 
     const recipients = await collectRecipients(admin, sku);
+
+    // Los intentos fallidos anteriores sí pueden reintentarse; los ya enviados no.
+    await admin
+      .from("product_version_notices")
+      .delete()
+      .eq("sku", sku)
+      .eq("notice_key", noticeKey)
+      .in("status", ["failed", "sending"]);
+
     let sent = 0, skipped = 0, failed = 0;
     const errors: string[] = [];
 

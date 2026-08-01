@@ -265,38 +265,84 @@ export const SEO = ({
       "name": b.name,
       "item": b.url,
     })),
-  } : canonicalUrl ? {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
+  } : canonicalUrl ? (() => {
+    // Inferencia automática de migas de pan a partir de la URL canónica,
+    // válida para TODAS las secciones (productos/libros, blog, aprender,
+    // vista previa y páginas legales/informativas).
+    const SEGMENT_LABELS: Record<string, string> = {
+      products: "Productos",
+      productos: "Productos",
+      blog: "Blog",
+      aprender: "Aprender idiomas",
+      learn: "Aprender idiomas",
+      "vista-previa": "Vista previa",
+      "sobre-nosotros": "Sobre nosotros",
+      contacto: "Contacto",
+      faq: "Preguntas frecuentes",
+      privacidad: "Política de privacidad",
+      condiciones: "Términos y condiciones",
+      copyright: "Copyright",
+      trademark: "Marca registrada",
+      "aviso-trademark": "Marca registrada",
+      "licencias-y-avisos-legales": "Licencias y avisos legales",
+      licenses: "Licencias y avisos legales",
+      "envios-y-entregas": "Envíos y entregas",
+      "shipping-and-delivery": "Envíos y entregas",
+      "devoluciones-y-reembolsos": "Devoluciones y reembolsos",
+      "returns-and-refunds": "Devoluciones y reembolsos",
+      "dejar-resena": "Dejar reseña",
+      "mi-pedido": "Mi pedido",
+      "order-status": "Mi pedido",
+    };
+
+    let pathname = "";
+    try {
+      pathname = new URL(canonicalUrl, "https://ilinguerelax.com").pathname;
+    } catch {
+      pathname = "";
+    }
+
+    const segments = pathname.split("/").filter(Boolean);
+    const pageTitle = title.split(" | ")[0];
+
+    const humanize = (segment: string) =>
+      segment
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+    const items: Array<Record<string, unknown>> = [
       {
         "@type": "ListItem",
         "position": 1,
         "name": "Inicio",
-        "item": "https://ilinguerelax.com"
+        "item": "https://ilinguerelax.com",
       },
-      ...(canonicalUrl.includes("/products/") ? [
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Productos",
-          "item": "https://ilinguerelax.com/products"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": title.split(" | ")[0],
-          "item": canonicalUrl
-        }
-      ] : []),
-      ...(canonicalUrl.endsWith("/products") ? [{
+    ];
+
+    segments.forEach((segment, index) => {
+      const isLast = index === segments.length - 1;
+      const url = `https://ilinguerelax.com/${segments.slice(0, index + 1).join("/")}`;
+      const name = isLast
+        ? pageTitle || SEGMENT_LABELS[segment] || humanize(segment)
+        : SEGMENT_LABELS[segment] || humanize(segment);
+      items.push({
         "@type": "ListItem",
-        "position": 2,
-        "name": "Productos",
-          "item": "https://ilinguerelax.com/products"
-      }] : []),
-    ]
-  } : null;
+        "position": items.length + 1,
+        "name": name,
+        "item": url,
+      });
+    });
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      "itemListElement": items,
+    };
+  })() : null;
+
 
   // FAQPage structured data
   const faqStructuredData = faqItems && faqItems.length > 0 ? {

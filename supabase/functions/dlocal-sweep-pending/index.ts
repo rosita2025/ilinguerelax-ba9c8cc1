@@ -39,8 +39,14 @@ const json = (b: unknown, s = 200) =>
 const HOUR = 60 * 60 * 1000;
 /** Rails inmediatos (tarjeta, billetera, redirect): si en 6 h no hay pago, se abandonó. */
 const FAST_WINDOW_MS = 6 * HOUR;
-/** Efectivo y transferencia: el cupón/CBU tiene vigencia real de días. */
+/** Efectivo y transferencia: el cupón/CBU tiene vigencia real de días (dLocal expira en 3). */
 const SLOW_WINDOW_MS = 72 * HOUR;
+/**
+ * El comprador ni siquiera llegó a crear el pago en dLocal (no hay referencia
+ * o dLocal no reconoce el pago): no existe cupón que pagar, así que se cierra
+ * en 6 h en vez de dejarlo "pendiente" días mandando recordatorios.
+ */
+const NO_PAYMENT_WINDOW_MS = 6 * HOUR;
 /** Tope absoluto: nada queda pendiente más de 7 días. */
 const HARD_WINDOW_MS = 7 * 24 * HOUR;
 /** No revisamos pedidos más viejos que esto (ya barridos antes). */
@@ -50,6 +56,24 @@ function isSlowRail(method: string | null, status: string | null): boolean {
   const v = `${method ?? ""} ${status ?? ""}`.toUpperCase();
   return /TICKET|CASH|EFECTIVO|TRANSFER|BANK|BOLETO|OXXO|PAGOEFECTIVO|SPEI|PIX/.test(v);
 }
+
+/** Cierra los recordatorios de pago pendiente para que dejen de enviarse correos. */
+async function resolveReminders(
+  supabase: ReturnType<typeof createClient>,
+  orderNumber: string,
+  reason: string,
+) {
+  try {
+    await supabase
+      .from("pending_payment_reminders")
+      .update({ resolved: true, resolved_reason: reason, resolved_at: new Date().toISOString() })
+      .eq("order_number", orderNumber)
+      .eq("resolved", false);
+  } catch (e) {
+    console.warn("[dlocal-sweep] no se pudo cerrar el recordatorio:", e instanceof Error ? e.message : String(e));
+  }
+}
+
 
 async function fetchDlocalPayment(paymentId: string): Promise<Record<string, unknown> | null> {
   const apiKey = Deno.env.get("DLOCAL_GO_API_KEY");

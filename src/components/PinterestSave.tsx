@@ -13,6 +13,8 @@ interface PinterestSaveProps {
   label?: string;
   /** Botón flotante fijo (para páginas de producto estáticas). */
   floating?: boolean;
+  /** Botón compacto superpuesto sobre la imagen del producto (esquina superior derecha). */
+  overlay?: boolean;
 }
 
 const PinterestIcon = ({ className }: { className?: string }) => (
@@ -40,6 +42,7 @@ export const PinterestSave = ({
   variant = "outline",
   label = "Guardar en Pinterest",
   floating = false,
+  overlay = false,
 }: PinterestSaveProps) => {
   const handleClick = () => {
     const pageUrl =
@@ -75,6 +78,22 @@ export const PinterestSave = ({
       });
     }
   };
+
+  if (overlay) {
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        aria-label={label}
+        data-pin-do="none"
+        title={label}
+        className={`absolute top-3 right-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-card/90 backdrop-blur px-3 py-2 text-xs font-semibold text-foreground border border-border shadow-md hover:bg-card transition-colors ${className ?? ""}`}
+      >
+        <PinterestIcon className="w-4 h-4 text-[#E60023]" />
+        <span className="hidden sm:inline">Guardar</span>
+      </button>
+    );
+  }
 
   return (
     <Button

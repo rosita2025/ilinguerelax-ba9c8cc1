@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Rocket, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,26 +30,35 @@ export default function AdminLaunches() {
   const [q, setQ] = useState("");
   const [sku, setSku] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("manage-products", {
-          body: { action: "list", adminKey },
-        });
-        if (error) throw new Error(error.message);
-        const rows = ((data as { products?: ProductLite[] })?.products ?? []).map((p) => ({
-          sku: p.sku, name: p.name, active: p.active, cover_image_url: p.cover_image_url ?? null,
-        }));
-        setProducts(rows);
-        if (rows.length && !sku) setSku(rows[0].sku);
-      } catch (e) {
+  const loadProducts = useCallback(async (silent = false) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "list", adminKey },
+      });
+      if (error) throw new Error(error.message);
+      const rows = ((data as { products?: ProductLite[] })?.products ?? []).map((p) => ({
+        sku: p.sku, name: p.name, active: p.active, cover_image_url: p.cover_image_url ?? null,
+      }));
+      setProducts(rows);
+      setSku((cur) => (cur && rows.some((r) => r.sku === cur) ? cur : rows[0]?.sku ?? ""));
+    } catch (e) {
+      if (!silent) {
         toast({ title: "No se pudieron cargar los productos", description: e instanceof Error ? e.message : "Error", variant: "destructive" });
-      } finally {
-        setLoading(false);
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adminKey]);
+    } finally {
+      setLoading(false);
+    }
+  }, [adminKey, toast]);
+
+  // La lista se actualiza sola: al entrar, cada 60 s y al volver a la pestaña,
+  // así los productos nuevos aparecen aquí sin recargar la página.
+  useEffect(() => {
+    void loadProducts();
+    const t = setInterval(() => void loadProducts(true), 60_000);
+    const onFocus = () => void loadProducts(true);
+    window.addEventListener("focus", onFocus);
+    return () => { clearInterval(t); window.removeEventListener("focus", onFocus); };
+  }, [loadProducts]);
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();

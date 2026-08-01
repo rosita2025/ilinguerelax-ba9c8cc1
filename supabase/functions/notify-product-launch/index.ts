@@ -345,7 +345,15 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
     const errors: string[] = [];
     const byAudience: Record<string, number> = {};
 
+    // Lotes: como máximo MAX_PER_RUN envíos reales por llamada, para que la
+    // función nunca agote su tiempo (causa típica del "edge error"). El panel
+    // vuelve a llamar automáticamente mientras queden pendientes.
+    const MAX_PER_RUN = 25;
+    let processed = 0;
+
     for (const r of recipients) {
+      if (sent + failed >= MAX_PER_RUN) break;
+      processed++;
       // Reserva atómica: si ya existe la fila, el índice único falla y saltamos.
       const { error: claimErr } = await admin.from("product_launch_notices").insert({
         sku,
@@ -390,7 +398,7 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
     }
 
     // La lista de espera ya recibió su aviso: la marcamos para no repetir.
-    if (audiences.includes("waitlist") && sent > 0) {
+    if (audiences.includes("waitlist") && sent > 0 && recipients.length === processed) {
       await admin
         .from("store_subscribers")
         .update({ announcement_sent: true })
@@ -399,7 +407,11 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
 
     adminLog("notify-product-launch", "info", "launch_sent", { sku, launchKey, sent, skipped, failed });
 
-    return json({ sku, launchKey, total: recipients.length, sent, skipped, failed, byAudience, errors });
+    const remaining = Math.max(0, recipients.length - processed);
+    return json({
+      sku, launchKey, total: recipients.length, sent, skipped, failed, byAudience, errors,
+      remaining, done: remaining === 0,
+    });
   }
 
   return json({ error: "Acción no soportada" }, 400);

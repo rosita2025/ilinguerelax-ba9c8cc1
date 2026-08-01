@@ -45,7 +45,6 @@ Deno.serve(async (req) => {
         "sku, name, description, price_usd, price_usd_tienda, cover_image_url, is_physical, target_language",
       )
       .eq("active", true)
-      .eq("is_upsell", false)
       .order("sort_order", { ascending: true });
     if (error) throw error;
 

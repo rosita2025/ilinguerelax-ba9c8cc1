@@ -188,7 +188,6 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
     launchKey?: string;
     audiences?: string[];
     pitch?: string;
-    highlights?: string[];
     coupon?: string;
     sampleAudience?: string;
   };
@@ -206,7 +205,7 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
 
   const { data: product } = await admin
     .from("digital_products")
-    .select("sku, name, description, active")
+    .select("sku, name, description, active, cover_image_url")
     .eq("sku", sku)
     .maybeSingle();
   if (!product) return json({ error: "Producto no encontrado" }, 404);
@@ -215,12 +214,9 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
   const launchKey = String(body.launchKey ?? "").trim().slice(0, 40);
   const audiences = parseAudiences(body.audiences);
   const productUrl = `${SITE}/products/${sku}`;
+  const rawImage = String((product as { cover_image_url?: string | null }).cover_image_url ?? "").trim();
+  const imageUrl = /^https:\/\//.test(rawImage) ? rawImage : undefined;
 
-  const highlights = (body.highlights ?? [])
-    .map((h) => String(h ?? "").trim())
-    .filter(Boolean)
-    .slice(0, 12)
-    .map((h) => h.slice(0, 200));
   const pitch = String(body.pitch ?? "").trim().slice(0, 400);
   const coupon = String(body.coupon ?? "").trim().slice(0, 24).toUpperCase();
 
@@ -271,7 +267,7 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
       customerName: sample?.name || "Hola",
       productName: product.name,
       productPitch: pitch || product.description || undefined,
-      highlights: highlights.length ? highlights : ["(aún no escribiste los puntos destacados)"],
+      imageUrl,
       productUrl,
       coupon: coupon || undefined,
       audience: sample?.audience ?? (audiences[0] as string),
@@ -295,7 +291,6 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
   // ---------- SEND ----------
   if (action === "send") {
     if (!launchKey) return json({ error: "Falta la etiqueta del lanzamiento (ej. lanzamiento-1)" }, 400);
-    if (highlights.length === 0) return json({ error: "Escribe al menos un punto destacado" }, 400);
     if (!product.active) return json({ error: "El producto está inactivo: actívalo antes de anunciarlo" }, 400);
 
     const { recipients } = await collectRecipients(admin, audiences);
@@ -320,7 +315,7 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
         email: r.email,
         audience: r.audience,
         status: "sending",
-        metadata: { highlights, coupon: coupon || null },
+        metadata: { imageUrl: imageUrl ?? null, coupon: coupon || null },
       });
       if (claimErr) { skipped++; continue; }
 
@@ -332,7 +327,7 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
           customerName: r.name || "Hola",
           productName: product.name,
           productPitch: pitch || product.description || undefined,
-          highlights,
+          imageUrl,
           productUrl,
           coupon: coupon || undefined,
           audience: r.audience,

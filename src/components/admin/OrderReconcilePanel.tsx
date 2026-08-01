@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -44,24 +44,33 @@ export default function OrderReconcilePanel() {
   const [pending, setPending] = useState<PendingOrder[] | null>(null);
 
 
-  async function loadPending() {
+  async function loadPending(silent = false) {
     setBusy("list");
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
         body: { action: "list_pending" },
       });
       if (error || data?.error) {
-        toast.error(data?.error || error?.message || "No se pudo cargar la lista");
+        if (!silent) toast.error(data?.error || error?.message || "No se pudo cargar la lista");
         return;
       }
       setPending(data.pending ?? []);
-      toast.success(`${(data.pending ?? []).length} pedido(s) pendiente(s)`);
+      if (!silent) toast.success(`${(data.pending ?? []).length} pedido(s) pendiente(s)`);
     } catch (e) {
       toast.error((e as Error).message || "Error inesperado");
     } finally {
       setBusy(null);
     }
   }
+
+  // Muestra la lista de pendientes reales apenas se abre el panel
+  const autoLoaded = useRef(false);
+  useEffect(() => {
+    if (autoLoaded.current) return;
+    autoLoaded.current = true;
+    loadPending(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery") {
     const order = orderNumber.trim().toUpperCase();
@@ -140,7 +149,7 @@ export default function OrderReconcilePanel() {
           {busy === "retry_delivery" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
           Reintentar entrega
         </Button>
-        <Button size="sm" variant="outline" disabled={!!busy} onClick={loadPending}>
+        <Button size="sm" variant="outline" disabled={!!busy} onClick={() => loadPending()}>
           {busy === "list" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
           Ver pendientes
         </Button>

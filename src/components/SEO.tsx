@@ -37,6 +37,14 @@ interface SEOProps {
   isPhysical?: boolean;
   /** Custom breadcrumb trail. Overrides the default URL-based inference. */
   breadcrumbs?: Array<{ name: string; url: string }>;
+  /** Article metadata (Rich Pins de artículo en Pinterest + og article tags). */
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
   /** Emits schema.org Book markup for physical books and ebooks. */
   book?: {
     name?: string;
@@ -48,6 +56,7 @@ interface SEOProps {
     format?: "Paperback" | "Hardcover" | "EBook" | "AudiobookFormat";
   };
 }
+
 
 export const SEO = ({
   title,

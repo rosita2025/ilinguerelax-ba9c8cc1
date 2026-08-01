@@ -395,9 +395,11 @@ serve(async (req) => {
         .lte("purchased_at", toDate.toISOString()),
       supabase
         .from("manual_payments")
-        .select("items, amount_usd, buyer_country, created_at, status, verified_at")
+        .select("items, amount_usd, buyer_country, created_at, status, verified_at, method")
         .in("status", ["approved", "verified", "completed", "pending", "in_process", "in_review"])
-        .gte("created_at", fromDate.toISOString())
+        // Ventana ampliada: un pago creado antes puede verificarse dentro del
+        // rango; abajo se filtra por la fecha efectiva (verified_at || created_at).
+        .gte("created_at", new Date(fromDate.getTime() - 45 * 24 * 60 * 60 * 1000).toISOString())
         .lte("created_at", toDate.toISOString()),
       supabase.from("digital_products").select("sku, name, sku_aliases"),
       supabase

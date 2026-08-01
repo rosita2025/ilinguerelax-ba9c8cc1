@@ -297,6 +297,28 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       checkoutNoPurchase: toNumber((abandoned as any).checkoutNoPurchase),
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
+      sources: {
+        hotmart: {
+          label: "Hotmart (carrito abandonado)",
+          total: toNumber((abandoned as any)?.sources?.hotmart?.total),
+          open: toNumber((abandoned as any)?.sources?.hotmart?.open),
+          recovered: toNumber((abandoned as any)?.sources?.hotmart?.recovered),
+        },
+        store: {
+          label: "Tienda propia (checkout interno)",
+          total: toNumber((abandoned as any)?.sources?.store?.total),
+          open: toNumber((abandoned as any)?.sources?.store?.open),
+          recovered: toNumber((abandoned as any)?.sources?.store?.recovered),
+        },
+        checkoutVisitors: {
+          label: "Visitantes del checkout",
+          total: toNumber((abandoned as any)?.sources?.checkoutVisitors?.total),
+          open: toNumber((abandoned as any)?.sources?.checkoutVisitors?.open),
+          withoutEmail: toNumber((abandoned as any)?.sources?.checkoutVisitors?.withoutEmail),
+          recovered: toNumber((abandoned as any)?.sources?.checkoutVisitors?.recovered),
+        },
+        unifiedPeople: toNumber((abandoned as any)?.sources?.unifiedPeople),
+      },
     },
 
     series: toArray(value?.series).slice(0, 500).map((s) => ({

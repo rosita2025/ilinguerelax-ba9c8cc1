@@ -326,20 +326,36 @@ Deno.serve(async (req) => {
 
       const nextStep = stepIndex + 1;
       const base = new Date(r.order_created_at).getTime();
+
+      if (isLast) {
+        // Solo días 1, 2 y 3: tras el tercer aviso la secuencia se cierra y el
+        // cliente no vuelve a recibir correos de pago pendiente.
+        await supabase
+          .from("pending_payment_reminders")
+          .update({
+            step: nextStep,
+            last_sent_at: sentAt,
+            resolved: true,
+            resolved_reason: "secuencia_completa",
+            resolved_at: sentAt,
+            next_at: new Date(Date.now() + 365 * DAY_MS).toISOString(),
+          })
+          .eq("id", r.id);
+        result.resolved++;
+        continue;
+      }
+
       await supabase
         .from("pending_payment_reminders")
         .update({
           step: nextStep,
           last_sent_at: sentAt,
           next_at: new Date(
-            Math.max(
-              nextStep < STEP_DAYS.length ? base + STEP_DAYS[nextStep] * DAY_MS : Date.now() + DAY_MS,
-              Date.now() + MIN_GAP_MS,
-            ),
+            Math.max(base + STEP_DAYS[nextStep] * DAY_MS, Date.now() + MIN_GAP_MS),
           ).toISOString(),
-          ...(isLast ? {} : {}),
         })
         .eq("id", r.id);
+
     }
 
     return json({ ok: true, ...result });

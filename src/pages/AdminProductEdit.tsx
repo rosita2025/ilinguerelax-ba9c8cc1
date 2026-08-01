@@ -329,15 +329,10 @@ const AdminProductEdit = () => {
                   />
                   {!isNew && <LockIcon className="w-4 h-4 mt-3 shrink-0 text-muted-foreground" />}
                 </div>
-                {isNew ? (
+                {isNew && (
                   <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Este SKU será permanente: no se podrá cambiar después.</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    🔒 El SKU es fijo y no se puede cambiar. Es la clave que usan Stripe, PayPal, Mercado Pago, dLocal, Yape/Plin,
-                    los tokens de descarga y el aviso a compradores. Cambiarlo rompería pagos y entregas ya emitidos.
-                    Si necesitas otro nombre de URL, usa los <b>alias cortos del checkout</b> de abajo.
-                  </p>
                 )}
+
 
                 {duplicateSku && (
                   <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">

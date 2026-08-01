@@ -656,6 +656,7 @@ serve(async (req) => {
         usd: isPending ? 0 : usdAmount,
         source: "store",
         pending: isPending,
+        provider,
       });
       // Make this webhook sale visible to the pixel dedupe pass below.
       alreadyIngested.push({

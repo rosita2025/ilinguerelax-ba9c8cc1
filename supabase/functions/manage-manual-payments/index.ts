@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { action, orderId, adminKey, notes, buyerEmail, buyerName, buyerPhone, buyerCountry } = await req.json();
+    const { action, orderId, adminKey, notes, buyerEmail, buyerName, buyerPhone, buyerCountry, paymentReference, paymentReferenceSource } = await req.json();
 
     const expectedKey = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expectedKey || adminKey !== expectedKey) {
@@ -182,6 +182,13 @@ Deno.serve(async (req) => {
           verified_at: new Date().toISOString(),
           verified_by: "admin",
           notes: notes ?? order.notes ?? null,
+          ...(typeof paymentReference === "string" && paymentReference.trim()
+            ? {
+                payment_reference: paymentReference.trim().slice(0, 64),
+                payment_reference_source: (typeof paymentReferenceSource === "string" && paymentReferenceSource.trim()) || "Manual",
+                payment_reference_at: new Date().toISOString(),
+              }
+            : {}),
         })
         .eq("id", orderId);
       if (updErr) throw updErr;
@@ -285,6 +292,30 @@ Deno.serve(async (req) => {
         .eq("id", orderId);
       if (error) throw error;
       return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Guarda el comprobante / N° de operación del banco (Interbank, BCP, SPEI,
+    // Binance, Yape/Plin…) para poder conciliar qué pago corresponde a qué precio.
+    if (action === "set_reference" && orderId) {
+      const ref = typeof paymentReference === "string" ? paymentReference.trim().slice(0, 64) : "";
+      const src = typeof paymentReferenceSource === "string" ? paymentReferenceSource.trim().slice(0, 40) : null;
+      if (ref && !/^[A-Za-z0-9._/-]{4,64}$/.test(ref)) {
+        return new Response(JSON.stringify({ error: "invalid_reference" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await admin
+        .from("manual_payments")
+        .update({
+          payment_reference: ref || null,
+          payment_reference_source: ref ? (src || "Manual") : null,
+          payment_reference_at: ref ? new Date().toISOString() : null,
+        })
+        .eq("id", orderId);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, reference: ref || null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

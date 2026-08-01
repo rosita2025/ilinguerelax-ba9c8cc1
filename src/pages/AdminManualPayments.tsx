@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe, Pencil, Save } from "lucide-react";
+import { CheckCircle2, X, RotateCcw, Copy, Wallet, Mail, Phone, Globe, Pencil, Save, Receipt, Hash, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+import { extractPaymentReference, methodLabel } from "@/lib/paymentReference";
 
 import { useAdminKey } from "@/components/admin/AdminGate";
 
@@ -25,6 +26,9 @@ interface ManualPayment {
   notes: string | null;
   verified_at: string | null;
   created_at: string;
+  payment_reference?: string | null;
+  payment_reference_source?: string | null;
+  payment_reference_at?: string | null;
 }
 
 type Filter = "pending" | "verified" | "rejected" | "all";
@@ -38,6 +42,56 @@ const AdminManualPayments = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<{ email: string; name: string; phone: string; country: string }>({ email: "", name: "", phone: "", country: "" });
   const [savingEdit, setSavingEdit] = useState(false);
+  // Comprobante / ID de operación del banco por pedido
+  const [refDraft, setRefDraft] = useState<Record<string, string>>({});
+  const [refSource, setRefSource] = useState<Record<string, string>>({});
+  const [savingRef, setSavingRef] = useState<string | null>(null);
+
+  // Detecta automáticamente el N° de operación desde el texto pegado del banco
+  const onRefChange = (id: string, value: string) => {
+    setRefDraft((d) => ({ ...d, [id]: value }));
+    const hit = extractPaymentReference(value);
+    setRefSource((s) => ({ ...s, [id]: hit?.source ?? "" }));
+  };
+
+  const autoDetect = (id: string) => {
+    const hit = extractPaymentReference(refDraft[id] ?? "");
+    if (!hit) {
+      toast({ title: "No se detectó un ID de pago", description: "Pega el mensaje o voucher del banco.", variant: "destructive" });
+      return;
+    }
+    setRefDraft((d) => ({ ...d, [id]: hit.reference }));
+    setRefSource((s) => ({ ...s, [id]: hit.source }));
+    toast({ title: `🔎 ID detectado (${hit.source})`, description: hit.reference });
+  };
+
+  const saveReference = async (o: ManualPayment) => {
+    const raw = (refDraft[o.id] ?? "").trim();
+    const hit = raw ? extractPaymentReference(raw) : null;
+    const reference = hit?.reference ?? raw;
+    setSavingRef(o.id);
+    try {
+      const { error } = await adminInvoke("manage-manual-payments", {
+        body: {
+          action: "set_reference",
+          orderId: o.id,
+          adminKey,
+          paymentReference: reference,
+          paymentReferenceSource: refSource[o.id] || hit?.source || "Manual",
+        },
+      });
+      if (error) throw error;
+      toast({ title: reference ? "🧾 Comprobante guardado" : "Comprobante borrado" });
+      setRefDraft((d) => ({ ...d, [o.id]: "" }));
+      fetchOrders();
+    } catch (e) {
+      toast({ title: "Error al guardar comprobante", description: (e as Error).message, variant: "destructive" });
+    } finally {
+      setSavingRef(null);
+    }
+  };
+
+
 
   const startEdit = (o: ManualPayment) => {
     setEditingId(o.id);
@@ -112,8 +166,16 @@ const AdminManualPayments = () => {
 
   const runAction = async (action: "verify" | "reject" | "reset", orderId: string) => {
     try {
+      // Al verificar, adjunta el comprobante escrito (si el admin lo dejó sin guardar)
+      const draft = (refDraft[orderId] ?? "").trim();
+      const hit = action === "verify" && draft ? extractPaymentReference(draft) : null;
       const { error } = await adminInvoke("manage-manual-payments", {
-        body: { action, orderId, adminKey },
+        body: {
+          action,
+          orderId,
+          adminKey,
+          ...(hit ? { paymentReference: hit.reference, paymentReferenceSource: hit.source } : {}),
+        },
       });
       if (error) throw error;
       toast({
@@ -229,7 +291,10 @@ const AdminManualPayments = () => {
                         ? `${o.currency_local} ${Number(o.amount_local).toFixed(2)}`
                         : `USD ${Number(o.amount_usd).toFixed(2)}`}
                     </div>
-                    <div className="text-xs text-muted-foreground">{o.method}</div>
+                    {o.amount_local != null && o.currency_local && (
+                      <div className="text-xs text-muted-foreground">≈ USD {Number(o.amount_usd).toFixed(2)}</div>
+                    )}
+                    <div className="text-xs font-medium text-foreground mt-0.5">{methodLabel(o.method)}</div>
                   </div>
                 </div>
 
@@ -240,6 +305,58 @@ const AdminManualPayments = () => {
                     ))}
                   </ul>
                 )}
+
+                {/* Comprobante / ID de operación del banco */}
+                <div className="border-t border-border pt-3 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
+                      <Hash className="w-3.5 h-3.5" /> Pedido:
+                    </span>
+                    <button onClick={() => copy(o.order_number)} className="font-mono font-semibold hover:text-primary">
+                      {o.order_number}
+                    </button>
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
+                      <Wallet className="w-3.5 h-3.5" /> {methodLabel(o.method)}
+                    </span>
+                    {o.payment_reference ? (
+                      <button
+                        onClick={() => copy(o.payment_reference!)}
+                        className="inline-flex items-center gap-1 font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                        title={o.payment_reference_at ? new Date(o.payment_reference_at).toLocaleString("es-PE") : undefined}
+                      >
+                        <Receipt className="w-3.5 h-3.5" />
+                        {o.payment_reference}
+                        {o.payment_reference_source ? ` · ${o.payment_reference_source}` : ""}
+                        <Copy className="w-3 h-3 opacity-60" />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        <Receipt className="w-3.5 h-3.5" /> Sin comprobante
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      value={refDraft[o.id] ?? ""}
+                      onChange={(e) => onRefChange(o.id, e.target.value)}
+                      placeholder="Pega el voucher o N° de operación (Interbank, BCP, SPEI, Yape, Binance…)"
+                      className="flex-1"
+                    />
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => autoDetect(o.id)} disabled={!((refDraft[o.id] ?? "").trim())}>
+                        <Sparkles className="w-4 h-4 mr-1" /> Detectar ID
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => saveReference(o)} disabled={savingRef === o.id}>
+                        <Save className="w-4 h-4 mr-1" /> {savingRef === o.id ? "Guardando…" : "Guardar"}
+                      </Button>
+                    </div>
+                  </div>
+                  {refSource[o.id] && (
+                    <p className="text-xs text-muted-foreground">Origen detectado: <strong>{refSource[o.id]}</strong></p>
+                  )}
+                </div>
+
 
                 <div className="flex flex-wrap gap-2 justify-end pt-1">
                   {editingId !== o.id && (

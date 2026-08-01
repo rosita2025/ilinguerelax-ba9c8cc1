@@ -82,13 +82,37 @@ async function fetchAudience(admin: Admin, audience: Audience): Promise<Array<{ 
   };
 
   if (audience === "buyers") {
-    const { data } = await admin
+    // Compradores reales del checkout propio: 4 fuentes (tokens de descarga,
+    // entregas digitales enviadas, auditoría de entregas y pagos manuales
+    // verificados: Yape/Plin/transferencias). El Map de collectRecipients
+    // garantiza un solo correo por persona aunque aparezca en las 4.
+    const { data: tok } = await admin
       .from("download_tokens")
       .select("email, created_at")
       .eq("revoked", false)
       .order("created_at", { ascending: false })
       .limit(20000);
-    for (const r of data ?? []) push(r.email, null);
+    for (const r of tok ?? []) push(r.email, null);
+
+    const { data: sends } = await admin
+      .from("digital_email_sends")
+      .select("customer_email, customer_name")
+      .limit(20000);
+    for (const r of sends ?? []) push(r.customer_email, r.customer_name);
+
+    const { data: audit } = await admin
+      .from("digital_delivery_audit")
+      .select("customer_email, customer_name, status")
+      .eq("status", "sent")
+      .limit(20000);
+    for (const r of audit ?? []) push(r.customer_email, r.customer_name);
+
+    const { data: manual } = await admin
+      .from("manual_payments")
+      .select("buyer_email, buyer_name, status")
+      .eq("status", "verified")
+      .limit(20000);
+    for (const r of manual ?? []) push(r.buyer_email, r.buyer_name);
   } else if (audience === "hotmart") {
     const { data } = await admin
       .from("hotmart_purchases")

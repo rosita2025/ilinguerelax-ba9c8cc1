@@ -508,6 +508,25 @@ serve(async (req) => {
     let hotmartPendingCount = 0;
     let storePendingCount = 0;
 
+    // Detalle de compras PENDIENTES (no cuentan como venta hasta aprobarse).
+    // Se muestran en /admin/analytics con proveedor, estado y último intento
+    // de verificación para revisarlas una por una.
+    type PendingDetail = {
+      orderNumber: string;
+      provider: string;
+      source: PurchaseSource;
+      status: string;
+      email: string;
+      country: string;
+      product: string;
+      amount: number;
+      currency: string;
+      amountUsd: number;
+      createdAt: string;
+      lastCheckAt: string | null;
+    };
+    const pendingDetails: PendingDetail[] = [];
+
     // Aggregate pending amounts per currency for the FX transparency card
     const pendingByCurrencyAgg = new Map<string, { source: PurchaseSource; amount: number; count: number }[]>();
     const addPending = (currency: string, source: PurchaseSource, amount: number) => {

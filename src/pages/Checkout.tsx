@@ -532,7 +532,7 @@ export default function Checkout() {
               className="text-base sm:text-xl font-bold tracking-tight whitespace-nowrap"
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
-              ILINGUE <span className="text-primary">RELAX</span>
+              iLingue <span className="text-primary">Relax</span>
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">

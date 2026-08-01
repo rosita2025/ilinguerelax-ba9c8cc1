@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, Loader2, Mail, Send } from "lucide-react";
+import { Eye, Loader2, Lock, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,7 +29,6 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
   const [noticeKey, setNoticeKey] = useState("");
   const [changes, setChanges] = useState("");
   const [bonusNote, setBonusNote] = useState("");
-  const [confirm, setConfirm] = useState("");
   const [rendering, setRendering] = useState(false);
   const [emailPreview, setEmailPreview] = useState<{
     html: string; subject: string; sampleEmail: string | null; isSample: boolean; downloadUrl: string; orderNumber: string | null;
@@ -73,7 +72,6 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
     const list = changes.split("\n").map((l) => l.trim()).filter(Boolean);
     if (!noticeKey.trim()) return toast({ title: "Falta la etiqueta (ej. v1.7)", variant: "destructive" });
     if (list.length === 0) return toast({ title: "Escribe al menos una novedad", variant: "destructive" });
-    if (confirm.trim() !== sku) return toast({ title: "Escribe el SKU para confirmar", description: sku, variant: "destructive" });
     setSending(true);
     try {
       const data = await call({
@@ -86,7 +84,6 @@ export default function ProductUpdateNoticePanel({ sku, adminKey }: { sku: strin
         title: `Aviso enviado a ${data.sent} comprador(es)`,
         description: `Ya avisados antes: ${data.skipped} · Fallidos: ${data.failed} · Total compradores: ${data.buyers}`,
       });
-      setConfirm("");
       await loadPreview();
     } catch (e) {
       toast({ title: "Error al enviar", description: e instanceof Error ? e.message : "Error", variant: "destructive" });

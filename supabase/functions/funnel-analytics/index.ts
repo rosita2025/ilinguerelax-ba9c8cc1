@@ -614,7 +614,10 @@ serve(async (req) => {
     const pixelEvents: any[] = [];
     // Proveedores con webhook verificado. dLocal Go escribe la compra con la
     // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
-    const GATEWAY_PROVIDERS = ["stripe", "paypal", "mercadopago", "mp", "dlocal", "dlocalgo"];
+    const GATEWAY_PROVIDERS = [
+      "stripe", "paypal", "mercadopago", "mercado_pago", "mp",
+      "dlocal", "dlocalgo", "dlocal_go",
+    ];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
       try { m = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }

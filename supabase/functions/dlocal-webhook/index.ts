@@ -18,6 +18,7 @@ import {
 } from "../_shared/dlocal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+import { checkAmount, describeAmountCheck } from "../_shared/dlocalAmounts.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
 const API_BASE = dlocalApiBase();
@@ -323,6 +324,38 @@ Deno.serve(async (req) => {
     }
 
 
+    // ---- Conciliación de montos -------------------------------------------
+    // Comparamos lo acreditado por dLocal contra el importe que registramos al
+    // crear el pedido (16.65 PEN, 3.70 PEN, …). Un pago de MENOS no se entrega.
+    const { data: expectedRows } = await supabase
+      .from("order_events")
+      .select("amount, currency, created_at")
+      .eq("order_number", orderNumber)
+      .in("event", ["order_created", "payment_pending", "payment_instructions"])
+      .order("created_at", { ascending: true })
+      .limit(10);
+    const expectedRow = (expectedRows ?? []).find((r) => typeof r.amount === "number" && r.amount > 0);
+    const amountCheck = checkAmount(
+      (expectedRow?.amount as number | undefined) ?? null,
+      (expectedRow?.currency as string | undefined) ?? currency,
+      { amount: amount ?? null, currency },
+    );
+    if (amountCheck.mismatch) {
+      console.warn("[dlocal-webhook] discrepancia de monto", orderNumber, amountCheck.reason);
+      await logOrderEvent({
+        orderNumber,
+        event: "payment_mismatch",
+        provider: "dlocalgo",
+        status: amountCheck.underpaid ? "AMOUNT_MISMATCH" : "AMOUNT_OVERPAID",
+        reference: paymentId,
+        detail: describeAmountCheck(amountCheck),
+        customerEmail: customerEmail || null,
+        amount: amount ?? null,
+        currency,
+        metadata: { country: country ?? null, skus, amountCheck },
+      });
+    }
+
     await logOrderEvent({
       orderNumber,
       event: "payment_paid",
@@ -330,12 +363,22 @@ Deno.serve(async (req) => {
       status,
       method: String(payment.payment_method_id || payment.payment_method_type || q.get("ptype") || "dLocal Go"),
       reference: paymentId,
-      detail: "Pago confirmado por dLocal Go",
+      detail: amountCheck.mismatch
+        ? `Pago confirmado por dLocal Go con discrepancia de monto: ${describeAmountCheck(amountCheck)}`
+        : "Pago confirmado por dLocal Go",
       customerEmail: customerEmail || null,
       amount: amount ?? null,
       currency,
       metadata: { country: country ?? null, skus },
     });
+
+    if (amountCheck.underpaid) {
+      // Pago incompleto o en otra moneda: se retiene la entrega para revisión.
+      return new Response(JSON.stringify({ received: true, held: "amount_mismatch", check: amountCheck.reason }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!customerEmail) {
       console.error("dLocal PAID sin email de comprador", { paymentId, orderNumber });

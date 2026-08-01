@@ -29,6 +29,28 @@ import { mergeProductRows, canonicalProductId } from "@/lib/productSkuAliases";
 
 type Granularity = "hour" | "day";
 
+// Etiquetas legibles para cada pasarela/método de pago del desglose de compras.
+const PROVIDER_LABELS: Record<string, string> = {
+  stripe: "Stripe (tarjeta)",
+  paypal: "PayPal",
+  mercadopago: "Mercado Pago",
+  mercado_pago: "Mercado Pago",
+  mp: "Mercado Pago",
+  dlocal: "dLocal Go",
+  dlocalgo: "dLocal Go",
+  dlocal_go: "dLocal Go",
+  yape_plin: "Yape / Plin",
+  yape: "Yape",
+  plin: "Plin",
+  binance_pay: "Binance Pay",
+  binance: "Binance Pay",
+  clabe_mx: "Transferencia MX (SPEI)",
+  spei: "Transferencia MX (SPEI)",
+  hotmart: "Hotmart",
+  manual: "Manual",
+  otros: "Otros",
+};
+
 interface AnalyticsData {
   range: { from: string; to: string; granularity: Granularity };
   totals: {

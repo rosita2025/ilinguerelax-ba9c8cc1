@@ -175,6 +175,7 @@ const Product8000Book = () => {
                   alt={bookImages[currentImage].alt}
                   className="w-full h-auto rounded-2xl shadow-hero aspect-square object-cover"
                 />
+                <PinterestSave overlay />
                 {/* Thumbnail strip */}
                 <div className="flex gap-2 mt-4 justify-center">
                   {bookImages.map((img, i) => (
@@ -684,7 +685,6 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
-      <PinterestSave floating />
       <StickyBuyBar
         price="$25.00"
         originalPrice="$45"

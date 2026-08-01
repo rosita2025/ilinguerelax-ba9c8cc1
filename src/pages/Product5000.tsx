@@ -431,6 +431,7 @@ const Product5000 = () => {
                   fetchPriority="high"
                   decoding="async"
                 />
+                <PinterestSave overlay />
               </div>
             </div>
 
@@ -894,7 +895,6 @@ const Product5000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar */}
-      <PinterestSave floating />
       <StickyBuyBar
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}

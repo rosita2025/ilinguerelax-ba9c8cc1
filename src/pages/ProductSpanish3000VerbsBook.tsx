@@ -209,6 +209,7 @@ const ProductSpanish3000VerbsBook = () => {
                   className="w-full h-auto"
                   loading="eager"
                 />
+                <PinterestSave overlay />
               </motion.div>
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-cyan-500/30 blur-2xl rounded-full" />
             </div>
@@ -638,7 +639,6 @@ const ProductSpanish3000VerbsBook = () => {
       <Footer />
       <ScrollToTop />
       <WhatsAppButton />
-      <PinterestSave floating />
       <StickyBuyBar
         lang="en"
         productName="3,000 Spanish Verbs Mastery — Pre-Order"

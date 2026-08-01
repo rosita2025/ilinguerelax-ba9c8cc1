@@ -170,6 +170,7 @@ const ProductCoreanoRelax = () => {
                   className="w-full h-auto rounded-2xl shadow-hero"
                   onContextMenu={(e) => e.preventDefault()}
                 />
+                <PinterestSave overlay />
               </div>
             </div>
 
@@ -387,7 +388,6 @@ const ProductCoreanoRelax = () => {
       <ScrollToTop showAfter={500} />
 
       {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
-      <PinterestSave floating />
       <StickyBuyBar
         price={displayPrice}
         originalPrice={tier.originalLabel}

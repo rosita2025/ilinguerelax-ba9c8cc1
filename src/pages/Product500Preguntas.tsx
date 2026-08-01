@@ -118,6 +118,7 @@ const Product500Preguntas = () => {
                   alt="Inglés Relax - 500 Preguntas en Inglés"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
+                <PinterestSave overlay />
               </div>
             </div>
 
@@ -290,7 +291,6 @@ const Product500Preguntas = () => {
 
       <Footer />
 
-      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

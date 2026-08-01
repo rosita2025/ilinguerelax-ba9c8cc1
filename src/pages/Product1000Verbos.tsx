@@ -134,6 +134,7 @@ const Product1000Verbos = () => {
                   alt="Inglés Relax - 1,000 Verbos Esenciales"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
+                <PinterestSave overlay />
               </div>
             </div>
 
@@ -312,7 +313,6 @@ const Product1000Verbos = () => {
 
       <Footer />
 
-      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

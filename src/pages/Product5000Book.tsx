@@ -178,6 +178,7 @@ const Product5000Book = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative overflow-hidden rounded-2xl shadow-hero">
+                <PinterestSave overlay />
                 {MEDIA_SLIDES.map((slide, i) => (
                   <div
                     key={i}
@@ -506,7 +507,6 @@ const Product5000Book = () => {
       />
 
       <Footer />
-      <PinterestSave floating />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"

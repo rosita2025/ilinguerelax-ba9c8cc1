@@ -221,6 +221,7 @@ const Product8000 = () => {
                   src={product8000Image}
                   alt="Inglés Relax - 8,000 Palabras"
                   className="w-full h-auto rounded-2xl shadow-hero" />
+                <PinterestSave overlay />
                 
               </div>
             </div>
@@ -660,7 +661,6 @@ const Product8000 = () => {
       <Footer />
 
       {/* Sticky Buy Bar — 4-tier routing */}
-      <PinterestSave floating />
       <StickyBuyBar
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}

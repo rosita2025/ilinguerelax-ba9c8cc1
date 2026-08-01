@@ -190,6 +190,7 @@ const ProductSpanishGrammarPatterns = () => {
                   className="w-full h-auto"
                   loading="eager"
                 />
+                <PinterestSave overlay />
               </motion.div>
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-[#a78bfa]/30 blur-2xl rounded-full" />
             </div>
@@ -605,7 +606,6 @@ const ProductSpanishGrammarPatterns = () => {
       <Footer />
       <ScrollToTop />
       <WhatsAppButton />
-      <PinterestSave floating />
       <StickyBuyBar
         lang="en"
         productName="Grammar Patterns A1-C1 Mastery"

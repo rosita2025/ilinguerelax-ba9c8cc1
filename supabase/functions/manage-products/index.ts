@@ -1,5 +1,6 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
+import { pingPinterestAndCms } from "../_shared/pinterestPing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -281,6 +282,7 @@ Deno.serve(async (req) => {
       // Bing/Yandex/Seznam (IndexNow) and pings sitemap for Google.
       if (p.active !== false) {
         await pingIndexNow([productUrl(p.sku)]);
+        pingPinterestAndCms({ url: productUrl(p.sku), type: "product" }).catch(() => {});
         notifyGoogleIndexing([productUrl(p.sku)], "URL_UPDATED").catch(() => {});
         pingSitemap().catch(() => {});
         resubmitSitemapsGSC().catch(() => {});
@@ -313,6 +315,7 @@ Deno.serve(async (req) => {
       await admin.from("product_upsells").update({ upsell_sku: newSku }).eq("upsell_sku", oldSku);
       // Announce both old (now 404) and new URLs so search engines refresh.
       await pingIndexNow([productUrl(oldSku), productUrl(newSku)]);
+      pingPinterestAndCms({ url: productUrl(newSku), type: "product" }).catch(() => {});
       notifyGoogleIndexing([productUrl(newSku)], "URL_UPDATED").catch(() => {});
       notifyGoogleIndexing([productUrl(oldSku)], "URL_DELETED").catch(() => {});
       pingSitemap().catch(() => {});

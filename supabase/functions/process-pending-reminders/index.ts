@@ -231,13 +231,44 @@ Deno.serve(async (req) => {
       }
 
       result.sent++;
+      const sentAt = new Date().toISOString();
+
+      // Registro auditable: queda constancia de que el recordatorio salió solo
+      // (cron), con día, paso y correo destino. Así en /mi-pedido y en el admin
+      // se ve como envío automático y no como una acción manual del equipo.
+      try {
+        await supabase.from("order_events").insert({
+          order_number: r.order_number,
+          customer_email: r.customer_email,
+          provider: r.provider ?? "system",
+          event: "reminder_sent",
+          status: "pending",
+          method: r.method,
+          amount: r.amount,
+          currency: r.currency,
+          detail: `Recordatorio automático de pago pendiente (día ${day}${isLast ? ", último aviso" : ""})`,
+          metadata: {
+            automated: true,
+            trigger: "cron:process-pending-reminders",
+            step: stepIndex + 1,
+            day,
+            isLast,
+            sentAt,
+            template: "customer-pending-reminder",
+            recipient: r.customer_email,
+          },
+        });
+      } catch (e) {
+        console.warn("[pending-reminders] no se pudo registrar el evento:", e instanceof Error ? e.message : String(e));
+      }
+
       const nextStep = stepIndex + 1;
       const base = new Date(r.order_created_at).getTime();
       await supabase
         .from("pending_payment_reminders")
         .update({
           step: nextStep,
-          last_sent_at: new Date().toISOString(),
+          last_sent_at: sentAt,
           next_at: nextStep < STEP_DAYS.length
             ? new Date(base + STEP_DAYS[nextStep] * DAY_MS).toISOString()
             : new Date(Date.now() + DAY_MS).toISOString(),

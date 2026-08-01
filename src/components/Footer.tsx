@@ -9,7 +9,7 @@ export const Footer = () => {
 
   const content = {
     es: {
-      brand: "ILINGUE RELAX",
+      brand: "iLingue Relax",
       services: "SERVICIOS",
       categories: "CATEGORÍAS",
       community: "COMUNIDAD",
@@ -35,7 +35,7 @@ export const Footer = () => {
       tagline: "Aprende idiomas sin estrés — con pronunciación real.",
     },
     en: {
-      brand: "ILINGUE RELAX",
+      brand: "iLingue Relax",
       services: "SERVICES",
       categories: "CATEGORIES",
       community: "COMMUNITY",
@@ -61,7 +61,7 @@ export const Footer = () => {
       tagline: "Learn languages stress-free — with real pronunciation.",
     },
     fr: {
-      brand: "ILINGUE RELAX",
+      brand: "iLingue Relax",
       services: "SERVICES",
       categories: "CATÉGORIES",
       community: "COMMUNAUTÉ",
@@ -87,7 +87,7 @@ export const Footer = () => {
       tagline: "Apprenez les langues sans stress — avec vraie prononciation.",
     },
     pt: {
-      brand: "ILINGUE RELAX",
+      brand: "iLingue Relax",
       services: "SERVIÇOS",
       categories: "CATEGORIAS",
       community: "COMUNIDADE",

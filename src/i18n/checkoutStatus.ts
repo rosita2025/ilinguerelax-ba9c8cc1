@@ -53,10 +53,10 @@ export interface CheckoutStatusStrings {
 }
 
 const es: CheckoutStatusStrings = {
-  metaSuccess: "¡Gracias por tu compra! · ILINGUE RELAX",
-  metaPending: "Pago pendiente · ILINGUE RELAX",
-  metaFailure: "Pago no completado · ILINGUE RELAX",
-  metaReturn: "Procesando pago · ILINGUE RELAX",
+  metaSuccess: "¡Gracias por tu compra! · iLingue Relax",
+  metaPending: "Pago pendiente · iLingue Relax",
+  metaFailure: "Pago no completado · iLingue Relax",
+  metaReturn: "Procesando pago · iLingue Relax",
 
   orderConfirmed: "Pedido confirmado",
   orderNumber: "Pedido",
@@ -103,10 +103,10 @@ const es: CheckoutStatusStrings = {
 };
 
 const en: CheckoutStatusStrings = {
-  metaSuccess: "Thanks for your purchase · ILINGUE RELAX",
-  metaPending: "Payment pending · ILINGUE RELAX",
-  metaFailure: "Payment not completed · ILINGUE RELAX",
-  metaReturn: "Processing payment · ILINGUE RELAX",
+  metaSuccess: "Thanks for your purchase · iLingue Relax",
+  metaPending: "Payment pending · iLingue Relax",
+  metaFailure: "Payment not completed · iLingue Relax",
+  metaReturn: "Processing payment · iLingue Relax",
 
   orderConfirmed: "Order confirmed",
   orderNumber: "Order",
@@ -153,10 +153,10 @@ const en: CheckoutStatusStrings = {
 };
 
 const pt: CheckoutStatusStrings = {
-  metaSuccess: "Obrigado pela sua compra · ILINGUE RELAX",
-  metaPending: "Pagamento pendente · ILINGUE RELAX",
-  metaFailure: "Pagamento não concluído · ILINGUE RELAX",
-  metaReturn: "Processando pagamento · ILINGUE RELAX",
+  metaSuccess: "Obrigado pela sua compra · iLingue Relax",
+  metaPending: "Pagamento pendente · iLingue Relax",
+  metaFailure: "Pagamento não concluído · iLingue Relax",
+  metaReturn: "Processando pagamento · iLingue Relax",
 
   orderConfirmed: "Pedido confirmado",
   orderNumber: "Pedido",
@@ -203,10 +203,10 @@ const pt: CheckoutStatusStrings = {
 };
 
 const fr: CheckoutStatusStrings = {
-  metaSuccess: "Merci pour votre achat · ILINGUE RELAX",
-  metaPending: "Paiement en attente · ILINGUE RELAX",
-  metaFailure: "Paiement non complété · ILINGUE RELAX",
-  metaReturn: "Traitement du paiement · ILINGUE RELAX",
+  metaSuccess: "Merci pour votre achat · iLingue Relax",
+  metaPending: "Paiement en attente · iLingue Relax",
+  metaFailure: "Paiement non complété · iLingue Relax",
+  metaReturn: "Traitement du paiement · iLingue Relax",
 
   orderConfirmed: "Commande confirmée",
   orderNumber: "Commande",

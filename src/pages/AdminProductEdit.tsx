@@ -642,10 +642,10 @@ const AdminProductEdit = () => {
               Activa uno o los dos canales. Se muestran <b>en cualquier país</b> según lo que actives, salvo los países excluidos abajo.
             </p>
 
-            {/* Tienda ILINGUE RELAX */}
+            {/* Tienda iLingue Relax */}
             <div className="flex items-start justify-between gap-3 p-3 border rounded-lg">
               <div className="flex-1">
-                <div className="font-medium text-sm">Tienda ILINGUE RELAX (checkout propio)</div>
+                <div className="font-medium text-sm">Tienda iLingue Relax (checkout propio)</div>
                 <div className="text-xs text-muted-foreground">Stripe, PayPal, Yape/Plin (Perú), Mercado Pago.</div>
               </div>
               <Switch
@@ -793,7 +793,7 @@ const AdminProductEdit = () => {
                 <div className="text-sm font-semibold">🌍 Tienda mundial (sin Hotmart)</div>
                 <p className="text-xs text-muted-foreground">
                   Para productos que enseñan <b>español a angloparlantes</b> u otros idiomas — o cuando <b>no tienes enlace de Hotmart</b>.<br />
-                  Se muestra la Tienda ILINGUE RELAX en <b>todos los países</b>.
+                  Se muestra la Tienda iLingue Relax en <b>todos los países</b>.
                 </p>
                 <Button
                   type="button"
@@ -838,7 +838,7 @@ const AdminProductEdit = () => {
                     {/* Tienda */}
                     <div className={`p-2 rounded border text-xs ${storeOn ? "border-green-500/40 bg-green-500/10" : "border-border bg-muted/40 opacity-60"}`}>
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">🛒 Tienda ILINGUE RELAX</span>
+                        <span className="font-medium">🛒 Tienda iLingue Relax</span>
                         <span className={storeOn ? "text-green-700 dark:text-green-400" : "text-muted-foreground"}>
                           {storeOn ? "Activo" : "Inactivo"}
                         </span>

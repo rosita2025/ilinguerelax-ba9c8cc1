@@ -250,7 +250,7 @@ export default function OrderStatus() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Estado de mi pedido | ILINGUE RELAX</title>
+        <title>Estado de mi pedido | iLingue Relax</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

@@ -2182,7 +2182,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   amountUsd={Number(totalUsd)}
                   localCurrency={local.currency}
                   localAmount={local.amount}
-                  description={items.map((i) => i.name).join(" + ").slice(0, 120) || "ILINGUE RELAX"}
+                  description={items.map((i) => i.name).join(" + ").slice(0, 120) || "iLingue Relax"}
                   buyerEmail={buyer.email.trim() || undefined}
                   buyerName={buyer.fullName.trim() || undefined}
                   buyerPhone={buyer.phone || undefined}

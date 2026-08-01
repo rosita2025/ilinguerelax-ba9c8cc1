@@ -187,43 +187,76 @@ export default function AdminPaymentErrors() {
               No hay fallos de pago en este período. 🎉
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/20 text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="text-left p-2">Fecha</th>
-                    <th className="text-left p-2">Motivo</th>
-                    <th className="text-left p-2">Proveedor</th>
-                    <th className="text-left p-2">País</th>
-                    <th className="text-left p-2">IP</th>
-                    <th className="text-left p-2">Producto</th>
-                    <th className="text-left p-2">Monto</th>
-                    <th className="text-left p-2">Página</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.id} className="border-t align-top">
-                      <td className="p-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
-                      <td className="p-2 max-w-[240px]">
-                        <span className="font-medium">
-                          {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
-                        </span>
-                      </td>
-                      <td className="p-2 whitespace-nowrap">{r.provider || "—"}</td>
-                      <td className="p-2 whitespace-nowrap">{flagOf(r.country)} {r.country || "—"}</td>
-                      <td className="p-2 font-mono text-xs whitespace-nowrap">{r.ip || "—"}</td>
-                      <td className="p-2 max-w-[180px] truncate" title={r.product_id || ""}>{r.product_id || "—"}</td>
-                      <td className="p-2 whitespace-nowrap">
-                        {r.value != null ? `${r.value} ${r.currency || ""}` : "—"}
-                      </td>
-                      <td className="p-2 max-w-[200px] truncate" title={r.page_path || ""}>{r.page_path || "—"}</td>
+            <>
+              {/* Móvil: tarjetas legibles en lugar de tabla comprimida */}
+              <ul className="divide-y md:hidden">
+                {rows.map((r) => (
+                  <li key={r.id} className="p-3 space-y-1 text-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-medium break-words">
+                        {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {r.provider || "—"} · {flagOf(r.country)} {r.country || "—"} ·{" "}
+                      {r.value != null ? `${r.value} ${r.currency || ""}` : "—"}
+                    </p>
+                    <p className="text-xs text-muted-foreground break-all">
+                      IP: <span className="font-mono">{r.ip || "—"}</span>
+                    </p>
+                    {r.product_id && (
+                      <p className="text-xs text-muted-foreground break-all">Producto: {r.product_id}</p>
+                    )}
+                    {r.page_path && (
+                      <p className="text-xs text-muted-foreground break-all">Página: {r.page_path}</p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Escritorio: tabla completa */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/20 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="text-left p-2">Fecha</th>
+                      <th className="text-left p-2">Motivo</th>
+                      <th className="text-left p-2">Proveedor</th>
+                      <th className="text-left p-2">País</th>
+                      <th className="text-left p-2">IP</th>
+                      <th className="text-left p-2">Producto</th>
+                      <th className="text-left p-2">Monto</th>
+                      <th className="text-left p-2">Página</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.id} className="border-t align-top">
+                        <td className="p-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
+                        <td className="p-2 max-w-[240px]">
+                          <span className="font-medium">
+                            {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
+                          </span>
+                        </td>
+                        <td className="p-2 whitespace-nowrap">{r.provider || "—"}</td>
+                        <td className="p-2 whitespace-nowrap">{flagOf(r.country)} {r.country || "—"}</td>
+                        <td className="p-2 font-mono text-xs whitespace-nowrap">{r.ip || "—"}</td>
+                        <td className="p-2 max-w-[180px] truncate" title={r.product_id || ""}>{r.product_id || "—"}</td>
+                        <td className="p-2 whitespace-nowrap">
+                          {r.value != null ? `${r.value} ${r.currency || ""}` : "—"}
+                        </td>
+                        <td className="p-2 max-w-[200px] truncate" title={r.page_path || ""}>{r.page_path || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
+
         </section>
       </div>
     </div>

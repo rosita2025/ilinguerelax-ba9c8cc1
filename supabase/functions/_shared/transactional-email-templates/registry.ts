@@ -4,6 +4,7 @@ import { template as materialDelivery } from './material-delivery.tsx'
 import { template as adminManualPending } from './admin-manual-pending.tsx'
 import { template as customerManualPending } from './customer-manual-pending.tsx'
 import { template as customerPendingReminder } from './customer-pending-reminder.tsx'
+import { template as productVersionUpdate } from './product-version-update.tsx'
 
 export interface TemplateEntry {
   component: (props: any) => any

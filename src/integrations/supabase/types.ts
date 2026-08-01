@@ -1902,10 +1902,24 @@ export type Database = {
             referencedColumns: ["sku"]
           },
           {
+            foreignKeyName: "product_upsells_product_sku_fkey"
+            columns: ["product_sku"]
+            isOneToOne: false
+            referencedRelation: "digital_products_public"
+            referencedColumns: ["sku"]
+          },
+          {
             foreignKeyName: "product_upsells_upsell_sku_fkey"
             columns: ["upsell_sku"]
             isOneToOne: false
             referencedRelation: "digital_products"
+            referencedColumns: ["sku"]
+          },
+          {
+            foreignKeyName: "product_upsells_upsell_sku_fkey"
+            columns: ["upsell_sku"]
+            isOneToOne: false
+            referencedRelation: "digital_products_public"
             referencedColumns: ["sku"]
           },
         ]
@@ -2161,6 +2175,99 @@ export type Database = {
       }
     }
     Views: {
+      digital_products_public: {
+        Row: {
+          active: boolean | null
+          bonus_name: string | null
+          bonus_titles: Json | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          excluded_countries: string[] | null
+          hotmart_excluded_countries: string[] | null
+          hotmart_prices_by_country: Json | null
+          hotmart_url: string | null
+          hotmart_urls_by_country: Json | null
+          id: string | null
+          is_physical: boolean | null
+          is_upsell: boolean | null
+          learner_language: string | null
+          local_prices: Json | null
+          name: string | null
+          price_pen: number | null
+          price_usd: number | null
+          price_usd_latam: number | null
+          price_usd_tienda: number | null
+          sku: string | null
+          sku_aliases: string[] | null
+          sort_order: number | null
+          store_enabled: boolean | null
+          store_excluded_countries: string[] | null
+          target_language: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          bonus_name?: string | null
+          bonus_titles?: Json | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          excluded_countries?: string[] | null
+          hotmart_excluded_countries?: string[] | null
+          hotmart_prices_by_country?: Json | null
+          hotmart_url?: string | null
+          hotmart_urls_by_country?: Json | null
+          id?: string | null
+          is_physical?: boolean | null
+          is_upsell?: boolean | null
+          learner_language?: string | null
+          local_prices?: Json | null
+          name?: string | null
+          price_pen?: number | null
+          price_usd?: number | null
+          price_usd_latam?: number | null
+          price_usd_tienda?: number | null
+          sku?: string | null
+          sku_aliases?: string[] | null
+          sort_order?: number | null
+          store_enabled?: boolean | null
+          store_excluded_countries?: string[] | null
+          target_language?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          bonus_name?: string | null
+          bonus_titles?: Json | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          excluded_countries?: string[] | null
+          hotmart_excluded_countries?: string[] | null
+          hotmart_prices_by_country?: Json | null
+          hotmart_url?: string | null
+          hotmart_urls_by_country?: Json | null
+          id?: string | null
+          is_physical?: boolean | null
+          is_upsell?: boolean | null
+          learner_language?: string | null
+          local_prices?: Json | null
+          name?: string | null
+          price_pen?: number | null
+          price_usd?: number | null
+          price_usd_latam?: number | null
+          price_usd_tienda?: number | null
+          sku?: string | null
+          sku_aliases?: string[] | null
+          sort_order?: number | null
+          store_enabled?: boolean | null
+          store_excluded_countries?: string[] | null
+          target_language?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       reviews_public: {
         Row: {
           created_at: string | null

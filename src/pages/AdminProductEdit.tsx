@@ -296,6 +296,7 @@ const AdminProductEdit = () => {
   return (
     <>
       <AdminNav />
+      <TooltipProvider>
       <main className="min-h-dvh bg-background p-4 md:p-8">
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
@@ -1049,6 +1050,7 @@ const AdminProductEdit = () => {
           </div>
         </div>
       </main>
+      </TooltipProvider>
     </>
   );
 };

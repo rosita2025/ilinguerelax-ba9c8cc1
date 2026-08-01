@@ -402,7 +402,7 @@ serve(async (req) => {
       supabase.from("digital_products").select("sku, name, sku_aliases"),
       supabase
         .from("funnel_events")
-        .select("id, created_at, product_id, value, currency, country, session_id, referrer, page_path, is_bot")
+        .select("id, created_at, product_id, value, currency, country, session_id, referrer, page_path, is_bot, provider")
         .in("event_name", ["Purchase", "purchase"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),

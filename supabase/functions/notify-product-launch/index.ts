@@ -364,7 +364,7 @@ Deno.serve(withAdminLogging("notify-product-launch", async (req) => {
         .eq("announcement_sent", false);
     }
 
-    adminLog("notify-product-launch", `sku=${sku} key=${launchKey} sent=${sent} skipped=${skipped} failed=${failed}`);
+    adminLog("notify-product-launch", "info", "launch_sent", { sku, launchKey, sent, skipped, failed });
 
     return json({ sku, launchKey, total: recipients.length, sent, skipped, failed, byAudience, errors });
   }

@@ -363,6 +363,8 @@ export default function AdminDlocal() {
             </div>
           )}
 
+          <DlocalTestSimulator />
+
           <Card className="p-3 sm:p-4 text-xs text-muted-foreground space-y-1">
             <p><strong>Cómo funciona:</strong> al activar un país se crea (si falta) su región con la moneda local y se agrega el método dLocal Go correspondiente.</p>
             <p>El backend fuerza el rail elegido: “transferencia” solo muestra bancos/transferencias y “efectivo” solo agentes/vouchers.</p>

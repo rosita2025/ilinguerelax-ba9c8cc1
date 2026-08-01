@@ -1829,6 +1829,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pinterest_publications: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          image_url: string | null
+          kind: string
+          pin_id: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          pin_id?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          pin_id?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       product_launch_notices: {
         Row: {
           audience: string
@@ -2356,6 +2395,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      verify_cron_key: { Args: { _key: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

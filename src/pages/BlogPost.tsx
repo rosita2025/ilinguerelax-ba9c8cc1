@@ -360,10 +360,17 @@ const BlogPost = () => {
                       {post.author}
                     </span>
                   </div>
-                  <Button variant="outline" size="sm" onClick={handleShare}>
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Compartir
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <PinterestSave
+                      url={`https://ilinguerelax.com/blog/${post.slug}`}
+                      media={post.image}
+                      description={`${post.title} — ${post.excerpt}`}
+                    />
+                    <Button variant="outline" size="sm" onClick={handleShare}>
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Compartir
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

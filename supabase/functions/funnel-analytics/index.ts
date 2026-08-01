@@ -491,8 +491,18 @@ serve(async (req) => {
     };
 
     type PurchaseSource = "hotmart" | "store";
-    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean };
+    type RealPurchase = { at: string; productId: string; country: string; usd: number; source: PurchaseSource; pending: boolean; provider: string };
     const realPurchases: RealPurchase[] = [];
+    // Conteo/monto por pasarela real (stripe, mercadopago, paypal, dlocalgo,
+    // yape_plin, binance_pay, clabe_mx/spei, hotmart...) para el panel.
+    const byProviderAgg = new Map<string, { count: number; revenue: number; pending: number }>();
+    const addProvider = (provider: string, usd: number, pending: boolean) => {
+      const key = provider || "otros";
+      const agg = byProviderAgg.get(key) || { count: 0, revenue: 0, pending: 0 };
+      if (pending) agg.pending++;
+      else { agg.count++; agg.revenue += usd; }
+      byProviderAgg.set(key, agg);
+    };
     let hotmartPendingCount = 0;
     let storePendingCount = 0;
 

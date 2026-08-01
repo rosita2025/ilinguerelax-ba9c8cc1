@@ -695,6 +695,20 @@ serve(async (req) => {
       if (isPending && usdAmount > 0) {
         storePendingCount++;
         addPending(currency, "store", rawAmount);
+        pendingDetails.push({
+          orderNumber: String(meta.order_number || meta.external_reference || txn || "-"),
+          provider,
+          source: "store",
+          status,
+          email: String(meta.email || meta.customer_email || ""),
+          country: String(ev.country || "??"),
+          product: String(meta.product_name || pid),
+          amount: rawAmount,
+          currency,
+          amountUsd: usdAmount,
+          createdAt: ev.created_at,
+          lastCheckAt: ev.created_at,
+        });
       }
       realPurchases.push({
         at: ev.created_at,

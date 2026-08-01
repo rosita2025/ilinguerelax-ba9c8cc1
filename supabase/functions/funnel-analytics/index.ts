@@ -1190,6 +1190,7 @@ serve(async (req) => {
           recoveryRatePct: abandonedTotal
             ? Number(((abandonedRecovered / abandonedTotal) * 100).toFixed(2))
             : 0,
+          sources: abandonedSources,
         },
 
 

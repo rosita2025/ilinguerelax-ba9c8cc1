@@ -4,6 +4,7 @@
  */
 import { logIndexingEvents, type IndexingEvent } from "./indexingLog.ts";
 import { notifyGoogleIndexing } from "./googleIndexing.ts";
+import { pingPinterestAndCms } from "./pinterestPing.ts";
 
 const INDEXNOW_KEY = "ilr7k3n9x2q8w5m4v6b1p0d3s7z4h2y8";
 const HOST = "ilinguerelax.com";
@@ -241,6 +242,8 @@ export async function pingPostPublished(slug: string): Promise<void> {
       pingWebSub(),
       // 4) Google Indexing API (si hay cuenta de servicio configurada)
       notifyGoogleIndexing([postUrl], "URL_UPDATED"),
+      // 5) Pinterest (refresco de feeds + re-scrape) y webhook del CMS
+      pingPinterestAndCms({ url: postUrl, type: "blog" }),
     ]);
     console.log("[pingPostPublished] done for", postUrl);
   } catch (err) {

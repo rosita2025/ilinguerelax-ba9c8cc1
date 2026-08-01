@@ -67,6 +67,7 @@ export const SEO = ({
   availability = "InStock",
   isPhysical = false,
   breadcrumbs,
+  book,
 }: SEOProps) => {
   // Keep combined title under 60 chars to avoid SERP truncation.
   const SUFFIX = " | iLingue Relax";

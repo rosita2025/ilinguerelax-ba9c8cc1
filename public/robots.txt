@@ -139,6 +139,16 @@ Disallow: /checkout
 Disallow: /checkout/
 Disallow: /checkouts
 Disallow: /checkouts/
+Disallow: /mi-descarga
+Disallow: /mi-pedido
+Disallow: /mi-transaccion
+Disallow: /order-status
+Disallow: /transaction-status
+Disallow: /recuperar-carrito
+Disallow: /payment-success
+Disallow: /hotmart-success
+Disallow: /hotmart-pending
+Disallow: /hotmart-credit-pending
 Disallow: /*.json$
 
 # Allow important resources

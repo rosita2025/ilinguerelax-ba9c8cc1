@@ -61,6 +61,7 @@ const staticEntries: SitemapEntry[] = [
   { path: "/licencias-y-avisos-legales", changefreq: "yearly", priority: "0.3" },
   { path: "/envios-y-entregas", changefreq: "yearly", priority: "0.4" },
   { path: "/devoluciones-y-reembolsos", changefreq: "yearly", priority: "0.4" },
+  { path: "/dejar-resena", changefreq: "monthly", priority: "0.4" },
   { path: "/blog", changefreq: "weekly", priority: "0.8" },
   { path: "/vista-previa/patrones-especiales", changefreq: "monthly", priority: "0.6" },
   { path: "/vista-previa/coreano-100-mapas-mentales", changefreq: "monthly", priority: "0.6" },
@@ -349,10 +350,14 @@ function urlsetXml(entries: SitemapEntry[], hostBase: string = BASE_URL): string
   ].join("\n");
 }
 
-function indexXml(children: Array<{ file: string; lastmod: string }>): string {
+function indexXml(children: Array<{ file: string; lastmod?: string }>): string {
+  // <lastmod> solo se emite cuando viene de un dato real (updated_at / fecha de
+  // publicación). Inventar la fecha de build hace que Google desconfíe de la señal.
   const items = children.map(
     (c) =>
-      `  <sitemap>\n    <loc>${BASE_URL}/sitemaps/${c.file}</loc>\n    <lastmod>${c.lastmod}</lastmod>\n  </sitemap>`,
+      `  <sitemap>\n    <loc>${BASE_URL}/sitemaps/${c.file}</loc>` +
+      (c.lastmod ? `\n    <lastmod>${c.lastmod}</lastmod>` : "") +
+      `\n  </sitemap>`,
   );
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -398,29 +403,36 @@ async function main() {
     priority: "0.85",
   }));
 
-  const children: Array<{ file: string; lastmod: string }> = [];
+  const children: Array<{ file: string; lastmod?: string }> = [];
 
-  // Pages
+  // Pages (sin lastmod: no hay timestamp real por página)
   writeFileSync(join(SITEMAPS_DIR, "sitemap-pages.xml"), urlsetXml(staticEntries));
-  children.push({ file: "sitemap-pages.xml", lastmod: TODAY });
+  children.push({ file: "sitemap-pages.xml" });
 
-  // Products (chunked)
+  // Products (chunked) — lastmod = updated_at real más reciente del bloque
   const productChunks = chunk(productEntries, URLS_PER_SITEMAP);
   productChunks.forEach((entries, i) => {
     const file = `sitemap-products-${i + 1}.xml`;
     writeFileSync(join(SITEMAPS_DIR, file), urlsetXml(entries));
-    children.push({ file, lastmod: TODAY });
+    const latest = entries
+      .map((e) => e.lastmod)
+      .filter((d): d is string => Boolean(d))
+      .sort()
+      .pop();
+    children.push({ file, lastmod: latest });
   });
 
   // Blog
   if (blogEntries.length > 0) {
     writeFileSync(join(SITEMAPS_DIR, "sitemap-blog.xml"), urlsetXml(blogEntries));
     const latest = blogEntries
-      .map((e) => e.lastmod ?? TODAY)
+      .map((e) => e.lastmod)
+      .filter((d): d is string => Boolean(d))
       .sort()
-      .pop()!;
+      .pop();
     children.push({ file: "sitemap-blog.xml", lastmod: latest });
   }
+
 
   // RSS feed (blog) — validado antes de escribirse: nunca publicamos un feed roto.
   if (feedItems.length > 0) {
@@ -469,7 +481,7 @@ main().catch((err) => {
     writeFileSync(join(SITEMAPS_DIR, "sitemap-pages.xml"), urlsetXml(staticEntries));
     writeFileSync(
       join(PUBLIC_DIR, "sitemap.xml"),
-      indexXml([{ file: "sitemap-pages.xml", lastmod: TODAY }]),
+      indexXml([{ file: "sitemap-pages.xml" }]),
     );
   } catch {
     /* keep previous file */

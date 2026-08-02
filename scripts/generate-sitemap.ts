@@ -409,15 +409,42 @@ async function getDbProducts(): Promise<DbProduct[]> {
 // Catálogo de productos para Pinterest (RSS 2.0 + namespace g:)
 // URL para "Catálogos > Fuentes de datos > Proporcione un enlace URL".
 // --------------------------------------------------------------------------
-function catalogXml(products: DbProduct[]): string {
+/** Nombre legible del idioma que enseña el producto. */
+const LANG_LABEL: Record<string, { es: string; en: string }> = {
+  en: { es: "Inglés", en: "English" },
+  es: { es: "Español", en: "Spanish" },
+  ko: { es: "Coreano", en: "Korean" },
+  fr: { es: "Francés", en: "French" },
+  pt: { es: "Portugués", en: "Portuguese" },
+  it: { es: "Italiano", en: "Italian" },
+  de: { es: "Alemán", en: "German" },
+  nl: { es: "Neerlandés", en: "Dutch" },
+  ja: { es: "Japonés", en: "Japanese" },
+  zh: { es: "Chino", en: "Chinese" },
+};
+
+function langLabel(code: string | undefined, feedLang: "es" | "en"): string {
+  const key = (code ?? "").toLowerCase().slice(0, 2);
+  return LANG_LABEL[key]?.[feedLang] ?? (feedLang === "es" ? "Idiomas" : "Languages");
+}
+
+/**
+ * Catálogo minorista para Pinterest ("Fuentes de datos > enlace URL").
+ * País: US · Moneda: USD · Idioma del feed: es (principal) o en (secundario).
+ * El idioma del feed NO es el idioma que enseña el producto: eso va en
+ * g:product_type / g:custom_label_0 para poder segmentar (Inglés, Coreano...).
+ */
+function catalogXml(products: DbProduct[], feedLang: "es" | "en" = "es"): string {
+  const es = feedLang === "es";
   const items = products
     .filter((p) => p.sku && p.name && p.image && p.price && p.price > 0)
     .slice(0, 1000)
     .map((p) => {
       const link = `${BASE_URL}/products/${p.sku}`;
-      const type = p.is_physical
-        ? `Libros > Idiomas > ${p.target_language ?? "Idiomas"}`
-        : `Libros Digitales > Idiomas > ${p.target_language ?? "Idiomas"}`;
+      const teaches = langLabel(p.target_language, feedLang);
+      const type = es
+        ? `${p.is_physical ? "Libros" : "Libros Digitales"} > Idiomas > ${teaches}`
+        : `${p.is_physical ? "Books" : "Digital Books"} > Languages > ${teaches}`;
       return [
         "    <item>",
         `      <g:id>${xmlEscape(p.sku)}</g:id>`,
@@ -432,10 +459,16 @@ function catalogXml(products: DbProduct[]): string {
         `      <g:price>${p.price!.toFixed(2)} USD</g:price>`,
         "      <g:brand>iLingue Relax</g:brand>",
         `      <g:mpn>${xmlEscape(p.sku)}</g:mpn>`,
+        "      <g:identifier_exists>no</g:identifier_exists>",
+        "      <g:adult>no</g:adult>",
+        `      <g:content_language>${feedLang}</g:content_language>`,
+        "      <g:target_country>US</g:target_country>",
         `      <g:google_product_category>Media &gt; Books${
           p.is_physical ? "" : " &gt; E-books"
         }</g:google_product_category>`,
         `      <g:product_type>${xmlEscape(type)}</g:product_type>`,
+        `      <g:custom_label_0>${xmlEscape(teaches)}</g:custom_label_0>`,
+        `      <g:custom_label_1>${p.is_physical ? (es ? "Físico" : "Physical") : es ? "Digital" : "Digital"}</g:custom_label_1>`,
         "    </item>",
       ].join("\n");
     });
@@ -444,15 +477,21 @@ function catalogXml(products: DbProduct[]): string {
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
     "  <channel>",
-    "    <title>iLingue Relax - Catálogo</title>",
+    es
+      ? "    <title>iLingue Relax - Catálogo</title>"
+      : "    <title>iLingue Relax - Catalog</title>",
     `    <link>${BASE_URL}</link>`,
-    "    <description>Libros digitales y físicos para aprender idiomas sin estrés.</description>",
+    es
+      ? "    <description>Libros digitales y físicos para aprender idiomas sin estrés.</description>"
+      : "    <description>Digital and printed books to learn languages stress-free.</description>",
+    `    <language>${feedLang}</language>`,
     ...items,
     "  </channel>",
     "</rss>",
     "",
   ].join("\n");
 }
+
 
 // --------------------------------------------------------------------------
 // XML builders
@@ -627,7 +666,8 @@ async function main() {
   // CATÁLOGO Pinterest (public/catalogo-pinterest.xml): formato de catálogo
   // minorista (namespace g:) para "Fuentes de datos > Proporcione un enlace URL".
   {
-    const catalog = catalogXml(dbProducts);
+    const catalog = catalogXml(dbProducts, "es");
+    const catalogEn = catalogXml(dbProducts, "en");
     const count = (catalog.match(/<item>/g) ?? []).length;
     if (count === 0) {
       console.error("[catalogo-pinterest] ERROR sin productos válidos; se conserva el archivo anterior.");
@@ -635,8 +675,11 @@ async function main() {
       writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest.xml"), catalog);
       writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest"), catalog);
       writeFileSync(join(PUBLIC_DIR, "pinterest-catalog.xml"), catalog);
-      console.log(`[catalogo-pinterest] catálogo escrito (${count} productos).`);
+      writeFileSync(join(PUBLIC_DIR, "catalogo-pinterest-en.xml"), catalogEn);
+      writeFileSync(join(PUBLIC_DIR, "pinterest-catalog-en.xml"), catalogEn);
+      console.log(`[catalogo-pinterest] catálogo es+en escrito (${count} productos).`);
     }
+
   }
 
 

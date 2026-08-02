@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
-    <title>iLingue Relax - Catálogo</title>
+    <title>iLingue Relax - Catalog</title>
     <link>https://ilinguerelax.com</link>
-    <description>Libros digitales y físicos para aprender idiomas sin estrés.</description>
-    <language>es</language>
+    <description>Digital and printed books to learn languages stress-free.</description>
+    <language>en</language>
     <item>
       <g:id>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:id>
       <g:title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</g:title>
@@ -18,11 +18,11 @@
       <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -38,11 +38,11 @@
       <g:mpn>1-000-verbs-in-spanish-past-present-future-with-english-pronunciation</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
-      <g:custom_label_0>Español</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; Spanish</g:product_type>
+      <g:custom_label_0>Spanish</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -58,11 +58,11 @@
       <g:mpn>5-000-spanish-words-with-english-pronunciation-digital</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
-      <g:custom_label_0>Español</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; Spanish</g:product_type>
+      <g:custom_label_0>Spanish</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -78,11 +78,11 @@
       <g:mpn>500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -98,11 +98,11 @@
       <g:mpn>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -118,11 +118,11 @@
       <g:mpn>500-questions-in-spanish-with-english-pronunciation</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
-      <g:custom_label_0>Español</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; Spanish</g:product_type>
+      <g:custom_label_0>Spanish</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -138,11 +138,11 @@
       <g:mpn>8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -158,11 +158,11 @@
       <g:mpn>100-mapas-mentales-para-aprender-coreano-hangul-c1</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Coreano</g:product_type>
-      <g:custom_label_0>Coreano</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; Korean</g:product_type>
+      <g:custom_label_0>Korean</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -178,11 +178,11 @@
       <g:mpn>1-000-palabras-en-ingles-con-pronunciacion-espa-ol-con-pronunciacion-hispano</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -198,11 +198,11 @@
       <g:mpn>1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -218,11 +218,11 @@
       <g:mpn>1-000-palabras-esenciales-para-aprender-coreano</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
+      <g:content_language>en</g:content_language>
       <g:target_country>US</g:target_country>
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Coreano</g:product_type>
-      <g:custom_label_0>Coreano</g:custom_label_0>
+      <g:product_type>Digital Books &gt; Languages &gt; Korean</g:product_type>
+      <g:custom_label_0>Korean</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
   </channel>

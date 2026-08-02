@@ -34,7 +34,11 @@ Deno.serve(async (req) => {
 
   // ?format=rss → RSS 2.0 clásico (Pinterest "Importar contenido > RSS").
   // Por defecto → RSS con namespace g: (Pinterest "Catálogos").
-  const format = new URL(req.url).searchParams.get("format") ?? "catalog";
+  const params = new URL(req.url).searchParams;
+  const format = params.get("format") ?? "catalog";
+  // ?lang=en → catálogo con textos/canal en inglés (misma lista de g:id, así
+  // Pinterest no duplica pines entre las dos fuentes de datos).
+  const feedLang: "es" | "en" = params.get("lang") === "en" ? "en" : "es";
 
   try {
     const supabase = createClient(
@@ -118,6 +122,9 @@ ${pins}
       <g:mpn>${esc(p.sku)}</g:mpn>
       <g:google_product_category>Media &gt; Books${p.is_physical ? "" : " &gt; E-books"}</g:google_product_category>
       <g:product_type>${esc(type)}</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>${feedLang}</g:content_language>
     </item>`;
       })
       .join("\n");
@@ -125,9 +132,12 @@ ${pins}
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
-    <title>${BRAND} - Catálogo</title>
+    <title>${BRAND} - ${feedLang === "en" ? "Catalog" : "Catálogo"}</title>
     <link>${HOST}</link>
-    <description>Libros digitales y físicos para aprender idiomas sin estrés.</description>
+    <description>${feedLang === "en"
+      ? "Digital and printed books to learn languages stress-free."
+      : "Libros digitales y físicos para aprender idiomas sin estrés."}</description>
+    <language>${feedLang}</language>
 ${items}
   </channel>
 </rss>`;
@@ -136,7 +146,7 @@ ${items}
       headers: {
         ...cors,
         "Content-Type": "application/xml; charset=utf-8",
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "public, max-age=900",
       },
     });
   } catch (e) {

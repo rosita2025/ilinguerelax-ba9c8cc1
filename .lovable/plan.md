@@ -1,29 +1,29 @@
-## Objetivo
+# Plan - Fix Admin Product Upload and RLS Issues
 
-Dejar de depender de tasas de conversión automáticas para LATAM y permitir que tú fijes manualmente el precio exacto por moneda en `/admin/products/:sku` (igual que Hotmart: MXN, COP, ARS, CLP, BRL, etc.).
+The user reported issues when creating/updating products in `/admin/productos`:
+1. "Error subir imagen": Image upload fails.
+2. "New row violates row level security policy": Database insert/update fails.
+3. "Guardar error L-200": Likely a generic error code or a specific validation error in the UI.
 
-## Cambios
+## Diagnosis
+- **RLS/Grants**: `digital_products` and `product_upsells` tables lack explicit `GRANT` statements for `authenticated` and `anon` roles in the `public` schema. Even though `service_role` has policies, Supabase's Data API requires explicit grants.
+- **Image Upload**: The `product-images` storage bucket has policies allowing `service_role` to manage objects, but the client-side `ProductImageUploader.tsx` uses the standard `supabase.storage` client. If the user is authenticated as a regular user (or even admin but via the client), they might lack permissions to upload directly if the bucket isn't correctly configured for `authenticated` uploads, or if it expects the Edge Function to handle it. However, the code shows it trying to upload via `supabase.storage.from("product-images").upload(...)`.
+- **L-200**: This might refer to a line number in a specific file or a truncated error message. In `AdminProductEdit.tsx`, the `save` function calls the `manage-products` Edge Function.
 
-### 1. Base de datos
-Añadir una columna `local_prices JSONB` a `digital_products`:
-```json
-{ "MXN": 199, "COP": 33900, "ARS": 8500, "CLP": 9500, "BRL": 49, "PEN": 37 }
-```
-- Si una moneda está definida → se usa **tal cual** (sin conversión).
-- Si no está → se cae al comportamiento actual (USD × tasa).
+## Proposed Changes
 
-### 2. Admin `/admin/products/:sku`
-Nueva sección **"Precios por moneda (LATAM)"** con inputs para: MXN, COP, ARS, CLP, BRL, PEN, UYU, BOB, PYG, CRC, DOP, GTQ, HNL, NIO, VES. Cada campo vacío = usar conversión automática USD.
+### 1. Database Security (Grants & Policies)
+- Apply missing `GRANT` statements for `digital_products` and `product_upsells` to `authenticated`, `anon`, and `service_role`.
+- Verify and fix RLS policies for `digital_products` to ensure `service_role` can always bypass and `authenticated` (admins) can manage if needed.
 
-### 3. Frontend
-Actualizar `useLocalCurrency` / `formatLocalPrice` para leer `local_prices[currency]` del producto antes de aplicar la tasa. Sticky bar, cart drawer, product pages y checkout tomarán el precio manual automáticamente.
+### 2. Storage Security
+- Add a policy to the `product-images` bucket to allow `authenticated` users (admins) to upload images, OR ensure the `service_role` is correctly used. Since the client-side is used, we need a policy for `authenticated`.
 
-### 4. Checkout
-El precio cobrado sigue en USD (Stripe/PayPal/MP). El precio local es solo **visual** para no asustar al cliente con conversiones infladas — igual que hoy.
+### 3. Edge Function & UI Fixes
+- Review `manage-products` for any logic that might trigger "L-200" (possibly a validation or a sub-request failure).
+- Update `ProductImageUploader.tsx` to handle potential permission errors more gracefully.
 
-## Resultado
-- Tú controlas el precio exacto que ve cada país.
-- Cero dependencia de tasas obsoletas.
-- Igualas exactamente los precios de Hotmart.
-
-¿Procedo?
+## Execution Steps
+1. Execute SQL migration to fix GRANTS and storage policies.
+2. Update `AdminProductEdit.tsx` if any client-side calls are bypassing the Edge Function or if validation is too strict.
+3. Verify the fix by attempting to create a test product with an image.

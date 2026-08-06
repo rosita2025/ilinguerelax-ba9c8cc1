@@ -282,8 +282,12 @@ const AdminProductEdit = () => {
       publishCatalogUpdate(product.sku, version);
       toast({ title: "✅ Guardado" });
       navigate("/admin/productos");
-    } catch (e) {
-      toast({ title: (e as Error).message || "Error al guardar", variant: "destructive" });
+    } catch (e: any) {
+      // Si el error es una confirmación de drive_url (409), el flujo de window.prompt ya lo manejó o falló silenciosamente
+      // pero si viene de la función como un error real, lo mostramos.
+      const errorMsg = e.message || "Error al guardar";
+      if (errorMsg.includes("409")) return; // Ignorar si es el 409 de confirmación que ya manejamos con prompts
+      toast({ title: errorMsg, variant: "destructive" });
     } finally {
       setSaving(false);
     }

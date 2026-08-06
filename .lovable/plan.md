@@ -1,29 +1,57 @@
-# Plan - Fix Admin Product Upload and RLS Issues
+# Plan: Fix Admin Product Permissions
 
-The user reported issues when creating/updating products in `/admin/productos`:
-1. "Error subir imagen": Image upload fails.
-2. "New row violates row level security policy": Database insert/update fails.
-3. "Guardar error L-200": Likely a generic error code or a specific validation error in the UI.
-
-## Diagnosis
-- **RLS/Grants**: `digital_products` and `product_upsells` tables lack explicit `GRANT` statements for `authenticated` and `anon` roles in the `public` schema. Even though `service_role` has policies, Supabase's Data API requires explicit grants.
-- **Image Upload**: The `product-images` storage bucket has policies allowing `service_role` to manage objects, but the client-side `ProductImageUploader.tsx` uses the standard `supabase.storage` client. If the user is authenticated as a regular user (or even admin but via the client), they might lack permissions to upload directly if the bucket isn't correctly configured for `authenticated` uploads, or if it expects the Edge Function to handle it. However, the code shows it trying to upload via `supabase.storage.from("product-images").upload(...)`.
-- **L-200**: This might refer to a line number in a specific file or a truncated error message. In `AdminProductEdit.tsx`, the `save` function calls the `manage-products` Edge Function.
+The user is encountering "Error al subir" and "new row violates row-level security policy" when attempting to manage products in the admin panel. Although a previous attempt was made to fix this, the grants on the `public.digital_products` and `public.product_upsells` tables appear to be missing for the `authenticated` role (likely due to the order of operations in the migration or a failure during execution).
 
 ## Proposed Changes
 
-### 1. Database Security (Grants & Policies)
-- Apply missing `GRANT` statements for `digital_products` and `product_upsells` to `authenticated`, `anon`, and `service_role`.
-- Verify and fix RLS policies for `digital_products` to ensure `service_role` can always bypass and `authenticated` (admins) can manage if needed.
+### Database Permissions (Supabase Migration)
 
-### 2. Storage Security
-- Add a policy to the `product-images` bucket to allow `authenticated` users (admins) to upload images, OR ensure the `service_role` is correctly used. Since the client-side is used, we need a policy for `authenticated`.
+1.  Create a new migration to explicitly grant full access to the `authenticated` role and `service_role` for product management tables.
+2.  Ensure RLS policies allow `authenticated` users to manage rows.
+3.  Ensure the `product-images` storage bucket has the correct policies for `authenticated` users to upload and manage files.
 
-### 3. Edge Function & UI Fixes
-- Review `manage-products` for any logic that might trigger "L-200" (possibly a validation or a sub-request failure).
-- Update `ProductImageUploader.tsx` to handle potential permission errors more gracefully.
+```sql
+-- Explicitly grant permissions to authenticated users for admin tables
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.digital_products TO authenticated;
+GRANT ALL ON public.digital_products TO service_role;
+GRANT SELECT ON public.digital_products TO anon;
 
-## Execution Steps
-1. Execute SQL migration to fix GRANTS and storage policies.
-2. Update `AdminProductEdit.tsx` if any client-side calls are bypassing the Edge Function or if validation is too strict.
-3. Verify the fix by attempting to create a test product with an image.
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_upsells TO authenticated;
+GRANT ALL ON public.product_upsells TO service_role;
+GRANT SELECT ON public.product_upsells TO anon;
+
+-- Fix storage policies for product-images
+-- (Ensuring bucket exists and is public)
+DO $$
+BEGIN
+  INSERT INTO storage.buckets (id, name, public)
+  VALUES ('product-images', 'product-images', true)
+  ON CONFLICT (id) DO UPDATE SET public = true;
+END $$;
+
+-- Drop existing to avoid conflicts and recreate clean
+DROP POLICY IF EXISTS "Admins can upload product images" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can update product images" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can delete product images" ON storage.objects;
+DROP POLICY IF EXISTS "Public can view product images" ON storage.objects;
+
+CREATE POLICY "Admins can upload product images" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'product-images');
+CREATE POLICY "Admins can update product images" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'product-images');
+CREATE POLICY "Admins can delete product images" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'product-images');
+CREATE POLICY "Public can view product images" ON storage.objects FOR SELECT TO public USING (bucket_id = 'product-images');
+
+-- Ensure RLS is enabled and policies exist for authenticated users
+ALTER TABLE public.digital_products ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admins can manage digital_products" ON public.digital_products;
+CREATE POLICY "Admins can manage digital_products" ON public.digital_products FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+ALTER TABLE public.product_upsells ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admins can manage product_upsells" ON public.product_upsells;
+CREATE POLICY "Admins can manage product_upsells" ON public.product_upsells FOR ALL TO authenticated USING (true) WITH CHECK (true);
+```
+
+## Verification Plan
+
+1.  **Check Grants**: Run `psql` commands to verify that `authenticated` now has `INSERT`, `UPDATE`, `DELETE` privileges.
+2.  **Verify Storage**: Use `supabase--storage_update_bucket` or similar to check if the bucket is accessible.
+3.  **Manual Test**: Navigate to `/admin/productos` in the preview and attempt to create a "Test Product" with an image upload.

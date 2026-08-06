@@ -6,26 +6,6 @@
     <description>Libros digitales y físicos para aprender idiomas sin estrés.</description>
     <language>es</language>
     <item>
-      <g:id>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:id>
-      <g:title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</g:title>
-      <g:description>Método visual para dominar la pronunciación del inglés desde cero.</g:description>
-      <g:link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:link>
-      <g:image_link>https://ilinguerelax.com/images/product-patrones-especiales.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>7.00 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
       <g:id>1-000-verbs-in-spanish-past-present-future-with-english-pronunciation</g:id>
       <g:title>1,000 Verbs in Spanish Past, Present &amp; Future</g:title>
       <g:description>The complete stress-free guide to master Spanish verbs. With English pronunciation. Digital PDF — download instantly!</g:description>
@@ -76,26 +56,6 @@
       <g:price>9.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
-      <g:id>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:id>
-      <g:title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</g:title>
-      <g:description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</g:description>
-      <g:link>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>12.00 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
       <g:content_language>es</g:content_language>
@@ -166,6 +126,26 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
+      <g:id>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:id>
+      <g:title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</g:title>
+      <g:description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</g:description>
+      <g:link>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>10.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
+      <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
       <g:id>1-000-palabras-en-ingles-con-pronunciacion-espa-ol-con-pronunciacion-hispano</g:id>
       <g:title>1,000 palabras en ingles con pronunciacion español con pronunciacion Hispano</g:title>
       <g:description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado A1. Perfecto para principiantes y estudiantes prinpiantes</g:description>
@@ -213,7 +193,7 @@
       <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1784178628839-09lsq.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
-      <g:price>5.00 USD</g:price>
+      <g:price>8.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>1-000-palabras-esenciales-para-aprender-coreano</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
@@ -223,6 +203,26 @@
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
       <g:product_type>Libros Digitales &gt; Idiomas &gt; Coreano</g:product_type>
       <g:custom_label_0>Coreano</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:id>
+      <g:title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</g:title>
+      <g:description>Método visual para dominar la pronunciación del inglés desde cero.</g:description>
+      <g:link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:link>
+      <g:image_link>https://ilinguerelax.com/images/product-patrones-especiales.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>5.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
+      <g:custom_label_0>Inglés</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
   </channel>

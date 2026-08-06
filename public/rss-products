@@ -5,13 +5,13 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Sat, 01 Aug 2026 03:09:20 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 02 Aug 2026 21:34:24 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>1,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</title>
       <link>https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</link>
       <guid isPermaLink="true">https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</guid>
-      <pubDate>Sat, 01 Aug 2026 03:09:20 GMT</pubDate>
+      <pubDate>Sun, 02 Aug 2026 21:34:24 GMT</pubDate>
       <description>Aprende las 1,000 palabras más importantes del idioma coreano con pronunciación adaptada para hispanohablantes, traducción al español y vocabulario organizado por categorías. 🎁 Todas las futuras actualizaciones serán gratuitas para los compradores. La próxima actualización incluirá 2,000 palabras esenciales, sin costo adicional para quienes ya adquirieron el eBook.</description>
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1784178628839-09lsq.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1784178628839-09lsq.webp" medium="image" />
@@ -21,31 +21,31 @@
       <title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</title>
       <link>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</link>
       <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</guid>
-      <pubDate>Sat, 25 Jul 2026 04:53:20 GMT</pubDate>
+      <pubDate>Sun, 02 Aug 2026 21:32:22 GMT</pubDate>
       <description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</description>
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" />
     </item>
     <item>
-      <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
-      <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</guid>
-      <pubDate>Fri, 24 Jul 2026 17:07:18 GMT</pubDate>
-      <description>Método visual para dominar la pronunciación del inglés desde cero.</description>
-      <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
-      <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
-      <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
-    </item>
-    <item>
       <title>100 Mapas Mentales para Aprender Coreano (Hangul → C1)</title>
       <link>https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</link>
       <guid isPermaLink="true">https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</guid>
-      <pubDate>Fri, 17 Jul 2026 20:47:29 GMT</pubDate>
+      <pubDate>Sun, 02 Aug 2026 21:29:20 GMT</pubDate>
       <description>Guía completa con 100 mapas mentales para dominar el coreano de forma visual.</description>
       <enclosure url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" type="image/jpeg" length="0" />
       <media:content url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" medium="image" />
       <media:thumbnail url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" />
+    </item>
+    <item>
+      <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
+      <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</guid>
+      <pubDate>Sun, 02 Aug 2026 21:28:55 GMT</pubDate>
+      <description>Método visual para dominar la pronunciación del inglés desde cero.</description>
+      <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
+      <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
+      <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
     </item>
     <item>
       <title>1.000 Verbos Esenciales en Inglés (Presente, Pasado, Futuro)</title>

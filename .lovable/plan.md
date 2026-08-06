@@ -1,57 +1,43 @@
-# Plan: Fix Admin Product Permissions
+# Plan - Fix: Edge Function 3xx/RLS Error on Product Save
 
-The user is encountering "Error al subir" and "new row violates row-level security policy" when attempting to manage products in the admin panel. Although a previous attempt was made to fix this, the grants on the `public.digital_products` and `public.product_upsells` tables appear to be missing for the `authenticated` role (likely due to the order of operations in the migration or a failure during execution).
+The user is encountering an error when saving a product in the admin panel: "Edge Function returned a non-2xx status code". Based on the context and the image provided, this happens during the `upsert` action of the `manage-products` Edge Function.
 
-## Proposed Changes
+## Diagnosis
+1.  **Status Code 3xx/Non-2xx**: The error message in the UI suggests a failure at the Edge Function level. 
+2.  **RLS/Permissions**: The previous conversation mentioned "new row violates row level security policy" and missing `GRANT`s. Although fixes were supposedly applied, the user is still seeing errors.
+3.  **`manage-products` implementation**:
+    -   The function uses `assertAdminCsrf(req)` which requires `x-admin-csrf` and `x-admin-2fa` (unless disabled).
+    -   It uses `SUPABASE_SERVICE_ROLE_KEY` to create the admin client, so RLS shouldn't technically block the *database* operations *inside* the function, unless the function is calling another service or if the environment variables are misconfigured.
+    -   However, if the client-side code is calling `supabase.functions.invoke`, it depends on the authorization headers.
+    -   The error "Edge Function returned a non-2xx status code" (specifically 3xx mentioned in the prompt text "returned a non 3** staus code" which likely meant "non-2xx") often happens when there's a redirect or a CORS issue, or if the function itself returns a specific error code.
+4.  **Audit Logs**: The function writes to `digital_product_changes` (via triggers or direct inserts). If `digital_product_changes` is missing permissions for the `service_role` or has a weird trigger, it could fail.
+5.  **Storage**: The user mentioned "error subir imagen". This usually happens before or during the product save if the image upload to the `product-images` bucket fails.
 
-### Database Permissions (Supabase Migration)
+## Proposed Actions
 
-1.  Create a new migration to explicitly grant full access to the `authenticated` role and `service_role` for product management tables.
-2.  Ensure RLS policies allow `authenticated` users to manage rows.
-3.  Ensure the `product-images` storage bucket has the correct policies for `authenticated` users to upload and manage files.
+### 1. Database & Permissions Verification
+Ensure that the `authenticated` role and `service_role` have all necessary permissions on the tables used by the admin panel.
+-   Tables: `digital_products`, `product_upsells`, `digital_product_changes`.
+-   Verify `GRANT`s and `RLS` policies. Even if using `service_role` in the Edge Function, the frontend might be performing some direct reads or the Edge Function might be failing on the `insert` into `digital_product_changes` if there are triggers.
 
-```sql
--- Explicitly grant permissions to authenticated users for admin tables
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.digital_products TO authenticated;
-GRANT ALL ON public.digital_products TO service_role;
-GRANT SELECT ON public.digital_products TO anon;
+### 2. Edge Function Robustness
+-   Check `manage-products` logs (if possible, though I can't see them directly, I can add more logging or try-catch blocks).
+-   Ensure `assertAdminCsrf` isn't failing due to origin mismatch in the sandbox environment.
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_upsells TO authenticated;
-GRANT ALL ON public.product_upsells TO service_role;
-GRANT SELECT ON public.product_upsells TO anon;
+### 3. Storage Policy Fix
+-   Ensure the `product-images` bucket allows `authenticated` users to upload.
 
--- Fix storage policies for product-images
--- (Ensuring bucket exists and is public)
-DO $$
-BEGIN
-  INSERT INTO storage.buckets (id, name, public)
-  VALUES ('product-images', 'product-images', true)
-  ON CONFLICT (id) DO UPDATE SET public = true;
-END $$;
+## Step-by-Step Implementation Plan
 
--- Drop existing to avoid conflicts and recreate clean
-DROP POLICY IF EXISTS "Admins can upload product images" ON storage.objects;
-DROP POLICY IF EXISTS "Admins can update product images" ON storage.objects;
-DROP POLICY IF EXISTS "Admins can delete product images" ON storage.objects;
-DROP POLICY IF EXISTS "Public can view product images" ON storage.objects;
+### Step 1: Database Migration (Grants & RLS)
+Apply a comprehensive migration to ensure all tables and the storage bucket have the correct permissions. This is the most likely culprit for "RLS violation" errors.
 
-CREATE POLICY "Admins can upload product images" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'product-images');
-CREATE POLICY "Admins can update product images" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'product-images');
-CREATE POLICY "Admins can delete product images" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'product-images');
-CREATE POLICY "Public can view product images" ON storage.objects FOR SELECT TO public USING (bucket_id = 'product-images');
+### Step 2: Edge Function Verification
+Update `manage-products` to provide more descriptive error messages if a database operation fails, helping us pinpoint if it's a `digital_products` upsert or a `product_upsells` delete/insert that is failing.
 
--- Ensure RLS is enabled and policies exist for authenticated users
-ALTER TABLE public.digital_products ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Admins can manage digital_products" ON public.digital_products;
-CREATE POLICY "Admins can manage digital_products" ON public.digital_products FOR ALL TO authenticated USING (true) WITH CHECK (true);
+### Step 3: Frontend Error Handling
+Improve the error reporting in `AdminProductEdit.tsx` to show the actual error message from the Edge Function body if available.
 
-ALTER TABLE public.product_upsells ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Admins can manage product_upsells" ON public.product_upsells;
-CREATE POLICY "Admins can manage product_upsells" ON public.product_upsells FOR ALL TO authenticated USING (true) WITH CHECK (true);
-```
+---
 
-## Verification Plan
-
-1.  **Check Grants**: Run `psql` commands to verify that `authenticated` now has `INSERT`, `UPDATE`, `DELETE` privileges.
-2.  **Verify Storage**: Use `supabase--storage_update_bucket` or similar to check if the bucket is accessible.
-3.  **Manual Test**: Navigate to `/admin/productos` in the preview and attempt to create a "Test Product" with an image upload.
+I will now create the migration and the code updates.

@@ -68,7 +68,7 @@ const LANGS = [
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
   price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
-  is_upsell: false, active: true, sort_order: 0,
+  is_upsell: false, active: false, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
   hotmart_url: "",
@@ -98,6 +98,9 @@ const AdminProductEdit = () => {
   // cuando el admin lo cambia (evita pegar el link de otro producto por error).
   const [originalDriveUrl, setOriginalDriveUrl] = useState<string>("");
 
+  const [hasDraft, setHasDraft] = useState(false);
+  const draftKey = `product-draft-${sku || "nuevo"}`;
+
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -108,6 +111,13 @@ const AdminProductEdit = () => {
         if (error) throw error;
         const list: Product[] = data?.products ?? [];
         setAllProducts(list);
+
+        // Check for local draft
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+          setHasDraft(true);
+        }
+
         if (!isNew) {
           const found = list.find((p) => p.sku === sku);
           if (found) {
@@ -119,12 +129,11 @@ const AdminProductEdit = () => {
             .map((u: UpsellRow) => ({ upsell_sku: u.upsell_sku, discount_pct: u.discount_pct, sort_order: u.sort_order }));
           setUpsells(ups);
         } else {
-          // Nuevo producto: por defecto TIENDA MUNDIAL (sin exclusiones, sin Hotmart).
-          // Si luego pegas un enlace de Hotmart, un botón te sugiere la política estándar (LATAM→Hotmart).
           const maxOrder = list.reduce((m, p) => Math.max(m, p.sort_order ?? 0), 0);
           setProduct((p) => ({
             ...p,
             store_enabled: true,
+            active: false,
             store_excluded_countries: [],
             hotmart_excluded_countries: [],
             sort_order: maxOrder + 1,
@@ -136,8 +145,37 @@ const AdminProductEdit = () => {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line
-  }, [sku, adminKey]);
+  }, [sku, adminKey, draftKey]);
+
+  // Auto-save draft
+  useEffect(() => {
+    if (loading || saving) return;
+    const timer = setTimeout(() => {
+      localStorage.setItem(draftKey, JSON.stringify({ product, upsells, timestamp: Date.now() }));
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [product, upsells, draftKey, loading, saving]);
+
+  const restoreDraft = () => {
+    try {
+      const saved = localStorage.getItem(draftKey);
+      if (saved) {
+        const { product: p, upsells: u } = JSON.parse(saved);
+        setProduct(p);
+        setUpsells(u);
+        setHasDraft(false);
+        toast({ title: "Borrador restaurado" });
+      }
+    } catch {
+      toast({ title: "Error al restaurar", variant: "destructive" });
+    }
+  };
+
+  const discardDraft = () => {
+    localStorage.removeItem(draftKey);
+    setHasDraft(false);
+    toast({ title: "Borrador descartado" });
+  };
 
   // Auto-sugerir precio PEN desde USD (solo si está vacío) al crear
   useEffect(() => {
@@ -280,14 +318,13 @@ const AdminProductEdit = () => {
         if (fresh?.updated_at) version = new Date(fresh.updated_at).getTime();
       } catch { /* ignore */ }
       publishCatalogUpdate(product.sku, version);
-      toast({ title: "✅ Guardado" });
+      localStorage.removeItem(draftKey);
+      toast({ title: "✅ Guardado correctamente" });
       navigate("/admin/productos");
     } catch (e: any) {
-      // Si el error es una confirmación de drive_url (409), el flujo de window.prompt ya lo manejó o falló silenciosamente
-      // pero si viene de la función como un error real, lo mostramos.
-      const errorMsg = e.message || "Error al guardar";
-      if (errorMsg.includes("409")) return; // Ignorar si es el 409 de confirmación que ya manejamos con prompts
-      toast({ title: errorMsg, variant: "destructive" });
+      const errorMsg = e.message || "Error al guardar el producto";
+      if (errorMsg.includes("409")) return; 
+      toast({ title: "Error al guardar", description: errorMsg, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -317,6 +354,18 @@ const AdminProductEdit = () => {
             <div className="p-3 rounded-lg border border-primary/40 bg-primary/5 text-xs space-y-1">
               <div>🌍 <b>Por defecto: Tienda mundial</b> (todos los países, sin Hotmart). Ideal para productos en español dirigidos a angloparlantes u otros idiomas.</div>
               <div>⚡ Si tienes enlace de Hotmart (típico para productos que enseñan inglés/coreano/etc. a hispanos), pégalo abajo y toca <b>«Aplicar política estándar»</b> para enrutar LATAM → Hotmart.</div>
+            </div>
+          )}
+
+          {hasDraft && (
+            <div className="flex items-center justify-between p-3 rounded-lg border border-amber-500/40 bg-amber-500/10 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">⚠️ Tienes un borrador sin guardar de esta sesión.</span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="h-7 text-[10px]" onClick={restoreDraft}>Restaurar</Button>
+                <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={discardDraft}>Descartar</Button>
+              </div>
             </div>
           )}
 
@@ -1053,8 +1102,8 @@ const AdminProductEdit = () => {
             <h2 className="font-semibold">6. Publicación</h2>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">Activo</div>
-                <p className="text-xs text-muted-foreground">Visible en el checkout y correos.</p>
+                <div className="font-medium">{product.active ? "Publicado" : "Borrador (Oculto)"}</div>
+                <p className="text-xs text-muted-foreground">{product.active ? "Visible en el checkout y catálogo público." : "Guardado como borrador, no visible para clientes."}</p>
               </div>
               <Switch checked={product.active} onCheckedChange={(v) => update("active", v)} />
             </div>

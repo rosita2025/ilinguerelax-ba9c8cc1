@@ -451,6 +451,13 @@ const AdminProductEdit = () => {
           const parsed = JSON.parse(content);
           if (parsed.description) update("description", parsed.description);
           
+          const newMeta = { ...product.gallery_metadata };
+          
+          // Apply main alt text if available and cover image exists
+          if (parsed.alt_text && product.cover_image_url) {
+            newMeta[product.cover_image_url] = { ...newMeta[product.cover_image_url], alt: parsed.alt_text };
+          }
+          
           // Apply AI gallery alt texts to existing gallery images if available
           if (parsed.gallery_alts && Array.isArray(parsed.gallery_alts) && product.gallery_images?.length) {
             const newMeta = { ...product.gallery_metadata };

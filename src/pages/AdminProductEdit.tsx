@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
 import { COUNTRY_INFO } from "@/lib/countryInfo";
 import { publishCatalogUpdate } from "@/lib/catalogSync";

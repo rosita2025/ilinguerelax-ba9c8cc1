@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { formatCurrencyAmount } from "@/i18n";
 
 import type { RegionTier } from "@/hooks/useRegionTier";
 

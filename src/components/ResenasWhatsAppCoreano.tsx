@@ -11,31 +11,11 @@ import r1 from "@/assets/resena-mapas-korea-1.webp.asset.json";
 import r2 from "@/assets/resena-mapas-korea-2.webp.asset.json";
 import r3 from "@/assets/resena-mapas-korea-3.webp.asset.json";
 
-const resenas = [
-  {
-    src: r1.url,
-    contacto: "Supervisora Rosa",
-    telefono: "+1 251 2724704",
-    pais: "Perú 🇵🇪",
-    resumen: "«Me gusta mucho el material, es bastante colorido y eso me entretiene mucho»",
-  },
-  {
-    src: r2.url,
-    contacto: "Asistente Crady",
-    telefono: "+1 302 6624026",
-    pais: "Perú 🇵🇪",
-    resumen: "«Muy bien sintetizado, es mucho mejor estudiarlo de esa forma»",
-  },
-  {
-    src: r3.url,
-    contacto: "Supervisora Rosa",
-    telefono: "+1 251 2724704",
-    pais: "Perú 🇵🇪",
-    resumen: "«Me gustó mucho el material… el servicio es 100% seguro ✨»",
-  },
-];
+const resenas = [];
 
 export const ResenasWhatsAppCoreano = () => {
+  if (resenas.length === 0) return null;
+
   return (
     <section id="resenas-whatsapp-coreano" className="py-12 md:py-16 bg-gradient-to-b from-background to-muted/30 scroll-mt-20">
       <div className="container px-4 md:px-6">

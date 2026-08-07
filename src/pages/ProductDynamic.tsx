@@ -164,9 +164,9 @@ const ProductDynamic = () => {
 
   const isPEN = local.country === "PE" && product.price_pen != null;
   const displayPrice = isPEN ? Number(product.price_pen) : local.amount;
-  const displayFormatted = isPEN
-    ? `S/ ${Number(product.price_pen).toFixed(2)}`
-    : local.formatted;
+  
+  // Usar el formateo centralizado de i18n para consistencia total en toda la web
+  const displayFormatted = local.formatted;
 
   const cover = product.cover_image_url || "/placeholder.svg";
   const bonusList = Array.isArray(product.bonus_titles)

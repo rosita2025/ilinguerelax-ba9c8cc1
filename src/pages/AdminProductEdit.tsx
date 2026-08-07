@@ -910,7 +910,7 @@ const AdminProductEdit = () => {
                 </p>
               </div>
               <div>
-                <Label>Precio USD — Tienda online</Label>
+                <Label>Precio USD — Tienda (VE/CU/NI)</Label>
                 <Input
                   type="number" step="0.01"
                   value={product.price_usd_tienda ?? ""}
@@ -918,7 +918,7 @@ const AdminProductEdit = () => {
                   placeholder="7.00"
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  🇻🇪🇨🇺🇳🇮 Venezuela, Cuba, Nicaragua (donde Hotmart no vende). Si vacío, se usa el precio LATAM.
+                  🇻🇪🇨🇺🇳🇮 Países donde Hotmart no opera. Si vacío, usa precio LATAM.
                 </p>
               </div>
             </div>

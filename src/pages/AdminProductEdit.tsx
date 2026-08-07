@@ -346,7 +346,7 @@ const AdminProductEdit = () => {
           adminKey,
           confirmDriveChange,
           product: (() => {
-            const { bonus_titles, ...cleanProduct } = product as any;
+            const { bonus_titles, gallery_images: _gi, ...cleanProduct } = product as any;
             return {
               ...cleanProduct,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],

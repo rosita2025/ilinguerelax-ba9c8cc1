@@ -133,7 +133,7 @@ const AdminProductEdit = () => {
           setProduct((p) => ({
             ...p,
             store_enabled: true,
-            active: false,
+            active: false, // Inicia como borrador por defecto
             store_excluded_countries: [],
             hotmart_excluded_countries: [],
             sort_order: maxOrder + 1,
@@ -1102,7 +1102,7 @@ const AdminProductEdit = () => {
             <h2 className="font-semibold">6. Publicación</h2>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">{product.active ? "Publicado" : "Borrador (Oculto)"}</div>
+                <div className="font-medium">{product.active ? "Publicado (Activo)" : "Borrador (Oculto)"}</div>
                 <p className="text-xs text-muted-foreground">{product.active ? "Visible en el checkout y catálogo público." : "Guardado como borrador, no visible para clientes."}</p>
               </div>
               <Switch checked={product.active} onCheckedChange={(v) => update("active", v)} />

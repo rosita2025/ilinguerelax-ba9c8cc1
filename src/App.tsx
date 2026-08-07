@@ -94,6 +94,7 @@ const AdminEmailRules = lazy(() => import("./pages/AdminEmailRules"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
+const LandingVentasSEO = lazy(() => import("./pages/LandingVentasSEO.tsx"));
 const LearnCategory = lazy(() => import("./pages/LearnCategory"));
 
 import { AdminGate } from "@/components/admin/AdminGate";
@@ -225,6 +226,7 @@ const App = () => (
                 <Suspense fallback={<PageFallback />}>
                   <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/metodo" element={<LandingVentasSEO />} />
                   <Route path="/products" element={<Products />} />
                   <Route path="/aprender" element={<LearnCategory />} />
                   <Route path="/aprender/:pair" element={<LearnCategory />} />

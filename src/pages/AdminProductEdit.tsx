@@ -414,12 +414,17 @@ const AdminProductEdit = () => {
 
     setSaving(true);
     try {
-      const prompt = `Actúa como un experto en marketing educativo para la marca "iLingue Relax". 
+      const prompt = `Actúa como un experto en marketing educativo y SEO para la marca "iLingue Relax". 
       Genera una descripción persuasiva y profesional para un producto digital llamado "${product.name}".
       El producto está diseñado para personas que quieren aprender ${product.target_language} siendo su idioma nativo el ${product.learner_language}.
-      Enfócate en los beneficios, la facilidad de uso (PDF/Drive) y resultados rápidos.
-      Incluye puntos clave sobre el contenido y por qué es único.
-      Devuelve SOLO la descripción en formato de texto plano, máximo 4 párrafos estructurados para venta digital.`;
+      
+      INSTRUCCIONES SEO:
+      1. Incluye palabras clave relevantes para aprender ${product.target_language}.
+      2. Crea una estructura clara con encabezados implícitos.
+      3. Enfócate en beneficios concretos, metodología visual (mapas mentales) y fonética figurada.
+      4. Sugiere una lista de 5 palabras clave (keywords) al final separadas por comas.
+      
+      Devuelve SOLO la descripción y las keywords en formato de texto plano, máximo 4 párrafos estructurados para venta digital.`;
 
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
         body: { 

@@ -323,9 +323,15 @@ const AdminProductEdit = () => {
       navigate("/admin/productos");
     } catch (e: any) {
       const errorMsg = e.message || "Error al guardar el producto";
+      const errorDetail = e.detail || "";
       if (errorMsg.includes("409")) return; 
-      toast({ title: "Error al guardar", description: errorMsg, variant: "destructive" });
+      toast({ 
+        title: "Error al guardar", 
+        description: errorDetail ? `${errorMsg}: ${errorDetail}` : errorMsg,
+        variant: "destructive" 
+      });
     } finally {
+
       setSaving(false);
     }
   };

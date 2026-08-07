@@ -12,8 +12,8 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   USD: 1,
   EUR: 0.88,
   BRL: 5.20,
-  MXN: 18.50,
-  COP: 3400,
+  MXN: 20.00,
+  COP: 4200,
   ARS: 1250,
   GBP: 0.75,
   CAD: 1.38,
@@ -31,7 +31,7 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   PYG: 7300,
   UYU: 40,
   HTG: 132,
-  VES: 100,
+  VES: 754.21,
   CHF: 0.85,
   SEK: 10.5,
   NOK: 10.8,
@@ -39,6 +39,12 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   PLN: 4.0,
   CZK: 23,
   JPY: 155,
+  KRW: 1350,
+  CNY: 7.2,
+  INR: 84,
+  SGD: 1.35,
+  HKD: 7.8,
+  TWD: 32,
 };
 
 /** Monedas que dLocal rechaza con decimales. */

@@ -221,7 +221,7 @@ Deno.serve(async (req) => {
         is_physical: !!p.is_physical,
         active: p.active ?? true,
         sort_order: p.sort_order ?? 0,
-        bonus_titles: (p as any).bonus_titles ?? null,
+
         stripe_product_id: p.stripe_product_id ?? null,
         stripe_price_id: p.stripe_price_id ?? null,
         bonus_name: p.bonus_name?.toString().trim() || null,

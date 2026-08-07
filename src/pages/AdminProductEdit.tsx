@@ -343,14 +343,17 @@ const AdminProductEdit = () => {
           action: "upsert",
           adminKey,
           confirmDriveChange,
-          product: { 
-            ...product, 
-            upsells,
-            // Ensure boolean fields are correctly passed
-            is_physical: !!product.is_physical,
-            active: !!product.active,
-            store_enabled: !!product.store_enabled
-          },
+          product: (() => {
+            const { bonus_titles, ...rest } = product;
+            return {
+              ...rest,
+              upsells,
+              is_physical: !!product.is_physical,
+              active: !!product.active,
+              store_enabled: !!product.store_enabled
+            };
+          })(),
+
         },
       });
       if (error) {

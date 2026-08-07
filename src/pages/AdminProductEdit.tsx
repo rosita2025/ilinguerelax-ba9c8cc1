@@ -205,23 +205,27 @@ const AdminProductEdit = () => {
     return conflict ?? null;
   }, [product.sku, allProducts, isNew, sku]);
 
+  const [skuManuallyEdited, setSkuManuallyEdited] = useState(false);
+
   const update = <K extends keyof Product>(k: K, v: Product[K]) => {
     setProduct((p) => {
       const next = { ...p, [k]: v };
-      // Auto-generate SKU from name if creating a new product and SKU is empty or was auto-generated
-      if (isNew && k === "name" && typeof v === "string") {
+      
+      if (k === "sku") {
+        setSkuManuallyEdited(true);
+      }
+
+      // Auto-generate SKU from name if creating a new product and SKU wasn't manually touched
+      if (isNew && k === "name" && typeof v === "string" && !skuManuallyEdited) {
         const nameSku = v.toLowerCase()
           .trim()
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
           .replace(/[^a-z0-9\s-]/g, "") // remove special chars
           .replace(/\s+/g, "-") // spaces to hyphens
-          .replace(/-+/g, "-"); // collapse multiple hyphens
+          .replace(/-+/g, "-") // collapse multiple hyphens
+          .replace(/^-|-$/g, ""); // trim leading/trailing hyphens
         
-        // Only auto-update SKU if it's currently empty or the user hasn't manually touched it much
-        // Or simply if it's a new product, we help the user.
-        if (!p.sku || p.sku === "") {
-          next.sku = nameSku;
-        }
+        next.sku = nameSku;
       }
       return next;
     });

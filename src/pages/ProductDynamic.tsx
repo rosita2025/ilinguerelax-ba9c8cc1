@@ -18,10 +18,10 @@ import { ProductTypeBadge } from "@/components/ProductTypeBadge";
 import { FAQ } from "@/components/FAQ";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useI18n } from "@/i18n/I18nContext";
+import { formatCurrencyAmount, type Currency } from "@/i18n";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 interface DBProduct {
@@ -49,6 +49,8 @@ interface DBProduct {
   gallery_metadata: Record<string, any> | null;
   rating: number | null;
   review_count: number | null;
+  /** Montos exactos por moneda fijados en /admin/productos/:sku. */
+  local_prices: Record<string, number> | null;
 }
 
 import { COUNTRY_INFO } from "@/lib/countryInfo";
@@ -82,7 +84,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;
@@ -119,7 +121,6 @@ const ProductDynamic = () => {
           : Number(product.price_usd))
     : 0;
   const local = useLocalCurrency(effectiveUsd, (product as any)?.local_prices ?? null);
-  const tier = useCountryTierRouting(slug ?? "");
 
   // Track ViewContent per SKU for every product (existing + new) in /admin/live
   useEffect(() => {
@@ -162,11 +163,19 @@ const ProductDynamic = () => {
   }
 
 
+  // ÚNICA fuente de verdad del precio mostrado: los datos del admin
+  // (`digital_products`) + la moneda local del visitante. El hero y el sticky
+  // bar leen exactamente el mismo par (etiqueta, moneda) para que nunca haya
+  // dos precios distintos en la misma página.
   const isPEN = local.country === "PE" && product.price_pen != null;
   const displayPrice = isPEN ? Number(product.price_pen) : local.amount;
-  
-  // Usar el formateo centralizado de i18n para consistencia total en toda la web
-  const displayFormatted = local.formatted;
+
+  const displayFormatted = isPEN
+    ? formatCurrencyAmount(Number(product.price_pen), "PEN")
+    : local.formatted;
+  const displayCurrencyCode = isPEN ? "PEN" : local.currency;
+  const originalFormatted = formatCurrencyAmount(displayPrice * 2.5, displayCurrencyCode as Currency);
+
 
   const cover = product.cover_image_url || "/placeholder.svg";
   const bonusList = Array.isArray(product.bonus_titles)
@@ -429,16 +438,15 @@ const ProductDynamic = () => {
         const storeOn = product.store_enabled; // Habilitamos globalmente ignorando exclusiones de país
         if (!storeOn && storeExcluded) return null;
 
-        const priceLabel = tier.loaded ? tier.priceLabel : displayFormatted;
-        const originalLabel = tier.loaded ? tier.originalLabel : undefined;
+        // Mismo precio que el hero: nunca derivamos la etiqueta de otra fuente.
         return (
           <>
             <StickyBuyBar
               sku={product.sku}
-              price={priceLabel}
-              originalPrice={originalLabel}
-              currencyCode={tier.loaded ? tier.currencyCode : local.currency}
-              flag={tier.isPeru ? "🇵🇪" : undefined}
+              price={displayFormatted}
+              originalPrice={originalFormatted}
+              currencyCode={displayCurrencyCode}
+              flag={isPEN ? "🇵🇪" : undefined}
               rating={product.rating != null ? Number(product.rating) : 4.8}
               reviewCount={product.review_count != null ? Number(product.review_count) : 120}
               productName={product.name}

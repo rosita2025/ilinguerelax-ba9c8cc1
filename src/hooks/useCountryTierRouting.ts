@@ -1,6 +1,7 @@
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { detectCurrency, formatPrice } from "@/i18n";
+import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
+import { useLocalOverrides } from "@/lib/livePrices";
 
 /**
  * Países que compran vía Hotmart LATAM (USD). El resto del mundo (incl. Perú y
@@ -51,6 +52,10 @@ interface Options {
 export function useCountryTierRouting(adminSku: string, opts: Options = {}): CountryTierRouting {
   const pricing = useAdminPricing(adminSku);
   const region = useRegionTier();
+  // Montos exactos por moneda fijados en /admin/productos/:sku. Se aplican aquí
+  // para que cualquier página que use este hook muestre el MISMO importe que
+  // la ficha de producto y el checkout.
+  const overrides = useLocalOverrides(adminSku) as Partial<Record<Currency, number>> | null;
   const country = (region.country || "").toUpperCase();
   const isPeru = country === "PE";
   const isTiendaUsd = TIENDA_USD_COUNTRIES.has(country);
@@ -71,11 +76,16 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const mult = opts.originalMultiplier ?? 2.5;
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   const priceLabel = isPeru && pricePen
-    ? `S/ ${pricePen.toFixed(2)}`
-    : formatPrice(priceUsd, displayCurrency);
+    ? formatCurrencyAmount(pricePen, "PEN")
+    : formatPrice(priceUsd, displayCurrency, overrides ?? undefined);
   const originalLabel = isPeru && pricePen
-    ? `S/ ${(pricePen * mult).toFixed(2)}`
-    : formatPrice(priceGlobalUsd * mult, displayCurrency);
+    ? formatCurrencyAmount(pricePen * mult, "PEN")
+    : formatCurrencyAmount(
+        (overrides?.[displayCurrency] ?? 0) > 0
+          ? (overrides![displayCurrency] as number) * mult
+          : priceGlobalUsd * mult * (exchangeRates[displayCurrency] ?? 1),
+        displayCurrency,
+      );
 
   const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;
   const loaded = (pricing.loaded || hasFallback) && (isPeru ? (pricePen ?? 0) > 0 : priceUsd > 0);

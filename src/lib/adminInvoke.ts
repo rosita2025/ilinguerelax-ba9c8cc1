@@ -176,14 +176,23 @@ export async function adminInvoke<T = unknown>(fn: string, options: InvokeOption
   let detail: any = null;
   try {
     const ctx: any = (res.error as any)?.context;
-    if (ctx && typeof ctx.json === "function") detail = await ctx.clone().json();
-  } catch { /* body not JSON */ }
+    if (ctx) {
+      // Handle both Response objects (standard Fetch) and cloneable objects
+      const response = typeof ctx.clone === "function" ? ctx.clone() : ctx;
+      if (typeof response.json === "function") {
+        detail = await response.json().catch(() => null);
+      }
+    }
+  } catch (e) {
+    console.warn("[adminInvoke] Failed to extract error detail:", e);
+  }
 
   if (detail?.code === "TWO_FA_REQUIRED" || detail?.error === "2FA required") {
     resetAdmin2FAToken();
   }
 
-  const message = detail?.error || detail?.detail || res.error.message;
+  // Prioritize the structured error message from the Edge Function
+  const message = detail?.error || detail?.detail || (detail?.message && typeof detail.message === "string" ? detail.message : null) || res.error.message;
   return { data: (detail as T) ?? null, error: { ...res.error, message } as typeof res.error };
 }
 

@@ -405,7 +405,17 @@ const AdminProductEdit = () => {
           )}
 
           <Card className="p-6 space-y-4">
-            <h2 className="font-semibold">1. Información básica</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">1. Información básica</h2>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="is-physical" className="text-xs">Producto físico</Label>
+                <Switch
+                  id="is-physical"
+                  checked={product.is_physical}
+                  onCheckedChange={(v) => update("is_physical", v)}
+                />
+              </div>
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label className="flex items-center gap-2">

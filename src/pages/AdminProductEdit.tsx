@@ -960,7 +960,7 @@ const AdminProductEdit = () => {
               <div>
                 <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (LATAM)</h3>
                 <p className="text-[11px] text-muted-foreground">
-                  Fija el monto <b>exacto</b> que verá el cliente en su moneda (igual que Hotmart). Dejar vacío = usar conversión automática desde USD. El cobro real sigue en USD por Stripe/PayPal/MercadoPago.
+                  Fija el monto <b>exacto</b> (ej: 199.00). El sistema detecta el país por IP y muestra este valor sin errores de redondeo. Dejar vacío = conversión automática.
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">

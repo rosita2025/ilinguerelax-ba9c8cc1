@@ -61,7 +61,8 @@ export const StickyBuyBar = ({
   currencyCode = "USD",
   dismissible = false,
   flag,
-}: StickyBuyBarProps) => {
+  sku,
+}: StickyBuyBarProps & { sku?: string }) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
   const isVeryLongPrice = price.length > 10;

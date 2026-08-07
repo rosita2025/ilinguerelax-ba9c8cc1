@@ -28,6 +28,7 @@ export interface Product {
   learnerLanguage?: LangCode;
   /** Idioma que enseña el producto (para filtro "Quiero aprender"). */
   targetLanguage?: LangCode;
+  active?: boolean;
 }
 
 export const products: Product[] = [

@@ -163,6 +163,30 @@ Deno.serve(async (req) => {
         eventSourceUrl: "https://ilinguerelax.com/hotmart-success",
       });
     }
+    
+    // Iniciar la entrega digital segura (tokenizada) inmediatamente tras la aprobación
+    if (status === "approved" && buyerEmail) {
+      const buyerName = data?.buyer?.name ?? data?.purchase?.buyer?.name ?? undefined;
+      const buyerPhone = data?.buyer?.checkout_phone ?? data?.buyer?.phone ?? undefined;
+      const buyerCountry = data?.buyer?.address?.country_iso ?? data?.buyer?.address?.country ?? undefined;
+      
+      try {
+        await invokeInternalFunction("send-digital-ilinguerelax", {
+          customerEmail: buyerEmail.toLowerCase().trim(),
+          customerName: buyerName,
+          customerPhone: buyerPhone,
+          customerCountry: buyerCountry,
+          orderId: transactionCode,
+          skus: [product.id],
+          amount: priceValue,
+          currency,
+          provider: "hotmart",
+          idempotencyKey: `digital:hotmart:${transactionCode}`,
+        });
+      } catch (e) {
+        console.error("[hotmart-webhook] digital delivery trigger failed:", e);
+      }
+
 
     // Sincronizar SIEMPRE a Brevo (compra, pendiente, rechazado, reembolso, chargeback, cancelado)
     try {

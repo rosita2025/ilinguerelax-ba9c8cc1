@@ -1060,7 +1060,7 @@ const AdminProductEdit = () => {
               <Label>Enlace de Google Drive (PDF)</Label>
               <Input value={product.drive_url ?? ""} onChange={(e) => update("drive_url", e.target.value)} placeholder="https://drive.google.com/file/d/…" />
               <GoogleDrivePreview url={product.drive_url} />
-              <p className="text-xs text-muted-foreground mt-1">Este enlace se envía automáticamente al cliente cuando su pago se verifica.</p>
+              <p className="text-xs text-muted-foreground mt-1">Este enlace <b>nunca se muestra directamente</b> al cliente. El sistema lo protege automáticamente usando tokens de acceso seguro (/mi-descarga?t=TOKEN) tras verificar el pago.</p>
 
             </div>
             <div>
@@ -1073,7 +1073,7 @@ const AdminProductEdit = () => {
                 <div>
                   <h3 className="font-medium text-sm">🎁 Bonos adicionales (opcional)</h3>
                   <p className="text-xs text-muted-foreground">
-                    Hasta {MAX_BONUSES} bonos. Se envían junto con el producto principal en el mismo correo.
+                    Hasta {MAX_BONUSES} bonos. Se entregan automáticamente vía tokens seguros junto con el producto principal.
                   </p>
                 </div>
                 <Button

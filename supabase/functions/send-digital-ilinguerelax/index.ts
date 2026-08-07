@@ -611,13 +611,15 @@ serve(async (req) => {
       const catLine = catParts.length
         ? `<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:600;color:${BRAND.primaryDark};background:#ecfdf5;border:1px solid #a7f3d0;border-radius:999px;padding:2px 10px;letter-spacing:.3px;">${escapeHtml(t.categoryLabel)}: ${escapeHtml(catParts.join(" → "))}</div>`
         : "";
-      // Nunca se envían enlaces de Drive ni claves por correo: sólo el enlace
-      // privado del comprador (/mi-descarga?t=…) que resuelve el archivo con
-      // una redirección firmada de 15 minutos.
+      // Seguridad Estricta: NUNCA se envían enlaces de Drive ni claves por correo.
+      // El cliente recibe únicamente el enlace a su centro de descargas seguro
+      // (/mi-descarga?t=TOKEN) donde se valida el pago y se genera una redirección
+      // firmada y temporal hacia Drive.
       const secureLink = downloadUrl || `${SITE}/mi-pedido`;
       const mainBtn = p.drive_url
-        ? `<div style="margin-top:12px;"><a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">${escapeHtml(t.downloadBtn)}</a></div>`
+        ? `<div style="margin-top:12px;"><a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:14px;">${escapeHtml(hasMultiple ? t.downloadBtn.replace('Download', 'Access').replace('Descargar', 'Acceder') : t.downloadBtn)}</a></div>`
         : `<div style="margin-top:10px;color:${BRAND.muted};font-size:13px;">${escapeHtml(t.pending)}</div>`;
+
       const keyLine = "";
 
       const productTitle = p.name || prettifySlug(p.sku);
@@ -635,7 +637,7 @@ serve(async (req) => {
             ${bonusList.map((b, i) => `
               <div style="margin:10px 0;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;">
                 <div style="font-size:14px;font-weight:bold;color:#78350f;margin-bottom:8px;">🎁 ${escapeHtml(bonusDisplayName(b, i, t.bonusFallback))}</div>
-                <a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-size:13px;">${escapeHtml(t.bonusBtn)}</a>
+                <a href="${escapeHtml(secureLink)}" style="display:inline-block;background:${BRAND.primary};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-size:13px;">${escapeHtml(t.bonusBtn.replace('Download', 'Access').replace('Descargar', 'Acceder'))}</a>
 
               </div>`).join("")}
           </div>`

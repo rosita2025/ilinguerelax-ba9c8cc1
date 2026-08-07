@@ -77,7 +77,9 @@ export const StickyBuyBar = ({
   const origNum = parseNum(originalPrice);
   const savings = isFinite(priceNum) && isFinite(origNum) && origNum > priceNum ? origNum - priceNum : 0;
   const symbol = (price.match(/^[^\d]+/)?.[0] || "$").trim();
-  const savingsLabel = savings > 0 ? `${symbol}${savings.toFixed(savings % 1 === 0 ? 0 : 2)}` : "";
+  const savingsLabel = savings > 0
+    ? `${symbol}${formatAmountLocalized(savings, savings % 1 === 0 ? 0 : 2)}`
+    : "";
   const [stickyEmail, setStickyEmail] = useState("");
   const [stickySubmitting, setStickySubmitting] = useState(false);
   const [pulse, setPulse] = useState(false);

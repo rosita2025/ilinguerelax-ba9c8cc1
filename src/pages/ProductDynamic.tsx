@@ -16,6 +16,8 @@ import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
 import { FAQ } from "@/components/FAQ";
+import { TrustBadges } from "@/components/checkout/TrustBadges";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useI18n } from "@/i18n/I18nContext";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
@@ -273,13 +275,27 @@ const ProductDynamic = () => {
                 }
 
                 return (
-                  <div className="space-y-2">
-                    <Button asChild size="lg" className="w-full">
-                      <Link to={`/checkouts/${product.sku}`}>
-                        Comprar ahora
-                      </Link>
-                    </Button>
-                    <StockAlert count={7} className="mt-2 w-full justify-center" />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Button asChild size="lg" className="w-full text-lg h-14 shadow-lg shadow-primary/20">
+                        <Link to={`/checkouts/${product.sku}`}>
+                          Comprar ahora
+                        </Link>
+                      </Button>
+                      <StockAlert count={7} className="mt-2 w-full justify-center" />
+                    </div>
+
+                    <div className="pt-4 border-t border-border/50 mt-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Shield className="w-4 h-4 text-primary" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Pago Seguro & Garantizado</span>
+                      </div>
+                      <TrustBadges className="mb-4" />
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-muted-foreground font-medium">Aceptamos:</span>
+                        <PaymentLogos />
+                      </div>
+                    </div>
                   </div>
                 );
               })()}

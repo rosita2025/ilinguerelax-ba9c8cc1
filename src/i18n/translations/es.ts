@@ -302,6 +302,14 @@ export const es = {
     lifetimeAccess: "Acceso de Por Vida",
     moneyBack: "Garantía de Devolución",
   },
+  
+  // Checkout
+  checkout: {
+    secureTitle: "Checkout Seguro",
+    acceptedPayments: "Métodos de pago aceptados:",
+    guaranteed: "Pago Seguro & Garantizado",
+    weAccept: "Aceptamos:",
+  },
 
   // Countdown
   countdown: {

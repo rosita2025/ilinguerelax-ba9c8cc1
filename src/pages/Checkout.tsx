@@ -14,6 +14,8 @@ import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";
+import { TrustBadges } from "@/components/checkout/TrustBadges";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -598,10 +600,26 @@ export default function Checkout() {
           </div>
         </div>
 
-        <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
+        <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start space-y-6">
           <SectionErrorBoundary name="order-summary-desktop" extra={{ slug: catalogItem?.id }}>
             <OrderSummary mainProductId={catalogItem?.id} />
           </SectionErrorBoundary>
+
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <Lock className="w-5 h-5 text-primary" />
+              <h3 className="font-bold text-lg">Checkout Seguro</h3>
+            </div>
+            
+            <TrustBadges className="mb-6" />
+            
+            <div className="pt-6 border-t border-border/50">
+              <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
+                Métodos de pago aceptados:
+              </p>
+              <PaymentLogos />
+            </div>
+          </div>
         </aside>
       </div>
 

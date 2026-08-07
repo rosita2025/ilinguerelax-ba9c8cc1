@@ -308,11 +308,12 @@ const AdminProductEdit = () => {
       }
       const aliasList = (product.sku_aliases ?? []).join(", ") || "(sin alias)";
       const typed = window.prompt(
-        `⚠️ Vas a cambiar el enlace de entrega de este producto.\n\n` +
+        `⚠️ Confirmación de Seguridad: Cambio de Enlace de Entrega\n\n` +
           `SKU: ${product.sku}\n` +
           `Alias: ${aliasList}\n\n` +
-          `Anterior:\n${originalDriveUrl || "(vacío)"}\n\nNuevo:\n${newDrive || "(vacío)"}\n\n` +
-          `Para confirmar, escribe el SKU exacto:`,
+          `Anterior:\n${originalDriveUrl || "(vacío)"}\n\n` +
+          `Nuevo:\n${newDrive || "(vacío)"}\n\n` +
+          `Escribe el SKU "${product.sku}" para confirmar el cambio:`,
       );
       if (typed?.trim() !== product.sku) {
         return toast({

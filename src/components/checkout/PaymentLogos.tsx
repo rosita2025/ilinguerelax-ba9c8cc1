@@ -49,7 +49,7 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
         </span>
       </span>
 
-      {(country === "US" || !["PE", "MX", "CO", "AR", "CL"].includes(country)) && (
+      {(country === "US" || !["PE", "MX", "CO", "AR", "CL", "BR", "PA", "GT", "HN", "SV", "NI", "PY", "UY", "DO", "BO", "CR", "EC"].includes(country)) && (
         <LogoBadge src={PAYPAL} alt="PayPal" />
       )}
       
@@ -72,13 +72,83 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
           <TextBadge label="Nequi" bg="#200020" color="#DA0081" />
         </>
       )}
+      {country === "AR" && (
+        <>
+          <TextBadge label="Mercado Pago" bg="#00A6E0" color="#00263A" />
+          <TextBadge label="Rapipago" bg="#F5A623" color="#1F2937" />
+        </>
+      )}
+      {country === "CL" && (
+        <>
+          <TextBadge label="Webpay" bg="#E1251B" />
+          <TextBadge label="MACH" bg="#111827" color="#00E0A1" />
+        </>
+      )}
       {country === "BR" && (
-        <TextBadge label="Pix" bg="#32BCAD" color="#06211F" />
+        <>
+          <TextBadge label="Pix" bg="#32BCAD" color="#06211F" />
+          <TextBadge label="Boleto" bg="#1F2937" />
+        </>
+      )}
+      {country === "PA" && (
+        <>
+          <TextBadge label="Yappy" bg="#00A9E0" color="#00263A" />
+          <TextBadge label="Nequi" bg="#200020" color="#DA0081" />
+        </>
+      )}
+      {country === "GT" && (
+        <>
+          <TextBadge label="Industrial" bg="#0B5AA6" />
+          <TextBadge label="Banrural" bg="#00A94F" />
+        </>
+      )}
+      {country === "HN" && (
+        <>
+          <TextBadge label="Atlántida" bg="#E4002B" />
+          <TextBadge label="Tigo Money" bg="#0033A0" />
+        </>
+      )}
+      {country === "SV" && (
+        <>
+          <TextBadge label="Chivo" bg="#111827" />
+          <TextBadge label="Agricola" bg="#0B5AA6" />
+        </>
+      )}
+      {country === "CR" && (
+        <>
+          <TextBadge label="SINPE" bg="#0B5AA6" />
+          <TextBadge label="BAC" bg="#E4002B" />
+        </>
+      )}
+      {country === "BO" && (
+        <>
+          <TextBadge label="QR Yape" bg="#6B1FA0" />
+          <TextBadge label="BCB" bg="#F58220" color="#1F2937" />
+        </>
+      )}
+      {country === "PY" && (
+        <>
+          <TextBadge label="Infonet" bg="#0B5AA6" />
+          <TextBadge label="Ueno" bg="#00E08F" color="#04250F" />
+        </>
+      )}
+      {country === "DO" && (
+        <>
+          <TextBadge label="Popular" bg="#0B5AA6" />
+          <TextBadge label="BHD" bg="#00A94F" />
+        </>
       )}
       {country === "US" && (
         <>
           <TextBadge label="CashApp" bg="#00D632" color="#000000" />
           <TextBadge label="Kunfu" bg="#111827" />
+        </>
+      )}
+      {["ES", "FR", "DE", "IT", "PT", "GB", "NL", "BE"].includes(country) && (
+        <>
+          <TextBadge label="SEPA" bg="#0B5AA6" />
+          {country === "ES" && <TextBadge label="Bizum" bg="#fe3344" />}
+          {country === "NL" && <TextBadge label="iDEAL" bg="#cc0066" />}
         </>
       )}
     </div>

@@ -74,6 +74,7 @@ const LANGS = [
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
   price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
+  gallery_images: [],
   is_upsell: false, active: false, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],

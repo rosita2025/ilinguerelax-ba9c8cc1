@@ -304,6 +304,7 @@ Deno.serve(async (req) => {
               .filter(url => /^https?:\/\//i.test(url))
               .slice(0, 5)
           : [],
+        gallery_metadata: p.gallery_metadata && typeof p.gallery_metadata === "object" ? p.gallery_metadata : {},
       };
 
       // Duplicate-alias guard: if any alias is already used by a different product, reject.

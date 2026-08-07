@@ -36,6 +36,7 @@ interface ProductIn {
   access_key?: string | null;
   cover_image_url?: string | null;
   is_upsell?: boolean;
+  is_physical?: boolean;
   active?: boolean;
   sort_order?: number;
   stripe_product_id?: string | null;

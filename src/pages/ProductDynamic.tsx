@@ -66,6 +66,7 @@ const ProductDynamic = () => {
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [activeImage, setActiveImage] = useState<string>("");
   
   const { t } = useI18n();
 

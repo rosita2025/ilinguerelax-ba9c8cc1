@@ -26,19 +26,32 @@ async function toWebP(file: File, maxW = 1600, quality = 0.85): Promise<Blob | n
       i.onerror = () => rej(new Error("Formato no soportado por el navegador (¿HEIC?)"));
       i.src = dataUrl;
     });
-    const scale = Math.min(1, maxW / img.width);
-    const w = Math.max(1, Math.round(img.width * scale));
-    const h = Math.max(1, Math.round(img.height * scale));
+
+    // Calculate dimensions maintaining aspect ratio
+    let w = img.width;
+    let h = img.height;
+    if (w > maxW) {
+      const scale = maxW / w;
+      w = maxW;
+      h = Math.round(h * scale);
+    }
+
     const canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
+
+    // Use smooth scaling
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.drawImage(img, 0, 0, w, h);
+
     return await new Promise<Blob | null>((res) =>
       canvas.toBlob((b) => res(b), "image/webp", quality)
     );
-  } catch {
+  } catch (err) {
+    console.error("[toWebP] error:", err);
     return null;
   }
 }

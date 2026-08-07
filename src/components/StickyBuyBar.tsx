@@ -6,6 +6,7 @@ import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 
 interface StickyBuyBarProps {
+  sku?: string;
   price: string;
   originalPrice?: string;
   rating?: number;
@@ -61,7 +62,8 @@ export const StickyBuyBar = ({
   currencyCode = "USD",
   dismissible = false,
   flag,
-}: StickyBuyBarProps) => {
+  sku,
+}: StickyBuyBarProps & { sku?: string }) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
   const isVeryLongPrice = price.length > 10;
@@ -198,10 +200,12 @@ export const StickyBuyBar = ({
     if (goesToInternalCheckout) {
       try {
         trackHotmartEvent("AddToCart", {
+          content_ids: sku ? [sku] : undefined,
           content_name: productName,
           content_type: "product",
           value: parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
           currency: currencyCode,
+          product_id: sku,
         });
       } catch {}
     }

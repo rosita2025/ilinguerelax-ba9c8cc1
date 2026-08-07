@@ -44,7 +44,10 @@ export const PinterestSave = ({
   floating = false,
   overlay = false,
 }: PinterestSaveProps) => {
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const pageUrl =
       url ||
       metaContent('meta[property="og:url"]') ||

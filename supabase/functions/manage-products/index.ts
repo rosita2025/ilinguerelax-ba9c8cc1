@@ -5,6 +5,40 @@ import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+/**
+ * Utility for Google Drive URL extraction and normalization (Internal).
+ */
+export const extractDriveId = (url: string): { id: string; type: 'file' | 'folder' } | null => {
+  if (!url) return null;
+  const filePatterns = [
+    /\/file\/d\/([a-zA-Z0-9_-]{25,})/,
+    /\/d\/([a-zA-Z0-9_-]{25,})/,
+    /id=([a-zA-Z0-9_-]{25,})/,
+    /open\?id=([a-zA-Z0-9_-]{25,})/
+  ];
+  for (const pattern of filePatterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) return { id: match[1], type: 'file' };
+  }
+  const folderPatterns = [
+    /\/folders\/([a-zA-Z0-9_-]{25,})/,
+    /id=([a-zA-Z0-9_-]{25,})/
+  ];
+  for (const pattern of folderPatterns) {
+    const match = url.match(pattern);
+    if (match && match[1] && url.includes('folders')) return { id: match[1], type: 'folder' };
+  }
+  return null;
+};
+
+export const normalizeDriveUrl = (url: string): string => {
+  const extracted = extractDriveId(url);
+  if (!extracted) return url;
+  if (extracted.type === 'folder') return `https://drive.google.com/drive/folders/${extracted.id}`;
+  return `https://drive.google.com/file/d/${extracted.id}/view`;
+};
+
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -170,8 +204,9 @@ Deno.serve(async (req) => {
         price_usd_latam: p.price_usd_latam == null || (p.price_usd_latam as unknown as string) === "" ? null : Number(p.price_usd_latam),
         price_usd_tienda: p.price_usd_tienda == null || (p.price_usd_tienda as unknown as string) === "" ? null : Number(p.price_usd_tienda),
         price_pen: p.price_pen == null || (p.price_pen as unknown as string) === "" ? null : Number(p.price_pen),
-        drive_url: p.drive_url ?? null,
+        drive_url: p.drive_url ? normalizeDriveUrl(p.drive_url) : null,
         access_key: p.access_key ?? null,
+
         cover_image_url: p.cover_image_url ?? null,
         is_upsell: !!p.is_upsell,
         is_physical: !!p.is_physical,
@@ -181,13 +216,14 @@ Deno.serve(async (req) => {
         stripe_product_id: p.stripe_product_id ?? null,
         stripe_price_id: p.stripe_price_id ?? null,
         bonus_name: p.bonus_name?.toString().trim() || null,
-        bonus_drive_url: p.bonus_drive_url?.toString().trim() || null,
+        bonus_drive_url: p.bonus_drive_url ? normalizeDriveUrl(p.bonus_drive_url.toString()) : null,
         bonus_access_key: p.bonus_access_key?.toString().trim() || null,
+
         bonuses: Array.isArray(p.bonuses)
           ? p.bonuses
               .map((b) => ({
                 name: (b?.name ?? "").toString().trim(),
-                drive_url: (b?.drive_url ?? "").toString().trim(),
+                drive_url: b?.drive_url ? normalizeDriveUrl(b.drive_url.toString()) : "",
                 access_key: (b?.access_key ?? "").toString().trim(),
               }))
               .filter((b) => b.drive_url)

@@ -760,6 +760,8 @@ const AdminProductEdit = () => {
               <ProductImageUploader
                 value={product.cover_image_url ?? ""}
                 onChange={(url) => update("cover_image_url", url as string)}
+                metadata={product.gallery_metadata || {}}
+                onMetadataChange={(meta) => update("gallery_metadata", meta)}
                 sku={product.sku}
               />
             </div>

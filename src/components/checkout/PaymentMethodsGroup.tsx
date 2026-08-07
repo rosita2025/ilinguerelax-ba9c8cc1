@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
+import { formatCurrencyAmount, formatAmountLocalized } from "@/i18n";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
@@ -1144,9 +1145,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const hotmartPriceLabel = hotmartResolvedPrice
     ? (hotmartResolvedPrice.currency === "USD"
         ? (hotmartLocal.loading || hotmartLocal.isUsd
-            ? `USD $${hotmartResolvedPrice.amount.toLocaleString()}`
+            ? `USD ${formatCurrencyAmount(hotmartResolvedPrice.amount, "USD")}`
             : hotmartLocal.formatted)
-        : `${hotmartResolvedPrice.currency} ${hotmartResolvedPrice.amount.toLocaleString()}`)
+        : `${hotmartResolvedPrice.currency} ${formatAmountLocalized(hotmartResolvedPrice.amount, Number.isInteger(hotmartResolvedPrice.amount) ? 0 : 2)}`)
     : priceBadge;
 
   // Métodos locales reales que ofrece Hotmart en cada país (se muestran en la

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Smartphone, Building2, Wallet } from "lucide-react";
+import { formatAmountLocalized } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -14,7 +15,7 @@ export function MercadoPagoButton() {
   const [loading, setLoading] = useState(false);
   const redirectingRef = useRef(false);
 
-  const totalPen = (total * USD_TO_PEN).toFixed(2);
+  const totalPen = formatAmountLocalized(total * USD_TO_PEN, 2);
 
   useEffect(() => {
     const resetLoading = () => {

@@ -228,6 +228,43 @@ const AMBIGUOUS_DOLLAR_CURRENCIES = new Set<Currency>([
   "MXN", "ARS", "COP", "CLP", "BRL", "CRC",
 ] as unknown as Currency[]);
 
+/**
+ * Formats a raw number with the LATAM/European convention: dot for thousands,
+ * comma for decimals (e.g. 1.889,25). Used everywhere a local-currency amount
+ * is printed so cart, checkout and product pages never disagree.
+ */
+export const formatAmountLocalized = (amount: number, decimals: number): string =>
+  amount.toLocaleString("es-ES", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+    // es-ES omits grouping for 4-digit integers (1889 -> "1889"); force it so
+    // every amount reads the same way (1.889,25).
+    useGrouping: "always" as unknown as boolean,
+  });
+
+/**
+ * Formats an amount that is ALREADY in the target currency (no conversion),
+ * applying the currency symbol/position and the dot/comma convention.
+ * USD keeps the international style ($1,889.25) to avoid confusion.
+ */
+export const formatCurrencyAmount = (amount: number, currency: Currency): string => {
+  const config = currencyConfig[currency];
+  if (currency === "USD") {
+    return `$${amount.toLocaleString("en-US", {
+      minimumFractionDigits: config.decimals,
+      maximumFractionDigits: config.decimals,
+    })}`;
+  }
+  const formattedNumber = formatAmountLocalized(amount, config.decimals);
+  if (AMBIGUOUS_DOLLAR_CURRENCIES.has(currency)) {
+    return `${currency} ${formattedNumber}`;
+  }
+  if (config.position === "before") {
+    return `${config.symbol}${formattedNumber}`;
+  }
+  return `${formattedNumber} ${config.symbol}`;
+};
+
 // Format price with currency.
 // `overrides` permite fijar el monto exacto en una moneda (ej. { COP: 33900 })
 // para no depender de la tasa de cambio. Si la moneda no está en overrides,
@@ -237,25 +274,12 @@ export const formatPrice = (
   currency: Currency,
   overrides?: Partial<Record<Currency, number>> | null,
 ): string => {
-  const config = currencyConfig[currency];
   const override = overrides && overrides[currency];
   const hasOverride = typeof override === "number" && override > 0;
   const rate = exchangeRates[currency];
   const convertedPrice = hasOverride ? (override as number) : priceInUSD * rate;
 
-  const formattedNumber = convertedPrice.toLocaleString("es-ES", {
-    minimumFractionDigits: config.decimals,
-    maximumFractionDigits: config.decimals,
-  });
-
-  if (currency !== "USD" && AMBIGUOUS_DOLLAR_CURRENCIES.has(currency)) {
-    return `${currency} ${formattedNumber}`;
-  }
-
-  if (config.position === "before") {
-    return `${config.symbol}${formattedNumber}`;
-  }
-  return `${formattedNumber} ${config.symbol}`;
+  return formatCurrencyAmount(convertedPrice, currency);
 };
 
 // Language names for selector

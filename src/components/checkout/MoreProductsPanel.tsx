@@ -7,6 +7,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 import { formatLocalAmount, useSkuOverridesResolver } from "@/hooks/useLocalCurrency";
+import { formatCurrencyAmount } from "@/i18n";
 
 interface DBRow {
   id: string;
@@ -141,9 +142,9 @@ export function MoreProductsPanel({ parentSku }: Props) {
 
   const overridesFor = useSkuOverridesResolver();
   const fmt = (usd: number, pen?: number | null, sku?: string) => {
-    if (isPeru && pen && pen > 0) return `S/ ${Number(pen).toFixed(2)}`;
+    if (isPeru && pen && pen > 0) return formatCurrencyAmount(Number(pen), "PEN");
     const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "", overridesFor(sku));
-    return isUsd ? `$${Number(usd).toFixed(2)}` : formatted;
+    return isUsd ? formatCurrencyAmount(Number(usd) || 0, "USD") : formatted;
   };
 
   const priced = (r: UpsellRow) => {

@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useLocalCurrency, useLocalCurrencyForSku } from "@/hooks/useLocalCurrency";
+import { formatCurrencyAmount } from "@/i18n";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
@@ -40,11 +41,11 @@ function Price({
 
   let label: string;
   if (isPeru && typeof pen === "number" && pen > 0) {
-    label = `S/ ${pen.toFixed(2)}`;
+    label = formatCurrencyAmount(pen, "PEN");
   } else if (!local.isUsd && !local.loading) {
     label = local.formatted;
   } else {
-    label = `$${usd.toFixed(2)}`;
+    label = formatCurrencyAmount(usd, "USD");
   }
 
   if (strike) {

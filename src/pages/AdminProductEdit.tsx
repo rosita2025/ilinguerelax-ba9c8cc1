@@ -426,15 +426,18 @@ const AdminProductEdit = () => {
       1. Genera una DESCRIPCIÓN persuasiva (máximo 4 párrafos).
       2. Genera una lista de 5 KEYWORDS separadas por comas.
       3. Genera un ALT TEXT descriptivo y optimizado para SEO para la imagen principal del producto.
-      4. Si el producto tiene imágenes de galería (puedes inventar temas basados en el nombre), sugiere ALT TEXTs para 3 imágenes más.
+      4. Si el producto tiene imágenes de galería, sugiere ALT TEXTs específicos para cada una de las 3-5 imágenes basándote en lo que suelen mostrar estos materiales (previa del contenido, mapas mentales, tablas fonéticas, etc.).
+      5. Genera un título SEO corto y atractivo para la galería de imágenes (ej: "Vista previa del interior", "Lo que aprenderás").
+
       
       Formato de respuesta (devuelve SOLO este JSON):
       {
         "description": "...",
         "keywords": "...",
-        "alt_text": "...",
-        "gallery_alts": ["alt 1", "alt 2", "alt 3"]
-      }`;
+         "alt_text": "...",
+         "gallery_alts": ["alt 1", "alt 2", "alt 3", "alt 4", "alt 5"],
+         "gallery_title": "..."
+       }`;
 
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
         body: { 
@@ -460,14 +463,18 @@ const AdminProductEdit = () => {
           
           // Apply AI gallery alt texts to existing gallery images if available
           if (parsed.gallery_alts && Array.isArray(parsed.gallery_alts) && product.gallery_images?.length) {
-            const newMeta = { ...product.gallery_metadata };
             product.gallery_images.forEach((url, i) => {
               if (parsed.gallery_alts[i]) {
                 newMeta[url] = { ...newMeta[url], alt: parsed.gallery_alts[i] };
               }
             });
-            update("gallery_metadata", newMeta);
           }
+
+          if (parsed.gallery_title) {
+            newMeta.gallery_title = parsed.gallery_title;
+          }
+          
+          update("gallery_metadata", newMeta);
 
           toast({ 
             title: "Contenido generado con IA",

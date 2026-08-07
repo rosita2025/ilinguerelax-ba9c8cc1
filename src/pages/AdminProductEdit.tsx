@@ -979,23 +979,47 @@ const AdminProductEdit = () => {
                   { code: "HNL", flag: "🇭🇳", label: "Honduras" },
                   { code: "NIO", flag: "🇳🇮", label: "Nicaragua" },
                   { code: "VES", flag: "🇻🇪", label: "Venezuela" },
-                ].map(({ code, flag, label }) => (
-                  <div key={code}>
-                    <Label className="text-xs">{flag} {code} <span className="text-muted-foreground font-normal">· {label}</span></Label>
-                    <Input
-                      type="number" step="0.01" inputMode="decimal"
-                      value={product.local_prices?.[code] ?? ""}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        const next = { ...(product.local_prices || {}) };
-                        if (v === "" || Number(v) <= 0) delete next[code];
-                        else next[code] = Number(v);
-                        update("local_prices", next);
-                      }}
-                      placeholder="auto"
-                    />
-                  </div>
-                ))}
+                ].map(({ code, flag, label }) => {
+                  const regionPrice = (() => {
+                    const baseUsd = product.price_usd_latam ?? product.price_usd ?? 0;
+                    if (code === "MXN") return Math.round(baseUsd * 20 * 1) / 1;
+                    if (code === "COP") return Math.round(baseUsd * 4200 / 100) * 100;
+                    if (code === "ARS") return Math.round(baseUsd * 950 / 10) * 10;
+                    if (code === "CLP") return Math.round(baseUsd * 940 / 10) * 10;
+                    return null;
+                  })();
+                  return (
+                    <div key={code}>
+                      <div className="flex items-center justify-between mb-1">
+                        <Label className="text-xs">{flag} {code} <span className="text-muted-foreground font-normal">· {label}</span></Label>
+                        {regionPrice && !product.local_prices?.[code] && (
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const next = { ...(product.local_prices || {}), [code]: regionPrice };
+                              update("local_prices", next);
+                            }}
+                            className="text-[10px] text-primary hover:underline"
+                          >
+                            Sug: {regionPrice}
+                          </button>
+                        )}
+                      </div>
+                      <Input
+                        type="number" step="1" inputMode="decimal"
+                        value={product.local_prices?.[code] ?? ""}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          const next = { ...(product.local_prices || {}) };
+                          if (v === "" || Number(v) <= 0) delete next[code];
+                          else next[code] = Number(v);
+                          update("local_prices", next);
+                        }}
+                        placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </Card>

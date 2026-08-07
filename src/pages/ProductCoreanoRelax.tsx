@@ -12,7 +12,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { Button } from "@/components/ui/button";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { Input } from "@/components/ui/input";
-import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart, Store, Eye, Download, Shield } from "lucide-react";
+import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart, Store, Eye, Download, Shield, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";

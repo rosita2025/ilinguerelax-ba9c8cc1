@@ -152,12 +152,12 @@ const AdminProductEdit = () => {
 
   // Auto-save draft
   useEffect(() => {
-    if (loading || saving) return;
+    if (loading || saving || hasDraft) return;
     const timer = setTimeout(() => {
       localStorage.setItem(draftKey, JSON.stringify({ product, upsells, timestamp: Date.now() }));
     }, 2000);
     return () => clearTimeout(timer);
-  }, [product, upsells, draftKey, loading, saving]);
+  }, [product, upsells, draftKey, loading, saving, hasDraft]);
 
   const restoreDraft = () => {
     try {

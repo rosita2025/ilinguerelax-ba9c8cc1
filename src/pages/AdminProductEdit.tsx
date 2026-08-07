@@ -442,10 +442,6 @@ const AdminProductEdit = () => {
       setSaving(false);
     }
   };
-    } finally {
-      setSaving(false);
-    }
-  };
 
   if (loading) return (
     <><AdminNav /><div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div></>

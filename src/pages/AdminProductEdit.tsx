@@ -219,7 +219,7 @@ const AdminProductEdit = () => {
 
       // Auto-generate SKU from name if creating a new product and SKU wasn't manually touched
       if (isNew && k === "name" && typeof v === "string" && !skuManuallyEdited) {
-        const nameSku = v.toLowerCase()
+        const baseSku = v.toLowerCase()
           .trim()
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
           .replace(/[^a-z0-9\s-]/g, " ") // replace special chars with space
@@ -227,7 +227,9 @@ const AdminProductEdit = () => {
           .replace(/\s+/g, "-") // spaces to hyphens
           .replace(/-+/g, "-"); // collapse multiple hyphens
         
-        next.sku = nameSku;
+        // Add unique suffix to avoid collisions during draft creation
+        const uniqueSuffix = Math.random().toString(36).substring(2, 6);
+        next.sku = baseSku ? `${baseSku}-${uniqueSuffix}` : "";
       }
       return next;
     });
@@ -308,11 +310,12 @@ const AdminProductEdit = () => {
       }
       const aliasList = (product.sku_aliases ?? []).join(", ") || "(sin alias)";
       const typed = window.prompt(
-        `⚠️ Vas a cambiar el enlace de entrega de este producto.\n\n` +
+        `⚠️ Confirmación de Seguridad: Cambio de Enlace de Entrega\n\n` +
           `SKU: ${product.sku}\n` +
           `Alias: ${aliasList}\n\n` +
-          `Anterior:\n${originalDriveUrl || "(vacío)"}\n\nNuevo:\n${newDrive || "(vacío)"}\n\n` +
-          `Para confirmar, escribe el SKU exacto:`,
+          `Anterior:\n${originalDriveUrl || "(vacío)"}\n\n` +
+          `Nuevo:\n${newDrive || "(vacío)"}\n\n` +
+          `Escribe el SKU "${product.sku}" para confirmar el cambio:`,
       );
       if (typed?.trim() !== product.sku) {
         return toast({
@@ -414,13 +417,17 @@ const AdminProductEdit = () => {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">1. Información básica</h2>
-              <div className="flex items-center gap-2">
-                <Label htmlFor="is-physical" className="text-xs">Producto físico</Label>
-                <Switch
-                  id="is-physical"
-                  checked={product.is_physical}
-                  onCheckedChange={(v) => update("is_physical", v)}
-                />
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="product-type" className="text-xs font-medium">Digital</Label>
+                  <Switch
+                    id="product-type"
+                    checked={product.is_physical}
+                    onCheckedChange={(v) => update("is_physical", v)}
+                    className="data-[state=checked]:bg-orange-500"
+                  />
+                  <Label htmlFor="product-type" className="text-xs font-medium">Físico</Label>
+                </div>
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">

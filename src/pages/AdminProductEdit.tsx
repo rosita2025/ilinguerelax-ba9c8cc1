@@ -21,6 +21,8 @@ import ProductUpdateNoticePanel from "@/components/admin/ProductUpdateNoticePane
 import ProductLaunchPanel from "@/components/admin/ProductLaunchPanel";
 import GoogleDrivePreview from "@/components/admin/GoogleDrivePreview";
 import { normalizeDriveUrl } from "@/lib/googleDrive";
+import { exchangeRates, type Currency } from "@/i18n";
+
 
 
 interface Product {
@@ -982,12 +984,21 @@ const AdminProductEdit = () => {
                 ].map(({ code, flag, label }) => {
                   const regionPrice = (() => {
                     const baseUsd = product.price_usd_latam ?? product.price_usd ?? 0;
-                    if (code === "MXN") return Math.round(baseUsd * 20 * 1) / 1;
-                    if (code === "COP") return Math.round(baseUsd * 4200 / 100) * 100;
-                    if (code === "ARS") return Math.round(baseUsd * 950 / 10) * 10;
-                    if (code === "CLP") return Math.round(baseUsd * 940 / 10) * 10;
-                    return null;
+                    if (baseUsd <= 0) return null;
+                    
+                    const rate = exchangeRates[code as Currency];
+                    if (!rate) return null;
+
+                    const raw = baseUsd * rate;
+                    
+                    // Lógica de redondeo "bonito" según la moneda
+                    if (code === "COP") return Math.round(raw / 100) * 100;
+                    if (code === "CLP" || code === "PYG") return Math.round(raw / 10) * 10;
+                    if (code === "MXN" || code === "ARS" || code === "UYU") return Math.round(raw);
+                    
+                    return Math.round(raw * 100) / 100;
                   })();
+
                   return (
                     <div key={code}>
                       <div className="flex items-center justify-between mb-1">

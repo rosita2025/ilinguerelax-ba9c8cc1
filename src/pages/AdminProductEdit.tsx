@@ -417,7 +417,7 @@ const AdminProductEdit = () => {
       return;
     }
 
-    setSaving(true);
+    setIsGeneratingAI(true);
     try {
       const prompt = `Actúa como un experto en marketing educativo y SEO para la marca "iLingue Relax". 
       Genera contenido para un producto digital llamado "${product.name}".

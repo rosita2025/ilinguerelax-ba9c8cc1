@@ -198,7 +198,7 @@ export const exchangeRates: Record<Currency, number> = {
   PYG: 7300,
   UYU: 40,
   HTG: 132,
-  VES: 75.57,
+  VES: 754.21,
   CHF: 0.85,
   SEK: 10.5,
   NOK: 10.8,

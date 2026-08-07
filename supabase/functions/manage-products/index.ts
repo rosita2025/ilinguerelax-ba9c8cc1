@@ -1,4 +1,13 @@
+/**
+ * Backend Product Management
+ * 
+ * Política de Entrega Digital:
+ * Los enlaces de Drive guardados aquí NUNCA se exponen directamente al cliente ni a las pasarelas.
+ * Al guardar, se normalizan automáticamente. La entrega utiliza exclusivamente el sistema de 
+ * tokens seguros (/mi-descarga?t=TOKEN) para proteger el material intelectual.
+ */
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
 import { pingPinterestAndCms } from "../_shared/pinterestPing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";

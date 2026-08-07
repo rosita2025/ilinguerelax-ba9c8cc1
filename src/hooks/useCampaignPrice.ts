@@ -235,7 +235,7 @@ function format(currency: CampaignCurrency, usdAmount: number): { str: string; n
   const safeLocal = local < 0 ? 0 : local;
   const formatted = cfg.decimals > 0
     ? safeLocal.toFixed(cfg.decimals)
-    : Math.round(safeLocal).toLocaleString("es-CO");
+    : Math.round(safeLocal).toLocaleString("es-ES");
   return { str: `${cfg.symbol}${formatted}`, numeric: safeLocal };
 }
 

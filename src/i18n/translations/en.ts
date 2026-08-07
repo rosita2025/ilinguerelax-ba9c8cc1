@@ -303,6 +303,14 @@ export const en = {
     moneyBack: "Money-Back Guarantee",
   },
 
+  // Checkout
+  checkout: {
+    secureTitle: "Secure Checkout",
+    acceptedPayments: "Accepted payment methods:",
+    guaranteed: "Secure & Guaranteed Payment",
+    weAccept: "We accept:",
+  },
+
   // Countdown
   countdown: {
     offer: "Limited Time Offer!",

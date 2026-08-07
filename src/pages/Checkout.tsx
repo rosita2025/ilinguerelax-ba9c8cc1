@@ -14,6 +14,8 @@ import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";
+import { TrustBadges } from "@/components/checkout/TrustBadges";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";

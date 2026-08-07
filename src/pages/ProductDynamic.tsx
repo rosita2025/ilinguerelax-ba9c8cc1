@@ -162,11 +162,19 @@ const ProductDynamic = () => {
   }
 
 
+  // ÚNICA fuente de verdad del precio mostrado: los datos del admin
+  // (`digital_products`) + la moneda local del visitante. El hero y el sticky
+  // bar leen exactamente el mismo par (etiqueta, moneda) para que nunca haya
+  // dos precios distintos en la misma página.
   const isPEN = local.country === "PE" && product.price_pen != null;
   const displayPrice = isPEN ? Number(product.price_pen) : local.amount;
-  
-  // Usar el formateo centralizado de i18n para consistencia total en toda la web
-  const displayFormatted = local.formatted;
+
+  const displayFormatted = isPEN
+    ? formatCurrencyAmount(Number(product.price_pen), "PEN")
+    : local.formatted;
+  const displayCurrencyCode = isPEN ? "PEN" : local.currency;
+  const originalFormatted = formatCurrencyAmount(displayPrice * 2.5, displayCurrencyCode as Currency);
+
 
   const cover = product.cover_image_url || "/placeholder.svg";
   const bonusList = Array.isArray(product.bonus_titles)

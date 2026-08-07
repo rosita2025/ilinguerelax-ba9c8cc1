@@ -205,7 +205,27 @@ const AdminProductEdit = () => {
     return conflict ?? null;
   }, [product.sku, allProducts, isNew, sku]);
 
-  const update = <K extends keyof Product>(k: K, v: Product[K]) => setProduct((p) => ({ ...p, [k]: v }));
+  const update = <K extends keyof Product>(k: K, v: Product[K]) => {
+    setProduct((p) => {
+      const next = { ...p, [k]: v };
+      // Auto-generate SKU from name if creating a new product and SKU is empty or was auto-generated
+      if (isNew && k === "name" && typeof v === "string") {
+        const nameSku = v.toLowerCase()
+          .trim()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
+          .replace(/[^a-z0-9\s-]/g, "") // remove special chars
+          .replace(/\s+/g, "-") // spaces to hyphens
+          .replace(/-+/g, "-"); // collapse multiple hyphens
+        
+        // Only auto-update SKU if it's currently empty or the user hasn't manually touched it much
+        // Or simply if it's a new product, we help the user.
+        if (!p.sku || p.sku === "") {
+          next.sku = nameSku;
+        }
+      }
+      return next;
+    });
+  };
 
   // Países sin ningún canal disponible: ni Tienda (activa y no excluye) ni Hotmart (con enlace y no excluye)
   const orphanCountries = useMemo(() => {

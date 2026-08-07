@@ -83,7 +83,7 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     : formatCurrencyAmount(
         (overrides?.[displayCurrency] ?? 0) > 0
           ? (overrides![displayCurrency] as number) * mult
-          : priceGlobalUsd * mult * (exchangeRates[displayCurrency] ?? 1),
+          : priceUsd * mult * (exchangeRates[displayCurrency] ?? 1),
         displayCurrency,
       );
 

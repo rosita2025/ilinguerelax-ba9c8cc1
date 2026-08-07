@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle } from "lucide-react";
+import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
@@ -187,7 +187,7 @@ const ProductDynamic = () => {
         {!product.active && (
           <div className="max-w-6xl mx-auto px-4 mb-6">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3 text-amber-800">
-              <LockIcon className="w-5 h-5 shrink-0" />
+              <Lock className="w-5 h-5 shrink-0" />
               <div className="text-sm">
                 <span className="font-bold">Vista previa de Borrador:</span> Este producto está oculto para los clientes. Solo tú puedes verlo porque eres administrador.
               </div>

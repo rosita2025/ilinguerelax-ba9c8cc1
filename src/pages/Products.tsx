@@ -82,8 +82,10 @@ const Products = () => {
     };
   }, []);
   const isLatam = LATAM.has(detectedCurrency);
-  const priceFor = (p: typeof products[number]) =>
-    p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
+  // El precio real siempre sale de /admin/productos/:sku (useCardPrice); el
+  // precio del catálogo estático solo actúa como último recurso cuando el
+  // producto todavía no tiene fila en el admin.
+  const priceFor = (p: typeof products[number]) => p.price;
   const cardPrice = useCardPrice();
 
   // Collect available learner/target language codes from the merged catalog.

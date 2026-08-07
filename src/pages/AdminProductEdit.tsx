@@ -667,7 +667,7 @@ const AdminProductEdit = () => {
               <Label>Portada del producto</Label>
               <ProductImageUploader
                 value={product.cover_image_url ?? ""}
-                onChange={(url) => update("cover_image_url", url)}
+                onChange={(url) => update("cover_image_url", url as string)}
                 sku={product.sku}
               />
             </div>

@@ -329,24 +329,18 @@ const ProductDynamic = () => {
         subtitle={product.name}
         items={[
           {
-            question: product.target_language === 'en' ? "What makes this English guide special?" : "¿Qué hace especial a esta guía?",
-            answer: product.target_language === 'en' 
-              ? "Our method focuses on stress-free learning with pronunciations adapted specifically for Spanish speakers."
-              : "Nuestro método se enfoca en aprender sin estrés con pronunciaciones adaptadas específicamente para hispanohablantes.",
+            question: t.productFaq.specialTitle,
+            answer: t.productFaq.specialAnswer,
             icon: Sparkles
           },
           {
-            question: product.target_language === 'en' ? "How do I receive the product?" : "¿Cómo recibo el producto?",
-            answer: product.target_language === 'en'
-              ? "After purchase, you will receive an email with a direct download link to your PDF guide."
-              : "Después de la compra, recibirás un correo con un enlace de descarga directa a tu guía en PDF.",
+            question: t.productFaq.receiveTitle,
+            answer: t.productFaq.receiveAnswer,
             icon: Download
           },
           {
-            question: product.target_language === 'en' ? "Is my payment secure?" : "¿Es seguro mi pago?",
-            answer: product.target_language === 'en'
-              ? "Yes, we use industry-standard encryption and trusted payment processors like Stripe and Hotmart."
-              : "Sí, utilizamos cifrado estándar de la industria y procesadores de pago confiables como Stripe y Hotmart.",
+            question: t.productFaq.secureTitle,
+            answer: t.productFaq.secureAnswer,
             icon: Shield
           }
         ]}

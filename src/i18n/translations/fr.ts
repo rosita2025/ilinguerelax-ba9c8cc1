@@ -360,4 +360,12 @@ export const fr = {
     successTitle: "Abonné !",
     successMessage: "Nous vous notifierons quand disponible sur",
   },
+  productFaq: {
+    specialTitle: "Qu'est-ce qui rend ce guide spécial ?",
+    specialAnswer: "Notre méthode se concentre sur un apprentissage sans stress avec des prononciations adaptées spécifiquement à votre langue.",
+    receiveTitle: "Comment recevoir le produit ?",
+    receiveAnswer: "Après l'achat, vous recevrez un e-mail contenant un lien de téléchargement direct vers votre guide PDF.",
+    secureTitle: "Mon paiement est-il sécurisé ?",
+    secureAnswer: "Oui, nous utilisons un cryptage standard de l'industrie et des processeurs de paiement fiables comme Stripe et Hotmart.",
+  },
 };

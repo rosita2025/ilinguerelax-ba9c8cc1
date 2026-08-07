@@ -696,22 +696,27 @@ const AdminProductEdit = () => {
               <Label>Nombre</Label>
               <Input value={product.name} onChange={(e) => update("name", e.target.value)} />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Descripción</Label>
+                <Label>Descripción del producto</Label>
                 <Button 
                   type="button" 
                   variant="outline" 
                   size="sm" 
-                  className="h-7 text-[10px] gap-1 px-2"
                   onClick={generateAIContent}
                   disabled={saving}
+                  className="gap-2 text-primary border-primary/20 hover:bg-primary/5"
                 >
-                  <Sparkles className="w-3 h-3 text-primary" />
-                  Generar con IA
+                  <Sparkles className="w-4 h-4" />
+                  Escribir con IA
                 </Button>
               </div>
-              <Textarea rows={4} value={product.description ?? ""} onChange={(e) => update("description", e.target.value)} />
+              <Textarea 
+                value={product.description || ""} 
+                onChange={(e) => update("description", e.target.value)}
+                placeholder="Describe los beneficios y qué aprenderá el estudiante…"
+                className="min-h-[200px]"
+              />
             </div>
             <div>
               <Label>Portada del producto</Label>

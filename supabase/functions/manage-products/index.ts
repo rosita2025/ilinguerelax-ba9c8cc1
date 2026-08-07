@@ -97,6 +97,7 @@ interface ProductIn {
   hotmart_excluded_countries?: string[] | null;
   local_prices?: Record<string, number> | null;
   upsells?: UpsellIn[];
+  gallery_metadata?: Record<string, any> | null;
 }
 
 const SKU_RE = /^[a-z0-9][a-z0-9-]*$/;

@@ -348,7 +348,7 @@ const AdminProductEdit = () => {
           adminKey,
           confirmDriveChange,
           product: (() => {
-            const { bonus_titles, ...cleanProduct } = product as any;
+            const { bonus_titles, id, created_at, updated_at, ...cleanProduct } = product as any;
             return {
               ...cleanProduct,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
@@ -454,7 +454,9 @@ const AdminProductEdit = () => {
       const content = data?.choices?.[0]?.message?.content;
       if (content) {
         try {
-          const parsed = JSON.parse(content);
+          // Clean potential markdown blocks if AI wraps JSON
+          const jsonStr = content.replace(/```json\n?/, "").replace(/\n?```/, "").trim();
+          const parsed = JSON.parse(jsonStr);
           if (parsed.description) update("description", parsed.description);
           
           const newMeta = { ...product.gallery_metadata };

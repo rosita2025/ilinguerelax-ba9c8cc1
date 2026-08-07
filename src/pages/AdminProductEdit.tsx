@@ -287,7 +287,7 @@ const AdminProductEdit = () => {
     // el SKU exacto para confirmar. Esto evita pegar el link de otro producto
     // por error (causa raíz de envíos con PDF equivocado).
     const newDrive = (product.drive_url ?? "").trim();
-    const driveChanged = !isNew && newDrive !== originalDriveUrl;
+    const driveChanged = !isNew && originalDriveUrl && newDrive !== originalDriveUrl;
     let confirmDriveChange = false;
     if (driveChanged) {
       const looksLikeDrive = /^https?:\/\/(drive|docs)\.google\.com\//i.test(newDrive);

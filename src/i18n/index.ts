@@ -243,7 +243,7 @@ export const formatPrice = (
   const rate = exchangeRates[currency];
   const convertedPrice = hasOverride ? (override as number) : priceInUSD * rate;
 
-  const formattedNumber = convertedPrice.toLocaleString(undefined, {
+  const formattedNumber = convertedPrice.toLocaleString("es-ES", {
     minimumFractionDigits: config.decimals,
     maximumFractionDigits: config.decimals,
   });

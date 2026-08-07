@@ -121,8 +121,8 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
   }},
   // CUP (Peso cubano) — referencia local aproximada
   CUP: { symbol: "$",    rate: 24, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
-  // VES (Bolívar venezolano) — alta volatilidad; mantener conservador
-  VES: { symbol: "Bs.S", rate: 75.57, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
+  // VES (Bolívar venezolano) — alta volatilidad; tasa oficial/paralelo referencial
+  VES: { symbol: "Bs.S", rate: 754.21, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   NZD: { symbol: "NZ$",  rate: 1.65, decimals: 2, nice: (n) => Math.round(n) - 0.10 },
   SEK: { symbol: "kr ",  rate: 10,   decimals: 0, nice: (n) => Math.round(n / 10) * 10 },
   NOK: { symbol: "kr ",  rate: 10.7, decimals: 0, nice: (n) => Math.round(n / 10) * 10 },

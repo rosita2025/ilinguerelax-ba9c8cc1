@@ -438,14 +438,30 @@ const AdminProductEdit = () => {
                     </Tooltip>
                   )}
                 </Label>
-                <Input
-                  value={product.sku}
-                  onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
-                  placeholder="ej: coreano-100-mapas"
-                  readOnly={!isNew}
-                  disabled={!isNew}
-                  className={!isNew ? "font-mono bg-muted cursor-not-allowed" : "font-mono"}
-                />
+                <div className="relative">
+                  <Input
+                    value={product.sku}
+                    onChange={(e) => update("sku", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+                    placeholder="ej: coreano-100-mapas"
+                    readOnly={!isNew}
+                    disabled={!isNew}
+                    className={!isNew ? "font-mono bg-muted cursor-not-allowed" : "font-mono pr-20"}
+                  />
+                  {isNew && product.name && (
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2 text-[10px] text-muted-foreground"
+                      onClick={() => {
+                        setSkuManuallyEdited(false);
+                        // Trigger re-generation by calling update with the same name
+                        update("name", product.name);
+                      }}
+                    >
+                      Regenerar
+                    </Button>
+                  )}
+                </div>
                 {isNew && (
                   <p className="text-xs text-muted-foreground mt-1">Solo minúsculas, números y guiones. Este SKU será permanente: no se podrá cambiar después.</p>
                 )}

@@ -167,17 +167,15 @@ export default function ProductImageUploader({
                   <X className="w-3 h-3" />
                 </button>
               </div>
-              {multiple && (
-                <div className="mt-1">
-                  <input 
-                    type="text"
-                    placeholder="SEO Alt Text..."
-                    value={metadata[url]?.alt || ""}
-                    onChange={(e) => updateAlt(url, e.target.value)}
-                    className="w-32 text-[10px] px-2 py-1 border rounded bg-background focus:ring-1 focus:ring-primary outline-none"
-                  />
-                </div>
-              )}
+              <div className="mt-1">
+                <input 
+                  type="text"
+                  placeholder="SEO Alt Text..."
+                  value={metadata[url]?.alt || ""}
+                  onChange={(e) => updateAlt(url, e.target.value)}
+                  className="w-32 text-[10px] px-2 py-1 border rounded bg-background focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
             </div>
           ))}
           {!multiple && values.length === 0 && (

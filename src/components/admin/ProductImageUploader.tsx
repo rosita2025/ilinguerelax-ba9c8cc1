@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 interface Props {
   value: string | string[];
   onChange: (value: string | string[]) => void;
+  metadata?: Record<string, any>;
+  onMetadataChange?: (metadata: Record<string, any>) => void;
   sku?: string;
   multiple?: boolean;
   maxImages?: number;

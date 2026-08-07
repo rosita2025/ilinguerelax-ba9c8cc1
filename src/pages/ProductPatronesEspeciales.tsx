@@ -733,8 +733,8 @@ const ProductPatronesEspeciales = () => {
         currencyCode={displayCurrency}
         flag={isPeru ? "🇵🇪" : undefined}
         productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
-        rating={4.9}
-        reviewCount={6}
+        rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
+        reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}

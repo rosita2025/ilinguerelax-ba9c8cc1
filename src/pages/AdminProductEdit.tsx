@@ -771,7 +771,7 @@ const AdminProductEdit = () => {
                   variant="outline" 
                   size="sm" 
                   onClick={generateAIContent}
-                  disabled={saving}
+                  disabled={isGeneratingAI}
                   className="gap-2 text-primary border-primary/20 hover:bg-primary/5"
                 >
                   <Sparkles className="w-4 h-4" />

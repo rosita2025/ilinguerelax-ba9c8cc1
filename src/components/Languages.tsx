@@ -395,7 +395,7 @@ export const Languages = () => {
                     </span>
                     {product.originalPrice && (
                       <span className="text-sm text-muted-foreground line-through">
-                        {formatPrice(product.originalPrice)}
+                        {cardPrice.formatOriginal(product.slug, product.originalPrice)}
                       </span>
                     )}
                     {product.price > 0 && (

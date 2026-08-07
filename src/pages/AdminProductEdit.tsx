@@ -49,6 +49,7 @@ interface Product {
   hotmart_excluded_countries: string[];
   sku_aliases: string[];
   local_prices: Record<string, number>;
+  is_physical: boolean;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -81,6 +82,7 @@ const EMPTY: Product = {
   hotmart_excluded_countries: [],
   sku_aliases: [],
   local_prices: {},
+  is_physical: false,
 };
 
 const AdminProductEdit = () => {

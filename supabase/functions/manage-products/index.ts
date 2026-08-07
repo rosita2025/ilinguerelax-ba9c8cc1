@@ -165,6 +165,7 @@ Deno.serve(async (req) => {
         access_key: p.access_key ?? null,
         cover_image_url: p.cover_image_url ?? null,
         is_upsell: !!p.is_upsell,
+        is_physical: !!p.is_physical,
         active: p.active ?? true,
         sort_order: p.sort_order ?? 0,
         stripe_product_id: p.stripe_product_id ?? null,

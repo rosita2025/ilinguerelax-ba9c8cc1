@@ -262,15 +262,20 @@ const ProductDynamic = () => {
                 const effectiveCountry = local.country || "";
                 const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
                 const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
-                const storeOn = product.store_enabled && !storeExcluded;
+                
+                // Forzamos disponibilidad global ignorando exclusiones si el usuario lo pide
+                // Pero mantenemos la lógica por si acaso se necesita bloquear algo crítico en el futuro
+                // En este caso, el usuario quiere "todo el mundo", así que habilitamos siempre.
+                const storeOn = product.store_enabled; // Ignoramos storeExcluded por petición del usuario
 
-                if (!storeOn) {
+                if (!storeOn && storeExcluded) {
                   return (
                     <div className="p-4 rounded-lg border bg-muted/40 text-sm text-center text-muted-foreground">
                       Este producto no está disponible en tu país por ahora.
                     </div>
                   );
                 }
+
 
                 return (
                   <div className="space-y-4">
@@ -352,8 +357,9 @@ const ProductDynamic = () => {
         const effectiveCountry = local.country || "";
         const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
         const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
-        const storeOn = product.store_enabled && !storeExcluded;
-        if (!storeOn) return null;
+        const storeOn = product.store_enabled; // Habilitamos globalmente ignorando exclusiones de país
+        if (!storeOn && storeExcluded) return null;
+
         const priceLabel = tier.loaded ? tier.priceLabel : displayFormatted;
         const originalLabel = tier.loaded ? tier.originalLabel : undefined;
         return (

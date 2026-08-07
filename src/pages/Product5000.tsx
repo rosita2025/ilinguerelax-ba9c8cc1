@@ -197,12 +197,10 @@ const Product5000 = () => {
   const isLatam = useHotmartLatam;
   const pricing5000Ready = tier.loaded;
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
-  const displayPrice = isPeru && pricePen
-    ? `S/${pricePen.toFixed(2)}`
-    : formatPrice(priceUSD, displayCurrency);
-  const displayOriginalPrice = isPeru && pricePen
-    ? `S/${Math.round(pricePen * 2.4 * 100) / 100}`
-    : formatPrice(Math.max(priceUSD * 2.4, priceUSD + 1), displayCurrency);
+  // Fuente única: los labels del hook (respetan los montos exactos por moneda
+  // fijados en /admin/productos/:sku y el formato local punto/coma).
+  const displayPrice = tier.priceLabel;
+  const displayOriginalPrice = tier.originalLabel;
   const regionLabel = isPeru ? "PE" : isLatam ? "LATAM" : "Global";
   const buyUrl = TIENDA_CHECKOUT_5000;
   const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";

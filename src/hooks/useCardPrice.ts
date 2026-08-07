@@ -1,17 +1,29 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { useRegionTier } from "./useRegionTier";
-import { detectCurrency, formatPrice } from "@/i18n";
+import {
+  detectCurrency,
+  formatPrice,
+  formatCurrencyAmount,
+  exchangeRates,
+  type Currency,
+} from "@/i18n";
 import { LATAM_HOTMART_COUNTRIES, TIENDA_USD_COUNTRIES } from "./useCountryTierRouting";
 
 /**
- * Bulk-fetches admin pricing for all active digital products (once per session)
- * and returns a formatter that renders card prices according to the 4-tier model:
+ * Bulk-fetches admin pricing for all active digital products and returns a
+ * formatter that renders card prices with EXACTLY the same rules as the product
+ * page (`/products/:sku`) and the checkout:
  *
- *   - Peru (PE): native `S/ X.XX PEN` from admin `price_pen`.
-  *   - Tienda (VE/CU/NI): local currency from admin `price_usd_tienda` ($7 base).
-  *   - LATAM Hotmart: local currency from admin `price_usd_latam` ($10 base).
-  *   - Global (US/CA/EU/Asia/HT/resto): local currency from admin `price_usd` ($15 base).
+ *   - Peru (PE): native PEN from admin `price_pen`.
+ *   - Tienda (VE/CU/NI): local currency from admin `price_usd_tienda`.
+ *   - LATAM Hotmart: local currency from admin `price_usd_latam`.
+ *   - Global (US/CA/EU/Asia/resto): local currency from admin `price_usd`.
+ *
+ * When the admin sets an exact amount for the visitor's currency in
+ * `local_prices` (e.g. `{ MXN: 199 }`), that amount wins over the automatic
+ * USD→local conversion — same behaviour as the product page.
  */
 interface Row {
   sku: string;
@@ -19,38 +31,60 @@ interface Row {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  local_prices: Record<string, number> | null;
 }
 
-let cache: Record<string, Row> | null = null;
-let inflight: Promise<Record<string, Row>> | null = null;
+type Rows = Record<string, Row>;
 
-async function loadAll(): Promise<Record<string, Row>> {
-  if (cache) return cache;
-  if (inflight) return inflight;
-  inflight = (async () => {
-    let data: Row[] | null = null;
-    try {
-      const result = await supabase
-        .from("digital_products")
-        .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen")
-        .eq("active", true);
-      data = result.data as Row[] | null;
-    } catch {
-      data = [];
-    }
-    const map: Record<string, Row> = {};
-    for (const r of data ?? []) map[r.sku] = r;
-    cache = map;
-    return map;
-  })();
+let cache: Rows | null = null;
+let inflight: Promise<Rows> | null = null;
+
+async function fetchRows(): Promise<Rows> {
+  let data: Row[] | null = null;
+  try {
+    const result = await supabase
+      .from("digital_products")
+      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices")
+      .eq("active", true);
+    data = result.data as unknown as Row[] | null;
+  } catch {
+    data = [];
+  }
+  const map: Rows = {};
+  for (const r of data ?? []) {
+    const raw = (r as any).local_prices;
+    const local_prices =
+      raw && typeof raw === "object" && !Array.isArray(raw)
+        ? (raw as Record<string, number>)
+        : null;
+    map[r.sku] = { ...r, local_prices };
+  }
+  cache = map;
+  return map;
+}
+
+/** Deduped load. `force` bypasses the cache when the admin publishes an edit. */
+async function loadAll(force = false): Promise<Rows> {
+  if (!force) {
+    if (cache) return cache;
+    if (inflight) return inflight;
+  }
+  inflight = fetchRows().finally(() => {
+    inflight = null;
+  });
   return inflight;
 }
 
 export type RegionLabel = "PE" | "TiendaUSD" | "LATAM" | "Global";
 
 export interface CardPriceFormatter {
-  /** Formatted primary label (e.g. `$15.00`, `S/ 55.00`, `18,50 €`, `$7.00`). */
+  /** Formatted primary label (e.g. `$15,00`, `S/ 55,00`, `18,50 €`). */
   format: (sku: string | null | undefined, fallbackUsd: number) => string;
+  /**
+   * Formats a "before" (crossed-out) price in the SAME currency as `format`,
+   * so cards never mix a local amount with a raw USD figure.
+   */
+  formatOriginal: (sku: string | null | undefined, originalUsd: number) => string;
   /** Currency badge (e.g. `USD`, `PEN`, `EUR`). */
   currencyLabel: (sku: string | null | undefined) => string;
   /** Region tier badge. */
@@ -60,28 +94,32 @@ export interface CardPriceFormatter {
 
 export function useCardPrice(): CardPriceFormatter {
   const { country, loading } = useRegionTier();
-  const [rows, setRows] = useState<Record<string, Row> | null>(cache);
+  const [rows, setRows] = useState<Rows | null>(cache);
 
   useEffect(() => {
-    if (rows) return;
     let cancelled = false;
-    loadAll().then((r) => {
+    const apply = (r: Rows) => {
       if (!cancelled) setRows(r);
+    };
+    if (!cache) loadAll().then(apply);
+    // Refresh when the admin publishes a price change (broadcast, focus, poll)
+    // so cards never keep a stale amount for the rest of the session.
+    const unsubscribe = subscribeCatalogUpdates({
+      onUpdate: () => loadAll(true).then(apply),
+      pollMs: 120000,
     });
     return () => {
       cancelled = true;
+      unsubscribe();
     };
-  }, [rows]);
+  }, []);
 
   const cc = (country || "").toUpperCase();
   const isPeru = cc === "PE";
   const isTiendaUsd = TIENDA_USD_COUNTRIES.has(cc);
   const isLatamHotmart = LATAM_HOTMART_COUNTRIES.has(cc);
-  const isGlobal = !isPeru && !isTiendaUsd && !isLatamHotmart;
 
-  const displayCurrency = isPeru
-    ? "PEN"
-    : detectCurrency(cc || "US");
+  const displayCurrency: Currency = isPeru ? "PEN" : (detectCurrency(cc || "US") as Currency);
 
   const regionLabel: RegionLabel = isPeru
     ? "PE"
@@ -91,40 +129,65 @@ export function useCardPrice(): CardPriceFormatter {
         ? "LATAM"
         : "Global";
 
+  /** USD price for the visitor's tier, from admin data when available. */
+  const tierUsd = useCallback(
+    (row: Row | undefined, fallbackUsd: number): number => {
+      if (isTiendaUsd) {
+        return Number(row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
+      }
+      if (isLatamHotmart) {
+        return Number(row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
+      }
+      return Number(row?.price_usd ?? fallbackUsd);
+    },
+    [isTiendaUsd, isLatamHotmart],
+  );
+
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {
     const row = sku && rows ? rows[sku] : undefined;
 
-    // Perú → PEN nativo desde admin
+    // Perú → PEN nativo desde admin.
     if (isPeru) {
-      const pen = row?.price_pen && row.price_pen > 0 ? Number(row.price_pen) : null;
-      if (pen) return `S/ ${pen.toFixed(2)}`;
-      return formatPrice(fallbackUsd, "PEN");
+      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
+      if (pen) return formatCurrencyAmount(pen, "PEN");
+      return formatPrice(fallbackUsd, "PEN", row?.local_prices as any);
     }
 
-    // VE / CU / NI → precio Tienda convertido a moneda local del país
-    if (isTiendaUsd) {
-      const usd = row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd;
-      return formatPrice(Number(usd), displayCurrency as any);
-    }
-
-    // LATAM Hotmart → moneda local convertida desde USD LATAM
-    if (isLatamHotmart) {
-      const usd = row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd;
-      return formatPrice(Number(usd), displayCurrency as any);
-    }
-
-    // Global → moneda local convertida desde USD Global
-    const usd = row?.price_usd ?? fallbackUsd;
-    return formatPrice(Number(usd), displayCurrency as any);
+    // Resto → USD del tier convertido, respetando el monto manual por moneda.
+    return formatPrice(tierUsd(row, fallbackUsd), displayCurrency, row?.local_prices as any);
   };
 
-  const currencyLabel = (_sku: string | null | undefined): string => {
-    if (isPeru) return "PEN";
-    return displayCurrency;
+  // El precio "antes" usa la MISMA regla que la ficha de producto y el sticky
+  // bar (precio mostrado x 2.5) para que no haya diferencias entre tarjeta y
+  // página. Solo si el producto aún no existe en el admin se usa el precio
+  // tachado del catálogo estático.
+  const ORIGINAL_MULTIPLIER = 2.5;
+
+  const formatOriginal = (sku: string | null | undefined, originalUsd: number): string => {
+    const row = sku && rows ? rows[sku] : undefined;
+    const override = row?.local_prices?.[displayCurrency];
+
+    if (isPeru) {
+      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
+      if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
+      return formatPrice(originalUsd, "PEN");
+    }
+
+    if (typeof override === "number" && override > 0) {
+      return formatCurrencyAmount(override * ORIGINAL_MULTIPLIER, displayCurrency);
+    }
+
+    const rate = exchangeRates[displayCurrency] ?? 1;
+    const current = tierUsd(row, 0);
+    if (current > 0) return formatCurrencyAmount(current * ORIGINAL_MULTIPLIER * rate, displayCurrency);
+    return formatCurrencyAmount(originalUsd * rate, displayCurrency);
   };
+
+  const currencyLabel = (_sku: string | null | undefined): string => displayCurrency;
 
   return {
     format,
+    formatOriginal,
     currencyLabel,
     regionLabel,
     ready: !loading && rows !== null,

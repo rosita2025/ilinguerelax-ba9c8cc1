@@ -82,8 +82,10 @@ const Products = () => {
     };
   }, []);
   const isLatam = LATAM.has(detectedCurrency);
-  const priceFor = (p: typeof products[number]) =>
-    p.id === "5000" ? (isLatam ? 13.99 : 28) : p.price;
+  // El precio real siempre sale de /admin/productos/:sku (useCardPrice); el
+  // precio del catálogo estático solo actúa como último recurso cuando el
+  // producto todavía no tiene fila en el admin.
+  const priceFor = (p: typeof products[number]) => p.price;
   const cardPrice = useCardPrice();
 
   // Collect available learner/target language codes from the merged catalog.
@@ -478,7 +480,7 @@ const Products = () => {
                             <div className="flex items-baseline gap-1.5">
                               <span className="text-lg font-black text-foreground">{cardPrice.format(p.slug, priceFor(p))}</span>
                               {p.originalPrice && p.originalPrice > p.price && (
-                                <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>
+                                <span className="text-xs text-muted-foreground line-through">{cardPrice.formatOriginal(p.slug, p.originalPrice)}</span>
                               )}
                               <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(p.slug)}</span>
                               <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
@@ -505,7 +507,7 @@ const Products = () => {
                         )}
                         {product.originalPrice && !product.isPhysical && product.originalPrice > product.price && (
                           <span className="text-lg text-muted-foreground line-through">
-                            ${product.originalPrice}
+                            {cardPrice.formatOriginal(product.slug, product.originalPrice)}
                           </span>
                         )}
                         <span className="text-sm text-accent font-medium">{cardPrice.currencyLabel(product.slug)}</span>

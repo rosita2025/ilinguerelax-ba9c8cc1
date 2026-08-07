@@ -22,7 +22,8 @@ import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { detectCurrency, formatPrice } from "@/i18n";
+import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
+import { useLocalOverrides } from "@/lib/livePrices";
 import { useI18n } from "@/i18n/I18nContext";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
@@ -99,14 +100,17 @@ const ProductPatronesEspeciales = () => {
   const PRICE_USD = isTiendaUsdCountry ? TIENDA_USD : useHotmartLatam ? LATAM_USD : GLOBAL_USD;
   const pricingReady = pricingAdmin.loaded && (isPeru ? (pricingAdmin.pricePen ?? 0) > 0 : PRICE_USD > 0);
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
-  const displayCurrency = isPeru ? "PEN" : detectCurrency(visitorCountry || "US");
+  const displayCurrency = (isPeru ? "PEN" : detectCurrency(visitorCountry || "US")) as Currency;
+  const localOverrides = useLocalOverrides("patrones-especiales-alfabeto-combinaciones-secretas-ingles") as Partial<Record<Currency, number>> | null;
   // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
   const priceLabel = isPeru && pricingAdmin.pricePen
-    ? `S/ ${pricingAdmin.pricePen.toFixed(2)}`
-    : formatPrice(PRICE_USD, displayCurrency);
+    ? formatCurrencyAmount(pricingAdmin.pricePen, "PEN")
+    : formatPrice(PRICE_USD, displayCurrency, localOverrides ?? undefined);
   const originalLabel = isPeru && pricingAdmin.pricePen
-    ? `S/ ${(pricingAdmin.pricePen * 2.5).toFixed(2)}`
-    : formatPrice(ORIGINAL_USD, displayCurrency);
+    ? formatCurrencyAmount(pricingAdmin.pricePen * 2.5, "PEN")
+    : (localOverrides?.[displayCurrency] ?? 0) > 0
+      ? formatCurrencyAmount((localOverrides![displayCurrency] as number) * 2.5, displayCurrency)
+      : formatCurrencyAmount(PRICE_USD * 2.5 * (exchangeRates[displayCurrency] ?? 1), displayCurrency);
   const HOTMART_URL = pricingAdmin.hotmartUrl || HOTMART_URL_LATAM;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({

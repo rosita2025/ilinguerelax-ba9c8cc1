@@ -80,7 +80,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;
@@ -237,7 +237,11 @@ const ProductDynamic = () => {
                         activeImage === img ? "border-primary shadow-sm scale-95" : "border-transparent opacity-70 hover:opacity-100"
                       }`}
                     >
-                      <img src={img} alt={`Vista ${i + 1}`} className="w-full h-full object-cover" />
+                      <img 
+                        src={img} 
+                        alt={product.gallery_metadata?.[img]?.alt || `Vista ${i + 1} de ${product.name}`} 
+                        className="w-full h-full object-cover" 
+                      />
                       {activeImage === img && (
                         <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
                           <Check className="w-5 h-5 text-primary drop-shadow-md" />

@@ -134,7 +134,12 @@ const Product1000Verbos = () => {
                   alt="Inglés Relax - 1,000 Verbos Esenciales"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
-                <PinterestSave overlay />
+                <PinterestSave 
+                  overlay 
+                  media={product1000VerbosImage}
+                  url="https://ilinguerelax.com/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion"
+                  description={pricing.description || "1,000 verbos esenciales en inglés en presente, pasado y futuro con pronunciación en español."}
+                />
               </div>
             </div>
 

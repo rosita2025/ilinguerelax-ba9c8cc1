@@ -170,7 +170,12 @@ const ProductCoreanoRelax = () => {
                   className="w-full h-auto rounded-2xl shadow-hero"
                   onContextMenu={(e) => e.preventDefault()}
                 />
-                <PinterestSave overlay />
+                <PinterestSave 
+                  overlay 
+                  media={coverAsset.url}
+                  url="https://ilinguerelax.com/products/coreano-relax-100-mapas-mentales-vocabulario-visual-con-pronunciacion"
+                  description="Aprende coreano con 100 mapas mentales visuales y pronunciación fácil."
+                />
               </div>
             </div>
 

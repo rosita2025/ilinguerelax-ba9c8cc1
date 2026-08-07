@@ -190,7 +190,12 @@ const ProductSpanishGrammarPatterns = () => {
                   className="w-full h-auto"
                   loading="eager"
                 />
-                <PinterestSave overlay />
+                <PinterestSave 
+                  overlay 
+                  media={coverImage}
+                  url="https://ilinguerelax.com/products/100-essential-grammar-patterns-in-spanish-with-pronunciation"
+                  description="Master 100 essential Spanish grammar patterns with pronunciation and practical examples."
+                />
               </motion.div>
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-[#a78bfa]/30 blur-2xl rounded-full" />
             </div>

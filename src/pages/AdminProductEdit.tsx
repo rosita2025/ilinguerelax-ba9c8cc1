@@ -36,6 +36,7 @@ interface Product {
   drive_url: string | null;
   access_key: string | null;
   cover_image_url: string | null;
+  gallery_images: string[] | null;
   is_upsell: boolean;
   active: boolean;
   sort_order: number;

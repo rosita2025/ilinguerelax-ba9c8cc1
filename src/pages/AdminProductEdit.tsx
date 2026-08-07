@@ -349,6 +349,7 @@ const AdminProductEdit = () => {
             const { bonus_titles, ...cleanProduct } = product as any;
             return {
               ...cleanProduct,
+              gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               upsells,
               is_physical: !!product.is_physical,
               active: !!product.active,

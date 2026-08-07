@@ -92,7 +92,7 @@ const AdminProducts = () => {
         body: { action: "toggle", sku, active: !active, adminKey },
       });
       if (error) throw error;
-      toast({ title: !active ? "Publicado" : "Ocultado" });
+      toast({ title: !active ? "Publicado (Activo)" : "Ocultado (Borrador)" });
       load();
     } catch {
       toast({ title: "Error", variant: "destructive" });

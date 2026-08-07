@@ -22,7 +22,6 @@ import { formatCurrencyAmount, type Currency } from "@/i18n";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 interface DBProduct {
@@ -122,7 +121,6 @@ const ProductDynamic = () => {
           : Number(product.price_usd))
     : 0;
   const local = useLocalCurrency(effectiveUsd, (product as any)?.local_prices ?? null);
-  const tier = useCountryTierRouting(slug ?? "");
 
   // Track ViewContent per SKU for every product (existing + new) in /admin/live
   useEffect(() => {

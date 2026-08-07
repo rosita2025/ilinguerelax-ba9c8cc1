@@ -360,4 +360,12 @@ export const en = {
     successTitle: "Subscribed!",
     successMessage: "We'll notify you when available on",
   },
+  productFaq: {
+    specialTitle: "What makes this guide special?",
+    specialAnswer: "Our method focuses on stress-free learning with pronunciations adapted specifically for your language.",
+    receiveTitle: "How do I receive the product?",
+    receiveAnswer: "After purchase, you will receive an email with a direct download link to your PDF guide.",
+    secureTitle: "Is my payment secure?",
+    secureAnswer: "Yes, we use industry-standard encryption and trusted payment processors like Stripe and Hotmart.",
+  },
 };

@@ -360,4 +360,12 @@ export const es = {
     successTitle: "¡Suscrito!",
     successMessage: "Te notificaremos cuando esté disponible en",
   },
+  productFaq: {
+    specialTitle: "¿Qué hace especial a esta guía?",
+    specialAnswer: "Nuestro método se enfoca en aprender sin estrés con pronunciaciones adaptadas específicamente para hispanohablantes.",
+    receiveTitle: "¿Cómo recibo el producto?",
+    receiveAnswer: "Después de la compra, recibirás un correo con un enlace de descarga directa a tu guía en PDF.",
+    secureTitle: "¿Es seguro mi pago?",
+    secureAnswer: "Sí, utilizamos cifrado estándar de la industria y procesadores de pago confiables como Stripe y Hotmart.",
+  },
 };

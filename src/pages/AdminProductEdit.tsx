@@ -371,7 +371,6 @@ const AdminProductEdit = () => {
         setSaving(false);
         return save({ force: false, confirmDrive: false }); // Re-try will trigger the window.prompt logic above
       }
-      }
 
       const errorMsg = detail?.error || detail?.message || e.message || "Error al guardar el producto";
       const errorDetail = detail?.detail || "";

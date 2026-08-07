@@ -19,6 +19,9 @@ import { publishCatalogUpdate } from "@/lib/catalogSync";
 import ProductImageUploader from "@/components/admin/ProductImageUploader";
 import ProductUpdateNoticePanel from "@/components/admin/ProductUpdateNoticePanel";
 import ProductLaunchPanel from "@/components/admin/ProductLaunchPanel";
+import GoogleDrivePreview from "@/components/admin/GoogleDrivePreview";
+import { normalizeDriveUrl } from "@/lib/googleDrive";
+
 
 interface Product {
   sku: string;
@@ -211,7 +214,14 @@ const AdminProductEdit = () => {
 
   const update = <K extends keyof Product>(k: K, v: Product[K]) => {
     setProduct((p) => {
-      const next = { ...p, [k]: v };
+      let val = v;
+
+      // Normalize Google Drive URLs automatically
+      if (typeof val === "string" && (k === "drive_url" || k === "bonus_drive_url")) {
+        val = normalizeDriveUrl(val) as Product[K];
+      }
+
+      const next = { ...p, [k]: val };
       
       if (k === "sku") {
         setSkuManuallyEdited(true);
@@ -234,6 +244,7 @@ const AdminProductEdit = () => {
       return next;
     });
   };
+
 
   // Países sin ningún canal disponible: ni Tienda (activa y no excluye) ni Hotmart (con enlace y no excluye)
   const orphanCountries = useMemo(() => {
@@ -1048,7 +1059,9 @@ const AdminProductEdit = () => {
             <div>
               <Label>Enlace de Google Drive (PDF)</Label>
               <Input value={product.drive_url ?? ""} onChange={(e) => update("drive_url", e.target.value)} placeholder="https://drive.google.com/file/d/…" />
+              <GoogleDrivePreview url={product.drive_url} />
               <p className="text-xs text-muted-foreground mt-1">Este enlace se envía automáticamente al cliente cuando su pago se verifica.</p>
+
             </div>
             <div>
               <Label>Clave de acceso (opcional)</Label>
@@ -1118,11 +1131,13 @@ const AdminProductEdit = () => {
                       value={b.drive_url}
                       onChange={(e) => {
                         const list = [...(product.bonuses ?? [])];
-                        list[i] = { ...list[i], drive_url: e.target.value };
+                        list[i] = { ...list[i], drive_url: normalizeDriveUrl(e.target.value) };
                         update("bonuses", list);
                       }}
                       placeholder="https://drive.google.com/file/d/…"
                     />
+                    <GoogleDrivePreview url={b.drive_url} />
+
                   </div>
                   <div>
                     <Label>Clave de acceso (opcional)</Label>

@@ -358,7 +358,7 @@ const ProductDynamic = () => {
       </main>
       
       <FAQ
-        title={t.product.whyUnique}
+        title={(t as any).product.whyUnique}
         subtitle={product.name}
         items={[
           {

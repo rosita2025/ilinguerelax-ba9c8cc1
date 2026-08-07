@@ -298,7 +298,10 @@ Deno.serve(async (req) => {
           return out;
         })(),
         gallery_images: Array.isArray(p.gallery_images)
-          ? p.gallery_images.map(url => String(url ?? "").trim()).filter(url => /^https?:\/\//i.test(url)).slice(0, 5)
+          ? p.gallery_images
+              .map(url => String(url ?? "").trim())
+              .filter(url => /^https?:\/\//i.test(url))
+              .slice(0, 5)
           : [],
       };
 

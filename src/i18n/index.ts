@@ -271,25 +271,12 @@ export const formatPrice = (
   currency: Currency,
   overrides?: Partial<Record<Currency, number>> | null,
 ): string => {
-  const config = currencyConfig[currency];
   const override = overrides && overrides[currency];
   const hasOverride = typeof override === "number" && override > 0;
   const rate = exchangeRates[currency];
   const convertedPrice = hasOverride ? (override as number) : priceInUSD * rate;
 
-  const formattedNumber = convertedPrice.toLocaleString("es-ES", {
-    minimumFractionDigits: config.decimals,
-    maximumFractionDigits: config.decimals,
-  });
-
-  if (currency !== "USD" && AMBIGUOUS_DOLLAR_CURRENCIES.has(currency)) {
-    return `${currency} ${formattedNumber}`;
-  }
-
-  if (config.position === "before") {
-    return `${config.symbol}${formattedNumber}`;
-  }
-  return `${formattedNumber} ${config.symbol}`;
+  return formatCurrencyAmount(convertedPrice, currency);
 };
 
 // Language names for selector

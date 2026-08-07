@@ -768,6 +768,8 @@ const AdminProductEdit = () => {
               <ProductImageUploader
                 value={product.gallery_images ?? []}
                 onChange={(urls) => update("gallery_images", urls as string[])}
+                metadata={product.gallery_metadata || {}}
+                onMetadataChange={(meta) => update("gallery_metadata", meta)}
                 sku={product.sku}
                 multiple
                 maxImages={5}

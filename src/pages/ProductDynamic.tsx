@@ -255,13 +255,6 @@ const ProductDynamic = () => {
 
               <CartBadge className="mb-6 w-full justify-center" />
 
-              <PinterestSave
-                className="mb-6"
-                url={canonical}
-                media={cover}
-                description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
-              />
-
               <SocialProofPill className="mb-4 w-full justify-center" />
 
 

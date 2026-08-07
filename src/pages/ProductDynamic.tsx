@@ -212,9 +212,10 @@ const ProductDynamic = () => {
               <div className="relative group bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
                 <img
                   src={activeImage}
-                  alt={product.description?.includes("Alt Text sugerido:") 
+                  alt={product.gallery_metadata?.[activeImage]?.alt || 
+                    (product.description?.includes("Alt Text sugerido:") 
                     ? product.description.split("Alt Text sugerido:")[1].trim().split("\n")[0]
-                    : `${product.name} — portada del PDF · ${LANG[product.target_language] ?? product.target_language} para hablantes de ${LANG[product.learner_language] ?? product.learner_language} · iLingue Relax`}
+                    : `${product.name} — portada del PDF · ${LANG[product.target_language] ?? product.target_language} para hablantes de ${LANG[product.learner_language] ?? product.learner_language} · iLingue Relax`)}
                   title={product.name}
                   className="w-full aspect-square object-cover transition-all duration-300"
                   loading="eager"

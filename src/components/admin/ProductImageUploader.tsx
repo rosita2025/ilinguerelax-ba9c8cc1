@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
-  value: string;
-  onChange: (url: string) => void;
+  value: string | string[];
+  onChange: (value: string | string[]) => void;
   sku?: string;
+  multiple?: boolean;
+  maxImages?: number;
 }
 
 // Convert any image to WebP via canvas (max 1600px wide, quality 0.85).

@@ -17,7 +17,15 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { action, messages, model = "google/gemini-2.0-flash" } = body;
+    const { action, messages, model = "google/gemini-2.0-flash", adminKey } = body;
+
+    const expected = Deno.env.get("ADMIN_REVIEW_KEY");
+    if (!expected || adminKey !== expected) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (action !== "chat") {
       return new Response(JSON.stringify({ error: "Unsupported action" }), {

@@ -440,7 +440,7 @@ const AdminProductEdit = () => {
         "gallery_description": "..."
       }`;
 
-      const { data, error } = await supabase.functions.invoke("ai-gateway", {
+      const { data, error } = await adminInvoke<any>("ai-gateway", {
         body: { 
           action: "chat",
           adminKey,

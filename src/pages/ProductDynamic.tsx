@@ -301,6 +301,13 @@ const ProductDynamic = () => {
               )}
             </div>
           </div>
+          {product.description && (
+            <div className="mt-16 border-t border-border/50 pt-10">
+              <p className="text-muted-foreground whitespace-pre-line leading-relaxed text-lg max-w-4xl">
+                {product.description}
+              </p>
+            </div>
+          )}
         </div>
       </main>
       

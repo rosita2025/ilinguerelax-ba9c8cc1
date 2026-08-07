@@ -188,7 +188,7 @@ const ProductDynamic = () => {
         reviewCount="120"
         availability="InStock"
         isPhysical={false}
-        keywords={`${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
+        keywords={product.gallery_metadata?.keywords || `${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
       />
       <Navbar />
       <main className="min-h-dvh bg-background pt-4 pb-16">
@@ -230,10 +230,19 @@ const ProductDynamic = () => {
 
               {product.gallery_images && product.gallery_images.length > 0 && (
                 <div className="space-y-3">
-                  {product.gallery_metadata?.gallery_title && (
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-                      {product.gallery_metadata.gallery_title}
-                    </h3>
+                  {(product.gallery_metadata?.gallery_title || product.gallery_metadata?.gallery_description) && (
+                    <div className="px-1 space-y-1">
+                      {product.gallery_metadata.gallery_title && (
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {product.gallery_metadata.gallery_title}
+                        </h3>
+                      )}
+                      {product.gallery_metadata.gallery_description && (
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {product.gallery_metadata.gallery_description}
+                        </p>
+                      )}
+                    </div>
                   )}
                   <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                   {[product.cover_image_url || "/placeholder.svg", ...product.gallery_images].slice(0, 5).map((img, i) => (

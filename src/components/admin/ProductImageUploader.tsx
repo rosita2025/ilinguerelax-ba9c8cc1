@@ -60,7 +60,15 @@ async function toWebP(file: File, maxW = 1600, quality = 0.85): Promise<Blob | n
   }
 }
 
-export default function ProductImageUploader({ value, onChange, sku, multiple = false, maxImages = 5 }: Props) {
+export default function ProductImageUploader({ 
+  value, 
+  onChange, 
+  metadata = {}, 
+  onMetadataChange,
+  sku, 
+  multiple = false, 
+  maxImages = 5 
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
@@ -116,9 +124,22 @@ export default function ProductImageUploader({ value, onChange, sku, multiple = 
   const removeImage = (urlToRemove: string) => {
     if (multiple) {
       onChange(values.filter(url => url !== urlToRemove));
+      if (onMetadataChange && metadata[urlToRemove]) {
+        const newMeta = { ...metadata };
+        delete newMeta[urlToRemove];
+        onMetadataChange(newMeta);
+      }
     } else {
       onChange("");
     }
+  };
+
+  const updateAlt = (url: string, alt: string) => {
+    if (!onMetadataChange) return;
+    onMetadataChange({
+      ...metadata,
+      [url]: { ...(metadata[url] || {}), alt }
+    });
   };
 
   return (
@@ -134,33 +155,46 @@ export default function ProductImageUploader({ value, onChange, sku, multiple = 
       >
         <div className="flex flex-wrap gap-4">
           {values.map((url, idx) => (
-            <div key={idx} className="relative shrink-0">
-              <img src={url} alt={`Imagen ${idx + 1}`} className="w-24 h-24 object-cover rounded-md border" />
-              <button
-                type="button"
-                onClick={() => removeImage(url)}
-                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 shadow-sm hover:scale-110 transition-transform"
-                title="Quitar"
-              >
-                <X className="w-3 h-3" />
-              </button>
+            <div key={idx} className="relative shrink-0 group/img">
+              <div className="relative">
+                <img src={url} alt={`Imagen ${idx + 1}`} className="w-32 h-32 object-cover rounded-md border" />
+                <button
+                  type="button"
+                  onClick={() => removeImage(url)}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 shadow-sm hover:scale-110 transition-transform z-10"
+                  title="Quitar"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+              {multiple && (
+                <div className="mt-1">
+                  <input 
+                    type="text"
+                    placeholder="SEO Alt Text..."
+                    value={metadata[url]?.alt || ""}
+                    onChange={(e) => updateAlt(url, e.target.value)}
+                    className="w-32 text-[10px] px-2 py-1 border rounded bg-background focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              )}
             </div>
           ))}
           {!multiple && values.length === 0 && (
-            <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs shrink-0">
+            <div className="w-32 h-32 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs shrink-0">
               Sin portada
             </div>
           )}
           {multiple && values.length < maxImages && values.length > 0 && (
              <div 
               onClick={() => inputRef.current?.click()}
-              className="w-24 h-24 border-2 border-dashed border-muted-foreground/30 rounded-md flex items-center justify-center text-muted-foreground cursor-pointer hover:bg-muted transition-colors"
+              className="w-32 h-32 border-2 border-dashed border-muted-foreground/30 rounded-md flex items-center justify-center text-muted-foreground cursor-pointer hover:bg-muted transition-colors"
              >
                <Plus className="w-6 h-6" />
              </div>
           )}
           {values.length === 0 && multiple && (
-             <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs shrink-0">
+             <div className="w-32 h-32 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs shrink-0">
                Sin imágenes
              </div>
           )}

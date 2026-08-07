@@ -54,6 +54,7 @@ interface Product {
   sku_aliases: string[];
   local_prices: Record<string, number>;
   is_physical: boolean;
+  gallery_metadata: Record<string, any>;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -88,6 +89,7 @@ const EMPTY: Product = {
   sku_aliases: [],
   local_prices: {},
   is_physical: false,
+  gallery_metadata: {},
 };
 
 const AdminProductEdit = () => {
@@ -346,10 +348,11 @@ const AdminProductEdit = () => {
           adminKey,
           confirmDriveChange,
           product: (() => {
-            const { bonus_titles, gallery_images: _gi, ...cleanProduct } = product as any;
+            const { bonus_titles, ...cleanProduct } = product as any;
             return {
               ...cleanProduct,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
+              gallery_metadata: product.gallery_metadata || {},
               upsells,
               is_physical: !!product.is_physical,
               active: !!product.active,
@@ -423,12 +426,14 @@ const AdminProductEdit = () => {
       1. Genera una DESCRIPCIÓN persuasiva (máximo 4 párrafos).
       2. Genera una lista de 5 KEYWORDS separadas por comas.
       3. Genera un ALT TEXT descriptivo y optimizado para SEO para la imagen principal del producto.
+      4. Si el producto tiene imágenes de galería (puedes inventar temas basados en el nombre), sugiere ALT TEXTs para 3 imágenes más.
       
       Formato de respuesta (devuelve SOLO este JSON):
       {
         "description": "...",
         "keywords": "...",
-        "alt_text": "..."
+        "alt_text": "...",
+        "gallery_alts": ["alt 1", "alt 2", "alt 3"]
       }`;
 
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
@@ -445,12 +450,21 @@ const AdminProductEdit = () => {
         try {
           const parsed = JSON.parse(content);
           if (parsed.description) update("description", parsed.description);
-          // Almacenamos keywords y alt_text en la descripción como metadatos si no hay campos específicos,
-          // o simplemente informamos al usuario. Por ahora, como no hay campos en la DB para alt_text,
-          // los mostraremos en el toast o los adjuntaremos.
+          
+          // Apply AI gallery alt texts to existing gallery images if available
+          if (parsed.gallery_alts && Array.isArray(parsed.gallery_alts) && product.gallery_images?.length) {
+            const newMeta = { ...product.gallery_metadata };
+            product.gallery_images.forEach((url, i) => {
+              if (parsed.gallery_alts[i]) {
+                newMeta[url] = { ...newMeta[url], alt: parsed.gallery_alts[i] };
+              }
+            });
+            update("gallery_metadata", newMeta);
+          }
+
           toast({ 
             title: "Contenido generado con IA",
-            description: `Alt Text sugerido: ${parsed.alt_text}`
+            description: `SEO Alt Text y descripción listos.`
           });
         } catch (e) {
           // Si no devolvió JSON, intentamos usarlo como descripción directamente

@@ -7,6 +7,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 import { formatLocalAmount, useSkuOverridesResolver } from "@/hooks/useLocalCurrency";
+import { formatCurrencyAmount } from "@/i18n";
 
 interface DBRow {
   id: string;

@@ -192,13 +192,19 @@ const ProductDynamic = () => {
           </Link>
 
           <div className="grid md:grid-cols-2 gap-8 items-start">
-            <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+            <div className="relative group bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
               <img
                 src={cover}
                 alt={`${product.name} — portada del PDF · ${LANG[product.target_language] ?? product.target_language} para hablantes de ${LANG[product.learner_language] ?? product.learner_language} · iLingue Relax`}
                 title={product.name}
                 className="w-full aspect-square object-cover"
                 loading="eager"
+              />
+              <PinterestSave 
+                overlay 
+                media={cover} 
+                url={canonical}
+                description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
               />
             </div>
 

@@ -49,6 +49,7 @@ interface Product {
   hotmart_excluded_countries: string[];
   sku_aliases: string[];
   local_prices: Record<string, number>;
+  is_physical: boolean;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -81,6 +82,7 @@ const EMPTY: Product = {
   hotmart_excluded_countries: [],
   sku_aliases: [],
   local_prices: {},
+  is_physical: false,
 };
 
 const AdminProductEdit = () => {
@@ -205,23 +207,27 @@ const AdminProductEdit = () => {
     return conflict ?? null;
   }, [product.sku, allProducts, isNew, sku]);
 
+  const [skuManuallyEdited, setSkuManuallyEdited] = useState(false);
+
   const update = <K extends keyof Product>(k: K, v: Product[K]) => {
     setProduct((p) => {
       const next = { ...p, [k]: v };
-      // Auto-generate SKU from name if creating a new product and SKU is empty or was auto-generated
-      if (isNew && k === "name" && typeof v === "string") {
+      
+      if (k === "sku") {
+        setSkuManuallyEdited(true);
+      }
+
+      // Auto-generate SKU from name if creating a new product and SKU wasn't manually touched
+      if (isNew && k === "name" && typeof v === "string" && !skuManuallyEdited) {
         const nameSku = v.toLowerCase()
           .trim()
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
           .replace(/[^a-z0-9\s-]/g, "") // remove special chars
           .replace(/\s+/g, "-") // spaces to hyphens
-          .replace(/-+/g, "-"); // collapse multiple hyphens
+          .replace(/-+/g, "-") // collapse multiple hyphens
+          .replace(/^-|-$/g, ""); // trim leading/trailing hyphens
         
-        // Only auto-update SKU if it's currently empty or the user hasn't manually touched it much
-        // Or simply if it's a new product, we help the user.
-        if (!p.sku || p.sku === "") {
-          next.sku = nameSku;
-        }
+        next.sku = nameSku;
       }
       return next;
     });
@@ -399,7 +405,17 @@ const AdminProductEdit = () => {
           )}
 
           <Card className="p-6 space-y-4">
-            <h2 className="font-semibold">1. Información básica</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">1. Información básica</h2>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="is-physical" className="text-xs">Producto físico</Label>
+                <Switch
+                  id="is-physical"
+                  checked={product.is_physical}
+                  onCheckedChange={(v) => update("is_physical", v)}
+                />
+              </div>
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label className="flex items-center gap-2">

@@ -27,6 +27,10 @@ export interface AdminPricing {
   loaded: boolean;
   /** `true` if the SKU has no active row in `digital_products`. */
   missing: boolean;
+  /** Average rating (0-5) from admin. Defaults to 4.8. */
+  rating: number | null;
+  /** Number of reviews from admin. Defaults to 120. */
+  reviewCount: number | null;
 }
 
 const INITIAL: AdminPricing = {
@@ -42,6 +46,8 @@ const INITIAL: AdminPricing = {
   active: true,
   loaded: false,
   missing: false,
+  rating: null,
+  reviewCount: null,
 };
 
 /**
@@ -73,11 +79,13 @@ export function useAdminPricing(sku: string): AdminPricing {
         store_enabled: boolean | null;
         cover_image_url: string | null;
         active: boolean | null;
+        rating: number | null;
+        review_count: number | null;
       } | null = null;
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active")
+          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count")
           .eq("sku", sku)
           .maybeSingle();
         data = result.data as typeof data;
@@ -106,6 +114,8 @@ export function useAdminPricing(sku: string): AdminPricing {
         storeEnabled: (data as any).store_enabled !== false,
         coverImageUrl: (data as any).cover_image_url ?? null,
         active: (data as any).active !== false,
+        rating: (data as any).rating != null ? Number((data as any).rating) : null,
+        reviewCount: (data as any).review_count != null ? Number((data as any).review_count) : null,
         loaded: true,
         missing: false,
       });

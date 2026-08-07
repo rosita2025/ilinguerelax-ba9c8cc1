@@ -34,7 +34,7 @@ import bonoHangul from "@/assets/Bono-1-hangul.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Eye } from "lucide-react";
+
 import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCoreano";
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";

@@ -6,6 +6,7 @@ import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 
 
 interface StickyBuyBarProps {
+  sku?: string;
   price: string;
   originalPrice?: string;
   rating?: number;

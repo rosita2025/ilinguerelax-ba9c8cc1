@@ -14,7 +14,7 @@ export function MercadoPagoButton() {
   const [loading, setLoading] = useState(false);
   const redirectingRef = useRef(false);
 
-  const totalPen = (total * USD_TO_PEN).toFixed(2);
+  const totalPen = formatAmountLocalized(total * USD_TO_PEN, 2);
 
   useEffect(() => {
     const resetLoading = () => {

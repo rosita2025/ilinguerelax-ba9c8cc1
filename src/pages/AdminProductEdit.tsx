@@ -219,7 +219,7 @@ const AdminProductEdit = () => {
 
       // Auto-generate SKU from name if creating a new product and SKU wasn't manually touched
       if (isNew && k === "name" && typeof v === "string" && !skuManuallyEdited) {
-        const nameSku = v.toLowerCase()
+        const baseSku = v.toLowerCase()
           .trim()
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
           .replace(/[^a-z0-9\s-]/g, " ") // replace special chars with space
@@ -227,7 +227,9 @@ const AdminProductEdit = () => {
           .replace(/\s+/g, "-") // spaces to hyphens
           .replace(/-+/g, "-"); // collapse multiple hyphens
         
-        next.sku = nameSku;
+        // Add unique suffix to avoid collisions during draft creation
+        const uniqueSuffix = Math.random().toString(36).substring(2, 6);
+        next.sku = baseSku ? `${baseSku}-${uniqueSuffix}` : "";
       }
       return next;
     });

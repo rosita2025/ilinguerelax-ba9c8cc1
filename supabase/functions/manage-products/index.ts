@@ -271,7 +271,10 @@ Deno.serve(async (req) => {
       const { error: upErr } = await admin
         .from("digital_products")
         .upsert(row, { onConflict: "sku" });
-      if (upErr) throw upErr;
+      if (upErr) {
+        console.error(`[manage-products] Database upsert error for ${p.sku}:`, upErr);
+        return json({ error: "Database error", detail: upErr.message, code: upErr.code }, 500);
+      }
 
       // Reemplazar upsells si vienen
       if (Array.isArray(p.upsells)) {

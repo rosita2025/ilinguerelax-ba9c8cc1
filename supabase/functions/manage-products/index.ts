@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
       console.log(`[manage-products] Upserting product: ${p?.sku}`, { 
         is_physical: p?.is_physical, 
         active: p?.active,
-        bonus_titles: !!(p as any).bonus_titles 
+        bonus_titles_present: !!(p as any).bonus_titles 
       });
 
       const confirmDriveChange = (body as { confirmDriveChange?: boolean }).confirmDriveChange === true;
@@ -221,7 +221,7 @@ Deno.serve(async (req) => {
         is_physical: !!p.is_physical,
         active: p.active ?? true,
         sort_order: p.sort_order ?? 0,
-        bonus_titles: (p as any).bonus_titles ?? null,
+
         stripe_product_id: p.stripe_product_id ?? null,
         stripe_price_id: p.stripe_price_id ?? null,
         bonus_name: p.bonus_name?.toString().trim() || null,

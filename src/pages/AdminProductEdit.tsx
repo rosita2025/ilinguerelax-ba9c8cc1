@@ -350,7 +350,10 @@ const AdminProductEdit = () => {
             is_physical: !!product.is_physical,
             active: !!product.active,
             store_enabled: !!product.store_enabled
-          },
+          } as any,
+
+
+
         },
       });
       if (error) {

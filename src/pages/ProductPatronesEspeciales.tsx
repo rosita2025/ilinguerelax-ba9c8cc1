@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -11,7 +11,7 @@ import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
-import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2 } from "lucide-react";
+import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download } from "lucide-react";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -23,6 +23,7 @@ import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatPrice } from "@/i18n";
+import { useI18n } from "@/i18n/I18nContext";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
@@ -81,6 +82,7 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
@@ -697,10 +699,10 @@ const ProductPatronesEspeciales = () => {
 
       <FAQ
         items={[
-          { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba.", icon: Lightbulb },
-          { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas.", icon: BookOpen },
+          { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
+          { question: t.productFaq.receiveTitle, answer: t.productFaq.receiveAnswer, icon: Download },
+          { question: t.productFaq.secureTitle, answer: t.productFaq.secureAnswer, icon: Shield },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo.", icon: Smartphone },
-          { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de iLingue Relax o Hotmart LATAM.", icon: CreditCard },
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"

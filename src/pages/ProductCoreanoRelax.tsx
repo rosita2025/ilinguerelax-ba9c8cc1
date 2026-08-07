@@ -12,13 +12,14 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { Button } from "@/components/ui/button";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { Input } from "@/components/ui/input";
-import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart, Store } from "lucide-react";
+import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart, Store, Eye, Download, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { useI18n } from "@/i18n/I18nContext";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
 import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
@@ -57,6 +58,7 @@ const features = [
 ];
 
 const ProductCoreanoRelax = () => {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -386,9 +388,9 @@ const ProductCoreanoRelax = () => {
       
       <FAQ
         items={[
-          { question: "¿Cuándo estará disponible?", answer: "Coreano Relax está en producción y estará disponible muy pronto. Suscríbete para ser el primero en saberlo y acceder al precio de lanzamiento.", icon: Sparkles },
-          { question: "¿Qué incluye el ebook?", answer: "100 mapas mentales del nivel A1 al C1 con Hangul, romanización, pronunciación para hispanohablantes, vocabulario por temas, mini conversaciones, ejercicios y respuestas. Más 2 bonos: Guía Completa del Hangul y 100 Expresiones Esenciales.", icon: BookOpen },
-          { question: "¿Necesito saber coreano para empezar?", answer: "No. Está diseñado para empezar desde cero, incluso si nunca has visto el alfabeto Hangul.", icon: Lightbulb },
+          { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
+          { question: t.productFaq.receiveTitle, answer: t.productFaq.receiveAnswer, icon: Download },
+          { question: t.productFaq.secureTitle, answer: t.productFaq.secureAnswer, icon: Shield },
           { question: "¿En qué formato se entrega?", answer: "PDF descargable, optimizado para leer desde celular, tablet o computadora. Puedes imprimirlo si lo deseas.", icon: Globe },
         ]}
         title="Preguntas Frecuentes"

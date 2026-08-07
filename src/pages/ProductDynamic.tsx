@@ -46,6 +46,7 @@ interface DBProduct {
   excluded_countries: string[] | null;
   store_excluded_countries: string[] | null;
   hotmart_excluded_countries: string[] | null;
+  gallery_metadata: Record<string, any> | null;
 }
 
 import { COUNTRY_INFO } from "@/lib/countryInfo";

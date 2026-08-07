@@ -21,7 +21,7 @@ export const SocialProofPill = ({ className = "" }: SocialProofPillProps) => {
   return (
     <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-teal-500/20 to-primary/20 border border-primary/30 text-primary text-xs font-bold shadow-sm ${className}`}>
       <Sparkles className="w-3.5 h-3.5 text-primary animate-spin-slow" />
-      <span>{t.product.socialProofMessage.replace("{{name}}", name).replace("{{count}}", String(count))}</span>
+      <span>{(t as any).product.socialProofMessage.replace("{{name}}", name).replace("{{count}}", String(count))}</span>
     </div>
   );
 };

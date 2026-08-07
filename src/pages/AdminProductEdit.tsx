@@ -345,10 +345,14 @@ const AdminProductEdit = () => {
       if (error) {
         // Detailed error reporting for the user
         const errorMsg = error.message || "Error al guardar el producto";
+        const errorDetail = (error as any).detail ? `: ${(error as any).detail}` : "";
         console.error("[AdminProductEdit] Save failed:", error);
-        throw new Error(errorMsg);
+        throw new Error(`${errorMsg}${errorDetail}`);
       }
-      if (data?.error) throw new Error(data.error);
+      if (data?.error) {
+        console.error("[AdminProductEdit] Function returned error:", data.error);
+        throw new Error(data.error);
+      }
 
       // Revalidate: read the fresh updated_at from the DB so we broadcast a real version stamp.
       let version = Date.now();

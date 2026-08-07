@@ -104,6 +104,12 @@ Deno.serve(async (req) => {
 
     if (action === "upsert") {
       const p = body.product as ProductIn;
+      console.log(`[manage-products] Upserting product: ${p?.sku}`, { 
+        is_physical: p?.is_physical, 
+        active: p?.active,
+        bonus_titles: !!(p as any).bonus_titles 
+      });
+
       const confirmDriveChange = (body as { confirmDriveChange?: boolean }).confirmDriveChange === true;
       if (!p?.sku || !SKU_RE.test(p.sku)) return json({ error: "SKU inválido (usa minúsculas, números y guiones)" }, 400);
       if (!p.name?.trim()) return json({ error: "Nombre requerido" }, 400);
@@ -265,7 +271,10 @@ Deno.serve(async (req) => {
       const { error: upErr } = await admin
         .from("digital_products")
         .upsert(row, { onConflict: "sku" });
-      if (upErr) throw upErr;
+      if (upErr) {
+        console.error(`[manage-products] Database upsert error for ${p.sku}:`, upErr);
+        return json({ error: "Database error", detail: upErr.message, code: upErr.code }, 500);
+      }
 
       // Reemplazar upsells si vienen
       if (Array.isArray(p.upsells)) {

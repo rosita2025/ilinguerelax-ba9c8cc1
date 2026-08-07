@@ -12,7 +12,7 @@ export const ProductTypeBadge = ({ isPhysical = false, className = "" }: Product
   return (
     <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-md bg-muted text-muted-foreground text-xs font-medium ${className}`}>
       {isPhysical ? <Package className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
-      <span>{isPhysical ? t("product.productTypePhysical") : t("product.productTypeDigital")}</span>
+      <span>{isPhysical ? t.product.productTypePhysical : t.product.productTypeDigital}</span>
     </div>
   );
 };

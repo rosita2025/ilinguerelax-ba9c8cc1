@@ -18,7 +18,7 @@ export const VerifiedReviews = ({ rating = 4.8, count = 120, className = "" }: V
         ))}
       </div>
       <span className="font-bold text-sm">{rating}/5</span>
-      <span className="text-xs text-muted-foreground">({count}+ {t("product.verifiedReviews")})</span>
+      <span className="text-xs text-muted-foreground">({count}+ {t.product.verifiedReviews})</span>
     </div>
   );
 };

@@ -200,10 +200,12 @@ export const StickyBuyBar = ({
     if (goesToInternalCheckout) {
       try {
         trackHotmartEvent("AddToCart", {
+          content_ids: sku ? [sku] : undefined,
           content_name: productName,
           content_type: "product",
           value: parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
           currency: currencyCode,
+          product_id: sku,
         });
       } catch {}
     }

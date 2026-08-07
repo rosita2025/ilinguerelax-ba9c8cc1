@@ -36,6 +36,7 @@ interface DBProduct {
   price_usd_tienda: number | null;
   price_pen: number | null;
   cover_image_url: string | null;
+  gallery_images: string[] | null;
   is_upsell: boolean;
   active: boolean;
   /** Solo los títulos de los bonos. Los enlaces/claves nunca salen del servidor. */

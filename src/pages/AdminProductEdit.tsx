@@ -55,6 +55,8 @@ interface Product {
   local_prices: Record<string, number>;
   is_physical: boolean;
   gallery_metadata: Record<string, any>;
+  rating?: number | null;
+  review_count?: number | null;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -90,6 +92,8 @@ const EMPTY: Product = {
   local_prices: {},
   is_physical: false,
   gallery_metadata: {},
+  rating: 4.8,
+  review_count: 120,
 };
 
 const AdminProductEdit = () => {
@@ -357,7 +361,9 @@ const AdminProductEdit = () => {
               upsells,
               is_physical: !!product.is_physical,
               active: !!product.active,
-              store_enabled: !!product.store_enabled
+              store_enabled: !!product.store_enabled,
+              rating: product.rating,
+              review_count: product.review_count
             };
           })(),
         },

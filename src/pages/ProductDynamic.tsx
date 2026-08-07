@@ -47,6 +47,8 @@ interface DBProduct {
   store_excluded_countries: string[] | null;
   hotmart_excluded_countries: string[] | null;
   gallery_metadata: Record<string, any> | null;
+  rating: number | null;
+  review_count: number | null;
 }
 
 import { COUNTRY_INFO } from "@/lib/countryInfo";
@@ -80,7 +82,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;
@@ -184,8 +186,8 @@ const ProductDynamic = () => {
         type="product"
         price={product.price_usd ? String(product.price_usd) : undefined}
         sku={product.sku}
-        rating="4.8"
-        reviewCount="120"
+        rating={product.rating != null ? String(product.rating) : "4.8"}
+        reviewCount={product.review_count != null ? String(product.review_count) : "120"}
         availability="InStock"
         isPhysical={false}
         keywords={product.gallery_metadata?.keywords || `${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
@@ -276,7 +278,11 @@ const ProductDynamic = () => {
                 <span>{LANG[product.target_language] ?? product.target_language} para hablantes de {LANG[product.learner_language] ?? product.learner_language}</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">{product.name}</h1>
-              <VerifiedReviews rating={4.8} count={120} className="mb-4" />
+              <VerifiedReviews 
+                rating={product.rating != null ? Number(product.rating) : 4.8} 
+                count={product.review_count != null ? Number(product.review_count) : 120} 
+                className="mb-4" 
+              />
               
               <ul className="space-y-2 mb-5">
                 <li className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -432,8 +438,8 @@ const ProductDynamic = () => {
               originalPrice={originalLabel}
               currencyCode={tier.loaded ? tier.currencyCode : local.currency}
               flag={tier.isPeru ? "🇵🇪" : undefined}
-              rating={4.8}
-              reviewCount={120}
+              rating={product.rating != null ? Number(product.rating) : 4.8}
+              reviewCount={product.review_count != null ? Number(product.review_count) : 120}
               productName={product.name}
               ctaText={"Comprar ahora"}
               buyUrl={`/checkouts/${product.sku}`}

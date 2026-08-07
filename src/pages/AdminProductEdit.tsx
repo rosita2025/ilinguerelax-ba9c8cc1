@@ -266,7 +266,7 @@ const AdminProductEdit = () => {
     return "custom" as const;
   }, [product.store_excluded_countries, product.hotmart_excluded_countries]);
 
-  const save = async (opts: { force?: boolean } = {}) => {
+  const save = async (opts: { force?: boolean; confirmDrive?: boolean } = {}) => {
     if (!product.sku.trim()) return toast({ title: "SKU requerido", variant: "destructive" });
     if (!product.name.trim()) return toast({ title: "Nombre requerido", variant: "destructive" });
     if (duplicateSku) {
@@ -283,13 +283,12 @@ const AdminProductEdit = () => {
       );
       if (!ok) return;
     }
-    // ⚠️ Guard drive_url: si cambió respecto al original, el admin debe tipear
-    // el SKU exacto para confirmar. Esto evita pegar el link de otro producto
-    // por error (causa raíz de envíos con PDF equivocado).
+    // ⚠️ Guard drive_url: security confirmation prompt.
     const newDrive = (product.drive_url ?? "").trim();
-    const driveChanged = !isNew && originalDriveUrl && newDrive !== originalDriveUrl;
-    let confirmDriveChange = false;
-    if (driveChanged) {
+    const driveChanged = !isNew && originalDriveUrl && newDrive !== originalDriveUrl && newDrive !== "";
+    let confirmDriveChange = !!opts.confirmDrive;
+
+    if (driveChanged && !confirmDriveChange) {
       const looksLikeDrive = /^https?:\/\/(drive|docs)\.google\.com\//i.test(newDrive);
       if (newDrive && !looksLikeDrive) {
         return toast({
@@ -368,9 +367,9 @@ const AdminProductEdit = () => {
     } catch (e: any) {
       // Si la función nos devolvió un 409 (Conflict) con datos estructurados para drive_url
       const detail = e.data || e;
-      if (detail?.error === "drive_url_change_requires_confirmation") {
+      if (detail?.error === "drive_url_change_requires_confirmation" || detail?.requiresConfirmation) {
         setSaving(false);
-        return save({ force: false }); // Re-try will trigger the window.prompt
+        return save({ force: false, confirmDrive: false }); // Re-try will trigger the window.prompt logic above
       }
 
       const errorMsg = detail?.error || detail?.message || e.message || "Error al guardar el producto";

@@ -427,17 +427,18 @@ const AdminProductEdit = () => {
       2. Genera una lista de 5 KEYWORDS separadas por comas.
       3. Genera un ALT TEXT descriptivo y optimizado para SEO para la imagen principal del producto.
       4. Si el producto tiene imágenes de galería, sugiere ALT TEXTs específicos para cada una de las 3-5 imágenes basándote en lo que suelen mostrar estos materiales (previa del contenido, mapas mentales, tablas fonéticas, etc.).
-      5. Genera un título SEO corto y atractivo para la galería de imágenes (ej: "Vista previa del interior", "Lo que aprenderás").
-
+      5. Genera un TÍTULO SEO corto y atractivo para la galería de imágenes (ej: "Vista previa del interior", "Lo que aprenderás").
+      6. Genera una DESCRIPCIÓN SEO corta (máximo 2 párrafos) específica para la galería de imágenes.
       
       Formato de respuesta (devuelve SOLO este JSON):
       {
         "description": "...",
         "keywords": "...",
-         "alt_text": "...",
-         "gallery_alts": ["alt 1", "alt 2", "alt 3", "alt 4", "alt 5"],
-         "gallery_title": "..."
-       }`;
+        "alt_text": "...",
+        "gallery_alts": ["alt 1", "alt 2", "alt 3", "alt 4", "alt 5"],
+        "gallery_title": "...",
+        "gallery_description": "..."
+      }`;
 
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
         body: { 
@@ -472,6 +473,12 @@ const AdminProductEdit = () => {
 
           if (parsed.gallery_title) {
             newMeta.gallery_title = parsed.gallery_title;
+          }
+          if (parsed.gallery_description) {
+            newMeta.gallery_description = parsed.gallery_description;
+          }
+          if (parsed.keywords) {
+            newMeta.keywords = parsed.keywords;
           }
           
           update("gallery_metadata", newMeta);
@@ -790,6 +797,38 @@ const AdminProductEdit = () => {
                 multiple
                 maxImages={5}
               />
+              
+              <div className="mt-4 space-y-4 border-t pt-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs">Título SEO de Galería</Label>
+                    <Input 
+                      value={product.gallery_metadata?.gallery_title || ""} 
+                      onChange={(e) => update("gallery_metadata", { ...product.gallery_metadata, gallery_title: e.target.value })}
+                      placeholder="Ej: Vista previa del contenido"
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Keywords SEO (separadas por coma)</Label>
+                    <Input 
+                      value={product.gallery_metadata?.keywords || ""} 
+                      onChange={(e) => update("gallery_metadata", { ...product.gallery_metadata, keywords: e.target.value })}
+                      placeholder="Ej: aprender ingles, vocabulario tecnico"
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs">Descripción SEO de Galería</Label>
+                  <Textarea 
+                    value={product.gallery_metadata?.gallery_description || ""} 
+                    onChange={(e) => update("gallery_metadata", { ...product.gallery_metadata, gallery_description: e.target.value })}
+                    placeholder="Describe lo que se ve en las imágenes de la galería..."
+                    className="min-h-[80px] text-xs"
+                  />
+                </div>
+              </div>
             </div>
           </Card>
 

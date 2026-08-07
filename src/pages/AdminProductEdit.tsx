@@ -222,10 +222,10 @@ const AdminProductEdit = () => {
         const nameSku = v.toLowerCase()
           .trim()
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
-          .replace(/[^a-z0-9\s-]/g, "") // remove special chars
+          .replace(/[^a-z0-9\s-]/g, " ") // replace special chars with space
+          .trim()
           .replace(/\s+/g, "-") // spaces to hyphens
-          .replace(/-+/g, "-") // collapse multiple hyphens
-          .replace(/^-|-$/g, ""); // trim leading/trailing hyphens
+          .replace(/-+/g, "-"); // collapse multiple hyphens
         
         next.sku = nameSku;
       }
@@ -351,9 +351,16 @@ const AdminProductEdit = () => {
       toast({ title: "✅ Guardado correctamente" });
       navigate("/admin/productos");
     } catch (e: any) {
-      const errorMsg = e.message || "Error al guardar el producto";
-      const errorDetail = e.detail || "";
-      if (errorMsg.includes("409")) return; 
+      // Si la función nos devolvió un 409 (Conflict) con datos estructurados para drive_url
+      const detail = e.data || e;
+      if (detail?.error === "drive_url_change_requires_confirmation") {
+        setSaving(false);
+        return save({ force: false }); // Re-try will trigger the window.prompt
+      }
+
+      const errorMsg = detail?.error || detail?.message || e.message || "Error al guardar el producto";
+      const errorDetail = detail?.detail || "";
+      
       toast({ 
         title: "Error al guardar", 
         description: errorDetail ? `${errorMsg}: ${errorDetail}` : errorMsg,

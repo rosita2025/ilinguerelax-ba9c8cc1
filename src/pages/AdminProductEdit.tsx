@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Info } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Info, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,7 @@ interface Product {
   drive_url: string | null;
   access_key: string | null;
   cover_image_url: string | null;
+  gallery_images: string[] | null;
   is_upsell: boolean;
   active: boolean;
   sort_order: number;
@@ -73,6 +74,7 @@ const LANGS = [
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
   price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
+  gallery_images: [],
   is_upsell: false, active: false, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
   bonuses: [],
@@ -404,6 +406,42 @@ const AdminProductEdit = () => {
   };
 
 
+  const generateAIContent = async () => {
+    if (!product.name) {
+      toast({ title: "Nombre requerido", description: "Ingresa un nombre para generar contenido con IA", variant: "destructive" });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const prompt = `Actúa como un experto en marketing educativo para la marca "iLingue Relax". 
+      Genera una descripción persuasiva y profesional para un producto digital llamado "${product.name}".
+      El producto está diseñado para personas que quieren aprender ${product.target_language} siendo su idioma nativo el ${product.learner_language}.
+      Enfócate en los beneficios, la facilidad de uso (PDF/Drive) y resultados rápidos.
+      Devuelve SOLO la descripción en formato de texto plano, máximo 3 párrafos cortos.`;
+
+      const { data, error } = await supabase.functions.invoke("ai-gateway", {
+        body: { 
+          action: "chat",
+          messages: [{ role: "user", content: prompt }]
+        }
+      });
+
+      if (error) throw error;
+      
+      const content = data?.choices?.[0]?.message?.content;
+      if (content) {
+        update("description", content);
+        toast({ title: "Contenido generado con IA" });
+      }
+    } catch (e) {
+      console.error("[AI Generation] failed:", e);
+      toast({ title: "Error con la IA", description: "No se pudo generar el contenido", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) return (
     <><AdminNav /><div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div></>
   );
@@ -657,16 +695,39 @@ const AdminProductEdit = () => {
               <Label>Nombre</Label>
               <Input value={product.name} onChange={(e) => update("name", e.target.value)} />
             </div>
-            <div>
-              <Label>Descripción</Label>
-              <Textarea rows={3} value={product.description ?? ""} onChange={(e) => update("description", e.target.value)} />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Descripción</Label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-7 text-[10px] gap-1 px-2"
+                  onClick={generateAIContent}
+                  disabled={saving}
+                >
+                  <Sparkles className="w-3 h-3 text-primary" />
+                  Generar con IA
+                </Button>
+              </div>
+              <Textarea rows={4} value={product.description ?? ""} onChange={(e) => update("description", e.target.value)} />
             </div>
             <div>
               <Label>Portada del producto</Label>
               <ProductImageUploader
                 value={product.cover_image_url ?? ""}
-                onChange={(url) => update("cover_image_url", url)}
+                onChange={(url) => update("cover_image_url", url as string)}
                 sku={product.sku}
+              />
+            </div>
+            <div>
+              <Label>Galería de imágenes (3-5 imágenes recomendadas)</Label>
+              <ProductImageUploader
+                value={product.gallery_images ?? []}
+                onChange={(urls) => update("gallery_images", urls as string[])}
+                sku={product.sku}
+                multiple
+                maxImages={5}
               />
             </div>
           </Card>

@@ -36,6 +36,7 @@ interface DBProduct {
   price_usd_tienda: number | null;
   price_pen: number | null;
   cover_image_url: string | null;
+  gallery_images: string[] | null;
   is_upsell: boolean;
   active: boolean;
   /** Solo los títulos de los bonos. Los enlaces/claves nunca salen del servidor. */
@@ -65,6 +66,7 @@ const ProductDynamic = () => {
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [activeImage, setActiveImage] = useState<string>("");
   
   const { t } = useI18n();
 
@@ -77,7 +79,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;
@@ -87,7 +89,12 @@ const ProductDynamic = () => {
       }
       if (cancelled) return;
       if (error || !data) setNotFound(true);
-      else { setProduct(data as unknown as DBProduct); setNotFound(false); }
+      else { 
+        const p = data as unknown as DBProduct;
+        setProduct(p); 
+        setActiveImage(p.cover_image_url || "/placeholder.svg");
+        setNotFound(false); 
+      }
       setLoading(false);
     };
     load();
@@ -200,20 +207,38 @@ const ProductDynamic = () => {
           </Link>
 
           <div className="grid md:grid-cols-2 gap-8 items-start">
-            <div className="relative group bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-              <img
-                src={cover}
-                alt={`${product.name} — portada del PDF · ${LANG[product.target_language] ?? product.target_language} para hablantes de ${LANG[product.learner_language] ?? product.learner_language} · iLingue Relax`}
-                title={product.name}
-                className="w-full aspect-square object-cover"
-                loading="eager"
-              />
-              <PinterestSave 
-                overlay 
-                media={cover} 
-                url={canonical}
-                description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
-              />
+            <div className="space-y-4">
+              <div className="relative group bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+                <img
+                  src={activeImage}
+                  alt={`${product.name} — portada del PDF · ${LANG[product.target_language] ?? product.target_language} para hablantes de ${LANG[product.learner_language] ?? product.learner_language} · iLingue Relax`}
+                  title={product.name}
+                  className="w-full aspect-square object-cover transition-all duration-300"
+                  loading="eager"
+                />
+                <PinterestSave 
+                  overlay 
+                  media={activeImage} 
+                  url={canonical}
+                  description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
+                />
+              </div>
+
+              {product.gallery_images && product.gallery_images.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {[product.cover_image_url || "/placeholder.svg", ...product.gallery_images].map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImage(img)}
+                      className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
+                        activeImage === img ? "border-primary shadow-sm" : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={img} alt={`Vista ${i + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>

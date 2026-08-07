@@ -102,11 +102,13 @@ const ProductPatronesEspeciales = () => {
   const displayCurrency = isPeru ? "PEN" : detectCurrency(visitorCountry || "US");
   // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
   const priceLabel = isPeru && pricingAdmin.pricePen
-    ? `S/ ${pricingAdmin.pricePen.toFixed(2)}`
-    : formatPrice(PRICE_USD, displayCurrency);
+    ? formatCurrencyAmount(pricingAdmin.pricePen, "PEN")
+    : formatPrice(PRICE_USD, displayCurrency, localOverrides ?? undefined);
   const originalLabel = isPeru && pricingAdmin.pricePen
-    ? `S/ ${(pricingAdmin.pricePen * 2.5).toFixed(2)}`
-    : formatPrice(ORIGINAL_USD, displayCurrency);
+    ? formatCurrencyAmount(pricingAdmin.pricePen * 2.5, "PEN")
+    : (localOverrides?.[displayCurrency] ?? 0) > 0
+      ? formatCurrencyAmount((localOverrides![displayCurrency] as number) * 2.5, displayCurrency)
+      : formatCurrencyAmount(PRICE_USD * 2.5 * (exchangeRates[displayCurrency] ?? 1), displayCurrency);
   const HOTMART_URL = pricingAdmin.hotmartUrl || HOTMART_URL_LATAM;
   const hasLongPriceLabel = priceLabel.length > 9;
   const pixelParams = useMemo(() => ({

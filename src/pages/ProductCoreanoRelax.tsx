@@ -162,6 +162,16 @@ const ProductCoreanoRelax = () => {
       <Navbar />
 
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">
+        {!pricing.active && (
+          <div className="container px-4 md:px-6 mb-6">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3 text-amber-800">
+              <Lock className="w-5 h-5 shrink-0" />
+              <div className="text-sm">
+                <span className="font-bold">Vista previa de Borrador:</span> Este producto está oculto para los clientes. Solo tú puedes verlo porque eres administrador.
+              </div>
+            </div>
+          </div>
+        )}
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative">

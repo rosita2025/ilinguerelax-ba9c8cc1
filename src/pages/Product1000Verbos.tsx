@@ -250,7 +250,10 @@ const Product1000Verbos = () => {
                 👆 Haz clic para asegurar tu copia al precio de oferta
               </p>
 
-
+              <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
+                <PaymentLogos />
+              </div>
 
               <motion.div
                 initial={{ opacity: 0 }}

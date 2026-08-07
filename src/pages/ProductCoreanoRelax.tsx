@@ -230,6 +230,11 @@ const ProductCoreanoRelax = () => {
                   )}
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
+                
+                <div className="mt-6 mb-6 flex items-center justify-between bg-white/50 p-3 rounded-xl border border-amber-500/20">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos:</span>
+                  <PaymentLogos />
+                </div>
               </motion.div>
 
             </div>

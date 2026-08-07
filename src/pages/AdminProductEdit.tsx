@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { REGIONS, REGION_KEYS } from "@/lib/countryRegions";
 import { COUNTRY_INFO } from "@/lib/countryInfo";
 import { publishCatalogUpdate } from "@/lib/catalogSync";
@@ -298,7 +299,7 @@ const AdminProductEdit = () => {
     }
     setSaving(true);
     try {
-      const { data, error } = await supabase.functions.invoke("manage-products", {
+      const { data, error } = await adminInvoke<{ success?: boolean; sku?: string; error?: string }>("manage-products", {
         body: {
           action: "upsert",
           adminKey,
@@ -306,7 +307,9 @@ const AdminProductEdit = () => {
           product: { ...product, upsells },
         },
       });
-      if (error || data?.error) throw new Error(data?.error || error?.message);
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
       // Revalidate: read the fresh updated_at from the DB so we broadcast a real version stamp.
       let version = Date.now();
       try {
@@ -323,9 +326,15 @@ const AdminProductEdit = () => {
       navigate("/admin/productos");
     } catch (e: any) {
       const errorMsg = e.message || "Error al guardar el producto";
+      const errorDetail = e.detail || "";
       if (errorMsg.includes("409")) return; 
-      toast({ title: "Error al guardar", description: errorMsg, variant: "destructive" });
+      toast({ 
+        title: "Error al guardar", 
+        description: errorDetail ? `${errorMsg}: ${errorDetail}` : errorMsg,
+        variant: "destructive" 
+      });
     } finally {
+
       setSaving(false);
     }
   };

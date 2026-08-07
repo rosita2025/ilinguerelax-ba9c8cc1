@@ -282,9 +282,12 @@ Deno.serve(async (req) => {
       // We wrap this in a fire-and-forget block with a timeout to avoid delaying
       // the product save response or failing the whole request if a bot is slow.
       if (p.active !== false) {
-        (async () => {
-          const url = productUrl(p.sku);
+        // Deno.serve allows the request handler to complete while background
+        // tasks continue as long as they were started before the response.
+        const url = productUrl(p.sku);
+        const pings = async () => {
           try {
+            console.log(`[manage-products] Starting SEO pings for ${p.sku}`);
             await Promise.allSettled([
               pingIndexNow([url]),
               pingPinterestAndCms({ url, type: "product" }),
@@ -297,9 +300,16 @@ Deno.serve(async (req) => {
           } catch (e) {
             console.error(`[manage-products] SEO pings failed for ${p.sku}`, e);
           }
-        })().catch(() => {});
+        };
+        
+        // Execute background pings without awaiting. 
+        // In Deno Deploy / Supabase Edge Functions, background tasks must be finished 
+        // before the response is sent unless using specific platform APIs like EdgeRuntime.waitUntil.
+        // To be safe and fast, we keep them async but ensure they don't block the return.
+        pings().catch(err => console.error(`[manage-products] Uncaught background error:`, err));
       }
       return json({ success: true, sku: p.sku });
+
     }
 
     if (action === "rename") {

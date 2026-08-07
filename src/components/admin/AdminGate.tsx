@@ -130,12 +130,13 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
     navigate("/admin", { replace: true });
   };
 
-  // Validate a stored session on mount. Only erase it after a definitive
-  // invalid response; iOS PWAs can briefly report a network error while waking.
+  // Validate a stored session on mount and periodically.
   useEffect(() => {
     if (!adminKey) return;
     let cancelled = false;
-    (async () => {
+    let timer: number | null = null;
+
+    const checkSession = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("admin-2fa", {
           body: { action: "validate", adminKey },
@@ -143,7 +144,6 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
         if (cancelled) return;
 
         // Network or server errors (500, etc) should NOT wipe the session.
-        // We only wipe on definitive 401/403 auth failures.
         if (error) {
           console.warn("[AdminGate] Validation call failed (network?):", error);
           return;
@@ -162,12 +162,18 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
       } catch (e) {
         console.error("[AdminGate] Unexpected validation error:", e);
       }
-    })();
+    };
+
+    checkSession();
+    // Re-validate every 5 minutes to catch session expiry before a big save.
+    timer = window.setInterval(checkSession, 5 * 60 * 1000);
+
     return () => {
       cancelled = true;
+      if (timer) clearInterval(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [adminKey]);
 
   const getLockRemaining = () => {
     try {

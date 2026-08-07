@@ -434,6 +434,7 @@ const ProductDynamic = () => {
         return (
           <>
             <StickyBuyBar
+              sku={product.sku}
               price={priceLabel}
               originalPrice={originalLabel}
               currencyCode={tier.loaded ? tier.currencyCode : local.currency}

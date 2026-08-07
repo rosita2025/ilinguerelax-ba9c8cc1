@@ -4,8 +4,12 @@ import { assertAdminCsrf, withAdminLogging, adminCorsHeaders } from "../_shared/
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 const handler = async (req: Request): Promise<Response> => {
-  // CORS check is handled by serve / OPTIONS block if needed, 
-  // but withAdminLogging + assertAdminCsrf handles it too.
+  if (req.method === "OPTIONS") {
+    return new Response(null, { 
+      status: 204, 
+      headers: adminCorsHeaders 
+    });
+  }
 
   const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;

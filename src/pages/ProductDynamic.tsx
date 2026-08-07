@@ -89,7 +89,12 @@ const ProductDynamic = () => {
       }
       if (cancelled) return;
       if (error || !data) setNotFound(true);
-      else { setProduct(data as unknown as DBProduct); setNotFound(false); }
+      else { 
+        const p = data as unknown as DBProduct;
+        setProduct(p); 
+        setActiveImage(p.cover_image_url || "/placeholder.svg");
+        setNotFound(false); 
+      }
       setLoading(false);
     };
     load();

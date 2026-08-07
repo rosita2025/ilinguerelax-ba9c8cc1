@@ -27,6 +27,7 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { PinterestSave } from "@/components/PinterestSave";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
 const ADMIN_SKU_1000_VERBOS = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";

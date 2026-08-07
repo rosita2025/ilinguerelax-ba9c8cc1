@@ -440,16 +440,15 @@ const ProductDynamic = () => {
         const storeOn = product.store_enabled; // Habilitamos globalmente ignorando exclusiones de país
         if (!storeOn && storeExcluded) return null;
 
-        const priceLabel = tier.loaded ? tier.priceLabel : displayFormatted;
-        const originalLabel = tier.loaded ? tier.originalLabel : undefined;
+        // Mismo precio que el hero: nunca derivamos la etiqueta de otra fuente.
         return (
           <>
             <StickyBuyBar
               sku={product.sku}
-              price={priceLabel}
-              originalPrice={originalLabel}
-              currencyCode={tier.loaded ? tier.currencyCode : local.currency}
-              flag={tier.isPeru ? "🇵🇪" : undefined}
+              price={displayFormatted}
+              originalPrice={originalFormatted}
+              currencyCode={displayCurrencyCode}
+              flag={isPEN ? "🇵🇪" : undefined}
               rating={product.rating != null ? Number(product.rating) : 4.8}
               reviewCount={product.review_count != null ? Number(product.review_count) : 120}
               productName={product.name}

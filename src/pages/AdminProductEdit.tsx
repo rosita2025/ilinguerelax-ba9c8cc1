@@ -497,11 +497,15 @@ const AdminProductEdit = () => {
           toast({ title: "Contenido generado con IA" });
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("[AI Generation] failed:", e);
-      toast({ title: "Error con la IA", description: "No se pudo generar el contenido", variant: "destructive" });
+      toast({ 
+        title: "Error con la IA", 
+        description: e.message || "No se pudo generar el contenido", 
+        variant: "destructive" 
+      });
     } finally {
-      setSaving(false);
+      setIsGeneratingAI(false);
     }
   };
 

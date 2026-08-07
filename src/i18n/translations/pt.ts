@@ -239,6 +239,14 @@ export const pt = {
     discount: "Desconto",
     off: "de desconto",
     viewDetails: "Ver Detalhes",
+    verifiedReviews: "Avaliações Verificadas",
+    peopleInCart: "pessoas têm isso no carrinho",
+    peoplePurchased: "pessoas compraram isso recentemente",
+    onlyLeft: "Apenas {{count}} restantes a este preço!",
+    productTypePhysical: "Produto Físico",
+    productTypeDigital: "Produto Digital",
+    whyUnique: "Por que é único?",
+    socialProofMessage: "{{name}} e mais {{count}} pessoas compraram isso",
   },
 
   // Products page

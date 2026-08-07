@@ -239,6 +239,14 @@ export const fr = {
     discount: "Réduction",
     off: "de réduction",
     viewDetails: "Voir les Détails",
+    verifiedReviews: "Avis Vérifiés",
+    peopleInCart: "personnes ont ceci dans leur panier",
+    peoplePurchased: "personnes ont acheté ceci récemment",
+    onlyLeft: "Plus que {{count}} à ce prix !",
+    productTypePhysical: "Produit Physique",
+    productTypeDigital: "Produit Numérique",
+    whyUnique: "Pourquoi est-ce unique ?",
+    socialProofMessage: "{{name}} et {{count}} autres personnes ont acheté ceci",
   },
 
   // Products page

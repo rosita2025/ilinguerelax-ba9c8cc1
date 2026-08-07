@@ -299,7 +299,7 @@ const AdminProductEdit = () => {
     }
     setSaving(true);
     try {
-      const { data, error } = await adminInvoke("manage-products", {
+      const { data, error } = await adminInvoke<{ success?: boolean; sku?: string; error?: string }>("manage-products", {
         body: {
           action: "upsert",
           adminKey,

@@ -39,8 +39,8 @@ interface StickyBuyBarProps {
 export const StickyBuyBar = ({
   price,
   originalPrice,
-  rating = 4.65,
-  reviewCount = 800,
+  rating,
+  reviewCount,
   buyUrl,
   onBuyClick,
   ctaText = "COMPRAR AHORA",
@@ -239,8 +239,9 @@ export const StickyBuyBar = ({
 
   // Render stars with partial fill
   const renderStars = () => {
-    const fullStars = Math.floor(rating);
-    const hasPartial = rating % 1 !== 0;
+    const effectiveRating = rating != null ? rating : 4.65;
+    const fullStars = Math.floor(effectiveRating);
+    const hasPartial = effectiveRating % 1 !== 0;
     
     return (
       <div className="flex items-center gap-0.5">
@@ -327,9 +328,11 @@ export const StickyBuyBar = ({
           {showReviews && (
             <div className="flex items-center gap-1.5 text-[11px]">
               {renderStars()}
-              <span className="text-foreground font-bold tabular-nums">{rating}</span>
+              <span className="text-foreground font-bold tabular-nums">
+                {rating != null ? rating.toFixed(2) : "4.65"}
+              </span>
               <span className="text-muted-foreground">
-                ({reviewCount} {lang === "en" ? "reviews" : "reseñas"})
+                ({reviewCount != null ? reviewCount : 800} {lang === "en" ? "reviews" : "reseñas"})
               </span>
             </div>
           )}
@@ -448,8 +451,12 @@ export const StickyBuyBar = ({
             {showReviews && (
               <div className="flex items-center gap-1.5 text-sm">
                 {renderStars()}
-                <span className="text-foreground font-medium">{rating}</span>
-                <span className="text-muted-foreground">({reviewCount} {lang === "en" ? "reviews" : "reseñas"})</span>
+                <span className="text-foreground font-medium">
+                  {rating != null ? rating.toFixed(2) : "4.65"}
+                </span>
+                <span className="text-muted-foreground">
+                  ({reviewCount != null ? reviewCount : 800} {lang === "en" ? "reviews" : "reseñas"})
+                </span>
               </div>
             )}
           </div>

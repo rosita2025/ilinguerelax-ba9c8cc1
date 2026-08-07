@@ -48,12 +48,6 @@ interface DBProduct {
 
 import { COUNTRY_INFO } from "@/lib/countryInfo";
 
-const COUNTRY_OPTIONS: Array<{ code: string; label: string }> = [
-  { code: "auto", label: "🌐 Auto (detectar por IP)" },
-  ...Object.entries(COUNTRY_INFO)
-    .map(([code, info]) => ({ code, label: `${info.flag} ${info.name}` }))
-    .sort((a, b) => a.label.localeCompare(b.label)),
-];
 
 
 const FLAG: Record<string, string> = {
@@ -70,7 +64,7 @@ const ProductDynamic = () => {
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [simCountry, setSimCountry] = useState<string>("auto");
+  
   const { t } = useI18n();
 
   useEffect(() => {
@@ -268,7 +262,7 @@ const ProductDynamic = () => {
 
 
               {(() => {
-                const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
+                const effectiveCountry = local.country || "";
                 const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
                 const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
                 const storeOn = product.store_enabled && !storeExcluded;
@@ -293,50 +287,6 @@ const ProductDynamic = () => {
                 );
               })()}
 
-              {/* Simulador de país (pruebas) */}
-              {(() => {
-                const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
-                const info = COUNTRY_INFO[effectiveCountry];
-                const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
-                const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
-                const storeOn = product.store_enabled && !storeExcluded;
-                return (
-                  <div className="mt-4 p-3 border border-dashed border-primary/40 rounded-lg bg-muted/30 text-xs space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold">🧪 Simulador de país</span>
-                      <span className="text-muted-foreground">IP real: <b>{local.country || "?"}</b></span>
-                    </div>
-                    <select
-                      value={simCountry}
-                      onChange={(e) => setSimCountry(e.target.value)}
-                      className="w-full border rounded px-2 py-1 bg-background"
-                    >
-                      {COUNTRY_OPTIONS.map((c) => (
-                        <option key={c.code} value={c.code}>{c.label}</option>
-                      ))}
-                    </select>
-                    <div className="p-2 rounded bg-background border">
-                      <div className="mb-1">
-                        Para <b>{info ? `${info.flag} ${info.name}` : effectiveCountry || "?"}</b> se mostrará:
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {storeOn ? (
-                          <span className="px-2 py-1 rounded bg-primary/10 text-primary border border-primary/30">
-                            ✅ Botón Tienda iLingue Relax (checkout interno con Hotmart 1 clic como opción)
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 rounded bg-destructive/10 text-destructive border border-destructive/30">
-                            ❌ Ningún botón (país sin canal)
-                          </span>
-                        )}
-                      </div>
-                      {storeExcluded && (
-                        <div className="mt-2 text-muted-foreground">• Tienda excluida en este país</div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
 
 
 
@@ -388,7 +338,7 @@ const ProductDynamic = () => {
       <Footer />
 
       {(() => {
-        const effectiveCountry = (simCountry === "auto" ? local.country : simCountry) || "";
+        const effectiveCountry = local.country || "";
         const globalExcluded = (product.excluded_countries ?? []).includes(effectiveCountry);
         const storeExcluded = globalExcluded || (product.store_excluded_countries ?? []).includes(effectiveCountry);
         const storeOn = product.store_enabled && !storeExcluded;

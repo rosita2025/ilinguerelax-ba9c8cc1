@@ -507,7 +507,7 @@ const Products = () => {
                         )}
                         {product.originalPrice && !product.isPhysical && product.originalPrice > product.price && (
                           <span className="text-lg text-muted-foreground line-through">
-                            ${product.originalPrice}
+                            {cardPrice.formatOriginal(product.slug, product.originalPrice)}
                           </span>
                         )}
                         <span className="text-sm text-accent font-medium">{cardPrice.currencyLabel(product.slug)}</span>

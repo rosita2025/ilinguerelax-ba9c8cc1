@@ -238,7 +238,12 @@ const ProductPatronesEspeciales = () => {
                   alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
-                <PinterestSave overlay />
+                <PinterestSave 
+                  overlay 
+                  media={`https://ilinguerelax.com${productImage}`}
+                  url="https://ilinguerelax.com/products/patrones-de-estructuras-gramaticales-especiales-ingles-con-pronunciacion"
+                  description="Domina patrones especiales y estructuras gramaticales en inglés con pronunciación adaptada."
+                />
               </div>
             </div>
 

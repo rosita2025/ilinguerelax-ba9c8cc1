@@ -119,7 +119,10 @@ Deno.serve(async (req) => {
         .maybeSingle();
       const currentDrive = ((currentRow?.drive_url as string | null) ?? "").trim();
       const driveChanged = newDrive !== currentDrive;
-      if (driveChanged && newDrive) {
+      
+      // Confirmation ONLY if there was an existing drive link and it is being changed to a different NON-EMPTY link.
+      // This avoids blocking new product creation or first-time URL setup.
+      if (driveChanged && newDrive && currentDrive) {
         // 1) Formato: debe ser un enlace de Google Drive/Docs (dominio esperado)
         const looksLikeDrive = /^https?:\/\/(drive|docs)\.google\.com\//i.test(newDrive);
         if (!looksLikeDrive) {

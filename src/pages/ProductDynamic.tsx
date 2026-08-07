@@ -16,7 +16,6 @@ import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
 import { FAQ } from "@/components/FAQ";
-import { TrustBadges } from "@/components/checkout/TrustBadges";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useI18n } from "@/i18n/I18nContext";
 
@@ -289,8 +288,7 @@ const ProductDynamic = () => {
                         <Shield className="w-4 h-4 text-primary" />
                         <span className="text-xs font-bold uppercase tracking-wider">Pago Seguro & Garantizado</span>
                       </div>
-                      <TrustBadges className="mb-4" />
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mt-2">
                         <span className="text-[10px] text-muted-foreground font-medium">Aceptamos:</span>
                         <PaymentLogos />
                       </div>

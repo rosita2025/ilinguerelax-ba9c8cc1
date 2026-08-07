@@ -7,6 +7,7 @@
 // se ignora por completo.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { normalizeSku } from "./digitalSku.ts";
+import { localAmountFromUsd, FX_USD_TO_LOCAL, ZERO_DECIMAL_CURRENCIES } from "./fxRates.ts";
 
 export type RegionTier = "latam" | "global" | "tienda";
 
@@ -74,6 +75,10 @@ export interface PricedItem {
   quantity: number;
   /** Precio unitario USD resuelto por el servidor (sin cupón). */
   unitUsd: number;
+  /** Overrides manuales por moneda (`digital_products.local_prices`). */
+  localPrices?: Record<string, number> | null;
+  /** Precio fijo en soles del catálogo (`digital_products.price_pen`). */
+  pricePen?: number | null;
 }
 
 export interface ResolvedPricing {
@@ -145,7 +150,7 @@ export async function resolveServerPricing(opts: {
   const lookups = Array.from(new Set([...skus, ...wanted.map((i) => i.id)]));
   const { data: rows, error } = await supabase
     .from("digital_products")
-    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases")
+    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen")
     .or(`sku.in.(${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}),sku_aliases.ov.{${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}}`);
   if (error) throw new PricingError("No se pudo leer el catálogo");
 
@@ -222,6 +227,8 @@ export async function resolveServerPricing(opts: {
       image: safeImage(row.cover_image_url),
       quantity: item.quantity,
       unitUsd: unit,
+      localPrices: (row.local_prices ?? null) as Record<string, number> | null,
+      pricePen: Number(row.price_pen) > 0 ? Number(row.price_pen) : null,
     });
   }
 
@@ -274,3 +281,40 @@ export async function resolveServerPricing(opts: {
   };
 }
 
+
+/**
+ * Total EXACTO en moneda local, espejo de `sumItemsLocal` en el front
+ * (`src/hooks/useLocalCurrency.ts`): usa el override manual por moneda del
+ * producto cuando existe y, si no, convierte el precio USD con la tasa
+ * autoritativa del servidor. Devuelve `null` si no hay tasa para esa moneda
+ * (el llamador debe cobrar en USD).
+ *
+ * Así el importe cobrado por la pasarela coincide con el que vio el comprador.
+ */
+export function localTotalFromPricing(
+  pricing: ResolvedPricing,
+  currency: string,
+): number | null {
+  const code = String(currency || "").toUpperCase();
+  if (code === "USD") return Number(pricing.totalUsd.toFixed(2));
+  const rate = FX_USD_TO_LOCAL[code];
+  if (!rate || !Number.isFinite(rate) || rate <= 0) return null;
+
+  let subtotal = 0;
+  for (const item of pricing.items) {
+    const override = code === "PEN" && !(Number(item.localPrices?.PEN) > 0)
+      ? item.pricePen ?? undefined
+      : item.localPrices?.[code];
+    const perUnit = typeof override === "number" && override > 0
+      ? override
+      : item.unitUsd * rate;
+    subtotal += perUnit * (item.quantity || 1);
+  }
+  const withCoupon = subtotal * (1 - (pricing.couponPercent || 0) / 100);
+  if (!Number.isFinite(withCoupon) || withCoupon <= 0) {
+    return localAmountFromUsd(pricing.totalUsd, code);
+  }
+  return ZERO_DECIMAL_CURRENCIES.has(code)
+    ? Math.round(withCoupon)
+    : Number(withCoupon.toFixed(2));
+}

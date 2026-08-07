@@ -2,7 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
-import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
+import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
 
 // SEGURIDAD: precio/nombre del cliente se ignoran; se resuelven en servidor.
 const ItemSchema = z.object({
@@ -89,17 +89,34 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Enviamos precios en USD y dejamos que Mercado Pago aplique el tipo de
-    // cambio local del comprador automáticamente (no hacemos conversión manual).
-    const mpItems = pricing.items.map((item) => ({
-      id: item.id,
-      title: item.name.slice(0, 250),
-      description: item.description?.slice(0, 250) ?? undefined,
-      picture_url: item.image ?? undefined,
-      quantity: item.quantity,
-      currency_id: "USD",
-      unit_price: Number((item.unitUsd * discountMultiplier).toFixed(2)),
-    }));
+    // Perú (moneda de la cuenta MP): cobramos en SOLES el importe EXACTO que
+    // vio el comprador, usando el precio local del catálogo (`local_prices` /
+    // `price_pen`) en vez de dejar que MP aplique su propio tipo de cambio.
+    // En el resto de países la cuenta solo admite USD, así que se mantiene USD.
+    const buyerCountry = String(body.country ?? "PE").toUpperCase().slice(0, 2);
+    const penTotal = buyerCountry === "PE" ? localTotalFromPricing(pricing, "PEN") : null;
+    const useLocal = penTotal != null && penTotal > 0;
+    const usdSubtotal = pricing.items.reduce(
+      (sum, i) => sum + i.unitUsd * discountMultiplier * i.quantity,
+      0,
+    );
+    // Repartimos el total local entre los ítems respetando su peso relativo,
+    // para que la suma coincida al céntimo con el total mostrado.
+    const mpItems = pricing.items.map((item) => {
+      const usdLine = item.unitUsd * discountMultiplier;
+      const unitLocal = useLocal && usdSubtotal > 0
+        ? Number(((usdLine / usdSubtotal) * (penTotal as number)).toFixed(2))
+        : 0;
+      return {
+        id: item.id,
+        title: item.name.slice(0, 250),
+        description: item.description?.slice(0, 250) ?? undefined,
+        picture_url: item.image ?? undefined,
+        quantity: item.quantity,
+        currency_id: useLocal ? "PEN" : "USD",
+        unit_price: useLocal ? unitLocal : Number(usdLine.toFixed(2)),
+      };
+    });
     const productSummary = pricing.items
       .map((i) => `${i.quantity}x ${i.name}`)
       .join(" · ")

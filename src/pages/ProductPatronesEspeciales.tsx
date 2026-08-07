@@ -100,7 +100,8 @@ const ProductPatronesEspeciales = () => {
   const PRICE_USD = isTiendaUsdCountry ? TIENDA_USD : useHotmartLatam ? LATAM_USD : GLOBAL_USD;
   const pricingReady = pricingAdmin.loaded && (isPeru ? (pricingAdmin.pricePen ?? 0) > 0 : PRICE_USD > 0);
   const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
-  const displayCurrency = isPeru ? "PEN" : detectCurrency(visitorCountry || "US");
+  const displayCurrency = (isPeru ? "PEN" : detectCurrency(visitorCountry || "US")) as Currency;
+  const localOverrides = useLocalOverrides("patrones-especiales-alfabeto-combinaciones-secretas-ingles") as Partial<Record<Currency, number>> | null;
   // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
   const priceLabel = isPeru && pricingAdmin.pricePen
     ? formatCurrencyAmount(pricingAdmin.pricePen, "PEN")

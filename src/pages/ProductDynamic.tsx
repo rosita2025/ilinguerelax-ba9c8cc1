@@ -229,7 +229,13 @@ const ProductDynamic = () => {
               </div>
 
               {product.gallery_images && product.gallery_images.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="space-y-3">
+                  {product.gallery_metadata?.gallery_title && (
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+                      {product.gallery_metadata.gallery_title}
+                    </h3>
+                  )}
+                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                   {[product.cover_image_url || "/placeholder.svg", ...product.gallery_images].slice(0, 5).map((img, i) => (
                     <button
                       key={i}
@@ -251,7 +257,8 @@ const ProductDynamic = () => {
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
+            )}
             </div>
 
             <div>

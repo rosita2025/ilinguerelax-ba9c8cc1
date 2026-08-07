@@ -18,6 +18,7 @@ import { ProductTypeBadge } from "@/components/ProductTypeBadge";
 import { FAQ } from "@/components/FAQ";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useI18n } from "@/i18n/I18nContext";
+import { formatCurrencyAmount, type Currency } from "@/i18n";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";

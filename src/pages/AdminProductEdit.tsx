@@ -344,9 +344,10 @@ const AdminProductEdit = () => {
         },
       });
       if (error) {
-        // Log detailed error for debugging if adminInvoke didn't catch it
+        // Detailed error reporting for the user
+        const errorMsg = error.message || "Error al guardar el producto";
         console.error("[AdminProductEdit] Save failed:", error);
-        throw error;
+        throw new Error(errorMsg);
       }
       if (data?.error) throw new Error(data.error);
 

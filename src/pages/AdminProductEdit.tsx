@@ -774,8 +774,8 @@ const AdminProductEdit = () => {
                   disabled={isGeneratingAI}
                   className="gap-2 text-primary border-primary/20 hover:bg-primary/5"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Escribir con IA
+                  {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {isGeneratingAI ? "Generando..." : "Escribir con IA"}
                 </Button>
               </div>
               <Textarea 

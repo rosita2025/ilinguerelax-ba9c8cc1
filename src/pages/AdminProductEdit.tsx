@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Info, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Info, Sparkles, Star, Eye } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,8 @@ interface Product {
   local_prices: Record<string, number>;
   is_physical: boolean;
   gallery_metadata: Record<string, any>;
+  rating?: number | null;
+  review_count?: number | null;
 }
 interface Bonus { name: string; drive_url: string; access_key: string; }
 const MAX_BONUSES = 4;
@@ -90,6 +92,8 @@ const EMPTY: Product = {
   local_prices: {},
   is_physical: false,
   gallery_metadata: {},
+  rating: 4.8,
+  review_count: 120,
 };
 
 const AdminProductEdit = () => {
@@ -357,7 +361,9 @@ const AdminProductEdit = () => {
               upsells,
               is_physical: !!product.is_physical,
               active: !!product.active,
-              store_enabled: !!product.store_enabled
+              store_enabled: !!product.store_enabled,
+              rating: product.rating,
+              review_count: product.review_count
             };
           })(),
         },
@@ -916,6 +922,40 @@ const AdminProductEdit = () => {
                 </p>
               </div>
             </div>
+
+            <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-dashed">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500" />
+                  <Label>Calificación (Rating)</Label>
+                </div>
+                <Input
+                  type="number" step="0.1" min="0" max="5"
+                  value={product.rating ?? ""}
+                  onChange={(e) => update("rating", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="4.8"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Valor de 0 a 5. Si es 0, se mostrará como "0.00" (ideal para productos nuevos).
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-primary" />
+                  <Label>Número de reseñas</Label>
+                </div>
+                <Input
+                  type="number"
+                  value={product.review_count ?? ""}
+                  onChange={(e) => update("review_count", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="120"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Cantidad total de compradores que han calificado.
+                </p>
+              </div>
+            </div>
+
             <div className="border-t pt-4 mt-2 space-y-3">
               <div>
                 <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (LATAM)</h3>

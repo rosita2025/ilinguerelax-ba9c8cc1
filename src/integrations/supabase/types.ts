@@ -925,6 +925,8 @@ export type Database = {
           price_usd: number
           price_usd_latam: number | null
           price_usd_tienda: number | null
+          rating: number | null
+          review_count: number | null
           sku: string
           sku_aliases: string[]
           sort_order: number
@@ -965,6 +967,8 @@ export type Database = {
           price_usd?: number
           price_usd_latam?: number | null
           price_usd_tienda?: number | null
+          rating?: number | null
+          review_count?: number | null
           sku: string
           sku_aliases?: string[]
           sort_order?: number
@@ -1005,6 +1009,8 @@ export type Database = {
           price_usd?: number
           price_usd_latam?: number | null
           price_usd_tienda?: number | null
+          rating?: number | null
+          review_count?: number | null
           sku?: string
           sku_aliases?: string[]
           sort_order?: number

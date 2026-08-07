@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
       }
 
       const row = {
-        sku: p.sku,
+        sku: p.sku.trim().toLowerCase(), // Final safety trim/lower
         name: p.name.trim(),
         description: p.description ?? null,
         learner_language: p.learner_language || "es",

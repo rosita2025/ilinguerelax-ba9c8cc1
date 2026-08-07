@@ -1,19 +1,30 @@
-# Plan: Fix `manage-products` Edge Function Errors - Final Review
+# Plan: Fix New Product Save Errors & Optimize SKU Logic
 
-The user reported "Edge Function error" (non-2xx) when publishing products. 
+The user is experiencing errors when saving new products despite recent fixes. Investigation revealed that while database permissions and RLS are set up, there are strict validation guards in the `manage-products` Edge Function (like Drive URL consistency and Alias uniqueness) that might be triggering 400/409 responses which are then reported as generic errors. Additionally, the automatic SKU generation needs to be more robust to handle edge cases and avoid manual overrides when not intended.
 
-## Accomplishments
-1. **Permission Fix**: Verified and corrected database GRANTS for `digital_products` and `product_upsells` to ensure the `authenticated` role (used by admins) can perform CRUD operations.
-2. **Timeout Prevention**: Refactored the `manage-products` edge function to run SEO pings (Google, Pinterest, Sitemap) in the background. Improved logging for these pings.
-3. **Admin UI Robustness**: 
-    - Switched from `supabase.functions.invoke` to `adminInvoke` in `AdminProductEdit.tsx`.
-    - `adminInvoke` is superior because it correctly extracts and displays the response body (json) even on non-2xx errors, allowing the user to see the actual problem (e.g., "SKU duplicado", "2FA required") instead of a generic "non-2xx" message.
-    - Added display for `detail` in the toast error message.
-4. **Build Fixes**: Resolved TypeScript errors related to `adminInvoke` and generics.
+## Proposed Changes
 
-## Final Verification
-- The code is now type-safe and handles errors with detailed feedback.
-- Background tasks in the edge function are non-blocking for the response.
-- RLS and GRANTS are aligned with admin needs.
+### 1. Backend: Edge Function Hardening (`supabase/functions/manage-products/index.ts`)
+- **Enhanced Error Details**: Ensure the `upsert` action returns specific error codes for Drive URL conflicts and Alias clashes so the frontend can show helpful toasts instead of a generic "non-2xx".
+- **RLS Verification**: Double-check that the `service_role` client is used for all internal checks to bypass potential RLS delays or misconfigurations during validation.
 
-Everything is ready.
+### 2. Frontend: Admin UI Improvements (`src/pages/AdminProductEdit.tsx`)
+- **SKU Generation Logic**:
+    - Improve the slugification regex to handle more characters.
+    - Add a "Regenerate SKU" button next to the field for when the user changes the title but already edited the SKU once.
+- **Improved Error Handling**:
+    - Update the `save` function to specifically handle the `requiresConfirmation` (409) response from the Edge Function if the Drive URL is changed.
+    - Show specific toasts for SKU or Alias conflicts returned by the backend.
+- **Image Upload Robustness**: Ensure the `ProductImageUploader` correctly passes the SKU to the bucket path even for new products (using the auto-generated one).
+
+### 3. Database: Security & Permissions
+- **Verify RLS**: Run a quick check on `digital_product_changes` and `product_upsells` to ensure the `authenticated` role has full access via the `has_role` function.
+- **Grant Review**: Ensure `GRANT ALL` is explicitly applied to any newly discovered related tables.
+
+## Verification Plan
+1. **Automated Test**: Run a Playwright script to:
+    - Navigate to `/admin/productos/nuevo`.
+    - Enter a product name and verify auto-SKU generation.
+    - Upload a dummy image and verify it lands in the `product-images` bucket.
+    - Save the product and verify it appears in the list.
+2. **Conflict Check**: Attempt to create a product with a duplicate SKU and verify the error message is clear.

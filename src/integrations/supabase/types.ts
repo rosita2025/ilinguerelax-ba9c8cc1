@@ -909,6 +909,7 @@ export type Database = {
           drive_url: string | null
           excluded_countries: string[]
           gallery_images: string[] | null
+          gallery_metadata: Json | null
           hotmart_excluded_countries: string[]
           hotmart_prices_by_country: Json
           hotmart_url: string | null
@@ -948,6 +949,7 @@ export type Database = {
           drive_url?: string | null
           excluded_countries?: string[]
           gallery_images?: string[] | null
+          gallery_metadata?: Json | null
           hotmart_excluded_countries?: string[]
           hotmart_prices_by_country?: Json
           hotmart_url?: string | null
@@ -987,6 +989,7 @@ export type Database = {
           drive_url?: string | null
           excluded_countries?: string[]
           gallery_images?: string[] | null
+          gallery_metadata?: Json | null
           hotmart_excluded_countries?: string[]
           hotmart_prices_by_country?: Json
           hotmart_url?: string | null

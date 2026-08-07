@@ -353,10 +353,6 @@ const AdminProductEdit = () => {
               store_enabled: !!product.store_enabled
             };
           })(),
-
-
-
-
         },
       });
       if (error) {

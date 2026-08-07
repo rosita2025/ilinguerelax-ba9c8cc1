@@ -333,10 +333,21 @@ const AdminProductEdit = () => {
           action: "upsert",
           adminKey,
           confirmDriveChange,
-          product: { ...product, upsells },
+          product: { 
+            ...product, 
+            upsells,
+            // Ensure boolean fields are correctly passed
+            is_physical: !!product.is_physical,
+            active: !!product.active,
+            store_enabled: !!product.store_enabled
+          },
         },
       });
-      if (error) throw error;
+      if (error) {
+        // Log detailed error for debugging if adminInvoke didn't catch it
+        console.error("[AdminProductEdit] Save failed:", error);
+        throw error;
+      }
       if (data?.error) throw new Error(data.error);
 
       // Revalidate: read the fresh updated_at from the DB so we broadcast a real version stamp.

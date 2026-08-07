@@ -220,9 +220,6 @@ const ProductDynamic = () => {
               </ul>
 
               <ProductTypeBadge isPhysical={false} className="mb-5" />
-              {product.description && (
-                <p className="text-muted-foreground mb-5 whitespace-pre-line">{product.description}</p>
-              )}
 
               <div className="flex items-baseline gap-3 mb-5">
                 <span className="text-4xl font-bold text-primary">{displayFormatted}</span>
@@ -304,6 +301,13 @@ const ProductDynamic = () => {
               )}
             </div>
           </div>
+          {product.description && (
+            <div className="mt-16 border-t border-border/50 pt-10">
+              <p className="text-muted-foreground whitespace-pre-line leading-relaxed text-lg max-w-4xl">
+                {product.description}
+              </p>
+            </div>
+          )}
         </div>
       </main>
       

@@ -415,16 +415,20 @@ const AdminProductEdit = () => {
     setSaving(true);
     try {
       const prompt = `Actúa como un experto en marketing educativo y SEO para la marca "iLingue Relax". 
-      Genera una descripción persuasiva y profesional para un producto digital llamado "${product.name}".
+      Genera contenido para un producto digital llamado "${product.name}".
       El producto está diseñado para personas que quieren aprender ${product.target_language} siendo su idioma nativo el ${product.learner_language}.
       
-      INSTRUCCIONES SEO:
-      1. Incluye palabras clave relevantes para aprender ${product.target_language}.
-      2. Crea una estructura clara con encabezados implícitos.
-      3. Enfócate en beneficios concretos, metodología visual (mapas mentales) y fonética figurada.
-      4. Sugiere una lista de 5 palabras clave (keywords) al final separadas por comas.
+      INSTRUCCIONES:
+      1. Genera una DESCRIPCIÓN persuasiva (máximo 4 párrafos).
+      2. Genera una lista de 5 KEYWORDS separadas por comas.
+      3. Genera un ALT TEXT descriptivo y optimizado para SEO para la imagen principal del producto.
       
-      Devuelve SOLO la descripción y las keywords en formato de texto plano, máximo 4 párrafos estructurados para venta digital.`;
+      Formato de respuesta (devuelve SOLO este JSON):
+      {
+        "description": "...",
+        "keywords": "...",
+        "alt_text": "..."
+      }`;
 
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
         body: { 
@@ -437,8 +441,21 @@ const AdminProductEdit = () => {
       
       const content = data?.choices?.[0]?.message?.content;
       if (content) {
-        update("description", content);
-        toast({ title: "Contenido generado con IA" });
+        try {
+          const parsed = JSON.parse(content);
+          if (parsed.description) update("description", parsed.description);
+          // Almacenamos keywords y alt_text en la descripción como metadatos si no hay campos específicos,
+          // o simplemente informamos al usuario. Por ahora, como no hay campos en la DB para alt_text,
+          // los mostraremos en el toast o los adjuntaremos.
+          toast({ 
+            title: "Contenido generado con IA",
+            description: `Alt Text sugerido: ${parsed.alt_text}`
+          });
+        } catch (e) {
+          // Si no devolvió JSON, intentamos usarlo como descripción directamente
+          update("description", content);
+          toast({ title: "Contenido generado con IA" });
+        }
       }
     } catch (e) {
       console.error("[AI Generation] failed:", e);

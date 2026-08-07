@@ -278,15 +278,26 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Fire-and-forget SEO propagation: announces the new/updated URL to
-      // Bing/Yandex/Seznam (IndexNow) and pings sitemap for Google.
+      // Announce the new/updated URL to search engines.
+      // We wrap this in a fire-and-forget block with a timeout to avoid delaying
+      // the product save response or failing the whole request if a bot is slow.
       if (p.active !== false) {
-        await pingIndexNow([productUrl(p.sku)]);
-        pingPinterestAndCms({ url: productUrl(p.sku), type: "product" }).catch(() => {});
-        notifyGoogleIndexing([productUrl(p.sku)], "URL_UPDATED").catch(() => {});
-        pingSitemap().catch(() => {});
-        resubmitSitemapsGSC().catch(() => {});
-        inspectUrlGSC(productUrl(p.sku)).catch(() => {});
+        (async () => {
+          const url = productUrl(p.sku);
+          try {
+            await Promise.allSettled([
+              pingIndexNow([url]),
+              pingPinterestAndCms({ url, type: "product" }),
+              notifyGoogleIndexing([url], "URL_UPDATED"),
+              pingSitemap(),
+              resubmitSitemapsGSC(),
+              inspectUrlGSC(url),
+            ]);
+            console.log(`[manage-products] SEO pings settled for ${p.sku}`);
+          } catch (e) {
+            console.error(`[manage-products] SEO pings failed for ${p.sku}`, e);
+          }
+        })().catch(() => {});
       }
       return json({ success: true, sku: p.sku });
     }
@@ -313,14 +324,24 @@ Deno.serve(async (req) => {
       if (e1) throw e1;
       await admin.from("product_upsells").update({ product_sku: newSku }).eq("product_sku", oldSku);
       await admin.from("product_upsells").update({ upsell_sku: newSku }).eq("upsell_sku", oldSku);
-      // Announce both old (now 404) and new URLs so search engines refresh.
-      await pingIndexNow([productUrl(oldSku), productUrl(newSku)]);
-      pingPinterestAndCms({ url: productUrl(newSku), type: "product" }).catch(() => {});
-      notifyGoogleIndexing([productUrl(newSku)], "URL_UPDATED").catch(() => {});
-      notifyGoogleIndexing([productUrl(oldSku)], "URL_DELETED").catch(() => {});
-      pingSitemap().catch(() => {});
-      resubmitSitemapsGSC().catch(() => {});
-      inspectUrlGSC(productUrl(newSku)).catch(() => {});
+      // SEO: Announce both old (now 404) and new URLs so search engines refresh.
+      (async () => {
+        const oldUrl = productUrl(oldSku);
+        const newUrl = productUrl(newSku);
+        try {
+          await Promise.allSettled([
+            pingIndexNow([oldUrl, newUrl]),
+            pingPinterestAndCms({ url: newUrl, type: "product" }),
+            notifyGoogleIndexing([newUrl], "URL_UPDATED"),
+            notifyGoogleIndexing([oldUrl], "URL_DELETED"),
+            pingSitemap(),
+            resubmitSitemapsGSC(),
+            inspectUrlGSC(newUrl),
+          ]);
+        } catch (e) {
+          console.error(`[manage-products] SEO pings failed on rename ${oldSku} -> ${newSku}`, e);
+        }
+      })().catch(() => {});
       return json({ success: true, sku: newSku });
     }
 
@@ -329,11 +350,20 @@ Deno.serve(async (req) => {
       if (!sku) return json({ error: "SKU requerido" }, 400);
       const { error } = await admin.from("digital_products").delete().eq("sku", sku);
       if (error) throw error;
-      // Product removed — tell IndexNow so it drops the URL from indexes.
-      await pingIndexNow([productUrl(sku)]);
-      notifyGoogleIndexing([productUrl(sku)], "URL_DELETED").catch(() => {});
-      pingSitemap().catch(() => {});
-      resubmitSitemapsGSC().catch(() => {});
+      // SEO: tell IndexNow so it drops the URL from indexes.
+      (async () => {
+        const url = productUrl(sku);
+        try {
+          await Promise.allSettled([
+            pingIndexNow([url]),
+            notifyGoogleIndexing([url], "URL_DELETED"),
+            pingSitemap(),
+            resubmitSitemapsGSC(),
+          ]);
+        } catch (e) {
+          console.error(`[manage-products] SEO pings failed on delete ${sku}`, e);
+        }
+      })().catch(() => {});
       return json({ success: true });
     }
 
@@ -343,12 +373,21 @@ Deno.serve(async (req) => {
       if (!sku) return json({ error: "SKU requerido" }, 400);
       const { error } = await admin.from("digital_products").update({ active }).eq("sku", sku);
       if (error) throw error;
-      // Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
-      await pingIndexNow([productUrl(sku)]);
-      notifyGoogleIndexing([productUrl(sku)], active ? "URL_UPDATED" : "URL_DELETED").catch(() => {});
-      pingSitemap().catch(() => {});
-      resubmitSitemapsGSC().catch(() => {});
-      inspectUrlGSC(productUrl(sku)).catch(() => {});
+      // SEO: Activated → announce URL; deactivated → still ping so bots recrawl and see 404.
+      (async () => {
+        const url = productUrl(sku);
+        try {
+          await Promise.allSettled([
+            pingIndexNow([url]),
+            notifyGoogleIndexing([url], active ? "URL_UPDATED" : "URL_DELETED"),
+            pingSitemap(),
+            resubmitSitemapsGSC(),
+            inspectUrlGSC(url),
+          ]);
+        } catch (e) {
+          console.error(`[manage-products] SEO pings failed on toggle ${sku}`, e);
+        }
+      })().catch(() => {});
       return json({ success: true });
     }
 

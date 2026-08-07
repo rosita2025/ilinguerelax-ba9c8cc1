@@ -480,7 +480,7 @@ const Products = () => {
                             <div className="flex items-baseline gap-1.5">
                               <span className="text-lg font-black text-foreground">{cardPrice.format(p.slug, priceFor(p))}</span>
                               {p.originalPrice && p.originalPrice > p.price && (
-                                <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>
+                                <span className="text-xs text-muted-foreground line-through">{cardPrice.formatOriginal(p.slug, p.originalPrice)}</span>
                               )}
                               <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(p.slug)}</span>
                               <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>

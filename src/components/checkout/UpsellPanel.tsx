@@ -40,11 +40,11 @@ function Price({
 
   let label: string;
   if (isPeru && typeof pen === "number" && pen > 0) {
-    label = `S/ ${pen.toFixed(2)}`;
+    label = formatCurrencyAmount(pen, "PEN");
   } else if (!local.isUsd && !local.loading) {
     label = local.formatted;
   } else {
-    label = `$${usd.toFixed(2)}`;
+    label = formatCurrencyAmount(usd, "USD");
   }
 
   if (strike) {

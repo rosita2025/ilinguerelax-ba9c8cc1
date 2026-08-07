@@ -51,13 +51,9 @@ export function calcTotalsPen(
   };
 }
 
-/** Formats a PEN amount as "S/ 29.90" using es-PE locale. */
+/** Formats a PEN amount as "S/29,90" (dot thousands, comma decimals). */
 export function formatPen(amount: number): string {
-  try {
-    return new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(amount);
-  } catch {
-    return `S/ ${amount.toFixed(2)}`;
-  }
+  return formatCurrencyAmount(amount, "PEN");
 }
 
 export interface BuyerInfo {

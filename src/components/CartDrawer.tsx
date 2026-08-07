@@ -117,7 +117,7 @@ export const CartDrawer = () => {
     return single.amount;
   };
   const formatInternalUnit = (it: typeof visibleInternalItems[number]) => {
-    if (showNativePen) return `S/ ${(it.pricePen as number).toFixed(2)} PEN`;
+    if (showNativePen) return `${formatCurrencyAmount(it.pricePen as number, "PEN")} PEN`;
     const amt = localItemAmount(it);
     return `${formatLocalDirect(amt, country || "")} ${displayCurrency}`;
   };
@@ -129,7 +129,7 @@ export const CartDrawer = () => {
         overridesFor,
       ).amount;
   const internalSubtotalLabel = showNativePen
-    ? `S/ ${internalSubtotal.toFixed(2)} PEN`
+    ? `${formatCurrencyAmount(internalSubtotal, "PEN")} PEN`
     : `${formatLocalDirect(internalSubtotal, country || "")} ${displayCurrency}`;
 
   const [couponInput, setCouponInput] = useState("");

@@ -171,7 +171,9 @@ Deno.serve(async (req) => {
       : "USD";
     // Importe local calculado 100% en el servidor (total del catálogo × tasa
     // propia). Si no hay tasa autorizada para esa moneda, cobramos en USD.
-    const serverLocal = wantedCurrency === "USD" ? null : localAmountFromUsd(calculatedUsd, wantedCurrency);
+    const serverLocal = wantedCurrency === "USD"
+      ? null
+      : localTotalFromPricing(pricing, wantedCurrency);
     const localCurrency = wantedCurrency === "USD" || serverLocal == null ? "USD" : wantedCurrency;
     const localAmount = localCurrency === "USD" ? calculatedUsd : (serverLocal as number);
 

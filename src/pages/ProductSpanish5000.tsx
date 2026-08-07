@@ -45,7 +45,6 @@ import previewSpanishUpdates from "@/assets/preview-spanish-updates.jpg";
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
@@ -363,7 +362,6 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* Trust Badges */}
-              <TrustBadges lang="en" variant="grid" />
 
               {/* Influencer video carousel — social proof */}
               <div className="mt-6 -mx-4 md:-mx-0">

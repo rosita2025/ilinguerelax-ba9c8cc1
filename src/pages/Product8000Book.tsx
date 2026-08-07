@@ -50,7 +50,6 @@ const AMAZON_URL = "https://ilinguerelax.com/amazon";
 
 // Conversion components
 import { PurchaseCounter } from "@/components/PurchaseCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
@@ -356,7 +355,6 @@ const Product8000Book = () => {
               </div>
 
               {/* Trust Badges */}
-              <TrustBadges lang="es" variant="grid" />
 
               {/* Pre-order Info */}
               <motion.div 

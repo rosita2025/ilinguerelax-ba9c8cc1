@@ -21,13 +21,13 @@ import { motion } from "framer-motion";
 const product1000VerbosImage = "/images/product-1000-verbos.webp";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { PinterestSave } from "@/components/PinterestSave";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 const HOTMART_URL = "https://pay.hotmart.com/T102978081M?bid=1775682831595";
 const ADMIN_SKU_1000_VERBOS = "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion";
@@ -250,8 +250,10 @@ const Product1000Verbos = () => {
                 👆 Haz clic para asegurar tu copia al precio de oferta
               </p>
 
-
-              <TrustBadges lang="es" variant="grid" />
+              <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
+                <PaymentLogos />
+              </div>
 
               <motion.div
                 initial={{ opacity: 0 }}

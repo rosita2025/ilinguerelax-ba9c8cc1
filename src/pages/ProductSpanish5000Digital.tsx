@@ -24,7 +24,6 @@ import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useI18n } from "@/i18n/I18nContext";
@@ -333,7 +332,6 @@ const ProductSpanish5000Digital = () => {
                 </p>
               </div>
 
-              <TrustBadges />
               <StockCounter />
 
               <ul className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">

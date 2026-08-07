@@ -14,7 +14,7 @@ import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";
-import { TrustBadges } from "@/components/checkout/TrustBadges";
+
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 
@@ -611,7 +611,7 @@ export default function Checkout() {
               <h3 className="font-bold text-lg">Checkout Seguro</h3>
             </div>
             
-            <TrustBadges className="mb-6" />
+            
             
             <div className="pt-6 border-t border-border/50">
               <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">

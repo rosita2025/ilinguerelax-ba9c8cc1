@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { TrustBadges } from "@/components/TrustBadges";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
@@ -405,7 +404,6 @@ const ProductSpanish3000VerbsBook = () => {
               )}
 
               <div className="mt-2">
-                <TrustBadges lang="en" variant="grid" />
               </div>
             </div>
           </div>

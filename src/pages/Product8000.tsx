@@ -49,7 +49,6 @@ import logoKindle from "@/assets/logo-kindle.png";
 import { Product8000Preview } from "@/components/Product8000Preview";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { VideoTestimonial } from "@/components/VideoTestimonial";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
@@ -344,7 +343,6 @@ const Product8000 = () => {
               </p>
 
               {/* Trust Badges */}
-              <TrustBadges lang="es" variant="grid" />
 
               {/* Money Back Guarantee - Enhanced */}
               <motion.div

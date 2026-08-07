@@ -443,6 +443,7 @@ const AdminProductEdit = () => {
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
         body: { 
           action: "chat",
+          model: "google/gemini-2.0-flash", // Use standard model
           messages: [{ role: "user", content: prompt }]
         }
       });

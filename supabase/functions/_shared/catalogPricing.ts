@@ -77,6 +77,8 @@ export interface PricedItem {
   unitUsd: number;
   /** Overrides manuales por moneda (`digital_products.local_prices`). */
   localPrices?: Record<string, number> | null;
+  /** Precio fijo en soles del catálogo (`digital_products.price_pen`). */
+  pricePen?: number | null;
 }
 
 export interface ResolvedPricing {
@@ -148,7 +150,7 @@ export async function resolveServerPricing(opts: {
   const lookups = Array.from(new Set([...skus, ...wanted.map((i) => i.id)]));
   const { data: rows, error } = await supabase
     .from("digital_products")
-    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices")
+    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen")
     .or(`sku.in.(${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}),sku_aliases.ov.{${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}}`);
   if (error) throw new PricingError("No se pudo leer el catálogo");
 
@@ -226,6 +228,7 @@ export async function resolveServerPricing(opts: {
       quantity: item.quantity,
       unitUsd: unit,
       localPrices: (row.local_prices ?? null) as Record<string, number> | null,
+      pricePen: Number(row.price_pen) > 0 ? Number(row.price_pen) : null,
     });
   }
 
@@ -299,7 +302,9 @@ export function localTotalFromPricing(
 
   let subtotal = 0;
   for (const item of pricing.items) {
-    const override = item.localPrices?.[code];
+    const override = code === "PEN" && !(Number(item.localPrices?.PEN) > 0)
+      ? item.pricePen ?? undefined
+      : item.localPrices?.[code];
     const perUnit = typeof override === "number" && override > 0
       ? override
       : item.unitUsd * rate;

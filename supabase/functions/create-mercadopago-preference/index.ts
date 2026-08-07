@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
     const mpItems = pricing.items.map((item) => {
       const usdLine = item.unitUsd * discountMultiplier;
       const unitLocal = useLocal && usdSubtotal > 0
-        ? Number(((usdLine / usdSubtotal) * (penTotal as number) / 1).toFixed(2))
+        ? Number(((usdLine / usdSubtotal) * (penTotal as number)).toFixed(2))
         : 0;
       return {
         id: item.id,

@@ -97,6 +97,7 @@ interface ProductIn {
   hotmart_excluded_countries?: string[] | null;
   local_prices?: Record<string, number> | null;
   upsells?: UpsellIn[];
+  gallery_metadata?: Record<string, any> | null;
 }
 
 const SKU_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -303,6 +304,7 @@ Deno.serve(async (req) => {
               .filter(url => /^https?:\/\//i.test(url))
               .slice(0, 5)
           : [],
+        gallery_metadata: p.gallery_metadata && typeof p.gallery_metadata === "object" ? p.gallery_metadata : {},
       };
 
       // Duplicate-alias guard: if any alias is already used by a different product, reject.

@@ -239,6 +239,14 @@ export const en = {
     discount: "Discount",
     off: "off",
     viewDetails: "View Details",
+    verifiedReviews: "Verified Reviews",
+    peopleInCart: "people have this in their cart",
+    peoplePurchased: "people purchased this recently",
+    onlyLeft: "Only {{count}} left at this price!",
+    productTypePhysical: "Physical Product",
+    productTypeDigital: "Digital Product",
+    whyUnique: "Why is this unique?",
+    socialProofMessage: "{{name}} and {{count}} others purchased this",
   },
 
   // Products page

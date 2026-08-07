@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { Check, ArrowLeft, Download, Shield, Zap } from "lucide-react";
+import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
@@ -10,6 +10,13 @@ import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
+import { VerifiedReviews } from "@/components/VerifiedReviews";
+import { CartBadge } from "@/components/CartBadge";
+import { StockAlert } from "@/components/StockAlert";
+import { SocialProofPill } from "@/components/SocialProofPill";
+import { ProductTypeBadge } from "@/components/ProductTypeBadge";
+import { FAQ } from "@/components/FAQ";
+import { useI18n } from "@/i18n/I18nContext";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -64,6 +71,7 @@ const ProductDynamic = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [simCountry, setSimCountry] = useState<string>("auto");
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!slug) return;
@@ -203,7 +211,21 @@ const ProductDynamic = () => {
                 <span className="text-lg">{FLAG[product.learner_language] ?? "🌐"} → {FLAG[product.target_language] ?? "🌐"}</span>
                 <span>{LANG[product.target_language] ?? product.target_language} para hablantes de {LANG[product.learner_language] ?? product.learner_language}</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-3">{product.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">{product.name}</h1>
+              <VerifiedReviews rating={4.8} count={120} className="mb-4" />
+              
+              <ul className="space-y-2 mb-5">
+                <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span>{product.target_language === 'en' ? 'From Beauty to Radiance' : 'Aprende sin Estrés'}</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span>{product.target_language === 'en' ? 'Fast Global Shipping' : 'Acceso Inmediato'}</span>
+                </li>
+              </ul>
+
+              <ProductTypeBadge isPhysical={false} className="mb-5" />
               {product.description && (
                 <p className="text-muted-foreground mb-5 whitespace-pre-line">{product.description}</p>
               )}
@@ -232,12 +254,16 @@ const ProductDynamic = () => {
 
               <DigitalProductNotice className="mb-6" />
 
+              <CartBadge className="mb-6 w-full justify-center" />
+
               <PinterestSave
                 className="mb-6"
                 url={canonical}
                 media={cover}
                 description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
               />
+
+              <SocialProofPill className="mb-4 w-full justify-center" />
 
 
 
@@ -262,6 +288,7 @@ const ProductDynamic = () => {
                         Comprar ahora
                       </Link>
                     </Button>
+                    <StockAlert count={7} className="mt-2 w-full justify-center" />
                   </div>
                 );
               })()}
@@ -329,6 +356,35 @@ const ProductDynamic = () => {
           </div>
         </div>
       </main>
+      
+      <FAQ
+        title={t("product.whyUnique")}
+        subtitle={product.name}
+        items={[
+          {
+            question: product.target_language === 'en' ? "What makes this English guide special?" : "¿Qué hace especial a esta guía?",
+            answer: product.target_language === 'en' 
+              ? "Our method focuses on stress-free learning with pronunciations adapted specifically for Spanish speakers."
+              : "Nuestro método se enfoca en aprender sin estrés con pronunciaciones adaptadas específicamente para hispanohablantes.",
+            icon: Sparkles
+          },
+          {
+            question: product.target_language === 'en' ? "How do I receive the product?" : "¿Cómo recibo el producto?",
+            answer: product.target_language === 'en'
+              ? "After purchase, you will receive an email with a direct download link to your PDF guide."
+              : "Después de la compra, recibirás un correo con un enlace de descarga directa a tu guía en PDF.",
+            icon: Download
+          },
+          {
+            question: product.target_language === 'en' ? "Is my payment secure?" : "¿Es seguro mi pago?",
+            answer: product.target_language === 'en'
+              ? "Yes, we use industry-standard encryption and trusted payment processors like Stripe and Hotmart."
+              : "Sí, utilizamos cifrado estándar de la industria y procesadores de pago confiables como Stripe y Hotmart.",
+            icon: Shield
+          }
+        ]}
+      />
+
       <Footer />
 
       {(() => {

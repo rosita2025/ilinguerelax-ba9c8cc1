@@ -98,6 +98,8 @@ interface ProductIn {
   local_prices?: Record<string, number> | null;
   upsells?: UpsellIn[];
   gallery_metadata?: Record<string, any> | null;
+  rating?: number | null;
+  review_count?: number | null;
 }
 
 const SKU_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -305,6 +307,8 @@ Deno.serve(async (req) => {
               .slice(0, 5)
           : [],
         gallery_metadata: p.gallery_metadata && typeof p.gallery_metadata === "object" ? p.gallery_metadata : {},
+        rating: p.rating === 0 ? 0 : (p.rating != null ? Number(p.rating) : null),
+        review_count: p.review_count === 0 ? 0 : (p.review_count != null ? Number(p.review_count) : null),
       };
 
       // Duplicate-alias guard: if any alias is already used by a different product, reject.

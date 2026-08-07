@@ -277,11 +277,18 @@ const ProductPatronesEspeciales = () => {
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    <Star 
+                      key={i} 
+                      className={`w-5 h-5 ${i < Math.floor(pricingAdmin.rating ?? 4.9) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} 
+                    />
                   ))}
                 </div>
-                <span className="font-bold text-foreground">4.9/5</span>
-                <span className="text-muted-foreground">Calidad verificada</span>
+                <span className="font-bold text-foreground">
+                  {pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9"}/5
+                </span>
+                <span className="text-muted-foreground">
+                  ({pricingAdmin.reviewCount ?? 6} {t.product.verifiedReviews})
+                </span>
               </div>
 
               <PrecioEconomicoBanner />

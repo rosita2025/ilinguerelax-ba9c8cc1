@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
       console.log(`[manage-products] Upserting product: ${p?.sku}`, { 
         is_physical: p?.is_physical, 
         active: p?.active,
-        bonus_titles: !!(p as any).bonus_titles 
+        bonus_titles_present: !!(p as any).bonus_titles 
       });
 
       const confirmDriveChange = (body as { confirmDriveChange?: boolean }).confirmDriveChange === true;

@@ -298,7 +298,7 @@ const AdminProductEdit = () => {
     }
     setSaving(true);
     try {
-      const { data, error } = await supabase.functions.invoke("manage-products", {
+      const { data, error } = await adminInvoke("manage-products", {
         body: {
           action: "upsert",
           adminKey,
@@ -306,7 +306,9 @@ const AdminProductEdit = () => {
           product: { ...product, upsells },
         },
       });
-      if (error || data?.error) throw new Error(data?.error || error?.message);
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
       // Revalidate: read the fresh updated_at from the DB so we broadcast a real version stamp.
       let version = Date.now();
       try {

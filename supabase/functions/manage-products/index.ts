@@ -302,8 +302,11 @@ Deno.serve(async (req) => {
           }
         };
         
-        // Execute background pings without awaiting
-        pings().catch(console.error);
+        // Execute background pings without awaiting. 
+        // In Deno Deploy / Supabase Edge Functions, background tasks must be finished 
+        // before the response is sent unless using specific platform APIs like EdgeRuntime.waitUntil.
+        // To be safe and fast, we keep them async but ensure they don't block the return.
+        pings().catch(err => console.error(`[manage-products] Uncaught background error:`, err));
       }
       return json({ success: true, sku: p.sku });
 

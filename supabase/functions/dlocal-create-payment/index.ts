@@ -5,8 +5,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
-import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
-import { localAmountFromUsd } from "../_shared/fxRates.ts";
+import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
 import { dlocalApiBase } from "../_shared/dlocal.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 

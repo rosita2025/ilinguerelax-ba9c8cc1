@@ -157,25 +157,29 @@ export function useCardPrice(): CardPriceFormatter {
     return formatPrice(tierUsd(row, fallbackUsd), displayCurrency, row?.local_prices as any);
   };
 
+  // El precio "antes" usa la MISMA regla que la ficha de producto y el sticky
+  // bar (precio mostrado x 2.5) para que no haya diferencias entre tarjeta y
+  // página. Solo si el producto aún no existe en el admin se usa el precio
+  // tachado del catálogo estático.
+  const ORIGINAL_MULTIPLIER = 2.5;
+
   const formatOriginal = (sku: string | null | undefined, originalUsd: number): string => {
     const row = sku && rows ? rows[sku] : undefined;
     const override = row?.local_prices?.[displayCurrency];
 
     if (isPeru) {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
-      const current = tierUsd(row, 0);
-      // Keep the same discount ratio the USD pair expresses.
-      if (pen && current > 0) return formatCurrencyAmount((pen * originalUsd) / current, "PEN");
+      if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
       return formatPrice(originalUsd, "PEN");
     }
 
     if (typeof override === "number" && override > 0) {
-      const current = tierUsd(row, 0);
-      if (current > 0) return formatCurrencyAmount((override * originalUsd) / current, displayCurrency);
-      return formatCurrencyAmount(override, displayCurrency);
+      return formatCurrencyAmount(override * ORIGINAL_MULTIPLIER, displayCurrency);
     }
 
     const rate = exchangeRates[displayCurrency] ?? 1;
+    const current = tierUsd(row, 0);
+    if (current > 0) return formatCurrencyAmount(current * ORIGINAL_MULTIPLIER * rate, displayCurrency);
     return formatCurrencyAmount(originalUsd * rate, displayCurrency);
   };
 

@@ -104,6 +104,7 @@ const AdminProductEdit = () => {
   const [upsells, setUpsells] = useState<UpsellRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   // Snapshot del drive_url original al cargar → usado para exigir confirmación
   // cuando el admin lo cambia (evita pegar el link de otro producto por error).
   const [originalDriveUrl, setOriginalDriveUrl] = useState<string>("");
@@ -416,7 +417,7 @@ const AdminProductEdit = () => {
       return;
     }
 
-    setSaving(true);
+    setIsGeneratingAI(true);
     try {
       const prompt = `Actúa como un experto en marketing educativo y SEO para la marca "iLingue Relax". 
       Genera contenido para un producto digital llamado "${product.name}".
@@ -497,11 +498,15 @@ const AdminProductEdit = () => {
           toast({ title: "Contenido generado con IA" });
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("[AI Generation] failed:", e);
-      toast({ title: "Error con la IA", description: "No se pudo generar el contenido", variant: "destructive" });
+      toast({ 
+        title: "Error con la IA", 
+        description: e.message || "No se pudo generar el contenido", 
+        variant: "destructive" 
+      });
     } finally {
-      setSaving(false);
+      setIsGeneratingAI(false);
     }
   };
 
@@ -766,11 +771,11 @@ const AdminProductEdit = () => {
                   variant="outline" 
                   size="sm" 
                   onClick={generateAIContent}
-                  disabled={saving}
+                  disabled={isGeneratingAI}
                   className="gap-2 text-primary border-primary/20 hover:bg-primary/5"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Escribir con IA
+                  {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {isGeneratingAI ? "Generando..." : "Escribir con IA"}
                 </Button>
               </div>
               <Textarea 

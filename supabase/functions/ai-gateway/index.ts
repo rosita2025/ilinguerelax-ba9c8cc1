@@ -35,11 +35,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     if (!lovableKey) {
+      adminLog("ai-gateway", "error", "config_missing", { key: "LOVABLE_API_KEY" });
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
         status: 500,
         headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    adminLog("ai-gateway", "info", "proxy_request", { model, messagesCount: messages?.length });
 
     const aiRes = await fetch(AI_URL, {
       method: "POST",

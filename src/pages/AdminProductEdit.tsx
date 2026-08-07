@@ -671,6 +671,16 @@ const AdminProductEdit = () => {
                 sku={product.sku}
               />
             </div>
+            <div>
+              <Label>Galería de imágenes (3-5 imágenes recomendadas)</Label>
+              <ProductImageUploader
+                value={product.gallery_images ?? []}
+                onChange={(urls) => update("gallery_images", urls as string[])}
+                sku={product.sku}
+                multiple
+                maxImages={5}
+              />
+            </div>
           </Card>
 
           <Card className="p-6 space-y-4">

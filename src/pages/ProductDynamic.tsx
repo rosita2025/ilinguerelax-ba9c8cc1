@@ -50,6 +50,8 @@ interface DBProduct {
   gallery_metadata: Record<string, any> | null;
   rating: number | null;
   review_count: number | null;
+  /** Montos exactos por moneda fijados en /admin/productos/:sku. */
+  local_prices: Record<string, number> | null;
 }
 
 import { COUNTRY_INFO } from "@/lib/countryInfo";

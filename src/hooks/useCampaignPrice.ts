@@ -50,7 +50,7 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
   CAD: { symbol: "$",    rate: 1.36, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   AUD: { symbol: "$",    rate: 1.55, decimals: 2, nice: (n) => Math.round(n * 100) / 100 },
   // COP: ajustado para landing $43k-$46k a $13.99 USD
-  COP: { symbol: "$",    rate: 3200, decimals: 0, nice: (n) => {
+  COP: { symbol: "$",    rate: 4200, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 1000) * 1000;
     return Math.max(900, rounded - 100); // termina en .900
   }},
@@ -65,7 +65,7 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
     return rounded - 0.10; // termina en .90
   }},
   // MXN: ajustado para landing $189-$199 a $13.99 USD
-  MXN: { symbol: "$",    rate: 14, decimals: 0, nice: (n) => {
+  MXN: { symbol: "$",    rate: 20, decimals: 0, nice: (n) => {
     const rounded = Math.round(n / 10) * 10;
     return Math.max(9, rounded - 1); // termina en 9 (psicológico)
   }},

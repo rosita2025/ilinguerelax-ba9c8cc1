@@ -418,7 +418,8 @@ const AdminProductEdit = () => {
       Genera una descripción persuasiva y profesional para un producto digital llamado "${product.name}".
       El producto está diseñado para personas que quieren aprender ${product.target_language} siendo su idioma nativo el ${product.learner_language}.
       Enfócate en los beneficios, la facilidad de uso (PDF/Drive) y resultados rápidos.
-      Devuelve SOLO la descripción en formato de texto plano, máximo 3 párrafos cortos.`;
+      Incluye puntos clave sobre el contenido y por qué es único.
+      Devuelve SOLO la descripción en formato de texto plano, máximo 4 párrafos estructurados para venta digital.`;
 
       const { data, error } = await supabase.functions.invoke("ai-gateway", {
         body: { 
@@ -437,6 +438,10 @@ const AdminProductEdit = () => {
     } catch (e) {
       console.error("[AI Generation] failed:", e);
       toast({ title: "Error con la IA", description: "No se pudo generar el contenido", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
     } finally {
       setSaving(false);
     }

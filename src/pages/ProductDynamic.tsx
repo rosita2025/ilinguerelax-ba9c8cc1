@@ -226,15 +226,20 @@ const ProductDynamic = () => {
 
               {product.gallery_images && product.gallery_images.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {[product.cover_image_url || "/placeholder.svg", ...product.gallery_images].map((img, i) => (
+                  {[product.cover_image_url || "/placeholder.svg", ...product.gallery_images].slice(0, 5).map((img, i) => (
                     <button
                       key={i}
                       onClick={() => setActiveImage(img)}
                       className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
-                        activeImage === img ? "border-primary shadow-sm" : "border-transparent opacity-70 hover:opacity-100"
+                        activeImage === img ? "border-primary shadow-sm scale-95" : "border-transparent opacity-70 hover:opacity-100"
                       }`}
                     >
                       <img src={img} alt={`Vista ${i + 1}`} className="w-full h-full object-cover" />
+                      {activeImage === img && (
+                        <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                          <Check className="w-5 h-5 text-primary drop-shadow-md" />
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>

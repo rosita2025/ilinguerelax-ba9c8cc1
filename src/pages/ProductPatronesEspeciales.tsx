@@ -12,6 +12,7 @@ import SalesNotification from "@/components/SalesNotification";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2 } from "lucide-react";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
@@ -370,6 +371,10 @@ const ProductPatronesEspeciales = () => {
                 👇 Mira la vista previa real antes de comprar
               </p>
 
+              <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
+                <PaymentLogos />
+              </div>
 
               <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
                 <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">

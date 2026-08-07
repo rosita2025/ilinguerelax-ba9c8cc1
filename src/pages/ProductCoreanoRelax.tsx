@@ -10,6 +10,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { Button } from "@/components/ui/button";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { Input } from "@/components/ui/input";
 import { Check, BookOpen, Mail, Loader2, Lightbulb, Globe, Sparkles, Brain, ShoppingCart, Store } from "lucide-react";
 import { motion } from "framer-motion";

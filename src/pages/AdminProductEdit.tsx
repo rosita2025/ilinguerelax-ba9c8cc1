@@ -406,6 +406,42 @@ const AdminProductEdit = () => {
   };
 
 
+  const generateAIContent = async () => {
+    if (!product.name) {
+      toast({ title: "Nombre requerido", description: "Ingresa un nombre para generar contenido con IA", variant: "destructive" });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const prompt = `Actúa como un experto en marketing educativo para la marca "iLingue Relax". 
+      Genera una descripción persuasiva y profesional para un producto digital llamado "${product.name}".
+      El producto está diseñado para personas que quieren aprender ${product.target_language} siendo su idioma nativo el ${product.learner_language}.
+      Enfócate en los beneficios, la facilidad de uso (PDF/Drive) y resultados rápidos.
+      Devuelve SOLO la descripción en formato de texto plano, máximo 3 párrafos cortos.`;
+
+      const { data, error } = await supabase.functions.invoke("ai-gateway", {
+        body: { 
+          action: "chat",
+          messages: [{ role: "user", content: prompt }]
+        }
+      });
+
+      if (error) throw error;
+      
+      const content = data?.choices?.[0]?.message?.content;
+      if (content) {
+        update("description", content);
+        toast({ title: "Contenido generado con IA" });
+      }
+    } catch (e) {
+      console.error("[AI Generation] failed:", e);
+      toast({ title: "Error con la IA", description: "No se pudo generar el contenido", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) return (
     <><AdminNav /><div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div></>
   );

@@ -701,8 +701,8 @@ const AdminProductEdit = () => {
                 <Button 
                   type="button" 
                   variant="outline" 
-                  size="xs" 
-                  className="h-7 text-[10px] gap-1"
+                  size="sm" 
+                  className="h-7 text-[10px] gap-1 px-2"
                   onClick={generateAIContent}
                   disabled={saving}
                 >

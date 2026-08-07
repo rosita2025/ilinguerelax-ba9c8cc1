@@ -21,7 +21,6 @@ import { motion } from "framer-motion";
 const product1000VerbosImage = "/images/product-1000-verbos.webp";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -251,7 +250,6 @@ const Product1000Verbos = () => {
               </p>
 
 
-              <TrustBadges lang="es" variant="grid" />
 
               <motion.div
                 initial={{ opacity: 0 }}

@@ -23,7 +23,6 @@ import { motion } from "framer-motion";
 const product500PreguntasImage = "/images/product-500-preguntas.webp";
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductCrossSell } from "@/components/ProductCrossSell";
 import { PinterestSave } from "@/components/PinterestSave";
@@ -224,7 +223,6 @@ const Product500Preguntas = () => {
                 👆 Haz clic para asegurar tu copia al precio de oferta
               </p>
 
-              <TrustBadges lang="es" variant="grid" />
 
               <motion.div
                 initial={{ opacity: 0 }}

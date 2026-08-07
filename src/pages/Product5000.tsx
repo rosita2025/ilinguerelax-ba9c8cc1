@@ -80,7 +80,6 @@ import logoKindle from "@/assets/logo-kindle.png";
 // Components
 import { PurchaseCounter } from "@/components/PurchaseCounter";
 import { StockCounter } from "@/components/StockCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { PinterestSave } from "@/components/PinterestSave";
@@ -600,7 +599,6 @@ const Product5000 = () => {
 
 
               {/* Trust Badges */}
-              <TrustBadges lang="es" variant="grid" />
 
 
               {/* Quality & Brand Trust */}

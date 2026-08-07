@@ -13,7 +13,6 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
@@ -371,7 +370,6 @@ const ProductPatronesEspeciales = () => {
                 👇 Mira la vista previa real antes de comprar
               </p>
 
-              <TrustBadges lang="es" variant="grid" />
 
               <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
                 <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">

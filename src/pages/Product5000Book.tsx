@@ -34,7 +34,6 @@ const product5000BookImage = "/images/product-5000-book.webp";
 const product5000BookPerson = "/images/product-5000-book.webp";
 
 import { PurchaseCounter } from "@/components/PurchaseCounter";
-import { TrustBadges } from "@/components/TrustBadges";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -334,7 +333,6 @@ const Product5000Book = () => {
               </Button>
 
               {/* Trust Badges */}
-              <TrustBadges lang="es" variant="grid" />
 
               {/* Amazon Info */}
               <motion.div

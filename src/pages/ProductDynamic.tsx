@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle } from "lucide-react";
+import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
@@ -79,7 +79,6 @@ const ProductDynamic = () => {
           .from("digital_products")
           .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries")
           .eq("sku", slug)
-          .eq("active", true)
           .maybeSingle();
         data = result.data;
         error = result.error;
@@ -185,6 +184,16 @@ const ProductDynamic = () => {
       />
       <Navbar />
       <main className="min-h-dvh bg-background pt-4 pb-16">
+        {!product.active && (
+          <div className="max-w-6xl mx-auto px-4 mb-6">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3 text-amber-800">
+              <Lock className="w-5 h-5 shrink-0" />
+              <div className="text-sm">
+                <span className="font-bold">Vista previa de Borrador:</span> Este producto está oculto para los clientes. Solo tú puedes verlo porque eres administrador.
+              </div>
+            </div>
+          </div>
+        )}
         <div className="max-w-6xl mx-auto px-4">
           <Link to="/products" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4">
             <ArrowLeft className="w-4 h-4" /> Todos los productos

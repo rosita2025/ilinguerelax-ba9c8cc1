@@ -51,6 +51,7 @@ function toProduct(p: DBProduct): Product {
     formats: ["digital"],
     learnerLanguage: p.learner_language as Product["learnerLanguage"],
     targetLanguage: p.target_language as Product["targetLanguage"],
+    active: p.active,
     // Route DB products to their dynamic product page (Shopify-style /products/:sku).
     externalUrl: `/products/${p.sku}`,
   };
@@ -74,7 +75,6 @@ export function useDigitalProducts() {
         const result = await supabase
           .from("digital_products")
           .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, sort_order")
-          .eq("active", true)
           .order("sort_order", { ascending: true });
         data = result.data as DBProduct[] | null;
         error = result.error;

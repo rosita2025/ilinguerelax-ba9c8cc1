@@ -21,6 +21,8 @@ export interface AdminPricing {
   storeEnabled: boolean;
   /** Cover image URL from admin. `null` until loaded. */
   coverImageUrl: string | null;
+  /** Whether the product is active (published). */
+  active: boolean;
   /** `true` once the query has resolved (successfully or not). */
   loaded: boolean;
   /** `true` if the SKU has no active row in `digital_products`. */
@@ -37,6 +39,7 @@ const INITIAL: AdminPricing = {
   hotmartUrl: null,
   storeEnabled: true,
   coverImageUrl: null,
+  active: true,
   loaded: false,
   missing: false,
 };
@@ -69,13 +72,13 @@ export function useAdminPricing(sku: string): AdminPricing {
         hotmart_url: string | null;
         store_enabled: boolean | null;
         cover_image_url: string | null;
+        active: boolean | null;
       } | null = null;
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url")
+          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active")
           .eq("sku", sku)
-          .eq("active", true)
           .maybeSingle();
         data = result.data as typeof data;
       } catch {
@@ -102,6 +105,7 @@ export function useAdminPricing(sku: string): AdminPricing {
         hotmartUrl: (data as any).hotmart_url ?? null,
         storeEnabled: (data as any).store_enabled !== false,
         coverImageUrl: (data as any).cover_image_url ?? null,
+        active: (data as any).active !== false,
         loaded: true,
         missing: false,
       });

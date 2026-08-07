@@ -100,6 +100,10 @@ const Products = () => {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return products.filter((p) => {
+      // Si el producto viene de la DB y tiene 'active' explícito, lo respetamos (filtramos borradores)
+      // Nota: p.active puede estar en Product si lo mapeamos en useDigitalProducts
+      if (p.active === false) return false;
+
       const formats = p.formats ?? (p.isPhysical ? ['physical'] : ['digital']);
       if (type === "digital" && !formats.includes('digital')) return false;
       if (type === "physical" && !formats.includes('physical')) return false;

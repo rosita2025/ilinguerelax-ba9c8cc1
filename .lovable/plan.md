@@ -1,6 +1,6 @@
-# Plan: Resilience and Error Analysis for dLocal Go (HTTP 502/505)
+# Plan: Resilience and Error Analysis for dLocal Go (HTTP 502 confirmed)
 
-The user reported a "https505" error (likely a typo for HTTP 505 or 502/503) related to dLocal Go. Based on the codebase analysis, we have already implemented 502/503 retries and fallbacks, but we need to ensure the system is even more robust and provides better visibility.
+The user confirmed that the error is **HTTP 502** (Bad Gateway) from dLocal Go. This indicates temporary downtime or instability on the provider's side. We have already implemented retries, but we will now harden the error reporting and visibility.
 
 ## Analysis
 - **Current State**: `dlocal-create-payment` edge function already has a retry loop (3 attempts) for 5xx errors and fallbacks to "Minimal payload" and "USD fallback".

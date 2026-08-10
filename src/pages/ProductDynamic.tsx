@@ -451,8 +451,9 @@ const ProductDynamic = () => {
               originalPrice={originalFormatted}
               currencyCode={displayCurrencyCode}
               flag={isPEN ? "🇵🇪" : undefined}
-              rating={product.rating != null ? Number(product.rating) : 4.8}
-              reviewCount={product.review_count != null ? Number(product.review_count) : 120}
+              rating={reviewsRating}
+              reviewCount={reviewsCount}
+              showReviews={reviewsCount > 0}
               productName={product.name}
               ctaText={"Comprar ahora"}
               buyUrl={`/checkouts/${product.sku}`}

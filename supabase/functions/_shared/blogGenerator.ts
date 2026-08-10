@@ -214,7 +214,7 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.0-flash-exp",
+      model: "nano-banana-2-ext",
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },

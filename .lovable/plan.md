@@ -1,30 +1,30 @@
-# Plan: dLocal Go 502 Error Handling & Resilience
+# Plan: Fix dLocal Go Downtime and Error Logging Issues
 
-The user reported that the dLocal Go integration experienced HTTP 502 errors yesterday, as shown in the `/admin/payment-errors` dashboard. This usually indicates temporary downtime or instability in the dLocal Go API. We will improve the Edge Function to handle these cases more gracefully and provide better diagnostic information.
+The user reported a "crash" or downtime (HTTP 502) in the dLocal Go integration. My analysis of the database logs confirms that several `PaymentError` events with `error_reason: HTTP 502` occurred on 2026-08-09, primarily affecting users in Argentina (AR) and Nicaragua (NI). 
+
+While I previously added a retry mechanism and better error extraction to the `dlocal-create-payment` Edge Function, there are still missing pieces in the overall error tracking and recovery flow.
 
 ## Proposed Changes
 
 ### 1. Edge Function: `dlocal-create-payment`
-- **Internal Retries**: Add a small retry mechanism with exponential backoff specifically for `5xx` errors from dLocal Go (502, 503, 504).
-- **Better Error Extraction**: If dLocal returns a non-JSON error (like an HTML 502 page), catch it and return a standardized JSON error message: `{ "error": "dLocal Go API returned a Bad Gateway (502). The service might be temporarily down.", "is_provider_down": true }`.
-- **Enhanced Logging**: Log the exact attempt that failed with status code to the console for better debugging in Supabase logs.
+- Ensure that every failed attempt in the fallback chain (Local -> Minimal -> USD) is correctly logged to the console so we can see which specific step failed during downtime.
+- Explicitly return the `provider_status: 502` to the frontend when dLocal is down, so the frontend can display a provider-specific downtime message.
 
-### 2. Shared Library: `_shared/dlocal.ts`
-- Add a helper to check if a status code indicates a temporary provider failure.
+### 2. Frontend: `PaymentMethodsGroup.tsx`
+- Add a specific check for `is_provider_down` in the error response.
+- If a provider is detected as down, show a clear message: "We are currently experiencing technical difficulties with this payment method. Please try another one." instead of a generic error.
 
-### 3. Frontend: `AdminPaymentErrors.tsx` & `CheckoutRecommendations.tsx`
-- **Resilience Info**: If a provider is detected as having a high rate of 502s, add a visual hint in the recommendations to "Consider disabling this provider temporarily or checking its status page".
-- **Better Labels**: Map `HTTP 502` to a more human-readable "Error de Servidor (dLocal)" in the UI.
+### 3. Frontend: `AdminPaymentErrors.tsx`
+- Ensure that `Network error` and `HTTP 502` are properly mapped to user-friendly labels in all parts of the admin dashboard.
 
-### 4. Frontend: `PaymentMethodsGroup.tsx`
-- If the `dlocal-create-payment` function returns a `502` status but with a valid JSON body indicating a provider downtime, show a specific user-friendly message: "Estamos experimentando dificultades técnicas con dLocal. Por favor, intenta con otro método de pago."
+### 4. Shared: `_shared/dlocal.ts`
+- Add a utility function to check if the dLocal API base is reachable (ping-like) before attempting a full payment creation if we suspect downtime.
 
 ## Verification Plan
 
-### Automated Tests
-- Mock a 502 response from dLocal in a test script and verify that `dlocal-create-payment` retries and eventually returns a clean JSON error.
-- Verify that `trackPaymentError` still logs the event correctly.
+### Automated Verification
+- I will run a script to simulate a 502 error and verify that the frontend correctly interprets the `is_provider_down` flag.
+- I will verify that the `funnel_events` table contains the expected details after a simulated failure.
 
 ### Manual Verification
-- Check the `/admin/payment-errors` page to ensure that current (simulated or real) errors are displayed correctly.
-- Review the logs in the admin panel to see if "HTTP 502" is now more descriptive if it happens again.
+- Review the `/admin/payment-errors` dashboard to ensure the historical 502 errors are correctly labeled.

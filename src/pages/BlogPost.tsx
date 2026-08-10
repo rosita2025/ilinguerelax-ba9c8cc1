@@ -122,10 +122,49 @@ const BlogPost = () => {
 
 
   // Convert markdown-like content to HTML
+  const ProductCardInline = ({ slug }: { slug: string }) => {
+    const p = products.find(x => x.slug === slug);
+    if (!p) return null;
+    return (
+      <Link 
+        to={`/products/${p.slug}`}
+        className="flex items-center gap-4 p-4 my-6 bg-primary/5 rounded-lg border border-primary/20 hover:border-primary hover:shadow-md transition-all group"
+      >
+        <img 
+          src={p.image} 
+          alt={p.title}
+          className="w-16 h-16 object-contain"
+        />
+        <div className="flex-1">
+          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors m-0 text-base">
+            {p.title}
+          </h3>
+          <p className="text-xs text-muted-foreground m-0">
+            {p.subtitle}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-base font-bold text-primary">
+              {cardPrice.format(p.slug, p.price)}
+            </span>
+            <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+              {cardPrice.regionLabel}
+            </span>
+          </div>
+        </div>
+        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+      </Link>
+    );
+  };
+
   const renderContent = (content: string) => {
     return content
       .split('\n')
       .map((line, index) => {
+        // Product Card shortcode [PRODUCT_CARD:slug]
+        if (line.includes('[PRODUCT_CARD:')) {
+          const match = line.match(/\[PRODUCT_CARD:(.*?)\]/);
+          if (match) return <ProductCardInline key={index} slug={match[1]} />;
+        }
         // Headers
         if (line.startsWith('# ')) {
           return <h2 key={index} className="text-3xl font-bold mt-8 mb-4">{line.replace('# ', '')}</h2>;

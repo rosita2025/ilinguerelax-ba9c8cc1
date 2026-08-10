@@ -469,7 +469,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
         },
       }, { attempts: 3, baseDelayMs: 500 });
-      if (error || !data?.clientSecret) throw new Error((error as { message?: string } | null)?.message || t.errorPayment);
+      if (error || !data?.clientSecret) {
+        const detail = (error as { edgeDetail?: string })?.edgeDetail;
+        throw new Error(detail || (error as { message?: string } | null)?.message || t.errorPayment);
+      }
 
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),

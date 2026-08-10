@@ -384,6 +384,18 @@ const AdminSEO = () => {
 
           <SitemapHealthCard />
 
+          <div className="flex justify-end">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="text-xs gap-1.5"
+              onClick={() => window.open("/admin/indexing", "_blank")}
+            >
+              <Target className="w-3.5 h-3.5" />
+              Ver historial de indexación completo
+            </Button>
+          </div>
+
           <IndexingEventsCard />
 
 

@@ -131,7 +131,10 @@ serve(async (req) => {
     }
     const site = await resolveSite(headers, canonicalizeUrl(list[0]));
     if (!site) {
-      return new Response(JSON.stringify({ error: "No verified Search Console property covers these URLs" }), {
+      return new Response(JSON.stringify({ 
+        error: "No verified Search Console property covers these URLs",
+        candidates: SITE_CANDIDATES
+      }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

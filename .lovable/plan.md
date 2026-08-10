@@ -1,22 +1,29 @@
-# Plan: Fix Apimart SSE JSON Parsing and Blog Generation Content
+# Plan - Restore AI Generator and Improve SEO Navigation
 
-The user is experiencing a `JSON.parse` error (`Unexpected token 'd', "data: {"id"... is not valid JSON`) during blog generation. This happens because Apimart sometimes returns Server-Sent Events (SSE) format (prefixed with `data: `) even when a standard JSON response is expected. Additionally, the user wants the generated articles to be around 1200 words and include a product card, image, and "generate preview" button without requiring immediate publication.
+The user reported that the "AI generator" is missing. Based on the codebase analysis, the AI blog generator is located in `/admin/seo`. The user might be referring to the fact that it's buried under the SEO tab or that they expected it in a more prominent place like the `AdminProductEdit` page or a dedicated top-level menu item. 
+
+Additionally, I noticed that while `AdminSEO` has a generator, the `AdminProductEdit` page has a button for "Generar con IA" which might also be what they are referring to if it's not working or visible enough.
+
+The user specifically mentioned "generador ai de pai" (AI generator for products/country?). They also recently asked about blog posts.
+
+I will:
+1.  **Add a dedicated "Blog & AI" item to the Admin Sidebar** to make the generator easier to find.
+2.  **Verify the `AdminProductEdit` AI generation logic** and ensure it's prominently accessible.
+3.  **Check if any Edge Function for generation is failing** (though recent logs showed fixes for Apimart).
 
 ## Proposed Changes
 
-### 1. `supabase/functions/_shared/blogGenerator.ts`
-- **Improve `parseAiResponse`**: The current implementation attempts to handle SSE but might be failing if the response starts with `data: ` but doesn't follow the expected structure perfectly or if `res.json()` is called before `parseAiResponse`.
-- **Refine Prompt**: Update the system prompt to explicitly request ~1200 words and ensure the JSON structure is strictly followed.
-- **Image Handling**: Ensure the image generation prompt and logic are robust.
+### 1. Admin Navigation
+- Modify `src/components/admin/AdminNav.tsx` to include a more prominent "Blog & Generador IA" link.
 
-### 2. `supabase/functions/generate-blog-post/index.ts` & `supabase/functions/process-blog-queue/index.ts`
-- **Avoid early `res.json()`**: Ensure we use `res.text()` first and then pass it to `parseAiResponse` instead of calling `.json()` which crashes on SSE.
-- **Preview vs Publish**: Ensure the `publish` flag is handled correctly so articles can be generated as drafts for preview.
+### 2. Admin SEO Page
+- Ensure the "Generador de posts SEO" section in `src/pages/AdminSEO.tsx` is clearly visible and functional.
 
-### 3. `src/pages/BlogPost.tsx`
-- **Render Content**: Ensure the markdown parser correctly handles the 1200+ word content and product cards.
+### 3. Admin Product Edit
+- Verify the `generateAIContent` functionality in `src/pages/AdminProductEdit.tsx`.
 
-## Validation Plan
-1. **Manual Check**: Verify `blogGenerator.ts` logic for `parseAiResponse`.
-2. **Edge Function Test**: (Simulated) Check that `generate-blog-post` correctly parses a mock SSE response.
-3. **UI Check**: Verify that the blog post page renders long content correctly.
+## Verification Plan
+- Navigate to `/admin` and check for the new navigation items.
+- Go to `/admin/seo` and verify the generator is present.
+- Go to `/admin/productos/nuevo` and check the "Generar con IA" button.
+- Check browser console for any 404s or 500s related to AI functions.

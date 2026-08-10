@@ -122,12 +122,18 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
     try {
       data = JSON.parse(text);
     } catch {
-      // Si falla, intentamos parsear como SSE por si acaso Apimart lo envía así en imágenes
+      console.log("[BlogGen] Respuesta de imagen no es JSON directo, intentando parsear SSE...");
       const parsed = parseAiResponse(text);
-      // Las respuestas de imágenes de Apimart/OpenAI suelen tener un campo 'data' en la raíz
-      // pero parseAiResponse devuelve { choices: [...] }. 
-      // Si llegamos aquí, es probable que el formato sea totalmente inesperado.
-      throw new Error(`Error parseando respuesta de imagen: ${text.slice(0, 200)}`);
+      // Si parseAiResponse rescató el contenido, intentamos parsear ese contenido como JSON
+      // porque Apimart a veces envuelve el JSON de la imagen en un stream de texto.
+      try {
+        const innerJson = typeof parsed.choices?.[0]?.message?.content === 'string' 
+          ? JSON.parse(parsed.choices[0].message.content)
+          : parsed.choices?.[0]?.message?.content;
+        data = innerJson || parsed;
+      } catch {
+        data = parsed;
+      }
     }
 
     const tempUrl = data.data?.[0]?.url;

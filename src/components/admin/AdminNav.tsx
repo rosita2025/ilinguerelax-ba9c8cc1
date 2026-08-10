@@ -86,7 +86,7 @@ const groups: Group[] = [
     items: [
       { to: "/admin/analytics", label: "Funnel", icon: TrendingUp },
       { to: "/admin/ga4-compare", label: "GA4 vs Pixel", icon: GitCompare },
-      { to: "/admin/seo", label: "SEO · Google", icon: Search },
+      { to: "/admin/seo", label: "Blog & Generador IA", icon: Sparkles },
       { to: "/admin/indexing", label: "Indexación · Estado", icon: Globe },
     ],
   },

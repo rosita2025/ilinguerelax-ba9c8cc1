@@ -19,6 +19,7 @@ export async function extractEdgeErrorMessage(error: unknown): Promise<string | 
     try {
       const body = await error.context.json();
       const msg =
+        (body as { reason?: string })?.reason ||
         (body as { error?: string; message?: string })?.error ||
         (body as { message?: string })?.message;
       if (msg && typeof msg === "string") return msg.slice(0, 300);

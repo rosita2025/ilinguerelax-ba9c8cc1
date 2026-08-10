@@ -35,6 +35,9 @@ const REASON_LABEL: Record<string, string> = {
   "HTTP 503": "Servicio No Disponible (dLocal)",
   "HTTP 505": "Versión HTTP no soportada",
   "Network error": "Error de Red",
+  "invalid_request_error:currency_not_supported": "Moneda no soportada (Stripe)",
+  "invalid_request_error:amount_too_large": "Monto demasiado alto",
+  "authentication_error": "Error de autenticación API",
 };
 
 const HOURS_OPTIONS = [

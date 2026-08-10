@@ -129,6 +129,11 @@ Deno.serve(async (req) => {
     // Antes, al elegir "Tarjeta", se omitía payment_method_types y Stripe
     // volvía a mostrar automáticamente PayPal, Klarna y todos los métodos
     // activados en la cuenta, aunque el administrador no los hubiera elegido.
+    
+    // Argentina (AR) y Honduras (HN) tienen restricciones cambiarias estrictas
+    // que a menudo causan fallos en Adaptive Pricing de Stripe.
+    const skipAdaptivePricing = ["AR", "HN"].includes(body.contact.country.toUpperCase());
+
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
@@ -136,7 +141,7 @@ Deno.serve(async (req) => {
       payment_method_types: [body.stripePaymentMethod],
       return_url: body.returnUrl,
       // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
-      adaptive_pricing: { enabled: true },
+      adaptive_pricing: { enabled: !skipAdaptivePricing },
       customer_email: body.contact.email,
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",
@@ -154,10 +159,16 @@ Deno.serve(async (req) => {
     console.error("create-checkout-prueba error:", err);
     // No exponemos el detalle interno de la pasarela, pero sí un código corto
     // (tipo/código de Stripe) para poder diagnosticar en /admin/payment-errors.
-    const e = err as { type?: string; code?: string; statusCode?: number };
-    const reason = [e?.type, e?.code].filter(Boolean).join(":").slice(0, 60) || "gateway_error";
+    const e = err as { type?: string; code?: string; statusCode?: number; message?: string };
+    const reason = [e?.type, e?.code].filter(Boolean).join(":").slice(0, 60) || 
+                   (e?.message && e.message.length < 100 ? e.message : "gateway_error");
+    
     return new Response(
-      JSON.stringify({ error: "No se pudo iniciar el pago. Intenta nuevamente.", reason }),
+      JSON.stringify({ 
+        error: "No se pudo iniciar el pago. Intenta nuevamente.", 
+        reason,
+        detail: e?.message 
+      }),
       { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }

@@ -195,9 +195,9 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
   },
   dlocal_downtime: {
     es: {
-      title: "El servicio de dLocal no está disponible",
-      message: "Estamos experimentando dificultades técnicas temporales con el procesador de pagos (dLocal). Tu pedido está seguro.",
-      instructions: ["Intenta de nuevo en unos minutos.", "Si te urge, elige otro método de pago (Mercado Pago, PayPal, Binance).", "Contáctanos por WhatsApp si necesitas un enlace de pago alternativo."],
+      title: "Servicio de dLocal fuera de servicio (Error 502)",
+      message: "El procesador de pagos (dLocal) está saturado o en mantenimiento. No es un error de tu tarjeta ni de nuestro sitio.",
+      instructions: ["Espera 2-3 minutos e intenta de nuevo.", "Elige otro método (Stripe/PayPal) si está disponible.", "Si persiste, escríbenos por WhatsApp."],
     },
     en: {
       title: "dLocal service is unavailable",

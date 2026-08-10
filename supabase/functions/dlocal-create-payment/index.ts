@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
           lastText = await resp.text();
           if (resp.ok || (lastStatus < 500 && lastStatus !== 429)) return { ok: resp.ok, status: lastStatus, text: lastText };
           console.warn(`dLocal Go API returned ${lastStatus} on attempt ${i + 1}. Retrying...`);
-          await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+          await new Promise(r => setTimeout(r, 2000 * (i + 1))); // Increased delay to 2s, 4s, 6s
         } catch (e) {
           console.error(`dLocal Go fetch error on attempt ${i + 1}:`, e);
           lastText = String(e);
@@ -175,6 +175,18 @@ Deno.serve(async (req) => {
 
     if (!attempt.ok) {
       console.error(`dLocal Go create payment completely failed [${attempt.status}] after ${failures.length} fallbacks: ${failures.join(" | ")}`);
+      
+      // Log critical failure to order_events for admin visibility
+      await logOrderEvent({
+        orderNumber: orderId,
+        event: "payment_error",
+        provider: "dlocalgo",
+        status: "FATAL_ERROR",
+        detail: `Critical failure creating payment: HTTP ${attempt.status}. Fallbacks exhausted.`,
+        customerEmail: body.payerEmail,
+        metadata: { failures, lastStatus: attempt.status, country: body.country }
+      }).catch(e => console.error("Failed to log critical dlocal error:", e));
+
       if (attempt.status >= 500 && (!attempt.text || attempt.text.trim().startsWith("<"))) {
         return json({ 
           error: "El servicio de dLocal Go está experimentando dificultades técnicas (Error 502/503). Por favor, intenta de nuevo en unos minutos o usa otro método.", 

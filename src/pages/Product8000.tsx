@@ -533,7 +533,7 @@ const Product8000 = () => {
                     </div>
                   </div>
                   <div className="p-3">
-                    <h4 className="font-bold text-foreground text-sm">{bonus.title}</h4>
+                    <h3 className="font-bold text-foreground text-sm">{bonus.title}</h3>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{bonus.description}</p>
                   </div>
                 </motion.div>

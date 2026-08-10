@@ -103,7 +103,7 @@ Writing rules:
 - Ready to rank on Google, maximize dwell time, and monetize with AdSense.
 - NEVER mention that you are an AI nor explain the process.
 
-Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL string values (title, metaTitle, metaDescription, excerpt, content, category, tags, anchors) MUST be written in ${L.name}:
+Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL string values (title, metaTitle, metaDescription, excerpt, content, category, tags, anchors, imagePrompt) MUST be written in ${L.name}:
 {
   "title": "Full attractive H1 title",
   "metaTitle": "Max 60 chars for <title>",
@@ -114,9 +114,11 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
+  "imagePrompt": "Highly descriptive prompt for DALL-E 3 (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image.",
   "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
   "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }
+
 
 The content field MUST start with "# " (H1) and contain the full article ready to publish. Do NOT explain anything outside the JSON.`;
 

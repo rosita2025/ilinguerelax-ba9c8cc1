@@ -359,6 +359,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
+  const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
+
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [stripeElapsed, setStripeElapsed] = useState(0);

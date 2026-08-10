@@ -483,9 +483,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       try {
         const s2 = useCheckoutPruebaStore.getState();
         const totals = calcTotals(s2.items, s2.couponPercent, region.tier);
-        // Lee el motivo real del body de la Edge Function en vez de registrar
-        // el genérico "Edge Function returned a non-2xx status code".
-        const detail = await extractEdgeErrorMessage(err);
+        // Prioritize the detailed edge error attached by invokeWithRetry
+        const edgeDetail = (err as any)?.edgeDetail;
+        const detail = edgeDetail || await extractEdgeErrorMessage(err);
         const raw = err instanceof Error ? err.message : String(err);
         trackPaymentError({
           provider: selected === "card" ? "stripe_card" : String(selected),
@@ -494,7 +494,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           value: totals.total,
           currency: "USD",
         });
-      } catch { /* noop */ }
       throw err;
 
     } finally {

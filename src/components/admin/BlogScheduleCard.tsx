@@ -46,7 +46,7 @@ interface PreviewPost {
 const STATUS_LABEL: Record<QueueItem["status"], { text: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { text: "Programado", variant: "outline" },
   processing: { text: "Generando…", variant: "secondary" },
-  done: { text: "Publicado", variant: "default" },
+  done: { text: "Borrador listo", variant: "default" },
   failed: { text: "Error", variant: "destructive" },
 };
 
@@ -159,8 +159,8 @@ const BlogScheduleCard = () => {
         const processed = Number(res.processed ?? 0);
         toast.info(
           processed
-            ? `${processed} artículo(s) publicados automáticamente.`
-            : 'No había artículos vencidos. Usa "Generar 2 ahora" para publicar de inmediato.',
+            ? `${processed} artículo(s) generados como borrador.`
+            : 'No había artículos vencidos. Usa "Generar 2 ahora" para crear borradores de inmediato.',
         );
       }
       await load();
@@ -232,7 +232,7 @@ const BlogScheduleCard = () => {
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
             5 turnos diarios (08:00, 09:00, 11:00, 13:00 y 20:00 hora Perú) × 2 artículos = 10 al día.
-            Los artículos se generan y publican automáticamente según la agenda.
+            Los artículos se generan automáticamente como borradores; el editor debe revisarlos y publicarlos.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -247,7 +247,7 @@ const BlogScheduleCard = () => {
         </div>
         <div className="rounded-lg border p-2">
           <div className="text-lg font-bold text-emerald-600">{done}</div>
-          <div className="text-[11px] text-muted-foreground">Publicados</div>
+          <div className="text-[11px] text-muted-foreground">Listos</div>
         </div>
         <div className="rounded-lg border p-2">
           <div className="text-lg font-bold text-destructive">{failed}</div>
@@ -269,63 +269,18 @@ const BlogScheduleCard = () => {
         </Button>
         <Button
           size="sm"
-          onClick={() => run("run-now", { force: true, count: 2 }, "Generando y publicando artículos…")}
+          onClick={() => run("run-now", { force: true, count: 2 }, "Generando borradores de artículos…")}
           disabled={busy === "run-now-force"}
         >
           {busy === "run-now-force" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Zap className="h-4 w-4 mr-1" />}
-          Generar 2 ahora (publicar)
+          Generar 2 ahora (borradores)
         </Button>
         <Button size="sm" variant="ghost" onClick={() => run("clear", {}, "Pendientes eliminados")} disabled={busy === "clear"}>
           <Trash2 className="h-4 w-4 mr-1" /> Limpiar pendientes
         </Button>
       </div>
 
-      <div className="divide-y max-h-[420px] overflow-y-auto">
-        {items.length === 0 && (
-          <div className="text-sm text-muted-foreground py-4">Sin artículos programados todavía.</div>
-        )}
-        {items.map((it) => (
-          <div key={it.id} className="py-2 space-y-2">
-            <div className="flex items-start gap-2">
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium break-words">{it.topic}</div>
-                <div className="text-[11px] text-muted-foreground break-words">
-                  {peruTime(it.scheduled_at)} · {it.keyword} · {it.language.toUpperCase()}
-                  {it.post_slug ? ` · /blog/${it.post_slug}` : ""}
-                </div>
-                {it.error && <div className="text-[11px] text-destructive break-words">{it.error}</div>}
-              </div>
-              <Badge variant={STATUS_LABEL[it.status].variant} className="shrink-0">
-                {STATUS_LABEL[it.status].text}
-              </Badge>
-              {it.status === "failed" && (
-                <Button variant="ghost" size="icon" onClick={() => run("retry", { id: it.id }, "Reprogramado")}>
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              )}
-              {it.status !== "done" && (
-                <Button variant="ghost" size="icon" onClick={() => run("delete", { id: it.id }, "Eliminado")}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              )}
-            </div>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs"
-              onClick={() => openPreview(it)}
-              disabled={busy === "preview" + it.id}
-            >
-              {busy === "preview" + it.id ? (
-                <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-              ) : (
-                <Eye className="h-3.5 w-3.5 mr-1" />
-              )}
-              {it.post_id ? "Vista previa" : "Vista previa (genera al momento)"}
-            </Button>
-          </div>
-        ))}
-      </div>
+      <AgendaList items={items} run={run} busy={busy} openPreview={openPreview} />
 
       {preview && (
         <div className="rounded-lg border p-3 space-y-2">
@@ -358,6 +313,120 @@ const BlogScheduleCard = () => {
         </div>
       )}
     </Card>
+  );
+};
+
+const AgendaList = ({
+  items,
+  run,
+  busy,
+  openPreview,
+}: {
+  items: QueueItem[];
+  run: (action: string, extra?: any, okMsg?: string) => Promise<void>;
+  busy: string | null;
+  openPreview: (it: QueueItem) => Promise<void>;
+}) => {
+  const [showAll, setShowAll] = useState(false);
+
+  if (items.length === 0) {
+    return <div className="text-sm text-muted-foreground py-4">Sin artículos programados todavía.</div>;
+  }
+
+  // Group by day (Peru Time)
+  const grouped = items.reduce((acc, it) => {
+    const day = new Date(it.scheduled_at).toLocaleDateString("es-PE", {
+      timeZone: "America/Lima",
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+    });
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(it);
+    return acc;
+  }, {} as Record<string, QueueItem[]>);
+
+  const days = Object.keys(grouped);
+  const visibleDays = showAll ? days : days.slice(0, 2);
+
+  return (
+    <div className="space-y-4">
+      <div className="divide-y border rounded-lg overflow-hidden">
+        {visibleDays.map((day) => (
+          <div key={day} className="bg-muted/30">
+            <div className="px-3 py-1.5 bg-muted/50 text-[10px] uppercase font-bold text-muted-foreground tracking-wider border-b">
+              {day}
+            </div>
+            <div className="divide-y bg-background">
+              {grouped[day].map((it) => (
+                <div key={it.id} className="p-3 hover:bg-muted/10 transition-colors space-y-2">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium leading-tight">{it.topic}</div>
+                      <div className="text-[10px] text-muted-foreground mt-1 flex flex-wrap gap-x-2">
+                        <span className="font-semibold text-primary/80">
+                          {new Date(it.scheduled_at).toLocaleTimeString("es-PE", {
+                            timeZone: "America/Lima",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                        <span>{it.keyword}</span>
+                        <span className="opacity-50 border-l pl-2">{it.language.toUpperCase()}</span>
+                        {it.post_slug && <span className="text-blue-600 truncate max-w-[150px]">/blog/{it.post_slug}</span>}
+                      </div>
+                      {it.error && <div className="text-[10px] text-destructive mt-1 italic">{it.error}</div>}
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <Badge variant={STATUS_LABEL[it.status].variant} className="text-[9px] px-1.5 py-0 h-4">
+                        {STATUS_LABEL[it.status].text}
+                      </Badge>
+                      <div className="flex gap-1">
+                        {it.status === "failed" && (
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => run("retry", { id: it.id }, "Reprogramado")}>
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                        )}
+                        {it.status !== "done" && (
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => run("delete", { id: it.id }, "Eliminado")}>
+                            <Trash2 className="h-3 w-3 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-[10px] px-2"
+                    onClick={() => openPreview(it)}
+                    disabled={busy === "preview" + it.id}
+                  >
+                    {busy === "preview" + it.id ? (
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    ) : (
+                      <Eye className="h-3 w-3 mr-1" />
+                    )}
+                    {it.post_id ? "Ver borrador" : "Generar vista previa"}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {days.length > 2 && (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-full text-xs text-muted-foreground hover:text-primary h-8" 
+          onClick={() => setShowAll(!showAll)}
+        >
+          {showAll ? "Ver menos" : `Ver agenda completa (${days.length} días)`}
+        </Button>
+      )}
+    </div>
   );
 };
 

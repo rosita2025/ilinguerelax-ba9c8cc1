@@ -238,8 +238,8 @@ serve(async (req) => {
               topic: item.topic as string,
               keyword: item.keyword as string,
               category: item.category as string,
-              language: item.language as string,
-              publish: true,
+               language: item.language as string,
+              publish: false,
             });
             postId = generated.id as string;
             await supabase

@@ -10,6 +10,7 @@ const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 const SITE_CANDIDATES = [
   "sc-domain:ilinguerelax.com",
   "https://ilinguerelax.com/",
+  "https://www.ilinguerelax.com/",
 ];
 
 function canonicalizeUrl(rawUrl: string): string {
@@ -77,6 +78,7 @@ serve(async (req) => {
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     const gscKey = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY");
     if (!lovableKey || !gscKey) {
+      console.error("[gsc-inspect-urls] GSC connector missing. LovableKey:", !!lovableKey, "GSCKey:", !!gscKey);
       return new Response(JSON.stringify({ error: "GSC connector not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

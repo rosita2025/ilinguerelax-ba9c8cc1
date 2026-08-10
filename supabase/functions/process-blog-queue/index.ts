@@ -53,9 +53,9 @@ serve(async (req) => {
           keyword: row.keyword,
           category: row.category,
           language: row.language,
-          // Publicación automática: el artículo se publica directamente
-          // sin necesidad de aprobación manual.
-          publish: true,
+          // Publicación manual: el artículo queda como borrador hasta que
+          // el editor lo revise y apruebe en el panel.
+          publish: false,
         });
         await supabase
           .from("blog_post_queue")

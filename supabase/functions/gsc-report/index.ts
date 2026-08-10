@@ -1,10 +1,7 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa",
-};
+import { adminCorsHeaders as corsHeaders } from "../_shared/adminCsrf.ts";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 // Try domain property first, then URL-prefix variants. The connector picks
@@ -65,7 +62,7 @@ async function querySearchAnalytics(dimension: "query" | "page", days: number, l
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;

@@ -160,7 +160,7 @@ Example: {"Spanish (Latin America)":"aprender coreano","English (North America)"
 }
 
 serve(withAdminLogging("google-suggest", async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;

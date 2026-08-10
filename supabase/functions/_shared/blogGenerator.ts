@@ -37,7 +37,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "black-forest-labs/flux-1-schnell",
+        model: "gpt-image-2-ext",
         prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text.`,
         n: 1,
         size: "1024x1024",

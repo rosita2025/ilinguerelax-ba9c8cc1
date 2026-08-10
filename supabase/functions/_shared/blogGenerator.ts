@@ -43,9 +43,11 @@ interface GenPayload {
   tags?: string[];
   readTime?: string;
   image?: string;
+  imagePrompt?: string; // Nuevo campo para DALL-E 3
   internalLinks?: Array<{ anchor: string; url: string }>;
   externalLinks?: Array<{ anchor: string; url: string }>;
 }
+
 
 export interface GenerateArgs {
   topic: string;

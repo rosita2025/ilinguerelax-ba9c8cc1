@@ -17,6 +17,7 @@ import {
   Mail,
   Send,
   AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";

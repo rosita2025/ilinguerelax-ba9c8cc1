@@ -154,7 +154,7 @@ const BlogScheduleCard = () => {
     try {
       const res = await call({ action, ...extra });
       toast.success(okMsg ?? "Listo");
-      if (action === "seed") toast.info(`${res.created} artículos programados`);
+      if (action === "seed") toast.info(`${res.count || res.created} artículos programados`);
       if (action === "run-now") {
         const processed = Number(res.processed ?? 0);
         toast.info(
@@ -232,7 +232,7 @@ const BlogScheduleCard = () => {
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
             5 turnos diarios (08:00, 09:00, 11:00, 13:00 y 20:00 hora Perú) × 2 artículos = 10 al día.
-            Los artículos se generan automáticamente como borradores; el editor debe revisarlos y publicarlos.
+            Se programan 100 artículos (10 días) para cubrir fines de semana y festivos.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -256,9 +256,9 @@ const BlogScheduleCard = () => {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" onClick={() => run("seed", { startTomorrow: true }, "Agenda de 50 artículos creada")} disabled={busy === "seed"}>
+        <Button size="sm" onClick={() => run("seed", { startTomorrow: true }, "Agenda de 100 artículos creada")} disabled={busy === "seed"}>
           {busy === "seed" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <CalendarClock className="h-4 w-4 mr-1" />}
-          Programar 50 (desde mañana)
+          Programar 100 (desde mañana)
         </Button>
         <Button size="sm" variant="outline" onClick={() => run("seed", { startTomorrow: false }, "Agenda creada desde hoy")} disabled={busy === "seed"}>
           Programar desde hoy

@@ -23,7 +23,7 @@ const corsHeaders = {
 /** Turnos diarios en hora de Perú (UTC-5). */
 export const SLOTS_PERU = [8, 9, 11, 13, 20];
 const POSTS_PER_SLOT = 2;
-const DAYS = 5;
+const DAYS = 10;
 const PERU_OFFSET_HOURS = 5;
 
 /** Palabras clave reales de Search Console (con su idioma objetivo). */
@@ -156,7 +156,7 @@ serve(async (req) => {
           .insert(rows)
           .select("id");
         if (error) throw error;
-        return json({ created: data?.length ?? 0, batch });
+        return json({ created: data?.length ?? 0, batch, count: rows.length });
       }
 
       case "delete": {
@@ -170,7 +170,7 @@ serve(async (req) => {
         const { error } = await supabase
           .from("blog_post_queue")
           .delete()
-          .in("status", ["pending", "failed"]);
+          .in("status", ["pending", "failed", "done", "processing"]);
         if (error) throw error;
         return json({ ok: true });
       }

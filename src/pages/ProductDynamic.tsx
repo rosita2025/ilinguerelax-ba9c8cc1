@@ -175,6 +175,8 @@ const ProductDynamic = () => {
     : local.formatted;
   const displayCurrencyCode = isPEN ? "PEN" : local.currency;
   const originalFormatted = formatCurrencyAmount(displayPrice * 2.5, displayCurrencyCode as Currency);
+  const reviewsCount = product.review_count != null ? Number(product.review_count) : 0;
+  const reviewsRating = product.rating != null ? Number(product.rating) : 0;
 
 
   const cover = product.cover_image_url || "/placeholder.svg";
@@ -195,8 +197,8 @@ const ProductDynamic = () => {
         type="product"
         price={product.price_usd ? String(product.price_usd) : undefined}
         sku={product.sku}
-        rating={product.rating != null ? String(product.rating) : "4.8"}
-        reviewCount={product.review_count != null ? String(product.review_count) : "120"}
+        rating={reviewsRating > 0 ? String(reviewsRating) : undefined}
+        reviewCount={reviewsCount > 0 ? String(reviewsCount) : undefined}
         availability="InStock"
         isPhysical={false}
         keywords={product.gallery_metadata?.keywords || `${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
@@ -287,11 +289,13 @@ const ProductDynamic = () => {
                 <span>{LANG[product.target_language] ?? product.target_language} para hablantes de {LANG[product.learner_language] ?? product.learner_language}</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">{product.name}</h1>
-              <VerifiedReviews 
-                rating={product.rating != null ? Number(product.rating) : 4.8} 
-                count={product.review_count != null ? Number(product.review_count) : 120} 
-                className="mb-4" 
-              />
+              {reviewsCount > 0 && (
+                <VerifiedReviews 
+                  rating={reviewsRating} 
+                  count={reviewsCount} 
+                  className="mb-4" 
+                />
+              )}
               
               <ul className="space-y-2 mb-5">
                 <li className="flex items-center gap-2 text-sm text-muted-foreground">

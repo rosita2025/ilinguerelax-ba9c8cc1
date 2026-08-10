@@ -170,7 +170,7 @@ serve(async (req) => {
         const { error } = await supabase
           .from("blog_post_queue")
           .delete()
-          .in("status", ["pending", "failed"]);
+          .in("status", ["pending", "failed", "done", "processing"]);
         if (error) throw error;
         return json({ ok: true });
       }

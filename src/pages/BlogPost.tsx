@@ -400,9 +400,9 @@ const BlogPost = () => {
                           className="w-16 h-16 object-contain"
                         />
                         <div className="flex-1">
-                          <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                             {product.title}
-                          </h4>
+                          </h3>
                           <p className="text-sm text-muted-foreground">
                             {product.subtitle}
                           </p>

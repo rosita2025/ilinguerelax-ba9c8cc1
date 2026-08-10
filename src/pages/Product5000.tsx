@@ -661,7 +661,7 @@ const Product5000 = () => {
                   <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
-                  <h4 className="font-bold text-foreground text-sm">Índice Completo</h4>
+                  <h3 className="font-bold text-foreground text-sm">Índice Completo</h3>
                   <p className="text-xs text-muted-foreground">52 capítulos</p>
                 </div>
               </div>
@@ -670,7 +670,7 @@ const Product5000 = () => {
                   <img src={previewVocabulario} alt="Vista previa del vocabulario inglés con pronunciación" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="p-3 text-center">
-                  <h4 className="font-bold text-foreground text-sm">5,000 Palabras</h4>
+                  <h3 className="font-bold text-foreground text-sm">5,000 Palabras</h3>
                   <p className="text-xs text-muted-foreground">Con pronunciación</p>
                 </div>
               </div>
@@ -731,7 +731,7 @@ const Product5000 = () => {
                     </div>
                   </div>
                   <div className="p-3">
-                    <h4 className="font-bold text-foreground text-sm">{bonus.title}</h4>
+                    <h3 className="font-bold text-foreground text-sm">{bonus.title}</h3>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{bonus.description}</p>
                   </div>
                 </motion.div>

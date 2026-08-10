@@ -10,7 +10,7 @@ import { pingPinterestAndCms } from "./pinterestPing.ts";
 import { notifyGoogleIndexing } from "./googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
-const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const AI_URL = "https://api.apimart.ai/v1/chat/completions";
 
 export class BlogGenError extends Error {
   status: number;
@@ -155,8 +155,9 @@ export async function generateAndStorePost(args: GenerateArgs): Promise<Record<s
 
   if (!topic || topic.trim().length < 4) throw new BlogGenError("Missing topic", 400);
 
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-  if (!lovableKey) throw new BlogGenError("LOVABLE_API_KEY missing", 500);
+  const apimartToken = Deno.env.get("APIMART_TOKEN");
+  if (!apimartToken) throw new BlogGenError("APIMART_TOKEN missing", 500);
+
 
   const L = LANG_MAP[language] ?? LANG_MAP.es;
 
@@ -209,11 +210,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
   const aiRes = await fetch(AI_URL, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${lovableKey}`,
+      "Authorization": `Bearer ${apimartToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-pro",
+      model: "google/gemini-2.0-flash-exp",
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },

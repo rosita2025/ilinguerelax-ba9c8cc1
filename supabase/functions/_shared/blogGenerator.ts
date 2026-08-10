@@ -212,9 +212,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     headers: {
       "Authorization": `Bearer ${apimartToken}`,
       "Content-Type": "application/json",
+      "Accept": "application/json",
     },
     body: JSON.stringify({
       model: "nano-banana-2-ext",
+      stream: false,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -236,8 +238,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     throw new BlogGenError(`AI ${aiRes.status}: ${t.slice(0, 300)}`, 502);
   }
 
-  const aiJson = await aiRes.json();
+  // Apimart puede responder con JSON normal o con un stream SSE ("data: {...}").
+  const aiText = await aiRes.text();
+  const aiJson = parseAiResponse(aiText);
   const raw = aiJson.choices?.[0]?.message?.content || "{}";
+
   let parsed: GenPayload = {};
   try {
     parsed = typeof raw === "string" ? JSON.parse(raw) : raw;

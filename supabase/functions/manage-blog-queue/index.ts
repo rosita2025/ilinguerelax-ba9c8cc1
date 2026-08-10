@@ -23,7 +23,7 @@ const corsHeaders = {
 /** Turnos diarios en hora de Perú (UTC-5). */
 export const SLOTS_PERU = [8, 9, 11, 13, 20];
 const POSTS_PER_SLOT = 2;
-const DAYS = 10;
+const DAYS = 5;
 const PERU_OFFSET_HOURS = 5;
 
 /** Palabras clave reales de Search Console (con su idioma objetivo). */

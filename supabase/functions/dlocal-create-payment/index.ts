@@ -88,6 +88,10 @@ Deno.serve(async (req) => {
     // Public brand always visible on the dLocal Go payment / bank voucher.
     const description = `iLingue Relax · ${pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ")}`.slice(0, 250);
 
+    // Registro preventivo del inicio del intento
+    console.log(`[dLocal] Inicia creación de pago: ${orderId} (${body.country}) - ${pricing.totalUsd} USD`);
+
+
 
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";

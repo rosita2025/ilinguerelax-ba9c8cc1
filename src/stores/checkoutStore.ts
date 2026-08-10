@@ -80,6 +80,8 @@ interface PruebaStore {
   resetToDefaults: () => void;
   /** Remove any cart line whose id is NOT in the provided allow-list of valid IDs. */
   pruneUnknown: (validIds: Set<string>) => number;
+  selectedMethod: string | null;
+  setSelectedMethod: (method: string | null) => void;
 }
 
 // Carrito arranca VACÍO. Los productos se agregan solo cuando el usuario
@@ -121,8 +123,10 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       coupon: null,
       couponPercent: 0,
       buyer: { fullName: "", email: "", phone: "" },
+      selectedMethod: null,
 
       setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
+      setSelectedMethod: (method) => set({ selectedMethod: method }),
 
 
       addItem: (item, opts) => {

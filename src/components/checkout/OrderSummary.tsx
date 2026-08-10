@@ -25,7 +25,7 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ collapsible = false, locked = false, mainProductId, onExpandedChange }: OrderSummaryProps) {
 
-  const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon } =
+  const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon, selectedMethod } =
     useCheckoutPruebaStore();
   const region = useRegionTier();
   const { language } = useI18n();
@@ -39,8 +39,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const localTotal = useLocalCurrency(total);
   const localSubtotal = useLocalCurrency(subtotal);
   const localDiscount = useLocalCurrency(discount);
-  const penMode = penTotals !== null;
-  const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading;
+  const isGlobalGateway = selectedMethod && (
+    selectedMethod.startsWith("stripe") || 
+    selectedMethod.startsWith("dlocal") || 
+    selectedMethod === "card" || 
+    selectedMethod === "paypal" || 
+    selectedMethod === "binance"
+  );
+
+  const penMode = penTotals !== null && !isGlobalGateway;
+  const showLocalRef = !penMode && !localTotal.isUsd && !localTotal.loading && !isGlobalGateway;
   // Local totals honoring per-sku overrides from /admin/products/:sku
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),

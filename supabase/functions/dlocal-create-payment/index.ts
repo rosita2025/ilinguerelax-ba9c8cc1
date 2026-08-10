@@ -81,13 +81,10 @@ Deno.serve(async (req) => {
     });
     const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
 
-    const restricted = isRestrictedCurrency(body.country);
-    const { amount: localAmount, currency: localCurrency } = localTotalFromPricing(pricing, body.country);
-    
-    // Si el país está restringido, dLocal suele fallar en moneda local (ej. ARS).
-    // Priorizamos USD de entrada si sabemos que fallará.
-    const startCurrency = restricted ? "USD" : localCurrency;
-    const startAmount = restricted ? calculatedUsd : localAmount;
+    // SIEMPRE USD: Forzamos el cobro en USD para evitar fallos en rieles locales
+    // y para unificar la experiencia de pago internacional.
+    const startCurrency = "USD";
+    const startAmount = calculatedUsd;
 
     const EXPIRATION_DAYS = 3;
 

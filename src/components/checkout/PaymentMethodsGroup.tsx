@@ -329,17 +329,28 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
   const overridesFor = useSkuOverridesResolver();
+  const countryCode = (region.country || "").toUpperCase();
+  const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
+
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
-    region.country || "",
+    countryCode,
     overridesFor,
   );
   const localTotalAmount = localItemsSum.amount * (1 - (couponPercent || 0) / 100);
-  const localFormatted = local.loading || local.isUsd ? local.formatted : formatLocalDirect(localTotalAmount, region.country || "");
+  
+  // Si el país tiene restricciones (AR/HN), mostramos el precio en USD para que coincida con el cobro real.
+  const showUsdOnly = isRestricted && countryCode !== "PE";
+  
+  const localFormatted = local.loading || local.isUsd || showUsdOnly 
+    ? `USD $${totalUsd}` 
+    : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
+
   const penBadge = penTotals ? formatPen(penTotals.total) : null;
-  // Badge principal: SIEMPRE en moneda local del país (USD, CAD, EUR, MXN, ARS, PEN, etc.)
-  const priceBadge = penBadge ?? (local.loading ? `USD $${totalUsd}` : localFormatted);
+  // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) donde se fuerza USD.
+  const priceBadge = penBadge ?? localFormatted;
   const localBadge = "";
+
 
 
   const [selected, setSelected] = useState<Method | null>(null);

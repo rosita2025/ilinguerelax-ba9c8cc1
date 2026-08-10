@@ -649,6 +649,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         },
       }, { attempts: 3, baseDelayMs: 500 });
       if (error || !data?.redirect_url) {
+        if ((error as any)?.is_provider_down || (error as any)?.provider_status === 502) {
+          const downtime = mapDlocalStatus("dlocal_downtime", language);
+          throw new Error(downtime.message);
+        }
         const detail = await extractEdgeErrorMessage(error);
         throw new Error(detail || t.errorPayment);
       }

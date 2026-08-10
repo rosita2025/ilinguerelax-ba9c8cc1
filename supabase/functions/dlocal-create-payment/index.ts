@@ -340,8 +340,10 @@ Deno.serve(async (req) => {
           error: "El servicio de dLocal Go está experimentando dificultades técnicas (Error 502/503). Por favor, intenta de nuevo en unos minutos o usa otro método.", 
           code: attempt.status,
           provider_status: attempt.status,
-          is_provider_down: true
+          is_provider_down: true,
+          failures: failures.length
         }, 502);
+      }
       }
 
       const code = errorCodeOf(attempt.text);

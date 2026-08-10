@@ -1330,7 +1330,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
     .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
-    { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: priceBadge },
+    { 
+      id: "card", 
+      icon: CreditCard, 
+      title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, 
+      sub: isFallingBackToUsd 
+        ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : "Pagando en USD por compatibilidad (Transacción internacional).")
+        : cardSubtitle, 
+      badge: isFallingBackToUsd ? `USD $${totalUsd}` : priceBadge 
+    },
+
     ...dynamicStripeRows,
     { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: priceBadge },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: priceBadge },

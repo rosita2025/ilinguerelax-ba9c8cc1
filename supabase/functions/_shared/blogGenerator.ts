@@ -20,6 +20,49 @@ export class BlogGenError extends Error {
   }
 }
 
+// Apimart a veces devuelve SSE aunque se pida JSON. Normalizamos ambos formatos
+// a la forma estándar { choices: [{ message: { content } }] }.
+// deno-lint-ignore no-explicit-any
+function parseAiResponse(text: string): any {
+  const trimmed = text.trim();
+  if (!trimmed) throw new BlogGenError("Respuesta vacía del proveedor de IA", 502);
+
+  if (!trimmed.startsWith("data:")) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      throw new BlogGenError(`Respuesta IA no parseable: ${trimmed.slice(0, 200)}`, 502);
+    }
+  }
+
+  let content = "";
+  // deno-lint-ignore no-explicit-any
+  let last: any = null;
+  for (const line of trimmed.split("\n")) {
+    const l = line.trim();
+    if (!l.startsWith("data:")) continue;
+    const payload = l.slice(5).trim();
+    if (!payload || payload === "[DONE]") continue;
+    try {
+      const chunk = JSON.parse(payload);
+      last = chunk;
+      const choice = chunk.choices?.[0];
+      const piece = choice?.delta?.content ?? choice?.message?.content ?? "";
+      if (typeof piece === "string") content += piece;
+    } catch {
+      // fragmento incompleto: lo ignoramos
+    }
+  }
+
+  if (!content && last?.choices?.[0]?.message?.content) {
+    content = last.choices[0].message.content;
+  }
+  if (!content) throw new BlogGenError("Stream de IA sin contenido utilizable", 502);
+
+  return { choices: [{ message: { content } }] };
+}
+
+
 async function generateImage(prompt: string, slug: string): Promise<string | null> {
   const apimartToken = Deno.env.get("APIMART_TOKEN");
   if (!apimartToken || !prompt) {
@@ -212,9 +255,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     headers: {
       "Authorization": `Bearer ${apimartToken}`,
       "Content-Type": "application/json",
+      "Accept": "application/json",
     },
     body: JSON.stringify({
       model: "nano-banana-2-ext",
+      stream: false,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -236,8 +281,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     throw new BlogGenError(`AI ${aiRes.status}: ${t.slice(0, 300)}`, 502);
   }
 
-  const aiJson = await aiRes.json();
+  // Apimart puede responder con JSON normal o con un stream SSE ("data: {...}").
+  const aiText = await aiRes.text();
+  const aiJson = parseAiResponse(aiText);
   const raw = aiJson.choices?.[0]?.message?.content || "{}";
+
   let parsed: GenPayload = {};
   try {
     parsed = typeof raw === "string" ? JSON.parse(raw) : raw;

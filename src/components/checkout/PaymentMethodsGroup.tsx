@@ -138,7 +138,8 @@ const CLABE_BANK = "STP (Sistema de Transferencias y Pagos)";
 const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
   MX: "MXN", CO: "COP", BR: "BRL", AR: "ARS", CL: "CLP", PE: "PEN",
   UY: "UYU", EC: "USD", CR: "CRC", GT: "GTQ", PA: "USD", DO: "DOP",
-  BO: "BOB", PY: "PYG", SV: "USD", HN: "HNL", NI: "NIO",
+  BO: "BOB", PY: "PYG", SV: "USD", HN: "HNL", NI: "NIO", PR: "USD",
+  US: "USD",
 };
 
 // Rails locales de dLocal Go, separados por tipo (transferencia / efectivo).

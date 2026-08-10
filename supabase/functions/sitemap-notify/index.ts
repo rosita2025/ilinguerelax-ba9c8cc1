@@ -47,13 +47,17 @@ Deno.serve(async (req) => {
     }
 
     const urls = skus.map(productUrl);
+    // Limiting concurrent pings and using AbortSignal timeouts (inside helpers) 
+    // to stay within the 60s Edge Function limit.
     await Promise.allSettled([
       pingIndexNow(urls),
       notifyGoogleIndexing(urls, "URL_UPDATED"),
       pingSitemap(),
       resubmitSitemapsGSC(),
-      ...urls.slice(0, 5).map((u) => inspectUrlGSC(u)),
+      // Inspections are slow; we only do a few per batch.
+      ...urls.slice(0, 3).map((u) => inspectUrlGSC(u)),
     ]);
+
 
     return new Response(
       JSON.stringify({ ok: true, notified: urls.length, sample: urls.slice(0, 5) }),

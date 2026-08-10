@@ -320,7 +320,7 @@ const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "meth
 
 export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
-  const { items, buyer, coupon, couponPercent } = useCheckoutPruebaStore();
+  const { items, buyer, coupon, couponPercent, selectedMethod, setSelectedMethod } = useCheckoutPruebaStore();
   const region = useRegionTier();
   const { language } = useI18n();
   const t = getCheckoutUI(language);
@@ -339,15 +339,25 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   );
   const localTotalAmount = localItemsSum.amount * (1 - (couponPercent || 0) / 100);
   
-  // Si el país tiene restricciones (AR/HN), mostramos el precio en USD para que coincida con el cobro real.
-  const showUsdOnly = isRestricted && countryCode !== "PE";
+  // Si el país tiene restricciones (AR/HN) o se elige un método global (Stripe, dLocal, PayPal, Binance),
+  // forzamos el precio en USD para que coincida con el cobro real.
+  const isGlobalGateway = selectedMethod && (
+    selectedMethod.startsWith("stripe") || 
+    selectedMethod.startsWith("dlocal") || 
+    selectedMethod === "card" || 
+    selectedMethod === "paypal" || 
+    selectedMethod === "binance"
+  );
+  
+  const showUsdOnly = (isRestricted || isGlobalGateway) && countryCode !== "PE";
   
   const localFormatted = local.loading || local.isUsd || showUsdOnly 
     ? `USD $${totalUsd}` 
     : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
 
-  const penBadge = penTotals ? formatPen(penTotals.total) : null;
-  // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) donde se fuerza USD.
+  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total) : null;
+  // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
+  // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localFormatted;
   const localBadge = "";
 
@@ -412,11 +422,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const reset = () => { redirectingRef.current = false; setMpLoading(null); };
     window.addEventListener("pageshow", reset);
     window.addEventListener("focus", reset);
+    // Al cargar el checkout, nos aseguramos que el store y el estado local estén sincronizados
+    if (selected) setSelectedMethod(selected);
     return () => {
       window.removeEventListener("pageshow", reset);
       window.removeEventListener("focus", reset);
     };
-  }, []);
+  }, [selected, setSelectedMethod]);
 
   const cartSignature = JSON.stringify({
     items: items.map((i) => ({ id: i.id, price: itemPrice(i, region.tier), q: i.quantity })),
@@ -767,6 +779,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     void captureAbandonedCheckout(m, true);
     if (m !== selected) setShowStripe(false);
     setSelected(m);
+    setSelectedMethod(m);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
     // Hotmart: no redirige al seleccionar; espera al botón "Comprar ahora".
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta

@@ -131,57 +131,24 @@ Deno.serve(async (req) => {
     // volvía a mostrar automáticamente PayPal, Klarna y todos los métodos
     // activados en la cuenta, aunque el administrador no los hubiera elegido.
     
-    // SMART FALLBACK: Intentamos Adaptive Pricing por defecto, pero si el país
-    // tiene restricciones conocidas o Stripe devuelve un error de moneda,
-    // reintentamos automáticamente en USD.
-    const initiallyRestricted = isRestrictedCurrency(body.contact.country);
-    
-    let session;
-    try {
-      session = await stripe.checkout.sessions.create({
-        line_items,
-        mode: "payment",
-        ui_mode: "embedded_page",
-        payment_method_types: [body.stripePaymentMethod],
-        return_url: body.returnUrl,
-        // Si el país es AR/HN, empezamos sin Adaptive Pricing para evitar fallos conocidos.
-        adaptive_pricing: { enabled: !initiallyRestricted },
-        customer_email: body.contact.email,
-        payment_intent_data: {
-          description: productSummary || "iLingue Relax Digital",
-          receipt_email: body.contact.email,
-          metadata: checkoutMetadata,
-        },
+    // SIEMPRE USD: Desactivamos Adaptive Pricing y forzamos USD para evitar errores
+    // de moneda local en regiones con restricciones bancarias (AR, HN, etc.)
+    // y para que el cobro coincida siempre con el precio base de la tienda.
+    const session = await stripe.checkout.sessions.create({
+      line_items,
+      mode: "payment",
+      ui_mode: "embedded_page",
+      payment_method_types: [body.stripePaymentMethod],
+      return_url: body.returnUrl,
+      adaptive_pricing: { enabled: false }, // Forzamos USD siempre
+      customer_email: body.contact.email,
+      payment_intent_data: {
+        description: productSummary || "iLingue Relax Digital",
+        receipt_email: body.contact.email,
         metadata: checkoutMetadata,
-      });
-    } catch (err) {
-      const e = err as { type?: string; code?: string; message?: string };
-      const isCurrencyError = 
-        e.code === "currency_not_supported" || 
-        e.message?.toLowerCase().includes("currency") ||
-        e.message?.toLowerCase().includes("adaptive pricing");
-
-      if (isCurrencyError && !initiallyRestricted) {
-        console.warn(`[Stripe] Adaptive Pricing falló para ${body.contact.country}. Reintentando en USD...`);
-        session = await stripe.checkout.sessions.create({
-          line_items,
-          mode: "payment",
-          ui_mode: "embedded_page",
-          payment_method_types: [body.stripePaymentMethod],
-          return_url: body.returnUrl,
-          adaptive_pricing: { enabled: false }, // Forzamos USD
-          customer_email: body.contact.email,
-          payment_intent_data: {
-            description: productSummary || "iLingue Relax Digital",
-            receipt_email: body.contact.email,
-            metadata: checkoutMetadata,
-          },
-          metadata: checkoutMetadata,
-        });
-      } else {
-        throw err;
-      }
-    }
+      },
+      metadata: checkoutMetadata,
+    });
 
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {

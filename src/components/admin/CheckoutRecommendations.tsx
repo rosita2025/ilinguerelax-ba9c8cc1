@@ -46,11 +46,27 @@ const REASON_LABEL: Record<string, string> = {
   processing_error: "Error de procesamiento",
   authentication_required: "Requiere 3D Secure",
   sin_motivo: "Sin motivo registrado",
+  "HTTP 502": "Error 502 (Bad Gateway)",
+  "HTTP 503": "Servicio No Disponible",
+  "Network error": "Error de Red",
 };
 
 function suggestionsFor(reason: string, country: string): Suggestion[] {
   const local = LOCAL_METHODS[country];
   const out: Suggestion[] = [];
+
+  // Recomendación específica para errores de infraestructura (502/503) o red
+  if (reason.includes("502") || reason.includes("503") || reason.includes("Gateway") || reason.includes("Network")) {
+    out.push({
+      kind: "provider",
+      text: `Downtime detectado en el proveedor. Si los errores persisten, considera priorizar otros métodos como ${local || "PayPal"} temporalmente.`,
+    });
+    out.push({
+      kind: "copy",
+      text: "Asegúrate de que el checkout tenga reintentos automáticos configurados para absorber caídas temporales de la API.",
+    });
+    return out;
+  }
 
   switch (reason) {
     case "card_declined":

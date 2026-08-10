@@ -2,7 +2,7 @@
 //
 // Lo usan dos entradas:
 //   - generate-blog-post   → generación manual desde /admin/seo
-//   - process-blog-queue   → cola programada (10 posts/día durante 5 días)
+//   - process-blog-queue   → cola programada (10 posts/día durante 10 días)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { pingIndexNow, pingSitemap, pingWebSub } from "./indexnow.ts";
@@ -11,6 +11,7 @@ import { notifyGoogleIndexing } from "./googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const IMG_URL = "https://ai.gateway.lovable.dev/v1/images/generations";
 
 export class BlogGenError extends Error {
   status: number;
@@ -20,7 +21,71 @@ export class BlogGenError extends Error {
   }
 }
 
+async function generateImage(prompt: string, slug: string): Promise<string | null> {
+  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+  if (!lovableKey || !prompt) return null;
+
+  try {
+    console.log(`[BlogGen] Generando imagen para: ${slug}...`);
+    const res = await fetch(IMG_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024.`,
+        n: 1,
+        size: "1024x1024",
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("[BlogGen] Error gateway imagen:", await res.text());
+      return null;
+    }
+
+    const data = await res.json();
+    const tempUrl = data.data?.[0]?.url;
+    if (!tempUrl) return null;
+
+    // Descargar y subir a Storage
+    const imgRes = await fetch(tempUrl);
+    const blob = await imgRes.blob();
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    const fileName = `${slug}-${Date.now()}.png`;
+    const { error: uploadError } = await supabase.storage
+      .from("blog-images")
+      .upload(fileName, blob, {
+        contentType: "image/png",
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("[BlogGen] Error upload imagen:", uploadError);
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("blog-images")
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  } catch (err) {
+    console.error("[BlogGen] generateImage error:", err);
+    return null;
+  }
+}
+
 export function slugify(input: string): string {
+
   return input
     .toLowerCase()
     .normalize("NFD")
@@ -43,9 +108,11 @@ interface GenPayload {
   tags?: string[];
   readTime?: string;
   image?: string;
+  imagePrompt?: string; // Nuevo campo para DALL-E 3
   internalLinks?: Array<{ anchor: string; url: string }>;
   externalLinks?: Array<{ anchor: string; url: string }>;
 }
+
 
 export interface GenerateArgs {
   topic: string;
@@ -101,7 +168,7 @@ Writing rules:
 - Ready to rank on Google, maximize dwell time, and monetize with AdSense.
 - NEVER mention that you are an AI nor explain the process.
 
-Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL string values (title, metaTitle, metaDescription, excerpt, content, category, tags, anchors) MUST be written in ${L.name}:
+Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL string values (title, metaTitle, metaDescription, excerpt, content, category, tags, anchors, imagePrompt) MUST be written in ${L.name}:
 {
   "title": "Full attractive H1 title",
   "metaTitle": "Max 60 chars for <title>",
@@ -112,9 +179,11 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
+  "imagePrompt": "Highly descriptive prompt for DALL-E 3 (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image.",
   "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
   "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }
+
 
 The content field MUST start with "# " (H1) and contain the full article ready to publish. Do NOT explain anything outside the JSON.`;
 
@@ -181,6 +250,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
   const baseSlug = (parsed.slug ? slugify(parsed.slug) : "") || slugify(parsed.title);
   const excerpt = (parsed.metaDescription || parsed.excerpt || content.replace(/^#.*$/m, "").trim().slice(0, 180)).slice(0, 240);
 
+  // Generación de imagen opcional pero recomendada
+  const generatedImageUrl = parsed.imagePrompt 
+    ? await generateImage(parsed.imagePrompt, baseSlug)
+    : null;
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -201,12 +275,13 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
         tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 10) : [],
         read_time: parsed.readTime || "6 min",
         keyword: keyword || topic,
-        image: parsed.image || "https://ilinguerelax.com/og-image.png",
+        image: generatedImageUrl || parsed.image || "https://ilinguerelax.com/og-image.png",
         published: !!publish,
         related_products: Array.isArray(relatedProducts) ? relatedProducts.slice(0, 12) : [],
       })
       .select()
       .single();
+
 
     if (!error) { inserted = data as Record<string, unknown>; break; }
     if ((error as { code?: string }).code !== "23505") throw error;

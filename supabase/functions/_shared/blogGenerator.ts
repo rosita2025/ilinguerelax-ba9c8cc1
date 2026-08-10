@@ -2,7 +2,7 @@
 //
 // Lo usan dos entradas:
 //   - generate-blog-post   → generación manual desde /admin/seo
-//   - process-blog-queue   → cola programada (10 posts/día durante 5 días)
+//   - process-blog-queue   → cola programada (10 posts/día durante 10 días)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { pingIndexNow, pingSitemap, pingWebSub } from "./indexnow.ts";
@@ -11,6 +11,7 @@ import { notifyGoogleIndexing } from "./googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const IMG_URL = "https://ai.gateway.lovable.dev/v1/images/generations";
 
 export class BlogGenError extends Error {
   status: number;
@@ -20,7 +21,71 @@ export class BlogGenError extends Error {
   }
 }
 
+async function generateImage(prompt: string, slug: string): Promise<string | null> {
+  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+  if (!lovableKey || !prompt) return null;
+
+  try {
+    console.log(`[BlogGen] Generando imagen para: ${slug}...`);
+    const res = await fetch(IMG_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024.`,
+        n: 1,
+        size: "1024x1024",
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("[BlogGen] Error gateway imagen:", await res.text());
+      return null;
+    }
+
+    const data = await res.json();
+    const tempUrl = data.data?.[0]?.url;
+    if (!tempUrl) return null;
+
+    // Descargar y subir a Storage
+    const imgRes = await fetch(tempUrl);
+    const blob = await imgRes.blob();
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    const fileName = `${slug}-${Date.now()}.png`;
+    const { error: uploadError } = await supabase.storage
+      .from("blog-images")
+      .upload(fileName, blob, {
+        contentType: "image/png",
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("[BlogGen] Error upload imagen:", uploadError);
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("blog-images")
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  } catch (err) {
+    console.error("[BlogGen] generateImage error:", err);
+    return null;
+  }
+}
+
 export function slugify(input: string): string {
+
   return input
     .toLowerCase()
     .normalize("NFD")

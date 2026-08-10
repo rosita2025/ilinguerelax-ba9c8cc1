@@ -15,7 +15,7 @@
  * páginas más recientes y las que llevan más tiempo sin avisar a Google.
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
 import { resubmitSitemapsGSC } from "../_shared/gsc.ts";
 import { notifyGoogleIndexing, indexingApiQuota } from "../_shared/googleIndexing.ts";

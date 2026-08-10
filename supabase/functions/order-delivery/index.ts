@@ -12,7 +12,7 @@
 //    para dLocal Go, se re-consulta la API oficial antes de habilitar el acceso
 //  - los SKUs salen del propio pedido, nunca del cuerpo de la petición
 //  - respuesta genérica cuando no coincide y límite de intentos por IP
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";

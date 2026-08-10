@@ -1,7 +1,7 @@
 // Guarda la atribución de Meta Ads (fbc/fbp) asociada al correo del comprador.
 // Los webhooks de compra la consultan para enviar el evento Purchase a la
 // Conversions API SOLO cuando la venta vino de un anuncio de Facebook/Instagram.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const supabase = createClient(

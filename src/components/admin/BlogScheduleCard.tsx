@@ -159,8 +159,8 @@ const BlogScheduleCard = () => {
         const processed = Number(res.processed ?? 0);
         toast.info(
           processed
-            ? `${processed} borrador(es) generados · ábrelos con "Vista previa"`
-            : 'No había artículos vencidos. Usa "Generar 2 ahora" para adelantar los próximos.',
+            ? `${processed} artículo(s) publicados automáticamente.`
+            : 'No había artículos vencidos. Usa "Generar 2 ahora" para publicar de inmediato.',
         );
       }
       await load();
@@ -232,7 +232,7 @@ const BlogScheduleCard = () => {
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
             5 turnos diarios (08:00, 09:00, 11:00, 13:00 y 20:00 hora Perú) × 2 artículos = 10 al día.
-            Usa “Vista previa” en cualquier post para revisarlo, aprobarlo o rechazarlo.
+            Los artículos se generan y publican automáticamente según la agenda.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -269,11 +269,11 @@ const BlogScheduleCard = () => {
         </Button>
         <Button
           size="sm"
-          onClick={() => run("run-now", { force: true, count: 2 }, "Generando borradores…")}
+          onClick={() => run("run-now", { force: true, count: 2 }, "Generando y publicando artículos…")}
           disabled={busy === "run-now-force"}
         >
           {busy === "run-now-force" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Zap className="h-4 w-4 mr-1" />}
-          Generar 2 ahora (borradores)
+          Generar 2 ahora (publicar)
         </Button>
         <Button size="sm" variant="ghost" onClick={() => run("clear", {}, "Pendientes eliminados")} disabled={busy === "clear"}>
           <Trash2 className="h-4 w-4 mr-1" /> Limpiar pendientes

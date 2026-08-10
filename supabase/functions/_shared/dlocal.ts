@@ -155,3 +155,8 @@ export function dlocalApiBase(): string {
     ? "https://api-sbx.dlocalgo.com/v1"
     : "https://api.dlocalgo.com/v1";
 }
+
+/** ¿Es un error reintentable de la red o del servidor (5xx)? */
+export function isRetryableStatus(status: number): boolean {
+  return status >= 500 || status === 408 || status === 429;
+}

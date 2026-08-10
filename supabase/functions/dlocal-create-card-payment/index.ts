@@ -1,7 +1,7 @@
 // dLocal Go — cobro con tarjeta usando un token de SmartFields.
 // El navegador nunca envía el PAN a nuestro backend: SmartFields tokeniza la
 // tarjeta en dLocal y aquí solo recibimos el token de un solo uso.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";

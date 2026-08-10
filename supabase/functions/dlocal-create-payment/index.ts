@@ -1,7 +1,7 @@
 // dLocal Go — creación de pago (API REST)
 // Docs: https://docs.dlocalgo.com/  ·  POST https://api.dlocalgo.com/v1/payments
 // Devuelve `redirect_url` para enviar al comprador al checkout de dLocal Go.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";

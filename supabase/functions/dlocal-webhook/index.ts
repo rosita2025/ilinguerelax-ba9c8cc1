@@ -2,7 +2,7 @@
 // dLocal Go llama a `notification_url` en cada cambio de estado del pago.
 // Seguridad: NUNCA confiamos en el body. Re-consultamos el pago en la API de
 // dLocal Go con nuestras credenciales y solo entregamos si está PAID.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";

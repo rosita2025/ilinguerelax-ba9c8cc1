@@ -6,7 +6,7 @@
  * modifica datos. Ratelimit natural: GSC rechaza pings muy frecuentes.
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { pingIndexNow, pingSitemap, productUrl } from "../_shared/indexnow.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "../_shared/gsc.ts";
 import { notifyGoogleIndexing } from "../_shared/googleIndexing.ts";
@@ -47,13 +47,17 @@ Deno.serve(async (req) => {
     }
 
     const urls = skus.map(productUrl);
+    // Limiting concurrent pings and using AbortSignal timeouts (inside helpers) 
+    // to stay within the 60s Edge Function limit.
     await Promise.allSettled([
       pingIndexNow(urls),
       notifyGoogleIndexing(urls, "URL_UPDATED"),
       pingSitemap(),
       resubmitSitemapsGSC(),
-      ...urls.slice(0, 5).map((u) => inspectUrlGSC(u)),
+      // Inspections are slow; we only do a few per batch.
+      ...urls.slice(0, 3).map((u) => inspectUrlGSC(u)),
     ]);
+
 
     return new Response(
       JSON.stringify({ ok: true, notified: urls.length, sample: urls.slice(0, 5) }),

@@ -9,7 +9,7 @@
 //  - respuesta genérica ({ found:false }) cuando no coincide: no revela si existe
 //  - límite de intentos por IP para evitar sondear pedidos ajenos
 //  - nunca devolvemos correos, referencias completas ni datos internos
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { isSettledStatus, isPendingStatus, isFailedStatus, dlocalApiBase } from "../_shared/dlocal.ts";

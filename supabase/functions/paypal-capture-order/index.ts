@@ -1,5 +1,5 @@
 // Capture a PayPal order server-side after buyer approves in the popup.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";

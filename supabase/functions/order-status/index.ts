@@ -6,7 +6,7 @@
 //  - respuesta genérica idéntica cuando no coincide (no revela si el pedido existe)
 //  - límite de intentos por IP para evitar adivinar correos de pedidos ajenos
 //  - la respuesta nunca incluye correos, detalles internos ni referencias completas
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { normalizeEmailBasic } from "../_shared/emailGuard.ts";

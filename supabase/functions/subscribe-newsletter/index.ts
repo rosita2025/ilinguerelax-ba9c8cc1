@@ -1,4 +1,4 @@
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { upsertBrevoContact } from '../_shared/brevoContact.ts';
 import { sendEmail } from '../_shared/brevo.ts';

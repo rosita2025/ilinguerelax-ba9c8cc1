@@ -22,7 +22,7 @@ import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
-import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout } from "@/lib/dlocalCoverage";
+import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
@@ -329,17 +329,28 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const totalUsd = total.toFixed(2);
   const local = useLocalCurrency(total);
   const overridesFor = useSkuOverridesResolver();
+  const countryCode = (region.country || "").toUpperCase();
+  const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
+
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
-    region.country || "",
+    countryCode,
     overridesFor,
   );
   const localTotalAmount = localItemsSum.amount * (1 - (couponPercent || 0) / 100);
-  const localFormatted = local.loading || local.isUsd ? local.formatted : formatLocalDirect(localTotalAmount, region.country || "");
+  
+  // Si el país tiene restricciones (AR/HN), mostramos el precio en USD para que coincida con el cobro real.
+  const showUsdOnly = isRestricted && countryCode !== "PE";
+  
+  const localFormatted = local.loading || local.isUsd || showUsdOnly 
+    ? `USD $${totalUsd}` 
+    : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
+
   const penBadge = penTotals ? formatPen(penTotals.total) : null;
-  // Badge principal: SIEMPRE en moneda local del país (USD, CAD, EUR, MXN, ARS, PEN, etc.)
-  const priceBadge = penBadge ?? (local.loading ? `USD $${totalUsd}` : localFormatted);
+  // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) donde se fuerza USD.
+  const priceBadge = penBadge ?? localFormatted;
   const localBadge = "";
+
 
 
   const [selected, setSelected] = useState<Method | null>(null);
@@ -348,6 +359,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
+  const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
+
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [stripeElapsed, setStripeElapsed] = useState(0);
@@ -449,30 +462,52 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
     };
     try {
-      const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
-        body: {
-          environment: getStripeEnvironment(),
-          items: s.items.map((i) => ({
-            id: i.id, name: i.name, price: itemPrice(i, region.tier),
-            quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
-          })),
-          currency: "usd",
-          stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
-          couponPercent: s.couponPercent,
-          couponCode: s.coupon ?? undefined,
-          contact: {
-            email: s.buyer.email.trim(),
-            phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
-            firstName, lastName,
-            country: (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
+      const country = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
+      const initiallyRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(country);
+
+      const fetchSecret = async (retryForRestricted = false) => {
+        const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
+          body: {
+            environment: getStripeEnvironment(),
+            items: s.items.map((i) => ({
+              id: i.id, name: i.name, price: itemPrice(i, region.tier),
+              quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
+            })),
+            currency: "usd",
+            stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
+            couponPercent: s.couponPercent,
+            couponCode: s.coupon ?? undefined,
+            contact: {
+              email: s.buyer.email.trim(),
+              phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
+              firstName, lastName,
+              country,
+            },
+            returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
+            // In the edge function we'll use this to skip adaptive pricing if we are retrying
+            isRestrictedRetry: retryForRestricted || initiallyRestricted,
           },
-          returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
-        },
-      }, { attempts: 3, baseDelayMs: 500 });
-      if (error || !data?.clientSecret) {
-        const detail = (error as { edgeDetail?: string })?.edgeDetail;
-        throw new Error(detail || (error as { message?: string } | null)?.message || t.errorPayment);
-      }
+        }, { attempts: 3, baseDelayMs: 500 });
+        
+        if (error || !data?.clientSecret) {
+          const detail = (error as { edgeDetail?: string })?.edgeDetail;
+          const msg = detail || (error as { message?: string } | null)?.message || t.errorPayment;
+          
+          // Fallback logic for currency restrictions
+          const isCurrencyError = msg.toLowerCase().includes("currency") || msg.toLowerCase().includes("adaptive pricing");
+          if (isCurrencyError && !retryForRestricted && !initiallyRestricted) {
+            console.warn("[Stripe] Fallback to USD triggered...");
+            setIsFallingBackToUsd(true);
+            return fetchSecret(true); // Recursive retry for restricted
+          }
+          
+          throw new Error(msg);
+        }
+        return data.clientSecret;
+      };
+
+      const clientSecret = await fetchSecret();
+
 
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
@@ -480,7 +515,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
       }, { onConflict: "email,source" }).then(() => {});
-      return data.clientSecret;
+      return clientSecret;
+
     } catch (err) {
       setStripeError(mapStripeError(err, language as StripeLang));
       try {
@@ -1294,7 +1330,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
     .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
-    { id: "card", icon: CreditCard, title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, sub: cardSubtitle, badge: priceBadge },
+    { 
+      id: "card", 
+      icon: CreditCard, 
+      title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, 
+      sub: isFallingBackToUsd 
+        ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : "Pagando en USD por compatibilidad (Transacción internacional).")
+        : cardSubtitle, 
+      badge: isFallingBackToUsd ? `USD $${totalUsd}` : priceBadge 
+    },
+
     ...dynamicStripeRows,
     { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: priceBadge },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: priceBadge },

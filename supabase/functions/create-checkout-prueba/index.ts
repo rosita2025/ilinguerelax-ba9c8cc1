@@ -2,7 +2,8 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
-import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
+import { resolveServerPricing, PricingError, isRestrictedCurrency } from "../_shared/catalogPricing.ts";
+
 
 // SEGURIDAD: solo se aceptan id y cantidad. El precio, el nombre y el
 // descuento se resuelven en el servidor desde el catálogo; los valores que
@@ -130,26 +131,58 @@ Deno.serve(async (req) => {
     // volvía a mostrar automáticamente PayPal, Klarna y todos los métodos
     // activados en la cuenta, aunque el administrador no los hubiera elegido.
     
-    // Argentina (AR) y Honduras (HN) tienen restricciones cambiarias estrictas
-    // que a menudo causan fallos en Adaptive Pricing de Stripe.
-    const skipAdaptivePricing = ["AR", "HN"].includes(body.contact.country.toUpperCase());
-
-    const session = await stripe.checkout.sessions.create({
-      line_items,
-      mode: "payment",
-      ui_mode: "embedded_page",
-      payment_method_types: [body.stripePaymentMethod],
-      return_url: body.returnUrl,
-      // Stripe convierte automáticamente el precio en USD a la moneda local del comprador.
-      adaptive_pricing: { enabled: !skipAdaptivePricing },
-      customer_email: body.contact.email,
-      payment_intent_data: {
-        description: productSummary || "iLingue Relax Digital",
-        receipt_email: body.contact.email,
+    // SMART FALLBACK: Intentamos Adaptive Pricing por defecto, pero si el país
+    // tiene restricciones conocidas o Stripe devuelve un error de moneda,
+    // reintentamos automáticamente en USD.
+    const initiallyRestricted = isRestrictedCurrency(body.contact.country);
+    
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        line_items,
+        mode: "payment",
+        ui_mode: "embedded_page",
+        payment_method_types: [body.stripePaymentMethod],
+        return_url: body.returnUrl,
+        // Si el país es AR/HN, empezamos sin Adaptive Pricing para evitar fallos conocidos.
+        adaptive_pricing: { enabled: !initiallyRestricted },
+        customer_email: body.contact.email,
+        payment_intent_data: {
+          description: productSummary || "iLingue Relax Digital",
+          receipt_email: body.contact.email,
+          metadata: checkoutMetadata,
+        },
         metadata: checkoutMetadata,
-      },
-      metadata: checkoutMetadata,
-    });
+      });
+    } catch (err) {
+      const e = err as { type?: string; code?: string; message?: string };
+      const isCurrencyError = 
+        e.code === "currency_not_supported" || 
+        e.message?.toLowerCase().includes("currency") ||
+        e.message?.toLowerCase().includes("adaptive pricing");
+
+      if (isCurrencyError && !initiallyRestricted) {
+        console.warn(`[Stripe] Adaptive Pricing falló para ${body.contact.country}. Reintentando en USD...`);
+        session = await stripe.checkout.sessions.create({
+          line_items,
+          mode: "payment",
+          ui_mode: "embedded_page",
+          payment_method_types: [body.stripePaymentMethod],
+          return_url: body.returnUrl,
+          adaptive_pricing: { enabled: false }, // Forzamos USD
+          customer_email: body.contact.email,
+          payment_intent_data: {
+            description: productSummary || "iLingue Relax Digital",
+            receipt_email: body.contact.email,
+            metadata: checkoutMetadata,
+          },
+          metadata: checkoutMetadata,
+        });
+      } else {
+        throw err;
+      }
+    }
+
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
       status: 200,

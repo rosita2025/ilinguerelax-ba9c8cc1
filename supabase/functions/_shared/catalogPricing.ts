@@ -17,6 +17,14 @@ const LATAM = new Set([
 ]);
 const TIENDA = new Set(["VE", "CU", "NI"]);
 
+/** Países con restricciones cambiarias que a menudo fallan en moneda local. */
+export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["AR", "HN"]);
+
+export function isRestrictedCurrency(country: string | null | undefined): boolean {
+  return RESTRICTED_CURRENCY_COUNTRIES.has(String(country || "").toUpperCase().slice(0, 2));
+}
+
+
 export function tierForCountry(country: string | null | undefined): RegionTier {
   const c = String(country || "").toUpperCase().slice(0, 2);
   if (TIENDA.has(c)) return "tienda";

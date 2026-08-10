@@ -5,7 +5,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
-import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
+import { resolveServerPricing, PricingError, localTotalFromPricing, isRestrictedCurrency } from "../_shared/catalogPricing.ts";
 import { dlocalApiBase } from "../_shared/dlocal.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
@@ -81,7 +81,14 @@ Deno.serve(async (req) => {
     });
     const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
 
+    const restricted = isRestrictedCurrency(body.country);
     const { amount: localAmount, currency: localCurrency } = localTotalFromPricing(pricing, body.country);
+    
+    // Si el país está restringido, dLocal suele fallar en moneda local (ej. ARS).
+    // Priorizamos USD de entrada si sabemos que fallará.
+    const startCurrency = restricted ? "USD" : localCurrency;
+    const startAmount = restricted ? calculatedUsd : localAmount;
+
     const EXPIRATION_DAYS = 3;
 
     const payloadFor = (amount: number, currency: string, opts: { minimal?: boolean } = {}) => ({
@@ -156,12 +163,13 @@ Deno.serve(async (req) => {
       return rest;
     };
 
-    let attempt = await createPayment(payloadFor(localAmount, localCurrency));
+    let attempt = await createPayment(payloadFor(startAmount, startCurrency));
     const failures = [];
-    let usedUsdFallback = false;
+    let usedUsdFallback = restricted || startCurrency === "USD";
 
     if (!attempt.ok) {
-      failures.push(`checkout ${localCurrency} [${attempt.status}] ${attempt.text.slice(0, 160)}`);
+      failures.push(`checkout ${startCurrency} [${attempt.status}] ${attempt.text.slice(0, 160)}`);
+
       const nextAttempts = await buildAttempts();
       for (const next of nextAttempts) {
         attempt = await createPayment(next.payload);

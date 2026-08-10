@@ -257,7 +257,7 @@ Writing rules:
 - Professional, close, humanized tone (never "as an AI", "in this article we will discuss", "in conclusion I have presented").
 - Include bullet lists with "- " and at least ONE comparative markdown table where it adds value.
 - Add a "## ${L.faqHeading}" section with 4-6 real questions using ### for each question.
-- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}, NEVER spammy.
+- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}, NEVER spammy. INTEGRATE [PRODUCT_CARD:slug] within the text to showcase products.
 - Optimize for the main keyword + related secondary keywords naturally (density ~1-2%).
 - Fulfill EEAT: experience, authority, trust. Cite official sources when relevant.
 - Ready to rank on Google, maximize dwell time, and monetize with AdSense.

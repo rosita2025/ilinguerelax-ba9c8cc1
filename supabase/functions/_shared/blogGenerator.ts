@@ -117,7 +117,19 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       return null;
     }
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // Si falla, intentamos parsear como SSE por si acaso Apimart lo envía así en imágenes
+      const parsed = parseAiResponse(text);
+      // Las respuestas de imágenes de Apimart/OpenAI suelen tener un campo 'data' en la raíz
+      // pero parseAiResponse devuelve { choices: [...] }. 
+      // Si llegamos aquí, es probable que el formato sea totalmente inesperado.
+      throw new Error(`Error parseando respuesta de imagen: ${text.slice(0, 200)}`);
+    }
+
     const tempUrl = data.data?.[0]?.url;
     if (!tempUrl) {
       console.error("[BlogGen] APIMART no devolvió URL de imagen.");

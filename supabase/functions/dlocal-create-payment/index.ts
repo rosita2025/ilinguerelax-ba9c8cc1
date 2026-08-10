@@ -245,15 +245,37 @@ Deno.serve(async (req) => {
     const basePayload = payloadFor(localAmount, localCurrency);
 
     const createPayment = async (payload: Record<string, unknown>) => {
-      const resp = await fetch(`${dlocalApiBase()}/payments`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}:${secretKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      return { ok: resp.ok, status: resp.status, text: await resp.text() };
+      let lastStatus = 0;
+      let lastText = "";
+      
+      // Reintentos internos para errores 5xx (Bad Gateway, etc)
+      for (let i = 0; i < 3; i++) {
+        try {
+          const resp = await fetch(`${dlocalApiBase()}/payments`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}:${secretKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+          
+          lastStatus = resp.status;
+          lastText = await resp.text();
+          
+          if (resp.ok || (lastStatus < 500 && lastStatus !== 429)) {
+            return { ok: resp.ok, status: lastStatus, text: lastText };
+          }
+          
+          console.warn(`dLocal Go API returned ${lastStatus} on attempt ${i + 1}. Retrying...`);
+          await new Promise(r => setTimeout(r, 1000 * (i + 1))); // Simple backoff
+        } catch (e) {
+          console.error(`dLocal Go fetch error on attempt ${i + 1}:`, e);
+          lastText = String(e);
+          await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+        }
+      }
+      return { ok: false, status: lastStatus || 502, text: lastText };
     };
 
     const errorCodeOf = (text: string): number | null => {
@@ -311,12 +333,22 @@ Deno.serve(async (req) => {
 
     if (!attempt.ok) {
       console.error(`dLocal Go create payment failed [${attempt.status}] (${failures.length} intentos): ${failures.join(" | ")}`);
+      
+      // Si recibimos un 502/503 real de dLocal que no es JSON (ej. página de Cloudflare)
+      if (attempt.status >= 500 && (!attempt.text || attempt.text.trim().startsWith("<"))) {
+        return json({ 
+          error: "El servicio de dLocal Go está experimentando dificultades técnicas (Error 502/503). Por favor, intenta de nuevo en unos minutos o usa otro método.", 
+          code: attempt.status,
+          provider_status: attempt.status,
+          is_provider_down: true
+        }, 502);
+      }
+
       const code = errorCodeOf(attempt.text);
       let msg = "No pudimos iniciar el pago con dLocal. Intenta de nuevo en unos segundos o elige otro método.";
       if (code === 5016) msg = "El monto es menor al mínimo permitido por dLocal para tu país. Agrega otro producto o elige otro método de pago.";
       else if (code === 5000 || code === 5010) msg = "Ese método no está disponible ahora mismo en tu país. Elige otro método de pago (transferencia, efectivo o billetera) y lo procesamos al instante.";
-      // Devolvemos también el código real de dLocal para que /admin/payment-errors
-      // muestre el motivo exacto en vez de un genérico "non-2xx".
+      
       return json({ error: msg, code, provider_status: attempt.status, attempts: failures.length }, 502);
     }
 

@@ -250,6 +250,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
   const baseSlug = (parsed.slug ? slugify(parsed.slug) : "") || slugify(parsed.title);
   const excerpt = (parsed.metaDescription || parsed.excerpt || content.replace(/^#.*$/m, "").trim().slice(0, 180)).slice(0, 240);
 
+  // Generación de imagen opcional pero recomendada
+  const generatedImageUrl = parsed.imagePrompt 
+    ? await generateImage(parsed.imagePrompt, baseSlug)
+    : null;
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -270,12 +275,13 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
         tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 10) : [],
         read_time: parsed.readTime || "6 min",
         keyword: keyword || topic,
-        image: parsed.image || "https://ilinguerelax.com/og-image.png",
+        image: generatedImageUrl || parsed.image || "https://ilinguerelax.com/og-image.png",
         published: !!publish,
         related_products: Array.isArray(relatedProducts) ? relatedProducts.slice(0, 12) : [],
       })
       .select()
       .single();
+
 
     if (!error) { inserted = data as Record<string, unknown>; break; }
     if ((error as { code?: string }).code !== "23505") throw error;

@@ -163,9 +163,13 @@ Deno.serve(async (req) => {
     const reason = [e?.type, e?.code].filter(Boolean).join(":").slice(0, 60) || 
                    (e?.message && e.message.length < 100 ? e.message : "gateway_error");
     
+    const message = e?.message && e.message.length < 200 && !e.message.includes("api.stripe.com")
+      ? e.message 
+      : "No se pudo iniciar el pago. Intenta nuevamente.";
+
     return new Response(
       JSON.stringify({ 
-        error: "No se pudo iniciar el pago. Intenta nuevamente.", 
+        error: message, 
         reason,
         detail: e?.message 
       }),

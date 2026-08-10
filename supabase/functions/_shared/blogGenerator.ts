@@ -104,7 +104,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-image-2-ext",
+        model: "flux-schnell",
         prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text.`,
         n: 1,
         size: "1024x1024",

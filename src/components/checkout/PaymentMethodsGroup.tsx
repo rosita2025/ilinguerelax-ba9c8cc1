@@ -494,6 +494,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           value: totals.total,
           currency: "USD",
         });
+      } catch { /* noop */ }
       throw err;
 
     } finally {

@@ -160,3 +160,23 @@ export function dlocalApiBase(): string {
 export function isRetryableStatus(status: number): boolean {
   return status >= 500 || status === 408 || status === 429;
 }
+
+/** 
+ * Verifica si el API de dLocal está respondiendo (ping básico).
+ * Útil para detectar caídas generales antes de procesar pagos pesados.
+ */
+export async function pingDlocal(): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 3000);
+    const resp = await fetch(`${dlocalApiBase()}/payment-methods?country=PE`, { 
+      signal: controller.signal,
+      headers: { "Accept": "application/json" } 
+    });
+    clearTimeout(id);
+    return resp.status < 500;
+  } catch (e) {
+    console.warn("dLocal ping failed:", e);
+    return false;
+  }
+}

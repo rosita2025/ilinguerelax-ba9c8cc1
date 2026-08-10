@@ -12,7 +12,8 @@ export type DlocalCode =
   | "dlocal_expired"
   | "dlocal_pending"
   | "dlocal_unknown"
-  | "dlocal_create_failed";
+  | "dlocal_create_failed"
+  | "dlocal_downtime";
 
 export interface MappedDlocalStatus {
   code: DlocalCode;
@@ -190,6 +191,28 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       title: "Impossible d'ouvrir le paiement",
       message: "Le processeur a refusé de démarrer la transaction. Ton panier est intact.",
       instructions: ["Essaie un autre moyen de paiement.", "Si tout échoue, écris-nous sur WhatsApp."],
+    },
+  },
+  dlocal_downtime: {
+    es: {
+      title: "El servicio de dLocal no está disponible",
+      message: "Estamos experimentando dificultades técnicas temporales con el procesador de pagos (dLocal). Tu pedido está seguro.",
+      instructions: ["Intenta de nuevo en unos minutos.", "Si te urge, elige otro método de pago (Mercado Pago, PayPal, Binance).", "Contáctanos por WhatsApp si necesitas un enlace de pago alternativo."],
+    },
+    en: {
+      title: "dLocal service is unavailable",
+      message: "We are experiencing temporary technical difficulties with the payment processor (dLocal). Your order is safe.",
+      instructions: ["Please try again in a few minutes.", "If you're in a hurry, choose another payment method.", "Contact us on WhatsApp for an alternative payment link."],
+    },
+    pt: {
+      title: "Serviço dLocal indisponível",
+      message: "Estamos com dificuldades técnicas temporárias com o processador de pagamentos (dLocal). Seu pedido está seguro.",
+      instructions: ["Tente novamente em alguns minutos.", "Se tiver pressa, escolha outro meio de pagamento.", "Fale conosco no WhatsApp para um link alternativo."],
+    },
+    fr: {
+      title: "Service dLocal indisponible",
+      message: "Nous rencontrons des difficultés techniques temporaires avec le processeur de paiement (dLocal).",
+      instructions: ["Réessaie dans quelques minutes.", "Choisis un autre mode de paiement si nécessaire.", "Contacte-nous sur WhatsApp pour un lien alternatif."],
     },
   },
 };

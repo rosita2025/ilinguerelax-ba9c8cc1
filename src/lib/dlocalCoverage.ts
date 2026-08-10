@@ -115,6 +115,14 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["BAC Credomatic", "Banpro", "Lafise Bancentro"],
     cash: ["PAYCASH (agentes)"],
     wallet: ["Banpro Billetera", "BAC Billetera"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+  { code: "PR", name: "Puerto Rico", flag: "🇵🇷", currency: "USD",
+    transfer: ["Transferencia Bancaria", "Banco Popular", "FirstBank"],
+    cash: ["Agentes locales"],
+    wallet: ["ATH Móvil"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+  { code: "US", name: "Estados Unidos", flag: "🇺🇸", currency: "USD",
+    transfer: ["Bank Transfer (ACH)", "Zelle", "Venmo"],
+    cash: ["Retail Stores"],
+    wallet: ["PayPal", "Google Pay", "Apple Pay"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
 ];
 
 const BY_CODE = new Map(DLOCAL_COVERAGE.map((c) => [c.code, c]));

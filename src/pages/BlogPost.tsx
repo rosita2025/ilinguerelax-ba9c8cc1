@@ -402,7 +402,7 @@ const BlogPost = () => {
                         <div className="flex-1">
                           <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                             {product.title}
-                          </h4>
+                          </h3>
                           <p className="text-sm text-muted-foreground">
                             {product.subtitle}
                           </p>

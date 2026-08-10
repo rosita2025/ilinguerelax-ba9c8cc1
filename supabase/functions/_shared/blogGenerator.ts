@@ -117,7 +117,7 @@ interface GenPayload {
   tags?: string[];
   readTime?: string;
   image?: string;
-  imagePrompt?: string; // Nuevo campo para DALL-E 3
+  imagePrompt?: string; // Nuevo campo para generación de imagen
   internalLinks?: Array<{ anchor: string; url: string }>;
   externalLinks?: Array<{ anchor: string; url: string }>;
 }

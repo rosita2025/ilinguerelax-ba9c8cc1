@@ -31,6 +31,9 @@ const REASON_LABEL: Record<string, string> = {
   processing_error: "Error de procesamiento",
   authentication_required: "Requiere 3D Secure",
   sin_motivo: "Sin motivo registrado",
+  "HTTP 502": "Error 502 (Bad Gateway)",
+  "HTTP 503": "Servicio No Disponible",
+  "Network error": "Error de Red",
 };
 
 const HOURS_OPTIONS = [

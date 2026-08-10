@@ -270,7 +270,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "metaDescription": "Max 155 chars for meta description",
   "slug": "url-friendly-lowercase-with-hyphens",
   "excerpt": "150-200 char summary for blog card",
-  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, around 2100 words, with table, lists, FAQ and conclusion + CTA)",
+  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, around 2100 words, with table, lists, FAQ and conclusion + CTA. INTEGRATE product cards naturally using the format [PRODUCT_CARD:slug] where appropriate)",
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",

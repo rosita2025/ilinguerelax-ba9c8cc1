@@ -11,7 +11,6 @@ import { notifyGoogleIndexing } from "./googleIndexing.ts";
 import { resubmitSitemapsGSC, inspectUrlGSC } from "./gsc.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const IMG_URL = "https://ai.gateway.lovable.dev/v1/images/generations";
 
 export class BlogGenError extends Error {
   status: number;
@@ -22,36 +21,45 @@ export class BlogGenError extends Error {
 }
 
 async function generateImage(prompt: string, slug: string): Promise<string | null> {
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-  if (!lovableKey || !prompt) return null;
+  const apimartToken = Deno.env.get("APIMART_TOKEN");
+  if (!apimartToken || !prompt) {
+    console.warn("[BlogGen] APIMART_TOKEN no configurado o prompt vacío, saltando imagen.");
+    return null;
+  }
 
   try {
-    console.log(`[BlogGen] Generando imagen para: ${slug}...`);
-    const res = await fetch(IMG_URL, {
+    console.log(`[BlogGen] Generando imagen con APIMART para: ${slug}...`);
+    // Usamos el endpoint de Flux Schnell en APIMART para mayor velocidad y calidad
+    const res = await fetch("https://api.apimart.ai/v1/images/generations", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${lovableKey}`,
+        "Authorization": `Bearer ${apimartToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "dall-e-3",
-        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024.`,
+        model: "black-forest-labs/flux-1-schnell",
+        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text.`,
         n: 1,
         size: "1024x1024",
       }),
     });
 
     if (!res.ok) {
-      console.error("[BlogGen] Error gateway imagen:", await res.text());
+      const errorText = await res.text();
+      console.error("[BlogGen] Error APIMART imagen:", errorText);
       return null;
     }
 
     const data = await res.json();
     const tempUrl = data.data?.[0]?.url;
-    if (!tempUrl) return null;
+    if (!tempUrl) {
+      console.error("[BlogGen] APIMART no devolvió URL de imagen.");
+      return null;
+    }
 
     // Descargar y subir a Storage
     const imgRes = await fetch(tempUrl);
+    if (!imgRes.ok) throw new Error(`Error descargando imagen de APIMART: ${imgRes.status}`);
     const blob = await imgRes.blob();
 
     const supabase = createClient(
@@ -86,6 +94,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
 
 export function slugify(input: string): string {
 
+
   return input
     .toLowerCase()
     .normalize("NFD")
@@ -108,7 +117,7 @@ interface GenPayload {
   tags?: string[];
   readTime?: string;
   image?: string;
-  imagePrompt?: string; // Nuevo campo para DALL-E 3
+  imagePrompt?: string; // Nuevo campo para generación de imagen
   internalLinks?: Array<{ anchor: string; url: string }>;
   externalLinks?: Array<{ anchor: string; url: string }>;
 }
@@ -179,7 +188,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
-  "imagePrompt": "Highly descriptive prompt for DALL-E 3 (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image.",
+  "imagePrompt": "Highly descriptive prompt for an AI image generator (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image.",
   "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
   "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }

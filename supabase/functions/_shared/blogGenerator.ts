@@ -27,36 +27,60 @@ function parseAiResponse(text: string): any {
   const trimmed = text.trim();
   if (!trimmed) throw new BlogGenError("Respuesta vacía del proveedor de IA", 502);
 
+  // Intentamos parsear como JSON directo primero
   if (!trimmed.startsWith("data:")) {
     try {
       return JSON.parse(trimmed);
     } catch {
-      throw new BlogGenError(`Respuesta IA no parseable: ${trimmed.slice(0, 200)}`, 502);
+      // Si falla, quizás es un error de formato pero tiene data: oculto o es texto plano
+      if (!trimmed.includes("data:")) {
+        throw new BlogGenError(`Respuesta IA no parseable (no JSON ni SSE): ${trimmed.slice(0, 200)}`, 502);
+      }
     }
   }
 
+  // Manejo robusto de SSE (data: { ... })
   let content = "";
-  // deno-lint-ignore no-explicit-any
   let last: any = null;
-  for (const line of trimmed.split("\n")) {
+  
+  // Dividimos por líneas y procesamos cada fragmento "data:"
+  const lines = trimmed.split("\n");
+  for (const line of lines) {
     const l = line.trim();
     if (!l.startsWith("data:")) continue;
+    
     const payload = l.slice(5).trim();
     if (!payload || payload === "[DONE]") continue;
+    
     try {
       const chunk = JSON.parse(payload);
       last = chunk;
+      
+      // Apimart/OpenAI suelen usar delta para streams y message para respuestas completas
       const choice = chunk.choices?.[0];
       const piece = choice?.delta?.content ?? choice?.message?.content ?? "";
       if (typeof piece === "string") content += piece;
     } catch {
-      // fragmento incompleto: lo ignoramos
+      // Fragmento JSON incompleto o corrupto en el stream, lo ignoramos para intentar rescatar el resto
     }
   }
 
+  // Fallback: si no acumulamos nada con deltas pero el último chunk tiene el mensaje completo
   if (!content && last?.choices?.[0]?.message?.content) {
     content = last.choices[0].message.content;
   }
+  
+  if (!content) {
+    // Caso desesperado: si no hay "data:" estructurado pero hay un JSON válido perdido en el texto
+    const match = trimmed.match(/\{"id":.*"content":.*\}/s);
+    if (match) {
+      try {
+        const rescued = JSON.parse(match[0]);
+        content = rescued.choices?.[0]?.message?.content ?? rescued.content ?? "";
+      } catch { /* ignore */ }
+    }
+  }
+
   if (!content) throw new BlogGenError("Stream de IA sin contenido utilizable", 502);
 
   return { choices: [{ message: { content } }] };
@@ -93,7 +117,19 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       return null;
     }
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // Si falla, intentamos parsear como SSE por si acaso Apimart lo envía así en imágenes
+      const parsed = parseAiResponse(text);
+      // Las respuestas de imágenes de Apimart/OpenAI suelen tener un campo 'data' en la raíz
+      // pero parseAiResponse devuelve { choices: [...] }. 
+      // Si llegamos aquí, es probable que el formato sea totalmente inesperado.
+      throw new Error(`Error parseando respuesta de imagen: ${text.slice(0, 200)}`);
+    }
+
     const tempUrl = data.data?.[0]?.url;
     if (!tempUrl) {
       console.error("[BlogGen] APIMART no devolvió URL de imagen.");
@@ -207,7 +243,7 @@ export async function generateAndStorePost(args: GenerateArgs): Promise<Record<s
   const system = `You are a SENIOR SEO WRITER with 15+ years of experience in web positioning, content marketing, EEAT, and Google AdSense monetization. Write the ENTIRE article in ${L.name} for ${L.audience}. Do NOT switch languages mid-article.
 
 Writing rules:
-- Length: 1500-2000 real words of content.
+- Length: Around 1200-1500 real words of high-quality content.
 - 100% original, useful content. No filler, no repetitive phrases.
 - Clear structure: ONE H1 (# ) with the main keyword, several descriptive H2 (## ) with semantic variants, and H3 (### ) for internal breakdowns.
 - Introduction that hooks the reader from the first line.
@@ -228,7 +264,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "metaDescription": "Max 155 chars for meta description",
   "slug": "url-friendly-lowercase-with-hyphens",
   "excerpt": "150-200 char summary for blog card",
-  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, 1500-2000 words, with table, lists, FAQ and conclusion + CTA)",
+  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, around 1200 words, with table, lists, FAQ and conclusion + CTA)",
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
@@ -283,7 +319,13 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
 
   // Apimart puede responder con JSON normal o con un stream SSE ("data: {...}").
   const aiText = await aiRes.text();
-  const aiJson = parseAiResponse(aiText);
+  let aiJson;
+  try {
+    aiJson = parseAiResponse(aiText);
+  } catch (e) {
+    console.error("[BlogGen] Error parseando respuesta de Apimart:", aiText.slice(0, 500));
+    throw e;
+  }
   const raw = aiJson.choices?.[0]?.message?.content || "{}";
 
   let parsed: GenPayload = {};

@@ -53,8 +53,8 @@ serve(async (req) => {
           keyword: row.keyword,
           category: row.category,
           language: row.language,
-          // Publicación manual: el artículo queda como borrador hasta que
-          // el editor lo revise y apruebe en el panel.
+          // Publicación manual: el artículo queda como borrador. 
+          // El editor lo verá en la agenda y podrá presionar "Generar vista previa" para verlo.
           publish: false,
         });
         await supabase

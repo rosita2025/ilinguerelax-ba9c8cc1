@@ -105,7 +105,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       },
       body: JSON.stringify({
         model: "flux-schnell",
-        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text.`,
+        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text. Relevant to language learning environment.`,
         n: 1,
         size: "1024x1024",
       }),
@@ -249,15 +249,15 @@ export async function generateAndStorePost(args: GenerateArgs): Promise<Record<s
   const system = `You are a SENIOR SEO WRITER with 15+ years of experience in web positioning, content marketing, EEAT, and Google AdSense monetization. Write the ENTIRE article in ${L.name} for ${L.audience}. Do NOT switch languages mid-article.
 
 Writing rules:
-- Length: Around 1200-1500 real words of high-quality content.
-- 100% original, useful content. No filler, no repetitive phrases.
+- Length: Minimum 2100 real words of high-quality, comprehensive content. Do NOT be repetitive. Deeply cover the topic.
+- 100% original, useful content. No filler, no generic phrases.
 - Clear structure: ONE H1 (# ) with the main keyword, several descriptive H2 (## ) with semantic variants, and H3 (### ) for internal breakdowns.
 - Introduction that hooks the reader from the first line.
 - Develop each section with depth and practical examples.
 - Professional, close, humanized tone (never "as an AI", "in this article we will discuss", "in conclusion I have presented").
 - Include bullet lists with "- " and at least ONE comparative markdown table where it adds value.
 - Add a "## ${L.faqHeading}" section with 4-6 real questions using ### for each question.
-- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}, NEVER spammy.
+- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}, NEVER spammy. INTEGRATE [PRODUCT_CARD:slug] within the text to showcase products.
 - Optimize for the main keyword + related secondary keywords naturally (density ~1-2%).
 - Fulfill EEAT: experience, authority, trust. Cite official sources when relevant.
 - Ready to rank on Google, maximize dwell time, and monetize with AdSense.
@@ -270,7 +270,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "metaDescription": "Max 155 chars for meta description",
   "slug": "url-friendly-lowercase-with-hyphens",
   "excerpt": "150-200 char summary for blog card",
-  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, around 1200 words, with table, lists, FAQ and conclusion + CTA)",
+  "content": "# H1...\\n\\n## H2...\\n\\n(full article in markdown, around 2100 words, with table, lists, FAQ and conclusion + CTA. INTEGRATE product cards naturally using the format [PRODUCT_CARD:slug] where appropriate)",
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",

@@ -104,7 +104,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-image-2-ext",
+        model: "flux-schnell",
         prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text.`,
         n: 1,
         size: "1024x1024",
@@ -122,12 +122,18 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
     try {
       data = JSON.parse(text);
     } catch {
-      // Si falla, intentamos parsear como SSE por si acaso Apimart lo envía así en imágenes
+      console.log("[BlogGen] Respuesta de imagen no es JSON directo, intentando parsear SSE...");
       const parsed = parseAiResponse(text);
-      // Las respuestas de imágenes de Apimart/OpenAI suelen tener un campo 'data' en la raíz
-      // pero parseAiResponse devuelve { choices: [...] }. 
-      // Si llegamos aquí, es probable que el formato sea totalmente inesperado.
-      throw new Error(`Error parseando respuesta de imagen: ${text.slice(0, 200)}`);
+      // Si parseAiResponse rescató el contenido, intentamos parsear ese contenido como JSON
+      // porque Apimart a veces envuelve el JSON de la imagen en un stream de texto.
+      try {
+        const innerJson = typeof parsed.choices?.[0]?.message?.content === 'string' 
+          ? JSON.parse(parsed.choices[0].message.content)
+          : parsed.choices?.[0]?.message?.content;
+        data = innerJson || parsed;
+      } catch {
+        data = parsed;
+      }
     }
 
     const tempUrl = data.data?.[0]?.url;
@@ -268,7 +274,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
-  "imagePrompt": "Highly descriptive prompt for an AI image generator (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image.",
+  "imagePrompt": "Highly descriptive prompt for an AI image generator (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image. Make it relevant to the topic of language learning.",
   "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
   "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }

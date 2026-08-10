@@ -336,7 +336,8 @@ Deno.serve(async (req) => {
     }
 
     if (!attempt.ok) {
-      console.error(`dLocal Go create payment failed [${attempt.status}] (${failures.length} intentos): ${failures.join(" | ")}`);
+      console.error(`dLocal Go create payment completely failed [${attempt.status}] after ${failures.length} fallbacks: ${failures.join(" | ")}`);
+
       
       // Si recibimos un 502/503 real de dLocal que no es JSON (ej. página de Cloudflare)
       if (attempt.status >= 500 && (!attempt.text || attempt.text.trim().startsWith("<"))) {

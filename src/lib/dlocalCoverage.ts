@@ -14,7 +14,7 @@ export type DlocalKind = "transfer" | "cash" | "wallet";
  * transferencia bancaria, el pago en efectivo y la BILLETERA DIGITAL
  * (Yape/Plin, Nequi, MACH, Pix wallets…) en todos los países de LATAM.
  */
-export const DLOCAL_CARD_ENABLED = false;
+export const DLOCAL_CARD_ENABLED = true;
 export const DLOCAL_WALLET_ENABLED = true;
 
 
@@ -74,7 +74,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
   { code: "GT", name: "Guatemala", flag: "🇬🇹", currency: "GTQ",
     transfer: ["Banco Industrial", "Banrural", "BAM"], cash: ["PAYCASH (agentes)"],
     wallet: ["Tigo Money", "Zigi"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
-    walletComingSoon: true },
+    walletComingSoon: false },
   { code: "MX", name: "México", flag: "🇲🇽", currency: "MXN",
     transfer: ["BBVA México", "Banorte", "Santander", "Citibanamex"],
     cash: ["OXXO"],
@@ -84,7 +84,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["Banco General", "Banistmo", "BAC Credomatic", "Global Bank"],
     cash: ["Punto Pago"],
     wallet: ["Yappy", "Nequi Panamá"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
-    walletComingSoon: true },
+    walletComingSoon: false },
 
   { code: "PE", name: "Perú", flag: "🇵🇪", currency: "PEN",
     transfer: ["BCP", "Interbank", "BBVA", "Scotiabank"],
@@ -95,26 +95,26 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     wallet: ["Ueno", "Personal Pay", "Tigo Money"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "UY", name: "Uruguay", flag: "🇺🇾", currency: "UYU",
     transfer: ["BROU", "Itaú Uruguay", "Santander", "Scotiabank"], cash: ["RedPagos", "Abitab"],
-    wallet: [], walletComingSoon: true, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+    wallet: ["Prex", "Midinero"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "DO", name: "República Dominicana", flag: "🇩🇴", currency: "DOP",
     transfer: ["Banreservas", "Banco Popular Dominicano", "BHD"],
     cash: ["PayCash", "Agentes bancarios"],
     wallet: ["tPago", "Cardnet Wallet"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
-    walletComingSoon: true },
+    walletComingSoon: false },
   { code: "SV", name: "El Salvador", flag: "🇸🇻", currency: "USD",
     transfer: ["Banco Agrícola", "Banco Cuscatlán", "Davivienda SV"],
     cash: ["PuntoXpress", "PAYCASH (agentes)"],
     wallet: ["Tigo Money"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
-    walletComingSoon: true },
+    walletComingSoon: false },
   { code: "HN", name: "Honduras", flag: "🇭🇳", currency: "HNL",
     transfer: ["Banco Atlántida", "BAC Credomatic", "Banpaís"],
     cash: ["PAYCASH (agentes)", "Banco Atlántida ventanilla"],
     wallet: ["Tigo Money"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
-    walletComingSoon: true },
+    walletComingSoon: false },
   { code: "NI", name: "Nicaragua", flag: "🇳🇮", currency: "NIO",
     transfer: ["BAC Credomatic", "Banpro", "Lafise Bancentro"],
     cash: ["PAYCASH (agentes)"],
-    wallet: [], walletComingSoon: true, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+    wallet: ["Banpro Billetera", "BAC Billetera"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
 ];
 
 const BY_CODE = new Map(DLOCAL_COVERAGE.map((c) => [c.code, c]));

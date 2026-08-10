@@ -224,7 +224,13 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
   });
 
   if (aiRes.status === 429) throw new BlogGenError("Rate limit del gateway de IA. Intenta en 1 min.", 429);
-  if (aiRes.status === 402) throw new BlogGenError("Créditos IA agotados. Recárgalos en Settings → Workspace → Usage.", 402);
+  if (aiRes.status === 402 || aiRes.status === 401) {
+    const text = await aiRes.text();
+    if (text.includes("balance") || text.includes("credits") || text.includes("quota")) {
+      throw new BlogGenError("Créditos de Apimart agotados o token inválido.", 402);
+    }
+  }
+
   if (!aiRes.ok) {
     const t = await aiRes.text();
     throw new BlogGenError(`AI ${aiRes.status}: ${t.slice(0, 300)}`, 502);

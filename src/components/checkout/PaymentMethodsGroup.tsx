@@ -462,30 +462,52 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
     };
     try {
-      const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
-        body: {
-          environment: getStripeEnvironment(),
-          items: s.items.map((i) => ({
-            id: i.id, name: i.name, price: itemPrice(i, region.tier),
-            quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
-          })),
-          currency: "usd",
-          stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
-          couponPercent: s.couponPercent,
-          couponCode: s.coupon ?? undefined,
-          contact: {
-            email: s.buyer.email.trim(),
-            phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
-            firstName, lastName,
-            country: (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2),
+      const country = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
+      const initiallyRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(country);
+
+      const fetchSecret = async (retryForRestricted = false) => {
+        const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
+          body: {
+            environment: getStripeEnvironment(),
+            items: s.items.map((i) => ({
+              id: i.id, name: i.name, price: itemPrice(i, region.tier),
+              quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
+            })),
+            currency: "usd",
+            stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
+            couponPercent: s.couponPercent,
+            couponCode: s.coupon ?? undefined,
+            contact: {
+              email: s.buyer.email.trim(),
+              phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
+              firstName, lastName,
+              country,
+            },
+            returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
+            // In the edge function we'll use this to skip adaptive pricing if we are retrying
+            isRestrictedRetry: retryForRestricted || initiallyRestricted,
           },
-          returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
-        },
-      }, { attempts: 3, baseDelayMs: 500 });
-      if (error || !data?.clientSecret) {
-        const detail = (error as { edgeDetail?: string })?.edgeDetail;
-        throw new Error(detail || (error as { message?: string } | null)?.message || t.errorPayment);
-      }
+        }, { attempts: 3, baseDelayMs: 500 });
+        
+        if (error || !data?.clientSecret) {
+          const detail = (error as { edgeDetail?: string })?.edgeDetail;
+          const msg = detail || (error as { message?: string } | null)?.message || t.errorPayment;
+          
+          // Fallback logic for currency restrictions
+          const isCurrencyError = msg.toLowerCase().includes("currency") || msg.toLowerCase().includes("adaptive pricing");
+          if (isCurrencyError && !retryForRestricted && !initiallyRestricted) {
+            console.warn("[Stripe] Fallback to USD triggered...");
+            setIsFallingBackToUsd(true);
+            return fetchSecret(true); // Recursive retry for restricted
+          }
+          
+          throw new Error(msg);
+        }
+        return data.clientSecret;
+      };
+
+      const clientSecret = await fetchSecret();
+
 
       supabase.from("email_contacts").upsert({
         email: s.buyer.email.trim().toLowerCase(),
@@ -493,7 +515,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
       }, { onConflict: "email,source" }).then(() => {});
-      return data.clientSecret;
+      return clientSecret;
+
     } catch (err) {
       setStripeError(mapStripeError(err, language as StripeLang));
       try {

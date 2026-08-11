@@ -1,8 +1,3 @@
-// Admin edge function: diagnóstico en tiempo real de fallos de pago (Stripe y otros).
-// Acciones:
-//   - list: últimos eventos PaymentError con motivo, proveedor, país e IP
-//   - (incluye agregados por motivo, proveedor y país)
-
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -56,6 +51,7 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
+    // Intentamos leer de funnel_events (nuestro tracking real de errores)
     let q = admin
       .from("funnel_events")
       .select(
@@ -70,8 +66,37 @@ Deno.serve(async (req) => {
     if (body.country) q = q.eq("country", body.country);
 
     const { data, error } = await q;
-    if (error) throw error;
-    const rows = (data || []) as Row[];
+    
+    // Si falla funnel_events, intentamos admin_payment_errors (nuestra tabla de auditoría)
+    let rows: Row[] = [];
+    if (error) {
+      console.warn("admin-payment-errors: funnel_events failed, falling back to admin_payment_errors", error);
+      const { data: fallbackData, error: fallbackError } = await admin
+        .from("admin_payment_errors")
+        .select("id, created_at, provider, error_message, error_kind, country:error_detail->>'country'")
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      
+      if (fallbackError) throw fallbackError;
+      
+      rows = (fallbackData || []).map(r => ({
+        id: r.id,
+        created_at: r.created_at,
+        provider: r.provider,
+        error_reason: r.error_kind || r.error_message,
+        country: r.country || null,
+        ip: null,
+        product_id: null,
+        value: null,
+        currency: null,
+        page_path: null,
+        session_id: null,
+        user_agent: null
+      }));
+    } else {
+      rows = (data || []) as Row[];
+    }
 
     const tally = (key: (r: Row) => string) => {
       const m = new Map<string, number>();

@@ -1,5 +1,7 @@
 // dLocal Go — creación de pago (API REST)
 // Docs: https://docs.dlocalgo.com/  ·  POST https://api.dlocalgo.com/v1/payments
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 // Devuelve `redirect_url` para enviar al comprador al checkout de dLocal Go.
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { z } from "npm:zod@3.23.8";
@@ -72,19 +74,23 @@ Deno.serve(async (req) => {
 
     console.log(`[dLocal] Inicia creación de pago: ${orderId} (${body.country}) - ${pricing.totalUsd} USD`);
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const notifyParams = new URLSearchParams({
+
       order: orderId,
       email: body.payerEmail,
       name: body.payerName,
       country: body.country.toUpperCase(),
       skus: skus.join(","),
     });
-    const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
+    const localCurrency = body.currency || "USD";
+    const localAmount = localTotalFromPricing(pricing, localCurrency);
+    const restricted = isRestrictedCurrency(localCurrency, body.country);
 
-    // SIEMPRE USD: Forzamos el cobro en USD para evitar fallos en rieles locales
-    // y para unificar la experiencia de pago internacional.
+    // SIEMPRE USD como base o fallback prioritario:
     const startCurrency = "USD";
     const startAmount = calculatedUsd;
+
 
     const EXPIRATION_DAYS = 3;
 
@@ -179,7 +185,32 @@ Deno.serve(async (req) => {
     }
 
     if (!attempt.ok) {
+      const errorDetail = attempt.text.slice(0, 500);
       console.error(`dLocal Go create payment completely failed [${attempt.status}] after ${failures.length} fallbacks: ${failures.join(" | ")}`);
+      
+      // Log critical failure to admin_payment_errors for diagnostics
+      try {
+        const admin = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+          { auth: { persistSession: false } }
+        );
+        await admin.from("admin_payment_errors").insert({
+          provider: "dlocalgo",
+          error_message: errorDetail,
+          error_kind: attempt.status === 502 ? "HTTP 502" : "dlocal_create_failed",
+          country: body.country,
+          error_detail: {
+            failures,
+            order_id: orderId,
+            status: attempt.status,
+            payer: body.payerEmail
+          }
+        });
+      } catch (e) {
+        console.error("Failed to log dlocal error to audit table:", e);
+      }
+
       
       // Log critical failure to order_events for admin visibility
       await logOrderEvent({

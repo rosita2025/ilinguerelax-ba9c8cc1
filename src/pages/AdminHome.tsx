@@ -29,6 +29,8 @@ const panels: Array<{
   
   { to: "/admin/brevo-abandoned", icon: Send, title: "Brevo · Carritos abandonados", desc: "Payload real enviado a Brevo por cada carrito abandonado (tienda vs Hotmart) con ORIGEN, SEGMENTO, TAGS e IDs de producto.", color: "text-pink-600", category: "Marketing" },
   { to: "/admin/newsletter-drip", icon: Mail, title: "Newsletter Drip · Test & Reenvío", desc: "Envía correos de prueba de cualquier paso del drip a un email cualquiera, o reenvía manualmente un paso a un suscriptor.", color: "text-purple-600", category: "Marketing" },
+  { to: "/admin/marketing-drips", icon: Calendar, title: "Marketing Post-Compra", desc: "Secuencias automáticas para compradores a los 7, 15 y 25 días según categoría del producto.", color: "text-rose-600", category: "Marketing" },
+
   { to: "/admin/analytics", icon: LineChart, title: "Analíticas · Funnel", desc: "Embudo estilo Shopify: sesiones, add-to-cart, checkout y compras. Conversiones, top productos por país y tendencias.", color: "text-violet-600", category: "Analítica" },
   { to: "/admin/ga4-compare", icon: GitCompare, title: "GA4 · Comparativa", desc: "Compara datos internos vs Google Analytics 4: usuarios, sesiones, eventos y fuentes de tráfico para detectar desviaciones.", color: "text-rose-500", category: "Analítica" },
   { to: "/admin/checkout-abuse", icon: Shield, title: "Anti-abuso · Checkout", desc: "IPs bloqueadas por rate limit, top IPs con más aperturas del checkout en 24 h y desbloqueo manual.", color: "text-red-500", category: "Seguridad" },

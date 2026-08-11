@@ -13,7 +13,7 @@ interface BrevoAbandonedRow {
   id: string;
   created_at: string;
   event_type: string;
-  origin: "hotmart" | "tienda" | string;
+  origin: "tienda" | string;
   source: string | null;
   email: string | null;
   product_name: string | null;
@@ -28,8 +28,6 @@ interface BrevoAbandonedRow {
     ORIGEN: string | null;
     SEGMENTO: string | null;
     TAGS: unknown;
-    HOTMART_PRODUCT_ID: string | null;
-    HOTMART_PRODUCT_CODE: string | null;
     TIENDA_SKU: string | null;
     COUNTRY_CODE: string | null;
     COUNTRY_STATUS: string | null;
@@ -66,11 +64,10 @@ const StatusPill = ({ status, http }: { status: string | null; http: number | nu
 };
 
 const OriginPill = ({ origin }: { origin: string }) => {
-  const isH = origin === "hotmart";
   return (
-    <Badge className={isH ? "bg-orange-100 text-orange-800" : "bg-teal-100 text-teal-800"}>
-      {isH ? <ShoppingCart className="w-3 h-3 mr-1 inline" /> : <Store className="w-3 h-3 mr-1 inline" />}
-      {isH ? "Hotmart" : "Tienda"}
+    <Badge className="bg-teal-100 text-teal-800">
+      <Store className="w-3 h-3 mr-1 inline" />
+      Tienda
     </Badge>
   );
 };
@@ -78,9 +75,9 @@ const OriginPill = ({ origin }: { origin: string }) => {
 const AdminBrevoAbandoned = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<BrevoAbandonedRow[]>([]);
-  const [summary, setSummary] = useState<Summary>({ total: 0, hotmart: 0, tienda: 0, errors: 0 });
+  const [summary, setSummary] = useState<Summary>({ total: 0, tienda: 0, errors: 0 });
   const [loading, setLoading] = useState(false);
-  const [origin, setOrigin] = useState<"all" | "hotmart" | "tienda">("all");
+  const [origin, setOrigin] = useState<"all" | "tienda">("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -106,9 +103,9 @@ const AdminBrevoAbandoned = () => {
       <main className="space-y-6">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex gap-1">
-            {(["all", "hotmart", "tienda"] as const).map((o) => (
+            {(["all", "tienda"] as const).map((o) => (
               <Button key={o} variant={origin === o ? "default" : "outline"} size="sm" onClick={() => setOrigin(o)}>
-                {o === "all" ? "Todos" : o === "hotmart" ? "Hotmart" : "Tienda"}
+                {o === "all" ? "Todos" : "Tienda"}
               </Button>
             ))}
           </div>
@@ -123,7 +120,7 @@ const AdminBrevoAbandoned = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Total</div><div className="text-xl font-bold">{summary.total}</div></Card>
-          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Hotmart</div><div className="text-xl font-bold text-orange-600">{summary.hotmart}</div></Card>
+          
           <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Tienda</div><div className="text-xl font-bold text-teal-600">{summary.tienda}</div></Card>
           <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Errores</div><div className="text-xl font-bold text-red-600">{summary.errors}</div></Card>
         </div>
@@ -155,7 +152,7 @@ const AdminBrevoAbandoned = () => {
                       <div className="mt-1 text-xs font-medium truncate">{r.email || "(sin email)"} · {r.product_name || r.product_sku || "(sin producto)"}</div>
                       <div className="mt-0.5 text-[10px] text-muted-foreground truncate">
                         SEGMENTO: <b>{r.summary.SEGMENTO || "—"}</b> · TAGS: {tagsToString(r.summary.TAGS)}
-                        {r.summary.HOTMART_PRODUCT_ID && <> · ID: <code>{r.summary.HOTMART_PRODUCT_ID}</code></>}
+                        
                         {r.summary.TIENDA_SKU && <> · SKU: <code>{r.summary.TIENDA_SKU}</code></>}
                       </div>
                     </div>

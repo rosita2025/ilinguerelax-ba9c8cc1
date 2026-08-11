@@ -43,3 +43,4 @@ INSERT INTO public.marketing_drip_config (category, step_name, day_offset, templ
 ('coreano_mapas', 'followup', 7, 'coreano-followup'),
 ('coreano_mapas', 'value', 15, 'coreano-value'),
 ('coreano_mapas', 'launch', 25, 'coreano-launch');
+SELECT cron.schedule('send-marketing-drip', '0 9 * * *', $$ SELECT net.http_post(url := 'https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/send-marketing-drip', headers := jsonb_build_object('Content-Type', 'application/json', 'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'email_queue_service_role_key')), body := '{}'::jsonb); $$ );

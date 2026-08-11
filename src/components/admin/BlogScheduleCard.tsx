@@ -46,7 +46,7 @@ interface PreviewPost {
 const STATUS_LABEL: Record<QueueItem["status"], { text: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { text: "Programado", variant: "outline" },
   processing: { text: "Generando…", variant: "secondary" },
-  done: { text: "Borrador listo", variant: "default" },
+  done: { text: "Publicado", variant: "default" },
   failed: { text: "Error", variant: "destructive" },
 };
 
@@ -233,11 +233,11 @@ const BlogScheduleCard = () => {
         <div>
           <h3 className="font-semibold flex items-center gap-2">
             <CalendarClock className="h-4 w-4 text-primary" />
-            Agenda de blog · 10 posts al día
+            Agenda de blog · 10 posts al día (Auto-Publicar)
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
             5 turnos diarios × 2 artículos = 10 al día.
-            Se programan 300 artículos (30 días) de forma automática.
+            Publicación automática con IA (texto e imagen) para 300 artículos.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>

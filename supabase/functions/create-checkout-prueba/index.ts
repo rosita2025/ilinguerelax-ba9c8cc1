@@ -136,13 +136,15 @@ Deno.serve(async (req) => {
     // de moneda local en regiones con restricciones bancarias o cuando falla el intento inicial.
     const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(body.contact.country);
 
+    console.log(`[Stripe] Creating session. ForceUSD: ${forceUsd}, Country: ${body.contact.country}, Currency: ${currency}`);
+
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
       // Desactivamos Adaptive Pricing si forzamos USD para evitar errores de moneda local.
-      ...(forceUsd && { adaptive_pricing: { enabled: false } }),
+      adaptive_pricing: { enabled: !forceUsd },
       currency: forceUsd ? "usd" : currency,
       customer_email: body.contact.email,
       payment_intent_data: {

@@ -17,11 +17,12 @@ const LATAM = new Set([
 ]);
 const TIENDA = new Set(["VE", "CU", "NI"]);
 
-/** Países con restricciones cambiarias o inestabilidad que a menudo fallan en moneda local. */
-export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN", "AR", "VE", "NI", "CU"]);
+/** Países con restricciones cambiarias, inestabilidad o alta tasa de rechazo en moneda local. */
+export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN", "AR", "VE", "NI", "CU", "BO", "PY", "SV", "GT"]);
 
 export function isRestrictedCurrency(country: string | null | undefined): boolean {
-  return RESTRICTED_CURRENCY_COUNTRIES.has(String(country || "").toUpperCase().slice(0, 2));
+  const c = String(country || "").toUpperCase().slice(0, 2);
+  return RESTRICTED_CURRENCY_COUNTRIES.has(c);
 }
 
 

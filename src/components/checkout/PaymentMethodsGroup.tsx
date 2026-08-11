@@ -13,6 +13,9 @@ import { useBinancePayConfig } from "@/hooks/useBinancePayConfig";
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { formatCurrencyAmount, formatAmountLocalized } from "@/i18n";
@@ -425,6 +428,11 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const reset = () => { redirectingRef.current = false; setMpLoading(null); };
     window.addEventListener("pageshow", reset);
     window.addEventListener("focus", reset);
+    return () => {
+      window.removeEventListener("pageshow", reset);
+      window.removeEventListener("focus", reset);
+    };
+  }, []);
     // Al cargar el checkout, nos aseguramos que el store y el estado local estén sincronizados
     if (selected) setSelectedMethod(selected);
     return () => {
@@ -540,7 +548,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       return clientSecret;
 
     } catch (err) {
-      setStripeError(mapStripeError(err, language as StripeLang));
+      const mapped = mapStripeError(err, language as StripeLang);
+      setStripeError(mapped);
+      
+      // Auto-fallback UI if it's a currency error
+      if (mapped.code === "currency_restricted" && !isFallingBackToUsd) {
+        setIsFallingBackToUsd(true);
+      }
+      
       try {
         const s2 = useCheckoutPruebaStore.getState();
         const totals = calcTotals(s2.items, s2.couponPercent, region.tier);

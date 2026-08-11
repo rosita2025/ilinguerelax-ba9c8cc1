@@ -15,6 +15,7 @@ export interface MappedStripeError {
     | "auth"
     | "rate_limit"
     | "invalid_request"
+    | "currency_restricted"
     | "card_declined"
     | "insufficient_funds"
     | "incorrect_cvc"
@@ -227,6 +228,7 @@ function detect(s: string): MappedStripeError["code"] {
   if (/amount|minimum|maximum|below|above/.test(s)) return "amount";
   if (/api.?key|authentication|unauthorized|401|403/.test(s)) return "auth";
   if (/invalid_request|invalid request|missing|parameter|400|payment_method_types/.test(s)) return "invalid_request";
+  if (/currency|adaptive pricing|not supported in this country/.test(s)) return "currency_restricted";
   if (/not configured|no.*configured|misconfigured|503|502|gateway_error/.test(s)) return "config";
   return "unknown";
 }

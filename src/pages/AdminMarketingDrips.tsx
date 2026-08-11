@@ -64,7 +64,7 @@ export default function AdminMarketingDrips() {
           <h2 className="text-sm font-semibold flex items-center gap-2">
             <Calendar className="w-4 h-4 text-primary" /> Secuencias Activas
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {configs.map((c, i) => (
               <Card key={i} className="p-4 flex flex-col justify-between">
                 <div>

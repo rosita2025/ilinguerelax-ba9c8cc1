@@ -10,6 +10,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount } from "@/i18n";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 

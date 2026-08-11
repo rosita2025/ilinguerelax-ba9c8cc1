@@ -614,10 +614,13 @@ serve(async (req) => {
     for (const ev of gatewayEvents) {
 
       let meta: any = {};
-      try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
-      const provider = String(meta.provider || ev.provider || "").toLowerCase();
-
-      const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
+      try { 
+        meta = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : (ev.event_data || {}); 
+      } catch { meta = ev.event_data || {}; }
+      
+      const provider = String(meta.provider || ev.provider || (ev.referrer === "hotmart-webhook" ? "hotmart" : "")).toLowerCase();
+      
+      const txn = String(meta.external_reference || meta.payment_id || meta.transaction || meta.transaction_code || ev.session_id || ev.id);
       if (/test|sandbox|prueba/i.test(txn)) continue;
       const dedupeKey = `${provider}:${txn}`;
       if (seenGatewayKeys.has(dedupeKey)) continue;
@@ -626,20 +629,20 @@ serve(async (req) => {
       const rawAmount = Number(ev.value || 0);
       const usdAmount = currency === "USD" ? rawAmount : toUsd(rawAmount, currency);
       const status = String(meta.status || "approved").toLowerCase();
-      const isPending = !APPROVED_STORE.has(status) && status !== "approved";
+      const isPending = !APPROVED_STORE.has(status) && status !== "approved" && status !== "complete" && status !== "completed";
       const pid = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "store");
       if (!pid || pid === "0") continue;
       if (isPending && usdAmount > 0) {
-        storePendingCount++;
-        addPending(currency, "store", rawAmount);
+        if (provider === "hotmart") hotmartPendingCount++; else storePendingCount++;
+        addPending(currency, provider === "hotmart" ? "hotmart" : "store", rawAmount);
         pendingDetails.push({
-          orderNumber: String(meta.order_number || meta.external_reference || txn || "-"),
+          orderNumber: String(meta.order_number || meta.external_reference || meta.transaction || meta.transactionCode || txn || "-"),
           provider,
-          source: "store",
+          source: provider === "hotmart" ? "hotmart" : "store",
           status,
-          email: String(meta.email || meta.customer_email || ""),
-          country: String(ev.country || "??"),
-          product: String(meta.product_name || pid),
+          email: String(meta.email || meta.customer_email || meta.buyer_email || ev.email || ""),
+          country: String(ev.country || meta.country || "??"),
+          product: String(meta.product_name || meta.name || ev.product_id || pid),
           amount: rawAmount,
           currency,
           amountUsd: usdAmount,
@@ -652,7 +655,7 @@ serve(async (req) => {
         productId: pid,
         country: ev.country || "??",
         usd: isPending ? 0 : usdAmount,
-        source: "store",
+        source: provider === "hotmart" ? "hotmart" : "store",
         pending: isPending,
         provider,
       });

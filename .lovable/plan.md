@@ -1,30 +1,23 @@
-# Plan: Increase Blog Post Capacity and Streamline Automation
+# Plan: Blog Automation Consolidation
 
-The user wants to increase the blog post agenda capacity from 300 to 1,000 posts (spanning ~100 days at 10 posts/day) and ensure the system operates fully autonomously (AI generates text and images, and publishes immediately without manual approval).
+The user wants to maintain the 300-post (30-day) agenda but ensure it is fully autonomous, with AI generating both text and images and publishing immediately without manual intervention.
 
 ## Proposed Changes
 
-### 1. Edge Function: `manage-blog-queue`
-- Update `DAYS` constant from 30 to 100 to support up to 1,000 posts (5 slots/day * 2 posts/slot = 10 posts/day * 100 days = 1,000 posts).
-- Verify the `seed` action correctly handles the increased volume.
+### 1. Edge Function: `process-blog-queue`
+- Confirm `publish: true` is always passed to `generateAndStorePost`.
+- This ensures that when the scheduled time arrives, the post is created and immediately set to `published: true` in the database.
 
-### 2. Edge Function: `process-blog-queue`
-- Ensure `publish: true` remains active (already set, but verify).
-- Confirm image generation via Apimart is triggered for every post in the queue.
+### 2. Edge Function: `_shared/blogGenerator.ts`
+- Verify that image generation via Apimart is triggered for every post.
+- Ensure the AI prompt for 300 posts generates unique content to avoid repetition across the 30-day cycle.
 
-### 3. Edge Function: `_shared/blogGenerator.ts`
-- Double-check that `publish: true` results in immediate visibility on the site (syncing with `generated_blog_posts` table).
-- Ensure image generation errors don't block the post creation (fallback to null or placeholder if needed, though the goal is 100% success).
-
-### 4. Admin UI: `BlogScheduleCard.tsx`
-- Update UI labels and limits to reflect the 1,000-post / 100-day agenda.
+### 3. Admin UI: `BlogScheduleCard.tsx`
+- Update descriptions and badges to reflect that the system is in "Auto-Publish" mode.
+- Remove or deprioritize "Approve" buttons if they are no longer necessary for the automated flow.
 
 ## Verification Plan
 
-### Automated Tests
-- Run `manage-blog-queue` with `action: "seed"` via a test script to verify 1,000 entries are created in `blog_post_queue`.
-- Trigger a manual `run-now` to ensure one post is generated and published successfully.
-
-### Manual Verification
-- Check the `/admin/seo` (or Blog & Generador IA) dashboard to see the updated agenda length.
-- Inspect the `blog_post_queue` table via Supabase to confirm scheduling spans ~3 months.
+### Automated Verification
+- Manual trigger of the queue processor to verify a post is generated, an image is created, and it appears on the blog without manual approval.
+- Check the `blog_post_queue` status updates to `done` and the post appears in `generated_blog_posts` with `published: true`.

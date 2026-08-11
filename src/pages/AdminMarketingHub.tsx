@@ -199,38 +199,40 @@ export default function AdminMarketingHub() {
         </Card>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
-            <TabsTrigger 
-              value="overview" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Resumen
-            </TabsTrigger>
-            <TabsTrigger 
-              value="post-purchase" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Post-Compra
-            </TabsTrigger>
-            <TabsTrigger 
-              value="newsletter" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Newsletter
-            </TabsTrigger>
-            <TabsTrigger 
-              value="abandoned" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Abandonos
-            </TabsTrigger>
-            <TabsTrigger 
-              value="reviews" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Reseñas
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+            <TabsList className="w-max sm:w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 flex-nowrap min-w-full">
+              <TabsTrigger 
+                value="overview" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Resumen
+              </TabsTrigger>
+              <TabsTrigger 
+                value="post-purchase" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Post-Compra
+              </TabsTrigger>
+              <TabsTrigger 
+                value="newsletter" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Newsletter
+              </TabsTrigger>
+              <TabsTrigger 
+                value="abandoned" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Abandonos
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reviews" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Reseñas
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">

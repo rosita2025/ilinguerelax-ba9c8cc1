@@ -236,8 +236,8 @@ const BlogScheduleCard = () => {
             Agenda de blog · 10 posts al día
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
-            5 turnos diarios (08:00, 09:00, 11:00, 13:00 y 20:00 hora Perú) × 2 artículos = 10 al día.
-            Se programan 50 artículos (5 días) para cubrir la semana actual.
+            5 turnos diarios × 2 artículos = 10 al día.
+            Se programan 300 artículos (30 días) de forma automática.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -261,9 +261,9 @@ const BlogScheduleCard = () => {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" onClick={() => run("seed", { startTomorrow: true }, "Agenda de 50 artículos creada")} disabled={busy === "seed"}>
+        <Button size="sm" onClick={() => run("seed", { startTomorrow: true }, "Agenda de 300 artículos creada")} disabled={busy === "seed"}>
           {busy === "seed" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <CalendarClock className="h-4 w-4 mr-1" />}
-          Programar 50 (desde mañana)
+          Programar 300 (desde mañana)
         </Button>
         <Button size="sm" variant="outline" onClick={() => run("seed", { startTomorrow: false }, "Agenda creada desde hoy")} disabled={busy === "seed"}>
           Programar desde hoy

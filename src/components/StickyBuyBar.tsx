@@ -66,6 +66,7 @@ export const StickyBuyBar = ({
   dismissible = false,
   flag,
   sku,
+  usdValue,
 }: StickyBuyBarProps & { sku?: string }) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
@@ -210,8 +211,8 @@ export const StickyBuyBar = ({
           content_ids: sku ? [sku] : undefined,
           content_name: productName,
           content_type: "product",
-          value: parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
-          currency: currencyCode,
+          value: usdValue || parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
+          currency: "USD", // Forzado a USD para Ads
           product_id: sku,
         });
       } catch {}

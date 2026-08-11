@@ -899,9 +899,10 @@ const Product5000 = () => {
       <StickyBuyBar
         sku={ADMIN_SKU_5000}
         price={safePriceLabel}
-        originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
-        currencyCode={displayCurrency}
-        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+           originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
+           currencyCode={displayCurrency}
+           usdValue={priceUSD}
+           flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
         productName={pricing5000.name ?? "Inglés Relax - 5,000 Palabras"}
         rating={4.8}
         reviewCount={800}

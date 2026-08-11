@@ -737,9 +737,10 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         sku={ADMIN_SKU}
         price={priceLabel}
-        originalPrice={originalLabel}
-        currencyCode={displayCurrency}
-        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+           originalPrice={originalLabel}
+           currencyCode={displayCurrency}
+           usdValue={PRICE_USD}
+           flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
         productName={pricingAdmin.name ?? "Patrones Especiales en Inglés"}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}

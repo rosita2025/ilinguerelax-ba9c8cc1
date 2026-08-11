@@ -28,6 +28,11 @@ interface Stats {
     newsletter: number;
     marketing: number;
   };
+  account?: {
+    emailsLeft: number | null;
+    planType: string | null;
+    planEndDate: string | null;
+  };
 }
 
 export default function AdminMarketingHub() {
@@ -70,6 +75,45 @@ export default function AdminMarketingHub() {
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar Global
           </Button>
         </header>
+
+        {/* Créditos y Estado del Plan */}
+        {stats?.account && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="bg-emerald-500/5 border-emerald-500/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" /> Créditos Brevo
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600">
+                  {stats.account.emailsLeft?.toLocaleString() ?? "—"}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Créditos disponibles para envío</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Plan Activo</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold uppercase">{stats.account.planType || "Free"}</div>
+                <p className="text-[10px] text-muted-foreground mt-1">Tipo de suscripción en Brevo</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vencimiento</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold">
+                  {stats.account.planEndDate ? new Date(stats.account.planEndDate).toLocaleDateString() : "No vence"}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Fecha de renovación del plan</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Salud del Sistema y Resumen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

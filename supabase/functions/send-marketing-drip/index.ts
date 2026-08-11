@@ -77,7 +77,8 @@ Deno.serve(async (req) => {
             replyTo: REPLY_TO,
             subject: template.subject,
             html: template.html,
-            text: template.text
+            text: template.text,
+            supabase: admin, // Enable global throttle
           } as any);
 
           await admin.from('marketing_drip_sends').insert({

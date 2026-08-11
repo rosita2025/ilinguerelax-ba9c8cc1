@@ -1,6 +1,7 @@
+import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkGlobalEmailThrottle } from "./emailGuard.ts";
+
 // Email sender — routes purchase/order emails through Brevo via the Lovable
-// connector gateway. Falls back to Resend if Brevo is unavailable, so
-// existing callers using `resend.emails.send({...})` don't break.
 
 interface SendArgs {
   from?: string;              // "Name <email@domain>" or just "email@domain"
@@ -18,6 +19,8 @@ interface SendArgs {
   headers?: Record<string, string>;
   /** Stable id used for List-Unsubscribe / references (order number, idem key). */
   entityRef?: string;
+  /** If provided, checks if this email was already sent recently (marketing only). */
+  supabase?: SupabaseClient;
 }
 
 interface SendResult {
@@ -170,6 +173,16 @@ async function sendViaResend(args: SendArgs): Promise<SendResult> {
 
 export async function sendEmail(rawArgs: SendArgs): Promise<SendResult> {
   const args = withDefaults(rawArgs);
+
+  // 1. Marketing Global Throttle (if supabase client provided)
+  if (args.supabase && typeof args.to === 'string') {
+    const throttle = await checkGlobalEmailThrottle(args.supabase, args.to);
+    if (throttle.throttled) {
+      console.log(`[brevo] Global throttle active for ${args.to}: ${throttle.reason}`);
+      return { error: { message: `Global throttle active: ${throttle.reason}`, status: 429 } };
+    }
+  }
+
   // Explicit per-call override wins (used for newsletters to avoid Brevo click tracking).
   if (args.provider === 'resend') return sendViaResend(args);
   if (args.provider === 'brevo') {

@@ -1568,6 +1568,69 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_drip_config: {
+        Row: {
+          category: string
+          day_offset: number
+          enabled: boolean
+          id: string
+          step_name: string
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          day_offset: number
+          enabled?: boolean
+          id?: string
+          step_name: string
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          day_offset?: number
+          enabled?: boolean
+          id?: string
+          step_name?: string
+          template_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      marketing_drip_sends: {
+        Row: {
+          category: string
+          created_at: string
+          email: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string
+          step_name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          email: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          step_name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          step_name?: string
+        }
+        Relationships: []
+      }
       meta_attribution: {
         Row: {
           country: string | null

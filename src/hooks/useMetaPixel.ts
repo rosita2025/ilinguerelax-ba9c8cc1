@@ -134,8 +134,12 @@ const isMetaPaidTraffic = (): boolean => {
 
 const hasPixelConsent = (): boolean => {
   if (typeof window === "undefined") return false;
-  if (isInternalTraffic()) return false; // admin / pruebas: nunca enviar a Meta
-  if (!isMetaPaidTraffic()) return false; // orgánico, email, referidos: fuera del Pixel
+  // Tráfico interno (admin / pruebas / lovable) NUNCA envía eventos al Pixel.
+  if (isInternalTraffic()) return false; 
+  // Solo se reportan eventos si el usuario llegó por un anuncio de Meta (Paid Traffic).
+  // El tráfico orgánico, directo o de otras fuentes no se reporta para no ensuciar el ROAS.
+  if (!isMetaPaidTraffic()) return false; 
+  
   if (!isEuUser()) return true; // non-EU: implicit consent
   try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
 };

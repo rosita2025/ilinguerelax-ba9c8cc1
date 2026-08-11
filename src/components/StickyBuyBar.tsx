@@ -200,6 +200,8 @@ export const StickyBuyBar = ({
         return p.startsWith("/checkout") || p.startsWith("/checkouts");
       } catch { return false; }
     })();
+    // NOTE: AddToCart pixel is ONLY fired if navigating to our OWN checkout.
+    // Hotmart has its own pixel 24959578143733255 embedded in its checkout.
     if (goesToInternalCheckout) {
       try {
         trackHotmartEvent("AddToCart", {

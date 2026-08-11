@@ -156,21 +156,6 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
           });
         } else {
           set({ items: [...get().items, { ...item, quantity: 1 }] });
-          // Fire AddToCart for every real add — powers /admin/live "agregó al
-          // carrito" counter per producto. `silent: true` skips tracking for
-          // auto-populate (landing on /checkouts/:slug) and recovery links.
-          if (!opts?.silent) {
-            try {
-              trackHotmartEvent("AddToCart", {
-                content_name: item.name,
-                content_ids: [item.id],
-                content_type: "product",
-                value: Number(item.price) || 0,
-                currency: "USD",
-                num_items: 1,
-              });
-            } catch { /* ignore */ }
-          }
         }
       },
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -123,8 +123,12 @@ const ProductDynamic = () => {
   const local = useLocalCurrency(effectiveUsd, (product as any)?.local_prices ?? null);
 
   // Track ViewContent per SKU for every product (existing + new) in /admin/live
+  // Se dispara solo una vez al cargar la ficha del producto.
+  const vcFiredRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!product) return;
+    if (!product || vcFiredRef.current === product.sku) return;
+    vcFiredRef.current = product.sku;
+
     trackHotmartEvent("ViewContent", {
       content_ids: [product.sku],
       content_name: product.name,

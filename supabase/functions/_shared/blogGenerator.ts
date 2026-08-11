@@ -400,8 +400,8 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
 
 The content field MUST start with "# " (H1) and contain the full article ready to publish. Do NOT explain anything outside the JSON.`;
 
-  const productsCtx = Array.isArray(productCards) && productCards.length
-    ? `\n\nPRODUCTOS iLINGUE RELAX A MENCIONAR NATURALMENTE en el CTA y "Recursos recomendados" (usa los títulos exactos y enlaza con la ruta /products/{slug}):\n${productCards.map((p) => `- ${p.title} → /products/${p.slug}${p.description ? " · " + p.description : ""}`).join("\n")}`
+  const productsCtx = productsList.length > 0
+    ? `\n\nPRODUCTOS iLINGUE RELAX A MENCIONAR NATURALMENTE en el CTA y "Recursos recomendados" (usa los títulos exactos y enlaza internamente usando el formato [PRODUCT_CARD:slug]):\n${productsList.map((p) => `- ${p.title} (slug: ${p.slug})${p.description ? " · " + p.description : ""}`).join("\n")}`
     : "";
 
   const user = `📝 Título del artículo: ${topic}

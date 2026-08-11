@@ -1989,74 +1989,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       </EmbeddedCheckoutProvider>
                     </div>
                   )}
-                </div>
-                    return (
-                      <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
-                        <div className="flex items-center justify-center gap-2 text-sm text-neutral-700 dark:text-neutral-200 font-medium">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{status}</span>
-                        </div>
-                        {stripeElapsed >= 5 && (
-                          <div className="mt-1 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
-                            {stripeElapsed}s
-                          </div>
-                        )}
-                        {stripeElapsed >= 30 && (
-                          <div className="mt-3 flex justify-center">
-                            <button
-                              type="button"
-                              onClick={retryStripe}
-                              className="inline-flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                            >
-                              <Loader2 className="w-3.5 h-3.5" />
-                              {isEn ? "Retry now" : isPt ? "Tentar agora" : isFr ? "Réessayer" : "Reintentar ahora"}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                  {stripeError && (
-                    <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
-                      <p className="font-semibold">{stripeError.title}</p>
-                      <p className="mt-1 text-xs">{stripeError.message}</p>
-                      {stripeError.instructions && stripeError.instructions.length > 0 && (
-                        <ol className="mt-2 ml-4 list-decimal space-y-0.5 text-xs">
-                          {stripeError.instructions.map((step, i) => (
-                            <li key={i}>{step}</li>
-                          ))}
-                        </ol>
-                      )}
-                      <p className="mt-1 text-[10px] opacity-70">
-                        {language === "en" ? "Code" : language === "pt" ? "Código" : language === "fr" ? "Code" : "Código"}: {stripeError.code}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {stripeError.retryable && (
-                          <button
-                            type="button"
-                            onClick={retryStripe}
-                            className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
-                          >
-                            <Loader2 className="w-3.5 h-3.5" />
-                            {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
-                          </button>
-                        )}
-                        <a
-                          href={WHATSAPP_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#20b858]"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          {language === "en" ? "Contact us on WhatsApp" : language === "pt" ? "Fale conosco no WhatsApp" : language === "fr" ? "Contactez-nous sur WhatsApp" : "Escríbenos por WhatsApp"}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  <EmbeddedCheckoutProvider key={stripeRetryKey} stripe={stripePromise} options={stripeOptions}>
-                    <EmbeddedCheckout />
-                  </EmbeddedCheckoutProvider>
-                </div>
+              </div>
+            )}
               </div>
             )}
 

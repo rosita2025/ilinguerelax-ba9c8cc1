@@ -4,10 +4,21 @@
  * All events also push to dataLayer for GTM (GTM-T3MZNK99).
  */
 import { useEffect, useRef } from "react";
+import { convertToUSD, type Currency } from "@/i18n";
 
 type GAParams = Record<string, unknown>;
 
 export function trackGAEvent(eventName: string, params: GAParams = {}) {
+  // Normalización forzada a USD para Google Ads/Analytics
+  if (params.value && params.currency && params.currency !== "USD") {
+    try {
+      params.value = convertToUSD(
+        Number(params.value),
+        params.currency as Currency
+      );
+      params.currency = "USD";
+    } catch {}
+  }
   try {
     const w = window as any;
     if (typeof w.gtag === "function") {

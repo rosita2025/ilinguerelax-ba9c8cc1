@@ -1647,6 +1647,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     } catch (e) {
       console.error("free order confirmation failed", e);
     } finally {
+      trackPurchase(orderId, "mercadopago_cash");
       navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
     }
   };

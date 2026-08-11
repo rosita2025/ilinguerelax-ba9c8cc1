@@ -87,7 +87,7 @@ const AdminBrevoAbandoned = lazy(() => import("./pages/AdminBrevoAbandoned"));
 const AdminNewsletterDrip = lazy(() => import("./pages/AdminNewsletterDrip"));
 const AdminLaunches = lazy(() => import("./pages/AdminLaunches"));
 const AdminAudiences = lazy(() => import("./pages/AdminAudiences"));
-const AdminMarketingDrips = lazy(() => import("./pages/AdminMarketingDrips"));
+const AdminMarketingHub = lazy(() => import("./pages/AdminMarketingHub"));
 
 
 const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
@@ -308,7 +308,7 @@ const App = () => (
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />
                   <Route path="/admin/lanzamientos" element={<AdminGate><AdminLaunches /></AdminGate>} />
                   <Route path="/admin/audiencias" element={<AdminGate><AdminAudiences /></AdminGate>} />
-                  <Route path="/admin/marketing-drips" element={<AdminGate><AdminMarketingDrips /></AdminGate>} />
+                  <Route path="/admin/marketing-drips" element={<AdminGate><AdminMarketingHub /></AdminGate>} />
 
                   
                   <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />

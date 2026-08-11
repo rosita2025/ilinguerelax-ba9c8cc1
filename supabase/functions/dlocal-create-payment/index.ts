@@ -83,6 +83,8 @@ Deno.serve(async (req) => {
       country: body.country.toUpperCase(),
       skus: skus.join(","),
     });
+    const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
+
     const localCurrency = body.currency || "USD";
     const localAmount = localTotalFromPricing(pricing, localCurrency);
     const restricted = isRestrictedCurrency(localCurrency, body.country);

@@ -184,7 +184,7 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
       />
       {!ready && !error && (
         <p className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin" /> Cargando formulario seguro…
+          <Loader2 className="h-3 w-3 animate-spin" /> Conectando con procesador de pago…
         </p>
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}

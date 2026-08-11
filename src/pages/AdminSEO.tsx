@@ -280,7 +280,14 @@ const AdminSEO = () => {
           productCards,
         },
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("2FA") || (error as any).status === 401) {
+          toast.error("Tu sesión de administrador ha expirado. Recarga la página para verificar tu 2FA.");
+        } else {
+          throw error;
+        }
+        return;
+      }
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
       toast.success(publishNow ? "¡Post publicado en el blog!" : "Borrador generado. Revísalo antes de publicar.");
 

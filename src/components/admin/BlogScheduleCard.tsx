@@ -194,8 +194,13 @@ const BlogScheduleCard = () => {
       if (!it.post_id) await load();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Error";
-      if (toastId) toast.error(msg, { id: toastId });
-      else toast.error(msg);
+      if (msg.includes("2FA") || msg.includes("401")) {
+        toast.error("Sesión expirada. Recarga para validar 2FA.", { id: toastId });
+      } else if (toastId) {
+        toast.error(msg, { id: toastId });
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBusy(null);
     }

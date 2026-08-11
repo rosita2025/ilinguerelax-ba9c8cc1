@@ -47,21 +47,33 @@ function parseAiResponse(text: string): any {
   const lines = trimmed.split("\n");
   for (const line of lines) {
     const l = line.trim();
-    if (!l.startsWith("data:")) continue;
+    if (!l) continue;
     
-    const payload = l.slice(5).trim();
-    if (!payload || payload === "[DONE]") continue;
-    
-    try {
-      const chunk = JSON.parse(payload);
-      last = chunk;
+    // Si la línea empieza con "data:", es SSE
+    if (l.startsWith("data:")) {
+      const payload = l.slice(5).trim();
+      if (!payload || payload === "[DONE]") continue;
       
-      // Apimart/OpenAI suelen usar delta para streams y message para respuestas completas
-      const choice = chunk.choices?.[0];
-      const piece = choice?.delta?.content ?? choice?.message?.content ?? "";
-      if (typeof piece === "string") content += piece;
-    } catch {
-      // Fragmento JSON incompleto o corrupto en el stream, lo ignoramos para intentar rescatar el resto
+      try {
+        const chunk = JSON.parse(payload);
+        last = chunk;
+        
+        // Apimart/OpenAI suelen usar delta para streams y message para respuestas completas
+        const choice = chunk.choices?.[0];
+        const piece = choice?.delta?.content ?? choice?.message?.content ?? "";
+        if (typeof piece === "string") content += piece;
+      } catch {
+        // Fragmento JSON incompleto o corrupto en el stream, lo ignoramos para intentar rescatar el resto
+      }
+    } else if (l.startsWith("{") && l.endsWith("}")) {
+      // Intento de rescate si hay un JSON puro en medio del stream
+      try {
+        const chunk = JSON.parse(l);
+        last = chunk;
+        const choice = chunk.choices?.[0];
+        const piece = choice?.message?.content ?? choice?.delta?.content ?? "";
+        if (typeof piece === "string") content += piece;
+      } catch { /* ignore */ }
     }
   }
 
@@ -72,12 +84,16 @@ function parseAiResponse(text: string): any {
   
   if (!content) {
     // Caso desesperado: si no hay "data:" estructurado pero hay un JSON válido perdido en el texto
-    const match = trimmed.match(/\{"id":.*"content":.*\}/s);
-    if (match) {
-      try {
-        const rescued = JSON.parse(match[0]);
-        content = rescued.choices?.[0]?.message?.content ?? rescued.content ?? "";
-      } catch { /* ignore */ }
+    // Buscamos cualquier bloque que parezca JSON de OpenAI/Apimart
+    const matches = trimmed.match(/\{"id":.*?"content":.*?\}/sg);
+    if (matches) {
+      for (const match of matches) {
+        try {
+          const rescued = JSON.parse(match);
+          const piece = rescued.choices?.[0]?.message?.content ?? rescued.choices?.[0]?.delta?.content ?? rescued.content ?? "";
+          if (piece) content += piece;
+        } catch { /* ignore */ }
+      }
     }
   }
 
@@ -128,9 +144,10 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       // Si parseAiResponse rescató el contenido, intentamos parsear ese contenido como JSON
       // porque Apimart a veces envuelve el JSON de la imagen en un stream de texto.
       try {
-        const innerJson = typeof parsed.choices?.[0]?.message?.content === 'string' 
-          ? JSON.parse(parsed.choices[0].message.content)
-          : parsed.choices?.[0]?.message?.content;
+        const contentStr = parsed.choices?.[0]?.message?.content;
+        const innerJson = typeof contentStr === 'string' && (contentStr.trim().startsWith('{') || contentStr.trim().startsWith('['))
+          ? JSON.parse(contentStr)
+          : contentStr;
         data = innerJson || parsed;
       } catch {
         data = parsed;

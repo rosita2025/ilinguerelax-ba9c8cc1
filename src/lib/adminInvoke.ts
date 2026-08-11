@@ -177,22 +177,42 @@ export async function adminInvoke<T = unknown>(fn: string, options: InvokeOption
   try {
     const ctx: any = (res.error as any)?.context;
     if (ctx) {
-      // Handle both Response objects (standard Fetch) and cloneable objects
+      // Use cloned response to avoid "body already used" errors
       const response = typeof ctx.clone === "function" ? ctx.clone() : ctx;
       if (typeof response.json === "function") {
         detail = await response.json().catch(() => null);
+      } else if (typeof response.text === "function") {
+        const text = await response.text().catch(() => "");
+        try {
+          detail = JSON.parse(text);
+        } catch {
+          detail = { error: text };
+        }
       }
     }
   } catch (e) {
     console.warn("[adminInvoke] Failed to extract error detail:", e);
   }
 
-  if (detail?.code === "TWO_FA_REQUIRED" || detail?.error === "2FA required") {
+  // Handle both JSON error field and status code based logic
+  const is2faError = detail?.code === "TWO_FA_REQUIRED" || 
+                    detail?.error === "2FA required" || 
+                    (res.error as any)?.status === 401;
+
+  if (is2faError) {
+    console.log("[adminInvoke] 2FA required or session expired. Resetting token.");
     resetAdmin2FAToken();
   }
 
   // Prioritize the structured error message from the Edge Function
-  const message = detail?.error || detail?.detail || (detail?.message && typeof detail.message === "string" ? detail.message : null) || res.error.message;
-  return { data: (detail as T) ?? null, error: { ...res.error, message } as typeof res.error };
+  const message = detail?.error || 
+                  detail?.detail || 
+                  (detail?.message && typeof detail.message === "string" ? detail.message : null) || 
+                  res.error.message;
+                  
+  return { 
+    data: (detail as T) ?? null, 
+    error: { ...res.error, message, status: (res.error as any)?.status } as typeof res.error 
+  };
 }
 

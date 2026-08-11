@@ -36,7 +36,7 @@ interface BrevoAbandonedRow {
   cart: Record<string, unknown> | null;
 }
 
-interface Summary { total: number; hotmart: number; tienda: number; errors: number; }
+interface Summary { total: number; tienda: number; errors: number; }
 
 const fmtExact = (iso: string) => {
   try {

@@ -32,6 +32,7 @@ const BodySchema = z.object({
     country: z.string().length(2),
   }),
   returnUrl: z.string().url(),
+  isRestrictedRetry: z.boolean().optional(),
 });
 
 Deno.serve(async (req) => {
@@ -137,16 +138,16 @@ Deno.serve(async (req) => {
     // 
     // SEGURIDAD: Solo pasamos 'payment_method_types' si el modo es compatible.
     // Para 'embedded_page', si no se especifica, Stripe usa los métodos habilitados en la cuenta.
+    const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(body.contact.country);
+
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
-      // Eliminamos payment_method_types para permitir que Stripe decida qué es válido
-      // para USD en el país del comprador, o bien usar los del Dashboard.
-      // Esto evita el StripeInvalidRequestError si el método elegido en el front
-      // no es compatible con la moneda/país/modo.
       return_url: body.returnUrl,
-      adaptive_pricing: { enabled: false }, // Forzamos USD siempre
+      // Desactivamos Adaptive Pricing si forzamos USD para evitar errores de moneda local.
+      ...(forceUsd && { adaptive_pricing: { enabled: false } }),
+      currency: forceUsd ? "usd" : currency,
       customer_email: body.contact.email,
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",

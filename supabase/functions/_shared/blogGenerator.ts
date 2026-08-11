@@ -207,10 +207,10 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       },
       body: JSON.stringify({
         model: "gpt-image-2-ext",
-        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text. Relevant to language learning environment.`,
+        prompt: `Professional educational photography, high quality, clean, 1024x1024, no text, no captions. Subject: ${prompt}. Relevant to language learning for iLingue Relax, using soft teal and coral accents in the environment.`,
         n: 1,
         size: "1024x1024",
-        stream: false,
+        response_format: "url"
       }),
     });
 

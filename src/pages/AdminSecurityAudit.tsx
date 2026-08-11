@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ShieldAlert, History, AlertTriangle } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
-import { adminInvoke } from "@/lib/adminGate";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 

@@ -286,7 +286,7 @@ const BlogScheduleCard = () => {
         </Button>
       </div>
 
-      <AgendaList items={items} run={run} busy={busy} openPreview={openPreview} />
+      <AgendaList items={items} loading={loading} run={run} busy={busy} openPreview={openPreview} />
 
       {preview && (
         <div className="rounded-lg border p-3 space-y-2">

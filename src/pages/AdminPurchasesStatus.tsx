@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Provider = "hotmart" | "mercadopago" | "paypal" | "stripe" | "manual";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
 
 interface Row {
@@ -32,7 +32,6 @@ interface Row {
 }
 
 const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; color: string }> = {
-  hotmart:     { label: "Hotmart",       icon: ShoppingBag, color: "bg-orange-100 text-orange-800" },
   mercadopago: { label: "Mercado Pago",  icon: Wallet,      color: "bg-sky-100 text-sky-800" },
   stripe:      { label: "Stripe",        icon: CreditCard,  color: "bg-purple-100 text-purple-800" },
   paypal:      { label: "PayPal",        icon: CreditCard,  color: "bg-blue-100 text-blue-800" },
@@ -165,7 +164,7 @@ const AdminPurchasesStatus = () => {
           <div>
             <h1 className="text-lg sm:text-xl font-bold">Estado de compras · Todas las pasarelas</h1>
             <p className="text-xs text-muted-foreground">
-              Stripe · Hotmart · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
+              Stripe · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
@@ -199,7 +198,7 @@ const AdminPurchasesStatus = () => {
               <select value={provider} onChange={(e) => setProvider(e.target.value as Provider | "all")}
                 className="w-full h-9 rounded-md border bg-background px-2 text-sm">
                 <option value="all">Todas</option>
-                <option value="hotmart">Hotmart</option>
+                
                 <option value="mercadopago">Mercado Pago</option>
                 <option value="paypal">PayPal</option>
                 <option value="stripe">Stripe</option>
@@ -282,31 +281,6 @@ const AdminPurchasesStatus = () => {
                         <code className="bg-muted px-1 rounded">{r.raw_status}</code>
                       </div>
 
-                      {r.provider === "hotmart" && (
-                        <div className="rounded-md border p-2 bg-muted/30 space-y-1">
-                          <label className="block text-[11px] font-medium">Cambiar estado del pago (Hotmart)</label>
-                          <div className="flex items-center gap-2">
-                            <select
-                              value={r.mapped_status === "unknown" || r.mapped_status === "blocked" ? "" : r.mapped_status}
-                              disabled={statusSaving === r.id}
-                              onChange={(e) => { const v = e.target.value as Mapped; if (v) changeStatus(r.id, v); }}
-                              className="h-8 rounded-md border bg-background px-2 text-xs"
-                            >
-                              <option value="">Seleccionar…</option>
-                              <option value="approved">Aprobado</option>
-                              <option value="pending">Pendiente</option>
-                              <option value="refused">Rechazado</option>
-                              <option value="refunded">Reembolsado</option>
-                              <option value="chargeback">Chargeback</option>
-                              <option value="cancelled">Cancelado</option>
-                            </select>
-                            {statusSaving === r.id && <span className="text-[11px] text-muted-foreground">Guardando…</span>}
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">
-                            El cambio queda registrado en el historial del pedido (auditoría).
-                          </p>
-                        </div>
-                      )}
 
 
 

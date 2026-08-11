@@ -19,7 +19,7 @@ import { formatCurrencyAmount, formatAmountLocalized } from "@/i18n";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
-import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";

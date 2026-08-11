@@ -25,6 +25,7 @@ import { useAdminKey } from "@/components/admin/AdminGate";
 import { getCountryInfo } from "@/lib/countryInfo";
 import { cn } from "@/lib/utils";
 import { mergeProductRows, canonicalProductId } from "@/lib/productSkuAliases";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 type Granularity = "hour" | "day";

@@ -140,11 +140,11 @@ export default function AdminNewsletterDrip() {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={send} disabled={sending} className="gap-2">
-              <Send className="w-4 h-4" /> {sending ? "Enviando..." : mode === "test" ? "Enviar test" : "Reenviar paso"}
+            <Button onClick={send} disabled={sending} className="gap-2" size="sm">
+              <Send className="w-3 h-3" /> {sending ? "Enviando..." : mode === "test" ? "Enviar test" : "Reenviar paso"}
             </Button>
-            <Button variant="outline" onClick={loadAll} disabled={loading} className="gap-2">
-              <RefreshCw className="w-4 h-4" /> Recargar
+            <Button variant="outline" onClick={loadAll} disabled={loading} className="gap-2" size="sm">
+              <RefreshCw className="w-3 h-3" /> Recargar
             </Button>
           </div>
 

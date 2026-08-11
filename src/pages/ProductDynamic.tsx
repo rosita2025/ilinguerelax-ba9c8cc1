@@ -139,7 +139,7 @@ const ProductDynamic = () => {
 
   if (notFound) return <Navigate to="/404" replace />;
   if (loading || !product) {
-    // Sin pantalla de carga: evitamos el flash "Cargando producto…" al
+    // Evitamos el flash de carga al navegar desde la home.
     // navegar desde la home. Aun así emitimos SEO + JSON-LD base con el slug
     // para que los bots siempre detecten datos estructurados en esta ruta.
     const fallbackName = (slug ?? "")

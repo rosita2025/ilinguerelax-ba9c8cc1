@@ -45,14 +45,24 @@ export function useGeneratedBlogPosts() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("generated_blog_posts")
-        .select(COLS)
-        .eq("published", true)
-        .order("created_at", { ascending: false });
-      if (!cancelled) {
-        setPosts((data ?? []).map((r) => toBlogPost(r as Row)));
-        setLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from("generated_blog_posts")
+          .select(COLS)
+          .eq("published", true)
+          .order("created_at", { ascending: false });
+        
+        if (error) throw error;
+        
+        if (!cancelled) {
+          setPosts((data ?? []).map((r) => toBlogPost(r as Row)));
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Error fetching blog posts:", err);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     })();
     return () => {

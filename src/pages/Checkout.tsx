@@ -306,9 +306,11 @@ export default function Checkout() {
       setAdminUpsells(upsells);
 
       if (error || !data) {
+        console.error("Checkout data error:", error);
         // No DB row → rely on static catalog if any, otherwise mark missing.
         setDbMissing(!staticItem);
         setLoadingDb(false);
+        if (error) toast.error("Error de conexión con el catálogo. Usando versión de respaldo.");
         return;
       }
 

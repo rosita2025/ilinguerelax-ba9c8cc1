@@ -1,29 +1,33 @@
-# Plan: Restore Stripe Card Payments Visibility
+# Plan: Ensure Stripe availability and USD payment for international transactions
 
-The user reports that Stripe (credit/debit cards) is missing or disabled in Latin America. My investigation confirms that while Stripe is intended to be the primary method globally, there are filters in `PaymentMethodsGroup.tsx` and `useCheckoutMethodsConfig.ts` that might be unintentionally hiding it in certain regions or configurations.
+The user wants to ensure Stripe is working flawlessly for international payments, specifically requesting to prioritize USD when necessary to avoid regional payment failures.
+
+## User Review Required
+
+> [!IMPORTANT]
+> To ensure international payments work without errors (like the previous ones in Mexico/Ecuador), the system will force USD for Stripe transactions when a regional currency fails or isn't fully supported. This is the most reliable way to handle "pagos internacionales" without technical errors.
 
 ## Proposed Changes
 
-### 1. Unified Method Mapping
-- Ensure all `stripe_` prefixed keys (e.g., `stripe_card`, `stripe_oxxo`) are correctly mapped to the `stripe` family in `src/hooks/useCheckoutMethodsConfig.ts`.
+### Checkout Logic (Frontend)
+- **Stripe Priority**: Ensure Stripe "Tarjeta" is always visible for international regions in `src/hooks/useCheckoutMethodsConfig.ts` and `src/components/checkout/PaymentMethodsGroup.tsx`.
+- **Force USD**: Update `PaymentMethodsGroup.tsx` to explicitly fallback to USD if a regional currency checkout session fails with a currency-related error.
+- **Visual Feedback**: Show a clear notice when paying in USD for compatibility (e.g., "Pagando en USD por compatibilidad / Transacción internacional").
 
-### 2. Global Visibility for Stripe Cards
-- Modify the filtering logic in `src/components/checkout/PaymentMethodsGroup.tsx` to ensure that if the "GLOBAL" region (or any active region) has cards enabled, they appear for all users regardless of their IP, while still allowing for region-specific method ordering.
-- Specifically, ensure `dlocal_card` being disabled (as seen in the code) does not prevent the primary Stripe `card` option from showing.
-
-### 3. Localization Support
-- Ensure the card subtitles and price badges correctly reflect local currency where possible (PE, MX, ES) while falling back to USD for Stripe transactions in other LatAm countries to prevent conversion errors at the gateway level.
+### Edge Functions (Backend)
+- **Stripe Session Configuration**: In `supabase/functions/create-checkout-prueba/index.ts`, ensure `adaptive_pricing` is disabled when a fallback to USD is requested.
+- **International Support**: Maintain the removal of `payment_method_types` to allow Stripe to automatically present the best methods (Apple Pay, Google Pay, Cards) for USD in the buyer's country.
 
 ## Technical Details
 
-- **`src/hooks/useCheckoutMethodsConfig.ts`**: Verify `keyToFamily` correctly groups all `stripe_*` keys into the `stripe` family to prevent configuration mismatches.
-- **`src/components/checkout/PaymentMethodsGroup.tsx`**:
-    - Update the `allMethods` array to ensure the "card" (Stripe) option is always present if enabled in the config.
-    - Review the `filteredByAdmin` logic to prevent accidental exclusion of Stripe in LatAm.
-    - Ensure `isRestricted` logic doesn't hide the method but rather adjusts the display currency.
+### `src/components/checkout/PaymentMethodsGroup.tsx`
+- Refine the `isFallingBackToUsd` logic to be more proactive for countries with historically unstable local currency gateways in Stripe.
+- Ensure the `stripeOptions` memoization correctly handles the fallback state to prevent iframe flicker.
+
+### `supabase/functions/create-checkout-prueba/index.ts`
+- Ensure the `currency: "usd"` is strictly enforced when the `isRestrictedRetry` flag is sent from the frontend.
+- Log specific Stripe error codes to `order_events` or a dedicated log table for better debugging of international failures.
 
 ## Validation Plan
-
-1. **Regional Simulation**: Run Playwright tests simulating users from Mexico (MX), Colombia (CO), and Argentina (AR).
-2. **Visibility Check**: Verify the "Tarjeta de débito / crédito" option appears at the top (or near the top) of the list.
-3. **Gateway Verification**: Trigger the `fetchClientSecret` call for a card payment in these regions to ensure the backend correctly returns a Stripe session.
+- Simulate a checkout from a country with currency restrictions (e.g., Honduras or Argentina) and verify it correctly prompts for USD via Stripe.
+- Verify that Stripe's `embedded_page` mode loads correctly with Apple Pay/Google Pay available for USD transactions.

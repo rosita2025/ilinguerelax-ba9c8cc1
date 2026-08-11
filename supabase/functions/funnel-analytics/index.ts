@@ -604,8 +604,8 @@ serve(async (req) => {
     ];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
-      try { m = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
-      const p = String(m.provider || ev.provider || "").toLowerCase();
+      try { m = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
+      const p = String(m.provider || ev.provider || (ev.referrer === "hotmart-webhook" ? "hotmart" : "")).toLowerCase();
       if (GATEWAY_PROVIDERS.includes(p)) gatewayEvents.push(ev);
       else pixelEvents.push(ev);
     }

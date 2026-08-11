@@ -1554,7 +1554,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // Si el admin configuró explícitamente la región (methodsConfig.loaded con
   // regionCode), respetamos exactamente lo que habilitó, sin forzar el filtro
   // legacy card+paypal fuera de Perú. Perú siempre oculta paypal directo.
-  const visibleMethods = orderedByAdmin;
+  const visibleMethods = orderedByAdmin.length > 0
+    ? orderedByAdmin
+    : allMethods.filter((m) => m.id === "card" || m.id === "paypal" || m.id === "binance" || (m.id === "clabe" && country === "MX"));
   // Orden de secciones para que el checkout se lea de arriba a abajo sin saltos:
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
   const methods = [...visibleMethods].sort(

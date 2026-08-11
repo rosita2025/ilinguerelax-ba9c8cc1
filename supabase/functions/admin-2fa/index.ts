@@ -123,6 +123,17 @@ Deno.serve(async (req) => {
     if (action === "request") {
       const adminKey = String(body?.adminKey || "");
       if (adminKey !== expectedKey) {
+        const supabase = admin();
+        try {
+          await supabase.from("admin_audit_logs").insert({
+            action: "admin_login_failed",
+            details: { reason: "invalid_key" },
+            ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+            user_agent: req.headers.get("user-agent"),
+          });
+        } catch (e) {
+          console.error("[admin-2fa] Failed to log audit:", e);
+        }
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: JSON_HEADERS });
       }
       const code = random6DigitCode();
@@ -162,6 +173,19 @@ Deno.serve(async (req) => {
       const ttlSeconds = remember ? 7 * 24 * 60 * 60 : 12 * 60 * 60; // 7d trusted / 12h
       const sessionExp = Math.floor(Date.now() / 1000) + ttlSeconds;
       const token = await signAdmin2FAToken({ kind: "session", iat: Math.floor(Date.now() / 1000), exp: sessionExp });
+      
+      const supabase = admin();
+      try {
+        await supabase.from("admin_audit_logs").insert({
+          action: "admin_login_success",
+          details: { remember },
+          ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+          user_agent: req.headers.get("user-agent"),
+        });
+      } catch (e) {
+        console.error("[admin-2fa] Failed to log audit:", e);
+      }
+
       return new Response(
         JSON.stringify({ token, expiresAt: sessionExp * 1000, remembered: remember }),
         { headers: JSON_HEADERS },

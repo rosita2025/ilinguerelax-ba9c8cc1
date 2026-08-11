@@ -1,27 +1,29 @@
-# Plan: Global Stripe Availability for Latin America
+# Plan: Restore Stripe Card Payments Visibility
 
-The goal is to ensure that Stripe (Card/Apple Pay) is always available as a primary payment option globally, specifically addressing the concern that customers in Latin America might be forced into cash methods when they prefer cards or Apple Pay.
-
-## Technical Details
-
-- **Stripe Global Enablement**: Verify and ensure that the `useCheckoutMethodsConfig` hook and `PaymentMethodsGroup` component do not inadvertently hide Stripe for LatAm countries.
-- **Payment Method Ordering**: Confirm that Stripe (Card/Apple Pay) is prioritized in the list of payment methods to encourage its use over cash/transfer methods.
-- **Stripe Iframe Resilience**: Ensure the Stripe `embedded_page` mode works correctly for all LatAm regions without currency mismatch errors by maintaining the forced USD strategy for global gateways.
+The user reports that Stripe (credit/debit cards) is missing or disabled in Latin America. My investigation confirms that while Stripe is intended to be the primary method globally, there are filters in `PaymentMethodsGroup.tsx` and `useCheckoutMethodsConfig.ts` that might be unintentionally hiding it in certain regions or configurations.
 
 ## Proposed Changes
 
-### Frontend
-- **useCheckoutMethodsConfig.ts**: Confirm the `DEFAULT_ORDER` has `"stripe"` at the beginning.
-- **PaymentMethodsGroup.tsx**:
-    - Ensure `stripe_card` is always checked for availability.
-    - Verify that Apple Pay and Google Pay badges are correctly shown when Stripe is active.
-    - Confirm the `showUsdOnly` logic allows localized pricing for the initial view while correctly handling the gateway's requirement for USD.
+### 1. Unified Method Mapping
+- Ensure all `stripe_` prefixed keys (e.g., `stripe_card`, `stripe_oxxo`) are correctly mapped to the `stripe` family in `src/hooks/useCheckoutMethodsConfig.ts`.
 
-### Backend (Edge Functions)
-- **create-checkout-prueba**: Keep the logic that allows Stripe to manage valid methods automatically by omitting explicit `payment_method_types` when appropriate, ensuring card payments are always an option.
+### 2. Global Visibility for Stripe Cards
+- Modify the filtering logic in `src/components/checkout/PaymentMethodsGroup.tsx` to ensure that if the "GLOBAL" region (or any active region) has cards enabled, they appear for all users regardless of their IP, while still allowing for region-specific method ordering.
+- Specifically, ensure `dlocal_card` being disabled (as seen in the code) does not prevent the primary Stripe `card` option from showing.
+
+### 3. Localization Support
+- Ensure the card subtitles and price badges correctly reflect local currency where possible (PE, MX, ES) while falling back to USD for Stripe transactions in other LatAm countries to prevent conversion errors at the gateway level.
+
+## Technical Details
+
+- **`src/hooks/useCheckoutMethodsConfig.ts`**: Verify `keyToFamily` correctly groups all `stripe_*` keys into the `stripe` family to prevent configuration mismatches.
+- **`src/components/checkout/PaymentMethodsGroup.tsx`**:
+    - Update the `allMethods` array to ensure the "card" (Stripe) option is always present if enabled in the config.
+    - Review the `filteredByAdmin` logic to prevent accidental exclusion of Stripe in LatAm.
+    - Ensure `isRestricted` logic doesn't hide the method but rather adjusts the display currency.
 
 ## Validation Plan
 
-- Use Playwright to simulate visits from multiple LatAm countries (e.g., MX, CO, AR, BR).
-- Verify that "Tarjeta" (Stripe) appears at the top or near the top of the payment list.
-- Confirm the Stripe iframe loads correctly after selecting the method and filling buyer info.
+1. **Regional Simulation**: Run Playwright tests simulating users from Mexico (MX), Colombia (CO), and Argentina (AR).
+2. **Visibility Check**: Verify the "Tarjeta de débito / crédito" option appears at the top (or near the top) of the list.
+3. **Gateway Verification**: Trigger the `fetchClientSecret` call for a card payment in these regions to ensure the backend correctly returns a Stripe session.

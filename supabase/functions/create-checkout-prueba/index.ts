@@ -136,11 +136,11 @@ Deno.serve(async (req) => {
     // y para que el cobro coincida siempre con el precio base de la tienda.
     // 
     // SEGURIDAD: Solo pasamos 'payment_method_types' si el modo es compatible.
-    // Para 'embedded', si no se especifica, Stripe usa los métodos habilitados en el Dashboard.
+    // Para 'embedded_page', si no se especifica, Stripe usa los métodos habilitados en la cuenta.
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
-      ui_mode: "embedded",
+      ui_mode: "embedded_page",
       // Eliminamos payment_method_types para permitir que Stripe decida qué es válido
       // para USD en el país del comprador, o bien usar los del Dashboard.
       // Esto evita el StripeInvalidRequestError si el método elegido en el front

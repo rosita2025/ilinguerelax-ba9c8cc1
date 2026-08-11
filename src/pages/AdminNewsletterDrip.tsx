@@ -97,7 +97,7 @@ export default function AdminNewsletterDrip() {
       <Card>
         <CardHeader className="py-3"><CardTitle className="text-sm">Enviar Prueba / Reenvío</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
             <div>
               <Label className="text-[10px] uppercase">Email</Label>
               <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="test@correo.com" className="h-8 text-xs" />
@@ -132,8 +132,8 @@ export default function AdminNewsletterDrip() {
               <Select value={mode} onValueChange={v => setMode(v as any)}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="test">Test send (no toca DB, asunto con [TEST])</SelectItem>
-                  <SelectItem value="resend">Reenvío manual (registra en newsletter_drip_sends)</SelectItem>
+                  <SelectItem value="test" className="text-xs">Test send (no toca DB)</SelectItem>
+                  <SelectItem value="resend" className="text-xs">Reenvío manual</SelectItem>
                 </SelectContent>
               </Select>
             </div>

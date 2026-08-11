@@ -15,4 +15,17 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom", "react-helmet-async"],
+          "vendor-ui": ["lucide-react", "framer-motion", "clsx", "tailwind-merge"],
+          "vendor-query": ["@tanstack/react-query"],
+          "vendor-utils": ["date-fns", "lodash"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 }));

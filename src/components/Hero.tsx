@@ -81,7 +81,7 @@ export const Hero = () => {
         alt=""
         width={1920}
         height={1080}
-        // @ts-ignore - fetchpriority is a valid HTML attribute
+        loading="eager"
         fetchpriority="high"
         decoding="async"
         className="absolute inset-0 w-full h-full object-cover object-center"

@@ -33,11 +33,11 @@ export default function AdminMarketingDrips() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const { data: configData } = await supabase.from('marketing_drip_config').select('*').order('day_offset');
-      const { data: sendsData } = await supabase.from('marketing_drip_sends').select('*').order('sent_at', { ascending: false }).limit(50);
+      const { data: configData } = await supabase.from('marketing_drip_config' as any).select('*').order('day_offset');
+      const { data: sendsData } = await supabase.from('marketing_drip_sends' as any).select('*').order('sent_at', { ascending: false }).limit(50);
       
-      if (configData) setConfigs(configData);
-      if (sendsData) setSends(sendsData);
+      if (configData) setConfigs(configData as any);
+      if (sendsData) setSends(sendsData as any);
     } catch (e) {
       toast.error("Error al cargar datos");
     } finally {

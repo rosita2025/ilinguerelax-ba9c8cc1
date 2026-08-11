@@ -448,7 +448,32 @@ const AdminSEO = () => {
             </div>
           </Card>
 
-          {report && (
+          {loading && !report ? (
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card className="p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-6 w-32" />
+                </div>
+                <div className="space-y-2">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <Skeleton key={`sq-${i}`} className="h-10 w-full" />
+                  ))}
+                </div>
+              </Card>
+              <Card className="p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-6 w-32" />
+                </div>
+                <div className="space-y-2">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <Skeleton key={`sp-${i}`} className="h-10 w-full" />
+                  ))}
+                </div>
+              </Card>
+            </div>
+          ) : report && (
             <div className="grid gap-6 lg:grid-cols-2">
               <Card className="p-4">
                 <div className="flex items-center gap-2 mb-4">

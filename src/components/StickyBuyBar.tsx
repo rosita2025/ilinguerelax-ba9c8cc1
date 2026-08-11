@@ -36,6 +36,8 @@ interface StickyBuyBarProps {
   dismissible?: boolean;
   /** Country flag emoji shown next to the price (e.g. "🇺🇸", "🇨🇦"). */
   flag?: string;
+  /** The exact USD value for tracking (avoids string parsing errors). */
+  usdValue?: number;
 }
 
 export const StickyBuyBar = ({

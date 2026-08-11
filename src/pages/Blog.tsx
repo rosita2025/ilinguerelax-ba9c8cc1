@@ -24,10 +24,10 @@ const Blog = () => {
   const { posts: generatedPosts } = useGeneratedBlogPosts();
   const [activeCategory, setActiveCategory] = useState<string>("Todos");
 
-  const allPosts: BlogPost[] = useMemo(
-    () => [...generatedPosts, ...blogPosts],
-    [generatedPosts],
-  );
+  const allPosts: BlogPost[] = useMemo(() => {
+    const validGenerated = (generatedPosts || []).filter(p => !!p && !!p.slug);
+    return [...validGenerated, ...blogPosts];
+  }, [generatedPosts]);
 
   const featuredPost = blogPosts[0];
   const otherPosts = useMemo(() => {
@@ -214,7 +214,12 @@ const Blog = () => {
               {activeCategory === "Todos" ? "Más artículos" : `Artículos de ${activeCategory}`}
             </h2>
             {otherPosts.length === 0 ? (
-              <p className="text-muted-foreground">Todavía no hay artículos en esta categoría.</p>
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No pudimos cargar los artículos dinámicos en este momento.</p>
+                <Button variant="ghost" className="mt-4" onClick={() => window.location.reload()}>
+                  Reintentar
+                </Button>
+              </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {otherPosts.map((post) => (

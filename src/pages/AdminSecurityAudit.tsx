@@ -26,16 +26,15 @@ const AdminSecurityAudit = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        // Usamos purchases-status temporalmente como proxy si no queremos crear una función nueva hoy,
-        // pero lo ideal es una función dedicada. Por ahora, intentamos leer de la tabla directamente si es posible
-        // o a través de una función de utilidad.
-        const { data, error: invokeError } = await adminInvoke("admin-audit-logs", {
+        // Obtenemos los logs a través de la función dedicada admin-audit-logs.
+        // Solo accesible con una sesión 2FA activa.
+        const res = await adminInvoke("admin-audit-logs", {
           method: "POST",
           body: { action: "list" }
         });
         
-        if (invokeError) throw invokeError;
-        setLogs(data as AuditLog[]);
+        if (res.error) throw res.error;
+        setLogs(res.data as AuditLog[]);
       } catch (err: any) {
         console.error("Error fetching audit logs:", err);
         setError(err.message || "Error al cargar los logs de auditoría");
@@ -75,7 +74,7 @@ const AdminSecurityAudit = () => {
                 <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
                 <p className="text-destructive font-medium">{error}</p>
                 <p className="text-xs text-muted-foreground">
-                  Nota: Esta función requiere que la tabla `admin_audit_logs` y su función asociada estén desplegadas.
+                  Nota: Esta función requiere permisos de administrador y una sesión 2FA válida.
                 </p>
               </div>
             ) : logs.length === 0 ? (

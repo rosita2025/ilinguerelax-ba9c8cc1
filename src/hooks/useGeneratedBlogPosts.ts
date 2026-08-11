@@ -45,40 +45,70 @@ export function useGeneratedBlogPosts() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("generated_blog_posts")
-        .select(COLS)
-        .eq("published", true)
-        .order("created_at", { ascending: false });
-      if (!cancelled) {
-        setPosts((data ?? []).map((r) => toBlogPost(r as Row)));
-        setLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from("generated_blog_posts")
+          .select(COLS)
+          .eq("published", true)
+          .order("created_at", { ascending: false });
+        
+        if (error) {
+          console.error("Error fetching blog posts:", error);
+          if (!cancelled) setLoading(false);
+          return;
+        }
+        
+        if (!cancelled) {
+          setPosts((data ?? []).map((r) => toBlogPost(r as Row)));
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("useGeneratedBlogPosts catch error:", err);
+        if (!cancelled) setLoading(false);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   return { posts, loading };
 }
 
 export async function fetchGeneratedBlogPostBySlug(slug: string): Promise<(BlogPost & { updatedAt?: string }) | null> {
-  const { data } = await supabase
-    .from("generated_blog_posts")
-    .select(COLS)
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
-  return data ? toBlogPost(data as Row) : null;
+  try {
+    const { data, error } = await supabase
+      .from("generated_blog_posts")
+      .select(COLS)
+      .eq("slug", slug)
+      .eq("published", true)
+      .maybeSingle();
+    
+    if (error) {
+      console.error(`Error fetching post by slug (${slug}):`, error);
+      return null;
+    }
+    return data ? toBlogPost(data as Row) : null;
+  } catch (err) {
+    console.error("fetchGeneratedBlogPostBySlug catch error:", err);
+    return null;
+  }
 }
 
 export async function fetchGeneratedBlogPosts(): Promise<BlogPost[]> {
-  const { data } = await supabase
-    .from("generated_blog_posts")
-    .select(COLS)
-    .eq("published", true)
-    .order("created_at", { ascending: false });
-  return (data ?? []).map((r) => toBlogPost(r as Row));
+  try {
+    const { data, error } = await supabase
+      .from("generated_blog_posts")
+      .select(COLS)
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+    
+    if (error) {
+      console.error("fetchGeneratedBlogPosts error:", error);
+      return [];
+    }
+    return (data ?? []).map((r) => toBlogPost(r as Row));
+  } catch (err) {
+    console.error("fetchGeneratedBlogPosts catch error:", err);
+    return [];
+  }
 }
 

@@ -17,6 +17,7 @@ import {
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface QueueItem {
   id: string;

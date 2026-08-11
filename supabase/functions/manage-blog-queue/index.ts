@@ -254,6 +254,7 @@ serve(async (req) => {
               category: item.category as string,
                language: item.language as string,
               publish: false,
+              productCards,
             });
             postId = generated.id as string;
             await supabase

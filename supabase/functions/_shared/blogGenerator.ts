@@ -358,9 +358,12 @@ export async function generateAndStorePost(args: GenerateArgs): Promise<Record<s
 
 
   const L = LANG_MAP[language] ?? LANG_MAP.es;
+  const productsList = (Array.isArray(productCards) && productCards.length > 0) ? productCards : [];
 
   const system = `You are a SENIOR SEO WRITER with 15+ years of experience. Write the ENTIRE article in ${L.name} for ${L.audience}.
 CRITICAL: Since we are generating 300 articles, this topic might repeat. Ensure this specific article has a UNIQUE perspective, different examples, and a fresh hook even if the keyword is common.
+CRITICAL: You MUST naturally integrate exactly 1 or 2 product cards from the provided list using the format [PRODUCT_CARD:slug] within the content body (not just at the end).
+
 
 
 Writing rules:
@@ -369,10 +372,10 @@ Writing rules:
 - Clear structure: ONE H1 (# ) with the main keyword, several descriptive H2 (## ) with semantic variants, and H3 (### ) for internal breakdowns.
 - Introduction: Hook the reader in the first paragraph while including the primary keyword naturally.
 - Professional, close, humanized tone (never "as an AI", "in this article we will discuss", "in conclusion I have presented").
-- Include bullet lists with "- " and at least ONE comparative markdown table where it adds value.
-- Add a "## ${L.faqHeading}" section with 4-6 real questions using ### for each question.
-- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}. INTEGRATE [PRODUCT_CARD:slug] within the text to showcase products.
-- Optimize for the main keyword (density ~1.5%) and related secondary keywords.
+  - Include bullet lists with "- " and at least ONE comparative markdown table where it adds value.
+  - Add a "## ${L.faqHeading}" section with 4-6 real questions using ### for each question.
+  - Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}. INTEGRATE [PRODUCT_CARD:slug] within the text to showcase products.
+  - Optimize for the main keyword (density ~1.5%) and related secondary keywords.
 - Fulfill EEAT: Cite official sources or common industry standards when relevant.
 - Ready to rank on Google and maximize dwell time.
 - NEVER mention that you are an AI nor explain the process.

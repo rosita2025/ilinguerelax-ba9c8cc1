@@ -11,7 +11,8 @@ import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
-import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock } from "lucide-react";
+import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText } from "lucide-react";
+import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -21,6 +22,7 @@ import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
@@ -86,37 +88,26 @@ const ProductPatronesEspeciales = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
-  const pricingAdmin = useAdminPricing("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
-  const region = useRegionTier();
-  const visitorCountry = (region.country || "").toUpperCase();
-  const isPeru = visitorCountry === "PE";
-  const isTiendaUsdCountry = TIENDA_USD_COUNTRIES.has(visitorCountry);
-  const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(visitorCountry);
-  const useTiendaOnly = !useHotmartLatam;
-  // 4 tiers dinámicos desde /admin/productos: Global / LATAM / Perú / Tienda (VE/CU/NI)
-  const TIENDA_USD = pricingAdmin.priceTiendaUsd ?? pricingAdmin.priceLatamUsd ?? pricingAdmin.priceGlobalUsd ?? 0;
-  const LATAM_USD = pricingAdmin.priceLatamUsd ?? pricingAdmin.priceGlobalUsd ?? 0;
-  const GLOBAL_USD = pricingAdmin.priceGlobalUsd ?? 0;
-  const PRICE_USD = isTiendaUsdCountry ? TIENDA_USD : useHotmartLatam ? LATAM_USD : GLOBAL_USD;
-  const pricingReady = pricingAdmin.loaded && (isPeru ? (pricingAdmin.pricePen ?? 0) > 0 : PRICE_USD > 0);
-  const ORIGINAL_USD = pricingAdmin.priceGlobalUsd ? Math.round(pricingAdmin.priceGlobalUsd * 2.5 * 100) / 100 : 19.99;
-  const displayCurrency = (isPeru ? "PEN" : detectCurrency(visitorCountry || "US")) as Currency;
-  const localOverrides = useLocalOverrides("patrones-especiales-alfabeto-combinaciones-secretas-ingles") as Partial<Record<Currency, number>> | null;
-  // Sticky bar y botones reflejan los 4 precios del admin: PE / Tienda USD / LATAM / Global USD.
-  const priceLabel = isPeru && pricingAdmin.pricePen
-    ? formatCurrencyAmount(pricingAdmin.pricePen, "PEN")
-    : formatPrice(PRICE_USD, displayCurrency, localOverrides ?? undefined);
-  const originalLabel = isPeru && pricingAdmin.pricePen
-    ? formatCurrencyAmount(pricingAdmin.pricePen * 2.5, "PEN")
-    : (localOverrides?.[displayCurrency] ?? 0) > 0
-      ? formatCurrencyAmount((localOverrides![displayCurrency] as number) * 2.5, displayCurrency)
-      : formatCurrencyAmount(PRICE_USD * 2.5 * (exchangeRates[displayCurrency] ?? 1), displayCurrency);
-  const HOTMART_URL = pricingAdmin.hotmartUrl || HOTMART_URL_LATAM;
+  const ADMIN_SKU = "patrones-especiales-alfabeto-combinaciones-secretas-ingles";
+  const pricingAdmin = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, {
+    tiendaPath: TIENDA_CHECKOUT_PATH,
+    fallbackHotmartUrl: HOTMART_URL_LATAM,
+  });
+
+  const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
+  const pricingReady = tier.loaded;
+  const displayCurrency = tier.currencyCode as Currency;
+  const priceLabel = tier.priceLabel;
+  const originalLabel = tier.originalLabel;
+
+  const HOTMART_URL = tier.hotmartUrl || HOTMART_URL_LATAM;
   const hasLongPriceLabel = priceLabel.length > 9;
+  
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
     content_category: "Digital Book",
-    content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
+    content_ids: [ADMIN_SKU],
     content_type: "product",
     value: PRICE_USD,
     currency: "USD",
@@ -145,6 +136,15 @@ const ProductPatronesEspeciales = () => {
 
   const handleAddToCart = () => {
     if (!pricingReady) return;
+    trackHotmartEvent("AddToCart", {
+      content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+      content_category: "Digital Book",
+      content_ids: [ADMIN_SKU],
+      content_type: "product",
+      value: PRICE_USD,
+      currency: "USD",
+      num_items: 1,
+    });
     addItem({
       id: "patrones-especiales-ingles",
       name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
@@ -214,11 +214,11 @@ const ProductPatronesEspeciales = () => {
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image={pricingAdmin.coverImageUrl ?? "https://ilinguerelax.com/images/product-patrones-especiales.webp"}
         type="product"
-        price="8.08"
-        originalPrice="19.99"
-        rating="4.9"
-        reviewCount="6"
-        sku="ILINGUE-PATRONES-ESP"
+        price={PRICE_USD.toString()}
+        originalPrice={(PRICE_USD * 2.5).toString()}
+        rating={pricingAdmin.rating?.toString() ?? "4.9"}
+        reviewCount={pricingAdmin.reviewCount?.toString() ?? "6"}
+        sku={ADMIN_SKU}
         keywords="pronunciación en inglés, patrones de pronunciación inglés, letras mudas en inglés, combinaciones de letras inglés, alfabeto en inglés con pronunciación, cómo pronunciar en inglés, mejorar pronunciación inglés, fonética inglés para hispanohablantes, ebook pronunciación inglés pdf, contracciones en inglés"
         reviews={productReviews}
         faqItems={[
@@ -337,6 +337,9 @@ const ProductPatronesEspeciales = () => {
                   <span className="text-green-600 font-semibold text-sm uppercase">
                     Precio de Lanzamiento
                   </span>
+                </div>
+                <div className="mb-4">
+                  <DigitalProductNotice compact />
                 </div>
                 <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
                   <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{priceLabel}</span>
@@ -732,18 +735,18 @@ const ProductPatronesEspeciales = () => {
       <Footer />
 
       <StickyBuyBar
+        sku={ADMIN_SKU}
         price={priceLabel}
         originalPrice={originalLabel}
         currencyCode={displayCurrency}
-        flag={isPeru ? "🇵🇪" : undefined}
-        productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
+        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+        productName={pricingAdmin.name ?? "Patrones Especiales en Inglés"}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
-        buyUrl={TIENDA_CHECKOUT_PATH}
-        onBuyClick={handleBuy}
+        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
+        onBuyClick={useTiendaOnly ? handleBuy : undefined}
         ctaText={"Comprar ahora"}
-
       />
 
       <div className="h-20 md:h-16" />

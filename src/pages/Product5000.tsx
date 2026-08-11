@@ -13,6 +13,7 @@ import reviewFb4 from "@/assets/review-fb-4.jpg";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 
 // Lazy-loaded below-the-fold components for faster initial load
@@ -287,11 +288,11 @@ const Product5000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image={pricing5000.coverImageUrl ?? "https://ilinguerelax.com/images/product-5000.webp"}
         type="product"
-        price="14.30"
-        originalPrice="54"
-        rating="4.8"
-        reviewCount="800"
-        sku="ILINGUE-5000"
+        price={priceUSD.toString()}
+        originalPrice={(priceUSD * 2.5).toString()}
+        rating={pricing5000.rating?.toString() ?? "4.8"}
+        reviewCount={pricing5000.reviewCount?.toString() ?? "800"}
+        sku={ADMIN_SKU_5000}
         availability="InStock"
         keywords="5000 palabras en inglés, vocabulario en inglés con pronunciación, libro de inglés pdf, aprender inglés desde cero, inglés para hispanohablantes, pronunciación inglés adaptada al español, fonética inglés UK USA, inglés A1 A2 B1 B2 C1, ebook de inglés, descargar libro de inglés, aprender inglés en Perú, aprender inglés en México"
       />
@@ -554,6 +555,10 @@ const Product5000 = () => {
                   </div>
                 </div>
               </motion.div>
+
+              <div className="mb-4">
+                <DigitalProductNotice compact />
+              </div>
 
               {/* Stock Counter - Scarcity */}
               <div className="mb-6">
@@ -892,18 +897,18 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
+        sku={ADMIN_SKU_5000}
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
         currencyCode={displayCurrency}
-        flag={isPeru ? "🇵🇪" : undefined}
-        productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)"
+        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+        productName={pricing5000.name ?? "Inglés Relax - 5,000 Palabras"}
         rating={4.8}
         reviewCount={800}
         showReviews={true}
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_5000}
         onBuyClick={handleBuy}
-
       />
 
       {/* Spacer for sticky bar */}

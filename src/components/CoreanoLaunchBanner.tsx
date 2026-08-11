@@ -98,6 +98,7 @@ export const CoreanoLaunchBanner = () => {
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  decoding="async"
                 />
                 <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-primary text-primary-foreground px-3 py-1 text-xs font-bold shadow">
                   <Sparkles className="w-3 h-3" /> NUEVO LANZAMIENTO

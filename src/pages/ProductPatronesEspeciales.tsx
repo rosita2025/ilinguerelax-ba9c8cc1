@@ -214,11 +214,11 @@ const ProductPatronesEspeciales = () => {
         canonicalUrl="https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles"
         image={pricingAdmin.coverImageUrl ?? "https://ilinguerelax.com/images/product-patrones-especiales.webp"}
         type="product"
-        price="8.08"
-        originalPrice="19.99"
-        rating="4.9"
-        reviewCount="6"
-        sku="ILINGUE-PATRONES-ESP"
+        price={PRICE_USD.toString()}
+        originalPrice={(PRICE_USD * 2.5).toString()}
+        rating={pricingAdmin.rating?.toString() ?? "4.9"}
+        reviewCount={pricingAdmin.reviewCount?.toString() ?? "6"}
+        sku={ADMIN_SKU}
         keywords="pronunciación en inglés, patrones de pronunciación inglés, letras mudas en inglés, combinaciones de letras inglés, alfabeto en inglés con pronunciación, cómo pronunciar en inglés, mejorar pronunciación inglés, fonética inglés para hispanohablantes, ebook pronunciación inglés pdf, contracciones en inglés"
         reviews={productReviews}
         faqItems={[

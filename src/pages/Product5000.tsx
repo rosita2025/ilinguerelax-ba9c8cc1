@@ -288,11 +288,11 @@ const Product5000 = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image={pricing5000.coverImageUrl ?? "https://ilinguerelax.com/images/product-5000.webp"}
         type="product"
-        price="14.30"
-        originalPrice="54"
-        rating="4.8"
-        reviewCount="800"
-        sku="ILINGUE-5000"
+        price={priceUSD.toString()}
+        originalPrice={(priceUSD * 2.5).toString()}
+        rating={pricing5000.rating?.toString() ?? "4.8"}
+        reviewCount={pricing5000.reviewCount?.toString() ?? "800"}
+        sku={ADMIN_SKU_5000}
         availability="InStock"
         keywords="5000 palabras en inglés, vocabulario en inglés con pronunciación, libro de inglés pdf, aprender inglés desde cero, inglés para hispanohablantes, pronunciación inglés adaptada al español, fonética inglés UK USA, inglés A1 A2 B1 B2 C1, ebook de inglés, descargar libro de inglés, aprender inglés en Perú, aprender inglés en México"
       />

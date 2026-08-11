@@ -210,30 +210,33 @@ Deno.serve(async (req) => {
       const { data } = await admin
         .from("funnel_events")
         .select("id, created_at, event_name, event_data, email, product_id, value, currency")
-        .or("event_name.eq.purchase,event_name.eq.InitiateCheckout")
+        .or("event_name.eq.Purchase,event_name.eq.purchase,event_name.eq.InitiateCheckout")
         .contains("event_data", { provider: "hotmart" } as any)
         .order("created_at", { ascending: false })
         .limit(take);
 
       for (const r of data ?? []) {
         const d: any = r.event_data ?? {};
-        const status = d.status || (r.event_name === "purchase" ? "approved" : "pending");
+        // Match both 'Purchase' and 'purchase' lowercase
+        const isPurchase = r.event_name.toLowerCase() === "purchase";
+        const status = d.status || (isPurchase ? "approved" : "pending");
         
         rows.push({
           id: `hm-${r.id}`, 
           provider: "hotmart", 
           received_at: r.created_at,
-          email: r.email || d.email || null,
-          amount: r.value || d.amount || null,
+          email: r.email || d.email || d.buyer_email || null,
+          amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
-          product: r.product_id || d.product_name || null,
-          transaction: d.transaction || d.transaction_code || null,
+          product: r.product_id || d.product_name || d.name || null,
+          transaction: d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
           mapped_status: status === "approved" ? "approved" : 
                          (status === "pending" || status === "processing") ? "pending" :
                          (status === "refunded") ? "refunded" : "unknown",
           failure_reason: d.failure_reason || null,
-          failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Hotmart)" : null,
+          failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Hotmart)" : 
+                       isPurchase ? "Compra aprobada (Hotmart)" : null,
           payload: d,
         });
       }

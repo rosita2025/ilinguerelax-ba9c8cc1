@@ -10,6 +10,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount } from "@/i18n";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 
@@ -122,9 +123,24 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         {/* Badge de región oculto al cliente (solo se aplica el precio por IP internamente) */}
 
         {items.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-6 text-center">
-            {t.emptyCart}
-          </p>
+          <div className="space-y-3 py-2">
+            <div className="flex gap-3 items-center">
+              <Skeleton className="h-16 w-16 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+              <Skeleton className="h-4 w-12" />
+            </div>
+            <div className="flex gap-3 items-center">
+              <Skeleton className="h-16 w-16 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+              <Skeleton className="h-4 w-12" />
+            </div>
+          </div>
         ) : (
           <div className="space-y-3">
             {items.map((item) => (

@@ -30,6 +30,8 @@ import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 
 function MobileOrderSummarySticky({ slug }: { slug?: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -495,9 +497,50 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden max-w-full">
+      {loadingDb && !catalogItem && (
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 space-y-6">
+          <header className="flex items-center justify-between gap-4 py-4 border-b">
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-6 w-24" />
+          </header>
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-8">
+            <div className="space-y-6">
+              <Card className="p-6 space-y-4">
+                <Skeleton className="h-6 w-48" />
+                <div className="grid gap-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </Card>
+              <Card className="p-6 space-y-4">
+                <Skeleton className="h-6 w-48" />
+                <div className="space-y-3">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              </Card>
+            </div>
+            <aside className="hidden lg:block space-y-6">
+              <Card className="p-6 space-y-4">
+                <Skeleton className="h-6 w-32" />
+                <div className="space-y-2">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+                <div className="pt-4 border-t space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </Card>
+            </aside>
+          </div>
+        </div>
+      )}
 
-
-      <Helmet>
+      {catalogItem && (
+        <>
+          <Helmet>
         <title>{`Checkout · iLingue Relax · ${isPeru ? "PE" : "GLOBAL"}`}</title>
         <meta name="robots" content="noindex, nofollow" />
         {/* Preconnect a los orígenes críticos del checkout para reducir de
@@ -623,6 +666,8 @@ export default function Checkout() {
         </aside>
       </div>
 
+        </>
+      )}
     </div>
   );
 }

@@ -25,6 +25,7 @@ import { useAdminKey } from "@/components/admin/AdminGate";
 import { getCountryInfo } from "@/lib/countryInfo";
 import { cn } from "@/lib/utils";
 import { mergeProductRows, canonicalProductId } from "@/lib/productSkuAliases";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 type Granularity = "hour" | "day";
@@ -677,33 +678,41 @@ const AdminAnalytics = () => {
           {loading && data.series.length === 0 && data.totals.sessions === 0 ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Card key={`k1-${i}`} className="p-4 space-y-2">
-                    <div className="h-3 w-20 bg-muted animate-pulse rounded" />
-                    <div className="h-7 w-24 bg-muted animate-pulse rounded" />
-                    <div className="h-3 w-16 bg-muted/70 animate-pulse rounded" />
-                  </Card>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Card key={`k2-${i}`} className="p-4 space-y-2">
-                    <div className="h-3 w-20 bg-muted animate-pulse rounded" />
-                    <div className="h-7 w-24 bg-muted animate-pulse rounded" />
-                    <div className="h-3 w-16 bg-muted/70 animate-pulse rounded" />
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Card key={`k-${i}`} className="p-4 space-y-3">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-7 w-24" />
+                    <Skeleton className="h-3 w-16 opacity-70" />
                   </Card>
                 ))}
               </div>
               <Card className="p-4">
-                <div className="h-4 w-40 bg-muted animate-pulse rounded mb-3" />
-                <div className="h-72 bg-muted/40 animate-pulse rounded flex items-center justify-center">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <div className="flex items-center justify-between mb-6">
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-8 w-24" />
+                </div>
+                <div className="space-y-4">
+                  <Skeleton className="h-[300px] w-full" />
                 </div>
               </Card>
-              <Card className="p-4">
-                <div className="h-4 w-32 bg-muted animate-pulse rounded mb-3" />
-                <div className="h-56 bg-muted/40 animate-pulse rounded" />
-              </Card>
+              <div className="grid lg:grid-cols-2 gap-6">
+                <Card className="p-4 space-y-4">
+                  <Skeleton className="h-5 w-40" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Skeleton key={`p-${i}`} className="h-10 w-full" />
+                    ))}
+                  </div>
+                </Card>
+                <Card className="p-4 space-y-4">
+                  <Skeleton className="h-5 w-40" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Skeleton key={`c-${i}`} className="h-10 w-full" />
+                    ))}
+                  </div>
+                </Card>
+              </div>
             </>
           ) : (
             <>

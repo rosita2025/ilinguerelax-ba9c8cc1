@@ -17,6 +17,7 @@ import {
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface QueueItem {
   id: string;
@@ -285,7 +286,7 @@ const BlogScheduleCard = () => {
         </Button>
       </div>
 
-      <AgendaList items={items} run={run} busy={busy} openPreview={openPreview} />
+      <AgendaList items={items} loading={loading} run={run} busy={busy} openPreview={openPreview} />
 
       {preview && (
         <div className="rounded-lg border p-3 space-y-2">
@@ -323,16 +324,43 @@ const BlogScheduleCard = () => {
 
 const AgendaList = ({
   items,
+  loading,
   run,
   busy,
   openPreview,
 }: {
   items: QueueItem[];
+  loading: boolean;
   run: (action: string, extra?: any, okMsg?: string) => Promise<void>;
   busy: string | null;
   openPreview: (it: QueueItem) => Promise<void>;
 }) => {
   const [showAll, setShowAll] = useState(false);
+
+  if (loading && items.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="border rounded-lg overflow-hidden divide-y">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="bg-muted/30 space-y-3 p-4">
+              <Skeleton className="h-4 w-32" />
+              <div className="space-y-3 bg-background p-3 rounded border">
+                {Array.from({ length: 3 }).map((_, j) => (
+                  <div key={j} className="flex items-center justify-between gap-4">
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <Skeleton className="h-6 w-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return <div className="text-sm text-muted-foreground py-4">Sin artículos programados todavía.</div>;

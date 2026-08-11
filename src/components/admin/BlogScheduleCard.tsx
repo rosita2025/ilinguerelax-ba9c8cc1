@@ -324,11 +324,13 @@ const BlogScheduleCard = () => {
 
 const AgendaList = ({
   items,
+  loading,
   run,
   busy,
   openPreview,
 }: {
   items: QueueItem[];
+  loading: boolean;
   run: (action: string, extra?: any, okMsg?: string) => Promise<void>;
   busy: string | null;
   openPreview: (it: QueueItem) => Promise<void>;

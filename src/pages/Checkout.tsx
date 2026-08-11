@@ -465,8 +465,8 @@ export default function Checkout() {
       content_name: catalogItem.name,
       content_ids: [sku],
       content_type: "product",
-      value,
-      currency,
+      value: initiateValue,
+      currency: "USD",
       num_items: items.length || 1,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

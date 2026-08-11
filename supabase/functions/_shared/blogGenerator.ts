@@ -168,7 +168,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
 
   try {
     console.log(`[BlogGen] Generando imagen con APIMART para: ${slug}...`);
-    // Usamos el endpoint de Flux Schnell en APIMART para mayor velocidad y calidad
+    // Usamos el endpoint de gpt-image-2-ext en APIMART para mayor disponibilidad
     const res = await fetch("https://api.apimart.ai/v1/images/generations", {
       method: "POST",
       headers: {
@@ -176,7 +176,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "flux-schnell",
+        model: "gpt-image-2-ext",
         prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text. Relevant to language learning environment.`,
         n: 1,
         size: "1024x1024",

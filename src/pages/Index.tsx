@@ -70,6 +70,10 @@ const Index = () => {
 
       <AllProductsReviews />
 
+      <InstagramFeed />
+
+
+
       <AboutMe />
       <Contact />
       <Footer />

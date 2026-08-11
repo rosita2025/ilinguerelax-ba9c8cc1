@@ -67,6 +67,11 @@ const DICT: Record<
     pt: { title: "Dados incorretos", message: "Revise seus dados e tente novamente. Fale conosco no WhatsApp se persistir." },
     fr: { title: "Données invalides", message: "Vérifie tes informations et réessaie. Contacte-nous sur WhatsApp si le problème persiste." },
   },
+  currency_restricted: {
+    es: { title: "Moneda no compatible", message: "Tu banco no permite pagos en moneda local. Intentaremos procesar el pago en USD para mayor seguridad." },
+    en: { title: "Currency not supported", message: "Your bank doesn't allow payments in local currency. We'll try processing in USD for better reliability." },
+    pt: { title: "Moeda não suportada", message: "Seu banco não permite pagamentos em moeda local. Tentaremos processar em USD para mayor seguridad." },
+    fr: { title: "Devise non supportée", message: "Votre banque n'autorise pas les paiements en devise locale. Nous allons essayer de traiter en USD." },
   card_declined: {
     es: { title: "Tarjeta rechazada", message: "Tu banco rechazó el pago. Prueba con otra tarjeta o PayPal." },
     en: { title: "Card declined", message: "Your bank declined the payment. Try another card or PayPal." },

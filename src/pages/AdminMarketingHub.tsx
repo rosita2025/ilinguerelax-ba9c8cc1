@@ -86,7 +86,7 @@ export default function AdminMarketingHub() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
                   {stats.account.emailsLeft?.toLocaleString() ?? "—"}
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">Créditos disponibles para envío</p>
@@ -124,7 +124,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.today.total ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold">{stats?.today.total ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Correos automáticos entregados hoy</p>
             </CardContent>
           </Card>
@@ -136,7 +136,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">{stats?.today.abandoned ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-orange-600">{stats?.today.abandoned ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Recuperación de ventas activa</p>
             </CardContent>
           </Card>
@@ -148,7 +148,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-rose-600">{stats?.today.marketing ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-rose-600">{stats?.today.marketing ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Fidelización a compradores</p>
             </CardContent>
           </Card>
@@ -160,7 +160,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-sky-600">{stats?.today.newsletter ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-sky-600">{stats?.today.newsletter ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Drip de bienvenida y contenido</p>
             </CardContent>
           </Card>
@@ -236,13 +236,13 @@ export default function AdminMarketingHub() {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
+              <Card className="shadow-none border-muted/60 sm:shadow-sm">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                     <Info className="w-5 h-5 text-primary" /> ¿Cómo funciona el flujo?
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm text-muted-foreground">
+                <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4 text-sm text-muted-foreground">
                   <p>
                     El sistema detecta automáticamente en qué fase está el usuario y prioriza el mensaje más relevante:
                   </p>
@@ -258,13 +258,13 @@ export default function AdminMarketingHub() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Estado de Listas Brevo</CardTitle>
+              <Card className="shadow-none border-muted/60 sm:shadow-sm">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">Estado de Listas Brevo</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
                   <div className="flex justify-between items-center py-2 border-b">
-                    <span className="text-sm">Contactos Newsletter</span>
+                    <span className="text-xs sm:text-sm">Contactos Newsletter</span>
                     <Badge variant="secondary">Sincronizado</Badge>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b">

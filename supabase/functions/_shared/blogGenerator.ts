@@ -193,6 +193,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
   const apimartToken = Deno.env.get("APIMART_TOKEN");
   if (!apimartToken || !prompt) {
     console.warn("[BlogGen] APIMART_TOKEN no configurado o prompt vacío, saltando imagen.");
+    console.log(`[BlogGen] Prompt: "${prompt}", Token present: ${!!apimartToken}`);
     return null;
   }
 

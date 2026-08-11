@@ -45,12 +45,32 @@ Deno.serve(async (req) => {
     }
 
     if (action === "approve" && reviewId) {
+      // Get review details first to send coupon
+      const { data: review } = await supabaseAdmin
+        .from("reviews")
+        .select("customer_email, customer_name")
+        .eq("id", reviewId)
+        .single();
+
       const { error } = await supabaseAdmin
         .from("reviews")
         .update({ status: "approved" })
         .eq("id", reviewId);
 
       if (error) throw error;
+
+      // Send coupon via the new function if we have the email
+      if (review?.customer_email) {
+        try {
+          await supabaseAdmin.functions.invoke("send-review-coupon", {
+            body: { email: review.customer_email, name: review.customer_name }
+          });
+          console.log(`Coupon invitation sent for review ${reviewId}`);
+        } catch (couponErr) {
+          console.error("Failed to trigger coupon send:", couponErr);
+        }
+      }
+
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }

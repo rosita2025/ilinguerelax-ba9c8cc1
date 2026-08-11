@@ -9,8 +9,8 @@ const corsHeaders = {
 
 // Schedule: 1 day, 5 days, 10 days, 15 days, 30 days, 60 days
 // intervals[i] = delay AFTER emails_sent == i before sending email i+1
-const EMAIL_INTERVALS_DAYS = [1, 5, 10, 15, 30, 60];
-const MAX_EMAILS = EMAIL_INTERVALS_DAYS.length;
+const EMAIL_INTERVALS_DAYS = [1, 15, 20, 27, 45]; // Ajustado a 1, 15, 20, 27 según pedido + backup 45
+const MAX_EMAILS = 5; // Máximo 5 correos según pedido
 
 const getNextEmailDelay = (emailsSent: number): number | null => {
   if (emailsSent >= MAX_EMAILS) return null;
@@ -59,9 +59,12 @@ const buildEmailHtml = (customerName: string, displayName: string, reviewUrl: st
             </a>
           </div>
           
-          <div style="background: #ecfdf5; border-radius: 12px; padding: 24px; margin: 32px 0;">
-            <p style="color: #065f46; margin: 0; font-size: 14px; line-height: 1.6;">
-              💚 <strong>Tu reseña puede incluir fotos</strong> de tu libro o de cómo lo usas. ¡Nos encanta ver tu progreso!
+          <div style="background: #ecfdf5; border-radius: 12px; padding: 24px; margin: 32px 0; border: 1px solid #10b981;">
+            <p style="color: #065f46; margin: 0; font-size: 15px; line-height: 1.6; text-align: center;">
+              🎁 <strong>¡Regalo Especial!</strong> Al completar tu reseña, te enviaremos un <strong>cupón del 15% de descuento</strong> para tu próxima compra.
+            </p>
+            <p style="color: #065f46; margin: 8px 0 0 0; font-size: 13px; line-height: 1.6; text-align: center; opacity: 0.8;">
+              Puedes incluir fotos de tu progreso, ¡nos encanta verlas!
             </p>
           </div>
           
@@ -152,9 +155,8 @@ Deno.serve(async (req) => {
         1: `⭐ ${invitation.customer_name}, ¿qué te pareció ${invitation.product_name}?`,
         2: `💬 ${invitation.customer_name}, tu opinión nos importa mucho`,
         3: `📝 ¡Aún esperamos tu reseña, ${invitation.customer_name}!`,
-        4: `🌟 Comparte tu experiencia con ${invitation.product_name}`,
-        5: `⏰ Última oportunidad - ¿nos dejas tu opinión?`,
-        6: `💛 Te extrañamos, ${invitation.customer_name} - ¿qué tal tu libro?`,
+        4: `🌟 Comparte tu experiencia con ${invitation.product_name} (y recibe un regalo)`,
+        5: `⏰ Última oportunidad - Regalo especial por tu opinión`,
       };
 
       try {

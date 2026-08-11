@@ -150,7 +150,8 @@ serve(async (req) => {
         if (body.startTomorrow !== false) start.setUTCDate(start.getUTCDate() + 1);
 
         const batch = `lote-${new Date().toISOString().slice(0, 16)}`;
-        const rows = buildSchedule(start).map((r) => ({ ...r, batch }));
+        const startFrom = start;
+        const rows = buildSchedule(startFrom).map((r) => ({ ...r, batch }));
 
         const { data, error } = await supabase
           .from("blog_post_queue")

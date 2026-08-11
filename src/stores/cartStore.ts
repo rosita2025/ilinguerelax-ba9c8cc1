@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { trackHotmartEvent } from '@/hooks/useMetaPixel';
+
 import { isBlockedVariant } from '@/config/blockedVariants';
 import { 
   CartItem, 
@@ -104,19 +104,6 @@ export const useCartStore = create<CartStore>()(
           });
         }
 
-        // Meta Pixel: AddToCart (centralizado para TODO el sitio)
-        try {
-          trackHotmartEvent('AddToCart', {
-            content_name: item.product?.node?.title,
-            content_ids: [item.variantId],
-            content_type: 'product',
-            value: parseFloat(item.price.amount) * item.quantity,
-            currency: item.price.currencyCode || 'USD',
-            num_items: item.quantity,
-          });
-        } catch (e) {
-          console.error('Pixel AddToCart error:', e);
-        }
         try {
           if (!cartId) {
             const result = await retryWithBackoff(

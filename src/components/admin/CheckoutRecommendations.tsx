@@ -49,6 +49,7 @@ const REASON_LABEL: Record<string, string> = {
   "HTTP 502": "Error 502 (Bad Gateway)",
   "HTTP 503": "Servicio No Disponible",
   "Network error": "Error de Red",
+  "StripeInvalidRequestError": "Error de Configuración (Stripe)",
 };
 
 function suggestionsFor(reason: string, country: string): Suggestion[] {
@@ -98,6 +99,10 @@ function suggestionsFor(reason: string, country: string): Suggestion[] {
       break;
     case "sin_motivo":
       out.push({ kind: "provider", text: "Estos intentos no registran motivo: verifica que el checkout envíe `reason` y `provider` al log de eventos." });
+      break;
+    case "StripeInvalidRequestError":
+      out.push({ kind: "provider", text: "Error de configuración en Stripe: forzamos el modo 'embedded' sin tipos de método explícitos para USD." });
+      out.push({ kind: "method", text: local ? `Usa ${local} como alternativa segura mientras Stripe se estabiliza.` : "Usa PayPal como alternativa." });
       break;
     default:
       out.push({ kind: "method", text: local ? `Prueba destacando ${local} para este país y compara la tasa de conversión.` : "Prueba reordenando los métodos de pago para este país." });

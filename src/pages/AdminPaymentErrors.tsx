@@ -38,7 +38,11 @@ const REASON_LABEL: Record<string, string> = {
   "invalid_request_error:currency_not_supported": "Moneda no soportada (Stripe)",
   "invalid_request_error:amount_too_large": "Monto demasiado alto",
   "authentication_error": "Error de autenticación API",
+  "StripeInvalidRequestError": "Error de Configuración (Stripe)",
+  "invalid_request_error": "Solicitud Inválida",
+  "dlocal_create_failed": "Fallo Creación dLocal",
 };
+
 
 const HOURS_OPTIONS = [
   { value: 24, label: "24 h" },

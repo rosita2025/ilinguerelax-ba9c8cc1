@@ -505,11 +505,17 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         }, { attempts: 3, baseDelayMs: 500 });
         
         if (error || !data?.clientSecret) {
-          const detail = (error as { edgeDetail?: string })?.edgeDetail;
+          const detail = (error as any)?.edgeDetail || (error as any)?.detail;
+          const stripeReason = (data as any)?.reason || (error as any)?.reason;
           const msg = detail || (error as { message?: string } | null)?.message || t.errorPayment;
           
+          console.error("[Stripe] Create session failed:", { error, data, stripeReason });
+
           // Fallback logic for currency restrictions
-          const isCurrencyError = msg.toLowerCase().includes("currency") || msg.toLowerCase().includes("adaptive pricing");
+          const isCurrencyError = msg.toLowerCase().includes("currency") || 
+                                 msg.toLowerCase().includes("adaptive pricing") ||
+                                 (stripeReason || "").toLowerCase().includes("currency");
+
           if (isCurrencyError && !retryForRestricted && !initiallyRestricted) {
             console.warn("[Stripe] Fallback to USD triggered...");
             setIsFallingBackToUsd(true);
@@ -547,6 +553,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           reason: detail && !looksTechnical(detail) ? detail : (detail || raw),
           value: totals.total,
           currency: "USD", // Forzado a USD para Ads/Tracking
+          content_name: `Stripe Error: ${detail || raw}`, // Incluimos el error en el tracking para el admin
         });
       } catch { /* noop */ }
       throw err;

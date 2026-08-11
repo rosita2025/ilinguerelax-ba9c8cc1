@@ -134,11 +134,17 @@ Deno.serve(async (req) => {
     // SIEMPRE USD: Desactivamos Adaptive Pricing y forzamos USD para evitar errores
     // de moneda local en regiones con restricciones bancarias (AR, HN, etc.)
     // y para que el cobro coincida siempre con el precio base de la tienda.
+    // 
+    // SEGURIDAD: Solo pasamos 'payment_method_types' si el modo es compatible.
+    // Para 'embedded', si no se especifica, Stripe usa los métodos habilitados en el Dashboard.
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded",
-      payment_method_types: [body.stripePaymentMethod],
+      // Eliminamos payment_method_types para permitir que Stripe decida qué es válido
+      // para USD en el país del comprador, o bien usar los del Dashboard.
+      // Esto evita el StripeInvalidRequestError si el método elegido en el front
+      // no es compatible con la moneda/país/modo.
       return_url: body.returnUrl,
       adaptive_pricing: { enabled: false }, // Forzamos USD siempre
       customer_email: body.contact.email,
@@ -159,10 +165,14 @@ Deno.serve(async (req) => {
     console.error("create-checkout-prueba error:", err);
     // No exponemos el detalle interno de la pasarela, pero sí un código corto
     // (tipo/código de Stripe) para poder diagnosticar en /admin/payment-errors.
-    const e = err as { type?: string; code?: string; statusCode?: number; message?: string };
-    const reason = [e?.type, e?.code].filter(Boolean).join(":").slice(0, 60) || 
+    const e = err as any;
+    const stripeCode = e?.code || e?.type || "unknown_error";
+    const stripeParam = e?.param || "";
+    const reason = [e?.type, e?.code, stripeParam].filter(Boolean).join(":").slice(0, 80) || 
                    (e?.message && e.message.length < 100 ? e.message : "gateway_error");
     
+    console.error(`Stripe Error [${stripeCode}]:`, e.message, "Param:", stripeParam);
+
     const message = e?.message && e.message.length < 200 && !e.message.includes("api.stripe.com")
       ? e.message 
       : "No se pudo iniciar el pago. Intenta nuevamente.";
@@ -171,6 +181,8 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         error: message, 
         reason,
+        stripe_code: stripeCode,
+        stripe_param: stripeParam,
         detail: e?.message 
       }),
       { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },

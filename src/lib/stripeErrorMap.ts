@@ -226,8 +226,8 @@ function detect(s: string): MappedStripeError["code"] {
   if (/coupon|promotion|discount/.test(s)) return "coupon";
   if (/amount|minimum|maximum|below|above/.test(s)) return "amount";
   if (/api.?key|authentication|unauthorized|401|403/.test(s)) return "auth";
-  if (/invalid_request|invalid request|missing|parameter|400/.test(s)) return "invalid_request";
-  if (/not configured|no.*configured|misconfigured|503|502/.test(s)) return "config";
+  if (/invalid_request|invalid request|missing|parameter|400|payment_method_types/.test(s)) return "invalid_request";
+  if (/not configured|no.*configured|misconfigured|503|502|gateway_error/.test(s)) return "config";
   return "unknown";
 }
 

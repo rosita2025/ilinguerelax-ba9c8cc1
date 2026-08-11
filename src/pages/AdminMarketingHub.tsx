@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import AdminNewsletterDrip from "./AdminNewsletterDrip";
 import AdminMarketingDrips from "./AdminMarketingDrips";
 import AdminBrevoAbandoned from "./AdminBrevoAbandoned";
+import AdminReviewInvitations from "./AdminReviewInvitations";
 
 interface Stats {
   today: {
@@ -179,6 +180,12 @@ export default function AdminMarketingHub() {
             >
               Abandonos
             </TabsTrigger>
+            <TabsTrigger 
+              value="reviews" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
+            >
+              Reseñas
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -259,6 +266,18 @@ export default function AdminMarketingHub() {
                </div>
                <div className="p-0 sm:p-2">
                  <AdminBrevoAbandoned />
+               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <div className="bg-card border rounded-lg overflow-hidden">
+               <div className="p-4 border-b bg-muted/30">
+                 <h3 className="font-semibold">Automatización de Reseñas</h3>
+                 <p className="text-xs text-muted-foreground">Recordatorios a los 1, 15, 20 y 27 días con incentivo de cupón.</p>
+               </div>
+               <div className="p-0 sm:p-4">
+                 <AdminReviewInvitations />
                </div>
             </div>
           </TabsContent>

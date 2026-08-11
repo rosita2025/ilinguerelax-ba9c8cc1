@@ -115,11 +115,12 @@ function parseAiResponse(text: string): any {
   // Intentamos parsear como JSON directo primero
   if (!trimmed.startsWith("data:")) {
     try {
-      return JSON.parse(trimmed);
+      return JSON.parse(repairJsonString(trimmed));
     } catch {
       // Si falla, quizás es un error de formato pero tiene data: oculto o es texto plano
       if (!trimmed.includes("data:")) {
-        throw new BlogGenError(`Respuesta IA no parseable (no JSON ni SSE): ${trimmed.slice(0, 200)}`, 502);
+        console.error("[BlogGen] Respuesta IA no parseable (no JSON ni SSE):", trimmed.slice(0, 500));
+        throw new BlogGenError(`La IA no devolvió un formato válido. Reintenta.`, 502);
       }
     }
   }

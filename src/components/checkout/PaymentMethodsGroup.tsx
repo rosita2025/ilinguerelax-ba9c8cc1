@@ -433,12 +433,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       window.removeEventListener("focus", reset);
     };
   }, []);
+  useEffect(() => {
     // Al cargar el checkout, nos aseguramos que el store y el estado local estén sincronizados
     if (selected) setSelectedMethod(selected);
-    return () => {
-      window.removeEventListener("pageshow", reset);
-      window.removeEventListener("focus", reset);
-    };
   }, [selected, setSelectedMethod]);
 
   const cartSignature = JSON.stringify({

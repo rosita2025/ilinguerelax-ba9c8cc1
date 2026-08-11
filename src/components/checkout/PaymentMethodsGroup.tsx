@@ -342,7 +342,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   
   const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
 
-  // Si el país tiene restricciones (AR/HN) o se elige un método global (Stripe, dLocal, PayPal, Binance),
+  // Si el país tiene restricciones o se elige un método global,
   // forzamos el precio en USD para que coincida con el cobro real.
   const isGlobalGateway = selectedMethod && (
     selectedMethod.startsWith("stripe") || 

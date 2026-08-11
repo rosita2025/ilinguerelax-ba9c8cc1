@@ -133,11 +133,7 @@ Deno.serve(async (req) => {
     // activados en la cuenta, aunque el administrador no los hubiera elegido.
     
     // SIEMPRE USD: Desactivamos Adaptive Pricing y forzamos USD para evitar errores
-    // de moneda local en regiones con restricciones bancarias (AR, HN, etc.)
-    // y para que el cobro coincida siempre con el precio base de la tienda.
-    // 
-    // SEGURIDAD: Solo pasamos 'payment_method_types' si el modo es compatible.
-    // Para 'embedded_page', si no se especifica, Stripe usa los métodos habilitados en la cuenta.
+    // de moneda local en regiones con restricciones bancarias o cuando falla el intento inicial.
     const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(body.contact.country);
 
     const session = await stripe.checkout.sessions.create({

@@ -20,7 +20,17 @@ import {
   verifyAdmin2FAToken,
 } from "../_shared/adminCsrf.ts";
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 const JSON_HEADERS = { ...adminCorsHeaders, "Content-Type": "application/json" };
+
+function admin() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    { auth: { persistSession: false } },
+  );
+}
 
 // ---------- Helpers ----------
 

@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
-      ui_mode: "embedded_page",
+      ui_mode: "embedded",
       payment_method_types: [body.stripePaymentMethod],
       return_url: body.returnUrl,
       adaptive_pricing: { enabled: false }, // Forzamos USD siempre

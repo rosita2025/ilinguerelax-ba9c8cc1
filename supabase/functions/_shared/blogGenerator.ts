@@ -108,6 +108,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
         prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text. Relevant to language learning environment.`,
         n: 1,
         size: "1024x1024",
+        stream: false,
       }),
     });
 

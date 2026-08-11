@@ -282,6 +282,15 @@ export const formatPrice = (
   return formatCurrencyAmount(convertedPrice, currency);
 };
 
+/**
+ * Convierte un monto de moneda local a USD usando la tasa interna de la tienda.
+ */
+export const convertToUSD = (amount: number, currency: Currency): number => {
+  const rate = exchangeRates[currency] || 1;
+  if (rate <= 0) return amount;
+  return amount / rate;
+};
+
 // Language names for selector
 export const languageNames: Record<Language, string> = {
   es: "Español",

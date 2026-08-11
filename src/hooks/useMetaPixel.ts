@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getClientId } from "@/lib/clientId";
+import { convertToUSD, type Currency } from "@/i18n";
 
 declare global {
   interface Window {
@@ -320,12 +321,25 @@ export const useHotmartPixel = (params: ViewContentParams) => {
   useEffect(() => {
     ensurePixelReady();
     const eventId = generateEventId();
-    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
-      window.fbq("track", "ViewContent", { ...params, eventID: eventId });
+    
+    // Normalización a USD para Ads (Facebook/Google/Pinterest)
+    const normalizedParams = { ...params };
+    if (normalizedParams.value && normalizedParams.currency && normalizedParams.currency !== "USD") {
+      try {
+        normalizedParams.value = convertToUSD(
+          Number(normalizedParams.value),
+          normalizedParams.currency as Currency
+        );
+        normalizedParams.currency = "USD";
+      } catch {}
     }
-    sendCapiEvent("ViewContent", eventId, params as unknown as Record<string, unknown>);
-    logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
-    markViewContentFired(params as unknown as Record<string, unknown>);
+
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
+      window.fbq("track", "ViewContent", { ...normalizedParams, eventID: eventId });
+    }
+    sendCapiEvent("ViewContent", eventId, normalizedParams as unknown as Record<string, unknown>);
+    logFunnelEvent("ViewContent", normalizedParams as unknown as Record<string, unknown>);
+    markViewContentFired(normalizedParams as unknown as Record<string, unknown>);
   }, [params.content_name]);
 };
 
@@ -335,6 +349,21 @@ export const trackHotmartEvent = (
 ) => {
   ensurePixelReady();
   const { __skipFunnelLog, email: userEmail, ...pixelParams } = params;
+
+  // Normalización forzada a USD para Meta Pixel (Ads) según solicitud del usuario.
+  // El Pixel debe recibir SIEMPRE el valor en USD para mantener consistencia en ROAS.
+  if (pixelParams.value && pixelParams.currency && pixelParams.currency !== "USD") {
+    try {
+      pixelParams.value = convertToUSD(
+        Number(pixelParams.value),
+        pixelParams.currency as Currency
+      );
+      pixelParams.currency = "USD";
+    } catch (e) {
+      console.warn("[Pixel] Fallback USD conversion failed:", e);
+    }
+  }
+
   // Purchase: usar un event_id determinista basado en el número de orden para
   // que Meta pueda desduplicar con el evento enviado por el servidor (CAPI).
   const orderId = typeof pixelParams.order_id === "string" ? pixelParams.order_id : "";

@@ -83,6 +83,7 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
       cart: cartFromItems(input.items),
       payment_method: input.paymentMethod || undefined,
       trigger_reason: input.triggerReason || "manual",
+      currency: input.currency || "USD",
     },
   });
 

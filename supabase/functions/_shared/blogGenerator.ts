@@ -186,33 +186,42 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error("[BlogGen] Error APIMART imagen:", errorText);
+      console.error(`[BlogGen] Error APIMART imagen (Status ${res.status}):`, errorText);
       return null;
     }
 
     const text = await res.text();
+    console.log("[BlogGen] Respuesta cruda de imagen:", text.slice(0, 500));
+    
     let data;
     try {
       data = JSON.parse(text);
     } catch {
       console.log("[BlogGen] Respuesta de imagen no es JSON directo, intentando parsear SSE...");
       const parsed = parseAiResponse(text);
-      // Si parseAiResponse rescató el contenido, intentamos parsear ese contenido como JSON
-      // porque Apimart a veces envuelve el JSON de la imagen en un stream de texto.
       try {
         const contentStr = parsed.choices?.[0]?.message?.content;
-        const innerJson = typeof contentStr === 'string' && (contentStr.trim().startsWith('{') || contentStr.trim().startsWith('['))
+        data = (typeof contentStr === 'string' && (contentStr.trim().startsWith('{') || contentStr.trim().startsWith('[')))
           ? JSON.parse(contentStr)
-          : contentStr;
-        data = innerJson || parsed;
+          : contentStr || parsed;
       } catch {
         data = parsed;
       }
     }
 
-    const tempUrl = data.data?.[0]?.url;
+    // Algunos modelos devuelven { data: [{ url: "..." }] } y otros { choices: [{ message: { content: "{\"data\":...}" } }] }
+    // Normalizamos la búsqueda de la URL
+    let tempUrl = data?.data?.[0]?.url || data?.url;
+    
+    if (!tempUrl && data?.choices?.[0]?.message?.content) {
+       try {
+         const nested = JSON.parse(data.choices[0].message.content);
+         tempUrl = nested?.data?.[0]?.url || nested?.url;
+       } catch { /* ignore */ }
+    }
+
     if (!tempUrl) {
-      console.error("[BlogGen] APIMART no devolvió URL de imagen.");
+      console.error("[BlogGen] APIMART no devolvió URL de imagen en ninguna estructura conocida. Data:", JSON.stringify(data).slice(0, 300));
       return null;
     }
 

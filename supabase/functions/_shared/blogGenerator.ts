@@ -32,27 +32,56 @@ function repairJsonString(src: string): string {
   let out = "";
   let inString = false;
   let escaped = false;
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i];
+  
+  // Limpieza inicial: eliminamos caracteres de control que suelen romper JSON.parse
+  // pero preservamos saltos de línea y tabs para manejarlos después.
+  const cleanSrc = src.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
+
+  for (let i = 0; i < cleanSrc.length; i++) {
+    const ch = cleanSrc[i];
     if (escaped) { out += ch; escaped = false; continue; }
     if (ch === "\\") { out += ch; escaped = true; continue; }
+    
     if (ch === '"') {
-      if (!inString) { inString = true; out += ch; continue; }
-      // Cierre válido solo si el siguiente token es estructural
-      const rest = src.slice(i + 1);
-      if (/^\s*([,:}\]]|$)/.test(rest)) { inString = false; out += ch; }
-      else out += '\\"'; // comilla interna sin escapar
+      if (!inString) {
+        inString = true;
+        out += ch;
+      } else {
+        // ¿Es un cierre real? Miramos el siguiente carácter no-blanco
+        let nextChar = "";
+        for (let j = i + 1; j < cleanSrc.length; j++) {
+          if (!/\s/.test(cleanSrc[j])) {
+            nextChar = cleanSrc[j];
+            break;
+          }
+        }
+        
+        // Si el siguiente es , : } ] o fin de string, es cierre probable
+        if (nextChar === "," || nextChar === ":" || nextChar === "}" || nextChar === "]" || nextChar === "") {
+          inString = false;
+          out += ch;
+        } else {
+          // Es una comilla dentro de un string sin escapar
+          out += '\\"';
+        }
+      }
       continue;
     }
+    
     if (inString) {
       if (ch === "\n") { out += "\\n"; continue; }
       if (ch === "\r") { out += "\\r"; continue; }
       if (ch === "\t") { out += "\\t"; continue; }
-      const code = ch.charCodeAt(0);
-      if (code < 0x20) { out += "\\u" + code.toString(16).padStart(4, "0"); continue; }
+      // Caracteres especiales que deben escaparse en JSON strings
+      if (ch === "\b") { out += "\\b"; continue; }
+      if (ch === "\f") { out += "\\f"; continue; }
     }
     out += ch;
   }
+  
+  // Si el string quedó abierto, intentamos cerrarlo
+  if (inString) out += '"';
+  
   return out;
 }
 
@@ -86,11 +115,12 @@ function parseAiResponse(text: string): any {
   // Intentamos parsear como JSON directo primero
   if (!trimmed.startsWith("data:")) {
     try {
-      return JSON.parse(trimmed);
+      return JSON.parse(repairJsonString(trimmed));
     } catch {
       // Si falla, quizás es un error de formato pero tiene data: oculto o es texto plano
       if (!trimmed.includes("data:")) {
-        throw new BlogGenError(`Respuesta IA no parseable (no JSON ni SSE): ${trimmed.slice(0, 200)}`, 502);
+        console.error("[BlogGen] Respuesta IA no parseable (no JSON ni SSE):", trimmed.slice(0, 500));
+        throw new BlogGenError(`La IA no devolvió un formato válido. Reintenta.`, 502);
       }
     }
   }
@@ -186,33 +216,42 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error("[BlogGen] Error APIMART imagen:", errorText);
+      console.error(`[BlogGen] Error APIMART imagen (Status ${res.status}):`, errorText);
       return null;
     }
 
     const text = await res.text();
+    console.log("[BlogGen] Respuesta cruda de imagen:", text.slice(0, 500));
+    
     let data;
     try {
       data = JSON.parse(text);
     } catch {
       console.log("[BlogGen] Respuesta de imagen no es JSON directo, intentando parsear SSE...");
       const parsed = parseAiResponse(text);
-      // Si parseAiResponse rescató el contenido, intentamos parsear ese contenido como JSON
-      // porque Apimart a veces envuelve el JSON de la imagen en un stream de texto.
       try {
         const contentStr = parsed.choices?.[0]?.message?.content;
-        const innerJson = typeof contentStr === 'string' && (contentStr.trim().startsWith('{') || contentStr.trim().startsWith('['))
+        data = (typeof contentStr === 'string' && (contentStr.trim().startsWith('{') || contentStr.trim().startsWith('[')))
           ? JSON.parse(contentStr)
-          : contentStr;
-        data = innerJson || parsed;
+          : contentStr || parsed;
       } catch {
         data = parsed;
       }
     }
 
-    const tempUrl = data.data?.[0]?.url;
+    // Algunos modelos devuelven { data: [{ url: "..." }] } y otros { choices: [{ message: { content: "{\"data\":...}" } }] }
+    // Normalizamos la búsqueda de la URL
+    let tempUrl = data?.data?.[0]?.url || data?.url;
+    
+    if (!tempUrl && data?.choices?.[0]?.message?.content) {
+       try {
+         const nested = JSON.parse(data.choices[0].message.content);
+         tempUrl = nested?.data?.[0]?.url || nested?.url;
+       } catch { /* ignore */ }
+    }
+
     if (!tempUrl) {
-      console.error("[BlogGen] APIMART no devolvió URL de imagen.");
+      console.error("[BlogGen] APIMART no devolvió URL de imagen en ninguna estructura conocida. Data:", JSON.stringify(data).slice(0, 300));
       return null;
     }
 
@@ -373,7 +412,7 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       "Accept": "application/json",
     },
     body: JSON.stringify({
-      model: "nano-banana-2-ext",
+      model: "gpt-image-2-ext", // Usamos el mismo modelo de imagen para texto ya que parece más estable con JSON
       stream: false,
       messages: [
         { role: "system", content: system },

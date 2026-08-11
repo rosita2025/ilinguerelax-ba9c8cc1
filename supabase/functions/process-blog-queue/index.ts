@@ -24,8 +24,22 @@ serve(async (req) => {
   );
 
   const results: Array<Record<string, unknown>> = [];
-
+  
   try {
+    // 0. Obtener productos activos para contexto de la IA
+    const { data: products } = await supabase
+      .from("digital_products")
+      .select("id,name,sku,description")
+      .eq("active", true)
+      .limit(10);
+
+    const productCards = (products ?? []).map(p => ({
+      id: p.id,
+      title: p.name,
+      slug: p.sku,
+      description: p.description
+    }));
+
     const { data: due, error } = await supabase
       .from("blog_post_queue")
       .select("id,topic,keyword,language,category,attempts")

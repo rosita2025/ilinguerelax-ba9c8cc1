@@ -364,6 +364,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
 
 
+  const { trackPurchase } = usePurchaseTracking();
   const [selected, setSelected] = useState<Method | null>(null);
   const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);

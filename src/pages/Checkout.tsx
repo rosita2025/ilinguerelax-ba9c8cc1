@@ -31,6 +31,7 @@ import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 
 function MobileOrderSummarySticky({ slug }: { slug?: string }) {
   const [expanded, setExpanded] = useState(false);

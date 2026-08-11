@@ -50,13 +50,13 @@ export default function AdminMarketingDrips() {
 
   return (
     <div className="space-y-8">
-        <header className="flex justify-between items-center">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold">Marketing Post-Compra</h1>
-            <p className="text-xs text-muted-foreground">Automatización de lanzamientos y seguimiento a los 7, 15 y 25 días.</p>
+            <h1 className="text-lg sm:text-xl font-bold">Marketing Post-Compra</h1>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Automatización de lanzamientos a los 7, 15 y 25 días.</p>
           </div>
-          <Button onClick={loadData} disabled={loading} variant="outline" size="sm">
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+          <Button onClick={loadData} disabled={loading} variant="outline" size="xs" className="h-8 sm:h-9">
+            <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
           </Button>
         </header>
 

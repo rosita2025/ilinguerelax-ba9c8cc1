@@ -69,7 +69,7 @@ serve(async (req) => {
           language: row.language,
           // Publicación automática según solicitud del usuario (300 posts / 30 días).
           publish: true,
-
+          productCards,
         });
         await supabase
           .from("blog_post_queue")

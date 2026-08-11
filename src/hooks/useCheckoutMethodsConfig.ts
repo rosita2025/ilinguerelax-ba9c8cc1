@@ -167,18 +167,18 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         if (alive) setState({ 
           loaded: true, 
           regionCode: "GLOBAL", 
-          enabledMethodKeys: ["stripe_card"], 
+          enabledMethodKeys: ["stripe_card", "stripe_apple_pay", "stripe_google_pay"], 
           ...DEFAULT_ALL_OFF, 
           stripe: true, 
-          familyOrder: DEFAULT_ORDER 
+          familyOrder: ["stripe", ...DEFAULT_ORDER.filter(f => f !== "stripe")] 
         });
         return;
       }
       const enabledFamilies = { stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: 0, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
 
 
-      const enabledMethodKeys: string[] = ["stripe_card"];
+      const enabledMethodKeys: string[] = ["stripe_card", "stripe_apple_pay", "stripe_google_pay"];
       let configuredMethods = 0;
       for (const m of methods) {
         if (m.region_code !== region.code) continue;

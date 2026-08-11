@@ -13,6 +13,9 @@ import { useBinancePayConfig } from "@/hooks/useBinancePayConfig";
 import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { formatCurrencyAmount, formatAmountLocalized } from "@/i18n";
@@ -425,12 +428,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const reset = () => { redirectingRef.current = false; setMpLoading(null); };
     window.addEventListener("pageshow", reset);
     window.addEventListener("focus", reset);
-    // Al cargar el checkout, nos aseguramos que el store y el estado local estén sincronizados
-    if (selected) setSelectedMethod(selected);
     return () => {
       window.removeEventListener("pageshow", reset);
       window.removeEventListener("focus", reset);
     };
+  }, []);
+  useEffect(() => {
+    // Al cargar el checkout, nos aseguramos que el store y el estado local estén sincronizados
+    if (selected) setSelectedMethod(selected);
   }, [selected, setSelectedMethod]);
 
   const cartSignature = JSON.stringify({
@@ -540,7 +545,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       return clientSecret;
 
     } catch (err) {
-      setStripeError(mapStripeError(err, language as StripeLang));
+      const mapped = mapStripeError(err, language as StripeLang);
+      setStripeError(mapped);
+      
+      // Auto-fallback UI if it's a currency error
+      if (mapped.code === "currency_restricted" && !isFallingBackToUsd) {
+        setIsFallingBackToUsd(true);
+      }
+      
       try {
         const s2 = useCheckoutPruebaStore.getState();
         const totals = calcTotals(s2.items, s2.couponPercent, region.tier);
@@ -1930,97 +1942,53 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
-                <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
-                  {(stripeLoading || !stripeFrameMounted) && !stripeError && (() => {
-                    const isEn = language === "en";
-                    const isPt = language === "pt";
-                    const isFr = language === "fr";
-                    const status =
-                      stripeElapsed < 15
-                        ? (isEn ? "Opening the Stripe checkout form…"
-                          : isPt ? "Abrindo o formulário da Stripe…"
-                          : isFr ? "Ouverture du formulaire Stripe…"
-                          : "Abriendo el formulario de Stripe…")
-                        : stripeElapsed < 45
-                        ? (isEn ? "Still loading… connecting with Stripe."
-                          : isPt ? "Ainda carregando… conectando com a Stripe."
-                          : isFr ? "Chargement en cours… connexion avec Stripe."
-                          : "Aún cargando… conectando con Stripe.")
-                        : stripeElapsed < 75
-                        ? (isEn ? "Taking longer than usual. Retrying automatically…"
-                          : isPt ? "Está demorando mais que o normal. Tentando novamente…"
-                          : isFr ? "Cela prend plus de temps que d’habitude. Nouvelle tentative…"
-                          : "Está tardando más de lo normal. Reintentando automáticamente…")
-                        : (isEn ? "Almost there… if it doesn't open in a few seconds you can retry."
-                          : isPt ? "Quase lá… se não abrir em poucos segundos, você pode tentar de novo."
-                          : isFr ? "Presque prêt… si rien ne s’ouvre, tu pourras réessayer."
-                          : "Casi listo… si no abre en unos segundos, podrás reintentar.");
-                    return (
-                      <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
-                        <div className="flex items-center justify-center gap-2 text-sm text-neutral-700 dark:text-neutral-200 font-medium">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{status}</span>
-                        </div>
-                        {stripeElapsed >= 5 && (
-                          <div className="mt-1 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
-                            {stripeElapsed}s
-                          </div>
-                        )}
-                        {stripeElapsed >= 30 && (
-                          <div className="mt-3 flex justify-center">
-                            <button
-                              type="button"
-                              onClick={retryStripe}
-                              className="inline-flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                            >
-                              <Loader2 className="w-3.5 h-3.5" />
-                              {isEn ? "Retry now" : isPt ? "Tentar agora" : isFr ? "Réessayer" : "Reintentar ahora"}
-                            </button>
-                          </div>
-                        )}
+                <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {isFallingBackToUsd && (
+                    <Alert className="mb-4 bg-teal-50 border-teal-200 dark:bg-teal-950/30 dark:border-teal-900/50">
+                      <AlertCircle className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                      <AlertTitle className="text-teal-800 dark:text-teal-300 font-semibold">
+                        Pago optimizado para {countryCode}
+                      </AlertTitle>
+                      <AlertDescription className="text-teal-700 dark:text-teal-400 text-sm">
+                        {language === "en" 
+                          ? "Paying in USD to ensure international bank compatibility." 
+                          : "Pagando en USD para garantizar la compatibilidad con tu banco internacional."}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {stripeError ? (
+                    <div className="p-6 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30 flex flex-col items-center text-center gap-4">
+                      <AlertCircle className="h-10 w-10 text-red-500" />
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-red-900 dark:text-red-200 text-lg">{stripeError.title}</h3>
+                        <p className="text-red-700 dark:text-red-300 text-sm max-w-xs">{stripeError.message}</p>
                       </div>
-                    );
-                  })()}
-                  {stripeError && (
-                    <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
-                      <p className="font-semibold">{stripeError.title}</p>
-                      <p className="mt-1 text-xs">{stripeError.message}</p>
-                      {stripeError.instructions && stripeError.instructions.length > 0 && (
-                        <ol className="mt-2 ml-4 list-decimal space-y-0.5 text-xs">
-                          {stripeError.instructions.map((step, i) => (
-                            <li key={i}>{step}</li>
-                          ))}
-                        </ol>
-                      )}
-                      <p className="mt-1 text-[10px] opacity-70">
-                        {language === "en" ? "Code" : language === "pt" ? "Código" : language === "fr" ? "Code" : "Código"}: {stripeError.code}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {stripeError.retryable && (
-                          <button
-                            type="button"
-                            onClick={retryStripe}
-                            className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
-                          >
-                            <Loader2 className="w-3.5 h-3.5" />
-                            {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
-                          </button>
-                        )}
-                        <a
-                          href={WHATSAPP_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#20b858]"
+                      {stripeError.retryable && (
+                        <Button 
+                          onClick={stripeError.code === "currency_restricted" ? () => { setIsFallingBackToUsd(true); retryStripe(); } : retryStripe}
+                          className="bg-red-600 hover:bg-red-700 text-white gap-2"
                         >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          {language === "en" ? "Contact us on WhatsApp" : language === "pt" ? "Fale conosco no WhatsApp" : language === "fr" ? "Contactez-nous sur WhatsApp" : "Escríbenos por WhatsApp"}
-                        </a>
-                      </div>
+                          <RefreshCw className="h-4 w-4" />
+                          {stripeError.code === "currency_restricted" ? "Intentar en USD" : t.tryAgain}
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
+                      {(stripeLoading || !stripeFrameMounted) && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 z-10 rounded-xl backdrop-blur-sm">
+                          <Loader2 className="h-8 w-8 animate-spin text-teal-600 mb-3" />
+                          <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                            {stripeElapsed > 5 ? "Configurando conexión segura..." : "Abriendo formulario de Stripe..."}
+                          </p>
+                        </div>
+                      )}
+                      <EmbeddedCheckoutProvider stripe={stripePromise} options={stripeOptions}>
+                        <EmbeddedCheckout />
+                      </EmbeddedCheckoutProvider>
                     </div>
                   )}
-                  <EmbeddedCheckoutProvider key={stripeRetryKey} stripe={stripePromise} options={stripeOptions}>
-                    <EmbeddedCheckout />
-                  </EmbeddedCheckoutProvider>
                 </div>
               </div>
             )}

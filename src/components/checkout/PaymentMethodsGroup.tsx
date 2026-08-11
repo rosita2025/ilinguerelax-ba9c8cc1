@@ -1990,25 +1990,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     </div>
                   )}
                 </div>
-                      stripeElapsed < 15
-                        ? (isEn ? "Opening the Stripe checkout form…"
-                          : isPt ? "Abrindo o formulário da Stripe…"
-                          : isFr ? "Ouverture du formulaire Stripe…"
-                          : "Abriendo el formulario de Stripe…")
-                        : stripeElapsed < 45
-                        ? (isEn ? "Still loading… connecting with Stripe."
-                          : isPt ? "Ainda carregando… conectando com a Stripe."
-                          : isFr ? "Chargement en cours… connexion avec Stripe."
-                          : "Aún cargando… conectando con Stripe.")
-                        : stripeElapsed < 75
-                        ? (isEn ? "Taking longer than usual. Retrying automatically…"
-                          : isPt ? "Está demorando mais que o normal. Tentando novamente…"
-                          : isFr ? "Cela prend plus de temps que d’habitude. Nouvelle tentative…"
-                          : "Está tardando más de lo normal. Reintentando automáticamente…")
-                        : (isEn ? "Almost there… if it doesn't open in a few seconds you can retry."
-                          : isPt ? "Quase lá… se não abrir em poucos segundos, você pode tentar de novo."
-                          : isFr ? "Presque prêt… si rien ne s’ouvre, tu pourras réessayer."
-                          : "Casi listo… si no abre en unos segundos, podrás reintentar.");
                     return (
                       <div className="absolute inset-0 z-10 bg-white dark:bg-neutral-950 px-4 py-6">
                         <div className="flex items-center justify-center gap-2 text-sm text-neutral-700 dark:text-neutral-200 font-medium">

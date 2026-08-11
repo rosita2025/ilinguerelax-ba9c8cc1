@@ -546,7 +546,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           skus: s2.items.map((i) => i.id),
           reason: detail && !looksTechnical(detail) ? detail : (detail || raw),
           value: totals.total,
-          currency: "USD",
+          currency: "USD", // Forzado a USD para Ads/Tracking
         });
       } catch { /* noop */ }
       throw err;
@@ -626,7 +626,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           skus: s3.items.map((i) => i.id),
           reason: err instanceof Error ? err.message : String(err),
           value: totals.total,
-          currency: "USD",
+          currency: "USD", // Forzado a USD para Ads/Tracking
         });
       } catch { /* noop */ }
       setMethodError({
@@ -723,7 +723,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           skus: s.items.map((i) => i.id),
           reason: rawReason,
           value: totals.total,
-          currency: "USD",
+          currency: "USD", // Forzado a USD para Ads/Tracking
         });
       } catch { /* noop */ }
       // Mensaje claro + siguiente paso: nunca dejamos un error técnico crudo.
@@ -2278,7 +2278,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                         skus: items.map((i) => i.id),
                         reason: err instanceof Error ? err.message : String(err),
                         value: totals.total,
-                        currency: "USD",
+                        currency: "USD", // Forzado a USD para Ads/Tracking
                       });
                     } catch { /* noop */ }
                   }}

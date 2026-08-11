@@ -23,7 +23,7 @@ const corsHeaders = {
 /** Turnos diarios en hora de Perú (UTC-5). */
 export const SLOTS_PERU = [8, 9, 11, 13, 20];
 const POSTS_PER_SLOT = 2;
-const DAYS = 30;
+const DAYS = 30; // Aseguramos 30 días para completar 300 posts (10 al día)
 const PERU_OFFSET_HOURS = 5;
 
 /** Palabras clave reales de Search Console (con su idioma objetivo). */
@@ -150,7 +150,8 @@ serve(async (req) => {
         if (body.startTomorrow !== false) start.setUTCDate(start.getUTCDate() + 1);
 
         const batch = `lote-${new Date().toISOString().slice(0, 16)}`;
-        const rows = buildSchedule(start).map((r) => ({ ...r, batch }));
+        const startFrom = start;
+        const rows = buildSchedule(startFrom).map((r) => ({ ...r, batch }));
 
         const { data, error } = await supabase
           .from("blog_post_queue")
@@ -230,6 +231,19 @@ serve(async (req) => {
         let postId = item.post_id as string | null;
 
         if (!postId) {
+          const { data: products } = await supabase
+            .from("digital_products")
+            .select("id,name,sku,description")
+            .eq("active", true)
+            .limit(10);
+
+          const productCards = (products ?? []).map(p => ({
+            id: p.id,
+            title: p.name,
+            slug: p.sku,
+            description: p.description
+          }));
+
           await supabase
             .from("blog_post_queue")
             .update({ status: "processing", attempts: (item.attempts ?? 0) + 1, error: null })
@@ -240,7 +254,8 @@ serve(async (req) => {
               keyword: item.keyword as string,
               category: item.category as string,
                language: item.language as string,
-              publish: false,
+              publish: true, // Cambiamos a true para que genere y publique si se pide desde admin
+              productCards,
             });
             postId = generated.id as string;
             await supabase

@@ -1942,12 +1942,54 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
                   <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
-                <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
-                  {(stripeLoading || !stripeFrameMounted) && !stripeError && (() => {
-                    const isEn = language === "en";
-                    const isPt = language === "pt";
-                    const isFr = language === "fr";
-                    const status =
+                <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {isFallingBackToUsd && (
+                    <Alert className="mb-4 bg-teal-50 border-teal-200 dark:bg-teal-950/30 dark:border-teal-900/50">
+                      <AlertCircle className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                      <AlertTitle className="text-teal-800 dark:text-teal-300 font-semibold">
+                        Pago optimizado para {countryCode}
+                      </AlertTitle>
+                      <AlertDescription className="text-teal-700 dark:text-teal-400 text-sm">
+                        {language === "en" 
+                          ? "Paying in USD to ensure international bank compatibility." 
+                          : "Pagando en USD para garantizar la compatibilidad con tu banco internacional."}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {stripeError ? (
+                    <div className="p-6 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30 flex flex-col items-center text-center gap-4">
+                      <AlertCircle className="h-10 w-10 text-red-500" />
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-red-900 dark:text-red-200 text-lg">{stripeError.title}</h3>
+                        <p className="text-red-700 dark:text-red-300 text-sm max-w-xs">{stripeError.message}</p>
+                      </div>
+                      {stripeError.retryable && (
+                        <Button 
+                          onClick={stripeError.code === "currency_restricted" ? () => { setIsFallingBackToUsd(true); retryStripe(); } : retryStripe}
+                          className="bg-red-600 hover:bg-red-700 text-white gap-2"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                          {stripeError.code === "currency_restricted" ? "Intentar en USD" : t.tryAgain}
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    <div ref={stripeContainerRef} className="relative min-h-[560px] sm:min-h-[500px] bg-white dark:bg-neutral-950 -mx-px">
+                      {(stripeLoading || !stripeFrameMounted) && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 z-10 rounded-xl backdrop-blur-sm">
+                          <Loader2 className="h-8 w-8 animate-spin text-teal-600 mb-3" />
+                          <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                            {stripeElapsed > 5 ? "Configurando conexión segura..." : "Abriendo formulario de Stripe..."}
+                          </p>
+                        </div>
+                      )}
+                      <EmbeddedCheckoutProvider stripe={stripePromise} options={stripeOptions}>
+                        <EmbeddedCheckout />
+                      </EmbeddedCheckoutProvider>
+                    </div>
+                  )}
+                </div>
                       stripeElapsed < 15
                         ? (isEn ? "Opening the Stripe checkout form…"
                           : isPt ? "Abrindo o formulário da Stripe…"

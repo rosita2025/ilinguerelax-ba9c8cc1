@@ -329,6 +329,9 @@ const ProductPatronesEspeciales = () => {
                     Precio de Lanzamiento
                   </span>
                 </div>
+                <div className="mb-4">
+                  <DigitalProductNotice compact />
+                </div>
                 <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
                   <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{priceLabel}</span>
                   <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through">{originalLabel}</span>

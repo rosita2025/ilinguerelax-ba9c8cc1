@@ -418,8 +418,9 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       "Accept": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-image-2-ext", // Usamos el mismo modelo de imagen para texto ya que parece más estable con JSON
+      model: "gpt-image-2-ext",
       stream: false,
+      temperature: 0.7, // Añadimos un poco de variedad para que no sean idénticos
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },

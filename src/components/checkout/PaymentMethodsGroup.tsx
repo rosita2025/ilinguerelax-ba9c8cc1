@@ -1989,8 +1989,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       </EmbeddedCheckoutProvider>
                     </div>
                   )}
-              </div>
-            )}
+                </div>
               </div>
             )}
 

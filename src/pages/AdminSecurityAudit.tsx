@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ShieldAlert, History, AlertTriangle } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
-import { adminInvoke } from "@/lib/adminInvoke";
+import { adminInvoke } from "@/lib/adminGate";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -28,13 +28,13 @@ const AdminSecurityAudit = () => {
       try {
         // Obtenemos los logs a través de la función dedicada admin-audit-logs.
         // Solo accesible con una sesión 2FA activa.
-        const { data, error: invokeError } = await adminInvoke("admin-audit-logs", {
+        const res = await adminInvoke("admin-audit-logs", {
           method: "POST",
           body: { action: "list" }
         });
         
-        if (invokeError) throw invokeError;
-        setLogs(data as AuditLog[]);
+        if (res.error) throw res.error;
+        setLogs(res.data as AuditLog[]);
       } catch (err: any) {
         console.error("Error fetching audit logs:", err);
         setError(err.message || "Error al cargar los logs de auditoría");

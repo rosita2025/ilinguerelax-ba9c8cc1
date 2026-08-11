@@ -6,7 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
 
-type Provider = "hotmart" | "mercadopago" | "paypal" | "manual";
+type Provider = "hotmart" | "mercadopago" | "paypal" | "stripe" | "manual";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
 
 interface Row {
@@ -204,6 +204,38 @@ Deno.serve(async (req) => {
           mapped_status: meta.mapped, failure_reason: meta.reason ?? null,
           failed_step: meta.step,
           payload: p,
+        });
+      }
+    }
+
+    // ─── Stripe (funnel_events) ───────────────────────────────────────
+    if (!provider || provider === "stripe") {
+      const { data } = await admin
+        .from("funnel_events")
+        .select("id, created_at, event_type, event_data, email, product_id, value, currency")
+        .contains("event_data", { provider: "stripe" } as any)
+        .order("created_at", { ascending: false })
+        .limit(take);
+
+      for (const r of data ?? []) {
+        const d: any = r.event_data ?? {};
+        // Stripe usually records status in metadata/event_data during our webhook
+        const status = d.status || "approved"; 
+        
+        rows.push({
+          id: `st-${r.id}`, 
+          provider: "stripe", 
+          received_at: r.created_at,
+          email: r.email || d.customer_email || null,
+          amount: r.value || d.amount || null,
+          currency: r.currency || d.currency || null,
+          product: r.product_id || d.items_summary || null,
+          transaction: d.payment_intent_id || d.session_id || null,
+          raw_status: status,
+          mapped_status: status === "approved" ? "approved" : "unknown",
+          failure_reason: d.failure_message || null,
+          failed_step: null,
+          payload: d,
         });
       }
     }

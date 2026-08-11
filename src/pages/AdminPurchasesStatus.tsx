@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Provider = "hotmart" | "mercadopago" | "paypal" | "manual";
+type Provider = "hotmart" | "mercadopago" | "paypal" | "stripe" | "manual";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
 
 interface Row {
@@ -34,6 +34,7 @@ interface Row {
 const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; color: string }> = {
   hotmart:     { label: "Hotmart",       icon: ShoppingBag, color: "bg-orange-100 text-orange-800" },
   mercadopago: { label: "Mercado Pago",  icon: Wallet,      color: "bg-sky-100 text-sky-800" },
+  stripe:      { label: "Stripe",        icon: CreditCard,  color: "bg-purple-100 text-purple-800" },
   paypal:      { label: "PayPal",        icon: CreditCard,  color: "bg-blue-100 text-blue-800" },
   manual:      { label: "Yape / Plin",   icon: Banknote,    color: "bg-emerald-100 text-emerald-800" },
 };
@@ -164,7 +165,7 @@ const AdminPurchasesStatus = () => {
           <div>
             <h1 className="text-lg sm:text-xl font-bold">Estado de compras · Todas las pasarelas</h1>
             <p className="text-xs text-muted-foreground">
-              Hotmart · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
+              Stripe · Hotmart · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
@@ -201,6 +202,7 @@ const AdminPurchasesStatus = () => {
                 <option value="hotmart">Hotmart</option>
                 <option value="mercadopago">Mercado Pago</option>
                 <option value="paypal">PayPal</option>
+                <option value="stripe">Stripe</option>
                 
               </select>
             </div>

@@ -359,7 +359,9 @@ export async function generateAndStorePost(args: GenerateArgs): Promise<Record<s
 
   const L = LANG_MAP[language] ?? LANG_MAP.es;
 
-  const system = `You are a SENIOR SEO WRITER with 15+ years of experience in web positioning, content marketing, EEAT, and Google AdSense monetization. Write the ENTIRE article in ${L.name} for ${L.audience}. Do NOT switch languages mid-article.
+  const system = `You are a SENIOR SEO WRITER with 15+ years of experience. Write the ENTIRE article in ${L.name} for ${L.audience}.
+CRITICAL: Since we are generating 300 articles, this topic might repeat. Ensure this specific article has a UNIQUE perspective, different examples, and a fresh hook even if the keyword is common.
+
 
 Writing rules:
 - Length: Target 1800 words of high-quality, comprehensive content. Deeply cover the topic without filler.

@@ -56,7 +56,7 @@ export default function AdminReviewInvitations() {
           <h1 className="text-lg sm:text-xl font-bold">Invitaciones a Reseñas</h1>
           <p className="text-[10px] sm:text-xs text-muted-foreground">Seguimiento de recordatorios y cupones post-compra (Días 1, 15, 20, 27).</p>
         </div>
-        <Button onClick={loadData} disabled={loading} variant="outline" size="xs" className="h-8 sm:h-9">
+        <Button onClick={loadData} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
           <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
         </Button>
       </header>

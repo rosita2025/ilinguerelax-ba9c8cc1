@@ -19,6 +19,7 @@ import BacklinksCard from "@/components/admin/BacklinksCard";
 import GscKeywordsMultilangCard from "@/components/admin/GscKeywordsMultilangCard";
 import GoogleSuggestCard from "@/components/admin/GoogleSuggestCard";
 import BlogScheduleCard from "@/components/admin/BlogScheduleCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface GscRow {

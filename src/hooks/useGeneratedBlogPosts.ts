@@ -43,6 +43,7 @@ export function useGeneratedBlogPosts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       try {
         const { data, error } = await supabase

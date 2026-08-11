@@ -36,7 +36,7 @@ export interface CheckoutMethodsConfig {
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "stripeAch", "stripeCashApp", "stripeKlarna", "paypal", "transfer", "cash", "yape", "binance", "clabe", "hotmart", "dlocalTransfer", "dlocalCash", "dlocalWallet", "dlocalCard"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "hotmart", "paypal", "transfer", "cash", "yape", "binance", "clabe", "dlocalTransfer", "dlocalCash", "dlocalWallet", "dlocalCard", "stripeAch", "stripeCashApp", "stripeKlarna"];
 
 const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
   stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false,

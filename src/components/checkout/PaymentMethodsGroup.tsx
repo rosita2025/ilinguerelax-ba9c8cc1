@@ -350,7 +350,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     selectedMethod === "binance"
   );
   
-  const showUsdOnly = (isRestricted || isGlobalGateway) && countryCode !== "PE";
+  const showUsdOnly = isGlobalGateway && !["PE", "MX", "ES"].includes(countryCode);
   
   const localFormatted = local.loading || local.isUsd || showUsdOnly 
     ? `USD $${totalUsd}` 

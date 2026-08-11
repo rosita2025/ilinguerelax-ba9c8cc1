@@ -90,8 +90,8 @@ export default function AdminMarketingDrips() {
             <Mail className="w-4 h-4 text-primary" /> Últimos Envíos Realizados
           </h2>
           <Card className="overflow-hidden border-none shadow-none">
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full text-xs min-w-[600px] sm:min-w-0">
                 <thead className="bg-muted/50 border-b">
                   <tr>
                     <th className="px-4 py-2 text-left">Comprador</th>

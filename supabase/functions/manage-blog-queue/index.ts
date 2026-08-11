@@ -230,6 +230,19 @@ serve(async (req) => {
         let postId = item.post_id as string | null;
 
         if (!postId) {
+          const { data: products } = await supabase
+            .from("digital_products")
+            .select("id,name,sku,description")
+            .eq("active", true)
+            .limit(10);
+
+          const productCards = (products ?? []).map(p => ({
+            id: p.id,
+            title: p.name,
+            slug: p.sku,
+            description: p.description
+          }));
+
           await supabase
             .from("blog_post_queue")
             .update({ status: "processing", attempts: (item.attempts ?? 0) + 1, error: null })

@@ -193,12 +193,12 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
   const apimartToken = Deno.env.get("APIMART_TOKEN");
   if (!apimartToken || !prompt) {
     console.warn("[BlogGen] APIMART_TOKEN no configurado o prompt vacío, saltando imagen.");
+    console.log(`[BlogGen] Prompt length: ${prompt?.length}, Token exists: ${!!apimartToken}`);
     return null;
   }
 
   try {
     console.log(`[BlogGen] Generando imagen con APIMART para: ${slug}...`);
-    // Usamos el endpoint de gpt-image-2-ext en APIMART para mayor disponibilidad
     const res = await fetch("https://api.apimart.ai/v1/images/generations", {
       method: "POST",
       headers: {
@@ -207,10 +207,10 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       },
       body: JSON.stringify({
         model: "gpt-image-2-ext",
-        prompt: `${prompt}. High quality photography style, educational, clean, 1024x1024, no text. Relevant to language learning environment.`,
+        prompt: `Professional educational photography, high quality, clean, 1024x1024, no text, no captions. Subject: ${prompt}. Relevant to language learning for iLingue Relax, using soft teal and coral accents in the environment.`,
         n: 1,
         size: "1024x1024",
-        stream: false,
+        response_format: "url"
       }),
     });
 
@@ -239,19 +239,31 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       }
     }
 
-    // Algunos modelos devuelven { data: [{ url: "..." }] } y otros { choices: [{ message: { content: "{\"data\":...}" } }] }
-    // Normalizamos la búsqueda de la URL
+    // Estructuras comunes de Apimart/OpenAI:
+    // 1. { data: [{ url: "..." }] }
+    // 2. { choices: [{ message: { content: "..." } }] }
+    // 3. Texto plano que es una URL
     let tempUrl = data?.data?.[0]?.url || data?.url;
     
     if (!tempUrl && data?.choices?.[0]?.message?.content) {
-       try {
-         const nested = JSON.parse(data.choices[0].message.content);
-         tempUrl = nested?.data?.[0]?.url || nested?.url;
-       } catch { /* ignore */ }
+       const content = data.choices[0].message.content.trim();
+       if (content.startsWith("http")) {
+         tempUrl = content;
+       } else {
+         try {
+           const nested = JSON.parse(content);
+           tempUrl = nested?.data?.[0]?.url || nested?.url || nested?.image_url;
+         } catch { /* ignore */ }
+       }
+    }
+
+    // Si data mismo es un string que empieza por http
+    if (!tempUrl && typeof data === 'string' && data.trim().startsWith("http")) {
+      tempUrl = data.trim();
     }
 
     if (!tempUrl) {
-      console.error("[BlogGen] APIMART no devolvió URL de imagen en ninguna estructura conocida. Data:", JSON.stringify(data).slice(0, 300));
+      console.error("[BlogGen] APIMART no devolvió URL de imagen. Estructura recibida:", JSON.stringify(data).slice(0, 500));
       return null;
     }
 
@@ -392,7 +404,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
-  "imagePrompt": "Highly descriptive prompt for an AI image generator (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image. Make it relevant to the topic of language learning.",
+  "imagePrompt": "Realistic high-quality educational photography style, clean 3D isometric or natural classroom setting, professional lighting. Relevant to: ${topic}. NO TEXT in image. Hints of teal and coral colors.",
   "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
   "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }

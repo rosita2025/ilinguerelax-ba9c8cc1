@@ -412,7 +412,7 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       "Accept": "application/json",
     },
     body: JSON.stringify({
-      model: "nano-banana-2-ext",
+      model: "gpt-image-2-ext", // Usamos el mismo modelo de imagen para texto ya que parece más estable con JSON
       stream: false,
       messages: [
         { role: "system", content: system },

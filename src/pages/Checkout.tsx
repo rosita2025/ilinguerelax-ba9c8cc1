@@ -447,14 +447,17 @@ export default function Checkout() {
         : Number(it.regionPrices?.[tier === "peru" ? "latam" : tier] ?? it.price);
       return sum + p * (it.quantity || 1);
     }, 0);
-    const value = cartTotal > 0 ? cartTotal : priceForTier;
+    // Meta Pixel: InitiateCheckout
+    // Forzamos USD para Ads (Facebook/Instagram) según requerimiento.
+    // Usamos el precio USD base del tier para mantener consistencia en reportes.
+    const initiateValue = catalogItem.regionPrices?.[tier === "peru" ? "latam" : tier] ?? catalogItem.price;
 
     trackHotmartEvent("InitiateCheckout", {
       content_name: catalogItem.name,
       content_ids: [sku],
       content_type: "product",
-      value,
-      currency,
+      value: initiateValue,
+      currency: "USD",
       num_items: items.length || 1,
     });
     // GA4-style alias for the same funnel step, linked to the same SKU.

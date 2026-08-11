@@ -25,7 +25,7 @@ const panels: Array<{
   { to: "/admin/purchases-status", icon: CreditCard, title: "Pagos · Estado unificado", desc: "Todas las compras (Hotmart, Mercado Pago, PayPal, Stripe, manuales) con estado, motivo de bloqueo y paso que falló.", color: "text-blue-500", category: "Ventas" },
   { to: "/admin/productos", icon: Package, title: "Productos digitales", desc: "Catálogo tipo Shopify: crea productos, precios, enlaces de Drive y upsells sin tocar código. Se sincroniza con checkout y correos.", color: "text-teal-600", category: "Productos" },
   { to: "/admin/orders", icon: Mail, title: "Órdenes / Pedidos", desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).", color: "text-sky-600", category: "Ventas" },
-  { to: "/admin/hotmart-audit", icon: ClipboardList, title: "Hotmart · Auditoría", desc: "Eventos recibidos de Hotmart y carritos abandonados con estado mapeado (aprobado/pendiente/rechazado/posventa) y sync a Brevo.", color: "text-orange-500", category: "Ventas" },
+  
   
   { to: "/admin/marketing-drips", icon: Calendar, title: "Automatización de Email", desc: "Centro unificado de Newsletter, Post-Compra y Carritos Abandonados con reglas de seguridad.", color: "text-rose-600", category: "Marketing" },
 

@@ -136,6 +136,15 @@ const ProductPatronesEspeciales = () => {
 
   const handleAddToCart = () => {
     if (!pricingReady) return;
+    trackHotmartEvent("AddToCart", {
+      content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+      content_category: "Digital Book",
+      content_ids: [ADMIN_SKU],
+      content_type: "product",
+      value: PRICE_USD,
+      currency: "USD",
+      num_items: 1,
+    });
     addItem({
       id: "patrones-especiales-ingles",
       name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",

@@ -97,6 +97,7 @@ const groups: Group[] = [
       { to: "/admin/checkout-abuse", label: "Anti-abuso Checkout", icon: Shield },
       { to: "/admin/payment-errors", label: "Fallos de pago", icon: AlertTriangle },
       { to: "/admin/email-rules", label: "Correos · Lista negra/blanca", icon: Mail },
+      { to: "/admin/seguridad", label: "Auditoría de Seguridad", icon: ShieldAlert },
     ],
   },
 ];

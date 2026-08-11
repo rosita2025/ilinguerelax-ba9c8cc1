@@ -37,6 +37,7 @@ const panels: Array<{
   { to: "/admin/dlocal", icon: Banknote, title: "dLocal Go · Cobertura y conciliación", desc: "Países activos, transferencias/efectivo/billeteras, pedidos pendientes, conciliación por voucher y modo test.", color: "text-lime-600", category: "Ventas" },
   { to: "/admin/email-rules", icon: MailCheck, title: "Reglas de correo", desc: "Corrige correos mal escritos, evita duplicados de entrega y controla reglas de envío por dominio.", color: "text-blue-600", category: "Marketing" },
   { to: "/admin/bot-report", icon: Bot, title: "Reporte de bots", desc: "Tráfico automatizado detectado: user-agents, IPs y páginas afectadas para depurar métricas reales.", color: "text-slate-500", category: "Seguridad" },
+  { to: "/admin/seguridad", icon: ShieldAlert, title: "Auditoría de Seguridad", desc: "Historial de accesos y acciones críticas del panel administrativo para detectar intrusos.", color: "text-red-700", category: "Seguridad" },
 ];
 
 

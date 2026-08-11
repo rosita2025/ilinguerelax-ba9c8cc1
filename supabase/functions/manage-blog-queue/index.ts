@@ -254,7 +254,7 @@ serve(async (req) => {
               keyword: item.keyword as string,
               category: item.category as string,
                language: item.language as string,
-              publish: false,
+              publish: true, // Cambiamos a true para que genere y publique si se pide desde admin
               productCards,
             });
             postId = generated.id as string;

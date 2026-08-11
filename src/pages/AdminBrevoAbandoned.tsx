@@ -103,7 +103,6 @@ const AdminBrevoAbandoned = () => {
 
   return (
     <>
-      <AdminNav />
       <main className="min-h-dvh bg-background py-8 px-4">
         <div className="max-w-7xl mx-auto space-y-6">
           <header className="flex flex-wrap items-end justify-between gap-3">
@@ -207,7 +206,6 @@ const AdminBrevoAbandoned = () => {
               );
             })}
           </Card>
-        </div>
       </main>
     </>
   );

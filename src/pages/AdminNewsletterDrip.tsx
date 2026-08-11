@@ -91,11 +91,8 @@ export default function AdminNewsletterDrip() {
   }
 
   return (
-    <div className="container mx-auto max-w-5xl py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Mail className="w-6 h-6"/> Newsletter Drip · Test & Reenvío</h1>
-        <p className="text-sm text-muted-foreground">Envía correos de prueba a cualquier email o reenvía manualmente un paso a un suscriptor.</p>
-      </div>
+    <div className="space-y-6">
+
 
       <Card>
         <CardHeader><CardTitle>Enviar</CardTitle></CardHeader>

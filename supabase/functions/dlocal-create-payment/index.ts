@@ -213,7 +213,6 @@ Deno.serve(async (req) => {
         console.error("Failed to log dlocal error to audit table:", e);
       }
 
-      
       // Log critical failure to order_events for admin visibility
       await logOrderEvent({
         orderNumber: orderId,

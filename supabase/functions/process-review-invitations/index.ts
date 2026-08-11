@@ -165,7 +165,8 @@ Deno.serve(async (req) => {
           to: [invitation.customer_email],
           subject: subjects[emailNumber] || `⭐ ¿Qué te pareció ${invitation.product_name}?`,
           html: buildEmailHtml(invitation.customer_name, invitation.product_name, reviewUrl, emailNumber),
-        });
+          supabase: supabaseAdmin, // Enable global throttle
+        } as any);
 
         // Calculate next email time
         const nextDelay = getNextEmailDelay(emailNumber);

@@ -25,13 +25,12 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, note: 'No active config', stats }));
     }
 
-    // 2. Obtener contactos que compraron productos (usamos email_contacts con source=hotmart_purchase o similar)
-    // O directamente desde hotmart_purchases para mayor precisión en la fecha
+    // 2. Obtener contactos que compraron productos (usamos email_contacts con source=store_purchase)
     const { data: purchases, error: pErr } = await admin
-      .from('hotmart_purchases')
-      .select('email, purchased_at, product_id, product_code')
-      .eq('status', 'approved')
-      .order('purchased_at', { ascending: false })
+      .from('email_contacts')
+      .select('email, created_at, product_type')
+      .eq('source', 'store_purchase')
+      .order('created_at', { ascending: false })
       .limit(BATCH_LIMIT);
 
     if (pErr) throw pErr;
@@ -39,12 +38,12 @@ Deno.serve(async (req) => {
     for (const p of purchases || []) {
       stats.processed++;
       const email = p.email.toLowerCase().trim();
-      const purchasedAt = new Date(p.purchased_at).getTime();
+      const purchasedAt = new Date(p.created_at).getTime();
       const daysSince = Math.floor((Date.now() - purchasedAt) / 86400000);
 
       // 3. Inferir categoría (basado en brevoCategory.ts logic)
       let category = 'otro';
-      const haystack = `${p.product_id} ${p.product_code}`.toLowerCase();
+      const haystack = `${p.product_type}`.toLowerCase();
       if (haystack.includes('verbo') || haystack.includes('1000')) category = '1000_verbos';
       else if (haystack.includes('5000')) category = '5000_palabras';
       else if (haystack.includes('coreano')) category = 'coreano_mapas';

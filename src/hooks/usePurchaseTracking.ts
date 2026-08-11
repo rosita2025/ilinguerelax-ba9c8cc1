@@ -8,11 +8,11 @@ import { trackHotmartEvent } from "@/hooks/useMetaPixel";
  * Hook para disparar el evento de Purchase (éxito) normalizado a USD.
  */
 export const usePurchaseTracking = () => {
-  const { region } = useRegionTier();
+  const regionInfo = useRegionTier();
   
   const trackPurchase = (orderId: string, methodLabel: string = "iLingue Store") => {
     const s = useCheckoutPruebaStore.getState();
-    const totals = calcTotals(s.items, s.couponPercent, region.tier);
+    const totals = calcTotals(s.items, s.couponPercent, regionInfo.tier);
     
     // Purchase: siempre reportamos en USD para Ads (Facebook/Instagram/Google)
     // trackHotmartEvent ya maneja la conversión interna si le pasamos la moneda local,

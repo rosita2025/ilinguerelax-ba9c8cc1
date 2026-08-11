@@ -138,7 +138,7 @@ const BlogScheduleCard = () => {
     if (!adminKey) return;
     setLoading(true);
     try {
-      const res = await call({ action: "list" });
+      const res = await call({ action: "list", limit: 30 });
       setItems((res.items as QueueItem[]) ?? []);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");

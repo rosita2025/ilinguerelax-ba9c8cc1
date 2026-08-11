@@ -209,9 +209,9 @@ Deno.serve(async (req) => {
     if (!provider || provider === "hotmart") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, event_data, email, product_id, value, currency")
+        .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
         .or("event_name.eq.Purchase,event_name.eq.purchase,event_name.eq.InitiateCheckout")
-        .contains("event_data", { provider: "hotmart" } as any)
+        .or("event_data->>provider.eq.hotmart,referrer.eq.hotmart-webhook")
         .order("created_at", { ascending: false })
         .limit(take);
 

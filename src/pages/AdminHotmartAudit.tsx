@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Search, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Clock, XCircle, RotateCcw, AlertOctagon, Ban, Send } from "lucide-react";
+import { RefreshCw, Search, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Clock, XCircle, RotateCcw, AlertOctagon, Ban, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 type MappedStatus = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "abandoned" | "unknown";
@@ -178,6 +178,7 @@ const AdminHotmartAudit = () => {
   const [status, setStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
 
   type BrevoLookup = { loading: boolean; data?: any; error?: string };
   const [brevoLookups, setBrevoLookups] = useState<Record<string, BrevoLookup>>({});
@@ -236,6 +237,26 @@ const AdminHotmartAudit = () => {
     } finally { setSyncing(false); }
   }, [adminKey, status, search]);
 
+  const clearAll = useCallback(async () => {
+    if (!window.confirm("¿Estás seguro de que quieres borrar TODA la auditoría de Hotmart (compras y abandonos)? Esta acción no se puede deshacer.")) {
+      return;
+    }
+    setClearing(true);
+    try {
+      const { error } = await adminInvoke(
+        "clear-hotmart-audit",
+        { body: { adminKey, action: "clear_all" } }
+      );
+      if (error) throw error;
+      toast.success("Auditoría limpiada");
+      void load();
+    } catch (e) {
+      toast.error("Error al limpiar", { description: (e as Error).message });
+    } finally {
+      setClearing(false);
+    }
+  }, [adminKey, load]);
+
   useEffect(() => { void load(); }, [load]);
 
   // Auto-refresh cada 30s para reflejar nuevos eventos y sincronizar contactos a Brevo
@@ -268,7 +289,11 @@ const AdminHotmartAudit = () => {
                 Cada evento recibido de Hotmart (compra, pendiente, rechazo, reembolso, chargeback, cancelación, carrito abandonado) con el evento original, el estado mapeado y la hora exacta.
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => void clearAll()} disabled={clearing || loading} variant="destructive" size="sm">
+                <Trash2 className="w-4 h-4 mr-2" />
+                {clearing ? "Borrando…" : "Borrar Todo"}
+              </Button>
               <Button onClick={() => void forceBrevoSync()} disabled={syncing || loading} size="sm">
                 <Send className={`w-4 h-4 mr-2 ${syncing ? "animate-pulse" : ""}`} />
                 {syncing ? "Sincronizando…" : "Sincronizar Brevo"}

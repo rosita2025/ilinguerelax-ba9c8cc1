@@ -2267,6 +2267,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       source: "checkout-prueba-1",
                       metadata: { phone: buyer.phone ?? "", processor: "paypal", orderId },
                     }, { onConflict: "email,source" }).then(() => {});
+                    trackPurchase(orderId, "paypal");
                     navigate(`/checkouts/success?paypal_order=${encodeURIComponent(orderId)}`);
                   }}
                   onError={(err) => {

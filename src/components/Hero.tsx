@@ -82,7 +82,8 @@ export const Hero = () => {
         width={1920}
         height={1080}
         loading="eager"
-        fetchpriority="high"
+        // @ts-ignore - fetchPriority is supported but types are missing
+        fetchPriority="high"
         decoding="async"
         className="absolute inset-0 w-full h-full object-cover object-center"
       />

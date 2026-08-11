@@ -340,6 +340,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   );
   const localTotalAmount = localItemsSum.amount * (1 - (couponPercent || 0) / 100);
   
+  const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
+
   // Si el país tiene restricciones (AR/HN) o se elige un método global (Stripe, dLocal, PayPal, Binance),
   // forzamos el precio en USD para que coincida con el cobro real.
   const isGlobalGateway = selectedMethod && (
@@ -350,7 +352,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     selectedMethod === "binance"
   );
   
-  const showUsdOnly = isGlobalGateway && !["PE", "MX", "ES"].includes(countryCode);
+  const showUsdOnly = (isGlobalGateway && !["PE", "MX", "ES"].includes(countryCode)) || isFallingBackToUsd;
   
   const localFormatted = local.loading || local.isUsd || showUsdOnly 
     ? `USD $${totalUsd}` 
@@ -371,7 +373,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
-  const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
 
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);

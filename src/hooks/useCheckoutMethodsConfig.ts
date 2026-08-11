@@ -163,7 +163,8 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
           ?? regions.find((r) => r.code.toUpperCase() === "GLOBAL");
       }
       if (!region) {
-        if (alive) setState({ loaded: true, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER });
+        // Fallback robusto: si no hay región, Stripe siempre debe estar disponible para pagos internacionales.
+        if (alive) setState({ loaded: true, regionCode: "GLOBAL", enabledMethodKeys: ["stripe_card"], ...DEFAULT_ALL_OFF, stripe: true, familyOrder: DEFAULT_ORDER });
         return;
       }
       const enabledFamilies = { stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false };

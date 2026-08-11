@@ -398,6 +398,7 @@ const AdminSEO = () => {
           </div>
 
           <SitemapHealthCard />
+          <PinterestRSSCard />
 
           <div className="flex justify-end">
             <Button 

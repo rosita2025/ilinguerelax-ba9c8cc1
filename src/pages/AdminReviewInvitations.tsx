@@ -97,8 +97,8 @@ export default function AdminReviewInvitations() {
       </div>
 
       <Card className="overflow-hidden border-none shadow-none bg-transparent">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full text-xs min-w-[700px] sm:min-w-0">
             <thead className="bg-muted/50 border-b">
               <tr>
                 <th className="px-4 py-2 text-left font-semibold">Cliente</th>

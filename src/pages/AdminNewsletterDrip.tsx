@@ -157,8 +157,8 @@ export default function AdminNewsletterDrip() {
       <Card>
         <CardHeader className="py-3"><CardTitle className="text-sm">Últimos 50 envíos del drip</CardTitle></CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <table className="w-full text-sm min-w-[600px] sm:min-w-0">
               <thead>
                 <tr className="border-b text-left">
                   <th className="py-2 pr-3">Fecha</th>

@@ -46,7 +46,7 @@ interface PreviewPost {
 const STATUS_LABEL: Record<QueueItem["status"], { text: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { text: "Programado", variant: "outline" },
   processing: { text: "Generando…", variant: "secondary" },
-  done: { text: "Borrador listo", variant: "default" },
+  done: { text: "Publicado", variant: "default" },
   failed: { text: "Error", variant: "destructive" },
 };
 

@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
       const latest = items[0]?.created_at ?? new Date().toISOString();
       xml = [
         '<?xml version="1.0" encoding="UTF-8"?>',
-        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">',
         "  <channel>",
         "    <title>Blog iLingue Relax</title>",
         `    <link>${BASE_URL}/blog</link>`,
@@ -104,17 +104,23 @@ Deno.serve(async (req) => {
         "    <language>es</language>",
         `    <lastBuildDate>${new Date(latest).toUTCString()}</lastBuildDate>`,
         `    <atom:link href="${BASE_URL}/rss.xml" rel="self" type="application/rss+xml" />`,
-        ...items.map((r) =>
-          [
+        ...items.map((r) => {
+          const itemUrl = `${BASE_URL}/blog/${xmlEscape(r.slug)}`;
+          const imgUrl = r.image ? (r.image.startsWith("http") ? r.image : `${BASE_URL}${r.image}`) : "";
+          return [
             "    <item>",
             `      <title>${xmlEscape(r.title ?? r.slug)}</title>`,
-            `      <link>${BASE_URL}/blog/${xmlEscape(r.slug)}</link>`,
-            `      <guid isPermaLink="true">${BASE_URL}/blog/${xmlEscape(r.slug)}</guid>`,
+            `      <link>${itemUrl}</link>`,
+            `      <guid isPermaLink="true">${itemUrl}</guid>`,
             `      <pubDate>${new Date(r.created_at ?? latest).toUTCString()}</pubDate>`,
             `      <description>${xmlEscape(r.excerpt ?? "")}</description>`,
+            ...(imgUrl ? [
+              `      <enclosure url="${xmlEscape(imgUrl)}" type="image/jpeg" length="0" />`,
+              `      <media:content url="${xmlEscape(imgUrl)}" medium="image" />`
+            ] : []),
             "    </item>",
-          ].join("\n")
-        ),
+          ].join("\n");
+        }),
         "  </channel>",
         "</rss>",
       ].join("\n");

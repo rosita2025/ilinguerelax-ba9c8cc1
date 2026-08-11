@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -665,6 +665,8 @@ export default function Checkout() {
         </aside>
       </div>
 
+        </>
+      )}
     </div>
   );
 }

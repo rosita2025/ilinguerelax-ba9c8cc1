@@ -193,13 +193,12 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
   const apimartToken = Deno.env.get("APIMART_TOKEN");
   if (!apimartToken || !prompt) {
     console.warn("[BlogGen] APIMART_TOKEN no configurado o prompt vacío, saltando imagen.");
-    console.log(`[BlogGen] Prompt: "${prompt}", Token present: ${!!apimartToken}`);
+    console.log(`[BlogGen] Prompt length: ${prompt?.length}, Token exists: ${!!apimartToken}`);
     return null;
   }
 
   try {
     console.log(`[BlogGen] Generando imagen con APIMART para: ${slug}...`);
-    // Usamos el endpoint de gpt-image-2-ext en APIMART para mayor disponibilidad
     const res = await fetch("https://api.apimart.ai/v1/images/generations", {
       method: "POST",
       headers: {

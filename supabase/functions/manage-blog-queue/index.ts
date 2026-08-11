@@ -33,24 +33,32 @@ const KEYWORDS: Array<{ kw: string; lang: string; category: string }> = [
   { kw: "pronunciación coreana paso a paso", lang: "es", category: "Coreano" },
   { kw: "mejores aplicaciones para aprender coreano", lang: "es", category: "Coreano" },
   { kw: "frases comunes en coreano para viajar", lang: "es", category: "Coreano" },
+  { kw: "gramática coreana para principiantes", lang: "es", category: "Coreano" },
+  { kw: "coreano para hispanohablantes", lang: "es", category: "Coreano" },
+  { kw: "cómo escribir en coreano Hangul", lang: "es", category: "Coreano" },
   { kw: "easiest way to learn spanish fast", lang: "en", category: "Spanish" },
   { kw: "how to learn spanish effectively", lang: "en", category: "Spanish" },
   { kw: "best resources to learn spanish 2026", lang: "en", category: "Spanish" },
   { kw: "spanish pronunciation guide for beginners", lang: "en", category: "Spanish" },
   { kw: "learn spanish vocabulary quickly", lang: "en", category: "Spanish" },
+  { kw: "spanish for travelers complete guide", lang: "en", category: "Spanish" },
+  { kw: "mastering spanish verbs and tenses", lang: "en", category: "Spanish" },
   { kw: "aprender inglés para el trabajo", lang: "es", category: "Inglés" },
   { kw: "verbos más usados en inglés", lang: "es", category: "Inglés" },
   { kw: "cómo mejorar la pronunciación en inglés", lang: "es", category: "Inglés" },
   { kw: "diccionario de inglés con pronunciación", lang: "es", category: "Inglés" },
+  { kw: "inglés desde cero para adultos", lang: "es", category: "Inglés" },
+  { kw: "vocabulario de negocios en inglés", lang: "es", category: "Inglés" },
   { kw: "ilingue relax opiniones y beneficios", lang: "es", category: "Marca" },
   { kw: "métodos para aprender idiomas rápido", lang: "es", category: "General" },
   { kw: "ventajas de ser bilingüe en 2026", lang: "es", category: "General" },
   { kw: "aprender francés básico", lang: "es", category: "Francés" },
   { kw: "gramática francesa para hispanohablantes", lang: "es", category: "Francés" },
   { kw: "consejos para aprender portugués", lang: "es", category: "Portugués" },
+  { kw: "portugués brasileño para turistas", lang: "es", category: "Portugués" },
 ];
 
-/** Ángulos editoriales para que 50 artículos no se repitan entre sí. */
+/** Ángulos editoriales para que 300 artículos no se repitan entre sí. */
 const ANGLES: Record<string, string[]> = {
   es: [
     "Guía completa 2026: {kw} paso a paso desde cero",
@@ -58,6 +66,11 @@ const ANGLES: Record<string, string[]> = {
     "Errores más comunes al {kw} y cómo evitarlos",
     "{kw} con pronunciación: técnicas que sí funcionan",
     "Plan de estudio semanal para {kw} trabajando o estudiando",
+    "Los mejores consejos de expertos para {kw} este año",
+    "¿Por qué es tan importante {kw} en el mundo actual?",
+    "Cómo dominar {kw} sin gastar una fortuna",
+    "Secretos para {kw} y sonar como un nativo",
+    "La psicología detrás de {kw}: mantén la motivación",
   ],
   en: [
     "{kw}: the complete step-by-step 2026 guide",
@@ -65,6 +78,11 @@ const ANGLES: Record<string, string[]> = {
     "Common mistakes when trying {kw} (and how to fix them)",
     "{kw} with pronunciation: proven techniques for real conversations",
     "A weekly study plan for {kw} when you have a full-time job",
+    "Top expert tips for {kw} this year",
+    "Why {kw} is more important than ever in 2026",
+    "Mastering {kw} on a budget: what really works",
+    "Secrets to {kw} and sounding like a native speaker",
+    "The psychology of {kw}: how to stay motivated and consistent",
   ],
 };
 

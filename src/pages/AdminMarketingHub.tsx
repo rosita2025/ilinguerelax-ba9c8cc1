@@ -173,7 +173,7 @@ export default function AdminMarketingHub() {
               <ShieldCheck className="w-5 h-5 text-emerald-600" /> Checklist de Seguridad y Anti-Duplicados
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
+          <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <div className="flex gap-3">
               <Clock className="w-5 h-5 text-emerald-600 shrink-0" />
               <div>

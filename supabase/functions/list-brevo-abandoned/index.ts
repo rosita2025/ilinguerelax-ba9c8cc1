@@ -25,10 +25,7 @@ Deno.serve(async (req) => {
 
     const take = Math.min(Math.max(Number(limit) || 200, 1), 500);
     const s = typeof search === "string" ? search.trim().toLowerCase() : "";
-    const eventFilter =
-      origin === "hotmart" ? ["hotmart_abandoned"] :
-      origin === "tienda"  ? ["tienda_abandoned"] :
-      ["hotmart_abandoned", "tienda_abandoned"];
+    const eventFilter = ["tienda_abandoned"];
 
     let q = admin
       .from("brevo_sync_logs")
@@ -41,38 +38,30 @@ Deno.serve(async (req) => {
     const { data: logs, error } = await q;
     if (error) throw error;
 
-    // Enrich with the matching abandoned_carts row (payload capturado desde la tienda / Hotmart)
+    // Enrich with the matching contact data if available
     const emails = Array.from(new Set((logs ?? []).map((l: any) => (l.email ?? "").toLowerCase()).filter(Boolean)));
     const cartsByEmail = new Map<string, any[]>();
     if (emails.length > 0) {
-      const { data: carts } = await admin
-        .from("abandoned_carts")
-        .select("id, customer_email, customer_name, customer_phone, product_type, language, country, is_completed, converted, created_at, updated_at, metadata")
-        .in("customer_email", emails)
-        .order("created_at", { ascending: false })
-        .limit(1000);
-      for (const c of carts ?? []) {
-        const k = String(c.customer_email || "").toLowerCase();
-        const arr = cartsByEmail.get(k) ?? [];
-        arr.push(c);
-        cartsByEmail.set(k, arr);
+      const { data: contacts } = await admin
+        .from("email_contacts")
+        .select("email, name, metadata")
+        .in("email", emails);
+      for (const c of contacts ?? []) {
+        const k = String(c.email || "").toLowerCase();
+        cartsByEmail.set(k, [c]);
       }
     }
 
     const rows = (logs ?? []).map((l: any) => {
       const key = String(l.email || "").toLowerCase();
       const list = cartsByEmail.get(key) ?? [];
-      // Prefer the abandoned cart closest in time to the log
-      const logTs = new Date(l.created_at).getTime();
-      const cart = list.slice().sort((a, b) =>
-        Math.abs(new Date(a.created_at).getTime() - logTs) - Math.abs(new Date(b.created_at).getTime() - logTs)
-      )[0] ?? null;
+      const cart = list[0] ?? null;
       const attrs = (l.attributes ?? {}) as Record<string, any>;
       return {
         id: l.id,
         created_at: l.created_at,
         event_type: l.event_type,
-        origin: l.origin || (l.event_type === "hotmart_abandoned" ? "hotmart" : "tienda"),
+        origin: l.origin || "tienda",
         source: l.source ?? null,
         email: l.email,
         product_name: l.product_name,
@@ -87,8 +76,6 @@ Deno.serve(async (req) => {
           ORIGEN: attrs.ORIGEN ?? null,
           SEGMENTO: attrs.SEGMENTO ?? null,
           TAGS: attrs.TAGS ?? null,
-          HOTMART_PRODUCT_ID: attrs.HOTMART_PRODUCT_ID ?? null,
-          HOTMART_PRODUCT_CODE: attrs.HOTMART_PRODUCT_CODE ?? null,
           TIENDA_SKU: attrs.TIENDA_SKU ?? null,
           COUNTRY_CODE: attrs.COUNTRY_CODE ?? attrs.PAIS_CODE ?? null,
           COUNTRY_STATUS: attrs.COUNTRY_STATUS ?? null,
@@ -100,7 +87,6 @@ Deno.serve(async (req) => {
 
     const summary = {
       total: rows.length,
-      hotmart: rows.filter((r) => r.origin === "hotmart").length,
       tienda: rows.filter((r) => r.origin === "tienda").length,
       errors: rows.filter((r) => r.status && r.status !== "ok" && r.status !== "success").length,
     };

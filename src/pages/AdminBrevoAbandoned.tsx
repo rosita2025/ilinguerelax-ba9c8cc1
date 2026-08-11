@@ -104,28 +104,30 @@ const AdminBrevoAbandoned = () => {
   return (
     <>
       <main className="space-y-6">
-
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Total</div><div className="text-2xl font-bold">{summary.total}</div></Card>
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Hotmart</div><div className="text-2xl font-bold text-orange-600">{summary.hotmart}</div></Card>
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Tienda</div><div className="text-2xl font-bold text-teal-600">{summary.tienda}</div></Card>
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Errores</div><div className="text-2xl font-bold text-red-600">{summary.errors}</div></Card>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex gap-1">
+            {(["all", "hotmart", "tienda"] as const).map((o) => (
+              <Button key={o} variant={origin === o ? "default" : "outline"} size="sm" onClick={() => setOrigin(o)}>
+                {o === "all" ? "Todos" : o === "hotmart" ? "Hotmart" : "Tienda"}
+              </Button>
+            ))}
           </div>
+          <div className="flex-1 min-w-[200px] relative">
+            <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input className="pl-8" placeholder="Buscar por email, SKU o producto…" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void load(); }} />
+          </div>
+          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
 
-          <Card className="p-4 flex flex-wrap items-center gap-2">
-            <div className="flex gap-1">
-              {(["all", "hotmart", "tienda"] as const).map((o) => (
-                <Button key={o} variant={origin === o ? "default" : "outline"} size="sm" onClick={() => setOrigin(o)}>
-                  {o === "all" ? "Todos" : o === "hotmart" ? "Hotmart" : "Tienda"}
-                </Button>
-              ))}
-            </div>
-            <div className="flex-1 min-w-[200px] relative">
-              <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-8" placeholder="Buscar por email, SKU o producto…" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void load(); }} />
-            </div>
-          </Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Total</div><div className="text-xl font-bold">{summary.total}</div></Card>
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Hotmart</div><div className="text-xl font-bold text-orange-600">{summary.hotmart}</div></Card>
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Tienda</div><div className="text-xl font-bold text-teal-600">{summary.tienda}</div></Card>
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Errores</div><div className="text-xl font-bold text-red-600">{summary.errors}</div></Card>
+        </div>
+
 
           <Card className="divide-y">
             {rows.length === 0 && !loading && (

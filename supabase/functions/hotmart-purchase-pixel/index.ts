@@ -284,6 +284,17 @@ serve(async (req) => {
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       );
+      const meta = {
+        provider: "hotmart",
+        event_type: event || "purchase",
+        status: "approved",
+        transaction: transactionCode,
+        email: buyerEmail,
+        name: buyerName,
+        product_name: productName,
+        hottok: receivedToken,
+      };
+
       await supabase.from("funnel_events").insert({
         event_name: "Purchase",
         product_id: product.id,
@@ -292,7 +303,8 @@ serve(async (req) => {
         session_id: transactionCode,
         page_path: "/hotmart-success",
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
-        referrer: "hotmart-webhook",
+        referrer: JSON.stringify(meta).slice(0, 2000),
+        event_data: meta
       });
     } catch (trackingError) {
       console.error("funnel purchase tracking error:", trackingError);

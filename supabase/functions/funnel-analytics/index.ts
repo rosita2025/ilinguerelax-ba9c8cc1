@@ -130,17 +130,22 @@ serve(async (req) => {
       (r) => !isExcludedPath(r.page_path) && (includeBots || r.is_bot !== true),
     );
 
-    // Fetch abandoned carts within window (columnas reales de la tabla)
-    const { data: abandoned, error: abandonedErr } = await supabase
-      .from("abandoned_carts")
-      .select("id, created_at, converted, is_completed, customer_email, product_type")
+    // Fetch abandoned carts from persistent_carts
+    const { data: abandonedRaw, error: abandonedErr } = await supabase
+      .from("persistent_carts")
+      .select("id, created_at, converted, is_completed, customer_email, items_summary")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
-    if (abandonedErr) console.error("abandoned_carts query failed", abandonedErr);
+    if (abandonedErr) console.error("persistent_carts query failed", abandonedErr);
 
-    // Correos que ya habían abandonado antes del rango → clientes recurrentes.
+    const abandoned = (abandonedRaw || []).map(r => ({
+      ...r,
+      product_type: r.items_summary || "digital"
+    }));
+
+    // Correos que ya habían abandonado antes del rango
     const { data: priorAbandoned } = await supabase
-      .from("abandoned_carts")
+      .from("persistent_carts")
       .select("customer_email")
       .lt("created_at", fromDate.toISOString());
     const priorEmails = new Set(
@@ -385,13 +390,9 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
-      supabase
-        .from("hotmart_purchases")
-        .select("product_id, purchased_at, updated_at, raw_payload, status, email, transaction_code")
-        .in("status", ["approved", "pending"])
-        .gte("purchased_at", fromDate.toISOString())
-        .lte("purchased_at", toDate.toISOString()),
+    // Note: hotmart_purchases table was dropped. Purchases are now unified in funnel_events
+    // with provider: 'hotmart' and referrer/event_data containing the webhook payload.
+    const [manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("manual_payments")
         .select("order_number, items, amount_usd, amount_local, currency_local, buyer_country, buyer_email, created_at, updated_at, status, verified_at, method")
@@ -537,71 +538,8 @@ serve(async (req) => {
       pendingByCurrencyAgg.set(cur, list);
     };
 
-    for (const h of (hotmartRes.data ?? []) as any[]) {
-      // Defensive: PURCHASE_COMPLETE es el fin del periodo de reembolso de una
-      // venta ya contada como PURCHASE_APPROVED. Nunca debe sumar como compra
-      // nueva. Ignorar aunque el webhook lo haya insertado por error.
-      const eventName = String(h.raw_payload?.event || h.raw_payload?.data?.event || "").toUpperCase();
-      if (eventName === "PURCHASE_COMPLETE") continue;
-      const txn = String(h.transaction_code ?? h.raw_payload?.data?.purchase?.transaction ?? h.raw_payload?.transaction ?? "");
-      if (/test|sandbox/i.test(txn)) continue;
-      const buyerEmail = String(h.email ?? h.raw_payload?.data?.buyer?.email ?? h.raw_payload?.data?.purchase?.buyer?.email ?? "").toLowerCase();
-      if (/test|example\.com|postman|hotmart\.com\.br/.test(buyerEmail)) continue;
-      const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
-      if (!rawPid || rawPid === "0") continue;
-      const purchase = h.raw_payload?.data?.purchase ?? {};
-      const price = purchase.price ?? {};
-      const currency = String(price.currency_code || price.currency_value || "USD").toUpperCase();
-      const amount = Number(price.value || 0);
-
-      // SOLO commissions[PRODUCER, USD]. Sin offer, sin price, sin FX.
-      let usdAmount = 0;
-      const usdCurrency = "USD";
-      const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
-      const producerComm = commissions.find((c: any) =>
-        String(c?.source || "").toUpperCase() === "PRODUCER" &&
-        String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
-      );
-      if (producerComm && Number(producerComm.value) > 0) {
-        usdAmount = Number(producerComm.value);
-      }
-
-
-
-
-
-      const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
-        || h.raw_payload?.data?.buyer?.address?.country
-        || "??";
-      const isPending = h.status === "pending";
-      if (isPending) {
-        hotmartPendingCount++;
-        if (usdAmount > 0) addPending(usdCurrency, "hotmart", usdAmount);
-        pendingDetails.push({
-          orderNumber: txn || String(h.transaction_code || "-"),
-          provider: "hotmart",
-          source: "hotmart",
-          status: String(h.status || "pending"),
-          email: buyerEmail,
-          country: String(buyerCountry || "??"),
-          product: String(h.raw_payload?.data?.product?.name || rawPid),
-          amount: amount || usdAmount,
-          currency,
-          amountUsd: usdAmount,
-          createdAt: h.purchased_at,
-          lastCheckAt: h.updated_at ?? null,
-        });
-      }
-      realPurchases.push({
-        at: h.purchased_at,
-        productId: rawPid,
-        country: buyerCountry,
-        usd: isPending ? 0 : usdAmount,
-        source: "hotmart",
-        pending: isPending,
-        provider: "hotmart",
-      });
-    }
+    // Hotmart purchases are now handled via gatewayEvents block below
+    // as they are stored in funnel_events by hotmart-purchase-pixel.
     for (const m of (manualRes.data ?? []) as any[]) {
       const items = Array.isArray(m.items) ? m.items : [];
       const first = items[0] || {};
@@ -662,12 +600,12 @@ serve(async (req) => {
     // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
     const GATEWAY_PROVIDERS = [
       "stripe", "paypal", "mercadopago", "mercado_pago", "mp",
-      "dlocal", "dlocalgo", "dlocal_go",
+      "dlocal", "dlocalgo", "dlocal_go", "hotmart",
     ];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
-      try { m = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
-      const p = String(m.provider || ev.provider || "").toLowerCase();
+      try { m = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
+      const p = String(m.provider || ev.provider || (ev.referrer === "hotmart-webhook" ? "hotmart" : "")).toLowerCase();
       if (GATEWAY_PROVIDERS.includes(p)) gatewayEvents.push(ev);
       else pixelEvents.push(ev);
     }
@@ -676,10 +614,13 @@ serve(async (req) => {
     for (const ev of gatewayEvents) {
 
       let meta: any = {};
-      try { meta = ev.referrer ? JSON.parse(ev.referrer) : {}; } catch { meta = {}; }
-      const provider = String(meta.provider || ev.provider || "").toLowerCase();
-
-      const txn = String(meta.external_reference || meta.payment_id || ev.session_id || ev.id);
+      try { 
+        meta = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : (ev.event_data || {}); 
+      } catch { meta = ev.event_data || {}; }
+      
+      const provider = String(meta.provider || ev.provider || (ev.referrer === "hotmart-webhook" ? "hotmart" : "")).toLowerCase();
+      
+      const txn = String(meta.external_reference || meta.payment_id || meta.transaction || meta.transaction_code || ev.session_id || ev.id);
       if (/test|sandbox|prueba/i.test(txn)) continue;
       const dedupeKey = `${provider}:${txn}`;
       if (seenGatewayKeys.has(dedupeKey)) continue;
@@ -688,20 +629,20 @@ serve(async (req) => {
       const rawAmount = Number(ev.value || 0);
       const usdAmount = currency === "USD" ? rawAmount : toUsd(rawAmount, currency);
       const status = String(meta.status || "approved").toLowerCase();
-      const isPending = !APPROVED_STORE.has(status) && status !== "approved";
+      const isPending = !APPROVED_STORE.has(status) && status !== "approved" && status !== "complete" && status !== "completed";
       const pid = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "store");
       if (!pid || pid === "0") continue;
       if (isPending && usdAmount > 0) {
-        storePendingCount++;
-        addPending(currency, "store", rawAmount);
+        if (provider === "hotmart") hotmartPendingCount++; else storePendingCount++;
+        addPending(currency, provider === "hotmart" ? "hotmart" : "store", rawAmount);
         pendingDetails.push({
-          orderNumber: String(meta.order_number || meta.external_reference || txn || "-"),
+          orderNumber: String(meta.order_number || meta.external_reference || meta.transaction || meta.transactionCode || txn || "-"),
           provider,
-          source: "store",
+          source: provider === "hotmart" ? "hotmart" : "store",
           status,
-          email: String(meta.email || meta.customer_email || ""),
-          country: String(ev.country || "??"),
-          product: String(meta.product_name || pid),
+          email: String(meta.email || meta.customer_email || meta.buyer_email || ev.email || ""),
+          country: String(ev.country || meta.country || "??"),
+          product: String(meta.product_name || meta.name || ev.product_id || pid),
           amount: rawAmount,
           currency,
           amountUsd: usdAmount,
@@ -714,7 +655,7 @@ serve(async (req) => {
         productId: pid,
         country: ev.country || "??",
         usd: isPending ? 0 : usdAmount,
-        source: "store",
+        source: provider === "hotmart" ? "hotmart" : "store",
         pending: isPending,
         provider,
       });
@@ -763,7 +704,7 @@ serve(async (req) => {
     }
 
 
-    console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
+    console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 
 
     // Último intento de verificación por pedido (order_events registra cada

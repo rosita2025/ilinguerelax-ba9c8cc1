@@ -297,7 +297,7 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
       sources: {
         store: {
-          label: "Tienda propia (checkout interno)",
+          label: "Tienda (Interno + Hotmart)",
           total: toNumber((abandoned as any)?.sources?.store?.total),
           open: toNumber((abandoned as any)?.sources?.store?.open),
           recovered: toNumber((abandoned as any)?.sources?.store?.recovered),

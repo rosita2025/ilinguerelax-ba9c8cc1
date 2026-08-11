@@ -390,13 +390,9 @@ serve(async (req) => {
     }
 
     // ---------- REAL purchases (USD only for revenue) ----------
-    const [hotmartRes, manualRes, digitalRes, storeGatewayRes] = await Promise.all([
-      supabase
-        .from("hotmart_purchases")
-        .select("product_id, purchased_at, updated_at, raw_payload, status, email, transaction_code")
-        .in("status", ["approved", "pending"])
-        .gte("purchased_at", fromDate.toISOString())
-        .lte("purchased_at", toDate.toISOString()),
+    // Note: hotmart_purchases table was dropped. Purchases are now unified in funnel_events
+    // with provider: 'hotmart' and referrer/event_data containing the webhook payload.
+    const [manualRes, digitalRes, storeGatewayRes] = await Promise.all([
       supabase
         .from("manual_payments")
         .select("order_number, items, amount_usd, amount_local, currency_local, buyer_country, buyer_email, created_at, updated_at, status, verified_at, method")
@@ -542,71 +538,8 @@ serve(async (req) => {
       pendingByCurrencyAgg.set(cur, list);
     };
 
-    for (const h of (hotmartRes.data ?? []) as any[]) {
-      // Defensive: PURCHASE_COMPLETE es el fin del periodo de reembolso de una
-      // venta ya contada como PURCHASE_APPROVED. Nunca debe sumar como compra
-      // nueva. Ignorar aunque el webhook lo haya insertado por error.
-      const eventName = String(h.raw_payload?.event || h.raw_payload?.data?.event || "").toUpperCase();
-      if (eventName === "PURCHASE_COMPLETE") continue;
-      const txn = String(h.transaction_code ?? h.raw_payload?.data?.purchase?.transaction ?? h.raw_payload?.transaction ?? "");
-      if (/test|sandbox/i.test(txn)) continue;
-      const buyerEmail = String(h.email ?? h.raw_payload?.data?.buyer?.email ?? h.raw_payload?.data?.purchase?.buyer?.email ?? "").toLowerCase();
-      if (/test|example\.com|postman|hotmart\.com\.br/.test(buyerEmail)) continue;
-      const rawPid = h.product_id || String(h.raw_payload?.data?.product?.id ?? "");
-      if (!rawPid || rawPid === "0") continue;
-      const purchase = h.raw_payload?.data?.purchase ?? {};
-      const price = purchase.price ?? {};
-      const currency = String(price.currency_code || price.currency_value || "USD").toUpperCase();
-      const amount = Number(price.value || 0);
-
-      // SOLO commissions[PRODUCER, USD]. Sin offer, sin price, sin FX.
-      let usdAmount = 0;
-      const usdCurrency = "USD";
-      const commissions = Array.isArray(purchase.commissions) ? purchase.commissions : [];
-      const producerComm = commissions.find((c: any) =>
-        String(c?.source || "").toUpperCase() === "PRODUCER" &&
-        String(c?.currency_value || c?.currency_code || "").toUpperCase() === "USD"
-      );
-      if (producerComm && Number(producerComm.value) > 0) {
-        usdAmount = Number(producerComm.value);
-      }
-
-
-
-
-
-      const buyerCountry = h.raw_payload?.data?.buyer?.address?.country_iso
-        || h.raw_payload?.data?.buyer?.address?.country
-        || "??";
-      const isPending = h.status === "pending";
-      if (isPending) {
-        hotmartPendingCount++;
-        if (usdAmount > 0) addPending(usdCurrency, "hotmart", usdAmount);
-        pendingDetails.push({
-          orderNumber: txn || String(h.transaction_code || "-"),
-          provider: "hotmart",
-          source: "hotmart",
-          status: String(h.status || "pending"),
-          email: buyerEmail,
-          country: String(buyerCountry || "??"),
-          product: String(h.raw_payload?.data?.product?.name || rawPid),
-          amount: amount || usdAmount,
-          currency,
-          amountUsd: usdAmount,
-          createdAt: h.purchased_at,
-          lastCheckAt: h.updated_at ?? null,
-        });
-      }
-      realPurchases.push({
-        at: h.purchased_at,
-        productId: rawPid,
-        country: buyerCountry,
-        usd: isPending ? 0 : usdAmount,
-        source: "hotmart",
-        pending: isPending,
-        provider: "hotmart",
-      });
-    }
+    // Hotmart purchases are now handled via gatewayEvents block below
+    // as they are stored in funnel_events by hotmart-purchase-pixel.
     for (const m of (manualRes.data ?? []) as any[]) {
       const items = Array.isArray(m.items) ? m.items : [];
       const first = items[0] || {};
@@ -667,7 +600,7 @@ serve(async (req) => {
     // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
     const GATEWAY_PROVIDERS = [
       "stripe", "paypal", "mercadopago", "mercado_pago", "mp",
-      "dlocal", "dlocalgo", "dlocal_go",
+      "dlocal", "dlocalgo", "dlocal_go", "hotmart",
     ];
     for (const ev of (storeGatewayRes.data ?? []) as any[]) {
       let m: any = {};
@@ -768,7 +701,7 @@ serve(async (req) => {
     }
 
 
-    console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "hotmartRows", (hotmartRes.data??[]).length, "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
+    console.log("[funnel-analytics] range", fromDate.toISOString(), "→", toDate.toISOString(), "manualRows", (manualRes.data??[]).length, "gatewayRows", (storeGatewayRes.data??[]).length, "realPurchases", realPurchases.length);
 
 
     // Último intento de verificación por pedido (order_events registra cada

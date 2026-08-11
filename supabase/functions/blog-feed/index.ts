@@ -23,6 +23,7 @@ interface Row {
   slug: string;
   title: string | null;
   excerpt: string | null;
+  image: string | null;
   created_at: string | null;
   updated_at: string | null;
 }

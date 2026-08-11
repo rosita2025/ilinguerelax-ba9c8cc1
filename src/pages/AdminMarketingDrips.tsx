@@ -50,13 +50,13 @@ export default function AdminMarketingDrips() {
 
   return (
     <div className="space-y-8">
-        <header className="flex justify-between items-center">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold">Marketing Post-Compra</h1>
-            <p className="text-xs text-muted-foreground">Automatización de lanzamientos y seguimiento a los 7, 15 y 25 días.</p>
+            <h1 className="text-lg sm:text-xl font-bold">Marketing Post-Compra</h1>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Automatización de lanzamientos a los 7, 15 y 25 días.</p>
           </div>
-          <Button onClick={loadData} disabled={loading} variant="outline" size="sm">
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+          <Button onClick={loadData} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
+            <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
           </Button>
         </header>
 
@@ -64,7 +64,7 @@ export default function AdminMarketingDrips() {
           <h2 className="text-sm font-semibold flex items-center gap-2">
             <Calendar className="w-4 h-4 text-primary" /> Secuencias Activas
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {configs.map((c, i) => (
               <Card key={i} className="p-4 flex flex-col justify-between">
                 <div>
@@ -90,8 +90,8 @@ export default function AdminMarketingDrips() {
             <Mail className="w-4 h-4 text-primary" /> Últimos Envíos Realizados
           </h2>
           <Card className="overflow-hidden border-none shadow-none">
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full text-xs min-w-[600px] sm:min-w-0">
                 <thead className="bg-muted/50 border-b">
                   <tr>
                     <th className="px-4 py-2 text-left">Comprador</th>

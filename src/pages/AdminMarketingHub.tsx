@@ -63,11 +63,11 @@ export default function AdminMarketingHub() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <AdminNav />
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Automatización de Email</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Marketing Hub</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Control centralizado de Newsletter, Post-Compra y Carritos Abandonados.
             </p>
           </div>
@@ -78,7 +78,7 @@ export default function AdminMarketingHub() {
 
         {/* Créditos y Estado del Plan */}
         {stats?.account && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             <Card className="bg-emerald-500/5 border-emerald-500/20">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function AdminMarketingHub() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
                   {stats.account.emailsLeft?.toLocaleString() ?? "—"}
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">Créditos disponibles para envío</p>
@@ -116,7 +116,7 @@ export default function AdminMarketingHub() {
         )}
 
         {/* Salud del Sistema y Resumen */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="bg-primary/5 border-primary/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
@@ -124,7 +124,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.today.total ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold">{stats?.today.total ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Correos automáticos entregados hoy</p>
             </CardContent>
           </Card>
@@ -136,7 +136,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">{stats?.today.abandoned ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-orange-600">{stats?.today.abandoned ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Recuperación de ventas activa</p>
             </CardContent>
           </Card>
@@ -148,7 +148,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-rose-600">{stats?.today.marketing ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-rose-600">{stats?.today.marketing ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Fidelización a compradores</p>
             </CardContent>
           </Card>
@@ -160,7 +160,7 @@ export default function AdminMarketingHub() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-sky-600">{stats?.today.newsletter ?? 0}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-sky-600">{stats?.today.newsletter ?? 0}</div>
               <p className="text-[10px] text-muted-foreground mt-1">Drip de bienvenida y contenido</p>
             </CardContent>
           </Card>
@@ -173,7 +173,7 @@ export default function AdminMarketingHub() {
               <ShieldCheck className="w-5 h-5 text-emerald-600" /> Checklist de Seguridad y Anti-Duplicados
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
+          <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <div className="flex gap-3">
               <Clock className="w-5 h-5 text-emerald-600 shrink-0" />
               <div>
@@ -199,48 +199,50 @@ export default function AdminMarketingHub() {
         </Card>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
-            <TabsTrigger 
-              value="overview" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Resumen
-            </TabsTrigger>
-            <TabsTrigger 
-              value="post-purchase" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Post-Compra
-            </TabsTrigger>
-            <TabsTrigger 
-              value="newsletter" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Newsletter
-            </TabsTrigger>
-            <TabsTrigger 
-              value="abandoned" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Abandonos
-            </TabsTrigger>
-            <TabsTrigger 
-              value="reviews" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold"
-            >
-              Reseñas
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+            <TabsList className="w-max sm:w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 flex-nowrap min-w-full">
+              <TabsTrigger 
+                value="overview" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Resumen
+              </TabsTrigger>
+              <TabsTrigger 
+                value="post-purchase" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Post-Compra
+              </TabsTrigger>
+              <TabsTrigger 
+                value="newsletter" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Newsletter
+              </TabsTrigger>
+              <TabsTrigger 
+                value="abandoned" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Abandonos
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reviews" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-2 h-auto font-semibold whitespace-nowrap"
+              >
+                Reseñas
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
+              <Card className="shadow-none border-muted/60 sm:shadow-sm">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                     <Info className="w-5 h-5 text-primary" /> ¿Cómo funciona el flujo?
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm text-muted-foreground">
+                <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4 text-sm text-muted-foreground">
                   <p>
                     El sistema detecta automáticamente en qué fase está el usuario y prioriza el mensaje más relevante:
                   </p>
@@ -256,13 +258,13 @@ export default function AdminMarketingHub() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Estado de Listas Brevo</CardTitle>
+              <Card className="shadow-none border-muted/60 sm:shadow-sm">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">Estado de Listas Brevo</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
                   <div className="flex justify-between items-center py-2 border-b">
-                    <span className="text-sm">Contactos Newsletter</span>
+                    <span className="text-xs sm:text-sm">Contactos Newsletter</span>
                     <Badge variant="secondary">Sincronizado</Badge>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b">
@@ -284,7 +286,7 @@ export default function AdminMarketingHub() {
                  <h3 className="font-semibold">Secuencias para Compradores</h3>
                  <p className="text-xs text-muted-foreground">Envíos automáticos tras la aprobación del pedido.</p>
                </div>
-               <div className="p-0 sm:p-2">
+               <div className="p-0 sm:p-4 overflow-hidden">
                  <AdminMarketingDrips />
                </div>
             </div>
@@ -296,7 +298,7 @@ export default function AdminMarketingHub() {
                  <h3 className="font-semibold">Drip de Newsletter</h3>
                  <p className="text-xs text-muted-foreground">Secuencia de bienvenida y valor para suscriptores.</p>
                </div>
-               <div className="p-0 sm:p-2">
+               <div className="p-0 sm:p-4 overflow-hidden">
                  <AdminNewsletterDrip />
                </div>
             </div>
@@ -308,7 +310,7 @@ export default function AdminMarketingHub() {
                  <h3 className="font-semibold">Log de Abandonos Brevo</h3>
                  <p className="text-xs text-muted-foreground">Payloads y estados de envío de carritos no finalizados.</p>
                </div>
-               <div className="p-0 sm:p-2">
+               <div className="p-0 sm:p-4 overflow-hidden">
                  <AdminBrevoAbandoned />
                </div>
             </div>

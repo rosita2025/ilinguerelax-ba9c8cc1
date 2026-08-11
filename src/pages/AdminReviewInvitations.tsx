@@ -51,17 +51,17 @@ export default function AdminReviewInvitations() {
 
   return (
     <div className="space-y-8">
-      <header className="flex justify-between items-center">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-bold">Invitaciones a Reseñas</h1>
-          <p className="text-xs text-muted-foreground">Seguimiento de recordatorios y cupones post-compra (Días 1, 15, 20, 27).</p>
+          <h1 className="text-lg sm:text-xl font-bold">Invitaciones a Reseñas</h1>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Seguimiento de recordatorios y cupones post-compra (Días 1, 15, 20, 27).</p>
         </div>
-        <Button onClick={loadData} disabled={loading} variant="outline" size="sm">
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+        <Button onClick={loadData} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
+          <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
         </Button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="bg-primary/5 border-primary/20">
           <CardHeader className="p-3 pb-0">
             <CardTitle className="text-[10px] uppercase text-muted-foreground">Pendientes</CardTitle>
@@ -97,8 +97,8 @@ export default function AdminReviewInvitations() {
       </div>
 
       <Card className="overflow-hidden border-none shadow-none bg-transparent">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full text-xs min-w-[700px] sm:min-w-0">
             <thead className="bg-muted/50 border-b">
               <tr>
                 <th className="px-4 py-2 text-left font-semibold">Cliente</th>

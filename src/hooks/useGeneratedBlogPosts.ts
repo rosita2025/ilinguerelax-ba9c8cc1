@@ -43,7 +43,6 @@ export function useGeneratedBlogPosts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
     (async () => {
       try {
         const { data, error } = await supabase
@@ -52,22 +51,22 @@ export function useGeneratedBlogPosts() {
           .eq("published", true)
           .order("created_at", { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching blog posts:", error);
+          if (!cancelled) setLoading(false);
+          return;
+        }
         
         if (!cancelled) {
           setPosts((data ?? []).map((r) => toBlogPost(r as Row)));
           setLoading(false);
         }
       } catch (err) {
-        console.error("Error fetching blog posts:", err);
-        if (!cancelled) {
-          setLoading(false);
-        }
+        console.error("useGeneratedBlogPosts catch error:", err);
+        if (!cancelled) setLoading(false);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   return { posts, loading };

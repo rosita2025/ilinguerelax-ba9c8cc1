@@ -24,10 +24,10 @@ const Blog = () => {
   const { posts: generatedPosts } = useGeneratedBlogPosts();
   const [activeCategory, setActiveCategory] = useState<string>("Todos");
 
-  const allPosts: BlogPost[] = useMemo(
-    () => [...generatedPosts, ...blogPosts],
-    [generatedPosts],
-  );
+  const allPosts: BlogPost[] = useMemo(() => {
+    const validGenerated = (generatedPosts || []).filter(p => !!p && !!p.slug);
+    return [...validGenerated, ...blogPosts];
+  }, [generatedPosts]);
 
   const featuredPost = blogPosts[0];
   const otherPosts = useMemo(() => {

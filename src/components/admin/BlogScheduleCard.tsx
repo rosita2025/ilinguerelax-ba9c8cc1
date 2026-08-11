@@ -261,9 +261,9 @@ const BlogScheduleCard = () => {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" onClick={() => run("seed", { startTomorrow: true }, "Agenda de 50 artículos creada")} disabled={busy === "seed"}>
+        <Button size="sm" onClick={() => run("seed", { startTomorrow: true }, "Agenda de 300 artículos creada")} disabled={busy === "seed"}>
           {busy === "seed" ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <CalendarClock className="h-4 w-4 mr-1" />}
-          Programar 50 (desde mañana)
+          Programar 300 (desde mañana)
         </Button>
         <Button size="sm" variant="outline" onClick={() => run("seed", { startTomorrow: false }, "Agenda creada desde hoy")} disabled={busy === "seed"}>
           Programar desde hoy

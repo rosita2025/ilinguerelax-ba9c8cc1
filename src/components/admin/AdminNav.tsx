@@ -66,7 +66,7 @@ const groups: Group[] = [
       { to: "/admin/manual-payments", label: "Pagos manuales", icon: Wallet },
       { to: "/admin/binance-config", label: "Binance Pay", icon: Wallet },
       { to: "/admin/dlocal", label: "dLocal Go · Cobertura", icon: Globe },
-      { to: "/admin/hotmart-audit", label: "Hotmart · Auditoría", icon: ShieldCheck },
+      
     ],
   },
   {

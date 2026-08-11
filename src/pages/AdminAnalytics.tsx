@@ -824,7 +824,7 @@ const AdminAnalytics = () => {
                   <h3 className="text-sm font-semibold">Carritos abandonados · 3 fuentes</h3>
                 </div>
                 <p className="text-[11px] text-muted-foreground mb-3">
-                  Consolida <strong>/admin/hotmart-audit</strong> (carritos abandonados de Hotmart), la tienda propia (checkout interno) y <strong>/admin/checkouts-abuse</strong> (visitantes del checkout, con o sin correo).
+                  Consolida la tienda propia (checkout interno) y <strong>/admin/checkout-abuse</strong> (visitantes del checkout, con o sin correo).
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[data.abandoned.sources.hotmart, data.abandoned.sources.store].map((s) => (

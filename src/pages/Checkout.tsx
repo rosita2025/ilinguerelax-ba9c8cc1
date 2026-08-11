@@ -500,6 +500,42 @@ export default function Checkout() {
 
 
 
+  if (slugUnknown) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-30">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+            <span
+              className="text-base sm:text-xl font-bold tracking-tight whitespace-nowrap"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              iLingue <span className="text-primary">Relax</span>
+            </span>
+          </div>
+        </header>
+        
+        <div className="flex-1 flex items-center justify-center p-4 text-center">
+          <Card className="max-w-md w-full p-8 space-y-6">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold">Producto no encontrado</h1>
+              <p className="text-muted-foreground">
+                El producto con el identificador <code className="bg-muted px-1 rounded">{slug}</code> no existe o no está disponible en este momento.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button asChild>
+                <Link to="/">Volver a la tienda</Link>
+              </Button>
+              <Button variant="ghost" onClick={() => window.location.reload()}>
+                Reintentar conexión
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden max-w-full">
       {loadingDb && !catalogItem && (

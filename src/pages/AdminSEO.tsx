@@ -340,25 +340,31 @@ const AdminSEO = () => {
   };
 
   useEffect(() => {
-    void loadGsc(days);
-    void loadSemrush();
-    void loadGenPosts();
+    const timer = setTimeout(() => {
+      void loadGsc(days);
+      void loadSemrush();
+      void loadGenPosts();
+    }, 100);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
 
   // Auto-verify indexing for posts without a fresh status (>24h old or never checked).
   useEffect(() => {
     if (genPosts.length === 0 || !adminKey) return;
-    const STALE_MS = 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    const stale = genPosts
-      .slice(0, 25)
-      .filter((p) => {
-        const s = indexStatus[p.slug];
-        return !s || (now - s.checkedAt) > STALE_MS;
-      })
-      .map((p) => p.slug);
-    if (stale.length > 0) void checkIndexing(stale);
+    const timer = setTimeout(() => {
+      const STALE_MS = 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      const stale = genPosts
+        .slice(0, 5) // Reduced from 25 to 5 to avoid initial load spike
+        .filter((p) => {
+          const s = indexStatus[p.slug];
+          return !s || (now - s.checkedAt) > STALE_MS;
+        })
+        .map((p) => p.slug);
+      if (stale.length > 0) void checkIndexing(stale);
+    }, 2000); // Wait 2s after posts load before checking indexing
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [genPosts, adminKey]);
 

@@ -308,6 +308,8 @@ const App = () => (
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />
                   <Route path="/admin/lanzamientos" element={<AdminGate><AdminLaunches /></AdminGate>} />
                   <Route path="/admin/audiencias" element={<AdminGate><AdminAudiences /></AdminGate>} />
+                  <Route path="/admin/marketing-drips" element={<AdminGate><AdminMarketingDrips /></AdminGate>} />
+
                   
                   <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />
                   <Route path="/admin/bot-report" element={<AdminGate><AdminBotReport /></AdminGate>} />

@@ -726,18 +726,18 @@ const ProductPatronesEspeciales = () => {
       <Footer />
 
       <StickyBuyBar
+        sku={ADMIN_SKU}
         price={priceLabel}
         originalPrice={originalLabel}
         currencyCode={displayCurrency}
-        flag={isPeru ? "🇵🇪" : undefined}
-        productName="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
+        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+        productName={pricingAdmin.name ?? "Patrones Especiales en Inglés"}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
-        buyUrl={TIENDA_CHECKOUT_PATH}
-        onBuyClick={handleBuy}
+        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
+        onBuyClick={useTiendaOnly ? handleBuy : undefined}
         ctaText={"Comprar ahora"}
-
       />
 
       <div className="h-20 md:h-16" />

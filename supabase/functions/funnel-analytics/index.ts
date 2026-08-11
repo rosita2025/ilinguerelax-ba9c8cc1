@@ -130,17 +130,22 @@ serve(async (req) => {
       (r) => !isExcludedPath(r.page_path) && (includeBots || r.is_bot !== true),
     );
 
-    // Fetch abandoned carts within window (columnas reales de la tabla)
-    const { data: abandoned, error: abandonedErr } = await supabase
-      .from("abandoned_carts")
-      .select("id, created_at, converted, is_completed, customer_email, product_type")
+    // Fetch abandoned carts from persistent_carts
+    const { data: abandonedRaw, error: abandonedErr } = await supabase
+      .from("persistent_carts")
+      .select("id, created_at, converted, is_completed, customer_email, items_summary")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
-    if (abandonedErr) console.error("abandoned_carts query failed", abandonedErr);
+    if (abandonedErr) console.error("persistent_carts query failed", abandonedErr);
 
-    // Correos que ya habían abandonado antes del rango → clientes recurrentes.
+    const abandoned = (abandonedRaw || []).map(r => ({
+      ...r,
+      product_type: r.items_summary || "digital"
+    }));
+
+    // Correos que ya habían abandonado antes del rango
     const { data: priorAbandoned } = await supabase
-      .from("abandoned_carts")
+      .from("persistent_carts")
       .select("customer_email")
       .lt("created_at", fromDate.toISOString());
     const priorEmails = new Set(

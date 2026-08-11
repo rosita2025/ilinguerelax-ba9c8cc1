@@ -351,13 +351,8 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
   }
   const raw = aiJson.choices?.[0]?.message?.content || "{}";
 
-  let parsed: GenPayload = {};
-  try {
-    parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-  } catch {
-    const cleaned = String(raw).replace(/```json\s*|```/g, "").trim();
-    parsed = JSON.parse(cleaned);
-  }
+  const parsed: GenPayload = typeof raw === "string" ? parseModelJson(raw) : (raw as GenPayload);
+
 
   if (!parsed.title || !parsed.content) throw new BlogGenError("Respuesta IA inválida", 502);
 

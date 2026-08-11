@@ -17,16 +17,28 @@ Deno.serve(async (req) => {
     today.setHours(0, 0, 0, 0);
     const todayIso = today.toISOString();
 
-    const [newsletter, marketing, abandoned] = await Promise.all([
+    const [newsletter, marketing, abandoned, accountRes] = await Promise.all([
       supabase.from('newsletter_drip_sends').select('id', { count: 'exact' }).gte('sent_at', todayIso).eq('status', 'sent'),
       supabase.from('marketing_drip_sends').select('id', { count: 'exact' }).gte('sent_at', todayIso).eq('status', 'sent'),
-      supabase.from('brevo_abandoned_logs').select('id', { count: 'exact' }).gte('created_at', todayIso).or('status.eq.ok,status.eq.success'),
+      supabase.from('brevo_sync_logs').select('id', { count: 'exact' }).gte('created_at', todayIso).or('status.eq.ok,status.eq.success'),
+      brevoGet('/account'),
     ]);
 
-    const [totalNewsletter, totalMarketing] = await Promise.all([
-      supabase.from('newsletter_drip_sends').select('id', { count: 'exact' }).eq('status', 'sent'),
-      supabase.from('marketing_drip_sends').select('id', { count: 'exact' }).eq('status', 'sent'),
-    ]);
+    // Extract plan info
+    if (accountRes) {
+      const plans = accountRes.plan ?? [];
+      for (const p of plans) {
+        if (p.type && String(p.type).toLowerCase().includes("sms")) continue;
+        if (typeof p.credits === "number") {
+          stats.account = {
+            emailsLeft: p.credits,
+            planType: p.type ?? null,
+            planEndDate: p.endDate ?? null,
+          };
+          break;
+        }
+      }
+    }
 
     return new Response(JSON.stringify({
       today: {

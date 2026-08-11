@@ -1,15 +1,19 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { adminCorsHeaders, assertAdminCsrf, adminLog } from "../_shared/adminCsrf.ts";
 
 const JSON_HEADERS = { ...adminCorsHeaders, "Content-Type": "application/json" };
 
 function admin() {
-  return createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) throw new Error("Missing Supabase configuration");
+  return createClient(url, key);
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: adminCorsHeaders });
 
+  // Authentication: Origin + CSRF + 2FA
   const block = await assertAdminCsrf(req);
   if (block) return block;
 
@@ -25,7 +29,12 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: false })
         .limit(100);
 
-      if (error) throw error;
+      if (error) {
+        adminLog("admin-audit-logs", "error", "list_failed", { error: error.message });
+        throw error;
+      }
+      
+      adminLog("admin-audit-logs", "info", "list_success", { count: data?.length || 0 });
       return new Response(JSON.stringify(data), { headers: JSON_HEADERS });
     }
 

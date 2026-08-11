@@ -107,8 +107,9 @@ function buildSchedule(startFrom: Date) {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const csrfBlock = await assertAdminCsrf(req, { require2fa: false });
+  const csrfBlock = await assertAdminCsrf(req);
   if (csrfBlock) return csrfBlock;
+
 
 
   const json = (body: unknown, status = 200) =>

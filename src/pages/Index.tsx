@@ -5,6 +5,7 @@ import { Languages } from "@/components/Languages";
 import { HowItWorks } from "@/components/HowItWorks";
 
 import { AboutMe } from "@/components/AboutMe";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { AllProductsReviews } from "@/components/AllProductsReviews";
@@ -68,6 +69,10 @@ const Index = () => {
       <HowItWorks />
 
       <AllProductsReviews />
+
+      <InstagramFeed />
+
+
 
       <AboutMe />
       <Contact />

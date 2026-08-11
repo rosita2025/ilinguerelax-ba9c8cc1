@@ -18,6 +18,7 @@ import {
   Send,
   AlertTriangle,
   Sparkles,
+  ShieldAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";

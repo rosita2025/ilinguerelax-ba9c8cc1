@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ShieldAlert, History } from "lucide-react";
+import { Loader2, ShieldAlert, History, AlertTriangle } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { format } from "date-fns";

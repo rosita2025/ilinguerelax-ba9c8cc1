@@ -112,7 +112,7 @@ const BacklinksCard = () => {
       </div>
 
       {!data && loading && (
-        <p className="text-sm text-muted-foreground">Cargando datos de Semrush…</p>
+        <p className="text-sm text-muted-foreground italic">Sincronizando con Semrush…</p>
       )}
 
       {data && (

@@ -1927,15 +1927,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     const isFr = language === "fr";
                     const status =
                       stripeElapsed < 15
-                        ? (isEn ? "Opening the secure Stripe form…"
-                          : isPt ? "Abrindo o formulário seguro da Stripe…"
-                          : isFr ? "Ouverture du formulaire sécurisé Stripe…"
-                          : "Abriendo el formulario seguro de Stripe…")
+                        ? (isEn ? "Opening the Stripe checkout form…"
+                          : isPt ? "Abrindo o formulário da Stripe…"
+                          : isFr ? "Ouverture du formulaire Stripe…"
+                          : "Abriendo el formulario de Stripe…")
                         : stripeElapsed < 45
-                        ? (isEn ? "Still loading… secure connection with Stripe."
-                          : isPt ? "Ainda carregando… conexão segura com a Stripe."
-                          : isFr ? "Chargement en cours… connexion sécurisée avec Stripe."
-                          : "Aún cargando… conexión segura con Stripe.")
+                        ? (isEn ? "Still loading… connecting with Stripe."
+                          : isPt ? "Ainda carregando… conectando com a Stripe."
+                          : isFr ? "Chargement en cours… connexion avec Stripe."
+                          : "Aún cargando… conectando con Stripe.")
                         : stripeElapsed < 75
                         ? (isEn ? "Taking longer than usual. Retrying automatically…"
                           : isPt ? "Está demorando mais que o normal. Tentando novamente…"

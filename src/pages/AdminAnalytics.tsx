@@ -529,7 +529,7 @@ const AdminAnalytics = () => {
         },
       });
       const timeoutPromise = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error("La analítica tardó demasiado. Mostrando panel seguro.")), 12000);
+        window.setTimeout(() => reject(new Error("La analítica tardó demasiado. Por favor, intenta de nuevo.")), 12000);
       });
       const { data: res, error } = await Promise.race([invokePromise, timeoutPromise]);
       if (error) throw error;
@@ -612,7 +612,7 @@ const AdminAnalytics = () => {
 
           {loadError && (
             <Card className="p-3 border-destructive/30 bg-destructive/5 text-sm text-destructive">
-              No se pudo cargar completo ahora: {loadError}. El panel queda abierto con valores seguros; intenta de nuevo en unos segundos.
+              No se pudo cargar completo ahora: {loadError}. Intenta de nuevo en unos segundos.
             </Card>
           )}
 

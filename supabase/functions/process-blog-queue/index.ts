@@ -53,9 +53,9 @@ serve(async (req) => {
           keyword: row.keyword,
           category: row.category,
           language: row.language,
-          // Publicación manual: el artículo queda como borrador. 
-          // El editor lo verá en la agenda y podrá presionar "Generar vista previa" para verlo.
-          publish: false,
+          // Publicación automática según solicitud del usuario (300 posts / 30 días).
+          publish: true,
+
         });
         await supabase
           .from("blog_post_queue")

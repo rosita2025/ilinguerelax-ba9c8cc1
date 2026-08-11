@@ -239,19 +239,31 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
       }
     }
 
-    // Algunos modelos devuelven { data: [{ url: "..." }] } y otros { choices: [{ message: { content: "{\"data\":...}" } }] }
-    // Normalizamos la búsqueda de la URL
+    // Estructuras comunes de Apimart/OpenAI:
+    // 1. { data: [{ url: "..." }] }
+    // 2. { choices: [{ message: { content: "..." } }] }
+    // 3. Texto plano que es una URL
     let tempUrl = data?.data?.[0]?.url || data?.url;
     
     if (!tempUrl && data?.choices?.[0]?.message?.content) {
-       try {
-         const nested = JSON.parse(data.choices[0].message.content);
-         tempUrl = nested?.data?.[0]?.url || nested?.url;
-       } catch { /* ignore */ }
+       const content = data.choices[0].message.content.trim();
+       if (content.startsWith("http")) {
+         tempUrl = content;
+       } else {
+         try {
+           const nested = JSON.parse(content);
+           tempUrl = nested?.data?.[0]?.url || nested?.url || nested?.image_url;
+         } catch { /* ignore */ }
+       }
+    }
+
+    // Si data mismo es un string que empieza por http
+    if (!tempUrl && typeof data === 'string' && data.trim().startsWith("http")) {
+      tempUrl = data.trim();
     }
 
     if (!tempUrl) {
-      console.error("[BlogGen] APIMART no devolvió URL de imagen en ninguna estructura conocida. Data:", JSON.stringify(data).slice(0, 300));
+      console.error("[BlogGen] APIMART no devolvió URL de imagen. Estructura recibida:", JSON.stringify(data).slice(0, 500));
       return null;
     }
 

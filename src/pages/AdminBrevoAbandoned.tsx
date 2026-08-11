@@ -103,17 +103,8 @@ const AdminBrevoAbandoned = () => {
 
   return (
     <>
-      <main className="min-h-dvh bg-background py-8 px-4">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <header className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-bold">Brevo · Carritos abandonados</h1>
-              <p className="text-sm text-muted-foreground">Payload real enviado a Brevo por cada abandono (tienda vs Hotmart) con atributos <code>ORIGEN</code>, <code>SEGMENTO</code>, <code>TAGS</code> e IDs de producto.</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Actualizar
-            </Button>
-          </header>
+      <main className="space-y-6">
+
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Card className="p-4"><div className="text-xs text-muted-foreground">Total</div><div className="text-2xl font-bold">{summary.total}</div></Card>

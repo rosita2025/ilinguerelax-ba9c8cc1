@@ -455,6 +455,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       items: s.items,
       paymentMethod,
       force,
+      currency: "USD", // Forzado a USD para Ads/Tracking
     });
   }, [language, region.country]);
 

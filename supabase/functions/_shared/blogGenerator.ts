@@ -405,7 +405,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
   "category": "...",
   "tags": ["main keyword","secondary 1","secondary 2","..."],
   "readTime": "8 min",
-  "imagePrompt": "Highly descriptive prompt for an AI image generator (1024x1024). Include style (realistic educational photography or clean 3D isometric), lighting, and brand colors (teal/coral hints). NO TEXT in image. Make it relevant to the topic of language learning.",
+  "imagePrompt": "Realistic high-quality educational photography style, clean 3D isometric or natural classroom setting, professional lighting. Relevant to: ${topic}. NO TEXT in image. Hints of teal and coral colors.",
   "internalLinks": [{"anchor":"anchor text","url":"/internal-path"}],
   "externalLinks": [{"anchor":"anchor text","url":"https://official-source.com"}]
 }

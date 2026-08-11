@@ -122,35 +122,14 @@ Deno.serve(async (req) => {
     // nuevo cada vez. Antes usaba .maybeSingle(), que falla cuando ya hay más de
     // una fila abierta del mismo correo y terminaba insertando duplicados.
     const { data: existingRows } = await supabase
-      .from("abandoned_carts")
-      .select("id")
-      .eq("customer_email", email)
-      .eq("is_completed", false)
-      .order("created_at", { ascending: false })
+      .from("persistent_carts")
+      .select("cart_token")
+      .eq("email", email)
       .limit(1);
     const existing = existingRows?.[0] ?? null;
 
-    if (existing) {
-
-      await supabase
-        .from("abandoned_carts")
-        .update({
-          customer_name: name,
-          product_type: productType,
-          language,
-          next_email_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existing.id);
-    } else {
-      await supabase.from("abandoned_carts").insert({
-        customer_name: name,
-        customer_email: email,
-        product_type: productType,
-        language,
-        next_email_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      });
-    }
+    // We use persistent_carts as the authoritative source for abandoned checkouts now.
+    // The previous abandoned_carts table is gone.
 
     // Persistent cart per email: accumulates ALL SKUs the buyer added across
     // sessions/devices so reminder emails and recovery links reflect the

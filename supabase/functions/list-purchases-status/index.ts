@@ -6,7 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
 
-type Provider = "hotmart" | "mercadopago" | "paypal" | "stripe" | "manual";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
 
 interface Row {
@@ -56,16 +56,6 @@ const PAYPAL_STEPS: Record<string, { step: string; reason?: string; mapped: Mapp
   "PAYMENT.CAPTURE.REVERSED":      { step: "Revertido (chargeback)", mapped: "chargeback" },
 };
 
-function mapHotmart(status: string): Mapped {
-  const s = (status || "").toLowerCase();
-  if (s === "approved") return "approved";
-  if (s === "pending") return "pending";
-  if (s === "refused") return "refused";
-  if (s === "refunded") return "refunded";
-  if (s === "chargeback") return "chargeback";
-  if (s === "cancelled") return "cancelled";
-  return "unknown";
-}
 
 function mapManual(status: string): Mapped {
   const s = (status || "").toLowerCase();
@@ -114,31 +104,6 @@ Deno.serve(async (req) => {
 
     const rows: Row[] = [];
 
-    // ─── Hotmart ──────────────────────────────────────────────────────
-    if (!provider || provider === "hotmart") {
-      const { data } = await admin
-        .from("hotmart_purchases")
-        .select("id, email, transaction_code, product_code, purchased_at, status, raw_payload, created_at")
-        .order("created_at", { ascending: false })
-        .limit(take);
-      for (const r of data ?? []) {
-        const p: any = r.raw_payload ?? {};
-        const price = p?.data?.purchase?.price?.value ?? null;
-        const cur = p?.data?.purchase?.price?.currency_value ?? null;
-        const mapped_status = mapHotmart(r.status);
-        rows.push({
-          id: `hot-${r.id}`, provider: "hotmart", received_at: r.created_at,
-          email: r.email, amount: price, currency: cur,
-          product: r.product_code, transaction: r.transaction_code,
-          raw_status: r.status, mapped_status,
-          failure_reason: mapped_status === "refused" ? "Compra rechazada en Hotmart (banco o antifraude)" :
-                          mapped_status === "chargeback" ? "Cliente disputó el cargo" : null,
-          failed_step: mapped_status === "pending" ? "Esperando confirmación de pago" :
-                       mapped_status === "cancelled" ? "Cliente canceló antes de pagar" : null,
-          payload: p,
-        });
-      }
-    }
 
     // ─── Mercado Pago (funnel_events) ─────────────────────────────────
     if (!provider || provider === "mercadopago") {

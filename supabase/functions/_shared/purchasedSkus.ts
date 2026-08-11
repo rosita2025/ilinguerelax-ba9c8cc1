@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 // Shared helper: returns the lowercase set of SKUs already purchased by a
-// given email across manual_payments, digital_email_sends and hotmart_purchases.
+// given email across manual_payments and digital_email_sends.
 // Used to filter abandoned-cart reminders and persistent_carts so we NEVER
 // remind a buyer about a product they already own.
 
@@ -45,19 +45,6 @@ export async function getPurchasedSkus(admin: any, rawEmail: string): Promise<Se
     }
   } catch (_) { /* ignore */ }
 
-  // 3) hotmart_purchases.product_code — only paid/approved
-  try {
-    const { data } = await admin
-      .from("hotmart_purchases")
-      .select("product_code, status")
-      .ilike("email", email)
-      .limit(200);
-    for (const row of data ?? []) {
-      const st = String(row?.status || "").toLowerCase();
-      if (st.includes("refund") || st.includes("chargeback") || st.includes("cancel")) continue;
-      push(row?.product_code);
-    }
-  } catch (_) { /* ignore */ }
 
   return out;
 }

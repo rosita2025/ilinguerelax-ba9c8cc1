@@ -378,8 +378,7 @@ serve(async (req) => {
           // (hotmart_purchases[status=approved] + manual_payments[verified]
           // + verified gateway webhooks). Funnel_events Purchase rows may
           // include pending, refunded or test transactions, so we ignore
-          // them here to keep the counter aligned with /admin/orders and
-          // /admin/hotmart-audit.
+          // them here to keep the counter aligned with /admin/orders.
           break;
         }
       }
@@ -829,8 +828,7 @@ serve(async (req) => {
       
       } else {
         // Authoritative purchase counters. Aligns totals with
-        // /admin/orders and /admin/hotmart-audit (approved only,
-        // tests excluded, gateway sandbox filtered).
+        // /admin/orders (approved only, tests excluded, gateway sandbox filtered).
         b.purchases++;
         totals.purchases++;
         b.revenue += p.usd;
@@ -921,7 +919,7 @@ serve(async (req) => {
     const abandonedValue = 0;
 
     // ---------- Carritos abandonados unificados (3 fuentes) ----------
-    // 1) Hotmart  → abandoned_carts (PURCHASE_OUT_OF_SHOPPING_CART, /admin/hotmart-audit)
+    // 1) Hotmart  → abandoned_carts (PURCHASE_OUT_OF_SHOPPING_CART)
     // 2) Tienda   → persistent_carts (checkout propio)
     // 3) Checkout → checkout_rate_hits (/admin/checkouts-abuse), incluye visitas sin correo
     const purchasedEmails = new Set(

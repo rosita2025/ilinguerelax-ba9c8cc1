@@ -66,10 +66,8 @@ export interface MergeableProductRow {
   product_id: string;
   name?: string | null;
   source?: string;
-  hotmart_purchases?: number;
   store_purchases?: number;
   pending?: number;
-  hotmart_pending?: number;
   store_pending?: number;
   views?: number;
   carts?: number;
@@ -98,10 +96,8 @@ export function mergeProductRows(rows: MergeableProductRow[]): MergedProductRow[
       product_id: key,
       name: null,
       source: "none",
-      hotmart_purchases: 0,
       store_purchases: 0,
       pending: 0,
-      hotmart_pending: 0,
       store_pending: 0,
       views: 0,
       carts: 0,
@@ -116,9 +112,7 @@ export function mergeProductRows(rows: MergeableProductRow[]): MergedProductRow[
     base.purchases += n(r.purchases);
     base.revenue += n(r.revenue);
     base.pending += n(r.pending);
-    base.hotmart_pending += n(r.hotmart_pending);
     base.store_pending += n(r.store_pending);
-    base.hotmart_purchases += n(r.hotmart_purchases);
     base.store_purchases += n(r.store_purchases);
 
     // Nombre: preferimos el más descriptivo (más largo y distinto al slug).
@@ -133,11 +127,7 @@ export function mergeProductRows(rows: MergeableProductRow[]): MergedProductRow[
 
   const out = Array.from(map.values()).map((g) => {
     g.source =
-      g.hotmart_purchases > 0 && g.store_purchases > 0
-        ? "mixto"
-        : g.hotmart_purchases > 0
-        ? "hotmart"
-        : g.store_purchases > 0 || g.purchases > 0
+      g.store_purchases > 0 || g.purchases > 0
         ? "store"
         : "none";
     g.conversion = g.views > 0 ? Math.round((g.purchases / g.views) * 1000) / 10 : 0;

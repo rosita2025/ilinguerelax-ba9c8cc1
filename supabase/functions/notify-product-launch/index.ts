@@ -9,10 +9,10 @@
 //   1. buyers      -> compradores del checkout interno (tokens de descarga,
 //                     entregas digitales, auditoría de entregas y pagos
 //                     manuales verificados: Yape/Plin/transferencias)
-//   2. hotmart     -> compradores vía Hotmart (hotmart_purchases)
+//   2. buyers_legacy -> historical buyers (email_contacts)
 //   3. reviewers   -> clientes que dejaron reseña aprobada (reviews)
 //   4. waitlist    -> lista de espera "avísame cuando salga" (store_subscribers)
-//   5. abandoned   -> carritos abandonados sin convertir (abandoned/persistent_carts)
+//   5. abandoned   -> carritos abandonados sin convertir (persistent_carts)
 //   6. newsletter  -> suscriptores del popup (email_contacts)
 //
 // Reglas: se excluyen correos suprimidos (rebote/queja/baja) y dominios de
@@ -39,12 +39,12 @@ const TEST_DOMAINS = new Set([
   "yopmail.com", "tempmail.com", "sandbox.com", "localhost",
 ]);
 
-export const AUDIENCES = ["buyers", "hotmart", "reviewers", "waitlist", "abandoned", "newsletter"] as const;
+export const AUDIENCES = ["buyers", "reviewers", "waitlist", "abandoned", "newsletter"] as const;
 type Audience = typeof AUDIENCES[number];
 
 const AUDIENCE_LABEL: Record<Audience, string> = {
   buyers: "Compradores (checkout propio)",
-  hotmart: "Compradores Hotmart",
+  
   reviewers: "Clientes que dejaron reseña",
   waitlist: "Lista de espera (avísame)",
   abandoned: "Carritos abandonados",
@@ -129,13 +129,6 @@ async function fetchAudience(
       .eq("status", "verified")
       .limit(20000);
     for (const r of manual ?? []) push(r.buyer_email, r.buyer_name, r.buyer_country, r.created_at);
-  } else if (audience === "hotmart") {
-    const { data } = await admin
-      .from("hotmart_purchases")
-      .select("email, status, purchased_at, created_at")
-      .neq("status", "refunded")
-      .limit(20000);
-    for (const r of data ?? []) push(r.email, null, null, r.purchased_at ?? r.created_at);
   } else if (audience === "reviewers") {
     const { data } = await admin
       .from("reviews")
@@ -150,12 +143,6 @@ async function fetchAudience(
       .limit(20000);
     for (const r of data ?? []) push(r.email, null, null, r.created_at);
   } else if (audience === "abandoned") {
-    const { data: ac } = await admin
-      .from("abandoned_carts")
-      .select("customer_email, customer_name, converted, created_at")
-      .eq("converted", false)
-      .limit(20000);
-    for (const r of ac ?? []) push(r.customer_email, r.customer_name, null, r.created_at);
     const { data: pc } = await admin
       .from("persistent_carts")
       .select("email, buyer, converted, country, last_activity, created_at")

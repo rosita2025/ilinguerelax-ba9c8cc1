@@ -63,11 +63,11 @@ export default function AdminMarketingHub() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <AdminNav />
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Automatización de Email</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Marketing Hub</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Control centralizado de Newsletter, Post-Compra y Carritos Abandonados.
             </p>
           </div>
@@ -286,7 +286,7 @@ export default function AdminMarketingHub() {
                  <h3 className="font-semibold">Secuencias para Compradores</h3>
                  <p className="text-xs text-muted-foreground">Envíos automáticos tras la aprobación del pedido.</p>
                </div>
-               <div className="p-0 sm:p-2">
+               <div className="p-0 sm:p-4 overflow-hidden">
                  <AdminMarketingDrips />
                </div>
             </div>
@@ -298,7 +298,7 @@ export default function AdminMarketingHub() {
                  <h3 className="font-semibold">Drip de Newsletter</h3>
                  <p className="text-xs text-muted-foreground">Secuencia de bienvenida y valor para suscriptores.</p>
                </div>
-               <div className="p-0 sm:p-2">
+               <div className="p-0 sm:p-4 overflow-hidden">
                  <AdminNewsletterDrip />
                </div>
             </div>
@@ -310,7 +310,7 @@ export default function AdminMarketingHub() {
                  <h3 className="font-semibold">Log de Abandonos Brevo</h3>
                  <p className="text-xs text-muted-foreground">Payloads y estados de envío de carritos no finalizados.</p>
                </div>
-               <div className="p-0 sm:p-2">
+               <div className="p-0 sm:p-4 overflow-hidden">
                  <AdminBrevoAbandoned />
                </div>
             </div>

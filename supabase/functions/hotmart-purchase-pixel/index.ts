@@ -293,6 +293,14 @@ serve(async (req) => {
         page_path: "/hotmart-success",
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
         referrer: "hotmart-webhook",
+        event_data: { 
+          provider: "hotmart", 
+          status: "approved",
+          email: buyerEmail,
+          name: buyerName,
+          transaction: transactionCode,
+          product_name: productName
+        }
       });
     } catch (trackingError) {
       console.error("funnel purchase tracking error:", trackingError);

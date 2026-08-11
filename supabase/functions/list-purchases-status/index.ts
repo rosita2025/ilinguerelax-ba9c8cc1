@@ -6,7 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
 
 interface Row {
@@ -200,6 +200,40 @@ Deno.serve(async (req) => {
           mapped_status: status === "approved" ? "approved" : "unknown",
           failure_reason: d.failure_message || null,
           failed_step: null,
+          payload: d,
+        });
+      }
+    }
+
+    // ─── Hotmart (funnel_events) ───────────────────────────────────────
+    if (!provider || provider === "hotmart") {
+      const { data } = await admin
+        .from("funnel_events")
+        .select("id, created_at, event_name, event_data, email, product_id, value, currency")
+        .or("event_name.eq.purchase,event_name.eq.InitiateCheckout")
+        .contains("event_data", { provider: "hotmart" } as any)
+        .order("created_at", { ascending: false })
+        .limit(take);
+
+      for (const r of data ?? []) {
+        const d: any = r.event_data ?? {};
+        const status = d.status || (r.event_name === "purchase" ? "approved" : "pending");
+        
+        rows.push({
+          id: `hm-${r.id}`, 
+          provider: "hotmart", 
+          received_at: r.created_at,
+          email: r.email || d.email || null,
+          amount: r.value || d.amount || null,
+          currency: r.currency || d.currency || null,
+          product: r.product_id || d.product_name || null,
+          transaction: d.transaction || d.transaction_code || null,
+          raw_status: status,
+          mapped_status: status === "approved" ? "approved" : 
+                         (status === "pending" || status === "processing") ? "pending" :
+                         (status === "refunded") ? "refunded" : "unknown",
+          failure_reason: d.failure_reason || null,
+          failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Hotmart)" : null,
           payload: d,
         });
       }

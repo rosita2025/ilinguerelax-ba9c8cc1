@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
 
 interface Row {
@@ -36,6 +36,7 @@ const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; 
   stripe:      { label: "Stripe",        icon: CreditCard,  color: "bg-purple-100 text-purple-800" },
   paypal:      { label: "PayPal",        icon: CreditCard,  color: "bg-blue-100 text-blue-800" },
   manual:      { label: "Yape / Plin",   icon: Banknote,    color: "bg-emerald-100 text-emerald-800" },
+  hotmart:     { label: "Hotmart",       icon: ShoppingBag, color: "bg-orange-100 text-orange-800" },
 };
 
 const STATUS_META: Record<Mapped, { label: string; className: string; icon: typeof CheckCircle2 }> = {
@@ -164,7 +165,7 @@ const AdminPurchasesStatus = () => {
           <div>
             <h1 className="text-lg sm:text-xl font-bold">Estado de compras · Todas las pasarelas</h1>
             <p className="text-xs text-muted-foreground">
-              Stripe · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
+              Hotmart · Stripe · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
@@ -202,6 +203,7 @@ const AdminPurchasesStatus = () => {
                 <option value="mercadopago">Mercado Pago</option>
                 <option value="paypal">PayPal</option>
                 <option value="stripe">Stripe</option>
+                <option value="hotmart">Hotmart</option>
                 
               </select>
             </div>

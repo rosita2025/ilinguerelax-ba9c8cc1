@@ -32,27 +32,56 @@ function repairJsonString(src: string): string {
   let out = "";
   let inString = false;
   let escaped = false;
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i];
+  
+  // Limpieza inicial: eliminamos caracteres de control que suelen romper JSON.parse
+  // pero preservamos saltos de línea y tabs para manejarlos después.
+  const cleanSrc = src.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
+
+  for (let i = 0; i < cleanSrc.length; i++) {
+    const ch = cleanSrc[i];
     if (escaped) { out += ch; escaped = false; continue; }
     if (ch === "\\") { out += ch; escaped = true; continue; }
+    
     if (ch === '"') {
-      if (!inString) { inString = true; out += ch; continue; }
-      // Cierre válido solo si el siguiente token es estructural
-      const rest = src.slice(i + 1);
-      if (/^\s*([,:}\]]|$)/.test(rest)) { inString = false; out += ch; }
-      else out += '\\"'; // comilla interna sin escapar
+      if (!inString) {
+        inString = true;
+        out += ch;
+      } else {
+        // ¿Es un cierre real? Miramos el siguiente carácter no-blanco
+        let nextChar = "";
+        for (let j = i + 1; j < cleanSrc.length; j++) {
+          if (!/\s/.test(cleanSrc[j])) {
+            nextChar = cleanSrc[j];
+            break;
+          }
+        }
+        
+        // Si el siguiente es , : } ] o fin de string, es cierre probable
+        if (nextChar === "," || nextChar === ":" || nextChar === "}" || nextChar === "]" || nextChar === "") {
+          inString = false;
+          out += ch;
+        } else {
+          // Es una comilla dentro de un string sin escapar
+          out += '\\"';
+        }
+      }
       continue;
     }
+    
     if (inString) {
       if (ch === "\n") { out += "\\n"; continue; }
       if (ch === "\r") { out += "\\r"; continue; }
       if (ch === "\t") { out += "\\t"; continue; }
-      const code = ch.charCodeAt(0);
-      if (code < 0x20) { out += "\\u" + code.toString(16).padStart(4, "0"); continue; }
+      // Caracteres especiales que deben escaparse en JSON strings
+      if (ch === "\b") { out += "\\b"; continue; }
+      if (ch === "\f") { out += "\\f"; continue; }
     }
     out += ch;
   }
+  
+  // Si el string quedó abierto, intentamos cerrarlo
+  if (inString) out += '"';
+  
   return out;
 }
 

@@ -91,28 +91,25 @@ export default function AdminNewsletterDrip() {
   }
 
   return (
-    <div className="container mx-auto max-w-5xl py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Mail className="w-6 h-6"/> Newsletter Drip · Test & Reenvío</h1>
-        <p className="text-sm text-muted-foreground">Envía correos de prueba a cualquier email o reenvía manualmente un paso a un suscriptor.</p>
-      </div>
+    <div className="space-y-6">
+
 
       <Card>
-        <CardHeader><CardTitle>Enviar</CardTitle></CardHeader>
+        <CardHeader className="py-3"><CardTitle className="text-sm">Enviar Prueba / Reenvío</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-3">
             <div>
-              <Label>Email destinatario</Label>
-              <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="test@correo.com" />
+              <Label className="text-[10px] uppercase">Email</Label>
+              <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="test@correo.com" className="h-8 text-xs" />
             </div>
             <div>
-              <Label>Nombre (opcional)</Label>
-              <Input value={name} onChange={e => setName(e.target.value)} placeholder="Nombre" />
+              <Label className="text-[10px] uppercase">Nombre</Label>
+              <Input value={name} onChange={e => setName(e.target.value)} placeholder="Nombre" className="h-8 text-xs" />
             </div>
             <div>
-              <Label>Paso / Plantilla</Label>
+              <Label className="text-[10px] uppercase">Paso / Plantilla</Label>
               <Select value={stepKey} onValueChange={setStepKey}>
-                <SelectTrigger><SelectValue placeholder="Elige un paso" /></SelectTrigger>
+                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Elige un paso" /></SelectTrigger>
                 <SelectContent>
                   {config.map(c => (
                     <SelectItem key={c.template_key} value={c.template_key}>
@@ -124,16 +121,16 @@ export default function AdminNewsletterDrip() {
               {stepLabel && <p className="text-xs text-muted-foreground mt-1">{stepLabel}</p>}
             </div>
             <div>
-              <Label>Idioma</Label>
+              <Label className="text-[10px] uppercase">Idioma</Label>
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>{LANGS.map(l => <SelectItem key={l} value={l}>{l.toUpperCase()}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Modo</Label>
+              <Label className="text-[10px] uppercase">Modo</Label>
               <Select value={mode} onValueChange={v => setMode(v as any)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="test">Test send (no toca DB, asunto con [TEST])</SelectItem>
                   <SelectItem value="resend">Reenvío manual (registra en newsletter_drip_sends)</SelectItem>
@@ -143,11 +140,11 @@ export default function AdminNewsletterDrip() {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={send} disabled={sending} className="gap-2">
-              <Send className="w-4 h-4" /> {sending ? "Enviando..." : mode === "test" ? "Enviar test" : "Reenviar paso"}
+            <Button onClick={send} disabled={sending} className="gap-2" size="sm">
+              <Send className="w-3 h-3" /> {sending ? "Enviando..." : mode === "test" ? "Enviar test" : "Reenviar paso"}
             </Button>
-            <Button variant="outline" onClick={loadAll} disabled={loading} className="gap-2">
-              <RefreshCw className="w-4 h-4" /> Recargar
+            <Button variant="outline" onClick={loadAll} disabled={loading} className="gap-2" size="sm">
+              <RefreshCw className="w-3 h-3" /> Recargar
             </Button>
           </div>
 
@@ -158,7 +155,7 @@ export default function AdminNewsletterDrip() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Últimos 50 envíos del drip</CardTitle></CardHeader>
+        <CardHeader className="py-3"><CardTitle className="text-sm">Últimos 50 envíos del drip</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

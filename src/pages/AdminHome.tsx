@@ -27,9 +27,8 @@ const panels: Array<{
   { to: "/admin/orders", icon: Mail, title: "Órdenes / Pedidos", desc: "Lista de pedidos con estado de entrega digital, SKUs enviados y confirmación de correo (delivered / opened / bounced).", color: "text-sky-600", category: "Ventas" },
   { to: "/admin/hotmart-audit", icon: ClipboardList, title: "Hotmart · Auditoría", desc: "Eventos recibidos de Hotmart y carritos abandonados con estado mapeado (aprobado/pendiente/rechazado/posventa) y sync a Brevo.", color: "text-orange-500", category: "Ventas" },
   
-  { to: "/admin/brevo-abandoned", icon: Send, title: "Brevo · Carritos abandonados", desc: "Payload real enviado a Brevo por cada carrito abandonado (tienda vs Hotmart) con ORIGEN, SEGMENTO, TAGS e IDs de producto.", color: "text-pink-600", category: "Marketing" },
-  { to: "/admin/newsletter-drip", icon: Mail, title: "Newsletter Drip · Test & Reenvío", desc: "Envía correos de prueba de cualquier paso del drip a un email cualquiera, o reenvía manualmente un paso a un suscriptor.", color: "text-purple-600", category: "Marketing" },
-  { to: "/admin/marketing-drips", icon: Calendar, title: "Marketing Post-Compra", desc: "Secuencias automáticas para compradores a los 7, 15 y 25 días según categoría del producto.", color: "text-rose-600", category: "Marketing" },
+  { to: "/admin/marketing-drips", icon: Calendar, title: "Automatización de Email", desc: "Centro unificado de Newsletter, Post-Compra y Carritos Abandonados con reglas de seguridad.", color: "text-rose-600", category: "Marketing" },
+
 
   { to: "/admin/analytics", icon: LineChart, title: "Analíticas · Funnel", desc: "Embudo estilo Shopify: sesiones, add-to-cart, checkout y compras. Conversiones, top productos por país y tendencias.", color: "text-violet-600", category: "Analítica" },
   { to: "/admin/ga4-compare", icon: GitCompare, title: "GA4 · Comparativa", desc: "Compara datos internos vs Google Analytics 4: usuarios, sesiones, eventos y fuentes de tráfico para detectar desviaciones.", color: "text-rose-500", category: "Analítica" },

@@ -103,39 +103,31 @@ const AdminBrevoAbandoned = () => {
 
   return (
     <>
-      <AdminNav />
-      <main className="min-h-dvh bg-background py-8 px-4">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <header className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-bold">Brevo · Carritos abandonados</h1>
-              <p className="text-sm text-muted-foreground">Payload real enviado a Brevo por cada abandono (tienda vs Hotmart) con atributos <code>ORIGEN</code>, <code>SEGMENTO</code>, <code>TAGS</code> e IDs de producto.</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Actualizar
-            </Button>
-          </header>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Total</div><div className="text-2xl font-bold">{summary.total}</div></Card>
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Hotmart</div><div className="text-2xl font-bold text-orange-600">{summary.hotmart}</div></Card>
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Tienda</div><div className="text-2xl font-bold text-teal-600">{summary.tienda}</div></Card>
-            <Card className="p-4"><div className="text-xs text-muted-foreground">Errores</div><div className="text-2xl font-bold text-red-600">{summary.errors}</div></Card>
+      <main className="space-y-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex gap-1">
+            {(["all", "hotmart", "tienda"] as const).map((o) => (
+              <Button key={o} variant={origin === o ? "default" : "outline"} size="sm" onClick={() => setOrigin(o)}>
+                {o === "all" ? "Todos" : o === "hotmart" ? "Hotmart" : "Tienda"}
+              </Button>
+            ))}
           </div>
+          <div className="flex-1 min-w-[200px] relative">
+            <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input className="pl-8" placeholder="Buscar por email, SKU o producto…" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void load(); }} />
+          </div>
+          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
 
-          <Card className="p-4 flex flex-wrap items-center gap-2">
-            <div className="flex gap-1">
-              {(["all", "hotmart", "tienda"] as const).map((o) => (
-                <Button key={o} variant={origin === o ? "default" : "outline"} size="sm" onClick={() => setOrigin(o)}>
-                  {o === "all" ? "Todos" : o === "hotmart" ? "Hotmart" : "Tienda"}
-                </Button>
-              ))}
-            </div>
-            <div className="flex-1 min-w-[200px] relative">
-              <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-8" placeholder="Buscar por email, SKU o producto…" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void load(); }} />
-            </div>
-          </Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Total</div><div className="text-xl font-bold">{summary.total}</div></Card>
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Hotmart</div><div className="text-xl font-bold text-orange-600">{summary.hotmart}</div></Card>
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Tienda</div><div className="text-xl font-bold text-teal-600">{summary.tienda}</div></Card>
+          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Errores</div><div className="text-xl font-bold text-red-600">{summary.errors}</div></Card>
+        </div>
+
 
           <Card className="divide-y">
             {rows.length === 0 && !loading && (
@@ -160,14 +152,14 @@ const AdminBrevoAbandoned = () => {
                           <Badge className="bg-amber-100 text-amber-800"><AlertTriangle className="w-3 h-3 mr-1 inline" />país: {r.summary.COUNTRY_MISSING_REASON || r.summary.COUNTRY_STATUS}</Badge>
                         )}
                       </div>
-                      <div className="mt-1 text-sm font-medium truncate">{r.email || "(sin email)"} · {r.product_name || r.product_sku || "(sin producto)"}</div>
-                      <div className="mt-0.5 text-xs text-muted-foreground truncate">
+                      <div className="mt-1 text-xs font-medium truncate">{r.email || "(sin email)"} · {r.product_name || r.product_sku || "(sin producto)"}</div>
+                      <div className="mt-0.5 text-[10px] text-muted-foreground truncate">
                         SEGMENTO: <b>{r.summary.SEGMENTO || "—"}</b> · TAGS: {tagsToString(r.summary.TAGS)}
-                        {r.summary.HOTMART_PRODUCT_ID && <> · Hotmart id: <code>{r.summary.HOTMART_PRODUCT_ID}</code></>}
-                        {r.summary.HOTMART_PRODUCT_CODE && <> · code: <code>{r.summary.HOTMART_PRODUCT_CODE}</code></>}
-                        {r.summary.TIENDA_SKU && <> · SKU tienda: <code>{r.summary.TIENDA_SKU}</code></>}
+                        {r.summary.HOTMART_PRODUCT_ID && <> · ID: <code>{r.summary.HOTMART_PRODUCT_ID}</code></>}
+                        {r.summary.TIENDA_SKU && <> · SKU: <code>{r.summary.TIENDA_SKU}</code></>}
                       </div>
                     </div>
+
                   </button>
 
                   {isOpen && (
@@ -207,7 +199,6 @@ const AdminBrevoAbandoned = () => {
               );
             })}
           </Card>
-        </div>
       </main>
     </>
   );

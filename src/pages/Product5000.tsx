@@ -13,6 +13,7 @@ import reviewFb4 from "@/assets/review-fb-4.jpg";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 
 // Lazy-loaded below-the-fold components for faster initial load
@@ -554,6 +555,10 @@ const Product5000 = () => {
                   </div>
                 </div>
               </motion.div>
+
+              <div className="mb-4">
+                <DigitalProductNotice compact />
+              </div>
 
               {/* Stock Counter - Scarcity */}
               <div className="mb-6">

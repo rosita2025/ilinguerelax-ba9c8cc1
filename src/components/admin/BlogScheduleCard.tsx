@@ -236,8 +236,8 @@ const BlogScheduleCard = () => {
             Agenda de blog · 10 posts al día
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
-            5 turnos diarios (08:00, 09:00, 11:00, 13:00 y 20:00 hora Perú) × 2 artículos = 10 al día.
-            Se programan 50 artículos (5 días) para cubrir la semana actual.
+            5 turnos diarios × 2 artículos = 10 al día.
+            Se programan 300 artículos (30 días) de forma automática.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>

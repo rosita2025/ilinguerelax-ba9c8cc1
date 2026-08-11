@@ -2037,6 +2037,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   payerPhone={buyer.phone ?? undefined}
                   language={language}
                   onPaid={(orderId) => {
+                    trackPurchase(orderId, "mercadopago_transfer");
                     navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
                   }}
                   onError={(message) => setMethodError({ method: "dlocal_card", message })}

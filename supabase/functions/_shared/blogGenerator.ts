@@ -250,18 +250,17 @@ export async function generateAndStorePost(args: GenerateArgs): Promise<Record<s
   const system = `You are a SENIOR SEO WRITER with 15+ years of experience in web positioning, content marketing, EEAT, and Google AdSense monetization. Write the ENTIRE article in ${L.name} for ${L.audience}. Do NOT switch languages mid-article.
 
 Writing rules:
-- Length: Minimum 2100 real words of high-quality, comprehensive content. Do NOT be repetitive. Deeply cover the topic.
-- 100% original, useful content. No filler, no generic phrases.
+- Length: Target 1800 words of high-quality, comprehensive content. Deeply cover the topic without filler.
+- 100% original, useful content. No generic AI-sounding phrases.
 - Clear structure: ONE H1 (# ) with the main keyword, several descriptive H2 (## ) with semantic variants, and H3 (### ) for internal breakdowns.
-- Introduction that hooks the reader from the first line.
-- Develop each section with depth and practical examples.
+- Introduction: Hook the reader in the first paragraph while including the primary keyword naturally.
 - Professional, close, humanized tone (never "as an AI", "in this article we will discuss", "in conclusion I have presented").
 - Include bullet lists with "- " and at least ONE comparative markdown table where it adds value.
 - Add a "## ${L.faqHeading}" section with 4-6 real questions using ### for each question.
-- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}, NEVER spammy. INTEGRATE [PRODUCT_CARD:slug] within the text to showcase products.
-- Optimize for the main keyword + related secondary keywords naturally (density ~1-2%).
-- Fulfill EEAT: experience, authority, trust. Cite official sources when relevant.
-- Ready to rank on Google, maximize dwell time, and monetize with AdSense.
+- Close with "## ${L.conclusionHeading}" and a natural CTA toward iLingue Relax (5,000 / 8,000 word dictionaries with Spanish pronunciation and UK/USA phonetics) written ${L.ctaLang}. INTEGRATE [PRODUCT_CARD:slug] within the text to showcase products.
+- Optimize for the main keyword (density ~1.5%) and related secondary keywords.
+- Fulfill EEAT: Cite official sources or common industry standards when relevant.
+- Ready to rank on Google and maximize dwell time.
 - NEVER mention that you are an AI nor explain the process.
 
 Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL string values (title, metaTitle, metaDescription, excerpt, content, category, tags, anchors, imagePrompt) MUST be written in ${L.name}:

@@ -897,18 +897,18 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
+        sku={ADMIN_SKU_5000}
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
         currencyCode={displayCurrency}
-        flag={isPeru ? "🇵🇪" : undefined}
-        productName="INGLÉS RELAX - 5,000 Palabras (Digital PDF)"
+        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+        productName={pricing5000.name ?? "Inglés Relax - 5,000 Palabras"}
         rating={4.8}
         reviewCount={800}
         showReviews={true}
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_5000}
         onBuyClick={handleBuy}
-
       />
 
       {/* Spacer for sticky bar */}

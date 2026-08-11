@@ -91,7 +91,6 @@ interface AnalyticsData {
   abandoned: {
     total: number; open: number; newCustomers: number; returningCustomers: number; recovered: number; checkoutNoPurchase: number; openValue: number; recoveryRatePct: number;
     sources: {
-      hotmart: { label: string; total: number; open: number; recovered: number };
       store: { label: string; total: number; open: number; recovered: number };
       checkoutVisitors: { label: string; total: number; open: number; withoutEmail: number; recovered: number };
       unifiedPeople: number;
@@ -111,10 +110,8 @@ interface AnalyticsData {
     product_id: string;
     name?: string | null;
     source?: string;
-    hotmart_purchases?: number;
     store_purchases?: number;
     pending?: number;
-    hotmart_pending?: number;
     store_pending?: number;
     views: number;
     carts: number;
@@ -299,12 +296,6 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       openValue: toNumber(abandoned.openValue),
       recoveryRatePct: toNumber(abandoned.recoveryRatePct),
       sources: {
-        hotmart: {
-          label: "Hotmart (carrito abandonado)",
-          total: toNumber((abandoned as any)?.sources?.hotmart?.total),
-          open: toNumber((abandoned as any)?.sources?.hotmart?.open),
-          recovered: toNumber((abandoned as any)?.sources?.hotmart?.recovered),
-        },
         store: {
           label: "Tienda propia (checkout interno)",
           total: toNumber((abandoned as any)?.sources?.store?.total),
@@ -336,10 +327,8 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       product_id: toText(p?.product_id, "producto-desconocido"),
       name: toText(p?.name, "") || null,
       source: toText(p?.source, "—"),
-      hotmart_purchases: toNumber(p?.hotmart_purchases),
       store_purchases: toNumber(p?.store_purchases),
       pending: toNumber(p?.pending),
-      hotmart_pending: toNumber(p?.hotmart_pending),
       store_pending: toNumber(p?.store_pending),
       views: toNumber(p?.views),
       carts: toNumber(p?.carts),
@@ -827,7 +816,7 @@ const AdminAnalytics = () => {
                   Consolida la tienda propia (checkout interno) y <strong>/admin/checkout-abuse</strong> (visitantes del checkout, con o sin correo).
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {[data.abandoned.sources.hotmart, data.abandoned.sources.store].map((s) => (
+                  {[data.abandoned.sources.store].map((s) => (
                     <div key={s.label} className="rounded-lg border p-3">
                       <div className="text-xs text-muted-foreground">{s.label}</div>
                       <div className="text-2xl font-bold">{s.open.toLocaleString()}</div>
@@ -847,7 +836,7 @@ const AdminAnalytics = () => {
                 <div className="mt-3 rounded-lg bg-muted/50 p-3 text-xs">
                   <strong>Personas únicas sin comprar (sin duplicar por correo): {data.abandoned.sources.unifiedPeople.toLocaleString()}</strong>
                   <div className="text-[11px] text-muted-foreground mt-1">
-                    Si un mismo correo abandonó en Hotmart y en la tienda, cuenta una sola vez. Quien ya compró se descuenta automáticamente.
+                    Quien ya compró se descuenta automáticamente.
                   </div>
                 </div>
               </Card>
@@ -937,12 +926,10 @@ const AdminAnalytics = () => {
                   {mergedProducts.map((p: any) => {
                     const src = p.source as string | undefined;
                     const badge =
-                      src === "hotmart"
-                        ? { label: "Hotmart", cls: "bg-orange-500/15 text-orange-600 border-orange-500/30" }
-                        : src === "store"
+                      src === "store"
                         ? { label: "Mi tienda", cls: "bg-primary/15 text-primary border-primary/30" }
                         : src === "mixto"
-                        ? { label: `H${p.hotmart_purchases}·T${p.store_purchases}`, cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" }
+                        ? { label: `T${p.store_purchases}`, cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" }
                         : { label: "Sin venta", cls: "bg-muted text-muted-foreground border-border" };
                     return (
                       <div key={p.product_id} className="border border-border/60 rounded-lg p-3 bg-card">
@@ -983,7 +970,7 @@ const AdminAnalytics = () => {
                             <div className="font-semibold tabular-nums">
                               {p.pending}
                               {(p.hotmart_pending || p.store_pending) ? (
-                                <span className="ml-1 opacity-70 font-normal">({p.hotmart_pending ?? 0}H·{p.store_pending ?? 0}T)</span>
+                                <span className="ml-1 opacity-70 font-normal">({p.store_pending ?? 0}T)</span>
                               ) : null}
                             </div>
                           </div>

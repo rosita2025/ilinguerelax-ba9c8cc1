@@ -19,8 +19,9 @@ import { formatCurrencyAmount, formatAmountLocalized } from "@/i18n";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
-import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
+import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
@@ -363,6 +364,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
 
 
+  const { trackPurchase } = usePurchaseTracking();
   const [selected, setSelected] = useState<Method | null>(null);
   const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
@@ -455,6 +457,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       items: s.items,
       paymentMethod,
       force,
+      currency: "USD", // Forzado a USD para Ads/Tracking
     });
   }, [language, region.country]);
 
@@ -543,7 +546,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           skus: s2.items.map((i) => i.id),
           reason: detail && !looksTechnical(detail) ? detail : (detail || raw),
           value: totals.total,
-          currency: "USD",
+          currency: "USD", // Forzado a USD para Ads/Tracking
         });
       } catch { /* noop */ }
       throw err;
@@ -623,7 +626,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           skus: s3.items.map((i) => i.id),
           reason: err instanceof Error ? err.message : String(err),
           value: totals.total,
-          currency: "USD",
+          currency: "USD", // Forzado a USD para Ads/Tracking
         });
       } catch { /* noop */ }
       setMethodError({
@@ -720,7 +723,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           skus: s.items.map((i) => i.id),
           reason: rawReason,
           value: totals.total,
-          currency: "USD",
+          currency: "USD", // Forzado a USD para Ads/Tracking
         });
       } catch { /* noop */ }
       // Mensaje claro + siguiente paso: nunca dejamos un error técnico crudo.
@@ -1644,6 +1647,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     } catch (e) {
       console.error("free order confirmation failed", e);
     } finally {
+      trackPurchase(orderId, "mercadopago_cash");
       navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
     }
   };
@@ -2033,6 +2037,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   payerPhone={buyer.phone ?? undefined}
                   language={language}
                   onPaid={(orderId) => {
+                    trackPurchase(orderId, "mercadopago_transfer");
                     navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
                   }}
                   onError={(message) => setMethodError({ method: "dlocal_card", message })}
@@ -2262,6 +2267,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       source: "checkout-prueba-1",
                       metadata: { phone: buyer.phone ?? "", processor: "paypal", orderId },
                     }, { onConflict: "email,source" }).then(() => {});
+                    trackPurchase(orderId, "paypal");
                     navigate(`/checkouts/success?paypal_order=${encodeURIComponent(orderId)}`);
                   }}
                   onError={(err) => {
@@ -2272,7 +2278,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                         skus: items.map((i) => i.id),
                         reason: err instanceof Error ? err.message : String(err),
                         value: totals.total,
-                        currency: "USD",
+                        currency: "USD", // Forzado a USD para Ads/Tracking
                       });
                     } catch { /* noop */ }
                   }}

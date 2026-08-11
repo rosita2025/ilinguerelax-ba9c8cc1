@@ -78,6 +78,7 @@ export const PinterestSave = ({
       window.open(href, "_blank", "noopener,noreferrer,width=750,height=650");
       (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.("trackCustom", "PinterestSave", {
         content_name: pinDescription.slice(0, 100),
+        currency: "USD", // Estandarización para Ads
       });
     }
   };

@@ -132,13 +132,14 @@ export default function CheckoutSuccess() {
     try {
       trackHotmartEvent("Purchase", {
         value: Number(total.toFixed(2)),
-        currency: "USD",
+        currency: "USD", // Forzado a USD para Ads
         content_ids: items.map((i) => i.id),
         content_type: "product",
         content_name: items.map((i) => i.name).join(" + "),
         num_items: items.reduce((n, i) => n + (i.quantity || 1), 0),
         order_id: orderNumber,
         email: buyer.email,
+        method: provider,
       });
       sessionStorage.setItem(key, "1");
     } catch { /* ignore */ }

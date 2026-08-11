@@ -350,6 +350,7 @@ Deno.serve(async (req) => {
         subject,
         html,
         text,
+        supabase, // Enable global throttle
       } as any);
       if ((result as any)?.error) {
         console.warn('welcome email send failed', (result as any).error);

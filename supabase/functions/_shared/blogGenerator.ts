@@ -23,7 +23,63 @@ export class BlogGenError extends Error {
 // Apimart a veces devuelve SSE aunque se pida JSON. Normalizamos ambos formatos
 // a la forma estándar { choices: [{ message: { content } }] }.
 // deno-lint-ignore no-explicit-any
+/**
+ * Repara y parsea el JSON que devuelve el modelo.
+ * Los LLM suelen romper el JSON con saltos de línea reales o comillas sin
+ * escapar dentro de los strings (típico en `content` markdown largo).
+ */
+function repairJsonString(src: string): string {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (escaped) { out += ch; escaped = false; continue; }
+    if (ch === "\\") { out += ch; escaped = true; continue; }
+    if (ch === '"') {
+      if (!inString) { inString = true; out += ch; continue; }
+      // Cierre válido solo si el siguiente token es estructural
+      const rest = src.slice(i + 1);
+      if (/^\s*([,:}\]]|$)/.test(rest)) { inString = false; out += ch; }
+      else out += '\\"'; // comilla interna sin escapar
+      continue;
+    }
+    if (inString) {
+      if (ch === "\n") { out += "\\n"; continue; }
+      if (ch === "\r") { out += "\\r"; continue; }
+      if (ch === "\t") { out += "\\t"; continue; }
+      const code = ch.charCodeAt(0);
+      if (code < 0x20) { out += "\\u" + code.toString(16).padStart(4, "0"); continue; }
+    }
+    out += ch;
+  }
+  return out;
+}
+
+function parseModelJson(raw: string): any {
+  let text = String(raw).replace(/```json\s*|```/g, "").trim();
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start > 0 || (end !== -1 && end < text.length - 1)) {
+    if (start !== -1 && end > start) text = text.slice(start, end + 1);
+  }
+  try {
+    return JSON.parse(text);
+  } catch (_e) {
+    try {
+      return JSON.parse(repairJsonString(text));
+    } catch (e2) {
+      console.error("[BlogGen] JSON del modelo irreparable:", text.slice(0, 500));
+      throw new BlogGenError(
+        `La IA devolvió un JSON inválido: ${(e2 as Error).message}. Reintenta la generación.`,
+        502,
+      );
+    }
+  }
+}
+
 function parseAiResponse(text: string): any {
+
   const trimmed = text.trim();
   if (!trimmed) throw new BlogGenError("Respuesta vacía del proveedor de IA", 502);
 

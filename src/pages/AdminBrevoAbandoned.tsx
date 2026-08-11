@@ -152,14 +152,14 @@ const AdminBrevoAbandoned = () => {
                           <Badge className="bg-amber-100 text-amber-800"><AlertTriangle className="w-3 h-3 mr-1 inline" />país: {r.summary.COUNTRY_MISSING_REASON || r.summary.COUNTRY_STATUS}</Badge>
                         )}
                       </div>
-                      <div className="mt-1 text-sm font-medium truncate">{r.email || "(sin email)"} · {r.product_name || r.product_sku || "(sin producto)"}</div>
-                      <div className="mt-0.5 text-xs text-muted-foreground truncate">
+                      <div className="mt-1 text-xs font-medium truncate">{r.email || "(sin email)"} · {r.product_name || r.product_sku || "(sin producto)"}</div>
+                      <div className="mt-0.5 text-[10px] text-muted-foreground truncate">
                         SEGMENTO: <b>{r.summary.SEGMENTO || "—"}</b> · TAGS: {tagsToString(r.summary.TAGS)}
-                        {r.summary.HOTMART_PRODUCT_ID && <> · Hotmart id: <code>{r.summary.HOTMART_PRODUCT_ID}</code></>}
-                        {r.summary.HOTMART_PRODUCT_CODE && <> · code: <code>{r.summary.HOTMART_PRODUCT_CODE}</code></>}
-                        {r.summary.TIENDA_SKU && <> · SKU tienda: <code>{r.summary.TIENDA_SKU}</code></>}
+                        {r.summary.HOTMART_PRODUCT_ID && <> · ID: <code>{r.summary.HOTMART_PRODUCT_ID}</code></>}
+                        {r.summary.TIENDA_SKU && <> · SKU: <code>{r.summary.TIENDA_SKU}</code></>}
                       </div>
                     </div>
+
                   </button>
 
                   {isOpen && (

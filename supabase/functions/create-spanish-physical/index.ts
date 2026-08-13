@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const PRICE_ID = "price_1Tg6KBBfc72Blbd9hEX3dulP"; // Spanish Relax Physical + Digital + Bonuses — $34.99
-const SHIPPING_COUNTRIES = ["US", "CA", "GB", "AU"] as const;
+const SHIPPING_COUNTRIES = ["US", "CA", "GB", "AU", "NZ"] as const;
 const FREESHIP_PROMO_CODE = "FREESHIP50";
 const FREESHIP_COUPON_ID = "oDp3a99D"; // $8 off — "Free shipping over $50"
 

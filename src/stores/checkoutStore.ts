@@ -16,6 +16,8 @@ export interface PruebaItem {
   regionPrices?: { latam: number; global: number; tienda?: number };
   /** Optional Peru local price (PEN). When set + country=PE, shown natively (no conversion). */
   pricePen?: number;
+  /** Whether the product is physical (requires shipping address). */
+  isPhysical?: boolean;
 }
 
 /** Returns the effective USD unit price for an item, given the visitor's IP region tier. */
@@ -61,6 +63,11 @@ export interface BuyerInfo {
   fullName: string;
   email: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
 }
 
 interface PruebaStore {

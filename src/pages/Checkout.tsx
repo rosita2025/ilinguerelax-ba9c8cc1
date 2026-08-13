@@ -227,7 +227,7 @@ export default function Checkout() {
           try {
             return await supabase
               .from("digital_products")
-              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at")
+              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, is_physical")
               .eq("sku", adminSku)
               .eq("active", true)
               .maybeSingle();
@@ -332,7 +332,7 @@ export default function Checkout() {
         productPath: staticItem?.productPath ?? `/products/${data.sku}`,
         adminSku: data.sku,
         upsells: upsells ?? undefined,
-        isPhysical: !!data.is_physical,
+        isPhysical: Boolean(data.is_physical),
         ...(pricePen != null && { pricePen }),
         // Always emit regionPrices so any region resolves to a valid price,
         // even for brand-new admin products that only have price_usd set.

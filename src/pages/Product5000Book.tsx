@@ -318,9 +318,20 @@ const Product5000Book = () => {
                 COMPRAR AHORA
               </Button>
 
-              <p className="w-full mb-4 text-center text-sm text-muted-foreground">
-                🔒 Pago seguro con tarjeta · Envío a 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
-              </p>
+              <div className="w-full mb-4 p-4 rounded-xl bg-muted/30 border border-dashed border-muted-foreground/30">
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm font-bold text-foreground flex items-center justify-center gap-2">
+                    <Truck className="w-4 h-4 text-primary" />
+                    Envío Internacional: $8.00 USD
+                  </p>
+                  <p className="text-[11px] text-muted-foreground text-center">
+                    📦 Disponible para: 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 Reino Unido · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
+                  </p>
+                  <p className="text-[10px] text-emerald-600 font-bold text-center uppercase tracking-wider">
+                    ✨ ENVÍO GRATIS en pedidos mayores a $50
+                  </p>
+                </div>
+              </div>
 
               {/* Trust Badges */}
 

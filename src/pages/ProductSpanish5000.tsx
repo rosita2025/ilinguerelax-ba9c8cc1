@@ -164,13 +164,13 @@ const ProductSpanish5000 = () => {
     ["A_add_to_cart", "B_i_want_to_buy", "C_download_now"] as const,
   );
   const ctaTextByVariant: Record<string, string> = {
-    A_add_to_cart: "BUY ON AMAZON",
-    B_i_want_to_buy: "BUY ON AMAZON",
-    C_download_now: "BUY ON AMAZON",
+    A_add_to_cart: "BUY NOW",
+    B_i_want_to_buy: "BUY NOW",
+    C_download_now: "BUY NOW",
   };
-  const stickyCtaText = "BUY ON AMAZON";
+  const stickyCtaText = "BUY NOW";
 
-  // Digital-only product — Spanish Relax 5,000 Words.
+  // Physical book — Stripe checkout with international shipping.
   const isPhysicalBundle = false;
   const dynamicCtaText = stickyCtaText;
   const stickyPriceLabel = campaign.price;
@@ -180,13 +180,18 @@ const ProductSpanish5000 = () => {
     await handleBuyNow();
   };
 
-  const AMAZON_PHYSICAL_URL = "https://amzn.to/4bgODhz";
   const handleBuyNow = async () => {
     if (checkoutLockRef.current) return;
     checkoutLockRef.current = true;
     try {
-      // Skip Meta Pixel: Amazon is external, our pixel does not need this event.
-      window.open(AMAZON_PHYSICAL_URL, "_blank", "noopener,noreferrer");
+      const { data, error } = await supabase.functions.invoke("create-spanish-physical", {
+        body: {},
+      });
+      if (error || !data?.url) throw new Error(error?.message || "Checkout unavailable");
+      window.location.href = data.url;
+    } catch (err) {
+      console.error("[ProductSpanish5000] checkout error", err);
+      toast.error("We couldn't open checkout. Please try again.");
     } finally {
       checkoutLockRef.current = false;
     }

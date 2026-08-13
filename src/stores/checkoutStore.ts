@@ -89,6 +89,7 @@ interface PruebaStore {
   pruneUnknown: (validIds: Set<string>) => number;
   selectedMethod: string | null;
   setSelectedMethod: (method: string | null) => void;
+  hasPhysicalItems: () => boolean;
 }
 
 // Carrito arranca VACÍO. Los productos se agregan solo cuando el usuario
@@ -134,6 +135,7 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
 
       setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
       setSelectedMethod: (method) => set({ selectedMethod: method }),
+      hasPhysicalItems: () => get().items.some((i) => i.isPhysical),
 
 
       addItem: (item, opts) => {

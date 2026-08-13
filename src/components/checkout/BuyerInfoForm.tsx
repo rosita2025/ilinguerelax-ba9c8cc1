@@ -264,7 +264,7 @@ export function BuyerInfoForm() {
           <div className="space-y-3 pt-3 border-t">
             <h3 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-2">
               <MapPin className="w-3 h-3" />
-              {t.shippingAddress}
+              {t.shippingAddress} ({t.physical.toLowerCase()}s)
             </h3>
             
             <label className="block">

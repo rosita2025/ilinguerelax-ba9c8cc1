@@ -253,6 +253,15 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
+            <span>{t.shipping}</span>
+            <span>
+              {items.some(i => i.isPhysical) 
+                ? (total >= 50 ? t.freeShipping : formatCurrencyAmount(8, "USD"))
+                : t.freeDigitalDelivery
+              }
+            </span>
+          </div>
+          <div className="flex justify-between text-muted-foreground text-xs">
             <span>{t.taxes}</span>
             <span>{t.included}</span>
           </div>

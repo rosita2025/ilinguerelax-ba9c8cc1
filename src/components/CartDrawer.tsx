@@ -392,7 +392,12 @@ export const CartDrawer = () => {
                         <img src={it.image} alt={it.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold leading-tight truncate">{it.name}</p>
+                        <p className="text-xs font-semibold leading-tight truncate">
+                          {it.name}
+                          <span className="ml-2 text-[9px] uppercase px-1 py-0.5 rounded bg-secondary/50 text-muted-foreground">
+                            {it.isPhysical ? t.physical : t.digital}
+                          </span>
+                        </p>
                         <p className="text-[11px] text-primary font-bold">
                           {formatInternalUnit(it)}
                         </p>
@@ -422,6 +427,7 @@ export const CartDrawer = () => {
                 onClick={goToInternalCheckout}
                 className="w-full mt-2 h-10 text-sm font-bold"
               >
+                {visibleInternalItems.some(i => i.isPhysical) ? t.configureShipping : t.buyNow}
                 Ir al checkout
                 <ArrowRight className="w-4 h-4 ml-1.5" />
               </Button>

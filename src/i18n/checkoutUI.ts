@@ -28,6 +28,13 @@ export interface CheckoutUIStrings {
   postalCode: string;
   shippingCountry: string;
   selectCountry: string;
+  shipping: string;
+  freeDigitalDelivery: string;
+  standardShipping: string;
+  freeShipping: string;
+  digital: string;
+  physical: string;
+  configureShipping: string;
 
   // PaymentMethodsGroup
   choosePaymentMethod: string;
@@ -123,6 +130,13 @@ const es: CheckoutUIStrings = {
   postalCode: "Código Postal",
   shippingCountry: "País de envío",
   selectCountry: "Seleccionar país",
+  shipping: "Envío",
+  freeDigitalDelivery: "Gratis (Entrega Digital)",
+  standardShipping: "Envío Estándar",
+  freeShipping: "Envío Gratis",
+  digital: "Digital",
+  physical: "Físico",
+  configureShipping: "Configurar envío",
 
   choosePaymentMethod: "Elige tu método de pago",
   cardPayment: "Pago con tarjeta",
@@ -214,6 +228,13 @@ const en: CheckoutUIStrings = {
   postalCode: "Postal Code",
   shippingCountry: "Shipping Country",
   selectCountry: "Select country",
+  shipping: "Shipping",
+  freeDigitalDelivery: "Free (Digital Delivery)",
+  standardShipping: "Standard Shipping",
+  freeShipping: "Free Shipping",
+  digital: "Digital",
+  physical: "Physical",
+  configureShipping: "Configure shipping",
 
   choosePaymentMethod: "Choose your payment method",
   cardPayment: "Card payment",
@@ -305,6 +326,13 @@ const pt: CheckoutUIStrings = {
   postalCode: "Código Postal",
   shippingCountry: "País de entrega",
   selectCountry: "Selecionar país",
+  shipping: "Envio",
+  freeDigitalDelivery: "Grátis (Entrega Digital)",
+  standardShipping: "Envio Padrão",
+  freeShipping: "Envio Grátis",
+  digital: "Digital",
+  physical: "Físico",
+  configureShipping: "Configurar envio",
 
   choosePaymentMethod: "Escolha sua forma de pagamento",
   cardPayment: "Pagamento com cartão",
@@ -396,6 +424,13 @@ const fr: CheckoutUIStrings = {
   postalCode: "Code postal",
   shippingCountry: "Pays de livraison",
   selectCountry: "Sélectionner le pays",
+  shipping: "Livraison",
+  freeDigitalDelivery: "Gratuit (Livraison numérique)",
+  standardShipping: "Livraison standard",
+  freeShipping: "Livraison gratuite",
+  digital: "Numérique",
+  physical: "Physique",
+  configureShipping: "Configurer la livraison",
 
   choosePaymentMethod: "Choisissez votre mode de paiement",
   cardPayment: "Paiement par carte",

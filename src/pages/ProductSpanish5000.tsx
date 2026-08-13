@@ -326,6 +326,8 @@ const ProductSpanish5000 = () => {
                     <div className="text-xs text-foreground leading-snug">
                       <strong>International shipping:</strong> 🇺🇸 USA · 🇨🇦 Canada · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 New Zealand — flat <strong>$8 USD</strong>.
                       <br />
+                      📦 Delivery address and country collected at checkout.
+                      <br />
                       <span className="text-emerald-700 dark:text-emerald-400 font-semibold">🎁 FREE shipping on orders over $50</span> (add 2+ books at checkout).
                     </div>
                   </div>

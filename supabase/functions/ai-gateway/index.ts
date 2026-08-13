@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { assertAdminCsrf, withAdminLogging, adminCorsHeaders } from "../_shared/adminCsrf.ts";
+import { assertAdminCsrf, withAdminLogging, adminCorsHeaders, adminLog } from "../_shared/adminCsrf.ts";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 

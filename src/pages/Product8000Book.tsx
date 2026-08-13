@@ -359,7 +359,10 @@ const Product8000Book = () => {
                     Envío Internacional: $8.00 USD
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    🌍 Ahorra tiempo: 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 Reino Unido · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
+                    📦 Dirección y país de entrega se solicitan al finalizar el pago.
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    🌍 Disponible para: 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 Reino Unido · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
                   </p>
                   <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
                     ✨ ENVÍO GRATIS EN PEDIDOS MAYORES A $50

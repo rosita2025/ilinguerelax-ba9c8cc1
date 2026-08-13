@@ -9,6 +9,7 @@ import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
@@ -148,6 +149,7 @@ const ProductSpanish5000 = () => {
   useScrollTimeTracking("product_spanish_5000");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [isCreatingDigitalCheckout, setIsCreatingDigitalCheckout] = useState(false);
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const checkoutLockRef = useRef(false);
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
@@ -181,20 +183,7 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    if (checkoutLockRef.current) return;
-    checkoutLockRef.current = true;
-    try {
-      const { data, error } = await supabase.functions.invoke("create-spanish-physical", {
-        body: {},
-      });
-      if (error || !data?.url) throw new Error(error?.message || "Checkout unavailable");
-      window.location.href = data.url;
-    } catch (err) {
-      console.error("[ProductSpanish5000] checkout error", err);
-      toast.error("We couldn't open checkout. Please try again.");
-    } finally {
-      checkoutLockRef.current = false;
-    }
+    setPhysicalCheckoutOpen(true);
   };
   return <main className="min-h-screen bg-background">
       <Helmet>
@@ -805,6 +794,7 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Relax 5,000 Words — Secure checkout" />
       <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} />
 
       {/* Spacer for sticky bar */}

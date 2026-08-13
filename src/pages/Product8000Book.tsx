@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -123,11 +124,9 @@ const Product8000Book = () => {
   }, []);
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToShopifyCart = async () => {
-    // Physical book — Shopify removed. Send buyers to Amazon.
-    if (typeof window !== "undefined") {
-      window.open(AMAZON_URL_8000, "_blank", "noopener,noreferrer");
-    }
+    setPhysicalCheckoutOpen(true);
   };
 
 
@@ -308,13 +307,13 @@ const Product8000Book = () => {
                   </Button>
                 </div>
 
-                {/* Tarjeta 2 - Amazon */}
+                {/* Tarjeta 2 - Envío internacional */}
                 <div className="relative rounded-2xl border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30 p-5 shadow-md flex flex-col">
                   <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-amber-500 text-amber-950 text-[10px] font-black uppercase tracking-wider">
                     🚚 Envío rápido
                   </div>
                   <h3 className="text-base md:text-lg font-bold text-amber-900 dark:text-amber-100 mb-1 mt-1">
-                    Comprar en Amazon
+                    Comprar ahora
                   </h3>
                   <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-3">
                     ENTREGA MÁS RÁPIDA 📦
@@ -326,11 +325,11 @@ const Product8000Book = () => {
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
                       <Truck className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span><strong>Entrega Amazon Prime</strong></span>
+                      <span><strong>Envío internacional 7–15 días</strong></span>
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
                       <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>Confianza Amazon</span>
+                      <span>Pago seguro con tarjeta</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm text-foreground">
                       <Gift className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -343,13 +342,11 @@ const Product8000Book = () => {
                   <Button
                     size="lg"
                     className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                    asChild
+                    onClick={handleAddToShopifyCart}
                   >
-                    <a href="/amazon">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Comprar en Amazon
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </a>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Comprar ahora — Envío internacional
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
               </div>
@@ -584,13 +581,13 @@ const Product8000Book = () => {
                 </Button>
               </div>
 
-              {/* Tarjeta Amazon - Envío rápido */}
+              {/* Tarjeta - Envío internacional rápido */}
               <div className="relative bg-card border-2 border-amber-400 rounded-2xl shadow-card p-6 flex flex-col">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-950 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
                   🚚 ENVÍO RÁPIDO
                 </span>
                 <h3 className="text-lg font-bold text-amber-700 dark:text-amber-300 mt-2 mb-1">
-                  Comprar en Amazon
+                  Comprar ahora
                 </h3>
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-3xl font-bold text-foreground">$25.00</span>
@@ -598,8 +595,8 @@ const Product8000Book = () => {
                 </div>
                 <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Libro físico</li>
-                  <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> <strong>Entrega Amazon Prime</strong></li>
-                  <li className="flex items-start gap-2"><Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Confianza Amazon</li>
+                  <li className="flex items-start gap-2"><Truck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> <strong>Envío internacional 7–15 días</strong></li>
+                  <li className="flex items-start gap-2"><Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Pago seguro con tarjeta</li>
                   <li className="flex items-start gap-2"><Gift className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" /> Ebook GRATIS enviando recibo a hola@ilinguerelax.com</li>
                 </ul>
                 <p className="text-xs text-amber-700 dark:text-amber-300 font-semibold mb-3">
@@ -608,13 +605,13 @@ const Product8000Book = () => {
                 <Button
                   size="lg"
                   className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                  asChild
+                  onClick={handleAddToShopifyCart}
                 >
-                  <a href="/amazon">
+                  <span className="inline-flex items-center">
                     <ShoppingCart className="w-5 h-5 mr-2" />
-                    Comprar en Amazon
+                    Comprar ahora
                     <ArrowRight className="w-4 h-4 ml-2" />
-                  </a>
+                  </span>
                 </Button>
               </div>
             </div>
@@ -683,18 +680,17 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Palabras — Libro Físico · Pago seguro" />
       <StickyBuyBar
         price="$25.00"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
-        ctaText="Agregar al Carrito"
+        ctaText="Comprar ahora"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}
         showReviews={true}
         rating={4.89}
         reviewCount={246}
-        secondaryCtaText="Comprar en Amazon"
-        onSecondaryClick={() => window.open("/amazon", "_blank")}
         isPhysical={true}
       />
 

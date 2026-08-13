@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -63,9 +64,9 @@ const benefits = [
   },
   {
     icon: Truck,
-    title: "Disponible en Amazon",
+    title: "Envío internacional",
     description:
-      "Compra directamente en Amazon con envío rápido a tu puerta. Disponible en múltiples países.",
+      "Compra directa con pago seguro y envío a USA, Canadá, UK, Australia y Nueva Zelanda.",
   },
   {
     icon: Sparkles,
@@ -117,11 +118,9 @@ const Product5000Book = () => {
     loadProduct();
   }, []);
 
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToShopifyCart = async () => {
-    // Physical book — Shopify removed. Send buyers to Amazon.
-    if (typeof window !== "undefined") {
-      window.open(AMAZON_URL, "_blank", "noopener,noreferrer");
-    }
+    setPhysicalCheckoutOpen(true);
   };
 
 
@@ -163,7 +162,7 @@ const Product5000Book = () => {
         rating=""
         reviewCount=""
         sku="ILINGUE-5000-BOOK"
-        keywords="libro de inglés físico, libro para aprender inglés, 5000 palabras en inglés libro, libro de vocabulario en inglés, libro de inglés con pronunciación en español, mejor libro para aprender inglés, libro de inglés para hispanohablantes, comprar libro de inglés Amazon, libro de inglés tapa blanda, iLingue Relax libro"
+        keywords="libro de inglés físico, libro para aprender inglés, 5000 palabras en inglés libro, libro de vocabulario en inglés, libro de inglés con pronunciación en español, mejor libro para aprender inglés, libro de inglés para hispanohablantes, libro de inglés tapa blanda, iLingue Relax libro"
         availability="InStock"
         isPhysical={true}
       />
@@ -229,7 +228,7 @@ const Product5000Book = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium"
                 >
                   <Package className="w-4 h-4" />
-                  <span>📦 Envío por Amazon</span>
+                  <span>📦 Envío internacional</span>
                 </motion.div>
               </div>
 
@@ -316,21 +315,12 @@ const Product5000Book = () => {
                 ) : (
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
-                AGREGAR AL CARRITO
+                COMPRAR AHORA
               </Button>
 
-              {/* Buy on Amazon - Secondary */}
-              <Button
-                variant="outline"
-                size="xl"
-                className="w-full mb-4 text-base py-5 font-semibold border-primary/30 text-primary hover:bg-primary/10"
-                asChild
-              >
-                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-5 h-5 mr-2" />
-                  COMPRAR EN AMAZON
-                </a>
-              </Button>
+              <p className="w-full mb-4 text-center text-sm text-muted-foreground">
+                🔒 Pago seguro con tarjeta · Envío a 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
+              </p>
 
               {/* Trust Badges */}
 
@@ -346,7 +336,7 @@ const Product5000Book = () => {
                 </div>
                 <div>
                   <p className="text-base font-bold text-foreground">📖 Libro Físico Premium</p>
-                  <p className="text-sm text-muted-foreground">Tapa blanda de alta calidad, 250-300 páginas. Disponible en Amazon con envío rápido.</p>
+                  <p className="text-sm text-muted-foreground">Tapa blanda de alta calidad, 250-300 páginas. Envío internacional rápido.</p>
                 </div>
               </motion.div>
             </div>
@@ -440,7 +430,7 @@ const Product5000Book = () => {
               ¡Consigue tu libro físico ahora!
             </h2>
             <p className="text-lg text-primary-foreground/90 mb-8">
-              Disponible en Amazon con envío rápido a tu puerta.
+              Envío internacional a USA, Canadá, UK, Australia y Nueva Zelanda.
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
@@ -451,18 +441,16 @@ const Product5000Book = () => {
                 </div>
                 <p className="text-accent font-bold text-sm mb-1">🎁 PACK: Libro Físico + Digital GRATIS</p>
                 <p className="text-muted-foreground mb-6">
-                  Pago único • Envío por Amazon • Incluye PDF digital
+                  Pago único • Envío internacional • Incluye PDF digital
                 </p>
-              <Button variant="hero" size="xl" className="w-full" asChild>
-                <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                  COMPRAR AHORA EN AMAZON
-                  <ExternalLink className="w-5 h-5 ml-2" />
-                </a>
+              <Button variant="hero" size="xl" className="w-full" onClick={handleAddToShopifyCart} disabled={cartLoading}>
+                COMPRAR AHORA
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
 
             <p className="text-sm text-primary-foreground/70">
-              🔒 Compra segura en Amazon • Garantía de satisfacción
+              🔒 Compra segura con tarjeta • Garantía de satisfacción
             </p>
           </div>
         </div>
@@ -478,12 +466,12 @@ const Product5000Book = () => {
           },
           {
             question: "¿Dónde puedo comprar el libro?",
-            answer: "El libro está disponible directamente en Amazon. Haz clic en 'Comprar Ahora en Amazon' para ir a la página del producto.",
+            answer: "Haz clic en 'Comprar ahora' y completa el pago seguro con tarjeta. El libro se envía a tu dirección.",
             icon: ShoppingCart,
           },
           {
             question: "¿Cuánto tarda el envío?",
-            answer: "El envío es gestionado por Amazon. Los tiempos varían según tu ubicación, pero normalmente recibes tu libro en pocos días.",
+            answer: "El envío internacional tarda entre 7 y 15 días hábiles según tu país.",
             icon: Truck,
           },
           {
@@ -498,21 +486,20 @@ const Product5000Book = () => {
           },
           {
             question: "¿Puedo comprar desde cualquier país?",
-            answer: "Sí, Amazon realiza envíos internacionales. Consulta la disponibilidad y costos de envío en la página de Amazon para tu país.",
+            answer: "Enviamos a USA, Canadá, Reino Unido, Australia y Nueva Zelanda. Envío estándar $8 (gratis en pedidos de $50+).",
             icon: Shield,
           },
         ]}
       />
 
       <Footer />
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_5000" title="5,000 Palabras — Libro Físico · Pago seguro" />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"
-        ctaText="Agregar al Carrito"
+        ctaText="Comprar ahora"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}
-        secondaryCtaText="Comprar en Amazon"
-        onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
         showReviews={false}
         isPhysical={true}
       />

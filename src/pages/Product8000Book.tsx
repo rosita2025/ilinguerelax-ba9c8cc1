@@ -351,7 +351,21 @@ const Product8000Book = () => {
                 </div>
               </div>
 
-              {/* Trust Badges */}
+              {/* Trust Badges & Shipping Info */}
+              <div className="w-full mb-4 p-4 rounded-xl bg-muted/30 border border-dashed border-muted-foreground/30">
+                <div className="flex flex-col gap-2 text-center">
+                  <p className="text-sm font-bold text-foreground flex items-center justify-center gap-2">
+                    <Truck className="w-4 h-4 text-primary" />
+                    Envío Internacional: $8.00 USD
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    🌍 Ahorra tiempo: 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 Reino Unido · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
+                  </p>
+                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
+                    ✨ ENVÍO GRATIS EN PEDIDOS MAYORES A $50
+                  </p>
+                </div>
+              </div>
 
               {/* Pre-order Info */}
               <motion.div 

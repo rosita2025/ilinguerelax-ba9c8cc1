@@ -3,7 +3,7 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Truck, ShieldCheck, Globe } from "lucide-react";
+import { MapPin, Truck, ShieldCheck, Globe, Gift } from "lucide-react";
 
 export type PhysicalBookKey = "english_5000" | "english_8000" | "spanish_5000";
 

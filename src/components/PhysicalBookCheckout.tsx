@@ -3,7 +3,7 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Truck, ShieldCheck, Globe } from "lucide-react";
+import { MapPin, Truck, ShieldCheck, Globe, Gift } from "lucide-react";
 
 export type PhysicalBookKey = "english_5000" | "english_8000" | "spanish_5000";
 
@@ -88,8 +88,18 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
                     Tus datos y dirección están protegidos por Stripe.
                   </p>
                 </div>
+                </div>
               </div>
-            </div>
+
+              <div className="flex gap-3">
+                <Gift className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-emerald-700">Digital GRATIS</p>
+                  <p className="text-xs text-muted-foreground">
+                    Acceso inmediato al PDF tras la compra.
+                  </p>
+                </div>
+              </div>
 
             <div className="pt-4 border-t border-muted">
               <p className="text-[10px] text-muted-foreground text-center italic">

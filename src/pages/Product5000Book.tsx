@@ -123,10 +123,9 @@ const Product5000Book = () => {
     setPhysicalCheckoutOpen(true);
   };
 
-
   const pixelParams = useMemo(() => ({
-    content_name: "Inglés Relax - 5,000 Palabras Libro Físico",
-    content_category: "Physical Book",
+    content_name: "Inglés Relax - 5,000 Palabras Libro Físico + Digital",
+    content_category: "Physical Book Bundle",
     content_ids: ["product-5000-book"],
     content_type: "product",
     value: 24.00,
@@ -235,7 +234,7 @@ const Product5000Book = () => {
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Inglés Relax - 5,000 Palabras
                 <br />
-                <span className="text-primary">Libro Físico Tapa Blanda</span>
+                <span className="text-primary">Libro Físico + Digital GRATIS</span>
               </h1>
 
               <p className="text-lg text-muted-foreground mb-4">

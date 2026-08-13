@@ -11,6 +11,8 @@ import {
   CreditCard,
   MessageCircle,
   Package,
+  Download,
+  Gift,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -322,6 +324,26 @@ export default function OrderStatus() {
 
         {result?.found && (
           <div className="space-y-6">
+            {result.stage === "paid" && (
+              <div className="rounded-xl border-2 border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Download className="w-5 h-5 text-emerald-600" />
+                  <h2 className="font-semibold text-emerald-900 dark:text-emerald-100">
+                    Tu material digital ya está disponible
+                  </h2>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Tu libro físico está en camino, pero puedes empezar a estudiar ahora mismo con la versión digital. Busca el correo de entrega para acceder.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 h-8 gap-1.5">
+                    <a href="/mi-descarga">
+                      <Download className="w-3.5 h-3.5" /> Acceder a mis descargas
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="rounded-xl border bg-card p-5 space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>

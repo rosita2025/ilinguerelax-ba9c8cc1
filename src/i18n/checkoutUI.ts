@@ -21,6 +21,13 @@ export interface CheckoutUIStrings {
   emailError: string;
   emailHint: string;
   whatsappOptional: string;
+  shippingAddress: string;
+  addressPlaceholder: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+  shippingCountry: string;
+  selectCountry: string;
 
   // PaymentMethodsGroup
   choosePaymentMethod: string;
@@ -109,6 +116,13 @@ const es: CheckoutUIStrings = {
   emailError: "Ingresa un correo válido.",
   emailHint: "Aquí enviaremos tu acceso al producto digital.",
   whatsappOptional: "WhatsApp (opcional)",
+  shippingAddress: "Dirección de envío",
+  addressPlaceholder: "Calle, número, departamento...",
+  city: "Ciudad",
+  stateProvince: "Estado / Provincia",
+  postalCode: "Código Postal",
+  shippingCountry: "País de envío",
+  selectCountry: "Seleccionar país",
 
   choosePaymentMethod: "Elige tu método de pago",
   cardPayment: "Pago con tarjeta",
@@ -193,6 +207,13 @@ const en: CheckoutUIStrings = {
   emailError: "Please enter a valid email.",
   emailHint: "We'll send your product access here.",
   whatsappOptional: "WhatsApp (optional)",
+  shippingAddress: "Shipping Address",
+  addressPlaceholder: "Street, number, apartment...",
+  city: "City",
+  stateProvince: "State / Province",
+  postalCode: "Postal Code",
+  shippingCountry: "Shipping Country",
+  selectCountry: "Select country",
 
   choosePaymentMethod: "Choose your payment method",
   cardPayment: "Card payment",
@@ -277,6 +298,13 @@ const pt: CheckoutUIStrings = {
   emailError: "Digite um e-mail válido.",
   emailHint: "Aqui enviaremos seu acesso ao produto digital.",
   whatsappOptional: "WhatsApp (opcional)",
+  shippingAddress: "Endereço de entrega",
+  addressPlaceholder: "Rua, número, apartamento...",
+  city: "Cidade",
+  stateProvince: "Estado / Província",
+  postalCode: "Código Postal",
+  shippingCountry: "País de entrega",
+  selectCountry: "Selecionar país",
 
   choosePaymentMethod: "Escolha sua forma de pagamento",
   cardPayment: "Pagamento com cartão",
@@ -361,6 +389,13 @@ const fr: CheckoutUIStrings = {
   emailError: "Veuillez saisir un e-mail valide.",
   emailHint: "Nous vous enverrons l'accès au produit ici.",
   whatsappOptional: "WhatsApp (facultatif)",
+  shippingAddress: "Adresse de livraison",
+  addressPlaceholder: "Rue, numéro, appartement...",
+  city: "Ville",
+  stateProvince: "État / Province",
+  postalCode: "Code postal",
+  shippingCountry: "Pays de livraison",
+  selectCountry: "Sélectionner le pays",
 
   choosePaymentMethod: "Choisissez votre mode de paiement",
   cardPayment: "Paiement par carte",

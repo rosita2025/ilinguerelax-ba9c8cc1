@@ -418,7 +418,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
   const stripeContainerRef = useRef<HTMLDivElement | null>(null);
-  const valid = isBuyerValid(buyer);
+  const hasPhysicalItems = items.some(i => i.isPhysical);
+  const valid = isBuyerValid(buyer, hasPhysicalItems);
 
   const stripePromise = (() => {
     try { return getStripe(); } catch { return null; }

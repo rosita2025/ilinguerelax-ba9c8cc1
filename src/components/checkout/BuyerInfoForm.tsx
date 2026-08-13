@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { User, Mail, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, Mail, CheckCircle2, AlertCircle, MapPin, Globe } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
@@ -16,8 +16,23 @@ function normalizeEmail(raw: string) {
   return checkEmail(raw).email;
 }
 
-export function isBuyerValid(buyer: { fullName: string; email: string }) {
-  return buyer.fullName.trim().length >= 3 && checkEmail(buyer.email).ok;
+export function isBuyerValid(buyer: { 
+  fullName: string; 
+  email: string;
+  address?: string;
+  city?: string;
+  zip?: string;
+  country?: string;
+}, hasPhysicalItems = false) {
+  const basicOk = buyer.fullName.trim().length >= 3 && checkEmail(buyer.email).ok;
+  if (!hasPhysicalItems) return basicOk;
+  return (
+    basicOk &&
+    (buyer.address || "").trim().length > 5 &&
+    (buyer.city || "").trim().length > 2 &&
+    (buyer.zip || "").trim().length > 3 &&
+    (buyer.country || "").trim().length > 1
+  );
 }
 
 export const BUYER_FORM_ID = "buyer-info-form";
@@ -94,7 +109,8 @@ export function BuyerInfoForm() {
     }).catch(() => { /* silencioso */ });
   };
 
-  const valid = isBuyerValid(buyer);
+  const hasPhysicalItems = items.some(i => i.isPhysical);
+  const valid = isBuyerValid(buyer, hasPhysicalItems);
   const [showErrors, setShowErrors] = useState(false);
   const [shake, setShake] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -104,6 +120,11 @@ export function BuyerInfoForm() {
   const nameInvalid = buyer.fullName.trim().length < 3;
   const emailCheck = checkEmail(buyer.email);
   const emailInvalid = !emailCheck.ok;
+  
+  const addressInvalid = hasPhysicalItems && (buyer.address || "").trim().length < 5;
+  const cityInvalid = hasPhysicalItems && (buyer.city || "").trim().length < 2;
+  const zipInvalid = hasPhysicalItems && (buyer.zip || "").trim().length < 3;
+  const countryInvalid = hasPhysicalItems && !(buyer.country || "").trim();
 
   useEffect(() => {
     const handler = () => {
@@ -114,6 +135,7 @@ export function BuyerInfoForm() {
       window.setTimeout(() => {
         if (nameInvalid) nameRef.current?.focus();
         else if (emailInvalid) emailRef.current?.focus();
+        else if (addressInvalid) document.getElementById("shipping-address")?.focus();
       }, 350);
     };
     window.addEventListener(BUYER_ERRORS_EVENT, handler);
@@ -237,6 +259,107 @@ export function BuyerInfoForm() {
             />
           </div>
         </label>
+
+        {hasPhysicalItems && (
+          <div className="space-y-3 pt-3 border-t">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+              <MapPin className="w-3 h-3" />
+              {t.shippingAddress}
+            </h3>
+            
+            <label className="block">
+              <span className="text-xs font-medium text-muted-foreground">{t.shippingAddress} *</span>
+              <div className="relative mt-1">
+                <MapPin className={cn(
+                  "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",
+                  showErrors && addressInvalid ? "text-destructive" : "text-muted-foreground",
+                )} />
+                <input
+                  id="shipping-address"
+                  type="text"
+                  required
+                  value={buyer.address || ""}
+                  onChange={(e) => setBuyer({ address: e.target.value })}
+                  placeholder={t.addressPlaceholder}
+                  className={cn(
+                    "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",
+                    showErrors && addressInvalid
+                      ? "border-destructive focus:ring-destructive/40"
+                      : "focus:ring-primary/40",
+                  )}
+                />
+              </div>
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="text-xs font-medium text-muted-foreground">{t.city} *</span>
+                <input
+                  type="text"
+                  required
+                  value={buyer.city || ""}
+                  onChange={(e) => setBuyer({ city: e.target.value })}
+                  className={cn(
+                    "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 mt-1",
+                    showErrors && cityInvalid
+                      ? "border-destructive focus:ring-destructive/40"
+                      : "focus:ring-primary/40",
+                  )}
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-muted-foreground">{t.postalCode} *</span>
+                <input
+                  type="text"
+                  required
+                  value={buyer.zip || ""}
+                  onChange={(e) => setBuyer({ zip: e.target.value })}
+                  className={cn(
+                    "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 mt-1",
+                    showErrors && zipInvalid
+                      ? "border-destructive focus:ring-destructive/40"
+                      : "focus:ring-primary/40",
+                  )}
+                />
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="text-xs font-medium text-muted-foreground">{t.stateProvince}</span>
+                <input
+                  type="text"
+                  value={buyer.state || ""}
+                  onChange={(e) => setBuyer({ state: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 mt-1"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-muted-foreground">{t.shippingCountry} *</span>
+                <div className="relative mt-1">
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <select
+                    value={buyer.country || ""}
+                    onChange={(e) => setBuyer({ country: e.target.value })}
+                    className={cn(
+                      "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 appearance-none",
+                      showErrors && countryInvalid
+                        ? "border-destructive focus:ring-destructive/40"
+                        : "focus:ring-primary/40",
+                    )}
+                  >
+                    <option value="">{t.selectCountry}</option>
+                    <option value="US">USA 🇺🇸</option>
+                    <option value="CA">Canada 🇨🇦</option>
+                    <option value="GB">United Kingdom 🇬🇧</option>
+                    <option value="AU">Australia 🇦🇺</option>
+                    <option value="NZ">New Zealand 🇳🇿</option>
+                  </select>
+                </div>
+              </label>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

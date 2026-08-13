@@ -332,6 +332,7 @@ export default function Checkout() {
         productPath: staticItem?.productPath ?? `/products/${data.sku}`,
         adminSku: data.sku,
         upsells: upsells ?? undefined,
+        isPhysical: !!data.is_physical,
         ...(pricePen != null && { pricePen }),
         // Always emit regionPrices so any region resolves to a valid price,
         // even for brand-new admin products that only have price_usd set.

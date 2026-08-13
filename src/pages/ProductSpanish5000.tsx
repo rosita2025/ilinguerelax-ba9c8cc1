@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";

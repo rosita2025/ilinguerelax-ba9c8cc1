@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -60,7 +61,6 @@ const InfluencerVideoCarousel = lazy(() => import("@/components/InfluencerVideoC
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
 // Store logos
-import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
 import logoShopify from "@/assets/logo-shopify.png";
 import { PinterestSave } from "@/components/PinterestSave";
@@ -164,13 +164,13 @@ const ProductSpanish5000 = () => {
     ["A_add_to_cart", "B_i_want_to_buy", "C_download_now"] as const,
   );
   const ctaTextByVariant: Record<string, string> = {
-    A_add_to_cart: "BUY ON AMAZON",
-    B_i_want_to_buy: "BUY ON AMAZON",
-    C_download_now: "BUY ON AMAZON",
+    A_add_to_cart: "BUY NOW",
+    B_i_want_to_buy: "BUY NOW",
+    C_download_now: "BUY NOW",
   };
-  const stickyCtaText = "BUY ON AMAZON";
+  const stickyCtaText = "BUY NOW";
 
-  // Digital-only product — Spanish Relax 5,000 Words.
+  // Physical book — Stripe checkout with international shipping.
   const isPhysicalBundle = false;
   const dynamicCtaText = stickyCtaText;
   const stickyPriceLabel = campaign.price;
@@ -180,13 +180,18 @@ const ProductSpanish5000 = () => {
     await handleBuyNow();
   };
 
-  const AMAZON_PHYSICAL_URL = "https://amzn.to/4bgODhz";
   const handleBuyNow = async () => {
     if (checkoutLockRef.current) return;
     checkoutLockRef.current = true;
     try {
-      // Skip Meta Pixel: Amazon is external, our pixel does not need this event.
-      window.open(AMAZON_PHYSICAL_URL, "_blank", "noopener,noreferrer");
+      const { data, error } = await supabase.functions.invoke("create-spanish-physical", {
+        body: {},
+      });
+      if (error || !data?.url) throw new Error(error?.message || "Checkout unavailable");
+      window.location.href = data.url;
+    } catch (err) {
+      console.error("[ProductSpanish5000] checkout error", err);
+      toast.error("We couldn't open checkout. Please try again.");
     } finally {
       checkoutLockRef.current = false;
     }
@@ -313,17 +318,17 @@ const ProductSpanish5000 = () => {
                 >
                   <span className="flex items-center justify-center gap-2 font-black">
                     <ShoppingCart className="w-5 h-5" />
-                    BUY ON AMAZON · {campaign.price}
+                    BUY NOW · {campaign.price}
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">
-                  Secure Amazon checkout · Ships worldwide
+                  Secure card checkout (Stripe) · International shipping
                 </p>
                 <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/5 dark:border-emerald-500/20 p-3">
                   <div className="flex items-start gap-2">
                     <Truck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                     <div className="text-xs text-foreground leading-snug">
-                      <strong>International shipping:</strong> 🇺🇸 USA · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 New Zealand — flat <strong>$8 USD</strong>.
+                      <strong>International shipping:</strong> 🇺🇸 USA · 🇨🇦 Canada · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 New Zealand — flat <strong>$8 USD</strong>.
                       <br />
                       <span className="text-emerald-700 dark:text-emerald-400 font-semibold">🎁 FREE shipping on orders over $50</span> (add 2+ books at checkout).
                     </div>
@@ -777,7 +782,7 @@ const ProductSpanish5000 = () => {
         answer: "Your Spanish Relax physical book is dispatched from our warehouse within 24–72 hours and is delivered worldwide in approximately 7–15 days depending on your country. You'll receive a tracking number by email as soon as it ships.",
         icon: Truck,
       }, {
-        question: "What does Bundle 1 include? (Spanish Relax Physical Book on Amazon — $33)",
+        question: "What does Bundle 1 include? (Spanish Relax Physical Book — $33)",
         answer: "1 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in 7–15 days · shipping calculated at checkout) + the 5,000 Words digital PDF FREE by email + 3 FREE bonuses (placement exam, daily planner, pronunciation cheat-sheet). FREE worldwide shipping unlocks automatically when you order 2 or more books.",
         icon: BookOpen,
       }, {

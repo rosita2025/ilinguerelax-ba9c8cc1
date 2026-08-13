@@ -5,13 +5,23 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Thu, 13 Aug 2026 23:25:54 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 13 Aug 2026 23:42:29 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Inglés Relax - 5,000 Palabras Libro</title>
+      <link>https://ilinguerelax.com/products/5-000-palabras-libro-fisico</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-palabras-libro-fisico</guid>
+      <pubDate>Thu, 13 Aug 2026 23:42:29 GMT</pubDate>
+      <description>Libro físico + Digital GRATIS</description>
+      <enclosure url="https://ilinguerelax.com/images/product-5000-book-hero.webp" type="image/jpeg" length="0" />
+      <media:content url="https://ilinguerelax.com/images/product-5000-book-hero.webp" medium="image" />
+      <media:thumbnail url="https://ilinguerelax.com/images/product-5000-book-hero.webp" />
+    </item>
     <item>
       <title>Spanish Relax - 5,000 Words Physical</title>
       <link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</link>
       <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</guid>
-      <pubDate>Thu, 13 Aug 2026 23:25:54 GMT</pubDate>
+      <pubDate>Thu, 13 Aug 2026 23:40:09 GMT</pubDate>
       <description>With English Pronunciation</description>
       <enclosure url="https://ilinguerelax.com/images/product-spanish-5000-physical.webp" type="image/jpeg" length="0" />
       <media:content url="https://ilinguerelax.com/images/product-spanish-5000-physical.webp" medium="image" />
@@ -26,16 +36,6 @@
       <enclosure url="https://ilinguerelax.com/images/8000-book-fisico-digital.webp" type="image/jpeg" length="0" />
       <media:content url="https://ilinguerelax.com/images/8000-book-fisico-digital.webp" medium="image" />
       <media:thumbnail url="https://ilinguerelax.com/images/8000-book-fisico-digital.webp" />
-    </item>
-    <item>
-      <title>Inglés Relax - 5,000 Palabras Libro</title>
-      <link>https://ilinguerelax.com/products/5-000-palabras-libro-fisico</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-palabras-libro-fisico</guid>
-      <pubDate>Thu, 13 Aug 2026 23:25:54 GMT</pubDate>
-      <description>Libro físico + Digital GRATIS</description>
-      <enclosure url="https://ilinguerelax.com/images/product-5000-book-hero.webp" type="image/jpeg" length="0" />
-      <media:content url="https://ilinguerelax.com/images/product-5000-book-hero.webp" medium="image" />
-      <media:thumbnail url="https://ilinguerelax.com/images/product-5000-book-hero.webp" />
     </item>
     <item>
       <title>5,000 Spanish Words with English Pronunciation</title>

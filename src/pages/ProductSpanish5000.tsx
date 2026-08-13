@@ -50,6 +50,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 
 // Lazy-loaded below-the-fold components for faster initial load
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
@@ -125,9 +126,15 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 );
 
 const ProductSpanish5000 = () => {
-  // Multi-currency display (USA / UK / Canada campaign). Display only.
-  // Physical book ships only to USA/CA/UK/AU/NZ → always priced in USD.
-  const campaign = { price: "$34.99", originalPrice: "$54.00", currency: "USD" };
+  // Libro físico: envíos solo a USA, Canadá, Reino Unido, Australia y Nueva Zelanda.
+  // Mostramos la moneda local de esos países (USD, CAD, GBP, AUD, NZD); cualquier
+  // otro país ve el precio en USD. El cobro siempre se realiza en USD.
+  const SHIPPING_CURRENCIES = ["USD", "CAD", "GBP", "AUD", "NZD"];
+  const detected = useCampaignPrice(34.99, 54);
+  const campaign = SHIPPING_CURRENCIES.includes(detected.currency)
+    ? detected
+    : { ...detected, currency: "USD" as const, symbol: "$", price: "$34.99", originalPrice: "$54.00" };
+
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words",

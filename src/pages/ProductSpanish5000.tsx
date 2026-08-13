@@ -61,7 +61,6 @@ const InfluencerVideoCarousel = lazy(() => import("@/components/InfluencerVideoC
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
 // Store logos
-import logoAmazon from "@/assets/logo-amazon.png";
 import logoEbay from "@/assets/logo-ebay.png";
 import logoShopify from "@/assets/logo-shopify.png";
 import { PinterestSave } from "@/components/PinterestSave";

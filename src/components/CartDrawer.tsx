@@ -14,6 +14,7 @@ import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { detectCurrency, formatCurrencyAmount } from "@/i18n";
 import { useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.webp";
@@ -62,7 +63,8 @@ const isPhysicalPreorderItem = (title: string) => {
 };
 
 export const CartDrawer = () => {
-  const { currency, formatPrice } = useI18n();
+  const { currency, formatPrice, language } = useI18n();
+  const t = getCheckoutUI(language);
   const { 
     items: rawItems, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,

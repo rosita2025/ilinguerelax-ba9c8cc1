@@ -169,8 +169,8 @@ export const products: Product[] = [
     discount: 48,
     badge: "🆕 New",
     features: ["5,000 words", "English pronunciation", "For English speakers"],
-    isPhysical: false,
-    formats: ['digital', 'physical'],
+    isPhysical: true,
+    formats: ['physical'],
   },
   {
     id: "spanish-5000-digital",

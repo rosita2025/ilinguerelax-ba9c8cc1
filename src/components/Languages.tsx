@@ -190,7 +190,11 @@ export const Languages = () => {
   const grouped = useMemo(() => {
     const g: Record<LangKey, Product[]> = { english: [], spanish: [], portuguese: [], korean: [], soon: [] };
     merged
-      .filter((p) => (activeFormat === "physical" ? p.isPhysical : !p.isPhysical))
+      .filter((p) => {
+        const fmts = (p as Product & { formats?: string[] }).formats;
+        if (fmts?.length) return fmts.includes(activeFormat);
+        return activeFormat === "physical" ? !!p.isPhysical : !p.isPhysical;
+      })
       .forEach((p) => g[getProductLangKey(p)].push(p));
     return g;
   }, [activeFormat, merged]);

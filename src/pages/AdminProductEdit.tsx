@@ -1044,9 +1044,22 @@ const AdminProductEdit = () => {
                     </div>
                   );
                 })}
+                </div>
               </div>
-            </div>
-          </Card>
+
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border mt-4">
+                <div className="space-y-0.5">
+                  <Label className="text-sm font-medium">Producto Físico</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Activa esto si el producto es un libro físico que requiere envío.
+                  </p>
+                </div>
+                <Switch 
+                  checked={product.is_physical} 
+                  onCheckedChange={(v) => update("is_physical", v)} 
+                />
+              </div>
+            </Card>
 
 
 

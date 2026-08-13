@@ -98,7 +98,12 @@ Deno.serve(async (req) => {
       shipping_options: [{ shipping_rate: standardId }, { shipping_rate: freeId }],
       payment_intent_data: { description: config.name },
       allow_promotion_codes: true,
-      metadata: { book, product_name: config.name },
+      metadata: { 
+        book, 
+        product_name: config.name,
+        digital_bundle: "true",
+        digital_sku: book === "english_5000" ? "5000" : book === "english_8000" ? "8000" : "spanish-5000-digital"
+      },
     });
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {

@@ -327,11 +327,16 @@ export default function CheckoutSuccess() {
 
         {/* Digital delivery — download links from admin/products */}
         {(deliveryLoading || delivery.length > 0) && (
-          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
+          <section className="rounded-xl border-2 border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5 p-5 space-y-4">
             <div className="flex items-center gap-2">
-              <Download className="w-5 h-5 text-primary" />
-              <h2 className="font-semibold text-base">Descarga tu material digital</h2>
+              <Download className="w-5 h-5 text-emerald-600" />
+              <h2 className="font-semibold text-base text-emerald-900 dark:text-emerald-100">
+                Tu material digital ya está listo
+              </h2>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Tu libro físico está en camino, pero puedes empezar a estudiar ahora mismo con la versión digital.
+            </p>
             {deliveryLoading && (
               <p className="text-sm text-muted-foreground">Cargando enlaces…</p>
             )}

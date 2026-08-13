@@ -196,7 +196,7 @@ const ProductSpanish5000 = () => {
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
       </Helmet>
-      <SEO title="5,000 Spanish Words Physical Book · Pronunciation" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.webp" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="5000 Spanish words physical book, learn Spanish for English speakers, Spanish vocabulary book, Spanish pronunciation, Spanish Relax book, Spanish ebook bundle" />
+      <SEO title="5,000 Spanish Words Physical Book + Digital PDF FREE" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.webp" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="5000 Spanish words physical book, learn Spanish for English speakers, Spanish vocabulary book, Spanish pronunciation, Spanish Relax book, Spanish ebook bundle" />
       <Navbar />
 
       {/* Hero Section */}

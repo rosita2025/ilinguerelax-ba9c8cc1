@@ -127,14 +127,15 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 
 const ProductSpanish5000 = () => {
   // Multi-currency display (USA / UK / Canada campaign). Display only.
-  const campaign = useCampaignPrice(33, 54);
+  // Physical book ships only to USA/CA/UK/AU/NZ → always priced in USD.
+  const campaign = { price: "$34.99", originalPrice: "$54.00", currency: "USD" };
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
     content_name: "Spanish Relax - 5,000 Words",
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000"],
     content_type: "product",
-    value: 33,
+    value: 34.99,
     currency: "USD"
   }), []);
   useHotmartPixel(pixelParams);
@@ -142,7 +143,7 @@ const ProductSpanish5000 = () => {
   useTrackProductView({
     productId: "product-spanish-5000",
     productName: "Spanish Relax - 5,000 Words",
-    price: 33,
+    price: 34.99,
     currency: "USD",
     category: "Digital Book",
   });
@@ -189,7 +190,7 @@ const ProductSpanish5000 = () => {
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />
       </Helmet>
-      <SEO title="5,000 Spanish Words Physical Book · Pronunciation" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.webp" type="product" price="33" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="5000 Spanish words physical book, learn Spanish for English speakers, Spanish vocabulary book, Spanish pronunciation, Spanish Relax book, Spanish ebook bundle" />
+      <SEO title="5,000 Spanish Words Physical Book · Pronunciation" description="Spanish Relax 5,000 Words physical book: learn 5,000 essential Spanish words with English pronunciation. Physical book + digital PDF FREE + 3 bonuses." canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical" image="https://ilinguerelax.com/product-spanish-5000.webp" type="product" price="34.99" originalPrice="54" rating="4.8" reviewCount="500" sku="SPANISH-5000-PHYSICAL" keywords="5000 Spanish words physical book, learn Spanish for English speakers, Spanish vocabulary book, Spanish pronunciation, Spanish Relax book, Spanish ebook bundle" />
       <Navbar />
 
       {/* Hero Section */}
@@ -771,7 +772,7 @@ const ProductSpanish5000 = () => {
         answer: "Your Spanish Relax physical book is dispatched from our warehouse within 24–72 hours and is delivered worldwide in approximately 7–15 days depending on your country. You'll receive a tracking number by email as soon as it ships.",
         icon: Truck,
       }, {
-        question: "What does Bundle 1 include? (Spanish Relax Physical Book — $33)",
+        question: "What does Bundle 1 include? (Spanish Relax Physical Book — $34.99)",
         answer: "1 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in 7–15 days · shipping calculated at checkout) + the 5,000 Words digital PDF FREE by email + 3 FREE bonuses (placement exam, daily planner, pronunciation cheat-sheet). FREE worldwide shipping unlocks automatically when you order 2 or more books.",
         icon: BookOpen,
       }, {

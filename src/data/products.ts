@@ -283,8 +283,6 @@ const LEARNER_TARGET: Record<string, [LangCode, LangCode]> = {
   "spanish-5000": ["en", "es"],
   "spanish-5000-digital": ["en", "es"],
   "spanish-1000-verbs": ["en", "es"],
-  "spanish-3000-verbs-book": ["en", "es"],
-  "spanish-grammar-patterns": ["en", "es"],
   "spanish-500-questions": ["en", "es"],
   "1000-verbos": ["es", "en"],
   "500-preguntas": ["es", "en"],

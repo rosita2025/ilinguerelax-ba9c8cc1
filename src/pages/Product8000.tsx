@@ -642,7 +642,7 @@ const Product8000 = () => {
               </p>
 
               <div className="flex items-baseline gap-3 justify-center mb-5">
-                <span className="text-4xl font-black text-yellow-400">$25.00 USD</span>
+                <span className="text-4xl font-black text-yellow-400">$34.99 USD</span>
                 <span className="text-lg text-yellow-300/50 line-through">$49.99</span>
               </div>
 

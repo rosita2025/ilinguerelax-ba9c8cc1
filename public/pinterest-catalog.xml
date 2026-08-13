@@ -26,26 +26,6 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
-      <g:id>5-000-spanish-words-with-english-pronunciation-digital</g:id>
-      <g:title>5,000 Spanish Words with English Pronunciation</g:title>
-      <g:description>The 5000 most common Spanish words with pronunciation guides for English speakers.</g:description>
-      <g:link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital</g:link>
-      <g:image_link>https://ilinguerelax.com/assets/spanish-5000-digital-only-CmEswQ2b.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>22.00 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>5-000-spanish-words-with-english-pronunciation-digital</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
-      <g:custom_label_0>Español</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
       <g:id>500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes</g:id>
       <g:title>500 Preguntas en Inglés con Pronunciación</g:title>
       <g:description>Domina las 500 preguntas más frecuentes del inglés conversacional.</g:description>
@@ -123,6 +103,26 @@
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
       <g:product_type>Libros Digitales &gt; Idiomas &gt; Coreano</g:product_type>
       <g:custom_label_0>Coreano</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>5-000-spanish-words-with-english-pronunciation-digital</g:id>
+      <g:title>5,000 Spanish Words with English Pronunciation</g:title>
+      <g:description>The 5000 most common Spanish words with pronunciation guides for English speakers.</g:description>
+      <g:link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital</g:link>
+      <g:image_link>https://ilinguerelax.com/assets/spanish-5000-digital-only-CmEswQ2b.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>22.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5-000-spanish-words-with-english-pronunciation-digital</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
+      <g:custom_label_0>Español</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -243,6 +243,26 @@
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
       <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
       <g:custom_label_0>Inglés</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej</g:id>
+      <g:title>Structural Spanish Grammar A1–C1 | Spanish Relax by iLingue Relax</g:title>
+      <g:description>Master Spanish grammar from A1 Beginner to C1 Advanced with a structured, practical, and professional approach. Structural Grammar A1–C1 Spanish Relax is a step-by-step Spanish grammar guide designed for learners, professionals, executives, and international leaders who want to develop greater accuracy, fluency, and confidence in Spanish. Instead of learning isolated grammar rules, this guide presents Spanish through clear structures, formulas, patterns, verb forms, connector</g:description>
+      <g:link>https://ilinguerelax.com/products/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej/1786644060805-sti98.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>27.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
+      <g:custom_label_0>Español</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
   </channel>

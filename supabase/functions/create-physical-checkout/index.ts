@@ -96,6 +96,7 @@ Deno.serve(async (req) => {
       ...(email && { customer_email: email }),
       shipping_address_collection: { allowed_countries: [...SHIPPING_COUNTRIES] },
       shipping_options: [{ shipping_rate: standardId }, { shipping_rate: freeId }],
+      phone_number_collection: { enabled: true },
       payment_intent_data: { description: config.name },
       allow_promotion_codes: true,
       metadata: { 

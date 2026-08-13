@@ -50,6 +50,7 @@ import { StockCounter } from "@/components/StockCounter";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
+import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 
 // Lazy-loaded below-the-fold components for faster initial load
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));

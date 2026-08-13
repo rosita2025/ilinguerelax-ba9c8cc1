@@ -324,7 +324,10 @@ const Product5000Book = () => {
                     Envío Internacional: $8.00 USD
                   </p>
                   <p className="text-[11px] text-muted-foreground text-center">
-                    📦 Disponible para: 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 Reino Unido · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
+                    📦 Dirección y país de entrega se solicitan al finalizar el pago.
+                  </p>
+                  <p className="text-[11px] text-muted-foreground text-center">
+                    ✈️ Disponible para: 🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 Reino Unido · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
                   </p>
                   <p className="text-[10px] text-emerald-600 font-bold text-center uppercase tracking-wider">
                     ✨ ENVÍO GRATIS en pedidos mayores a $50

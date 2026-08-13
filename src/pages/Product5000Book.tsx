@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -117,11 +118,9 @@ const Product5000Book = () => {
     loadProduct();
   }, []);
 
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToShopifyCart = async () => {
-    // Physical book — Shopify removed. Send buyers to Amazon.
-    if (typeof window !== "undefined") {
-      window.open(AMAZON_URL, "_blank", "noopener,noreferrer");
-    }
+    setPhysicalCheckoutOpen(true);
   };
 
 
@@ -505,14 +504,13 @@ const Product5000Book = () => {
       />
 
       <Footer />
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_5000" title="5,000 Palabras — Libro Físico · Pago seguro" />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
         price="$19.99"
-        ctaText="Agregar al Carrito"
+        ctaText="Comprar ahora"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}
-        secondaryCtaText="Comprar en Amazon"
-        onSecondaryClick={() => window.open(AMAZON_URL, '_blank')}
         showReviews={false}
         isPhysical={true}
       />

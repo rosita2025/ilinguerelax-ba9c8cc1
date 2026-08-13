@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -123,11 +124,9 @@ const Product8000Book = () => {
   }, []);
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToShopifyCart = async () => {
-    // Physical book — Shopify removed. Send buyers to Amazon.
-    if (typeof window !== "undefined") {
-      window.open(AMAZON_URL_8000, "_blank", "noopener,noreferrer");
-    }
+    setPhysicalCheckoutOpen(true);
   };
 
 
@@ -343,13 +342,11 @@ const Product8000Book = () => {
                   <Button
                     size="lg"
                     className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                    asChild
+                    onClick={handleAddToShopifyCart}
                   >
-                    <a href="/amazon">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Comprar en Amazon
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </a>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Comprar ahora — Envío internacional
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
               </div>
@@ -608,9 +605,9 @@ const Product8000Book = () => {
                 <Button
                   size="lg"
                   className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                  asChild
+                  onClick={handleAddToShopifyCart}
                 >
-                  <a href="/amazon">
+                  <span>
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Comprar en Amazon
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -683,18 +680,17 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Palabras — Libro Físico · Pago seguro" />
       <StickyBuyBar
         price="$25.00"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
-        ctaText="Agregar al Carrito"
+        ctaText="Comprar ahora"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}
         showReviews={true}
         rating={4.89}
         reviewCount={246}
-        secondaryCtaText="Comprar en Amazon"
-        onSecondaryClick={() => window.open("/amazon", "_blank")}
         isPhysical={true}
       />
 

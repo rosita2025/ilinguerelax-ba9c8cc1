@@ -783,7 +783,7 @@ const ProductSpanish5000 = () => {
         answer: "Your Spanish Relax physical book is dispatched from our warehouse within 24–72 hours and is delivered worldwide in approximately 7–15 days depending on your country. You'll receive a tracking number by email as soon as it ships.",
         icon: Truck,
       }, {
-        question: "What does Bundle 1 include? (Spanish Relax Physical Book on Amazon — $33)",
+        question: "What does Bundle 1 include? (Spanish Relax Physical Book — $33)",
         answer: "1 Spanish Relax PHYSICAL book (ships in 24–72h, delivered in 7–15 days · shipping calculated at checkout) + the 5,000 Words digital PDF FREE by email + 3 FREE bonuses (placement exam, daily planner, pronunciation cheat-sheet). FREE worldwide shipping unlocks automatically when you order 2 or more books.",
         icon: BookOpen,
       }, {

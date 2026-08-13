@@ -181,20 +181,7 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    if (checkoutLockRef.current) return;
-    checkoutLockRef.current = true;
-    try {
-      const { data, error } = await supabase.functions.invoke("create-spanish-physical", {
-        body: {},
-      });
-      if (error || !data?.url) throw new Error(error?.message || "Checkout unavailable");
-      window.location.href = data.url;
-    } catch (err) {
-      console.error("[ProductSpanish5000] checkout error", err);
-      toast.error("We couldn't open checkout. Please try again.");
-    } finally {
-      checkoutLockRef.current = false;
-    }
+    setPhysicalCheckoutOpen(true);
   };
   return <main className="min-h-screen bg-background">
       <Helmet>

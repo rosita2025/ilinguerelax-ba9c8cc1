@@ -129,7 +129,7 @@ const Product5000Book = () => {
     content_category: "Physical Book",
     content_ids: ["product-5000-book"],
     content_type: "product",
-    value: 19.99,
+    value: 24.00,
     currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
@@ -158,7 +158,7 @@ const Product5000Book = () => {
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/images/product-5000-book.webp"
         type="product"
-        price="19.99"
+        price="24.00"
         rating=""
         reviewCount=""
         sku="ILINGUE-5000-BOOK"
@@ -280,7 +280,7 @@ const Product5000Book = () => {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$19.99</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$24.00</span>
                   <span className="text-lg text-muted-foreground line-through">$31.99</span>
                   <span className="text-primary font-bold">USD</span>
                 </div>
@@ -293,7 +293,7 @@ const Product5000Book = () => {
                 <div className="flex flex-col gap-2 mt-3 p-3 rounded-xl bg-background/60">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $19.99</span>
+                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $24.00</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0" />
@@ -435,7 +435,7 @@ const Product5000Book = () => {
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
                 <div className="flex items-baseline justify-center gap-3 mb-2">
-                  <span className="text-5xl font-bold text-foreground">$19.99</span>
+                  <span className="text-5xl font-bold text-foreground">$24.00</span>
                   <span className="text-lg text-muted-foreground line-through">$31.99</span>
                   <span className="text-primary font-bold">USD</span>
                 </div>
@@ -481,7 +481,7 @@ const Product5000Book = () => {
           },
           {
             question: "¿El libro viene con versión digital?",
-            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $19.99 USD.",
+            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $24.00 USD.",
             icon: FileText,
           },
           {
@@ -496,7 +496,7 @@ const Product5000Book = () => {
       <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_5000" title="5,000 Palabras — Libro Físico · Pago seguro" />
       <StickyBuyBar
         productName="5,000 Palabras - Libro Físico"
-        price="$19.99"
+        price="$24.00"
         ctaText="Comprar ahora"
         onBuyClick={handleAddToShopifyCart}
         isLoading={cartLoading}

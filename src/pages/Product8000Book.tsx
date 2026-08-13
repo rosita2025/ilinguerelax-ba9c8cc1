@@ -137,7 +137,7 @@ const Product8000Book = () => {
     content_category: "Physical Book",
     content_ids: ["product-8000-book"],
     content_type: "product",
-    value: 25.00,
+    value: 34.99,
     currency: "USD",
   }), []);
   useMetaPixelViewContent(pixelParams);
@@ -150,7 +150,7 @@ const Product8000Book = () => {
         canonicalUrl="https://ilinguerelax.com/products/8-000-palabras-libro-fisico"
         image="https://ilinguerelax.com/product-8000-book.webp"
         type="product"
-        price="25.00"
+        price="34.99"
         rating=""
         reviewCount=""
         sku="ILINGUE-8000-BOOK"
@@ -236,7 +236,7 @@ const Product8000Book = () => {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">$25.00</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground">$34.99</span>
                   <span className="text-lg text-muted-foreground line-through">$49.99</span>
                   <span className="text-primary font-bold">USD</span>
                 </div>
@@ -249,7 +249,7 @@ const Product8000Book = () => {
                 <div className="flex flex-col gap-2 mt-3 p-3 rounded-xl bg-background/60">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $25.00</span>
+                    <span className="text-sm text-foreground font-medium">📖 Libro Físico Tapa Blanda — $34.99</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0" />
@@ -376,7 +376,7 @@ const Product8000Book = () => {
       {/* Countdown Timer */}
       <CountdownTimer 
         hoursFromNow={48} 
-        currentPrice="$25.00 USD"
+        currentPrice="$34.99 USD"
         originalPrice="$45 USD"
         storageKey="countdown_book_physical"
       />
@@ -540,7 +540,7 @@ const Product8000Book = () => {
               ¡Consigue tu libro físico ahora!
             </h2>
             <p className="text-lg text-white/90 mb-6">
-              Pack exclusivo: Libro Físico + Digital GRATIS por solo $25.00 USD.
+              Pack exclusivo: Libro Físico + Digital GRATIS por solo $34.99 USD.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-left">
@@ -553,7 +553,7 @@ const Product8000Book = () => {
                   Comprar aquí (Shopify) 🎁
                 </h3>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-bold text-foreground">$25.00</span>
+                  <span className="text-3xl font-bold text-foreground">$34.99</span>
                   <span className="text-sm text-muted-foreground line-through">$49.99</span>
                 </div>
                 <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
@@ -590,7 +590,7 @@ const Product8000Book = () => {
                   Comprar ahora
                 </h3>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-bold text-foreground">$25.00</span>
+                  <span className="text-3xl font-bold text-foreground">$34.99</span>
                   <span className="text-sm text-muted-foreground">USD</span>
                 </div>
                 <ul className="space-y-2 text-sm text-foreground mb-4 flex-1">
@@ -646,7 +646,7 @@ const Product8000Book = () => {
           },
           {
             question: "¿Incluye la versión digital?",
-            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $25.00 USD.",
+            answer: "¡Sí! Al comprar el libro físico, recibes la versión digital (PDF) completamente GRATIS. Es un pack promocional: libro físico + digital por solo $34.99 USD.",
             icon: Package,
           },
           {
@@ -682,7 +682,7 @@ const Product8000Book = () => {
       {/* Sticky Buy Bar */}
       <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Palabras — Libro Físico · Pago seguro" />
       <StickyBuyBar
-        price="$25.00"
+        price="$34.99"
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
         ctaText="Comprar ahora"

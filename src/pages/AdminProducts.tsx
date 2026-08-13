@@ -27,6 +27,7 @@ interface Product {
   store_enabled: boolean;
   store_excluded_countries: string[] | null;
   hotmart_excluded_countries: string[] | null;
+  is_physical: boolean;
 }
 
 const FLAGS: Record<string, string> = {
@@ -41,6 +42,7 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState<string>("all");
+  const [formatFilter, setFormatFilter] = useState<"all" | "digital" | "physical">("all");
   const [view, setView] = useState<"grid" | "table">(() => (localStorage.getItem("adminProductsView") as "grid" | "table") || "grid");
 
   useEffect(() => { localStorage.setItem("adminProductsView", view); }, [view]);
@@ -122,6 +124,8 @@ const AdminProducts = () => {
   const filtered = products.filter((p) => {
     if (catFilter !== "all" && `${p.learner_language}-${p.target_language}` !== catFilter) return false;
     if (search && !`${p.name} ${p.sku}`.toLowerCase().includes(search.toLowerCase())) return false;
+    if (formatFilter === "digital" && p.is_physical) return false;
+    if (formatFilter === "physical" && !p.is_physical) return false;
     return true;
   });
 
@@ -152,6 +156,25 @@ const AdminProducts = () => {
             <Button variant={catFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setCatFilter("all")}>
               Todas ({products.length})
             </Button>
+            
+            <div className="flex gap-1 border-l pl-2 border-border mr-1">
+              <Button 
+                variant={formatFilter === "digital" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setFormatFilter(prev => prev === "digital" ? "all" : "digital")}
+                className="h-8 px-2 text-[10px]"
+              >
+                Digital
+              </Button>
+              <Button 
+                variant={formatFilter === "physical" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setFormatFilter(prev => prev === "physical" ? "all" : "physical")}
+                className="h-8 px-2 text-[10px]"
+              >
+                Físico
+              </Button>
+            </div>
             {categories.map((c) => {
               const [ln, tg] = c.split("-");
               const count = products.filter((p) => `${p.learner_language}-${p.target_language}` === c).length;
@@ -212,6 +235,9 @@ const AdminProducts = () => {
                       )}
                       {p.is_upsell && (
                         <span className="text-[10px] bg-fuchsia-500/90 text-white px-2 py-0.5 rounded-full font-semibold">Upsell</span>
+                      )}
+                      {p.is_physical && (
+                        <span className="text-[10px] bg-orange-500/90 text-white px-2 py-0.5 rounded-full font-semibold">Físico</span>
                       )}
                     </div>
                     <div className="absolute top-2 right-2 text-lg bg-background/80 backdrop-blur px-1.5 py-0.5 rounded">
@@ -304,7 +330,14 @@ const AdminProducts = () => {
                       ) : <span className="text-xs text-red-500">Sin enlace</span>}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {p.is_upsell ? <span className="text-xs bg-fuchsia-100 text-fuchsia-800 px-2 py-0.5 rounded-full">Upsell</span> : <span className="text-xs text-muted-foreground">Principal</span>}
+                      <div className="flex flex-col gap-1 items-center">
+                        {p.is_physical ? (
+                          <span className="text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full">Físico</span>
+                        ) : (
+                          <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Digital</span>
+                        )}
+                        {p.is_upsell && <span className="text-[10px] bg-fuchsia-100 text-fuchsia-800 px-2 py-0.5 rounded-full">Upsell</span>}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-center">
                       {p.active ? (

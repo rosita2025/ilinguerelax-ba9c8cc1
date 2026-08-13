@@ -845,9 +845,22 @@ const AdminProductEdit = () => {
                     className="min-h-[80px] text-xs"
                   />
                 </div>
+                </div>
               </div>
-            </div>
-          </Card>
+
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border mt-4">
+                <div className="space-y-0.5">
+                  <Label className="text-sm font-medium">Producto Físico</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Activa esto si el producto es un libro físico que requiere envío.
+                  </p>
+                </div>
+                <Switch 
+                  checked={product.is_physical} 
+                  onCheckedChange={(v) => update("is_physical", v)} 
+                />
+              </div>
+            </Card>
 
           <Card className="p-6 space-y-4">
             <h2 className="font-semibold">2. Categoría (par de idiomas)</h2>
@@ -1031,9 +1044,22 @@ const AdminProductEdit = () => {
                     </div>
                   );
                 })}
+                </div>
               </div>
-            </div>
-          </Card>
+
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border mt-4">
+                <div className="space-y-0.5">
+                  <Label className="text-sm font-medium">Producto Físico</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Activa esto si el producto es un libro físico que requiere envío.
+                  </p>
+                </div>
+                <Switch 
+                  checked={product.is_physical} 
+                  onCheckedChange={(v) => update("is_physical", v)} 
+                />
+              </div>
+            </Card>
 
 
 
@@ -1302,7 +1328,16 @@ const AdminProductEdit = () => {
 
 
           <Card className="p-6 space-y-4">
-            <h2 className="font-semibold">4. Entrega digital</h2>
+            <div className="flex items-center gap-2 mb-2">
+              <LockIcon className="w-5 h-5 text-primary" />
+              <h2 className="font-semibold">4. Entrega digital {product.is_physical && "(Opcional)"}</h2>
+            </div>
+            {product.is_physical && (
+              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-400">
+                <Info className="w-4 h-4 inline mr-2" />
+                Este es un producto físico. Los campos de Drive y Access Key son opcionales y solo se usarán si también ofreces una versión digital descargable con la compra.
+              </div>
+            )}
             <div>
               <Label>Enlace de Google Drive (PDF)</Label>
               <Input value={product.drive_url ?? ""} onChange={(e) => update("drive_url", e.target.value)} placeholder="https://drive.google.com/file/d/…" />

@@ -607,11 +607,11 @@ const Product8000Book = () => {
                   className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
                   onClick={handleAddToShopifyCart}
                 >
-                  <span>
+                  <span className="inline-flex items-center">
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Comprar ahora
                     <ArrowRight className="w-4 h-4 ml-2" />
-                  </a>
+                  </span>
                 </Button>
               </div>
             </div>

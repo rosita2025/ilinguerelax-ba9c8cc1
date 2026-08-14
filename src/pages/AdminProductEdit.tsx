@@ -21,7 +21,7 @@ import ProductUpdateNoticePanel from "@/components/admin/ProductUpdateNoticePane
 import ProductLaunchPanel from "@/components/admin/ProductLaunchPanel";
 import GoogleDrivePreview from "@/components/admin/GoogleDrivePreview";
 import { normalizeDriveUrl } from "@/lib/googleDrive";
-import { exchangeRates, currencyConfig, type Currency } from "@/i18n";
+import { exchangeRates, currencyConfig, formatCurrencyAmount, type Currency } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 

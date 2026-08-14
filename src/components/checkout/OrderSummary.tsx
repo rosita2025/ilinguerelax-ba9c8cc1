@@ -29,15 +29,24 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const { items, coupon, couponPercent, updateQuantity, removeItem, applyCoupon, removeCoupon, selectedMethod } =
     useCheckoutPruebaStore();
   const region = useRegionTier();
+  const country = region.country?.toUpperCase() || "";
+  const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(country);
+  const isNorthAmericaEurope = ["US", "CA", "GB"].includes(country);
+  const isAsia = ["CN", "JP", "KR", "IN", "SG", "MY", "TH", "VN", "PH", "ID"].includes(country);
+
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : 8) : 0;
+  
+  // Lógica de costo de envío: Latam $9, Resto (USA/CAN/UK) $8 (o free > 50). 
+  // Si es Asia no se permite pagar (se maneja en PaymentMethodsGroup, pero aquí mostramos costo estimado o aviso)
+  const shippingCost = isLatam ? 9 : 8;
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
   const grandTotal = total + shipping;
-  const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
+  const penTotals = calcTotalsPen(items, couponPercent, country);
   const overridesFor = useSkuOverridesResolver();
   const localTotal = useLocalCurrency(total);
   const localSubtotal = useLocalCurrency(subtotal);
@@ -120,11 +129,21 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
 
         {items.some(i => i.isPhysical) ? (
-          <div className="flex gap-2.5 items-start rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2.5 mb-2 ring-1 ring-destructive/20 animate-pulse">
-            <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
-            <p className="text-xs text-destructive font-medium leading-snug">
-              <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> Se solicita dirección de envío obligatoria para continuar.
-            </p>
+          <div className="flex flex-col gap-2 rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2.5 mb-2 ring-1 ring-destructive/20">
+            <div className="flex gap-2.5 items-start">
+              <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-xs text-destructive font-medium leading-snug">
+                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> Se solicita dirección de envío obligatoria para continuar.
+              </p>
+            </div>
+            <div className="text-[10px] space-y-1 pl-6 opacity-90 italic">
+              {isLatam && <p className="text-destructive">{t.shippingNoticeLatam}</p>}
+              {isNorthAmericaEurope && <p className="text-destructive">{t.shippingNoticeGlobal}</p>}
+              {isAsia && <p className="text-destructive font-bold uppercase">{t.shippingNoticeAsia}</p>}
+              {!isLatam && !isNorthAmericaEurope && !isAsia && (
+                <p className="text-destructive">{t.shippingNoticeGlobal}</p>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex gap-2.5 items-start rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5 mb-2">
@@ -263,7 +282,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.shipping}</span>
             <span>
               {items.some(i => i.isPhysical) 
-                ? (shipping === 0 ? t.freeShipping : formatCurrencyAmount(8, "USD"))
+                ? (shipping === 0 ? t.freeShipping : formatCurrencyAmount(shipping, "USD"))
                 : t.freeDigitalDelivery
               }
             </span>

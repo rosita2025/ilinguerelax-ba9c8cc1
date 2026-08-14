@@ -29,6 +29,9 @@ export interface CheckoutUIStrings {
   shippingCountry: string;
   selectCountry: string;
   shipping: string;
+  shippingNoticeLatam: string;
+  shippingNoticeGlobal: string;
+  shippingNoticeAsia: string;
   freeDigitalDelivery: string;
   standardShipping: string;
   freeShipping: string;
@@ -131,6 +134,9 @@ const es: CheckoutUIStrings = {
   shippingCountry: "País de envío",
   selectCountry: "Seleccionar país",
   shipping: "Envío",
+  shippingNoticeLatam: "Envío a LATAM: $9 USD (5-7 días). Preparación: 7-10 días.",
+  shippingNoticeGlobal: "Envío USA/CAN/UK: 3-5 días. Preparación: 5-7 días.",
+  shippingNoticeAsia: "Asia: No disponible actualmente (próximamente).",
   freeDigitalDelivery: "Gratis (Entrega Digital)",
   standardShipping: "Envío Estándar",
   freeShipping: "Envío Gratis",
@@ -229,6 +235,9 @@ const en: CheckoutUIStrings = {
   shippingCountry: "Shipping Country",
   selectCountry: "Select country",
   shipping: "Shipping",
+  shippingNoticeLatam: "LATAM Shipping: $9 USD (5-7 days). Handling: 7-10 days.",
+  shippingNoticeGlobal: "USA/CAN/UK Shipping: 3-5 days. Handling: 5-7 days.",
+  shippingNoticeAsia: "Asia: Not available at the moment (coming soon).",
   freeDigitalDelivery: "Free (Digital Delivery)",
   standardShipping: "Standard Shipping",
   freeShipping: "Free Shipping",
@@ -327,6 +336,9 @@ const pt: CheckoutUIStrings = {
   shippingCountry: "País de entrega",
   selectCountry: "Selecionar país",
   shipping: "Envio",
+  shippingNoticeLatam: "Envio para LATAM: $9 USD (5-7 dias). Preparação: 7-10 dias.",
+  shippingNoticeGlobal: "Envio EUA/CAN/UK: 3-5 dias. Preparação: 5-7 dias.",
+  shippingNoticeAsia: "Ásia: Não disponível no momento (em breve).",
   freeDigitalDelivery: "Grátis (Entrega Digital)",
   standardShipping: "Envio Padrão",
   freeShipping: "Envio Grátis",
@@ -425,6 +437,9 @@ const fr: CheckoutUIStrings = {
   shippingCountry: "Pays de livraison",
   selectCountry: "Sélectionner le pays",
   shipping: "Livraison",
+  shippingNoticeLatam: "Livraison LATAM : 9 $ USD (5-7 jours). Préparation : 7-10 jours.",
+  shippingNoticeGlobal: "Livraison USA/CAN/UK : 3-5 jours. Préparation : 5-7 jours.",
+  shippingNoticeAsia: "Asie : Non disponible pour le moment (bientôt disponible).",
   freeDigitalDelivery: "Gratuit (Livraison numérique)",
   standardShipping: "Livraison standard",
   freeShipping: "Livraison gratuite",

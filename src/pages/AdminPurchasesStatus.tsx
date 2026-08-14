@@ -124,7 +124,7 @@ const AdminPurchasesStatus = () => {
     setLoading(true);
     try {
       const { data, error } = await adminInvoke("list-purchases-status", {
-        body: { adminKey, provider: provider === "all" ? undefined : provider, mapped, search, limit: 300 },
+        body: { adminKey, provider: provider === "all" ? undefined : provider, mapped, search, limit: 1000 },
       });
       if (error) throw error;
       const rows = ((data as any)?.rows ?? []) as any[];
@@ -170,7 +170,7 @@ const AdminPurchasesStatus = () => {
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Recargar
+            <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} /> {loading ? "Sincronizando..." : "Recargar"}
           </Button>
         </div>
 

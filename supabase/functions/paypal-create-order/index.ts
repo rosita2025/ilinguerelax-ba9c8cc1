@@ -60,22 +60,13 @@ Deno.serve(async (req) => {
     let finalAmount = amountReq;
     let finalCurrency = currencyReq;
 
+    let pricing;
     try {
-      const pricing = await resolveServerPricing({
+      pricing = await resolveServerPricing({
         items: bodyItems,
         country: country,
         couponCode: couponCode
       });
-      finalAmount = pricing.totalUsd;
-      finalCurrency = "USD"; // PayPal checkout usually USD for us
-      
-      // If client asked for supported currency, we can use it, but resolveServerPricing 
-      // is the authority on the total value.
-      if (PAYPAL_SUPPORTED.has(currencyReq)) {
-        finalCurrency = currencyReq;
-        // Re-calculate local total if needed, or stick to USD for simplicity in PayPal.
-        // For now, enforcing the catalog total USD.
-      }
     } catch (e) {
       if (e instanceof PricingError) {
         return new Response(JSON.stringify({ error: e.message, trace: traceId }), {
@@ -84,6 +75,10 @@ Deno.serve(async (req) => {
       }
       throw e;
     }
+    
+    const pricedItems = pricing.items;
+    finalAmount = pricing.totalUsd;
+    finalCurrency = "USD";
 
     let currency = finalCurrency;
     let amount = finalAmount;

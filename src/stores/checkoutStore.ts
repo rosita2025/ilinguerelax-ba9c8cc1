@@ -117,6 +117,7 @@ const VALID_COUPONS: Record<string, number> = {
  */
 const FIXED_TOTAL_COUPONS: Record<string, number> = {
   DLTEST1: 1,
+  FIXED1: 1,
 };
 
 

@@ -303,8 +303,28 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </div>
           </div>
 
+          <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 mt-6">
+            <h4 className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-3">
+              {t.acceptedMethods}
+            </h4>
+            <div className="grid grid-cols-4 gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="bg-white dark:bg-neutral-800 p-1.5 rounded border border-neutral-200 dark:border-neutral-700 flex items-center justify-center h-8">
+                <img src="/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg" alt="Visa" className="max-h-full max-w-full grayscale brightness-0 dark:brightness-200" />
+              </div>
+              <div className="bg-white dark:bg-neutral-800 p-1.5 rounded border border-neutral-200 dark:border-neutral-700 flex items-center justify-center h-8">
+                <img src="/__l5e/assets-v1/94d65183-1752-495e-ac5b-70ec4cba62b2/mastercard.svg" alt="Mastercard" className="max-h-full max-w-full grayscale brightness-0 dark:brightness-200" />
+              </div>
+              <div className="bg-white dark:bg-neutral-800 p-1.5 rounded border border-neutral-200 dark:border-neutral-700 flex items-center justify-center h-8">
+                <img src="/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/apple-pay.svg" alt="Apple Pay" className="max-h-full max-w-full grayscale brightness-0 dark:brightness-200" />
+              </div>
+              <div className="bg-white dark:bg-neutral-800 p-1.5 rounded border border-neutral-200 dark:border-neutral-700 flex items-center justify-center h-8 font-bold text-[8px] text-neutral-400">
+                +20
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
   );
 }

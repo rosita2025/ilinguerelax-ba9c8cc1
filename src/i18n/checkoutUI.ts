@@ -104,6 +104,13 @@ export interface CheckoutUIStrings {
   inYourCurrency: string;
   acceptedMethods: string;
   paymentMethod: string;
+  currencyBreakdown: string;
+  baseUsd: string;
+  exchangeRate: string;
+  adjustment: string;
+  localPrice: string;
+  localAdjustmentNotice: string;
+
 
   // Footer
   sslEncryption: string;

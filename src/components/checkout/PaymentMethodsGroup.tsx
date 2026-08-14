@@ -367,7 +367,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     selectedMethod.startsWith("dlocal") || 
     selectedMethod === "card" || 
     selectedMethod === "paypal" || 
-    selectedMethod === "binance"
+    selectedMethod === "binance" ||
+    selectedMethod === "clabe" ||
+    selectedMethod === "yape" ||
+    selectedMethod === "transfer"
   );
   
   const showUsdOnly = isFallingBackToUsd;

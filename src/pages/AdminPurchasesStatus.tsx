@@ -154,10 +154,10 @@ const AdminPurchasesStatus = () => {
   const kpis = useMemo(() => ([
     { label: "Aprobados",   value: summary.approved   ?? 0, className: STATUS_META.approved.className },
     { label: "Pendientes",  value: summary.pending    ?? 0, className: STATUS_META.pending.className },
+    { label: "Abandonos",   value: summary.abandoned  ?? 0, className: STATUS_META.abandoned.className },
     { label: "Rechazados",  value: summary.refused    ?? 0, className: STATUS_META.refused.className },
     { label: "Bloqueados",  value: summary.blocked    ?? 0, className: STATUS_META.blocked.className },
     { label: "Reembolsos",  value: summary.refunded   ?? 0, className: STATUS_META.refunded.className },
-    { label: "Chargebacks", value: summary.chargeback ?? 0, className: STATUS_META.chargeback.className },
     { label: "Cancelados / Exp", value: summary.cancelled ?? 0, className: STATUS_META.cancelled.className },
   ]), [summary]);
 

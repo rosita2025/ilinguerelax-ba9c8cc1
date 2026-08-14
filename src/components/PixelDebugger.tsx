@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Activity, Bug, DollarSign, CheckCircle2, AlertCircle } from "lucide-react";
+import { Activity, Bug, DollarSign, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PixelEvent {
   timestamp: string;
@@ -79,9 +80,14 @@ export const PixelDebugger = () => {
             <Bug className="w-5 h-5 text-teal-500" />
             <CardTitle className="text-sm font-bold tracking-tight">Meta Pixel Real-Time Debugger</CardTitle>
           </div>
-          <Badge variant="outline" className="bg-teal-500/10 text-teal-600 border-teal-500/20">
-            Admin Mode
-          </Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={() => setIsVisible(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </CardHeader>
         <CardContent className="p-0 flex flex-col h-[500px]">
           <div className="p-2 border-b">

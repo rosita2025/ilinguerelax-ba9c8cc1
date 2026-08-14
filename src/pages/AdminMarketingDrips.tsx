@@ -37,7 +37,8 @@ interface AbandonedLog {
 }
 
 export default function AdminMarketingDrips() {
-  const [configs, setConfigs] = useState<DripConfig[]>([]);
+  const { adminKey } = useAdminKey();
+  const [configs, setConfigs] = useState<any[]>([]);
   const [sends, setSends] = useState<DripSend[]>([]);
   const [abandonedLogs, setAbandonedLogs] = useState<AbandonedLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,19 +46,27 @@ export default function AdminMarketingDrips() {
   const [stats, setStats] = useState<any>(null);
 
   const loadData = async () => {
+    if (!adminKey) return;
     setLoading(true);
     try {
-      const { data: configData } = await supabase.from('marketing_drip_config' as any).select('*').order('day_offset');
-      const { data: sendsData } = await supabase.from('marketing_drip_sends' as any).select('*').order('sent_at', { ascending: false }).limit(100);
-      const { data: abLogs } = await supabase.from('brevo_sync_logs').select('*').in('event_type', ['tienda_abandoned', 'hotmart_abandoned']).order('created_at', { ascending: false }).limit(100);
+      const { data, error } = await adminInvoke("list-marketing-drips", {
+        body: { adminKey, search, limit: 100 }
+      });
       
-      if (configData) setConfigs(configData as any);
-      if (sendsData) setSends(sendsData as any);
-      if (abLogs) setAbandonedLogs(abLogs as any);
+      if (error) throw error;
+      
+      const d = data as any;
+      const combinedConfigs = [
+        ...(d.configs?.marketing || []).map((c: any) => ({ ...c, type: 'marketing' })),
+        ...(d.configs?.newsletter || []).map((c: any) => ({ ...c, type: 'newsletter', category: 'Newsletter', step_name: `Paso ${c.step}`, template_key: c.template_key }))
+      ];
 
-      const sentToday = (sendsData as any[])?.filter(s => s.sent_at && new Date(s.sent_at).toDateString() === new Date().toDateString()).length || 0;
-      setStats({ sentToday });
+      setConfigs(combinedConfigs);
+      setSends(d.sends || []);
+      setAbandonedLogs(d.abandonedLogs || []);
+      setStats(d.stats);
     } catch (e) {
+      console.error("Error loading marketing drips:", e);
       toast.error("Error al cargar datos");
     } finally {
       setLoading(false);
@@ -65,12 +74,15 @@ export default function AdminMarketingDrips() {
   };
 
   const processQueue = async (endpoint: string, label: string) => {
+    if (!adminKey) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke(endpoint);
+      const { data, error } = await adminInvoke(endpoint, {
+        body: { adminKey }
+      });
       if (error) throw error;
       toast.success(`${label} procesado`, { 
-        description: data.stats ? `Enviados: ${data.stats.sent}` : 'Proceso completado' 
+        description: (data as any).stats ? `Enviados: ${(data as any).stats.sent}` : 'Proceso completado' 
       });
       loadData();
     } catch (e) {
@@ -81,8 +93,10 @@ export default function AdminMarketingDrips() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (adminKey) {
+      loadData();
+    }
+  }, [adminKey]);
 
   const filteredSends = useMemo(() => {
     if (!search) return sends;

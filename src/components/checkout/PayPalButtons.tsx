@@ -24,7 +24,11 @@ let loadedClientId: string | null = null;
 let loadedCurrency: string | null = null;
 
 async function loadPayPalSdk(currency: string): Promise<void> {
-  const { data, error } = await supabase.functions.invoke("paypal-config", { method: "GET" });
+  const { data, error } = await invokeEdge<{ clientId?: string }>(
+    "paypal-config",
+    { method: "GET" },
+    { attempts: 3 },
+  );
   if (error || !data?.clientId) throw new Error("PayPal no está configurado");
   const clientId = data.clientId as string;
   if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;

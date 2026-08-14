@@ -158,11 +158,12 @@ export function useCardPrice(): CardPriceFormatter {
     if (isPeru) {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
       if (pen) return formatCurrencyAmount(pen, "PEN");
-      return formatPrice(fallbackUsd, "PEN", row?.local_prices as any);
+      return formatPrice(fallbackUsd, "PEN", row?.local_prices as any, row?.local_usd_prices as any);
     }
 
     // Resto → USD del tier convertido, respetando el monto manual por moneda.
-    return formatPrice(tierUsd(row, fallbackUsd), displayCurrency, row?.local_prices as any);
+    const tierUsdVal = tierUsd(row, fallbackUsd);
+    return formatPrice(tierUsdVal, displayCurrency, row?.local_prices as any, row?.local_usd_prices as any);
   };
 
   // El precio "antes" usa la MISMA regla que la ficha de producto y el sticky

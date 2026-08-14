@@ -25,11 +25,11 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, note: 'No active config', stats }));
     }
 
-    // 2. Obtener contactos que compraron productos (usamos email_contacts con source=store_purchase)
+    // 2. Obtener contactos que compraron productos (usamos email_contacts)
     const { data: purchases, error: pErr } = await admin
       .from('email_contacts')
-      .select('email, created_at, product_type')
-      .eq('source', 'store_purchase')
+      .select('email, name, country, created_at, product_type, source')
+      .or('source.eq.store_purchase,source.eq.hotmart_purchase,source.eq.manual_payment')
       .order('created_at', { ascending: false })
       .limit(BATCH_LIMIT);
 
@@ -41,14 +41,17 @@ Deno.serve(async (req) => {
       .order('last_activity', { ascending: false })
       .limit(BATCH_LIMIT);
 
-    const merged = new Map<string, { email: string; created_at: string; product_type: string }>();
+    const merged = new Map<string, { email: string; name?: string; country?: string; created_at: string; product_type: string; source?: string }>();
     (purchases || []).forEach(p => merged.set(p.email, p));
     (cCarts || []).forEach(c => {
       if (!merged.has(c.email)) {
         merged.set(c.email, {
           email: c.email,
+          name: (c.buyer as any)?.name,
+          country: c.country,
           created_at: c.last_activity,
-          product_type: Array.isArray(c.items) && c.items[0]?.id ? String(c.items[0].id) : 'tienda'
+          product_type: Array.isArray(c.items) && c.items[0]?.id ? String(c.items[0].id) : 'tienda',
+          source: 'persistent_cart'
         });
       }
     });
@@ -118,7 +121,8 @@ Deno.serve(async (req) => {
             category,
             step_name: step.step_name,
             status: 'sent',
-            sent_at: new Date().toISOString()
+            sent_at: new Date().toISOString(),
+            metadata: { name: p.name, country: p.country, source: p.source }
           });
           stats.sent++;
         } catch (e) {

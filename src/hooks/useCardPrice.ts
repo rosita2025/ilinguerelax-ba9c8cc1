@@ -45,7 +45,7 @@ async function fetchRows(): Promise<Rows> {
   try {
     const result = await supabase
       .from("digital_products")
-      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices")
+      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices, local_usd_prices")
       .eq("active", true);
     data = result.data as unknown as Row[] | null;
   } catch {

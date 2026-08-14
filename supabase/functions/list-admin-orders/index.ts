@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { adminKey } = await req.json().catch(() => ({}));
+    const { adminKey, action, orderId, trackingNumber, shippingProvider, source } = await req.json().catch(() => ({}));
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expected || adminKey !== expected) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -24,6 +24,37 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // Accción: Actualizar tracking
+    if (action === "update_tracking" && orderId) {
+      const table = source === "manual" ? "manual_payments" : 
+                    source === "shopify" ? "shopify_sales" : null;
+      
+      if (!table) throw new Error("Source table not supported for tracking updates");
+
+      const idField = table === "manual_payments" ? "order_number" : "id";
+      
+      const { error: updateError } = await admin
+        .from(table)
+        .update({ 
+          tracking_number: trackingNumber,
+          shipping_provider: shippingProvider 
+        })
+        .eq(idField, orderId);
+
+      if (updateError) throw updateError;
+
+      // Log event
+      await admin.from("order_events").insert({
+        order_id: orderId,
+        event_type: "tracking_updated",
+        details: { trackingNumber, shippingProvider, source }
+      });
+
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const [manual, shopify, hotmart, digital, funnel, emailLog, products, access] = await Promise.all([
       admin.from("manual_payments").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("shopify_sales").select("*").order("created_at", { ascending: false }).limit(200),
@@ -31,12 +62,10 @@ Deno.serve(async (req) => {
       admin.from("digital_email_sends").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("funnel_events").select("*").in("event_name", ["Purchase", "purchase", "mp_pending", "mp_in_process"]).order("created_at", { ascending: false }).limit(300),
       admin.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(300),
-      admin.from("digital_products").select("sku,name,bonus_name,bonus_drive_url,bonuses,active,drive_url,updated_at").limit(500),
+      admin.from("digital_products").select("sku,name,bonus_name,bonus_drive_url,bonuses,active,drive_url,updated_at,is_physical").limit(500),
       admin.from("download_token_access").select("id,token_id,action,sku,ip,created_at").order("created_at", { ascending: false }).limit(300),
     ]);
 
-    // Historial de acceso por token (auditoría): nunca se expone el token ni el
-    // enlace de Drive, sólo pedido, correo, acción, SKU y contador de descargas.
     const accessRows = access.data ?? [];
     const tokenIds = [...new Set(accessRows.map((r: { token_id: string }) => r.token_id))];
     let tokenMap = new Map<string, {

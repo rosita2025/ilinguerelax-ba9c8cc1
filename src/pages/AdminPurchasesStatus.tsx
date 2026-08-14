@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   RefreshCw, Search, CheckCircle2, Clock, XCircle, Ban, AlertOctagon,
   ChevronDown, ChevronRight, CreditCard, ShoppingBag, Wallet, Banknote, Pencil, Send,
+  Box, UserMinus
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
-type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify";
+type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {
   id: string;
@@ -37,6 +38,7 @@ const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; 
   paypal:      { label: "PayPal",        icon: CreditCard,  color: "bg-blue-100 text-blue-800" },
   manual:      { label: "Yape / Plin",   icon: Banknote,    color: "bg-emerald-100 text-emerald-800" },
   hotmart:     { label: "Hotmart",       icon: ShoppingBag, color: "bg-orange-100 text-orange-800" },
+  shopify:     { label: "Shopify / Físico", icon: Box,      color: "bg-teal-100 text-teal-800" },
 };
 
 const STATUS_META: Record<Mapped, { label: string; className: string; icon: typeof CheckCircle2 }> = {
@@ -47,6 +49,7 @@ const STATUS_META: Record<Mapped, { label: string; className: string; icon: type
   refunded:   { label: "Reembolsado",  className: "bg-purple-100 text-purple-800", icon: AlertOctagon },
   chargeback: { label: "Chargeback",   className: "bg-fuchsia-100 text-fuchsia-800", icon: AlertOctagon },
   cancelled:  { label: "Cancelado",    className: "bg-gray-100 text-gray-800",     icon: XCircle },
+  abandoned:  { label: "Abandonado",   className: "bg-orange-100 text-orange-800", icon: UserMinus },
   unknown:    { label: "Desconocido",  className: "bg-muted text-foreground",       icon: Clock },
 };
 
@@ -151,10 +154,10 @@ const AdminPurchasesStatus = () => {
   const kpis = useMemo(() => ([
     { label: "Aprobados",   value: summary.approved   ?? 0, className: STATUS_META.approved.className },
     { label: "Pendientes",  value: summary.pending    ?? 0, className: STATUS_META.pending.className },
+    { label: "Abandonos",   value: summary.abandoned  ?? 0, className: STATUS_META.abandoned.className },
     { label: "Rechazados",  value: summary.refused    ?? 0, className: STATUS_META.refused.className },
     { label: "Bloqueados",  value: summary.blocked    ?? 0, className: STATUS_META.blocked.className },
     { label: "Reembolsos",  value: summary.refunded   ?? 0, className: STATUS_META.refunded.className },
-    { label: "Chargebacks", value: summary.chargeback ?? 0, className: STATUS_META.chargeback.className },
     { label: "Cancelados / Exp", value: summary.cancelled ?? 0, className: STATUS_META.cancelled.className },
   ]), [summary]);
 
@@ -205,6 +208,8 @@ const AdminPurchasesStatus = () => {
                 <option value="paypal">PayPal</option>
                 <option value="stripe">Stripe</option>
                 <option value="hotmart">Hotmart</option>
+                <option value="shopify">Shopify / Físico</option>
+                <option value="manual">Yape / Plin</option>
                 
               </select>
             </div>
@@ -215,6 +220,7 @@ const AdminPurchasesStatus = () => {
                 <option value="all">Todos</option>
                 <option value="approved">Aprobado</option>
                 <option value="pending">Pendiente</option>
+                <option value="abandoned">Abandono</option>
                 <option value="refused">Rechazado</option>
                 <option value="blocked">Bloqueado</option>
                 <option value="refunded">Reembolsado</option>

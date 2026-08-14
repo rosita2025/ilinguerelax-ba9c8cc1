@@ -6,8 +6,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
-type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify";
+type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {
   id: string;
@@ -104,6 +104,32 @@ Deno.serve(async (req) => {
 
     const rows: Row[] = [];
 
+    // ─── Shopify (Physical Orders) ────────────────────────────────────
+    if (!provider || provider === "shopify") {
+      const { data } = await admin
+        .from("shopify_sales")
+        .select("id, shopify_order_id, customer_name, country, product_name, order_created_at")
+        .order("order_created_at", { ascending: false })
+        .limit(take);
+      
+      for (const r of data ?? []) {
+        rows.push({
+          id: `sh-${r.id}`,
+          provider: "shopify",
+          received_at: r.order_created_at,
+          email: r.customer_name, 
+          amount: null,
+          currency: "USD",
+          product: r.product_name,
+          transaction: r.shopify_order_id,
+          raw_status: "approved",
+          mapped_status: "approved",
+          failure_reason: null,
+          failed_step: "Orden física recibida",
+          payload: r,
+        });
+      }
+    }
 
     // ─── Mercado Pago (funnel_events) ─────────────────────────────────
     if (!provider || provider === "mercadopago") {
@@ -153,6 +179,8 @@ Deno.serve(async (req) => {
         .select("id, event_id, event_type, correlation_id, resource_id, payload, created_at")
         .order("created_at", { ascending: false })
         .limit(take);
+
+      for (const r of data ?? []) {
       for (const r of data ?? []) {
         const meta = PAYPAL_STEPS[r.event_type] ?? { step: r.event_type, mapped: "unknown" as Mapped };
         const p: any = r.payload ?? {};
@@ -182,18 +210,36 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: false })
         .limit(take);
 
-      for (const r of data ?? []) {
+      // Add Abandoned Checkout detection for Stripe/Global
+      const { data: abandoned } = await admin
+        .from("funnel_events")
+        .select("id, created_at, event_name, event_data, email, product_id, value, currency, country, referrer")
+        .in("event_name", ["InitiateCheckout", "BeginCheckout"])
+        .order("created_at", { ascending: false })
+        .limit(take);
+      
+      const allStripe = [...(data ?? []), ...(abandoned ?? [])];
+      
+      // Filter out InitiateCheckout events if a Purchase exists for the same session/email
+      // (This is a naive filter, but helps reduce noise)
+      const purchaseEmails = new Set((data ?? []).map(p => p.email).filter(Boolean));
+
+      for (const r of allStripe) {
         let d: any = r.event_data ?? {};
         if (Object.keys(d).length === 0 && r.referrer) {
           try { d = JSON.parse(r.referrer); } catch { d = {}; }
         }
         
-        const status = d.status || (r.event_name === "Purchase" ? "approved" : "pending");
+        const isAbandoned = r.event_name === "InitiateCheckout" || r.event_name === "BeginCheckout";
+        if (isAbandoned && r.email && purchaseEmails.has(r.email)) continue;
+
+        const status = d.status || (r.event_name === "Purchase" ? "approved" : isAbandoned ? "abandoned" : "pending");
         let mapped: Mapped = "unknown";
         if (status === "approved" || status === "succeeded") mapped = "approved";
         else if (status === "pending" || status === "processing") mapped = "pending";
         else if (status === "failed" || status === "requires_payment_method") mapped = "refused";
         else if (status === "canceled") mapped = "cancelled";
+        else if (status === "abandoned") mapped = "abandoned";
 
         rows.push({
           id: `st-${r.id}`, 
@@ -240,7 +286,8 @@ Deno.serve(async (req) => {
           transaction: d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
           mapped_status: (status === "approved" || status === "complete" || status === "succeeded" || status === "Purchase") ? "approved" : 
-                         (status === "pending" || status === "processing" || status === "InitiateCheckout") ? "pending" :
+                         (status === "pending" || status === "processing") ? "pending" :
+                         (status === "InitiateCheckout" || status === "abandoned") ? "abandoned" :
                          (status === "refunded") ? "refunded" : 
                          (status === "chargeback") ? "chargeback" :
                          (status === "expired" || status === "canceled" || status === "failed") ? "cancelled" : "unknown",

@@ -164,7 +164,7 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 
 
 type MethodBadge = { label: string; bg: string; color: string };
-type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
+
 
 const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
   stripe_apple_pay: {

@@ -1011,12 +1011,15 @@ const AdminProductEdit = () => {
                   const baseUsdRef = Number(product.price_usd) || 0;
                   
                   const regionPrice = (() => {
-                    if (baseUsdRef <= 0) return null;
+                    const regionalUsd = product.local_usd_prices?.[code];
+                    const activeBaseUsd = regionalUsd != null ? Number(regionalUsd) : baseUsdRef;
+
+                    if (activeBaseUsd <= 0) return null;
                     
                     const rate = exchangeRates[code as Currency];
                     if (!rate) return null;
 
-                    const raw = baseUsdRef * rate;
+                    const raw = activeBaseUsd * rate;
                     // El usuario prefiere precios más bajos en LATAM y más altos en USA/Europa
                     // Lógica de redondeo "bonito" según la moneda
                     if (code === "COP" || code === "TZS" || code === "UGX") return Math.round(raw / 100) * 100;
@@ -1025,6 +1028,8 @@ const AdminProductEdit = () => {
                     
                     return Math.round(raw * 100) / 100;
                   })();
+
+                  const currentUsdValue = product.local_usd_prices?.[code] ?? baseUsdRef;
 
                   return (
                     <div key={code}>

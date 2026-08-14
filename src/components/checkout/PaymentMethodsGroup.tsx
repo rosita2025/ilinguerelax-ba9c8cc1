@@ -1514,7 +1514,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pague em moeda local com seu cartão. Campos seguros da dLocal."
         : language === "fr" ? "Payez en monnaie locale par carte. Champs sécurisés dLocal."
         : "Paga en tu moneda local con tu tarjeta. Campos seguros de dLocal.",
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: [
         { label: "Visa", bg: "#1A1F71", color: "#ffffff" },
         { label: "Mastercard", bg: "#EB001B", color: "#ffffff" },

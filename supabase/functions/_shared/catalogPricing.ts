@@ -169,7 +169,7 @@ export async function resolveServerPricing(opts: {
     .filter((i) => i.id);
   if (!wanted.length) throw new PricingError("Carrito vacío");
 
-  const currencyHint = opts.items[0]?.price === undefined ? null : (opts as any).currency; // Opcional, si el llamador pasa currency
+  const currencyHint = opts.currency;
 
 
   const skus = Array.from(new Set(wanted.map((i) => normalizeSku(i.id)).filter(Boolean))) as string[];

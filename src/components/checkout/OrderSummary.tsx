@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect, useCurrencyBreakdown } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount } from "@/i18n";
@@ -74,6 +74,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const localSubtotalAmount = localItemsSum.amount;
   const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
   const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
+  const breakdown = useCurrencyBreakdown(total, null, items[0]?.localUsdPrices);
+
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
@@ -331,8 +333,46 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   ≈ USD ${localItemsSum.usdReference.toFixed(2)}
                 </div>
               )}
+              
+              {showLocalRef && !breakdown.isUsd && (
+                <div className="mt-4 pt-4 border-t border-dashed space-y-2">
+                  <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">
+                    <span>{t.currencyBreakdown}</span>
+                    <span className="text-primary/70">{breakdown.currency}</span>
+                  </div>
+                  
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{t.baseUsd}</span>
+                    <span className="font-medium text-foreground">${breakdown.baseUsd.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{t.exchangeRate}</span>
+                    <span>1 USD = {breakdown.rate.toFixed(2)} {breakdown.currency}</span>
+                  </div>
+
+                  {breakdown.hasRegionalUsd && (
+                    <div className="flex justify-between text-xs text-green-600 font-medium bg-green-50/50 px-2 py-1 rounded">
+                      <span>{t.adjustment}</span>
+                      <span>-${breakdown.adjustmentUsd.toFixed(2)} USD</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between text-xs font-bold pt-1 border-t border-muted/50">
+                    <span>{t.localPrice}</span>
+                    <span className="text-primary">{localTotalLabel}</span>
+                  </div>
+                  
+                  {breakdown.hasRegionalUsd && (
+                    <p className="text-[9px] text-muted-foreground italic leading-tight mt-1">
+                      {t.localAdjustmentNotice}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
+
 
         </div>
       </div>

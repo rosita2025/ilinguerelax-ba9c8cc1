@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { User, Mail, CheckCircle2, AlertCircle, MapPin, Globe } from "lucide-react";
+import { User, Mail, CheckCircle2, AlertCircle, MapPin, Globe, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";

@@ -335,9 +335,19 @@ const AdminPhysicalOrders = () => {
                   </div>
                 )}
                 {!order.tracking_number && (order.status === "approved" || order.status === "paid") && (
-                  <div className="flex items-center gap-2 text-xs text-amber-600 font-medium">
-                    <AlertCircle className="w-3 h-3" />
-                    Pendiente de envío / tracking.
+                  <div className="space-y-2 pt-2 border-t border-dashed">
+                    <div className="flex items-center gap-2 text-xs text-amber-600 font-medium">
+                      <AlertCircle className="w-3 h-3" />
+                      Pendiente de envío / tracking.
+                    </div>
+                    {order.source === "manual" && (
+                      <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
+                        <p className="text-[10px] uppercase font-bold text-primary/70 mb-1">Conversión Manual a Pedido Físico</p>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Si este pago manual incluye un producto físico (ej: libro), completa el transportista y tracking para activar el rastreo del cliente.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </Card>

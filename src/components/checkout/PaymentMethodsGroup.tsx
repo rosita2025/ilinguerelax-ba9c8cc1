@@ -1443,7 +1443,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Transferência em MXN para uma CLABE mexicana · Verificação 1-24h pela Supervisora Rosa"
         : language === "fr" ? "Virement en MXN vers une CLABE mexicaine · Vérification 1-24h par la Superviseure Rosa"
         : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
     },
     {
       id: "dlocal_transfer",

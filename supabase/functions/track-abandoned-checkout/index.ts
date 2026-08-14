@@ -109,6 +109,15 @@ Deno.serve(async (req) => {
     email = guard.email;
 
 
+    // Ignorar si ya compró recientemente (evita spam de abandonos tras compra exitosa)
+    const recentPurchased = await getPurchasedSkus(supabase, email);
+    if (productType && recentPurchased.has(String(productType).toLowerCase())) {
+      console.log(`[track-abandoned-checkout] skipping for ${email} - already purchased ${productType}`);
+      return new Response(JSON.stringify({ ok: true, skipped: "already_purchased" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Resolver idioma: body.language > tabla country_language_map > TLD > "es"
     let language: string;
     if (body.language) {

@@ -38,6 +38,12 @@ interface AbandonedLog {
   attributes: any;
 }
 
+interface PurchaseRow {
+  email: string;
+  mapped_status: string;
+  provider: string;
+}
+
 export default function AdminMarketingDrips() {
   const { adminKey } = useAdminKey();
   const [configs, setConfigs] = useState<any[]>([]);
@@ -46,6 +52,8 @@ export default function AdminMarketingDrips() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [stats, setStats] = useState<any>(null);
+
+  const [purchases, setPurchases] = useState<PurchaseRow[]>([]);
 
   const loadData = async () => {
     if (!adminKey) return;
@@ -67,6 +75,12 @@ export default function AdminMarketingDrips() {
       setSends(d.sends || []);
       setAbandonedLogs(d.abandonedLogs || []);
       setStats(d.stats);
+
+      // Load recent successful purchases to highlight converted users
+      const { data: purchaseData } = await adminInvoke("list-purchases-status", {
+        body: { adminKey, mapped: 'approved', limit: 200 }
+      });
+      if (purchaseData) setPurchases((purchaseData as any).rows || []);
     } catch (e) {
       console.error("Error loading marketing drips:", e);
       toast.error("Error al cargar datos");
@@ -236,26 +250,36 @@ export default function AdminMarketingDrips() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {abandonedLogs.map((l, i) => (
-                    <tr key={i} className="hover:bg-muted/30">
-                      <td className="px-4 py-2">
-                        <div className="font-medium">{l.email}</div>
-                        <div className="text-[9px] text-muted-foreground flex items-center gap-1">
-                          <Badge variant="outline" className="text-[8px] h-3 px-1">
-                            {l.attributes?.ORIGEN || 'tienda'}
+                  {abandonedLogs.map((l, i) => {
+                    const hasPurchase = purchases.some(p => p.email?.toLowerCase() === l.email?.toLowerCase());
+                    return (
+                      <tr key={i} className={`hover:bg-muted/30 ${hasPurchase ? 'bg-emerald-50/30' : ''}`}>
+                        <td className="px-4 py-2">
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium">{l.email}</div>
+                            {hasPurchase && (
+                              <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[8px] h-4">
+                                COMPRADOR
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-[9px] text-muted-foreground flex items-center gap-1">
+                            <Badge variant="outline" className="text-[8px] h-3 px-1">
+                              {l.attributes?.ORIGEN || 'tienda'}
+                            </Badge>
+                            {l.attributes?.COUNTRY_CODE && `· ${l.attributes.COUNTRY_CODE}`}
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 max-w-[200px] truncate">{l.product_name || l.attributes?.ABANDONED_PRODUCT_NAME}</td>
+                        <td className="px-4 py-2 text-muted-foreground">{new Date(l.created_at).toLocaleString('es-PE')}</td>
+                        <td className="px-4 py-2 text-right">
+                          <Badge variant={l.status === 'success' ? 'default' : 'destructive'} className="text-[9px]">
+                            {l.status} {l.http_status ? `(${l.http_status})` : ''}
                           </Badge>
-                          {l.attributes?.COUNTRY_CODE && `· ${l.attributes.COUNTRY_CODE}`}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 max-w-[200px] truncate">{l.product_name || l.attributes?.ABANDONED_PRODUCT_NAME}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{new Date(l.created_at).toLocaleString('es-PE')}</td>
-                      <td className="px-4 py-2 text-right">
-                        <Badge variant={l.status === 'success' ? 'default' : 'destructive'} className="text-[9px]">
-                          {l.status} {l.http_status ? `(${l.http_status})` : ''}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

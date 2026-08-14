@@ -17,11 +17,14 @@ export interface PruebaItem {
   /** Optional Peru local price (PEN). When set + country=PE, shown natively (no conversion). */
   pricePen?: number;
   /** Whether the product is physical (requires shipping address). */
+  /** Whether the product is physical (requires shipping address). */
+  isPhysical?: boolean;
   /** Optional per-currency manual prices (override automatic conversion). */
   localPrices?: Record<string, number>;
   /** Optional per-currency regional USD base overrides. */
   localUsdPrices?: Record<string, number>;
 }
+
 
 /** Returns the effective USD unit price for an item, given the visitor's IP region tier. */
 export function itemPrice(item: PruebaItem, tier: RegionTier): number {

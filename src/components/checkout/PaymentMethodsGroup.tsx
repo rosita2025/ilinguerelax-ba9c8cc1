@@ -334,22 +334,29 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent, selectedMethod, setSelectedMethod } = useCheckoutPruebaStore();
   const region = useRegionTier();
+  const countryCode = (region.country || "").toUpperCase();
+  const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(countryCode);
   const { language } = useI18n();
   const t = getCheckoutUI(language);
-  const { total } = calcTotals(items, couponPercent, region.tier);
-  const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
-  const totalUsd = total.toFixed(2);
-  const local = useLocalCurrency(total);
+  const { total, subtotal } = calcTotals(items, couponPercent, region.tier);
+  const shippingCost = isLatam ? 9 : 8;
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
+  const grandTotal = total + shipping;
+  const totalUsd = grandTotal.toFixed(2);
+  const penTotals = calcTotalsPen(items, couponPercent, countryCode);
   const overridesFor = useSkuOverridesResolver();
-  const countryCode = (region.country || "").toUpperCase();
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
+  const local = useLocalCurrency(total); // For overrides and loading state
+  void local; // Silenciar advertencia si no se usa local.isUsd etc directamente
 
+  // Replicating exactly the logic from OrderSummary.tsx
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     countryCode,
     overridesFor,
   );
-  const localTotalAmount = localItemsSum.amount * (1 - (couponPercent || 0) / 100);
+  const localSubtotalAmount = localItemsSum.amount;
+  const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
   
   const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
 
@@ -364,19 +371,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   );
   
   const showUsdOnly = isFallingBackToUsd;
-  
-  const localFormatted = local.loading || showUsdOnly 
-    ? `USD $${totalUsd}` 
-    : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
+  const localTotalLabel = formatLocalDirect(localTotalAmount, countryCode);
 
-  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total) : null;
+  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shipping) : null;
   const isActuallyShowingLocal = !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.
-  const priceBadge = penBadge ?? localFormatted;
+  const priceBadge = penBadge ?? localTotalLabel;
   const usdSuffix = isActuallyShowingLocal 
-    ? (local.isUsd ? ` (≈ USD $${totalUsd})` : ` (≈ USD $${totalUsd})`) 
+    ? ` (≈ USD $${totalUsd})` 
     : "";
   const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";
@@ -1395,7 +1399,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const STRIPE_VISIBLE_METHODS = getStripeVisibleMethods(language);
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
-    .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));
+    .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 
       id: "card", 
@@ -1404,17 +1408,17 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       sub: isFallingBackToUsd 
         ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : "Pagando en USD por compatibilidad (Transacción internacional).")
         : cardSubtitle, 
-      badge: isFallingBackToUsd ? `USD $${totalUsd}` : priceBadge 
+      badge: isFallingBackToUsd ? `USD $${totalUsd}` : finalPriceLabel 
     },
 
     ...dynamicStripeRows,
-    { id: "stripe_ach", icon: Building2, title: language === "en" ? "ACH Bank Transfer" : "Transferencia bancaria ACH", sub: language === "en" ? "Pay from a US bank account inside Stripe." : "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: priceBadge },
-    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with Cash App within Stripe's secure form." : "Paga con Cash App dentro del formulario seguro de Stripe.", badge: priceBadge },
-    { id: "stripe_klarna", icon: Wallet, title: language === "en" ? "Klarna — Pay in 4" : "Klarna — Paga en 4", sub: language === "en" ? "Split your purchase into 4 interest-free installments inside Stripe." : "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: priceBadge },
-    { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: `USD $${totalUsd}` },
-    { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
-    { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
-    { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: priceBadge },
+    { id: "stripe_ach", icon: Building2, title: language === "en" ? "ACH Bank Transfer" : "Transferencia bancaria ACH", sub: language === "en" ? "Pay from a US bank account inside Stripe." : "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: finalPriceLabel },
+    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with Cash App within Stripe's secure form." : "Paga con Cash App dentro del formulario seguro de Stripe.", badge: finalPriceLabel },
+    { id: "stripe_klarna", icon: Wallet, title: language === "en" ? "Klarna — Pay in 4" : "Klarna — Paga en 4", sub: language === "en" ? "Split your purchase into 4 interest-free installments inside Stripe." : "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: finalPriceLabel },
+    { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: finalPriceLabel },
+    { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: finalPriceLabel },
+    { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: finalPriceLabel },
+    { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: finalPriceLabel },
     {
       id: "binance",
       icon: Wallet,
@@ -1426,7 +1430,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "USDT / Binance Pay · Verificação 1-24h pela Supervisora Rosa"
         : language === "fr" ? "USDT / Binance Pay · Vérification 1-24h par la Superviseure Rosa"
         : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
-      badge: `USD $${totalUsd}`,
+      badge: finalPriceLabel,
     },
     {
       id: "clabe",
@@ -1439,7 +1443,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Transferência em MXN para uma CLABE mexicana · Verificação 1-24h pela Supervisora Rosa"
         : language === "fr" ? "Virement en MXN vers une CLABE mexicaine · Vérification 1-24h par la Superviseure Rosa"
         : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
     },
     {
       id: "dlocal_transfer",
@@ -1454,7 +1459,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pague pelo seu banco ou carteira em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
         : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: dlocalBadges(country, "transfer", 6).length
         ? dlocalBadges(country, "transfer", 6)
         : [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
@@ -1472,7 +1478,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Gere um voucher e pague em dinheiro em uma loja ou agente."
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
         : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: dlocalBadges(country, "cash", 6).length
         ? dlocalBadges(country, "cash", 6)
         : [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }],
@@ -1492,7 +1499,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pague pela sua carteira digital em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre portefeuille en monnaie locale. Confirmation immédiate."
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: dlocalBadges(country, "wallet", 6),
     },
     {
@@ -1506,7 +1514,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pague em moeda local com seu cartão. Campos seguros da dLocal."
         : language === "fr" ? "Payez en monnaie locale par carte. Champs sécurisés dLocal."
         : "Paga en tu moneda local con tu tarjeta. Campos seguros de dLocal.",
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: [
         { label: "Visa", bg: "#1A1F71", color: "#ffffff" },
         { label: "Mastercard", bg: "#EB001B", color: "#ffffff" },
@@ -1876,7 +1885,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100 whitespace-nowrap shrink-0">
+                    <span className={cn(
+                      "text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0",
+                      isSelected
+                        ? "bg-neutral-800 text-neutral-100 dark:bg-neutral-100 dark:text-neutral-900"
+                        : "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100"
+                    )}>
                       {m.badge}
                     </span>
                   )}

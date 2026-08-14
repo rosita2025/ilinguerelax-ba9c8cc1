@@ -132,20 +132,24 @@ Deno.serve(async (req) => {
     // volvía a mostrar automáticamente PayPal, Klarna y todos los métodos
     // activados en la cuenta, aunque el administrador no los hubiera elegido.
     
-    // SIEMPRE USD: Desactivamos Adaptive Pricing y forzamos USD para evitar errores
-    // de moneda local en regiones con restricciones bancarias o cuando falla el intento inicial.
+    // Favor local currency if supported and not restricted.
     const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(body.contact.country);
+    
+    // Stripe handle Adaptive Pricing better when the base currency matches the catalog (USD)
+    // but the final session can be shown in local. We prefer local currency processing 
+    // for non-restricted countries.
+    const targetCurrency = forceUsd ? "usd" : currency;
 
-    console.log(`[Stripe] Creating session. ForceUSD: ${forceUsd}, Country: ${body.contact.country}, Currency: ${currency}`);
+    console.log(`[Stripe] Creating session. TargetCurrency: ${targetCurrency}, ForceUSD: ${forceUsd}, Country: ${body.contact.country}`);
 
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
-      // Desactivamos Adaptive Pricing si forzamos USD para evitar errores de moneda local.
+      // Adaptive Pricing allows Stripe to present local currency automatically if enabled.
       adaptive_pricing: { enabled: !forceUsd },
-      currency: forceUsd ? "usd" : currency,
+      currency: targetCurrency,
       customer_email: body.contact.email,
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",

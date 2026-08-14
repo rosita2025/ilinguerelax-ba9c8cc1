@@ -462,6 +462,8 @@ const ProductDynamic = () => {
               productName={product.name}
               ctaText={"Comprar ahora"}
               buyUrl={`/checkouts/${product.sku}`}
+              usdValue={effectiveUsd}
+              localUsdPrices={product.local_usd_prices}
             />
             <div className="h-20 md:h-16" />
           </>

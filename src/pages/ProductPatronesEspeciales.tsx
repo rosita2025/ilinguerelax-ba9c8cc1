@@ -749,6 +749,8 @@ const ProductPatronesEspeciales = () => {
         buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
         onBuyClick={useTiendaOnly ? handleBuy : undefined}
         ctaText={"Comprar ahora"}
+        usdValue={PRICE_USD}
+        localUsdPrices={pricingAdmin.localUsdPrices}
       />
 
       <div className="h-20 md:h-16" />

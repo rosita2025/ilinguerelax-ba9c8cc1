@@ -119,12 +119,6 @@
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</loc>
-    <lastmod>2026-08-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
     <loc>https://ilinguerelax.com/products/1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
@@ -133,6 +127,12 @@
   <url>
     <loc>https://ilinguerelax.com/products/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej</loc>
     <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</loc>
+    <lastmod>2026-08-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>

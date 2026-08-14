@@ -60,6 +60,64 @@ Deno.serve(async (req) => {
         }
       });
 
+      // Send tracking email if tracking was added (and not just cleared)
+      if (trackingNumber) {
+        try {
+          // Fetch order details to get customer email
+          const { data: orderData } = await admin
+            .from(table)
+            .select(idField === "order_number" ? "buyer_email, buyer_name" : "customer_email, customer_name")
+            .eq(idField, orderId)
+            .maybeSingle();
+
+          const email = orderData?.buyer_email || orderData?.customer_email;
+          const name = orderData?.buyer_name || orderData?.customer_name || "Cliente";
+
+          if (email) {
+            const isAmazon = shippingProvider?.toLowerCase().includes("amazon");
+            const trackingLink = isAmazon 
+              ? `https://www.amazon.com/progress-tracker/package/ref=pt_redirect_from_gp?shipmentId=${trackingNumber}`
+              : trackingNumber.startsWith('http') ? trackingNumber : null;
+
+            await sendEmail({
+              to: [{ email, name }],
+              subject: `📦 Tu pedido ${orderId} ha sido enviado`,
+              htmlContent: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #111827;">
+                  <h1 style="color: #0d9488;">¡Tu pedido está en camino!</h1>
+                  <p>Hola ${name},</p>
+                  <p>Nos alegra informarte que tu pedido <strong>${orderId}</strong> ha sido enviado.</p>
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 0; font-size: 14px; color: #6b7280;">Número de seguimiento:</p>
+                    <p style="margin: 5px 0 15px 0; font-size: 18px; font-weight: bold; color: #111827;">${trackingNumber}</p>
+                    <p style="margin: 0; font-size: 14px; color: #6b7280;">Transportista:</p>
+                    <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold; color: #111827;">${shippingProvider || "Courier"}</p>
+                  </div>
+                  ${trackingLink ? `
+                    <div style="text-align: center; margin-top: 25px;">
+                      <a href="${trackingLink}" style="display: inline-block; background: #0d9488; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Rastrear mi pedido</a>
+                    </div>
+                  ` : `
+                    <p>Puedes rastrear tu pedido ingresando el número anterior en la web del transportista.</p>
+                  `}
+                  <p style="margin-top: 30px; font-size: 14px; color: #6b7280; text-align: center;">
+                    También puedes ver el estado detallado en: <br>
+                    <a href="https://ilinguerelax.com/mi-pedido?order=${orderId}&email=${encodeURIComponent(email)}" style="color: #0d9488; text-decoration: underline;">https://ilinguerelax.com/mi-pedido</a>
+                  </p>
+                  <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+                  <p style="font-size: 12px; color: #9ca3af; text-align: center;">iLingue Relax · Aprendizaje sin estrés</p>
+                </div>
+              `,
+              provider: "resend"
+            });
+            console.log(`Tracking email sent to ${email} for order ${orderId}`);
+          }
+        } catch (emailError) {
+          console.error("Error sending tracking email:", emailError);
+          // Don't throw, we want the tracking update to succeed even if email fails
+        }
+      }
+
       return new Response(JSON.stringify({ ok: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

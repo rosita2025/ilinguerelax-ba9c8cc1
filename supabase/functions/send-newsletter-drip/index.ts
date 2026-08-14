@@ -150,11 +150,15 @@ Deno.serve(async (req) => {
           .from('persistent_carts')
           .select('id, status, updated_at')
           .ilike('email', email)
-          .eq('converted', false)
-          .gte('updated_at', holdCutoff)
+          .eq("converted", false)
+          .gte("last_activity", holdCutoff)
           .limit(1)
           .maybeSingle();
-        if (cart) { stats.skipped++; continue; }
+        if (cart) {
+          console.log(`[newsletter-drip] skipping ${email} due to active abandoned cart hold (last activity: ${cart.last_activity})`);
+          stats.skipped++; 
+          continue; 
+        }
       } catch (_) { /* ignore */ }
 
       // 5) Product-specific: skip if already purchased

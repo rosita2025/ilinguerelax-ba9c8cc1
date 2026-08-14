@@ -56,6 +56,19 @@ Deno.serve(async (req) => {
     for (const p of merged.values()) {
       stats.processed++;
       const email = p.email.toLowerCase().trim();
+      
+      // 2.5. Skip if suppression exists
+      const { data: supp } = await admin
+        .from('suppressed_emails')
+        .select('email')
+        .eq('email', email)
+        .maybeSingle();
+      if (supp) {
+        console.log(`[marketing-drip] skipping ${email} - suppressed`);
+        stats.skipped++;
+        continue;
+      }
+
       const purchasedAt = new Date(p.created_at).getTime();
       const daysSince = Math.floor((Date.now() - purchasedAt) / 86400000);
 

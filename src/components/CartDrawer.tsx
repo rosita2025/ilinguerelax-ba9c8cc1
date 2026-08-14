@@ -14,6 +14,7 @@ import { CartUpsell } from "@/components/CartUpsell";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
 import { useI18n } from "@/i18n/I18nContext";
+import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { detectCurrency, formatCurrencyAmount } from "@/i18n";
 import { useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
 import productSpanish5000Image from "@/assets/cart-spanish-5000-physical-phone.webp";
@@ -62,7 +63,8 @@ const isPhysicalPreorderItem = (title: string) => {
 };
 
 export const CartDrawer = () => {
-  const { currency, formatPrice } = useI18n();
+  const { currency, formatPrice, language } = useI18n();
+  const t = getCheckoutUI(language);
   const { 
     items: rawItems, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, 
     syncCart, isDrawerOpen, setDrawerOpen, discountCodes, discountTotal,
@@ -392,7 +394,12 @@ export const CartDrawer = () => {
                         <img src={it.image} alt={it.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold leading-tight truncate">{it.name}</p>
+                        <p className="text-xs font-semibold leading-tight truncate">
+                          {it.name}
+                          <span className="ml-2 text-[9px] uppercase px-1 py-0.5 rounded bg-secondary/50 text-muted-foreground">
+                            {it.isPhysical ? t.physical : t.digital}
+                          </span>
+                        </p>
                         <p className="text-[11px] text-primary font-bold">
                           {formatInternalUnit(it)}
                         </p>
@@ -422,6 +429,7 @@ export const CartDrawer = () => {
                 onClick={goToInternalCheckout}
                 className="w-full mt-2 h-10 text-sm font-bold"
               >
+                {visibleInternalItems.some(i => i.isPhysical) ? t.configureShipping : t.securePayment}
                 Ir al checkout
                 <ArrowRight className="w-4 h-4 ml-1.5" />
               </Button>

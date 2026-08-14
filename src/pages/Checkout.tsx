@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock } from "lucide-react";
+import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock, Package } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -685,7 +685,15 @@ export default function Checkout() {
 
       <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-5 lg:gap-8">
         <div className="min-w-0 space-y-4">
-
+          {items.some(i => i.isPhysical) && items.some(i => !i.isPhysical) && (
+            <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex gap-3 items-start">
+              <Package className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-900 dark:text-amber-200">
+                <p className="font-bold">Pedido Mixto</p>
+                <p>Tu carrito contiene productos físicos y digitales. El acceso a los digitales es inmediato tras el pago, mientras que los físicos requieren datos de envío.</p>
+              </div>
+            </div>
+          )}
           <BuyerInfoForm />
 
           {catalogItem?.upsells?.length ? (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin, ShoppingBag, Truck } from "lucide-react";
+import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin, ShoppingBag, Truck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
@@ -35,6 +35,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : 8) : 0;
+  const grandTotal = total + shipping;
   const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
   const overridesFor = useSkuOverridesResolver();
   const localTotal = useLocalCurrency(total);
@@ -57,8 +59,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     overridesFor,
   );
   const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = localSubtotalAmount * (1 - (couponPercent || 0) / 100);
-  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(total, "USD");
+  const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
+  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
@@ -121,11 +123,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex gap-2.5 items-start rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 mb-2">
             <Truck className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
             <p className="text-xs text-muted-foreground leading-snug">
-              <strong className="text-foreground font-semibold">Producto físico.</strong> Se solicita dirección de envío en el formulario de datos.
+              <strong className="text-foreground font-semibold">{t.physical}.</strong> Se solicita dirección de envío en el formulario de datos.
             </p>
           </div>
         ) : (
-          <DigitalProductNotice />
+          <div className="flex gap-2.5 items-start rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5 mb-2">
+            <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-xs text-muted-foreground leading-snug">
+              <strong className="text-foreground font-semibold">{t.digital}.</strong> Recibirás el acceso inmediato por correo tras el pago.
+            </p>
+          </div>
         )}
 
 
@@ -253,13 +260,22 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
+            <span>{t.shipping}</span>
+            <span>
+              {items.some(i => i.isPhysical) 
+                ? (shipping === 0 ? t.freeShipping : formatCurrencyAmount(8, "USD"))
+                : t.freeDigitalDelivery
+              }
+            </span>
+          </div>
+          <div className="flex justify-between text-muted-foreground text-xs">
             <span>{t.taxes}</span>
             <span>{t.included}</span>
           </div>
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(total, "USD")}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
             </div>
           </div>
 

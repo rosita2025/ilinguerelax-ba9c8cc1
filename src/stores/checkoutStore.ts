@@ -167,7 +167,11 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
                     description: item.description ?? i.description,
                     regionPrices: item.regionPrices ?? i.regionPrices,
                     pricePen: item.pricePen ?? i.pricePen,
+                    isPhysical: item.isPhysical ?? i.isPhysical,
+                    localPrices: item.localPrices ?? i.localPrices,
+                    localUsdPrices: item.localUsdPrices ?? i.localUsdPrices,
                     quantity: 1,
+
                   }
                 : i,
             ),
@@ -189,7 +193,11 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
                   // so switching a product from region-priced to flat works.
                   regionPrices: patch.regionPrices ?? undefined,
                   pricePen: patch.pricePen ?? undefined,
+                  isPhysical: patch.isPhysical ?? i.isPhysical,
+                  localPrices: patch.localPrices ?? i.localPrices,
+                  localUsdPrices: patch.localUsdPrices ?? i.localUsdPrices,
                 }
+
               : i,
           ),
         });

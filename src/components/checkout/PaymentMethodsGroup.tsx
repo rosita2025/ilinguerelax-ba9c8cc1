@@ -2116,7 +2116,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl pointer-events-none" />
                     </div>
                   </div>
-                </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
                     {binanceCfg.pay_id && (

@@ -36,8 +36,23 @@ Deno.serve(async (req) => {
     if (dbError) {
       console.error("[paypal-config] DB Health check failed:", dbError);
     }
+    
+    const clientId = Deno.env.get("PAYPAL_CLIENT_ID");
+    const secret = Deno.env.get("PAYPAL_SECRET");
+    
+    if (!clientId || !secret) {
+      console.error("[paypal-config] MISSING CREDENTIALS:", { hasClientId: !!clientId, hasSecret: !!secret });
+      return new Response(JSON.stringify({ 
+        error: "PayPal no está configurado (faltan credenciales)", 
+        traceId, 
+        correlationId,
+        healthy: false 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    const clientId = Deno.env.get("PAYPAL_CLIENT_ID") ?? "";
     const environment = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
     
     return new Response(JSON.stringify({ clientId, environment, traceId, correlationId, healthy: !dbError }), {

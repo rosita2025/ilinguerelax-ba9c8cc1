@@ -219,7 +219,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
             try {
               const data = await invokeWithRetry<{ id: string }>(
                 "paypal-create-order",
-                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, couponCode, country: buyerCountry },
+                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, couponCode, country: buyerCountry, items },
                 "create",
               );
               if (!data?.id) throw new Error("No se pudo crear la orden");

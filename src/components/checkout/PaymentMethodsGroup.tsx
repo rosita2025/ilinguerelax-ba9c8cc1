@@ -2172,14 +2172,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   {t.alreadyPaid}
                 </button>
 
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
-                </a>
 
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>

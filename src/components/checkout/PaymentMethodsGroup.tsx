@@ -2156,17 +2156,18 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
                   </div>
 
-                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
-                  <li>{language === "en" ? "Open your Binance app and go to Pay / Send." : language === "pt" ? "Abra o app Binance e vá em Pay / Enviar." : language === "fr" ? "Ouvre l'app Binance et va dans Pay / Envoyer." : "Abre tu app Binance y ve a Pay / Enviar."}</li>
-                  <li>{language === "en" ? `Scan the QR or paste the Pay ID and send USD $${totalUsd} in USDT.` : language === "pt" ? `Escaneie o QR ou cole o Pay ID e envie USD $${totalUsd} em USDT.` : language === "fr" ? `Scanne le QR ou colle le Pay ID et envoie USD $${totalUsd} en USDT.` : `Escanea el QR o pega el Pay ID y envía USD $${totalUsd} en USDT.`}</li>
-                  <li>{language === "en" ? "Save the transaction screenshot." : language === "pt" ? "Salve a captura da transação." : language === "fr" ? "Sauvegarde la capture de la transaction." : "Guarda la captura de la transacción."}</li>
-                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
-                </ol>
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
+                    <p>
+                      <strong>Importante:</strong> Envía tu captura de pantalla a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pago de inmediato.
+                    </p>
+                  </div>
+                </div>
 
                 <button
                   type="button"
                   onClick={handleBinancePaid}
-                  className="w-full bg-[#F0B90B] hover:bg-[#d9a409] text-neutral-900 font-semibold py-3 rounded-xl transition-colors"
+                  className="w-full bg-[#F0B90B] hover:bg-[#d9a409] text-neutral-900 font-bold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>

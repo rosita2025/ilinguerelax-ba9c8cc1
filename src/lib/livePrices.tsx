@@ -39,7 +39,7 @@ const LivePricesContext = createContext<Ctx>({
   version: 0,
   prices: {},
   getLivePrice: () => undefined,
-  getLocalOverrides: () => null,
+  getLocalOverrides: () => ({ local_prices: null, local_usd_prices: null }),
 });
 
 export const useLivePrices = () => useContext(LivePricesContext);

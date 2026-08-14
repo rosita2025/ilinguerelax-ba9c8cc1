@@ -33,8 +33,8 @@ export const PixelDebugger = () => {
     }
 
     // Intercept fbq calls
-    const originalFbq = window.fbq;
-    window.fbq = function(...args: any[]) {
+    const originalFbq = (window as any).fbq;
+    (window as any).fbq = function(...args: any[]) {
       if (args[0] === 'track') {
         const eventName = args[1];
         const params = args[2];
@@ -57,7 +57,7 @@ export const PixelDebugger = () => {
     };
 
     return () => {
-      window.fbq = originalFbq;
+      (window as any).fbq = originalFbq;
     };
   }, []);
 

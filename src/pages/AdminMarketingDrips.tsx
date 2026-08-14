@@ -226,7 +226,7 @@ export default function AdminMarketingDrips() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {filteredAbandoned.map((l, i) => (
+                  {abandonedLogs.map((l, i) => (
                     <tr key={i} className="hover:bg-muted/30">
                       <td className="px-4 py-2">
                         <div className="font-medium">{l.email}</div>
@@ -238,7 +238,7 @@ export default function AdminMarketingDrips() {
                         </div>
                       </td>
                       <td className="px-4 py-2 max-w-[200px] truncate">{l.product_name || l.attributes?.ABANDONED_PRODUCT_NAME}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
+                      <td className="px-4 py-2 text-muted-foreground">{new Date(l.created_at).toLocaleString('es-PE')}</td>
                       <td className="px-4 py-2 text-right">
                         <Badge variant={l.status === 'success' ? 'default' : 'destructive'} className="text-[9px]">
                           {l.status} {l.http_status ? `(${l.http_status})` : ''}

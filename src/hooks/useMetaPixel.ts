@@ -352,16 +352,19 @@ export const trackHotmartEvent = (
 
   // Normalización forzada a USD para Meta Pixel (Ads) según solicitud del usuario.
   // El Pixel debe recibir SIEMPRE el valor en USD para mantener consistencia en ROAS.
+  // Note: conversion values should always have two decimals.
   if (pixelParams.value && pixelParams.currency && pixelParams.currency !== "USD") {
     try {
-      pixelParams.value = convertToUSD(
+      pixelParams.value = Math.round(convertToUSD(
         Number(pixelParams.value),
         pixelParams.currency as Currency
-      );
+      ) * 100) / 100;
       pixelParams.currency = "USD";
     } catch (e) {
       console.warn("[Pixel] Fallback USD conversion failed:", e);
     }
+  } else if (pixelParams.value && pixelParams.currency === "USD") {
+    pixelParams.value = Math.round(Number(pixelParams.value) * 100) / 100;
   }
 
   // Purchase: usar un event_id determinista basado en el número de orden para

@@ -160,6 +160,11 @@ const STAGES = [
   { key: "delivered", label: "Entregado", icon: PackageCheck, desc: "Recibido" },
 ] as const;
 
+const MANUAL_NOTE = {
+  es: "Gracias por tu compra. Estamos validando tu pago manual. Una vez verificado, habilitaremos tu acceso digital y prepararemos tu envío físico si corresponde.",
+  en: "Thank you for your purchase. We are validating your manual payment. Once verified, we will enable your digital access and prepare your physical shipment if applicable.",
+};
+
 function formatDate(value?: string | null) {
   if (!value) return "";
   try {
@@ -407,15 +412,24 @@ export default function OrderStatus() {
               {result.outcome && (() => {
                 const key = result.outcome === "rejected" && result.abandoned ? "abandoned" : result.outcome;
                 const ui = OUTCOME_UI[key];
+                const isManual = result.method?.toLowerCase().match(/yape|plin|binance|spei|manual/);
+                const showManualNote = result.outcome === "processing" && isManual;
 
                 const Icon = ui.icon;
                 return (
-                  <div className={`rounded-lg border p-3 flex gap-3 ${ui.box}`}>
-                    <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${ui.tone}`} />
-                    <div className="min-w-0">
-                      <div className={`text-sm font-semibold ${ui.tone}`}>{ui.label}</div>
-                      <p className="text-xs text-muted-foreground mt-0.5 break-words">{ui.text}</p>
+                  <div className="space-y-3">
+                    <div className={`rounded-lg border p-3 flex gap-3 ${ui.box}`}>
+                      <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${ui.tone}`} />
+                      <div className="min-w-0">
+                        <div className={`text-sm font-semibold ${ui.tone}`}>{ui.label}</div>
+                        <p className="text-xs text-muted-foreground mt-0.5 break-words">{ui.text}</p>
+                      </div>
                     </div>
+                    {showManualNote && (
+                      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary/80 leading-relaxed italic">
+                        {MANUAL_NOTE[language as 'es'|'en'] || MANUAL_NOTE.es}
+                      </div>
+                    )}
                   </div>
                 );
               })()}

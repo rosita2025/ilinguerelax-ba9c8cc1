@@ -77,8 +77,63 @@ const sleep = (ms: number, signal?: AbortSignal) =>
  * transient network / 5xx errors so a flaky link doesn't leave the user
  * with a blank checkout.
  */
+/** ¿Es un fallo de red puro (no una respuesta HTTP de la función)? */
+function isNetworkFailure(err: unknown): boolean {
+  const msg = String((err as { message?: string } | null)?.message ?? err ?? "").toLowerCase();
+  if (edgeErrorStatus(err) != null) return false;
+  return (
+    msg.includes("failed to send a request") ||
+    msg.includes("failed to fetch") ||
+    msg.includes("load failed") ||
+    msg.includes("networkerror") ||
+    msg.includes("network request failed") ||
+    msg.includes("timeout")
+  );
+}
+
+/**
+ * Último recurso: llamada directa a la Edge Function con `fetch` nativo.
+ * Evita que un fallo del SDK (preflight, interceptores, extensiones del
+ * navegador) deje al cliente sin poder pagar con Stripe.
+ */
+async function directFetchFallback<T>(
+  fnName: string,
+  invokeArgs: InvokeBody,
+): Promise<{ data: T | null; error: unknown }> {
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${fnName}`;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(url, {
+      method: invokeArgs.method ?? "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: key,
+        ...(invokeArgs.headers ?? {}),
+      },
+      body: invokeArgs.body != null ? JSON.stringify(invokeArgs.body) : undefined,
+      signal: ctrl.signal,
+    });
+    const text = await res.text();
+    let parsed: unknown = null;
+    try { parsed = text ? JSON.parse(text) : null; } catch { parsed = text; }
+    if (!res.ok) {
+      const message =
+        (parsed as { error?: string } | null)?.error || `Edge function error (${res.status})`;
+      return { data: null, error: Object.assign(new Error(message), { status: res.status, edgeDetail: message }) };
+    }
+    return { data: parsed as T, error: null };
+  } catch (err) {
+    return { data: null, error: err };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function invokeWithRetry<T = unknown>(
   fnName: string,
+
   invokeArgs: InvokeBody,
   opts: InvokeRetryOptions = {},
 ): Promise<{ data: T | null; error: unknown }> {

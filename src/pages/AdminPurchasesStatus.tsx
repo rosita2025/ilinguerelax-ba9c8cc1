@@ -220,6 +220,7 @@ const AdminPurchasesStatus = () => {
                 <option value="all">Todos</option>
                 <option value="approved">Aprobado</option>
                 <option value="pending">Pendiente</option>
+                <option value="abandoned">Abandono</option>
                 <option value="refused">Rechazado</option>
                 <option value="blocked">Bloqueado</option>
                 <option value="refunded">Reembolsado</option>

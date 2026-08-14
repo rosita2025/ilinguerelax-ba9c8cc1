@@ -305,9 +305,10 @@ Deno.serve(async (req) => {
       manual?.status === "verified" ||
       shopify?.status === "paid";
 
+    const isShipped = Boolean(manual?.tracking_number || shopify?.tracking_number);
     const stage: "pending" | "paid" | "shipped" | "delivered" = 
       delivered ? "delivered" : 
-      (manual?.tracking_number || shopify?.tracking_number) ? "shipped" :
+      isShipped ? "shipped" :
       paid ? "paid" : "pending";
 
     const rejected = !paid && (

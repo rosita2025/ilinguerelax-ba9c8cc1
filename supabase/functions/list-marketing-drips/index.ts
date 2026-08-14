@@ -64,7 +64,7 @@ serve(async (req) => {
     // 6) Abandoned Logs
     const { data: abLogs } = await admin.from('brevo_sync_logs')
       .select('*')
-      .in('event_type', ['tienda_abandoned', 'hotmart_abandoned', 'tienda_purchase', 'hotmart_purchase', 'newsletter_signup'])
+      .in('event_type', ['tienda_abandoned', 'hotmart_abandoned', 'tienda_purchase', 'hotmart_purchase', 'tienda_pending', 'hotmart_pending', 'hotmart_refused'])
       .order('created_at', { ascending: false })
       .limit(limit);
 

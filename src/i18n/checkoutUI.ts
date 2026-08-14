@@ -104,6 +104,13 @@ export interface CheckoutUIStrings {
   inYourCurrency: string;
   acceptedMethods: string;
   paymentMethod: string;
+  currencyBreakdown: string;
+  baseUsd: string;
+  exchangeRate: string;
+  adjustment: string;
+  localPrice: string;
+  localAdjustmentNotice: string;
+
 
   // Footer
   sslEncryption: string;
@@ -210,6 +217,13 @@ const es: CheckoutUIStrings = {
   inYourCurrency: "en tu moneda",
   acceptedMethods: "MÉTODOS DE PAGO ACEPTADOS:",
   paymentMethod: "Método de pago",
+  currencyBreakdown: "Desglose de moneda",
+  baseUsd: "Precio base USD",
+  exchangeRate: "Tasa de cambio",
+  adjustment: "Ajuste regional",
+  localPrice: "Precio local",
+  localAdjustmentNotice: "Aplicamos un ajuste regional para bajar el precio en moneda local.",
+
 
   sslEncryption: "Encriptación SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Perú",
@@ -315,6 +329,13 @@ const en: CheckoutUIStrings = {
   inYourCurrency: "in your currency",
   acceptedMethods: "ACCEPTED PAYMENT METHODS:",
   paymentMethod: "Payment Method",
+  currencyBreakdown: "Currency Breakdown",
+  baseUsd: "Base Price USD",
+  exchangeRate: "Exchange Rate",
+  adjustment: "Regional Adjustment",
+  localPrice: "Local Price",
+  localAdjustmentNotice: "A regional adjustment was applied to lower the local price.",
+
 
   sslEncryption: "SSL Stripe encryption",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -420,6 +441,13 @@ const pt: CheckoutUIStrings = {
   inYourCurrency: "na sua moeda",
   acceptedMethods: "MÉTODOS DE PAGAMENTO ACEITOS:",
   paymentMethod: "Método de pagamento",
+  currencyBreakdown: "Detalhamento da moeda",
+  baseUsd: "Preço base USD",
+  exchangeRate: "Taxa de câmbio",
+  adjustment: "Ajuste regional",
+  localPrice: "Preço local",
+  localAdjustmentNotice: "Um ajuste regional foi aplicado para baixar o preço local.",
+
 
   sslEncryption: "Criptografia SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -525,6 +553,13 @@ const fr: CheckoutUIStrings = {
   inYourCurrency: "dans votre monnaie",
   acceptedMethods: "MODES DE PAIEMENT ACCEPTÉS :",
   paymentMethod: "Mode de paiement",
+  currencyBreakdown: "Détail de la monnaie",
+  baseUsd: "Prix de base USD",
+  exchangeRate: "Taux de change",
+  adjustment: "Ajustement régional",
+  localPrice: "Prix local",
+  localAdjustmentNotice: "Un ajustement régional a été appliqué pour baisser le prix local.",
+
 
   sslEncryption: "Chiffrement SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Pérou",

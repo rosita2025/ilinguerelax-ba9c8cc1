@@ -146,3 +146,34 @@ export function sumItemsLocal(
   }
   return { amount, currency, isUsd: currency === "USD", usdReference };
 }
+
+export function useCurrencyBreakdown(usdAmount: number, overrides?: LocalPriceOverrides, localUsdPrices?: LocalPriceOverrides) {
+  const { country } = useRegionTier();
+  const currency = detectCurrency((country || "US").toUpperCase());
+  const rate = exchangeRates[currency] ?? 1;
+  const regionalUsdOverride = localUsdPrices && localUsdPrices[currency];
+  const activeUsd = typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
+    ? regionalUsdOverride
+    : usdAmount;
+  
+  const override = overrides && overrides[currency];
+  const hasOverride = typeof override === "number" && override > 0;
+  
+  const finalLocal = hasOverride ? override : activeUsd * rate;
+  
+  // Si hay override manual, el "ajuste" es la diferencia entre (USD * rate) y el override.
+  // Pero el usuario pidió específicamente mencionar cuando bajamos el precio.
+  // Si activeUsd < usdAmount, ya hay un ajuste regional en USD.
+  
+  return {
+    currency,
+    rate,
+    baseUsd: activeUsd,
+    originalUsd: usdAmount,
+    hasRegionalUsd: activeUsd < usdAmount,
+    adjustmentUsd: usdAmount - activeUsd,
+    finalLocal,
+    isUsd: currency === "USD"
+  };
+}
+

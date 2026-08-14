@@ -174,11 +174,11 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         });
         return;
       }
-      const enabledFamilies = { stripe: true, stripeAch: false, stripeCashApp: false, stripeKlarna: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
+      const enabledFamilies = { ...DEFAULT_ALL_OFF, stripe: true };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, paypal: 0, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
 
-
-      const enabledMethodKeys: string[] = ["stripe_card"];
+      const enabledMethodKeys: string[] = ["stripe_card", "paypal"];
+      enabledFamilies.paypal = true;
       let configuredMethods = 0;
       for (const m of methods) {
         if (m.region_code !== region.code) continue;

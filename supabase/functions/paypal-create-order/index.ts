@@ -90,11 +90,27 @@ Deno.serve(async (req) => {
     let fallbackApplied = false;
     let fallbackReason: string | null = null;
 
+    // Si resolveServerPricing devolvió USD pero el cliente pidió una moneda soportada por PayPal, 
+    // intentamos usar la moneda local para que el checkout sea más amigable.
+    if (finalCurrency === "USD" && PAYPAL_SUPPORTED.has(currencyReq)) {
+      const localTotal = localTotalFromPricing({
+        items: pricedItems, // pricedItems defined below
+        couponPercent: pricing.couponPercent,
+        couponCode: pricing.couponCode,
+        totalUsd: pricing.totalUsd
+      }, currencyReq);
+
+      if (localTotal && localTotal > 0) {
+        currency = currencyReq;
+        amount = localTotal;
+      }
+    }
+
     if (!PAYPAL_SUPPORTED.has(currency)) {
       fallbackApplied = true;
       fallbackReason = `currency_not_supported:${currency}`;
       currency = "USD";
-      // amount is already the catalog USD total from resolveServerPricing
+      amount = finalAmount;
     }
 
     console.log(JSON.stringify({

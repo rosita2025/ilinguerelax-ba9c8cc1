@@ -23,26 +23,36 @@ let loadedClientId: string | null = null;
 let loadedCurrency: string | null = null;
 
 async function loadPayPalSdk(currency: string): Promise<void> {
+  const correlationId = `sdk-${Date.now()}`;
   const { data, error } = await invokeEdge<{ clientId?: string }>(
     "paypal-config",
-    { method: "GET" },
+    { 
+      method: "GET",
+      headers: { "x-correlation-id": correlationId }
+    },
     { attempts: 3 },
   );
   if (error || !data?.clientId) throw new Error("PayPal no está configurado");
   const clientId = data.clientId as string;
+  
   if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
   if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
+  
   document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => s.remove());
   window.paypal = undefined;
   loadedClientId = clientId;
   loadedCurrency = currency;
+  
   sdkPromise = new Promise<void>((resolve, reject) => {
     const s = document.createElement("script");
     s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}&intent=capture&components=buttons`;
     s.async = true;
     s.dataset.paypalSdk = "1";
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error("No se pudo cargar PayPal"));
+    s.onerror = () => {
+      sdkPromise = null; // Allow retry on next mount
+      reject(new Error("No se pudo cargar el script de PayPal. Verifica si tienes un bloqueador de anuncios."));
+    };
     document.head.appendChild(s);
   });
   return sdkPromise;

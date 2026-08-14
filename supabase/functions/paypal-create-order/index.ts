@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
 
     const buyerEmail = body.buyerEmail ? String(body.buyerEmail).slice(0, 254) : undefined;
     // Client-supplied correlation id ties create + capture + client console.
-    const rawCorr = String(req.headers.get("x-correlation-id") ?? body.correlationId ?? "").slice(0, 64);
+    const rawCorr = String(req.headers.get("x-correlation-id") ?? req.headers.get("X-Correlation-Id") ?? body.correlationId ?? "").slice(0, 64);
     const correlationId = /^[A-Za-z0-9._:-]{6,64}$/.test(rawCorr) ? rawCorr : `srv-${traceId}`;
 
 

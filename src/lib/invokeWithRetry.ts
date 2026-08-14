@@ -80,6 +80,7 @@ const sleep = (ms: number, signal?: AbortSignal) =>
 /** ¿Es un fallo de red puro (no una respuesta HTTP de la función)? */
 function isNetworkFailure(err: unknown): boolean {
   const msg = String((err as { message?: string } | null)?.message ?? err ?? "").toLowerCase();
+  // Si tenemos un status HTTP >= 400, no es un fallo de red "mudo", es la función respondiendo.
   if (edgeErrorStatus(err) != null) return false;
   return (
     msg.includes("failed to send a request") ||
@@ -87,6 +88,8 @@ function isNetworkFailure(err: unknown): boolean {
     msg.includes("load failed") ||
     msg.includes("networkerror") ||
     msg.includes("network request failed") ||
+    msg.includes("connection reset") ||
+    msg.includes("dns_probe_finished") ||
     msg.includes("timeout")
   );
 }

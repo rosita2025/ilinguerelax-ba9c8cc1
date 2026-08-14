@@ -37,8 +37,11 @@ serve(async (req) => {
     const unifiedSends = [
       ...(mSends ?? []).map(s => ({ ...s, category: s.category || 'marketing' })),
       ...(nSends ?? []).map(s => ({ ...s, category: 'newsletter', step_name: `Paso ${s.step}` }))
-    ].sort((a, b) => new Date(b.sent_at || 0).getTime() - new Date(a.sent_at || 0).getTime())
-     .slice(0, limit);
+    ].sort((a, b) => {
+      const timeA = new Date(a.sent_at || a.created_at || 0).getTime();
+      const timeB = new Date(b.sent_at || b.created_at || 0).getTime();
+      return timeB - timeA;
+    }).slice(0, limit);
 
     // 4) Filter sends if search is present
     const filteredSends = s ? unifiedSends.filter(item => 

@@ -553,6 +553,13 @@ const fr: CheckoutUIStrings = {
   inYourCurrency: "dans votre monnaie",
   acceptedMethods: "MODES DE PAIEMENT ACCEPTÉS :",
   paymentMethod: "Mode de paiement",
+  currencyBreakdown: "Détail de la monnaie",
+  baseUsd: "Prix de base USD",
+  exchangeRate: "Taux de change",
+  adjustment: "Ajustement régional",
+  localPrice: "Prix local",
+  localAdjustmentNotice: "Un ajustement régional a été appliqué pour baisser le prix local.",
+
 
   sslEncryption: "Chiffrement SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Pérou",

@@ -886,98 +886,58 @@ const AdminProductEdit = () => {
           </Card>
 
           <Card className="p-6 space-y-4">
-            <h2 className="font-semibold">3. Precios por región</h2>
-
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <Label>Precio USD — Global</Label>
-                <Input
-                  type="number" step="0.01"
-                  value={product.price_usd}
-                  onChange={(e) => update("price_usd", Number(e.target.value))}
-                  placeholder="15.00"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  🇺🇸🇨🇦🇪🇺🇬🇧🇦🇺🇯🇵 USA, Canadá, Europa, UK, Asia
-                </p>
-              </div>
-              <div>
-                <Label>Precio USD — Latinoamérica</Label>
-                <Input
-                  type="number" step="0.01"
-                  value={product.price_usd_latam ?? ""}
-                  onChange={(e) => update("price_usd_latam", e.target.value === "" ? null : Number(e.target.value))}
-                  placeholder="10.00"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  🌎 MX, AR, CL, CO… Si lo dejas vacío, se usa el precio Global.
-                </p>
-              </div>
-              <div>
-                <Label>Precio PEN (Perú)</Label>
-                <Input
-                  type="number" step="0.01"
-                  value={product.price_pen ?? ""}
-                  onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))}
-                  placeholder="S/ 25.00"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  🇵🇪 Perú. Sugerido: S/ {Math.round((product.price_usd_latam ?? product.price_usd ?? 0) * 3.75 * 10) / 10}
-                </p>
-              </div>
-              <div>
-                <Label>Precio USD — Tienda (VE/CU/NI)</Label>
-                <Input
-                  type="number" step="0.01"
-                  value={product.price_usd_tienda ?? ""}
-                  onChange={(e) => update("price_usd_tienda", e.target.value === "" ? null : Number(e.target.value))}
-                  placeholder="7.00"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  🇻🇪🇨🇺🇳🇮 Países donde Hotmart no opera. Si vacío, usa precio LATAM.
-                </p>
+            <div className="flex items-center justify-between border-b pb-2">
+              <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Globales</h2>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD (Ancla)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-primary">$</span>
+                    <Input
+                      type="number" step="0.01"
+                      className="w-24 h-8 text-sm font-bold border-primary/30"
+                      value={product.price_usd}
+                      onChange={(e) => update("price_usd", Number(e.target.value))}
+                      placeholder="15.00"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-dashed">
-              <div className="space-y-2">
+            <div className="grid md:grid-cols-2 gap-4 bg-muted/20 p-3 rounded-lg border border-dashed">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-amber-500" />
-                  <Label>Calificación (Rating)</Label>
+                  <Star className="w-3.5 h-3.5 text-amber-500" />
+                  <Label className="text-xs font-semibold">Calificación (Rating)</Label>
                 </div>
                 <Input
                   type="number" step="0.1" min="0" max="5"
+                  className="h-8 text-xs"
                   value={product.rating ?? ""}
                   onChange={(e) => update("rating", e.target.value === "" ? null : Number(e.target.value))}
                   placeholder="4.8"
                 />
-                <p className="text-[11px] text-muted-foreground">
-                  Valor de 0 a 5. Si es 0, se mostrará como "0.00" (ideal para productos nuevos).
-                </p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-primary" />
-                  <Label>Número de reseñas</Label>
+                  <Eye className="w-3.5 h-3.5 text-primary" />
+                  <Label className="text-xs font-semibold">Reseñas</Label>
                 </div>
                 <Input
                   type="number"
+                  className="h-8 text-xs"
                   value={product.review_count ?? ""}
                   onChange={(e) => update("review_count", e.target.value === "" ? null : Number(e.target.value))}
                   placeholder="120"
                 />
-                <p className="text-[11px] text-muted-foreground">
-                  Cantidad total de compradores que han calificado.
-                </p>
               </div>
             </div>
 
-            <div className="border-t pt-4 mt-2 space-y-3">
+            <div className="space-y-3">
               <div>
-                <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (Global)</h3>
-                <p className="text-[11px] text-muted-foreground">
-                  Fija el monto <b>exacto</b> (ej: 199.00). El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde USD.
+                <p className="text-[11px] text-muted-foreground bg-primary/5 p-2 rounded border border-primary/10">
+                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base USD</b>.
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -1007,7 +967,7 @@ const AdminProductEdit = () => {
                   { code: "JPY", flag: "🇯🇵", label: "Japón" },
                 ].map(({ code, flag, label }) => {
                   const regionPrice = (() => {
-                    const baseUsd = product.price_usd_latam ?? product.price_usd ?? 0;
+                    const baseUsd = product.price_usd ?? 0;
                     if (baseUsd <= 0) return null;
                     
                     const rate = exchangeRates[code as Currency];
@@ -1023,7 +983,7 @@ const AdminProductEdit = () => {
                     return Math.round(raw * 100) / 100;
                   })();
 
-                  const baseUsdRef = product.price_usd_latam ?? product.price_usd ?? 0;
+                  const baseUsdRef = product.price_usd ?? 0;
 
                   return (
                     <div key={code}>

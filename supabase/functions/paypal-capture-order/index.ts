@@ -1,8 +1,9 @@
 // Capture a PayPal order server-side after buyer approves in the popup.
 const corsHeaders = { 
   "Access-Control-Allow-Origin": "*", 
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id", 
-  "Access-Control-Allow-Methods": "POST, OPTIONS" 
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id, x-trace-id", 
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Expose-Headers": "x-correlation-id, x-trace-id"
 };
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
@@ -66,7 +67,7 @@ Deno.serve(async (req) => {
     if (!/^[A-Z0-9]{5,32}$/i.test(orderId)) {
       console.warn(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "reject", reason: "invalid_orderId", orderId }));
       return new Response(JSON.stringify({ error: "Invalid orderId", trace: traceId, correlationId }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
       });
     }
     const token = await getAccessToken();
@@ -85,7 +86,7 @@ Deno.serve(async (req) => {
         status: res.status, error: data, orderId, ms: Date.now() - t0,
       }));
       return new Response(JSON.stringify({ error: data, trace: traceId, correlationId }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
       });
     }
     const status = data.status; // COMPLETED expected
@@ -206,7 +207,7 @@ Deno.serve(async (req) => {
       status, order: data, trace: traceId, correlationId,
       audit: { orderId, captureId, amount: capturedAmount, currency: capturedCurrency, payerCountry, corrMatches },
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
+      headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
     });
   } catch (e) {
     console.error(JSON.stringify({ trace: traceId, fn: "paypal-capture-order", phase: "exception", error: (e as Error).message, ms: Date.now() - t0 }));

@@ -90,6 +90,8 @@ function isNetworkFailure(err: unknown): boolean {
     msg.includes("network request failed") ||
     msg.includes("connection reset") ||
     msg.includes("dns_probe_finished") ||
+    msg.includes("typeerror: failed to fetch") ||
+    msg.includes("typeerror: load failed") ||
     msg.includes("timeout")
   );
 }
@@ -110,6 +112,8 @@ async function directFetchFallback<T>(
   try {
     const res = await fetch(url, {
       method: invokeArgs.method ?? "POST",
+      mode: "cors",
+      credentials: "omit", // Use omit for cross-origin apikey auth unless Supabase is on the same domain
       headers: {
         "Content-Type": "application/json",
         apikey: key,

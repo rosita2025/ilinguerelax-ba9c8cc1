@@ -2,8 +2,9 @@
 // PayPal Smart Buttons via createOrder.
 const corsHeaders = { 
   "Access-Control-Allow-Origin": "*", 
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id", 
-  "Access-Control-Allow-Methods": "POST, OPTIONS" 
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id, x-trace-id", 
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Expose-Headers": "x-correlation-id, x-trace-id"
 };
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
@@ -114,7 +115,7 @@ Deno.serve(async (req) => {
         ms: Date.now() - t0,
       }));
       return new Response(JSON.stringify({ error: data, trace: traceId, correlationId }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
       });
     }
     console.log(JSON.stringify({
@@ -123,7 +124,7 @@ Deno.serve(async (req) => {
       fallback: fallbackApplied, ms: Date.now() - t0,
     }));
     return new Response(JSON.stringify({ id: data.id, currency, amount, fallbackApplied, trace: traceId, correlationId }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId },
+      headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
     });
   } catch (e) {
     console.error(JSON.stringify({ trace: traceId, fn: "paypal-create-order", phase: "exception", error: (e as Error).message, ms: Date.now() - t0 }));

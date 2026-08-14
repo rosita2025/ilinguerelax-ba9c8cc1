@@ -87,11 +87,12 @@ Deno.serve(async (req) => {
 
     const localCurrency = body.currency || "USD";
     const localAmount = localTotalFromPricing(pricing, localCurrency);
-    const restricted = isRestrictedCurrency(localCurrency, body.country);
+    const restricted = isRestrictedCurrency(body.country);
 
-    // SIEMPRE USD como base o fallback prioritario:
-    const startCurrency = "USD";
-    const startAmount = calculatedUsd;
+    // Priorizamos moneda local si está disponible y NO es un país restringido.
+    // Si falla, los intentos posteriores (buildAttempts) probarán USD.
+    const startCurrency = (!restricted && localAmount && localAmount > 0) ? localCurrency : "USD";
+    const startAmount = startCurrency === "USD" ? calculatedUsd : localAmount!;
 
 
     const EXPIRATION_DAYS = 3;

@@ -1057,7 +1057,7 @@ const AdminProductEdit = () => {
                               : "Auto"}
                           </p>
                           <p className="text-[9px] text-muted-foreground/70 italic">
-                            (Ref: ${baseUsdRef} USD)
+                            (Ref: ${product.price_usd} USD)
                           </p>
                         </div>
                         {exchangeRates[code as Currency] && (

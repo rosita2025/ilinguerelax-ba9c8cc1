@@ -88,8 +88,8 @@ export function resolveAdminSku(idOrSku?: string | null): string | null {
  * the given sku/slug from LivePricesProvider (set at /admin/products/:sku).
  */
 export function useLocalCurrencyForSku(usdAmount: number, skuOrId?: string | null): LocalPrice {
-  const overrides = useLocalOverrides(resolveAdminSku(skuOrId)) as LocalPriceOverrides;
-  return useLocalCurrency(usdAmount, overrides, overrides.local_usd_prices);
+  const { local_prices, local_usd_prices } = useSkuOverridesResolver()(skuOrId);
+  return useLocalCurrency(usdAmount, local_prices, local_usd_prices);
 }
 
 /**

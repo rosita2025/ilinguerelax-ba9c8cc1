@@ -347,6 +347,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const overridesFor = useSkuOverridesResolver();
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
   const local = useLocalCurrency(total); // For overrides and loading state
+  void local; // Silenciar advertencia si no se usa local.isUsd etc directamente
 
   // Replicating exactly the logic from OrderSummary.tsx
   // Replicating exactly the logic from OrderSummary.tsx

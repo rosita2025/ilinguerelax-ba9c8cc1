@@ -42,7 +42,8 @@ Deno.serve(async (req) => {
         .from(table)
         .update({ 
           tracking_number: trackingNumber || null,
-          shipping_provider: shippingProvider || null 
+          shipping_provider: shippingProvider || null,
+          shipping_proof_url: shippingProofUrl || null
         })
         .eq(idField, orderId);
 

@@ -7,7 +7,7 @@ interface VerifiedReviewsProps {
   className?: string;
 }
 
-export const VerifiedReviews = ({ rating = 4.8, count = 120, className = "" }: VerifiedReviewsProps) => {
+export const VerifiedReviews = ({ rating = 5.0, count = 120, className = "" }: VerifiedReviewsProps) => {
   const { t } = useI18n();
   
   return (

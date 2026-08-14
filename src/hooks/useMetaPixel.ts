@@ -322,18 +322,20 @@ export const useHotmartPixel = (params: ViewContentParams) => {
     ensurePixelReady();
     const eventId = generateEventId();
     
-    // Normalización a USD para Ads (Facebook/Google/Pinterest)
+    // Normalización forzada a USD para Ads (Facebook/Google/Pinterest)
+    // Se asegura que el campo 'value' tenga exactamente 2 decimales para el Pixel.
     const normalizedParams = { ...params };
     if (normalizedParams.value && normalizedParams.currency && normalizedParams.currency !== "USD") {
       try {
-        normalizedParams.value = Math.round(convertToUSD(
+        const usdVal = convertToUSD(
           Number(normalizedParams.value),
           normalizedParams.currency as Currency
-        ) * 100) / 100;
+        );
+        normalizedParams.value = Number(usdVal.toFixed(2));
         normalizedParams.currency = "USD";
       } catch {}
-    } else if (normalizedParams.value && normalizedParams.currency === "USD") {
-      normalizedParams.value = Math.round(Number(normalizedParams.value) * 100) / 100;
+    } else if (normalizedParams.value !== undefined) {
+      normalizedParams.value = Number(Number(normalizedParams.value).toFixed(2));
     }
 
     if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {

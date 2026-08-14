@@ -370,9 +370,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
 
   const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total) : null;
+  const isActuallyShowingLocal = !penBadge && !local.isUsd && !local.loading && !showUsdOnly;
+  
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localFormatted;
+  const usdSuffix = isActuallyShowingLocal ? ` (≈ $${totalUsd} USD)` : "";
+  const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";
 
 
@@ -2362,14 +2366,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? "Checkout Securely"
+              ? `Checkout Securely · ${finalPriceLabel}`
               : language === "pt"
-                ? "Continuar para pagamento"
+                ? `Continuar para pagamento · ${finalPriceLabel}`
                 : language === "fr"
-                  ? "Continuer vers le paiement"
-                  : "Continuar de Pago"}</>
+                  ? `Continuer vers le paiement · ${finalPriceLabel}`
+                  : `Continuar de Pago · ${finalPriceLabel}`}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? "Checkout with Hotmart" : "Pagar con Hotmart") : t.buyNow}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${finalPriceLabel}` : `Pagar con Hotmart · ${finalPriceLabel}`) : `${t.buyNow} · ${finalPriceLabel}`}</>
           )}
         </button>
       )}

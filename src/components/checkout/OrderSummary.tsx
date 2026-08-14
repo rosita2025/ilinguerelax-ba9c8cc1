@@ -120,7 +120,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{expanded ? t.hideSummary : t.showSummary}</span>
             {expanded ? <ChevronUp className="w-4 h-4 opacity-60" /> : <ChevronDown className="w-4 h-4 opacity-60" />}
           </span>
-          <span className="text-base font-bold">{penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}</span>
+          <span className="text-right flex flex-col items-end">
+            <span className="text-base font-bold leading-tight">
+              {penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}
+            </span>
+            {showLocalRef && (
+              <span className="text-[10px] font-normal text-muted-foreground leading-none">
+                ≈ {formatCurrencyAmount(grandTotal, "USD")}
+              </span>
+            )}
+          </span>
         </button>
       )}
 
@@ -307,6 +316,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.total}</span>
             <div className="text-right">
               <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
+              {showLocalRef && (
+                <div className="text-[10px] text-muted-foreground font-normal">
+                  ≈ {formatCurrencyAmount(grandTotal, "USD")}
+                </div>
+              )}
             </div>
           </div>
 

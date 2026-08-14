@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     // intentamos usar la moneda local para que el checkout sea más amigable.
     if (finalCurrency === "USD" && PAYPAL_SUPPORTED.has(currencyReq)) {
       const localTotal = localTotalFromPricing({
-        items: pricedItems, // pricedItems defined below
+        items: pricedItems,
         couponPercent: pricing.couponPercent,
         couponCode: pricing.couponCode,
         totalUsd: pricing.totalUsd

@@ -370,6 +370,7 @@ export const trackHotmartEvent = (
       console.warn("[Pixel] Fallback USD conversion failed:", e);
     }
   } else if (pixelParams.value !== undefined) {
+    // Forzado estricto a 2 decimales para evitar el error de precisión en el debugger
     pixelParams.value = Number(Number(pixelParams.value).toFixed(2));
   }
 

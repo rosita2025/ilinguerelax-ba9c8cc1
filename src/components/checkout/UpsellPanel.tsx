@@ -148,7 +148,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
             <Sparkles className="w-3.5 h-3.5" />
           </span>
           <h3 className="font-bold text-sm leading-tight truncate">
-            Agrega a tu pedido y ahorra
+            {language === "en" ? "Add to your order and save" : "Agrega a tu pedido y ahorra"}
           </h3>
         </div>
         {totalSavings > 0 && <SavingsBadge usd={totalSavings} />}

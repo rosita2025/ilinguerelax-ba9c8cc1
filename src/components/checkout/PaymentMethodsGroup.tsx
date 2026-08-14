@@ -33,7 +33,7 @@ import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -45,7 +45,16 @@ interface HotmartConfig {
   pricesByCountry: Record<string, HotmartCountryPrice>;
 }
 
-
+interface PaymentMethodRow {
+  id: Method;
+  icon?: React.ElementType;
+  title: string;
+  sub: string;
+  badge?: string | React.ReactNode;
+  badges?: { label: string; bg: string; color: string }[];
+  methodKey?: string;
+  isSeparator?: boolean;
+}
 
 const visaLogo = "/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg";
 const mastercardLogo = "/__l5e/assets-v1/94d65183-1752-495e-ac5b-70ec4cba62b2/mastercard.svg";
@@ -116,10 +125,10 @@ function methodSection(id: string): MethodSection {
 
 const SECTION_LABELS: Record<MethodSection, Record<string, string>> = {
   cards: { es: "Tarjetas", en: "Cards", pt: "Cartões", fr: "Cartes" },
-  transfer: { es: "Transferencias bancarias", en: "Bank transfers", pt: "Transferências bancárias", fr: "Virements bancaires" },
-  cash: { es: "Pago en efectivo", en: "Cash payment", pt: "Pagamento em dinheiro", fr: "Paiement en espèces" },
-  wallet: { es: "Billeteras digitales", en: "Digital wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques" },
-  other: { es: "Otros métodos", en: "Other methods", pt: "Outros métodos", fr: "Autres moyens" },
+  transfer: { es: "Transferencias bancarias", en: "Bank Transfers", pt: "Transferências bancárias", fr: "Virements bancaires" },
+  cash: { es: "Pago en efectivo", en: "Cash Payments", pt: "Pagamento em dinheiro", fr: "Paiement en espèces" },
+  wallet: { es: "Billeteras digitales", en: "Digital Wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques" },
+  other: { es: "Otros métodos", en: "Other Methods", pt: "Outros métodos", fr: "Autres moyens" },
 };
 
 function sectionLabel(section: MethodSection, language: string) {
@@ -155,172 +164,172 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 
 
 type MethodBadge = { label: string; bg: string; color: string };
-type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
 
-const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> = {
+
+const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
   stripe_apple_pay: {
     icon: Smartphone,
     title: "Apple Pay",
-    sub: "Paga con Touch ID / Face ID desde tu iPhone, iPad o Mac (Safari).",
+    sub: language === "en" ? "Pay with Touch ID / Face ID from your iPhone, iPad or Mac (Safari)." : "Paga con Touch ID / Face ID desde tu iPhone, iPad o Mac (Safari).",
     badges: [{ label: " Pay", bg: "#000000", color: "#ffffff" }],
   },
   stripe_google_pay: {
     icon: Smartphone,
     title: "Google Pay",
-    sub: "Paga con tu cuenta Google desde Android o Chrome.",
+    sub: language === "en" ? "Pay with your Google account from Android or Chrome." : "Paga con tu cuenta Google desde Android o Chrome.",
     badges: [{ label: "G Pay", bg: "#ffffff", color: "#1F2937" }],
   },
   stripe_oxxo: {
     icon: Banknote,
     title: "OXXO",
-    sub: "Paga en tiendas OXXO (México) dentro del formulario seguro de Stripe.",
+    sub: language === "en" ? "Pay at OXXO stores (Mexico) through Stripe's secure form." : "Paga en tiendas OXXO (México) dentro del formulario seguro de Stripe.",
     badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
   },
   stripe_boleto: {
     icon: Banknote,
     title: "Boleto",
-    sub: "Voucher bancario para Brasil dentro de Stripe.",
+    sub: language === "en" ? "Bank voucher for Brazil inside Stripe." : "Voucher bancario para Brasil dentro de Stripe.",
     badges: [{ label: "Boleto", bg: "#1F2937", color: "#ffffff" }],
   },
   stripe_pix: {
     icon: Smartphone,
     title: "Pix",
-    sub: "Transferencia instantánea para Brasil dentro de Stripe.",
+    sub: language === "en" ? "Instant bank transfer for Brazil inside Stripe." : "Transferencia instantánea para Brasil dentro de Stripe.",
     badges: [{ label: "Pix", bg: "#32BCAD", color: "#06211F" }],
   },
   stripe_ideal: {
     icon: Building2,
     title: "iDEAL",
-    sub: "Banca online de Países Bajos dentro de Stripe.",
+    sub: language === "en" ? "Online banking from Netherlands inside Stripe." : "Banca online de Países Bajos dentro de Stripe.",
     badges: [{ label: "iDEAL", bg: "#CC0066", color: "#ffffff" }],
   },
   stripe_bancontact: {
     icon: Building2,
     title: "Bancontact",
-    sub: "Pago local de Bélgica dentro de Stripe.",
+    sub: language === "en" ? "Local payment from Belgium inside Stripe." : "Pago local de Bélgica dentro de Stripe.",
     badges: [{ label: "Bancontact", bg: "#005498", color: "#ffffff" }],
   },
   stripe_sepa_debit: {
     icon: Banknote,
     title: "SEPA débito directo",
-    sub: "Débito bancario para zona euro dentro de Stripe.",
+    sub: language === "en" ? "Bank debit for Eurozone inside Stripe." : "Débito bancario para zona euro dentro de Stripe.",
     badges: [{ label: "SEPA", bg: "#003399", color: "#ffffff" }],
   },
   stripe_giropay: {
     icon: Building2,
     title: "Giropay",
-    sub: "Banca online de Alemania dentro de Stripe.",
+    sub: language === "en" ? "Online banking from Germany inside Stripe." : "Banca online de Alemania dentro de Stripe.",
     badges: [{ label: "Giropay", bg: "#0B5AA6", color: "#ffffff" }],
   },
   stripe_sofort: {
     icon: Building2,
     title: "Sofort",
-    sub: "Transferencia instantánea dentro de Stripe.",
+    sub: language === "en" ? "Instant transfer inside Stripe." : "Transferencia instantánea dentro de Stripe.",
     badges: [{ label: "Sofort", bg: "#EE3423", color: "#ffffff" }],
   },
   stripe_eps: {
     icon: Building2,
     title: "EPS",
-    sub: "Banca online de Austria dentro de Stripe.",
+    sub: language === "en" ? "Online banking from Austria inside Stripe." : "Banca online de Austria dentro de Stripe.",
     badges: [{ label: "EPS", bg: "#C8102E", color: "#ffffff" }],
   },
   stripe_p24: {
     icon: Building2,
     title: "Przelewy24 (P24)",
-    sub: "Banca online de Polonia dentro de Stripe.",
+    sub: language === "en" ? "Online banking from Poland inside Stripe." : "Banca online de Polonia dentro de Stripe.",
     badges: [{ label: "P24", bg: "#D71920", color: "#ffffff" }],
   },
   stripe_blik: {
     icon: Smartphone,
     title: "BLIK",
-    sub: "Pago móvil de Polonia dentro de Stripe.",
+    sub: language === "en" ? "Mobile payment from Poland inside Stripe." : "Pago móvil de Polonia dentro de Stripe.",
     badges: [{ label: "BLIK", bg: "#111827", color: "#ffffff" }],
   },
   stripe_multibanco: {
     icon: Banknote,
     title: "Multibanco",
-    sub: "Pago local de Portugal dentro de Stripe.",
+    sub: language === "en" ? "Local payment from Portugal inside Stripe." : "Pago local de Portugal dentro de Stripe.",
     badges: [{ label: "Multibanco", bg: "#1F4E79", color: "#ffffff" }],
   },
   stripe_mb_way: {
     icon: Smartphone,
     title: "MB WAY",
-    sub: "Pago móvil de Portugal dentro de Stripe.",
+    sub: language === "en" ? "Mobile payment from Portugal inside Stripe." : "Pago móvil de Portugal dentro de Stripe.",
     badges: [{ label: "MB WAY", bg: "#00A3E0", color: "#001B2D" }],
   },
   stripe_twint: {
     icon: Smartphone,
     title: "TWINT",
-    sub: "Pago móvil de Suiza dentro de Stripe.",
+    sub: language === "en" ? "Mobile payment from Switzerland inside Stripe." : "Pago móvil de Suiza dentro de Stripe.",
     badges: [{ label: "TWINT", bg: "#FF5A00", color: "#ffffff" }],
   },
   stripe_mobilepay: {
     icon: Smartphone,
     title: "MobilePay",
-    sub: "Pago móvil de Dinamarca/Finlandia dentro de Stripe.",
+    sub: language === "en" ? "Mobile payment from Denmark/Finland inside Stripe." : "Pago móvil de Dinamarca/Finlandia dentro de Stripe.",
     badges: [{ label: "MobilePay", bg: "#5A78FF", color: "#ffffff" }],
   },
   stripe_bacs_debit: {
     icon: Banknote,
     title: "Bacs débito directo",
-    sub: "Débito bancario de Reino Unido dentro de Stripe.",
+    sub: language === "en" ? "Bank debit from United Kingdom inside Stripe." : "Débito bancario de Reino Unido dentro de Stripe.",
     badges: [{ label: "Bacs", bg: "#1F2937", color: "#ffffff" }],
   },
   stripe_acss_debit: {
     icon: Banknote,
-    title: "Débito bancario Canadá",
-    sub: "Débito preautorizado de Canadá dentro de Stripe.",
+    title: language === "en" ? "Canada Bank Debit" : "Débito bancario Canadá",
+    sub: language === "en" ? "Pre-authorized debit from Canada inside Stripe." : "Débito preautorizado de Canadá dentro de Stripe.",
     badges: [{ label: "ACSS", bg: "#D80621", color: "#ffffff" }],
   },
   stripe_afterpay_clearpay: {
     icon: CreditCard,
     title: "Afterpay / Clearpay",
-    sub: "Compra ahora y paga en cuotas dentro de Stripe.",
+    sub: language === "en" ? "Buy now and pay in installments inside Stripe." : "Compra ahora y paga en cuotas dentro de Stripe.",
     badges: [{ label: "Afterpay", bg: "#B2FCE4", color: "#0A0A0A" }],
   },
   stripe_affirm: {
     icon: CreditCard,
     title: "Affirm",
-    sub: "Compra ahora y paga después dentro de Stripe.",
+    sub: language === "en" ? "Buy now and pay later inside Stripe." : "Compra ahora y paga después dentro de Stripe.",
     badges: [{ label: "Affirm", bg: "#4A4AF4", color: "#ffffff" }],
   },
   stripe_paypal: {
     icon: Wallet,
     title: "PayPal (Stripe)",
-    sub: "PayPal procesado dentro del formulario seguro de Stripe.",
+    sub: language === "en" ? "PayPal processed within Stripe's secure form." : "PayPal procesado dentro del formulario seguro de Stripe.",
     badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
   },
   stripe_alipay: {
     icon: Smartphone,
     title: "Alipay",
-    sub: "Pago local de Asia dentro de Stripe.",
+    sub: language === "en" ? "Local payment from Asia inside Stripe." : "Pago local de Asia dentro de Stripe.",
     badges: [{ label: "Alipay", bg: "#1677FF", color: "#ffffff" }],
   },
   stripe_wechat_pay: {
     icon: Smartphone,
     title: "WeChat Pay",
-    sub: "Pago local de China dentro de Stripe.",
+    sub: language === "en" ? "Local payment from China inside Stripe." : "Pago local de China dentro de Stripe.",
     badges: [{ label: "WeChat", bg: "#07C160", color: "#001B0A" }],
   },
   stripe_grabpay: {
     icon: Smartphone,
     title: "GrabPay",
-    sub: "Pago local del sudeste asiático dentro de Stripe.",
+    sub: language === "en" ? "Local payment from Southeast Asia inside Stripe." : "Pago local del sudeste asiático dentro de Stripe.",
     badges: [{ label: "GrabPay", bg: "#00B14F", color: "#ffffff" }],
   },
   stripe_paynow: {
     icon: Smartphone,
     title: "PayNow",
-    sub: "Pago local de Singapur dentro de Stripe.",
+    sub: language === "en" ? "Local payment from Singapore inside Stripe." : "Pago local de Singapur dentro de Stripe.",
     badges: [{ label: "PayNow", bg: "#7B1FA2", color: "#ffffff" }],
   },
   stripe_konbini: {
     icon: Banknote,
     title: "Konbini",
-    sub: "Pago en tiendas de conveniencia de Japón dentro de Stripe.",
+    sub: language === "en" ? "Payment at convenience stores in Japan inside Stripe." : "Pago en tiendas de conveniencia de Japón dentro de Stripe.",
     badges: [{ label: "Konbini", bg: "#D32F2F", color: "#ffffff" }],
   },
-};
+});
 
 export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
@@ -1378,6 +1387,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     { label: "Google Pay", bg: "#ffffff", color: "#1F2937" },
     ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
   ];
+  const STRIPE_VISIBLE_METHODS = getStripeVisibleMethods(language);
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
     .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));
@@ -1393,9 +1403,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     },
 
     ...dynamicStripeRows,
-    { id: "stripe_ach", icon: Building2, title: "Transferencia bancaria ACH", sub: "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: priceBadge },
-    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: "Paga con Cash App dentro del formulario seguro de Stripe.", badge: priceBadge },
-    { id: "stripe_klarna", icon: Wallet, title: "Klarna — Paga en 4", sub: "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: priceBadge },
+    { id: "stripe_ach", icon: Building2, title: language === "en" ? "ACH Bank Transfer" : "Transferencia bancaria ACH", sub: language === "en" ? "Pay from a US bank account inside Stripe." : "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: priceBadge },
+    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with Cash App within Stripe's secure form." : "Paga con Cash App dentro del formulario seguro de Stripe.", badge: priceBadge },
+    { id: "stripe_klarna", icon: Wallet, title: language === "en" ? "Klarna — Pay in 4" : "Klarna — Paga en 4", sub: language === "en" ? "Split your purchase into 4 interest-free installments inside Stripe." : "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: priceBadge },
     { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: `USD $${totalUsd}` },
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: priceBadge },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: priceBadge },
@@ -1496,6 +1506,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         { label: "Visa", bg: "#1A1F71", color: "#ffffff" },
         { label: "Mastercard", bg: "#EB001B", color: "#ffffff" },
       ],
+    },
+    {
+      id: "hotmart_separator",
+      title: "HOTMART",
+      isSeparator: true,
+      icon: CreditCard,
+      sub: "",
+      badge: "",
     },
     {
       id: "hotmart",
@@ -1688,9 +1706,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   return (
     <div id="payment-methods" ref={methodsAnchorRef} className="space-y-2 scroll-mt-24">
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {isFree ? (language === "en" ? "Free order" : language === "pt" ? "Pedido grátis" : language === "fr" ? "Commande gratuite" : "Pedido gratis") : t.choosePaymentMethod}
-      </h2>
+
 
       {isFree && (
         <div className="rounded-xl border border-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800 p-4 space-y-3">
@@ -1768,6 +1784,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
 
 
+      {!isFree && !isInvalidZero && (
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <Smartphone className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h3 className="font-bold text-neutral-800 dark:text-neutral-100 uppercase tracking-tight">
+            {t.paymentMethod}
+          </h3>
+        </div>
+      )}
+
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
@@ -1781,6 +1806,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;
         const showSectionHeader = !prev || methodSection(prev.id) !== section;
+        if ((m as any).isSeparator) {
+          return (
+            <div key={rowKey} className="flex items-center gap-2 pt-1 mt-1 border-t border-neutral-200/70 dark:border-neutral-800 pt-2.5">
+              <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
+                {t.acceptedMethods}
+              </span>
+            </div>
+          );
+        }
         return (
           <React.Fragment key={rowKey}>
           {showSectionHeader && (
@@ -1963,7 +1997,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <Alert className="mb-4 bg-teal-50 border-teal-200 dark:bg-teal-950/30 dark:border-teal-900/50">
                       <AlertCircle className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                       <AlertTitle className="text-teal-800 dark:text-teal-300 font-semibold">
-                        Pago optimizado para {countryCode}
+                        {language === "en" ? `Optimized payment for ${countryCode}` : `Pago optimizado para ${countryCode}`}
                       </AlertTitle>
                       <AlertDescription className="text-teal-700 dark:text-teal-400 text-sm">
                         {language === "en" 
@@ -2158,7 +2192,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">
                     <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
                     <p>
-                      <strong>Importante:</strong> Envía tu captura de pantalla a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pago de inmediato.
+                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "Send your screenshot to " : "Envía tu captura de pantalla a "}<span className="font-bold">hola@ilinguerelax.com</span> {language === "en" ? "or via WhatsApp to validate your payment immediately." : "o por WhatsApp para validar tu pago de inmediato."}
                     </p>
                   </div>
                 </div>
@@ -2218,7 +2252,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     </div>
 
                     <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">Banco Receptor</p>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Receiving Bank" : "Banco Receptor"}</p>
                       <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{CLABE_BANK}</p>
                     </div>
                   </div>
@@ -2233,7 +2267,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
                     <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
                     <p>
-                      <strong>Importante:</strong> Envía tu comprobante de transferencia a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pedido inmediatamente.
+                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "Send your transfer proof to " : "Envía tu comprobante de transferencia a "}<span className="font-bold">hola@ilinguerelax.com</span> {language === "en" ? "or via WhatsApp to validate your order immediately." : "o por WhatsApp para validar tu pedido inmediatamente."}
                     </p>
                   </div>
                 </div>
@@ -2327,14 +2361,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? "Continue to payment"
+              ? "Checkout Securely"
               : language === "pt"
                 ? "Continuar para pagamento"
                 : language === "fr"
                   ? "Continuer vers le paiement"
                   : "Continuar de Pago"}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? "Pagar con Hotmart" : t.buyNow}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? "Checkout with Hotmart" : "Pagar con Hotmart") : t.buyNow}</>
           )}
         </button>
       )}

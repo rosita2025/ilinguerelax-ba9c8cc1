@@ -101,6 +101,8 @@ export interface CheckoutUIStrings {
   included: string;
   total: string;
   inYourCurrency: string;
+  acceptedMethods: string;
+  paymentMethod: string;
 
   // Footer
   sslEncryption: string;
@@ -146,7 +148,7 @@ const es: CheckoutUIStrings = {
   physical: "Físico",
   configureShipping: "Configurar envío e ir al checkout",
 
-  choosePaymentMethod: "Elige tu método de pago",
+  choosePaymentMethod: "Método de pago",
   cardPayment: "Pago con tarjeta",
   cardTitlePeru: "Tarjeta, Apple Pay o Link",
   cardTitleGlobal: "Tarjeta débito o crédito",
@@ -204,6 +206,8 @@ const es: CheckoutUIStrings = {
   included: "Incluidos",
   total: "Total",
   inYourCurrency: "en tu moneda",
+  acceptedMethods: "MÉTODOS DE PAGO ACEPTADOS:",
+  paymentMethod: "Método de pago",
 
   sslEncryption: "Encriptación SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Perú",
@@ -218,16 +222,16 @@ const en: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Your details",
-  yourDetailsHint: "Your access will be sent by email. For physical books, address is mandatory.",
+  yourDetailsHint: "Access will be sent by email. For physical books, address is mandatory.",
   ready: "Ready",
   required: "Required",
-  fullName: "Full name *",
-  fullNamePlaceholder: "e.g. Mary Smith",
+  fullName: "Full Name *",
+  fullNamePlaceholder: "e.g. Mary Dupont",
   fullNameError: "Please enter your full name.",
-  email: "Email address *",
-  emailPlaceholder: "you@email.com",
+  email: "Email *",
+  emailPlaceholder: "your@email.com",
   emailError: "Please enter a valid email.",
-  emailHint: "We'll send your product access here.",
+  emailHint: "This is where we'll send your digital access.",
   whatsappOptional: "WhatsApp (optional)",
   shippingAddress: "Shipping Address",
   addressPlaceholder: "Street, number, apartment...",
@@ -237,9 +241,9 @@ const en: CheckoutUIStrings = {
   shippingCountry: "Shipping Country",
   selectCountry: "Select country",
   shipping: "Shipping",
-  shippingNoticeLatam: "LATAM Shipping (Peru, Colombia, Mexico, etc.): $9 USD (5-7 days). Handling: 7-10 days.",
-  shippingNoticeGlobal: "USA/CAN/UK Shipping: 3-5 days. Handling: 5-7 days.",
-  shippingNoticeAsia: "Asia & Rest of the world: Not available at the moment (coming soon).",
+  shippingNoticeLatam: "LATAM Shipping (Peru, Colombia, Mexico, Argentina, etc.): $9 USD (5-7 days). Preparation: 7-10 days.",
+  shippingNoticeGlobal: "USA/CAN/UK Shipping: 3-5 days. Preparation: 5-7 days.",
+  shippingNoticeAsia: "Asia & Oceania: Currently unavailable (coming soon).",
   freeDigitalDelivery: "Free (Digital Delivery)",
   digitalAlternativeSuggest: "Consider purchasing the digital version available worldwide.",
   standardShipping: "Standard Shipping",
@@ -248,17 +252,17 @@ const en: CheckoutUIStrings = {
   physical: "Physical",
   configureShipping: "Configure shipping & checkout",
 
-  choosePaymentMethod: "Choose your payment method",
+  choosePaymentMethod: "Payment Method",
   cardPayment: "Card payment",
   cardTitlePeru: "Card, Apple Pay or Link",
-  cardTitleGlobal: "Debit or credit card",
+  cardTitleGlobal: "Debit or Credit Card",
   cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Charged in your local currency${lb}`,
-  cardSubtitleGlobal: (curr, lb) => `Debit or credit · Apple Pay · Google Pay · Link · Charged in ${curr}${lb}`,
+  cardSubtitleGlobal: (curr, lb) => `Debit or Credit · Apple Pay · Google Pay · Link · Pay in ${curr}${lb}`,
   autoActivatesByCountry: "Automatically enabled for your country",
   ssl256: "SSL 256-bit",
   stripeVerified: "Stripe verified",
   support24h: "24h support",
-  processedBy: "Payment securely processed by Stripe",
+  processedBy: "Securely processed by Stripe",
 
   bankTransfer: "Bank transfer",
   bankTransferSub: (lb) => `BCP · BBVA · Interbank · Scotiabank · Automatic conversion${lb}`,
@@ -277,7 +281,7 @@ const en: CheckoutUIStrings = {
 
   redirecting: "Redirecting…",
   buyNow: "Buy now",
-  enableMethods: "👆 Complete your name and email above to enable payment methods.",
+  enableMethods: "👆 Complete your info to enable payment methods.",
 
   sendPaymentTo: "Send payment to",
   amountToPay: "Amount to pay",
@@ -294,7 +298,7 @@ const en: CheckoutUIStrings = {
 
   hideSummary: "Hide summary",
   showSummary: "Show summary",
-  yourOrder: "Your order",
+  yourOrder: "Summary",
   emptyCart: "Empty cart",
   couponPlaceholder: "Discount code",
   applyCoupon: "Apply",
@@ -306,6 +310,8 @@ const en: CheckoutUIStrings = {
   included: "Included",
   total: "Total",
   inYourCurrency: "in your currency",
+  acceptedMethods: "ACCEPTED PAYMENT METHODS:",
+  paymentMethod: "Payment Method",
 
   sslEncryption: "SSL Stripe encryption",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -350,7 +356,7 @@ const pt: CheckoutUIStrings = {
   physical: "Físico",
   configureShipping: "Configurar envio e checkout",
 
-  choosePaymentMethod: "Escolha sua forma de pagamento",
+  choosePaymentMethod: "Método de pagamento",
   cardPayment: "Pagamento com cartão",
   cardTitlePeru: "Cartão, Apple Pay ou Link",
   cardTitleGlobal: "Cartão de débito ou crédito",
@@ -408,6 +414,8 @@ const pt: CheckoutUIStrings = {
   included: "Inclusos",
   total: "Total",
   inYourCurrency: "na sua moeda",
+  acceptedMethods: "MÉTODOS DE PAGAMENTO ACEITOS:",
+  paymentMethod: "Método de pagamento",
 
   sslEncryption: "Criptografia SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -452,7 +460,7 @@ const fr: CheckoutUIStrings = {
   physical: "Physique",
   configureShipping: "Configurer la livraison et commander",
 
-  choosePaymentMethod: "Choisissez votre mode de paiement",
+  choosePaymentMethod: "Mode de paiement",
   cardPayment: "Paiement par carte",
   cardTitlePeru: "Carte, Apple Pay ou Link",
   cardTitleGlobal: "Carte de débit ou crédit",
@@ -510,6 +518,8 @@ const fr: CheckoutUIStrings = {
   included: "Incluses",
   total: "Total",
   inYourCurrency: "dans votre monnaie",
+  acceptedMethods: "MODES DE PAIEMENT ACCEPTÉS :",
+  paymentMethod: "Mode de paiement",
 
   sslEncryption: "Chiffrement SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Pérou",

@@ -110,6 +110,7 @@ async function directFetchFallback<T>(
       headers: {
         "Content-Type": "application/json",
         apikey: key,
+        Authorization: `Bearer ${key}`,
         ...(invokeArgs.headers ?? {}),
       },
       body: invokeArgs.body != null ? JSON.stringify(invokeArgs.body) : undefined,

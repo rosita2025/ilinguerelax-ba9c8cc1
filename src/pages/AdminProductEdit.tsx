@@ -1098,6 +1098,32 @@ const AdminProductEdit = () => {
                               : "Auto"}
                           </p>
                           <p className="text-[9px] text-muted-foreground/70 italic">
+                            Ref: ${currentUsdValue} USD
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Region:</span>
+                          <Input
+                            type="number" step="any"
+                            className={cn(
+                              "h-5 text-[9px] px-1 py-0 w-16",
+                              product.local_usd_prices?.[code] ? "border-primary/40 bg-primary/5" : "border-muted/50"
+                            )}
+                            value={product.local_usd_prices?.[code] ?? ""}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              const next = { ...(product.local_usd_prices || {}) };
+                              if (v === "" || Number(v) <= 0) {
+                                delete next[code];
+                              } else {
+                                next[code] = Math.round(Number(v) * 100) / 100;
+                              }
+                              update("local_usd_prices", next);
+                            }}
+                            placeholder={baseUsdRef.toString()}
+                          />
+                        </div>
                             (Ref: ${product.price_usd} USD)
                           </p>
                         </div>

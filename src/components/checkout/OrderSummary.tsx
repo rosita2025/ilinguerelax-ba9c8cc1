@@ -57,7 +57,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     selectedMethod.startsWith("dlocal") || 
     selectedMethod === "card" || 
     selectedMethod === "paypal" || 
-    selectedMethod === "binance"
+    selectedMethod === "binance" ||
+    selectedMethod === "clabe" ||
+    selectedMethod === "yape" ||
+    selectedMethod === "transfer"
   );
 
   const penMode = penTotals !== null && !isGlobalGateway;
@@ -128,7 +131,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
                 {localTotal.isUsd 
                   ? `≈ USD $${grandTotal.toFixed(2)}` 
-                  : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                  : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`.replace("(", "").replace(")", "")}
               </span>
             )}
           </span>
@@ -322,7 +325,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                 <div className="text-[10px] text-muted-foreground font-normal">
                   {localTotal.isUsd 
                     ? `≈ USD $${grandTotal.toFixed(2)}` 
-                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`.replace("(", "").replace(")", "")}
                 </div>
               )}
             </div>

@@ -367,7 +367,10 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     selectedMethod.startsWith("dlocal") || 
     selectedMethod === "card" || 
     selectedMethod === "paypal" || 
-    selectedMethod === "binance"
+    selectedMethod === "binance" ||
+    selectedMethod === "clabe" ||
+    selectedMethod === "yape" ||
+    selectedMethod === "transfer"
   );
   
   const showUsdOnly = isFallingBackToUsd;
@@ -380,7 +383,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localTotalLabel;
   const usdSuffix = isActuallyShowingLocal 
-    ? ` (≈ USD $${totalUsd})` 
+    ? ` ≈ USD $${totalUsd}`.replace("(", "").replace(")", "") 
     : "";
   const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";

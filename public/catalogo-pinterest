@@ -246,26 +246,6 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
-      <g:id>5-000-palabras-libro-fisico</g:id>
-      <g:title>Inglés Relax - 5,000 Palabras Libro</g:title>
-      <g:description>Libro físico + Digital GRATIS</g:description>
-      <g:link>https://ilinguerelax.com/products/5-000-palabras-libro-fisico</g:link>
-      <g:image_link>https://ilinguerelax.com/images/product-5000-book-hero.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>24.00 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>5-000-palabras-libro-fisico</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books</g:google_product_category>
-      <g:product_type>Libros &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
-      <g:custom_label_1>Físico</g:custom_label_1>
-    </item>
-    <item>
       <g:id>8-000-palabras-libro-fisico</g:id>
       <g:title>Inglés Relax - 8,000 Palabras Libro</g:title>
       <g:description>Libro físico + Digital GRATIS</g:description>
@@ -303,6 +283,26 @@
       <g:google_product_category>Media &gt; Books</g:google_product_category>
       <g:product_type>Libros &gt; Idiomas &gt; Español</g:product_type>
       <g:custom_label_0>Español</g:custom_label_0>
+      <g:custom_label_1>Físico</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>5-000-palabras-libro-fisico</g:id>
+      <g:title>Inglés Relax - 5,000 Palabras Libro</g:title>
+      <g:description>Libro físico + Digital GRATIS</g:description>
+      <g:link>https://ilinguerelax.com/products/5-000-palabras-libro-fisico</g:link>
+      <g:image_link>https://ilinguerelax.com/images/product-5000-book-hero.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>24.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5-000-palabras-libro-fisico</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books</g:google_product_category>
+      <g:product_type>Libros &gt; Idiomas &gt; Inglés</g:product_type>
+      <g:custom_label_0>Inglés</g:custom_label_0>
       <g:custom_label_1>Físico</g:custom_label_1>
     </item>
     <item>

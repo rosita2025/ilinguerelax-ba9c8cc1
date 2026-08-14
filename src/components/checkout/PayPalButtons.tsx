@@ -140,7 +140,7 @@ function friendlyMessage(phase: Phase, raw: string): string {
   return raw || "Ocurrió un error con PayPal.";
 }
 
-export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError, couponCode }: Props & { couponCode?: string }) {
+export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError, couponCode, items = [] }: Props & { couponCode?: string; items?: any[] }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<ErrState | null>(null);

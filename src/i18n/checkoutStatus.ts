@@ -86,6 +86,9 @@ const es: CheckoutStatusStrings = {
   paymentRef: "Ref",
   continueShopping: "Seguir comprando",
   contactSupport: "Contactar soporte",
+  shippingEligibility: "Elegibilidad de envío confirmada",
+  shippingEligibilityDesc: "Tu pedido es elegible para envío internacional a Perú, Colombia, México, Argentina y más.",
+  paymentMethodConfirmed: "Método de pago confirmado",
 
   paymentPending: "Pago pendiente",
   pendingDesc:
@@ -136,6 +139,9 @@ const en: CheckoutStatusStrings = {
   paymentRef: "Ref",
   continueShopping: "Continue shopping",
   contactSupport: "Contact support",
+  shippingEligibility: "Shipping eligibility confirmed",
+  shippingEligibilityDesc: "Your order is eligible for international shipping to Peru, Colombia, Mexico, Argentina, and more.",
+  paymentMethodConfirmed: "Payment method confirmed",
 
   paymentPending: "Payment pending",
   pendingDesc:
@@ -186,6 +192,9 @@ const pt: CheckoutStatusStrings = {
   paymentRef: "Ref",
   continueShopping: "Continuar comprando",
   contactSupport: "Contatar suporte",
+  shippingEligibility: "Elegibilidade de envio confirmada",
+  shippingEligibilityDesc: "Seu pedido é elegível para envio internacional para Peru, Colômbia, México, Argentina e mais.",
+  paymentMethodConfirmed: "Método de pagamento confirmado",
 
   paymentPending: "Pagamento pendente",
   pendingDesc:
@@ -236,6 +245,9 @@ const fr: CheckoutStatusStrings = {
   paymentRef: "Réf",
   continueShopping: "Continuer les achats",
   contactSupport: "Contacter le support",
+  shippingEligibility: "Éligibilité à la livraison confirmée",
+  shippingEligibilityDesc: "Votre commande est éligible à la livraison internationale vers le Pérou, la Colombie, le Mexique, l'Argentine et plus.",
+  paymentMethodConfirmed: "Mode de paiement confirmé",
 
   paymentPending: "Paiement en attente",
   pendingDesc:

@@ -201,7 +201,7 @@ export default function AdminMarketingDrips() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {filteredSends.map((s, i) => (
+                  {sends.map((s, i) => (
                     <tr key={i} className="hover:bg-muted/30">
                       <td className="px-4 py-2">
                         <div className="font-medium">{s.email}</div>
@@ -209,18 +209,22 @@ export default function AdminMarketingDrips() {
                           <Globe className="w-2 h-2" /> {s.metadata?.country || '—'} · {s.metadata?.source || 'web'}
                         </div>
                       </td>
-                      <td className="px-4 py-2 uppercase text-[10px] font-mono">{s.category}</td>
+                      <td className="px-4 py-2">
+                         <Badge variant="outline" className={`text-[9px] font-mono ${s.category === 'newsletter' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
+                           {s.category.toUpperCase()}
+                         </Badge>
+                      </td>
                       <td className="px-4 py-2">{s.step_name}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{new Date(s.sent_at).toLocaleString()}</td>
+                      <td className="px-4 py-2 text-muted-foreground">{new Date(s.sent_at).toLocaleString('es-PE')}</td>
                       <td className="px-4 py-2 text-right">
                         <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[9px]">
-                          {s.status}
+                          ENVIADO
                         </Badge>
                       </td>
                     </tr>
                   ))}
-                  {filteredSends.length === 0 && (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No se encontraron registros.</td></tr>
+                  {sends.length === 0 && (
+                    <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">No se encontraron registros.</td></tr>
                   )}
                 </tbody>
               </table>

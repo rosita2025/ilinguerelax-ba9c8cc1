@@ -217,6 +217,13 @@ const es: CheckoutUIStrings = {
   inYourCurrency: "en tu moneda",
   acceptedMethods: "MÉTODOS DE PAGO ACEPTADOS:",
   paymentMethod: "Método de pago",
+  currencyBreakdown: "Desglose de moneda",
+  baseUsd: "Precio base USD",
+  exchangeRate: "Tasa de cambio",
+  adjustment: "Ajuste regional",
+  localPrice: "Precio local",
+  localAdjustmentNotice: "Aplicamos un ajuste regional para bajar el precio en moneda local.",
+
 
   sslEncryption: "Encriptación SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Perú",

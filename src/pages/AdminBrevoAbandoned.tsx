@@ -139,10 +139,20 @@ const AdminBrevoAbandoned = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Total</div><div className="text-xl font-bold">{summary.total}</div></Card>
+          <Card className="p-3">
+            <div className="text-[10px] uppercase text-muted-foreground flex justify-between items-center">
+              Total
+              <Badge variant="outline" className="ml-2 text-[9px] h-4">Ayer y Hoy</Badge>
+            </div>
+            <div className="text-xl font-bold">{summary.total}</div>
+          </Card>
           
           <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Tienda</div><div className="text-xl font-bold text-teal-600">{summary.tienda}</div></Card>
           <Card className="p-3"><div className="text-[10px] uppercase text-muted-foreground">Errores</div><div className="text-xl font-bold text-red-600">{summary.errors}</div></Card>
+          <Card className="p-3">
+            <div className="text-[10px] uppercase text-muted-foreground">Ult. Sync</div>
+            <div className="text-xs font-mono mt-1">{rows.length > 0 ? fmtExact(rows[0].created_at) : '—'}</div>
+          </Card>
         </div>
 
 

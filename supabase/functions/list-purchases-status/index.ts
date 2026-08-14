@@ -104,6 +104,32 @@ Deno.serve(async (req) => {
 
     const rows: Row[] = [];
 
+    // ─── Shopify (Physical Orders) ────────────────────────────────────
+    if (!provider || provider === "shopify") {
+      const { data } = await admin
+        .from("shopify_sales")
+        .select("id, shopify_order_id, customer_name, country, product_name, order_created_at")
+        .order("order_created_at", { ascending: false })
+        .limit(take);
+      
+      for (const r of data ?? []) {
+        rows.push({
+          id: `sh-${r.id}`,
+          provider: "shopify",
+          received_at: r.order_created_at,
+          email: r.customer_name, 
+          amount: null,
+          currency: "USD",
+          product: r.product_name,
+          transaction: r.shopify_order_id,
+          raw_status: "approved",
+          mapped_status: "approved",
+          failure_reason: null,
+          failed_step: "Orden física recibida",
+          payload: r,
+        });
+      }
+    }
 
     // ─── Mercado Pago (funnel_events) ─────────────────────────────────
     if (!provider || provider === "mercadopago") {

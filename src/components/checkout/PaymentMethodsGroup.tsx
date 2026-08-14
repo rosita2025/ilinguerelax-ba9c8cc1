@@ -1499,7 +1499,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pague pela sua carteira digital em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre portefeuille en monnaie locale. Confirmation immédiate."
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: dlocalBadges(country, "wallet", 6),
     },
     {

@@ -361,8 +361,10 @@ const AdminProductEdit = () => {
           product: (() => {
             const { bonus_titles, id, created_at, updated_at, ...cleanProduct } = product as any;
             
-            // Normalize and round local prices before saving
+            // Normalize and round local and regional USD prices before saving
             const normalizedLocalPrices: Record<string, number> = {};
+            const normalizedLocalUsdPrices: Record<string, number> = {};
+            
             if (product.local_prices) {
               Object.entries(product.local_prices).forEach(([code, amount]) => {
                 const numAmount = Number(amount);
@@ -374,9 +376,19 @@ const AdminProductEdit = () => {
               });
             }
 
+            if (product.local_usd_prices) {
+              Object.entries(product.local_usd_prices).forEach(([code, amount]) => {
+                const numAmount = Number(amount);
+                if (!isNaN(numAmount) && numAmount > 0) {
+                  normalizedLocalUsdPrices[code] = Math.round(numAmount * 100) / 100;
+                }
+              });
+            }
+
             return {
               ...cleanProduct,
               local_prices: normalizedLocalPrices,
+              local_usd_prices: normalizedLocalUsdPrices,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               gallery_metadata: product.gallery_metadata || {},
               upsells,

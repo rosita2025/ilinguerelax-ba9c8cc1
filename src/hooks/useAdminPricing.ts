@@ -84,6 +84,7 @@ export function useAdminPricing(sku: string): AdminPricing {
         active: boolean | null;
         rating: number | null;
         review_count: number | null;
+        local_usd_prices: Record<string, number> | null;
       } | null = null;
       try {
         const result = await supabase

@@ -1885,7 +1885,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}
                   {m.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100 whitespace-nowrap shrink-0">
+                    <span className={cn(
+                      "text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0",
+                      isSelected
+                        ? "bg-neutral-800 text-neutral-100 dark:bg-neutral-100 dark:text-neutral-900"
+                        : "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100"
+                    )}>
                       {m.badge}
                     </span>
                   )}

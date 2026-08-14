@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     const checkoutCountry = cleanString(body.buyerCountry, 2)?.toUpperCase();
     const skus = parseSkus(body.skus);
     // Correlation id from header or body; falls back to server-side trace.
-    const rawCorr = String(req.headers.get("x-correlation-id") ?? body.correlationId ?? "").slice(0, 64);
+    const rawCorr = String(req.headers.get("x-correlation-id") ?? req.headers.get("X-Correlation-Id") ?? body.correlationId ?? "").slice(0, 64);
     const clientCorr = /^[A-Za-z0-9._:-]{6,64}$/.test(rawCorr) ? rawCorr : null;
     const correlationId = clientCorr ?? `srv-${traceId}`;
     console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "input", env: PAYPAL_ENV, orderId, clientProvided: !!clientCorr, skuCount: skus.length, hasCheckoutEmail: !!checkoutEmail }));

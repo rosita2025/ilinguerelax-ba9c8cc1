@@ -151,6 +151,7 @@ const ProductPatronesEspeciales = () => {
       price: PRICE_USD,
       pricePen: pricingAdmin.pricePen ?? undefined,
       regionPrices: { latam: LATAM_USD, global: GLOBAL_USD, tienda: TIENDA_USD },
+      localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
       image: "/images/product-patrones-especiales.webp",
       description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
       quantity: 1,
@@ -737,10 +738,10 @@ const ProductPatronesEspeciales = () => {
       <StickyBuyBar
         sku={ADMIN_SKU}
         price={priceLabel}
-           originalPrice={originalLabel}
-           currencyCode={displayCurrency}
-           usdValue={PRICE_USD}
-           flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+        originalPrice={originalLabel}
+        currencyCode={displayCurrency}
+        usdValue={PRICE_USD}
+        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
         productName={pricingAdmin.name ?? "Patrones Especiales en Inglés"}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
@@ -748,6 +749,7 @@ const ProductPatronesEspeciales = () => {
         buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
         onBuyClick={useTiendaOnly ? handleBuy : undefined}
         ctaText={"Comprar ahora"}
+        localUsdPrices={pricingAdmin.localUsdPrices}
       />
 
       <div className="h-20 md:h-16" />

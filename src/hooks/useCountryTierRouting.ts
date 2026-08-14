@@ -34,6 +34,8 @@ export interface CountryTierRouting {
   priceLabel: string;
   currencyCode: string;
   originalLabel: string;
+  /** Regional USD overrides for specific currencies. */
+  localUsdPrices: Record<string, number> | null;
 }
 
 interface Options {
@@ -106,5 +108,6 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     priceLabel,
     currencyCode: displayCurrency,
     originalLabel,
+    localUsdPrices: pricing.localUsdPrices,
   };
 }

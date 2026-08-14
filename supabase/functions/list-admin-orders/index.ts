@@ -56,6 +56,7 @@ Deno.serve(async (req) => {
         details: { 
           trackingNumber, 
           shippingProvider, 
+          shippingProofUrl,
           source,
           updated_at: new Date().toISOString()
         }

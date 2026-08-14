@@ -47,9 +47,11 @@ serve(async (req) => {
       item.metadata?.country?.toLowerCase().includes(s)
     ) : unifiedSends;
 
-    // 5) Stats
+    // 5) Stats - Usamos zona horaria de Perú (UTC-5)
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    // Offset para Perú (UTC-5)
+    const peruDate = new Date(now.getTime() - (5 * 60 * 60 * 1000));
+    const today = new Date(peruDate.getFullYear(), peruDate.getMonth(), peruDate.getDate()).toISOString();
     const { count: mToday } = await admin.from('marketing_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', today);
     const { count: nToday } = await admin.from('newsletter_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', today);
     

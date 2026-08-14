@@ -114,7 +114,7 @@ export interface CheckoutUIStrings {
 }
 
 const es: CheckoutUIStrings = {
-  verifiedReviewNotice: "Reseñas verificadas: ⭐⭐⭐⭐⭐ 5/5. Exactamente fue rápido envío digital sin demoras.",
+  verifiedReviewNotice: "Reseñas verificadas: ⭐⭐⭐⭐⭐ 5.0/5.0. Exactamente fue rápido envío digital sin demoras.",
   securePayment: "Pago seguro",
   stripeSSL: "Stripe SSL · Pago seguro",
   stripeSslMP: "Stripe SSL · Mercado Pago",
@@ -219,7 +219,7 @@ const es: CheckoutUIStrings = {
 };
 
 const en: CheckoutUIStrings = {
-  verifiedReviewNotice: "Verified reviews: ⭐⭐⭐⭐⭐ 5/5. Exactly fast digital delivery without delays.",
+  verifiedReviewNotice: "Verified reviews: ⭐⭐⭐⭐⭐ 5.0/5.0. Exactly fast digital delivery without delays.",
   securePayment: "Secure payment",
   stripeSSL: "Stripe SSL · Secure payment",
   stripeSslMP: "Stripe SSL · Mercado Pago",
@@ -324,7 +324,7 @@ const en: CheckoutUIStrings = {
 };
 
 const pt: CheckoutUIStrings = {
-  verifiedReviewNotice: "Avaliações verificadas: ⭐⭐⭐⭐⭐ 5/5. Entrega digital exatamente rápida e sem atrasos.",
+  verifiedReviewNotice: "Avaliações verificadas: ⭐⭐⭐⭐⭐ 5.0/5.0. Entrega digital exatamente rápida e sem atrasos.",
   securePayment: "Pagamento seguro",
   stripeSSL: "Stripe SSL · Pagamento seguro",
   stripeSslMP: "Stripe SSL · Mercado Pago",
@@ -429,7 +429,7 @@ const pt: CheckoutUIStrings = {
 };
 
 const fr: CheckoutUIStrings = {
-  verifiedReviewNotice: "Avis vérifiés : ⭐⭐⭐⭐⭐ 5/5. Livraison numérique exactement rapide et sans délai.",
+  verifiedReviewNotice: "Avis vérifiés : ⭐⭐⭐⭐⭐ 5.0/5.0. Livraison numérique exactement rapide et sans délai.",
   securePayment: "Paiement sécurisé",
   stripeSSL: "Stripe SSL · Paiement sécurisé",
   stripeSslMP: "Stripe SSL · Mercado Pago",

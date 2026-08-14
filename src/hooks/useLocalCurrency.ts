@@ -45,22 +45,27 @@ export function formatLocalAmount(
 /** Convierte un monto USD a la moneda local aproximada del visitante (por IP). */
 export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverrides, localUsdPrices?: LocalPriceOverrides): LocalPrice {
   const { country, loading } = useRegionTier();
-  const upper = (country || "").toUpperCase();
-  const currency = detectCurrency(upper);
-  const override = overrides && overrides[currency];
+  const upper = (country || "US").toUpperCase();
+  const currency = detectCurrency(upper) as Currency;
+  
+  // Safe access to overrides
+  const override = overrides ? (overrides as Record<string, number>)[currency] : undefined;
   const hasOverride = typeof override === "number" && override > 0;
   
   // New: Check for regional USD price override
-  const regionalUsdOverride = localUsdPrices && localUsdPrices[currency];
+  const regionalUsdOverride = localUsdPrices ? (localUsdPrices as Record<string, number>)[currency] : undefined;
+  
+  // Ensure we have a valid base USD amount
+  const safeUsd = Number.isFinite(usdAmount) ? usdAmount : 0;
+  
   const activeUsdAmount = typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
     ? Math.round(regionalUsdOverride * 100) / 100
-    : Math.round(usdAmount * 100) / 100;
-
+    : Math.round(safeUsd * 100) / 100;
 
   const rate = exchangeRates[currency] ?? 1;
   const amount = hasOverride ? (override as number) : activeUsdAmount * rate;
   const isUsd = currency === "USD";
-  const formatted = formatPrice(activeUsdAmount, currency, overrides ?? undefined);
+  const formatted = formatPrice(activeUsdAmount, currency, overrides as any);
 
   return {
     country: upper,

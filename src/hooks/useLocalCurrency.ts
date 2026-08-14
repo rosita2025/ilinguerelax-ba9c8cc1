@@ -127,7 +127,7 @@ export function sumItemsLocal(
   items: Array<{ id?: string; sku?: string; usd: number; quantity: number }>,
   country: string,
   resolver: (idOrSku?: string | null) => { local_prices: LocalPriceOverrides; local_usd_prices: LocalPriceOverrides }
-): { amount: number; currency: Currency; isUsd: boolean } {
+): { amount: number; currency: Currency; isUsd: boolean; usdReference: number } {
   const currency = detectCurrency((country || "US").toUpperCase());
   const rate = exchangeRates[currency] ?? 1;
   let amount = 0;

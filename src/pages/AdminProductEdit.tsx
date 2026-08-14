@@ -1014,10 +1014,15 @@ const AdminProductEdit = () => {
                     return Math.round(raw * 100) / 100;
                   })();
 
+                  const baseUsdRef = product.price_usd_latam ?? product.price_usd ?? 0;
+
                   return (
                     <div key={code}>
                       <div className="flex items-center justify-between mb-1">
-                        <Label className="text-xs">{flag} {code} <span className="text-muted-foreground font-normal">· {label}</span></Label>
+                        <div className="flex flex-col">
+                          <Label className="text-xs">{flag} {code}</Label>
+                          <span className="text-[9px] text-muted-foreground leading-tight">{label}</span>
+                        </div>
                         {regionPrice && !product.local_prices?.[code] && (
                           <button 
                             type="button"
@@ -1025,7 +1030,7 @@ const AdminProductEdit = () => {
                               const next = { ...(product.local_prices || {}), [code]: regionPrice };
                               update("local_prices", next);
                             }}
-                            className="text-[10px] text-primary hover:underline"
+                            className="text-[9px] text-primary hover:underline bg-primary/5 px-1 rounded border border-primary/20"
                           >
                             Sug: {regionPrice}
                           </button>
@@ -1063,11 +1068,23 @@ const AdminProductEdit = () => {
                           </div>
                         )}
                       </div>
-                      <p className="text-[9px] text-muted-foreground mt-1 px-0.5">
-                        {product.local_prices?.[code] 
-                          ? "✓ Precio fijo manual activo" 
-                          : "Auto: Conversión dinámica desde USD"}
-                      </p>
+                      <div className="flex flex-col gap-0.5 mt-1 px-0.5">
+                        <div className="flex items-center justify-between">
+                          <p className="text-[9px] text-muted-foreground font-medium">
+                            {product.local_prices?.[code] 
+                              ? "✓ Manual" 
+                              : "Auto"}
+                          </p>
+                          <p className="text-[9px] text-muted-foreground/70 italic">
+                            (Ref: ${baseUsdRef} USD)
+                          </p>
+                        </div>
+                        {exchangeRates[code as Currency] && (
+                          <p className="text-[8px] text-muted-foreground/50 border-t border-muted-foreground/10 pt-0.5">
+                            Tasa: 1 USD = {exchangeRates[code as Currency]} {code}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

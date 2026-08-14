@@ -1957,7 +1957,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  <Lock className="w-3.5 h-3.5" /> {t.processedBy}
+                  <Lock className="w-3.5 h-3.5" /> {language === "en" ? "Securely processed by Stripe" : t.processedBy}
                 </div>
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (
@@ -2159,7 +2159,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">
                     <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
                     <p>
-                      <strong>Importante:</strong> Envía tu captura de pantalla a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pago de inmediato.
+                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "Send your screenshot to " : "Envía tu captura de pantalla a "}<span className="font-bold">hola@ilinguerelax.com</span> {language === "en" ? "or via WhatsApp to validate your payment immediately." : "o por WhatsApp para validar tu pago de inmediato."}
                     </p>
                   </div>
                 </div>
@@ -2219,7 +2219,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                     </div>
 
                     <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">Banco Receptor</p>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Receiving Bank" : "Banco Receptor"}</p>
                       <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{CLABE_BANK}</p>
                     </div>
                   </div>
@@ -2234,7 +2234,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
                     <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
                     <p>
-                      <strong>Importante:</strong> Envía tu comprobante de transferencia a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pedido inmediatamente.
+                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "Send your transfer proof to " : "Envía tu comprobante de transferencia a "}<span className="font-bold">hola@ilinguerelax.com</span> {language === "en" ? "or via WhatsApp to validate your order immediately." : "o por WhatsApp para validar tu pedido inmediatamente."}
                     </p>
                   </div>
                 </div>

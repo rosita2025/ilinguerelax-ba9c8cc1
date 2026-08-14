@@ -9,7 +9,8 @@ export type Currency =
   | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
   | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "NIO" | "CUP" | "PYG" | "UYU" | "HTG" | "VES"
   | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
-  | "JPY" | "KRW" | "CNY" | "INR" | "NZD" | "SGD" | "HKD" | "TWD";
+  | "JPY" | "KRW" | "CNY" | "INR" | "NZD" | "SGD" | "HKD" | "TWD"
+  | "ZAR" | "NGN" | "EGP" | "KES" | "GHS" | "TZS" | "UGX" | "MAD";
 
 export const translations = {
   es,
@@ -132,6 +133,9 @@ const countryToCurrency: Record<string, Currency> = {
 
   // Asia principal
   JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR", SG: "SGD", HK: "HKD", TW: "TWD",
+  
+  // Africa
+  ZA: "ZAR", NG: "NGN", EG: "EGP", KE: "KES", GH: "GHS", TZ: "TZS", UG: "UGX", MA: "MAD",
 };
 
 // Currency symbols and formatting
@@ -172,6 +176,14 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   SGD: { symbol: "S$", position: "before", decimals: 2 },
   HKD: { symbol: "HK$", position: "before", decimals: 2 },
   TWD: { symbol: "NT$", position: "before", decimals: 0 },
+  ZAR: { symbol: "R ", position: "before", decimals: 2 },
+  NGN: { symbol: "₦", position: "before", decimals: 2 },
+  EGP: { symbol: "E£", position: "before", decimals: 2 },
+  KES: { symbol: "KSh ", position: "before", decimals: 2 },
+  GHS: { symbol: "GH₵", position: "before", decimals: 2 },
+  TZS: { symbol: "TSh ", position: "before", decimals: 2 },
+  UGX: { symbol: "USh ", position: "before", decimals: 0 },
+  MAD: { symbol: "MAD ", position: "before", decimals: 2 },
 };
 
 // Exchange rates from USD (updated August 2026 — exact)
@@ -212,6 +224,14 @@ export const exchangeRates: Record<Currency, number> = {
   SGD: 1.34,
   HKD: 7.8,
   TWD: 32,
+  ZAR: 18.5,
+  NGN: 1550,
+  EGP: 48,
+  KES: 130,
+  GHS: 15,
+  TZS: 2700,
+  UGX: 3700,
+  MAD: 10,
 };
 
 // Detect currency from country

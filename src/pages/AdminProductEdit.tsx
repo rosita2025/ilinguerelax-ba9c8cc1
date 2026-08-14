@@ -946,29 +946,39 @@ const AdminProductEdit = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 {[
                   // LATAM
-                  { code: "MXN", flag: "🇲🇽", label: "México" },
-                  { code: "COP", flag: "🇨🇴", label: "Colombia" },
-                  { code: "ARS", flag: "🇦🇷", label: "Argentina" },
-                  { code: "CLP", flag: "🇨🇱", label: "Chile" },
-                  { code: "BRL", flag: "🇧🇷", label: "Brasil" },
-                  { code: "UYU", flag: "🇺🇾", label: "Uruguay" },
-                  { code: "PYG", flag: "🇵🇾", label: "Paraguay" },
-                  { code: "BOB", flag: "🇧🇴", label: "Bolivia" },
-                  { code: "CRC", flag: "🇨🇷", label: "Costa Rica" },
-                  { code: "DOP", flag: "🇩🇴", label: "Rep. Dominicana" },
-                  { code: "GTQ", flag: "🇬🇹", label: "Guatemala" },
-                  { code: "HNL", flag: "🇭🇳", label: "Honduras" },
-                  { code: "NIO", flag: "🇳🇮", label: "Nicaragua" },
-                  { code: "VES", flag: "🇻🇪", label: "Venezuela" },
+                  { code: "MXN", flag: "🇲🇽", label: "México", region: "LATAM" },
+                  { code: "COP", flag: "🇨🇴", label: "Colombia", region: "LATAM" },
+                  { code: "ARS", flag: "🇦🇷", label: "Argentina", region: "LATAM" },
+                  { code: "CLP", flag: "🇨🇱", label: "Chile", region: "LATAM" },
+                  { code: "BRL", flag: "🇧🇷", label: "Brasil", region: "LATAM" },
+                  { code: "PEN", flag: "🇵🇪", label: "Perú", region: "LATAM" },
+                  { code: "UYU", flag: "🇺🇾", label: "Uruguay", region: "LATAM" },
+                  { code: "PYG", flag: "🇵🇾", label: "Paraguay", region: "LATAM" },
+                  { code: "BOB", flag: "🇧🇴", label: "Bolivia", region: "LATAM" },
+                  { code: "CRC", flag: "🇨🇷", label: "Costa Rica", region: "LATAM" },
+                  { code: "DOP", flag: "🇩🇴", label: "Rep. Dominicana", region: "LATAM" },
+                  { code: "GTQ", flag: "🇬🇹", label: "Guatemala", region: "LATAM" },
+                  { code: "HNL", flag: "🇭🇳", label: "Honduras", region: "LATAM" },
+                  { code: "NIO", flag: "🇳🇮", label: "Nicaragua", region: "LATAM" },
+                  { code: "VES", flag: "🇻🇪", label: "Venezuela", region: "LATAM" },
                   // Global / Anglosphere / Europe
-                  { code: "EUR", flag: "🇪🇺", label: "Europa" },
-                  { code: "GBP", flag: "🇬🇧", label: "Reino Unido" },
-                  { code: "CAD", flag: "🇨🇦", label: "Canadá" },
-                  { code: "AUD", flag: "🇦🇺", label: "Australia" },
-                  { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda" },
+                  { code: "EUR", flag: "🇪🇺", label: "Europa", region: "Anglosphere/Europe" },
+                  { code: "GBP", flag: "🇬🇧", label: "Reino Unido", region: "Anglosphere/Europe" },
+                  { code: "CAD", flag: "🇨🇦", label: "Canadá", region: "Anglosphere/Europe" },
+                  { code: "AUD", flag: "🇦🇺", label: "Australia", region: "Anglosphere/Europe" },
+                  { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda", region: "Anglosphere/Europe" },
                   // Asia
-                  { code: "JPY", flag: "🇯🇵", label: "Japón" },
-                ].map(({ code, flag, label }) => {
+                  { code: "JPY", flag: "🇯🇵", label: "Japón", region: "Asia" },
+                  { code: "KRW", flag: "🇰🇷", label: "Corea del Sur", region: "Asia" },
+                  { code: "CNY", flag: "🇨🇳", label: "China", region: "Asia" },
+                  { code: "INR", flag: "🇮🇳", label: "India", region: "Asia" },
+                  // Africa
+                  { code: "ZAR", flag: "🇿🇦", label: "Sudáfrica", region: "Africa" },
+                  { code: "NGN", flag: "🇳🇬", label: "Nigeria", region: "Africa" },
+                  { code: "EGP", flag: "🇪🇬", label: "Egipto", region: "Africa" },
+                  { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa" },
+                  { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa" },
+                ].map(({ code, flag, label, region }) => {
                   const baseUsdRef = Number(product.price_usd) || 0;
                   
                   const regionPrice = (() => {
@@ -980,9 +990,9 @@ const AdminProductEdit = () => {
                     const raw = baseUsdRef * rate;
                     // El usuario prefiere precios más bajos en LATAM y más altos en USA/Europa
                     // Lógica de redondeo "bonito" según la moneda
-                    if (code === "COP") return Math.round(raw / 100) * 100;
-                    if (code === "CLP" || code === "PYG") return Math.round(raw / 10) * 10;
-                    if (code === "MXN" || code === "ARS" || code === "UYU") return Math.round(raw);
+                    if (code === "COP" || code === "TZS" || code === "UGX") return Math.round(raw / 100) * 100;
+                    if (code === "CLP" || code === "PYG" || code === "NGN" || code === "KRW") return Math.round(raw / 10) * 10;
+                    if (code === "MXN" || code === "ARS" || code === "UYU" || code === "JPY" || code === "INR") return Math.round(raw);
                     
                     return Math.round(raw * 100) / 100;
                   })();
@@ -992,7 +1002,7 @@ const AdminProductEdit = () => {
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex flex-col">
                           <Label className="text-xs">{flag} {code}</Label>
-                          <span className="text-[9px] text-muted-foreground leading-tight">{label}</span>
+                          <span className="text-[9px] text-muted-foreground leading-tight">{region} · {label}</span>
                         </div>
                         {regionPrice && !product.local_prices?.[code] && (
                           <button 

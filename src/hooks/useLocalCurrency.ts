@@ -121,15 +121,19 @@ export function formatLocalDirect(localAmount: number, country: string): string 
 export function sumItemsLocal(
   items: Array<{ id?: string; sku?: string; usd: number; quantity: number }>,
   country: string,
-  resolver: (idOrSku?: string | null) => LocalPriceOverrides,
+  resolver: (idOrSku?: string | null) => { local_prices: LocalPriceOverrides; local_usd_prices: LocalPriceOverrides }
 ): { amount: number; currency: Currency; isUsd: boolean } {
   const currency = detectCurrency((country || "US").toUpperCase());
   const rate = exchangeRates[currency] ?? 1;
   let amount = 0;
   for (const it of items) {
-    const ov = resolver(it.sku ?? it.id);
-    const override = ov && (ov as any)[currency];
-    const perUnit = typeof override === "number" && override > 0 ? override : it.usd * rate;
+    const { local_prices, local_usd_prices } = resolver(it.sku ?? it.id);
+    const override = local_prices && local_prices[currency];
+    const regionalUsd = local_usd_prices && local_usd_prices[currency];
+    
+    const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : it.usd;
+    const perUnit = typeof override === "number" && override > 0 ? override : activeUsd * rate;
+    
     amount += perUnit * (it.quantity || 1);
   }
   return { amount, currency, isUsd: currency === "USD" };

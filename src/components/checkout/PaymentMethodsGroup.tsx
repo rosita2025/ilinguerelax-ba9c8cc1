@@ -130,9 +130,9 @@ function sectionLabel(section: MethodSection, language: string) {
 
 
 
-const YAPE_PHONE = "972119741";
-const YAPE_NAME = "Carmen Aliaga";
-const WHATSAPP_URL = "https://wa.link/unpa9n";
+const YAPE_PHONE = "+51 972 119 741";
+const YAPE_NAME = "Carmen Rosa Aliaga Domínguez";
+const WHATSAPP_URL = "https://wa.me/12512724704";
 
 const CLABE_NUMBER = "646180546709905176";
 const CLABE_HOLDER = "Carmen Rosa Aliaga Domínguez";
@@ -2037,49 +2037,58 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
             {m.id === "yape" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
-                <div className="text-center space-y-1">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">{t.sendPaymentTo}</p>
-                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{YAPE_NAME}</p>
-                  <button
-                    type="button"
-                    onClick={copyPhone}
-                    className="inline-flex items-center gap-2 text-xl font-mono font-bold text-primary hover:opacity-80 transition"
-                  >
-                    {YAPE_PHONE}
-                    {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                  <p className="text-[11px] text-neutral-500">{copied ? t.copied : t.tapToCopy}</p>
-                </div>
+                <div className="bg-[#742282]/5 dark:bg-[#742282]/10 border border-[#742282]/20 dark:border-[#742282]/30 rounded-xl p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center gap-3 text-[#742282] dark:text-[#a356b1]">
+                    <div className="w-10 h-10 rounded-full bg-[#742282]/10 dark:bg-[#742282]/20 flex items-center justify-center shrink-0">
+                      <Smartphone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-base leading-tight">Yape o Plin (Perú)</p>
+                      <p className="text-xs opacity-80">Pago inmediato sin comisiones</p>
+                    </div>
+                  </div>
 
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
-                  <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
-                </div>
+                  <div className="space-y-3 bg-white/50 dark:bg-black/20 p-4 rounded-lg border border-[#742282]/10">
+                    <div className="text-center">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-[#742282]/70 dark:text-[#a356b1]/70">Número de celular</p>
+                      <button
+                        type="button"
+                        onClick={copyPhone}
+                        className="inline-flex items-center gap-2 text-2xl font-mono font-bold text-[#742282] dark:text-[#c484d3] hover:opacity-80 transition"
+                      >
+                        {YAPE_PHONE}
+                        {copied ? <Check className="w-5 h-5 text-emerald-600 shrink-0" /> : <Copy className="w-5 h-5 shrink-0" />}
+                      </button>
+                      <p className="text-[10px] text-neutral-500 mt-0.5">{copied ? t.copied : t.tapToCopy}</p>
+                    </div>
+                    
+                    <div className="pt-3 border-t border-[#742282]/10 text-center">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-[#742282]/70 dark:text-[#a356b1]/70">Titular</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{YAPE_NAME}</p>
+                    </div>
+                  </div>
 
-                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
-                  <li>{t.yapeStep1}</li>
-                  <li>{t.yapeStep2(penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted), YAPE_PHONE, YAPE_NAME)}</li>
-                  <li>{t.yapeStep3}</li>
-                  <li>{t.yapeStep4}</li>
-                </ol>
+                  <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-[#742282]/10">
+                    <p className="text-xs text-[#742282]/70 dark:text-[#a356b1]/70 uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
+                    <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#742282]/90 dark:text-[#c484d3]/90 italic">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
+                    <p>
+                      <strong>Importante:</strong> Envía tu captura de pantalla a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para habilitar tu descarga al instante.
+                    </p>
+                  </div>
+                </div>
 
                 <button
                   type="button"
                   onClick={handleManualPaid}
-                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-3 rounded-xl transition-colors"
+                  className="w-full bg-[#742282] hover:bg-[#5e1b69] text-white font-bold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>
-
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
-                </a>
 
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
@@ -2087,85 +2096,81 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
             {m.id === "binance" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
-                <div className="text-center space-y-1">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">
-                    {language === "en" ? "Send payment to" : language === "pt" ? "Enviar pagamento para" : language === "fr" ? "Envoyer le paiement à" : "Envía el pago a"}
-                  </p>
-                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{binanceCfg.holder_name}</p>
-                  <p className="text-[11px] text-neutral-500">{binanceCfg.network}</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <img
-                    src={binanceCfg.qr_url}
-                    alt="Binance Pay QR"
-                    className="w-48 h-48 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2"
-                    loading="lazy"
-                  />
-                </div>
-
-                {binanceCfg.pay_id && (
-                  <div className="rounded-lg bg-[#F0B90B]/10 border border-[#F0B90B]/40 p-3 space-y-1 text-center">
-                    <p className="text-[11px] uppercase tracking-wider text-neutral-500">Binance Pay ID</p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(binanceCfg.pay_id).catch(() => {});
-                        toast({ description: t.copied });
-                      }}
-                      className="w-full inline-flex items-center justify-center gap-2 text-xl font-mono font-bold text-[#a37800] dark:text-[#F0B90B] hover:opacity-80 transition"
-                    >
-                      <span>{binanceCfg.pay_id}</span>
-                      <Copy className="w-4 h-4 shrink-0" />
-                    </button>
+                <div className="bg-[#F0B90B]/5 dark:bg-[#F0B90B]/10 border border-[#F0B90B]/20 dark:border-[#F0B90B]/30 rounded-xl p-4 sm:p-5 space-y-4 text-center">
+                  <div className="flex flex-col items-center gap-2 text-[#b38a08] dark:text-[#F0B90B]">
+                    <div className="w-12 h-12 rounded-full bg-[#F0B90B]/10 dark:bg-[#F0B90B]/20 flex items-center justify-center shrink-0 mb-1">
+                      <Wallet className="w-6 h-6" />
+                    </div>
+                    <p className="font-bold text-lg leading-tight">Binance Pay / USDT</p>
+                    <p className="text-xs opacity-80">Red: {binanceCfg.network} • {binanceCfg.holder_name}</p>
                   </div>
-                )}
 
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
-                  <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">
-                    {language === "en" ? "Wallet address" : language === "pt" ? "Endereço da carteira" : language === "fr" ? "Adresse du portefeuille" : "Dirección de wallet"}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={copyBinance}
-                    className="w-full inline-flex items-center justify-center gap-2 text-sm font-mono font-semibold text-primary hover:opacity-80 transition break-all px-2"
-                  >
-                    <span className="break-all">{binanceCfg.address}</span>
-                    {copiedBinance ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
-                  </button>
-                  <p className="text-[11px] text-neutral-500 text-center">{copiedBinance ? t.copied : (language === "en" ? "Tap to copy" : language === "pt" ? "Toque para copiar" : language === "fr" ? "Touchez pour copier" : "Toca para copiar")}</p>
+                  <div className="flex justify-center py-2">
+                    <div className="relative group">
+                      <img
+                        src={binanceCfg.qr_url}
+                        alt="Binance Pay QR"
+                        className="w-44 h-44 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2 shadow-sm"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                    {binanceCfg.pay_id && (
+                      <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 border border-[#F0B90B]/10">
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-[#b38a08]/70">Binance Pay ID</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(binanceCfg.pay_id).catch(() => {});
+                            toast({ description: t.copied });
+                          }}
+                          className="w-full inline-flex items-center justify-between gap-2 text-base font-mono font-bold text-neutral-900 dark:text-neutral-100 hover:opacity-80 transition"
+                        >
+                          <span>{binanceCfg.pay_id}</span>
+                          <Copy className="w-3.5 h-3.5 shrink-0 opacity-50" />
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 border border-[#F0B90B]/10 overflow-hidden">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-[#b38a08]/70">Wallet Address</p>
+                      <button
+                        type="button"
+                        onClick={copyBinance}
+                        className="w-full inline-flex items-center justify-between gap-2 text-[13px] font-mono font-bold text-neutral-900 dark:text-neutral-100 hover:opacity-80 transition"
+                      >
+                        <span className="truncate">{binanceCfg.address.slice(0, 8)}...{binanceCfg.address.slice(-6)}</span>
+                        {copiedBinance ? <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0 opacity-50" />}
+                      </button>
+                    </div>
+                  </div>
+
+
+
+                  <div className="rounded-lg bg-[#F0B90B]/10 p-3 text-center border border-[#F0B90B]/20">
+                    <p className="text-xs text-[#b38a08] uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
+                    <p>
+                      <strong>Importante:</strong> Envía tu captura de pantalla a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pago de inmediato.
+                    </p>
+                  </div>
                 </div>
-
-
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
-                  <p className="text-[11px] text-neutral-500 mt-1">USDT · Binance Pay</p>
-                </div>
-
-                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
-                  <li>{language === "en" ? "Open your Binance app and go to Pay / Send." : language === "pt" ? "Abra o app Binance e vá em Pay / Enviar." : language === "fr" ? "Ouvre l'app Binance et va dans Pay / Envoyer." : "Abre tu app Binance y ve a Pay / Enviar."}</li>
-                  <li>{language === "en" ? `Scan the QR or paste the Pay ID and send USD $${totalUsd} in USDT.` : language === "pt" ? `Escaneie o QR ou cole o Pay ID e envie USD $${totalUsd} em USDT.` : language === "fr" ? `Scanne le QR ou colle le Pay ID et envoie USD $${totalUsd} en USDT.` : `Escanea el QR o pega el Pay ID y envía USD $${totalUsd} en USDT.`}</li>
-                  <li>{language === "en" ? "Save the transaction screenshot." : language === "pt" ? "Salve a captura da transação." : language === "fr" ? "Sauvegarde la capture de la transaction." : "Guarda la captura de la transacción."}</li>
-                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
-                </ol>
 
                 <button
                   type="button"
                   onClick={handleBinancePaid}
-                  className="w-full bg-[#F0B90B] hover:bg-[#d9a409] text-neutral-900 font-semibold py-3 rounded-xl transition-colors"
+                  className="w-full bg-[#F0B90B] hover:bg-[#d9a409] text-neutral-900 font-bold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>
 
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
-                </a>
 
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
@@ -2173,57 +2178,73 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
             {m.id === "clabe" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
-                <div className="text-center space-y-1">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">
-                    {language === "en" ? "Transfer to CLABE (Mexico)" : language === "pt" ? "Transferência para CLABE (México)" : language === "fr" ? "Virement vers CLABE (Mexique)" : "Transferencia a CLABE (México)"}
-                  </p>
-                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{CLABE_HOLDER}</p>
-                  <p className="text-[11px] text-neutral-500">{CLABE_BANK}</p>
-                </div>
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center gap-3 text-amber-800 dark:text-amber-400">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-base leading-tight">Instrucciones de pago SPEI</p>
+                      <p className="text-xs opacity-80">Transfiere desde tu app bancaria en México</p>
+                    </div>
+                  </div>
 
-                <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 p-3 space-y-1.5">
-                  <p className="text-[11px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 text-center">CLABE</p>
-                  <button
-                    type="button"
-                    onClick={copyClabe}
-                    className="w-full inline-flex items-center justify-center gap-2 text-lg font-mono font-bold text-emerald-900 dark:text-emerald-200 hover:opacity-80 transition"
-                  >
-                    <span className="tracking-wider">{CLABE_NUMBER}</span>
-                    {copiedClabe ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
-                  </button>
-                  <p className="text-[11px] text-neutral-500 text-center">{copiedClabe ? t.copied : (language === "en" ? "Tap to copy the 18-digit CLABE" : language === "pt" ? "Toque para copiar a CLABE de 18 dígitos" : language === "fr" ? "Touchez pour copier la CLABE (18 chiffres)" : "Toca para copiar la CLABE de 18 dígitos")}</p>
-                </div>
+                  <div className="space-y-3 bg-white/50 dark:bg-black/20 p-4 rounded-lg border border-amber-100 dark:border-amber-900/20">
+                    <div className="flex justify-between items-start gap-2 group">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">Titular de la cuenta</p>
+                        <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{CLABE_HOLDER}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-start gap-2 pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">CLABE Interbancaria</p>
+                        <p className="font-mono font-bold text-base tracking-wider text-neutral-900 dark:text-neutral-100">{CLABE_NUMBER}</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-100 shrink-0"
+                        onClick={() => {
+                          navigator.clipboard.writeText(CLABE_NUMBER);
+                          setCopiedClabe(true);
+                          toast({ title: "CLABE copiada", description: "Pégala en tu app bancaria." });
+                          setTimeout(() => setCopiedClabe(false), 2000);
+                        }}
+                      >
+                        {copiedClabe ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </Button>
+                    </div>
 
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
-                  </p>
-                </div>
+                    <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">Banco Receptor</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{CLABE_BANK}</p>
+                    </div>
+                  </div>
 
-                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
-                  <li>{language === "en" ? "Open your Mexican bank app (BBVA, Banorte, Santander, etc.) and go to SPEI transfer." : language === "pt" ? "Abra o app do seu banco mexicano (BBVA, Banorte, Santander etc.) e vá em transferência SPEI." : language === "fr" ? "Ouvre l'app de ta banque mexicaine (BBVA, Banorte, Santander, etc.) et va au virement SPEI." : "Abre la app de tu banco mexicano (BBVA, Banorte, Santander, etc.) y ve a transferencia SPEI."}</li>
-                  <li>{language === "en" ? `Paste the CLABE ${CLABE_NUMBER} and send the exact amount in MXN.` : language === "pt" ? `Cole a CLABE ${CLABE_NUMBER} e envie o valor exato em MXN.` : language === "fr" ? `Colle la CLABE ${CLABE_NUMBER} et envoie le montant exact en MXN.` : `Pega la CLABE ${CLABE_NUMBER} y envía el monto exacto en MXN.`}</li>
-                  <li>{language === "en" ? "Save the transfer receipt screenshot." : language === "pt" ? "Salve a captura do comprovante." : language === "fr" ? "Sauvegarde la capture du reçu." : "Guarda la captura del comprobante."}</li>
-                  <li>{language === "en" ? 'Press "I paid" and send us the receipt on WhatsApp.' : language === "pt" ? 'Pressione "Já paguei" e envie o comprovante pelo WhatsApp.' : language === "fr" ? "Appuie sur \"J'ai payé\" et envoie-nous le reçu par WhatsApp." : 'Presiona "Ya pagué" y envíanos el comprobante por WhatsApp.'}</li>
-                </ol>
+                  <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-amber-100 dark:border-amber-900/10">
+                    <p className="text-xs text-amber-700/70 dark:text-amber-500/50 uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                      {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>
+                      <strong>Importante:</strong> Envía tu comprobante de transferencia a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para validar tu pedido inmediatamente.
+                    </p>
+                  </div>
+                </div>
 
                 <button
                   type="button"
                   onClick={handleClabePaid}
-                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 rounded-xl transition-colors"
+                  className="w-full bg-[#0A2540] hover:bg-[#081e33] text-white font-bold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>
-
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
-                </a>
 
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
@@ -2290,7 +2311,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         </p>
       )}
 
-      {selected !== "yape" && selected !== "binance" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

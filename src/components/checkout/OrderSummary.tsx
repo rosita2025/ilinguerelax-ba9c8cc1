@@ -147,7 +147,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         )}
       >
 
-        <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
+        <h2 className="hidden lg:block text-lg font-bold flex items-center gap-2">
+          <ShoppingBag className="w-5 h-5 text-primary" />
+          {t.yourOrder}
+        </h2>
 
         {items.some(i => i.isPhysical) ? (
           <div className="flex flex-col gap-2 rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2.5 mb-2 ring-1 ring-destructive/20">

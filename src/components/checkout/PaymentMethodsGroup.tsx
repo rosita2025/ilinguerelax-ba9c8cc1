@@ -373,6 +373,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localFormatted;
+  const usdSuffix = showLocalRef ? ` (≈ $${totalUsd} USD)` : "";
+  const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";
 
 

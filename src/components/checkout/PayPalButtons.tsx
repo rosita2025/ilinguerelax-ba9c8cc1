@@ -132,8 +132,6 @@ function friendlyMessage(phase: Phase, raw: string): string {
   if (r.includes("401") || r.includes("unauthorized")) {
     return "Sesión expirada o error de configuración. Por favor, recarga.";
   }
-    return "Problema de conexión. Verifica tu internet e intenta de nuevo.";
-  }
   if (r.includes("no está configurado") || r.includes("clientid")) {
     return "PayPal no está disponible en este momento.";
   }

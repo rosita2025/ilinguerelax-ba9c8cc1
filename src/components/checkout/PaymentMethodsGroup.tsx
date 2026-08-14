@@ -2373,7 +2373,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   ? "Continuer vers le paiement"
                   : "Continuar de Pago"}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? "Checkout with Hotmart" : "Pagar con Hotmart") : t.buyNow}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${finalPriceLabel}` : `Pagar con Hotmart · ${finalPriceLabel}`) : `${t.buyNow} · ${finalPriceLabel}`}</>
           )}
         </button>
       )}

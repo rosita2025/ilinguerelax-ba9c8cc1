@@ -126,7 +126,7 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
       try {
         const { data, error } = await supabase
           .from("digital_products")
-          .select("sku, name, description, target_language, learner_language, cover_image_url, is_upsell, is_physical, price_usd, price_usd_latam, price_usd_tienda, price_pen, sku_aliases, local_prices")
+          .select("sku, name, description, target_language, learner_language, cover_image_url, is_upsell, is_physical, price_usd, price_usd_latam, price_usd_tienda, price_pen, sku_aliases, local_prices, local_usd_prices")
           .eq("active", true);
         if (error || !data) return;
         if (cancelled) return;

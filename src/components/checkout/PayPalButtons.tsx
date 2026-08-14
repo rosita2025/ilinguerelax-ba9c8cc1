@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, AlertTriangle, RefreshCw, Copy, Check, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeWithRetry as invokeEdge } from "@/lib/invokeWithRetry";
 
 declare global {
   interface Window {

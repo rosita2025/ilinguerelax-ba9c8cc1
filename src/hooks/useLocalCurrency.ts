@@ -38,16 +38,23 @@ export function formatLocalAmount(
 }
 
 /** Convierte un monto USD a la moneda local aproximada del visitante (por IP). */
-export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverrides): LocalPrice {
+export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverrides, localUsdPrices?: LocalPriceOverrides): LocalPrice {
   const { country, loading } = useRegionTier();
   const upper = (country || "").toUpperCase();
   const currency = detectCurrency(upper);
   const override = overrides && overrides[currency];
   const hasOverride = typeof override === "number" && override > 0;
+  
+  // New: Check for regional USD price override
+  const regionalUsdOverride = localUsdPrices && localUsdPrices[currency];
+  const activeUsdAmount = typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
+    ? regionalUsdOverride
+    : usdAmount;
+
   const rate = exchangeRates[currency] ?? 1;
-  const amount = hasOverride ? (override as number) : usdAmount * rate;
+  const amount = hasOverride ? (override as number) : activeUsdAmount * rate;
   const isUsd = currency === "USD";
-  const formatted = formatPrice(usdAmount, currency, overrides ?? undefined);
+  const formatted = formatPrice(activeUsdAmount, currency, overrides ?? undefined);
 
   return {
     country: upper,

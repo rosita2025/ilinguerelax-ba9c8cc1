@@ -1499,6 +1499,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       ],
     },
     {
+      id: "hotmart_separator",
+      id_raw: "hotmart",
+      title: "HOTMART",
+      isSeparator: true,
+    },
+    {
       id: "hotmart",
       icon: CreditCard,
       title: language === "en" ? "Hotmart (1-click)"
@@ -1782,6 +1788,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;
         const showSectionHeader = !prev || methodSection(prev.id) !== section;
+        if ((m as any).isSeparator) {
+          return (
+            <div key={rowKey} className="flex items-center gap-2 pt-1 mt-1 border-t border-neutral-200/70 dark:border-neutral-800 pt-2.5">
+              <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
+                {language === "en" ? "ACCEPTED PAYMENT METHODS:" : "MÉTODOS DE PAGO ACEPTADOS:"}
+              </span>
+            </div>
+          );
+        }
         return (
           <React.Fragment key={rowKey}>
           {showSectionHeader && (

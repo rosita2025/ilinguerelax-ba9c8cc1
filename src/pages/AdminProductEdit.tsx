@@ -897,7 +897,10 @@ const AdminProductEdit = () => {
                       type="number" step="0.01"
                       className="w-24 h-8 text-sm font-bold border-primary/30"
                       value={product.price_usd}
-                      onChange={(e) => update("price_usd", Number(e.target.value))}
+                      onChange={(e) => {
+                        const val = e.target.value === "" ? 0 : Number(e.target.value);
+                        update("price_usd", val);
+                      }}
                       placeholder="15.00"
                     />
                   </div>
@@ -966,14 +969,15 @@ const AdminProductEdit = () => {
                   // Asia
                   { code: "JPY", flag: "🇯🇵", label: "Japón" },
                 ].map(({ code, flag, label }) => {
+                  const baseUsdRef = product.price_usd ?? 0;
+                  
                   const regionPrice = (() => {
-                    const baseUsd = product.price_usd ?? 0;
-                    if (baseUsd <= 0) return null;
+                    if (baseUsdRef <= 0) return null;
                     
                     const rate = exchangeRates[code as Currency];
                     if (!rate) return null;
 
-                    const raw = baseUsd * rate;
+                    const raw = baseUsdRef * rate;
                     
                     // Lógica de redondeo "bonito" según la moneda
                     if (code === "COP") return Math.round(raw / 100) * 100;
@@ -982,8 +986,6 @@ const AdminProductEdit = () => {
                     
                     return Math.round(raw * 100) / 100;
                   })();
-
-                  const baseUsdRef = product.price_usd ?? 0;
 
                   return (
                     <div key={code}>

@@ -35,6 +35,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
   const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : 8) : 0;
+  const grandTotal = total + shipping;
   const penTotals = calcTotalsPen(items, couponPercent, region.country || "");
   const overridesFor = useSkuOverridesResolver();
   const localTotal = useLocalCurrency(total);
@@ -57,8 +59,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     overridesFor,
   );
   const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = localSubtotalAmount * (1 - (couponPercent || 0) / 100);
-  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(total, "USD");
+  const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
+  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
   const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
     penMode && penAmount != null
       ? formatPen(penAmount)
@@ -261,7 +263,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.shipping}</span>
             <span>
               {items.some(i => i.isPhysical) 
-                ? (total >= 50 ? t.freeShipping : formatCurrencyAmount(8, "USD"))
+                ? (shipping === 0 ? t.freeShipping : formatCurrencyAmount(8, "USD"))
                 : t.freeDigitalDelivery
               }
             </span>
@@ -273,7 +275,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(total, "USD")}</div>
+              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
             </div>
           </div>
 

@@ -205,6 +205,7 @@ const es: CheckoutUIStrings = {
   included: "Incluidos",
   total: "Total",
   inYourCurrency: "en tu moneda",
+  acceptedMethods: "MÉTODOS DE PAGO ACEPTADOS:",
 
   sslEncryption: "Encriptación SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Perú",

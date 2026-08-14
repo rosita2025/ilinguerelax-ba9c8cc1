@@ -322,7 +322,17 @@ export function localTotalFromPricing(
       : item.unitUsd * rate;
     subtotal += perUnit * (item.quantity || 1);
   }
+  
+  // Shipping logic must mirror OrderSummary.tsx / PaymentMethodsGroup.tsx
+  const isPhysical = pricing.items.some(i => (i as any).is_physical || (i as any).isPhysical);
+  const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(code);
+  const shippingCost = isLatam ? 9 : 8;
+  const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingCost) : 0;
+  const shippingLocal = shippingUsd * rate;
+
   const withCoupon = subtotal * (1 - (pricing.couponPercent || 0) / 100);
+  const totalLocal = withCoupon + shippingLocal;
+
   if (!Number.isFinite(withCoupon) || withCoupon <= 0) {
     return localAmountFromUsd(pricing.totalUsd, code);
   }

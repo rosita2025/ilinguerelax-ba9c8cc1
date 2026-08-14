@@ -93,6 +93,7 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
     }
   }
   
+  console.error("[paypal] loadPayPalSdk failed all attempts", lastError);
   throw lastError || new Error("PayPal no disponible");
 }
 

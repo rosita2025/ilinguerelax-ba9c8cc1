@@ -115,7 +115,16 @@ function serviceClient() {
   );
 }
 
-function pickTierPrice(row: Record<string, unknown>, tier: RegionTier): number {
+function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?: string | null): number {
+  // Si se especifica una moneda y existe un override USD regional para ella, esa es la verdad absoluta.
+  if (currency) {
+    const localUsdPrices = (row.local_usd_prices ?? null) as Record<string, number> | null;
+    const regionalUsd = localUsdPrices?.[currency.toUpperCase()];
+    if (typeof regionalUsd === "number" && regionalUsd > 0) {
+      return regionalUsd;
+    }
+  }
+
   const global = Number(row.price_usd) || 0;
   const latam = row.price_usd_latam != null ? Number(row.price_usd_latam) : global;
   const tienda = row.price_usd_tienda != null ? Number(row.price_usd_tienda) : latam;

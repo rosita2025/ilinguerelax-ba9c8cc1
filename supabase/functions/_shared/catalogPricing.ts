@@ -91,6 +91,8 @@ export interface PricedItem {
   localPrices?: Record<string, number> | null;
   /** Precio fijo en soles del catálogo (`digital_products.price_pen`). */
   pricePen?: number | null;
+  /** Regional USD overrides (`digital_products.local_usd_prices`). */
+  localUsdPrices?: Record<string, number> | null;
 }
 
 export interface ResolvedPricing {
@@ -162,7 +164,7 @@ export async function resolveServerPricing(opts: {
   const lookups = Array.from(new Set([...skus, ...wanted.map((i) => i.id)]));
   const { data: rows, error } = await supabase
     .from("digital_products")
-    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen")
+    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen, local_usd_prices")
     .or(`sku.in.(${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}),sku_aliases.ov.{${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}}`);
   if (error) throw new PricingError("No se pudo leer el catálogo");
 

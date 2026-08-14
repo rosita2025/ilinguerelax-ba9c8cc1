@@ -36,7 +36,7 @@ interface TimelineItem {
 interface OrderStatusResult {
   found: boolean;
   orderNumber?: string;
-  stage?: "pending" | "paid" | "shipped" | "delivered";
+  stage?: "pending" | "paid" | "prep" | "shipped" | "delivered";
   outcome?: "approved" | "rejected" | "processing";
   abandoned?: boolean;
 
@@ -151,10 +151,11 @@ const OUTCOME_UI = {
 
 
 const STAGES = [
-  { key: "pending", label: "Pendiente", icon: Clock },
-  { key: "paid", label: "Pagado", icon: CheckCircle2 },
-  { key: "shipped", label: "Enviado", icon: Truck },
-  { key: "delivered", label: "Entregado", icon: PackageCheck },
+  { key: "pending", label: "Pendiente", icon: Clock, desc: "Recibido" },
+  { key: "paid", label: "Pagado", icon: CheckCircle2, desc: "Confirmado" },
+  { key: "prep", label: "Preparación", icon: Package, desc: "5-7 días" },
+  { key: "shipped", label: "Enviado", icon: Truck, desc: "En camino" },
+  { key: "delivered", label: "Entregado", icon: PackageCheck, desc: "Recibido" },
 ] as const;
 
 function formatDate(value?: string | null) {
@@ -408,30 +409,33 @@ export default function OrderStatus() {
                 );
               })()}
 
-              <div className="flex items-center">
+              <div className="flex items-center overflow-x-auto pb-4 no-scrollbar">
                 {STAGES.map((s, i) => {
                   const Icon = s.icon;
                   const active = i <= stageIndex;
                   return (
-                    <div key={s.key} className="flex-1 flex items-center">
+                    <div key={s.key} className="flex flex-1 items-center min-w-[80px]">
                       <div className="flex flex-col items-center gap-1 flex-1">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                          className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-colors ${
                             active
-                              ? "bg-primary/10 border-primary text-primary"
+                              ? "bg-primary/10 border-primary text-primary shadow-sm"
                               : "bg-muted border-border text-muted-foreground"
                           }`}
                         >
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-4 h-4" />
                         </div>
-                        <span
-                          className={`text-xs ${active ? "font-medium text-foreground" : "text-muted-foreground"}`}
-                        >
-                          {s.label}
-                        </span>
+                        <div className="text-center">
+                          <p className={`text-[10px] uppercase tracking-tighter leading-none ${active ? "font-bold text-foreground" : "text-muted-foreground"}`}>
+                            {s.label}
+                          </p>
+                          <p className="text-[9px] text-muted-foreground/70 font-medium">
+                            {s.desc}
+                          </p>
+                        </div>
                       </div>
                       {i < STAGES.length - 1 && (
-                        <div className={`h-0.5 flex-1 ${i < stageIndex ? "bg-primary" : "bg-border"}`} />
+                        <div className={`h-0.5 w-4 flex-shrink-0 mx-1 ${i < stageIndex ? "bg-primary" : "bg-border"}`} />
                       )}
                     </div>
                   );

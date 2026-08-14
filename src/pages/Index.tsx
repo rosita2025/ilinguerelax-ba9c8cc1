@@ -10,6 +10,7 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { AllProductsReviews } from "@/components/AllProductsReviews";
 import { CoreanoLaunchBanner } from "@/components/CoreanoLaunchBanner";
+import { TrackingSearchBar } from "@/components/TrackingSearchBar";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useSpanishRelaxPixelPageView } from "@/hooks/useMetaPixel";
 
@@ -65,6 +66,14 @@ const Index = () => {
       </section>
 
       <CoreanoLaunchBanner />
+      
+      <section className="py-12 px-4 bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-top-left" />
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <TrackingSearchBar />
+        </div>
+      </section>
+
       <Languages />
       <HowItWorks />
 

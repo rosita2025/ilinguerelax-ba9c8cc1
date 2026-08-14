@@ -820,6 +820,18 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   const handleBuyNow = async () => {
     if (!valid) { requestBuyerInfo(); return; }
+    
+    // Validar Asia para productos físicos
+    const isAsia = ["CN", "JP", "KR", "IN", "SG", "MY", "TH", "VN", "PH", "ID"].includes(countryCode);
+    if (hasPhysicalItems && isAsia) {
+      toast({
+        title: language === "en" ? "Not available" : "No disponible",
+        description: t.shippingNoticeAsia,
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selected) {
       toast({ title: t.selectMethod, variant: "destructive" });
       return;

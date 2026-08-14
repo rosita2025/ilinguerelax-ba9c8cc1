@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { useLocalCurrency, useLocalCurrencyForSku } from "@/hooks/useLocalCurrency";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useLocalOverrides } from "@/lib/livePrices";
 import { formatCurrencyAmount } from "@/i18n";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import type { UpsellItem } from "@/config/checkoutCatalog";

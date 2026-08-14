@@ -224,6 +224,7 @@ const App = () => (
                 <ProductViewTracker />
                 <AutoTranslate />
                 <BrevoChatToggle />
+                <PixelDebugger />
                 <CookieConsent />
                 <EmailSubscribePopup />
                 

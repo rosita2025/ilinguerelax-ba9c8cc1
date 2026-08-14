@@ -40,7 +40,7 @@ export default function AdminMarketingDrips() {
       if (sendsData) setSends(sendsData as any);
 
       // Calculamos stats rápidos
-      const sentToday = sendsData?.filter(s => new Date(s.sent_at).toDateString() === new Date().toDateString()).length || 0;
+      const sentToday = (sendsData as any[])?.filter(s => s.sent_at && new Date(s.sent_at).toDateString() === new Date().toDateString()).length || 0;
       setStats({ sentToday });
     } catch (e) {
       toast.error("Error al cargar datos");

@@ -390,31 +390,43 @@ export const Languages = () => {
                 )}
 
                 {/* Pricing & Buy Button */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-baseline gap-1.5 flex-wrap">
-                    <span className="text-2xl font-bold text-primary">
-                      {product.price === 0
-                        ? "GRATIS"
-                        : cardPrice.format(product.slug, product.price)}
-                    </span>
-                    {product.originalPrice && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        {cardPrice.formatOriginal(product.slug, product.originalPrice)}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                      <span className="text-2xl font-bold text-primary">
+                        {product.price === 0
+                          ? "GRATIS"
+                          : cardPrice.format(product.slug, product.price)}
                       </span>
-                    )}
-                    {product.price > 0 && (
-                      <>
-                        <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(product.slug)}</span>
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
-                      </>
-                    )}
-                  </div>
-                  <Button size="sm" className="gap-2" asChild>
+                      {product.originalPrice ? (
+                        <span className="text-sm text-muted-foreground line-through">
+                          {cardPrice.formatOriginal(product.slug, product.originalPrice)}
+                        </span>
+                      ) : product.price > 0 ? (
+                        <span className="text-sm text-muted-foreground line-through">
+                          {cardPrice.formatOriginal(product.slug, product.price)}
+                        </span>
+                      ) : null}
+                      {product.price > 0 && (
+                        <>
+                          <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(product.slug)}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
+                        </>
+                      )}
+                    </div>
+
                     <Link to={getProductLink(product)}>
-                      <ShoppingCart className="w-4 h-4" />
-                      {product.price === 0 ? (language === 'en' ? 'Free' : 'Gratis') : c.buy}
+                      <Button
+                        size="sm"
+                        className={cn(
+                          "rounded-full px-6 font-bold shadow-sm transition-all active:scale-95 shrink-0",
+                          styles.tabActive
+                        )}
+                      >
+                        {c.buy}
+                      </Button>
                     </Link>
-                  </Button>
+                  </div>
                 </div>
               </div>
             </div>

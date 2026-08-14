@@ -55,38 +55,12 @@ const Products = () => {
   }, [dbProducts]);
 
 
-  // IP-based regional pricing for product "5000" (Latam vs USA/EU/UK/CA/AU)
-  const LATAM = new Set(["MXN","ARS","PEN","COP","CLP","BRL","UYU","BOB","PYG","GTQ","DOP","CRC","HNL","NIO","VES"]);
-  const readCurrency = () => {
-    if (typeof window === "undefined") return "USD";
-    try {
-      const raw = localStorage.getItem("campaign_currency_v5");
-      if (raw) {
-        const p = JSON.parse(raw);
-        if (p?.currency) return String(p.currency).toUpperCase();
-      }
-    } catch { /* ignore */ }
-    return "USD";
-  };
-  const [detectedCurrency, setDetectedCurrency] = useState<string>(readCurrency);
-  useEffect(() => {
-    const sync = () => setDetectedCurrency(readCurrency());
-    sync();
-    const id = window.setInterval(sync, 1500);
-    window.addEventListener("campaign-currency-change", sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.clearInterval(id);
-      window.removeEventListener("campaign-currency-change", sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, []);
-  const isLatam = LATAM.has(detectedCurrency);
-  // El precio real siempre sale de /admin/productos/:sku (useCardPrice); el
-  // precio del catálogo estático solo actúa como último recurso cuando el
-  // producto todavía no tiene fila en el admin.
-  const priceFor = (p: typeof products[number]) => p.price;
+  // Pricing logic is now handled centrally by useCardPrice hook.
+  // We keep a small local detection only for UI-specific tweaks if needed, 
+  // but primary formatting MUST use cardPrice.
   const cardPrice = useCardPrice();
+  
+  const priceFor = (p: typeof products[number]) => p.price;
 
   // Collect available learner/target language codes from the merged catalog.
   const { learners, targets } = useMemo(() => {

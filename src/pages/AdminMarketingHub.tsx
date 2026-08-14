@@ -14,7 +14,7 @@ import {
 import { toast } from "sonner";
 import AdminNewsletterDrip from "./AdminNewsletterDrip";
 import AdminMarketingDrips from "./AdminMarketingDrips";
-import AdminBrevoAbandoned from "./AdminBrevoAbandoned";
+
 import AdminReviewInvitations from "./AdminReviewInvitations";
 
 interface Stats {
@@ -311,7 +311,9 @@ export default function AdminMarketingHub() {
                  <p className="text-xs text-muted-foreground">Payloads y estados de envío de carritos no finalizados.</p>
                </div>
                <div className="p-0 sm:p-4 overflow-hidden">
-                 <AdminBrevoAbandoned />
+                 <div className="p-8 text-center text-sm text-muted-foreground">
+                   Los registros de abandonos ahora se gestionan directamente en la pestaña de <b>Automatización de Email</b>.
+                 </div>
                </div>
             </div>
           </TabsContent>

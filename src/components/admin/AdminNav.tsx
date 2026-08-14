@@ -80,7 +80,6 @@ const groups: Group[] = [
     label: "Marketing",
     items: [
       { to: "/admin/reviews", label: "Reseñas", icon: Star },
-      { to: "/admin/lanzamientos", label: "Lanzamientos · Anuncio", icon: Send },
       { to: "/admin/marketing-drips", label: "Automatización de Email", icon: Send },
     ],
   },

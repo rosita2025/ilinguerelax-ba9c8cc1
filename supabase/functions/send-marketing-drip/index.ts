@@ -25,33 +25,56 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, note: 'No active config', stats }));
     }
 
-    // 2. Obtener contactos que compraron productos (usamos email_contacts)
+    // 2. Obtener contactos que compraron productos
     const { data: purchases, error: pErr } = await admin
       .from('email_contacts')
-      .select('email, name, country, created_at, product_type, source')
-      .or('source.eq.store_purchase,source.eq.hotmart_purchase,source.eq.manual_payment')
+      .select('email, name, country, created_at, product_type, source, language')
+      .or('source.eq.store_purchase,source.eq.hotmart_purchase,source.eq.manual_payment,source.eq.shopify_sale')
       .order('created_at', { ascending: false })
       .limit(BATCH_LIMIT);
 
     // Complementar con persistent_carts marcados como convertidos
     const { data: cCarts } = await admin
       .from('persistent_carts')
-      .select('email, last_activity, items')
+      .select('email, last_activity, items, buyer, country, language')
       .eq('converted', true)
       .order('last_activity', { ascending: false })
       .limit(BATCH_LIMIT);
 
-    const merged = new Map<string, { email: string; name?: string; country?: string; created_at: string; product_type: string; source?: string }>();
-    (purchases || []).forEach(p => merged.set(p.email, p));
+    const merged = new Map<string, { email: string; name?: string; country?: string; created_at: string; product_type: string; source?: string; language?: string }>();
+    (purchases || []).forEach(p => merged.set(p.email.toLowerCase().trim(), p));
     (cCarts || []).forEach(c => {
-      if (!merged.has(c.email)) {
-        merged.set(c.email, {
-          email: c.email,
+      const email = c.email.toLowerCase().trim();
+      if (!merged.has(email)) {
+        merged.set(email, {
+          email: email,
           name: (c.buyer as any)?.name,
           country: c.country,
           created_at: c.last_activity,
           product_type: Array.isArray(c.items) && c.items[0]?.id ? String(c.items[0].id) : 'tienda',
-          source: 'persistent_cart'
+          source: 'persistent_cart',
+          language: c.language
+        });
+      }
+    });
+
+    // Añadir ventas de Shopify directamente
+    const { data: sSales } = await admin
+      .from('shopify_sales')
+      .select('customer_email, customer_name, country_code, created_at, product_name, sku')
+      .order('created_at', { ascending: false })
+      .limit(BATCH_LIMIT);
+    
+    (sSales || []).forEach(s => {
+      const email = s.customer_email.toLowerCase().trim();
+      if (!merged.has(email)) {
+        merged.set(email, {
+          email: email,
+          name: s.customer_name,
+          country: s.country_code,
+          created_at: s.created_at,
+          product_type: s.sku || s.product_name,
+          source: 'shopify'
         });
       }
     });
@@ -82,7 +105,7 @@ Deno.serve(async (req) => {
       else if (haystack.includes('5000') || haystack.includes('palabras')) category = '5000_palabras';
       else if (haystack.includes('coreano')) category = 'coreano_mapas';
       else if (haystack.includes('patron')) category = 'patrones';
-      else if (haystack.includes('fisico')) category = 'libros_fisicos';
+      else if (haystack.includes('fisico') || haystack.includes('physical') || haystack.includes('book')) category = 'libros_fisicos';
 
       // 4. Buscar pasos que le tocan hoy
       const eligibleSteps = configs.filter(c => c.category === category && c.day_offset <= daysSince);

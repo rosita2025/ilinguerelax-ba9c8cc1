@@ -49,11 +49,12 @@ export async function getPurchasedSkus(admin: any, rawEmail: string): Promise<Se
   try {
     const { data } = await admin
       .from("shopify_sales")
-      .select("product_name")
+      .select("product_name, sku")
       .ilike("customer_email", email)
       .limit(100);
     for (const row of data ?? []) {
       push(row?.product_name);
+      push(row?.sku);
     }
   } catch (_) { /* ignore */ }
 
@@ -68,10 +69,26 @@ export async function getPurchasedSkus(admin: any, rawEmail: string): Promise<Se
     for (const row of data ?? []) {
       push(row?.product_id);
       const d = row?.event_data ?? {};
-      push(d?.product_sku || d?.sku || d?.product_id);
+      push(d?.product_sku || d?.sku || d?.product_id || d?.item_id);
+      if (Array.isArray(d?.items)) {
+        for (const it of d.items) push(it?.id || it?.sku || it?.product_id);
+      }
     }
   } catch (_) { /* ignore */ }
 
+  // 5) persistent_carts (check if converted recently)
+  try {
+    const { data } = await admin
+      .from("persistent_carts")
+      .select("items, converted")
+      .ilike("email", email)
+      .eq("converted", true)
+      .limit(50);
+    for (const row of data ?? []) {
+      const items = Array.isArray(row?.items) ? row.items : [];
+      for (const it of items) push(it?.id || it?.sku);
+    }
+  } catch (_) { /* ignore */ }
 
   return out;
 }

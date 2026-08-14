@@ -111,8 +111,17 @@ Deno.serve(async (req) => {
 
     // Ignorar si ya compró recientemente (evita spam de abandonos tras compra exitosa)
     const recentPurchased = await getPurchasedSkus(supabase, email);
-    if (productType && recentPurchased.has(String(productType).toLowerCase())) {
-      console.log(`[track-abandoned-checkout] skipping for ${email} - already purchased ${productType}`);
+    const ownedSkus = [...recentPurchased].map(s => s.toLowerCase());
+    
+    // Check if the main product or ANY item in the cart is already owned
+    const cartHasOwned = cart.some(it => ownedSkus.includes(it.id.toLowerCase()));
+    const productOwned = productType && ownedSkus.includes(productType.toLowerCase());
+
+    if (productOwned || cartHasOwned) {
+      console.log(`[track-abandoned-checkout] skipping for ${email} - already owned product/cart items`);
+      // Also mark any existing cart as converted to stop drips
+      await supabase.from("persistent_carts").update({ converted: true }).ilike("email", email);
+      
       return new Response(JSON.stringify({ ok: true, skipped: "already_purchased" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

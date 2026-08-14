@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
     const currencyReq = String(body.currency ?? "USD").toUpperCase().slice(0, 3);
     const amountUsdHint = body.amountUsd != null ? Number(body.amountUsd) : undefined;
     const country = body.country ? String(body.country).toUpperCase().slice(0, 2) : undefined;
+    const couponCode = body.couponCode ? String(body.couponCode).trim().toUpperCase().slice(0, 30) : undefined;
     const rawDescription = String(body.description ?? "").trim();
     // Always show the public brand on the PayPal review screen.
     const description = (rawDescription ? `iLingue Relax · ${rawDescription}` : "iLingue Relax").slice(0, 127);

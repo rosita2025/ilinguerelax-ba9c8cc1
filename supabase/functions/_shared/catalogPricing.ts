@@ -242,6 +242,7 @@ export async function resolveServerPricing(opts: {
       quantity: item.quantity,
       unitUsd: unit,
       localPrices: (row.local_prices ?? null) as Record<string, number> | null,
+      localUsdPrices: (row.local_usd_prices ?? null) as Record<string, number> | null,
       pricePen: Number(row.price_pen) > 0 ? Number(row.price_pen) : null,
     });
   }

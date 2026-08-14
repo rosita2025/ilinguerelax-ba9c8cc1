@@ -14,7 +14,9 @@ import {
   CheckCircle2, 
   Clock, 
   AlertCircle,
-  Save
+  Save,
+  ClipboardCopy,
+  Mail
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -119,6 +121,11 @@ const AdminPhysicalOrders = () => {
   }, [adminKey]);
 
   const updateTracking = async (order: PhysicalOrder, tracking: string, provider: string) => {
+    if (!tracking && !provider) {
+      toast.error("Ingresa al menos un dato de seguimiento");
+      return;
+    }
+    
     setSaving(order.id);
     try {
       const { error } = await adminInvoke("list-admin-orders", {
@@ -132,13 +139,27 @@ const AdminPhysicalOrders = () => {
         },
       });
       if (error) throw error;
-      toast.success("Seguimiento actualizado");
+      toast.success("Seguimiento actualizado para " + (order.order_ref || order.id));
       loadOrders(true);
     } catch (e) {
       toast.error("Error al guardar: " + (e as Error).message);
     } finally {
       setSaving(null);
     }
+  };
+
+  const getTrackingUrl = (provider: string, tracking: string) => {
+    const p = provider.toLowerCase();
+    if (tracking.startsWith('http')) return tracking;
+    
+    if (p.includes('amazon')) return `https://www.amazon.com/progress-tracker/package/ref=pt_redirect_from_gp?shipmentId=${tracking}`;
+    if (p.includes('dhl')) return `https://www.dhl.com/en/express/tracking.html?AWB=${tracking}`;
+    if (p.includes('fedex')) return `https://www.fedex.com/fedextrack/?trknbr=${tracking}`;
+    if (p.includes('ups')) return `https://www.ups.com/track?tracknum=${tracking}`;
+    if (p.includes('serpost')) return `https://www.serpost.com.pe/Cliente/ConsultaEnvio?pTracking=${tracking}`;
+    if (p.includes('olva')) return `https://www.olvacourier.com/seguimiento-de-envios/`;
+    
+    return null;
   };
 
   const filteredOrders = useMemo(() => {
@@ -207,8 +228,11 @@ const AdminPhysicalOrders = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-lg">{order.order_ref}</span>
-                      <Badge variant={order.status === "approved" || order.status === "paid" ? "default" : "secondary"}>
-                        {order.status.toUpperCase()}
+                      <Badge 
+                        variant={order.status === "approved" || order.status === "paid" ? "default" : "secondary"}
+                        className={order.tracking_number ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : ""}
+                      >
+                        {order.tracking_number ? "ENVIADO" : order.status.toUpperCase()}
                       </Badge>
                       <Badge variant="outline" className="capitalize">
                         {order.source}
@@ -252,29 +276,58 @@ const AdminPhysicalOrders = () => {
                         defaultValue={order.tracking_number || ""}
                         id={`tracking-${order.id}`}
                       />
-                      <Button 
-                        size="sm" 
-                        disabled={saving === order.id}
-                        onClick={() => {
-                          const t = (document.getElementById(`tracking-${order.id}`) as HTMLInputElement).value;
-                          const p = (document.getElementById(`provider-${order.id}`) as HTMLInputElement).value;
-                          updateTracking(order, t, p);
-                        }}
-                      >
-                        {saving === order.id ? (
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Save className="w-4 h-4" />
-                        )}
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          title="Copiar tracking"
+                          onClick={() => {
+                            const val = (document.getElementById(`tracking-${order.id}`) as HTMLInputElement).value;
+                            if (val) {
+                              navigator.clipboard.writeText(val);
+                              toast.success("Copiado al portapapeles");
+                            }
+                          }}
+                        >
+                          <ClipboardCopy className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          disabled={saving === order.id}
+                          onClick={() => {
+                            const t = (document.getElementById(`tracking-${order.id}`) as HTMLInputElement).value;
+                            const p = (document.getElementById(`provider-${order.id}`) as HTMLInputElement).value;
+                            updateTracking(order, t, p);
+                          }}
+                        >
+                          {saving === order.id ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Save className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {order.tracking_number && (
-                  <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Tracking configurado. El cliente puede verlo en su estado de pedido.
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-dashed">
+                    <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Tracking configurado.
+                    </div>
+                    {getTrackingUrl(order.shipping_provider || "", order.tracking_number) && (
+                      <Button asChild variant="link" size="sm" className="h-auto p-0 text-xs gap-1">
+                        <a 
+                          href={getTrackingUrl(order.shipping_provider || "", order.tracking_number)!} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          Ver rastreo externo <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 )}
                 {!order.tracking_number && (order.status === "approved" || order.status === "paid") && (

@@ -125,7 +125,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     wallet: ["PayPal", "Google Pay", "Apple Pay"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
 ];
 
-export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN"]);
+export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN", "AR", "VE", "CU", "NI"]);
 
 
 const BY_CODE = new Map(DLOCAL_COVERAGE.map((c) => [c.code, c]));

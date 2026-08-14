@@ -44,6 +44,28 @@ export default function AdminMarketingDrips() {
     }
   };
 
+  const processDrips = async () => {
+    setLoading(true);
+    try {
+      // 1. Marketing Post-Compra
+      const { data: mData, error: mErr } = await supabase.functions.invoke('send-marketing-drip');
+      if (mErr) throw mErr;
+
+      // 2. Newsletter Drip
+      const { data: nData, error: nErr } = await supabase.functions.invoke('send-newsletter-drip');
+      if (nErr) throw nErr;
+
+      toast.success("Secuencias procesadas", { 
+        description: `Marketing: ${mData.stats.sent} enviados. Newsletter: ${nData.stats.sent} enviados.` 
+      });
+      loadData();
+    } catch (e) {
+      toast.error("Error al procesar secuencias", { description: (e as Error).message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadData();
   }, []);
@@ -55,9 +77,14 @@ export default function AdminMarketingDrips() {
             <h1 className="text-lg sm:text-xl font-bold">Marketing Post-Compra</h1>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Automatización de lanzamientos a los 7, 15 y 25 días.</p>
           </div>
-          <Button onClick={loadData} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
-            <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={processDrips} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
+              <Mail className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-pulse' : ''}`} /> Procesar Ahora
+            </Button>
+            <Button onClick={loadData} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
+              <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+            </Button>
+          </div>
         </header>
 
         <section className="space-y-4">

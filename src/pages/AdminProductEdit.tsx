@@ -57,6 +57,7 @@ interface Product {
   hotmart_excluded_countries: string[];
   sku_aliases: string[];
   local_prices: Record<string, number>;
+  local_usd_prices: Record<string, number>;
   is_physical: boolean;
   gallery_metadata: Record<string, any>;
   rating?: number | null;
@@ -94,6 +95,7 @@ const EMPTY: Product = {
   hotmart_excluded_countries: [],
   sku_aliases: [],
   local_prices: {},
+  local_usd_prices: {},
   is_physical: false,
   gallery_metadata: {},
   rating: 4.8,
@@ -359,8 +361,10 @@ const AdminProductEdit = () => {
           product: (() => {
             const { bonus_titles, id, created_at, updated_at, ...cleanProduct } = product as any;
             
-            // Normalize and round local prices before saving
+            // Normalize and round local and regional USD prices before saving
             const normalizedLocalPrices: Record<string, number> = {};
+            const normalizedLocalUsdPrices: Record<string, number> = {};
+            
             if (product.local_prices) {
               Object.entries(product.local_prices).forEach(([code, amount]) => {
                 const numAmount = Number(amount);
@@ -372,9 +376,19 @@ const AdminProductEdit = () => {
               });
             }
 
+            if (product.local_usd_prices) {
+              Object.entries(product.local_usd_prices).forEach(([code, amount]) => {
+                const numAmount = Number(amount);
+                if (!isNaN(numAmount) && numAmount > 0) {
+                  normalizedLocalUsdPrices[code] = Math.round(numAmount * 100) / 100;
+                }
+              });
+            }
+
             return {
               ...cleanProduct,
               local_prices: normalizedLocalPrices,
+              local_usd_prices: normalizedLocalUsdPrices,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               gallery_metadata: product.gallery_metadata || {},
               upsells,
@@ -997,12 +1011,15 @@ const AdminProductEdit = () => {
                   const baseUsdRef = Number(product.price_usd) || 0;
                   
                   const regionPrice = (() => {
-                    if (baseUsdRef <= 0) return null;
+                    const regionalUsd = product.local_usd_prices?.[code];
+                    const activeBaseUsd = regionalUsd != null ? Number(regionalUsd) : baseUsdRef;
+
+                    if (activeBaseUsd <= 0) return null;
                     
                     const rate = exchangeRates[code as Currency];
                     if (!rate) return null;
 
-                    const raw = baseUsdRef * rate;
+                    const raw = activeBaseUsd * rate;
                     // El usuario prefiere precios más bajos en LATAM y más altos en USA/Europa
                     // Lógica de redondeo "bonito" según la moneda
                     if (code === "COP" || code === "TZS" || code === "UGX") return Math.round(raw / 100) * 100;
@@ -1011,6 +1028,8 @@ const AdminProductEdit = () => {
                     
                     return Math.round(raw * 100) / 100;
                   })();
+
+                  const currentUsdValue = product.local_usd_prices?.[code] ?? baseUsdRef;
 
                   return (
                     <div key={code}>
@@ -1079,8 +1098,31 @@ const AdminProductEdit = () => {
                               : "Auto"}
                           </p>
                           <p className="text-[9px] text-muted-foreground/70 italic">
-                            (Ref: ${product.price_usd} USD)
+                            Ref: ${currentUsdValue} USD
                           </p>
+                        </div>
+                        
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Region:</span>
+                          <Input
+                            type="number" step="any"
+                            className={cn(
+                              "h-5 text-[9px] px-1 py-0 w-16",
+                              product.local_usd_prices?.[code] ? "border-primary/40 bg-primary/5" : "border-muted/50"
+                            )}
+                            value={product.local_usd_prices?.[code] ?? ""}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              const next = { ...(product.local_usd_prices || {}) };
+                              if (v === "" || Number(v) <= 0) {
+                                delete next[code];
+                              } else {
+                                next[code] = Math.round(Number(v) * 100) / 100;
+                              }
+                              update("local_usd_prices", next);
+                            }}
+                            placeholder={baseUsdRef.toString()}
+                          />
                         </div>
                         {exchangeRates[code as Currency] && (
                           <p className="text-[8px] text-muted-foreground/50 border-t border-muted-foreground/10 pt-0.5">

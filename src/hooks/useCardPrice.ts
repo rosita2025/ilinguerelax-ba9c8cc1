@@ -32,6 +32,7 @@ interface Row {
   price_usd_tienda: number | null;
   price_pen: number | null;
   local_prices: Record<string, number> | null;
+  local_usd_prices: Record<string, number> | null;
 }
 
 type Rows = Record<string, Row>;
@@ -44,7 +45,7 @@ async function fetchRows(): Promise<Rows> {
   try {
     const result = await supabase
       .from("digital_products")
-      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices")
+      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices, local_usd_prices")
       .eq("active", true);
     data = result.data as unknown as Row[] | null;
   } catch {
@@ -52,12 +53,19 @@ async function fetchRows(): Promise<Rows> {
   }
   const map: Rows = {};
   for (const r of data ?? []) {
-    const raw = (r as any).local_prices;
+    const rawLocal = (r as any).local_prices;
     const local_prices =
-      raw && typeof raw === "object" && !Array.isArray(raw)
-        ? (raw as Record<string, number>)
+      rawLocal && typeof rawLocal === "object" && !Array.isArray(rawLocal)
+        ? (rawLocal as Record<string, number>)
         : null;
-    map[r.sku] = { ...r, local_prices };
+        
+    const rawLocalUsd = (r as any).local_usd_prices;
+    const local_usd_prices =
+      rawLocalUsd && typeof rawLocalUsd === "object" && !Array.isArray(rawLocalUsd)
+        ? (rawLocalUsd as Record<string, number>)
+        : null;
+        
+    map[r.sku] = { ...r, local_prices, local_usd_prices };
   }
   cache = map;
   return map;
@@ -132,6 +140,9 @@ export function useCardPrice(): CardPriceFormatter {
   /** USD price for the visitor's tier, from admin data when available. */
   const tierUsd = useCallback(
     (row: Row | undefined, fallbackUsd: number): number => {
+      const regionalUsd = row?.local_usd_prices?.[displayCurrency];
+      if (typeof regionalUsd === "number" && regionalUsd > 0) return regionalUsd;
+
       if (isTiendaUsd) {
         return Number(row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
       }
@@ -140,7 +151,7 @@ export function useCardPrice(): CardPriceFormatter {
       }
       return Number(row?.price_usd ?? fallbackUsd);
     },
-    [isTiendaUsd, isLatamHotmart],
+    [isTiendaUsd, isLatamHotmart, displayCurrency],
   );
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {
@@ -150,11 +161,12 @@ export function useCardPrice(): CardPriceFormatter {
     if (isPeru) {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
       if (pen) return formatCurrencyAmount(pen, "PEN");
-      return formatPrice(fallbackUsd, "PEN", row?.local_prices as any);
+      return formatPrice(fallbackUsd, "PEN", row?.local_prices as any, row?.local_usd_prices as any);
     }
 
     // Resto → USD del tier convertido, respetando el monto manual por moneda.
-    return formatPrice(tierUsd(row, fallbackUsd), displayCurrency, row?.local_prices as any);
+    const tierUsdVal = tierUsd(row, fallbackUsd);
+    return formatPrice(tierUsdVal, displayCurrency, row?.local_prices as any, row?.local_usd_prices as any);
   };
 
   // El precio "antes" usa la MISMA regla que la ficha de producto y el sticky

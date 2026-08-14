@@ -143,7 +143,8 @@ export function MoreProductsPanel({ parentSku }: Props) {
   const overridesFor = useSkuOverridesResolver();
   const fmt = (usd: number, pen?: number | null, sku?: string) => {
     if (isPeru && pen && pen > 0) return formatCurrencyAmount(Number(pen), "PEN");
-    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "", overridesFor(sku));
+    const { local_prices, local_usd_prices } = overridesFor(sku);
+    const { formatted, isUsd } = formatLocalAmount(Number(usd) || 0, region.country || "", local_prices, local_usd_prices);
     return isUsd ? formatCurrencyAmount(Number(usd) || 0, "USD") : formatted;
   };
 

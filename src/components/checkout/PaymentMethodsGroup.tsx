@@ -357,6 +357,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   );
   const localSubtotalAmount = localItemsSum.amount;
   const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
+  const currentUsdRef = localItemsSum.usdReference; // The unified USD base for this cart in this region
   
   const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
 
@@ -383,7 +384,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localTotalLabel;
   const usdSuffix = isActuallyShowingLocal 
-    ? ` ≈ USD $${totalUsd}`.replace("(", "").replace(")", "") 
+    ? ` ≈ USD $${currentUsdRef.toFixed(2)}`
     : "";
   const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";

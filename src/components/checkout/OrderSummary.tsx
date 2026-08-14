@@ -130,8 +130,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             {showLocalRef && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
                 {localTotal.isUsd 
-                  ? `≈ USD $${grandTotal.toFixed(2)}` 
-                  : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`.replace("(", "").replace(")", "")}
+                  ? `≈ USD $${localItemsSum.usdReference.toFixed(2)}` 
+                  : `≈ USD $${localItemsSum.usdReference.toFixed(2)}`}
               </span>
             )}
           </span>
@@ -147,7 +147,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         )}
       >
 
-        <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
+        <h2 className="hidden lg:block text-lg font-bold flex items-center gap-2">
+          <ShoppingBag className="w-5 h-5 text-primary" />
+          {t.yourOrder}
+        </h2>
 
         {items.some(i => i.isPhysical) ? (
           <div className="flex flex-col gap-2 rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2.5 mb-2 ring-1 ring-destructive/20">
@@ -238,7 +241,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   {penMode && item.pricePen != null
                     ? formatPen(item.pricePen)
                     : showLocalRef
-                      ? formatLocalAmount(itemPrice(item, region.tier), region.country, overridesFor(item.id)).formatted
+                      ? (() => {
+                          const { local_prices, local_usd_prices } = overridesFor(item.id);
+                          return formatLocalAmount(itemPrice(item, region.tier), region.country, local_prices, local_usd_prices).formatted;
+                        })()
                       : formatCurrencyAmount(itemPrice(item, region.tier), "USD")}
                 </div>
               </div>
@@ -296,12 +302,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>{penMode && penTotals ? formatPen(penTotals.subtotal) : showLocalRef ? formatLocalDirect(localSubtotalAmount, region.country || "") : formatCurrencyAmount(subtotal, "USD")}</span>
+            <span>{penMode && penTotals ? formatPen(penTotals.subtotal) : showLocalRef ? formatLocalDirect(localItemsSum.amount, region.country || "") : formatCurrencyAmount(subtotal, "USD")}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-{penMode && penTotals ? formatPen(penTotals.discount) : showLocalRef ? formatLocalDirect(localSubtotalAmount - localTotalAmount, region.country || "") : formatCurrencyAmount(discount, "USD")}</span>
+              <span>-{penMode && penTotals ? formatPen(penTotals.discount) : showLocalRef ? formatLocalDirect(localItemsSum.amount - localTotalAmount, region.country || "") : formatCurrencyAmount(discount, "USD")}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
@@ -320,12 +326,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
+              <div className="text-xl">{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
               {showLocalRef && (
-                <div className="text-[10px] text-muted-foreground font-normal">
-                  {localTotal.isUsd 
-                    ? `≈ USD $${grandTotal.toFixed(2)}` 
-                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`.replace("(", "").replace(")", "")}
+                <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
+                  ≈ USD ${localItemsSum.usdReference.toFixed(2)}
                 </div>
               )}
             </div>

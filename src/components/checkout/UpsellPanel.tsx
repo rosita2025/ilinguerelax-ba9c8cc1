@@ -1,7 +1,9 @@
 import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { useLocalCurrency, useLocalCurrencyForSku } from "@/hooks/useLocalCurrency";
+import { useI18n } from "@/i18n/I18nContext";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+import { useLocalOverrides } from "@/lib/livePrices";
 import { formatCurrencyAmount } from "@/i18n";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import type { UpsellItem } from "@/config/checkoutCatalog";
@@ -36,7 +38,8 @@ function Price({
   sku?: string;
 }) {
   const { country } = useRegionTier();
-  const local = useLocalCurrencyForSku(usd, sku);
+  const overrides = useLocalOverrides(sku);
+  const local = useLocalCurrency(usd, (overrides as any)?.local_prices, (overrides as any)?.local_usd_prices);
   const isPeru = country === "PE";
 
   let label: string;
@@ -70,20 +73,22 @@ function Price({
 
 function SavingsBadge({ usd }: { usd: number }) {
   const local = useLocalCurrency(usd);
+  const { language } = useI18n();
   const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[11px] font-bold whitespace-nowrap">
-      <Tag className="w-3 h-3" /> Ahorras {label}
+      <Tag className="w-3 h-3" /> {language === "en" ? "Save" : "Ahorras"} {label}
     </span>
   );
 }
 
 function SavingsInline({ usd }: { usd: number }) {
   const local = useLocalCurrency(usd);
+  const { language } = useI18n();
   const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
   return (
     <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">
-      Ahorras {label}
+      {language === "en" ? "Save" : "Ahorras"} {label}
     </p>
   );
 }
@@ -93,6 +98,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
   const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
+  const { language } = useI18n();
 
   // Bundle discount only applies while the main product stays in the cart.
   // If the buyer removes the main product, upsells stay in the cart but are
@@ -146,7 +152,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
             <Sparkles className="w-3.5 h-3.5" />
           </span>
           <h3 className="font-bold text-sm leading-tight truncate">
-            Agrega a tu pedido y ahorra
+            {language === "en" ? "Add to your order and save" : "Agrega a tu pedido y ahorra"}
           </h3>
         </div>
         {totalSavings > 0 && <SavingsBadge usd={totalSavings} />}

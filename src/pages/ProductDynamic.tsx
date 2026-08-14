@@ -35,6 +35,7 @@ interface DBProduct {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  local_usd_prices: Record<string, number> | null;
   cover_image_url: string | null;
   gallery_images: string[] | null;
   is_upsell: boolean;
@@ -84,7 +85,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices, local_usd_prices")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;
@@ -120,7 +121,7 @@ const ProductDynamic = () => {
           ? Number(product.price_usd_latam)
           : Number(product.price_usd))
     : 0;
-  const local = useLocalCurrency(effectiveUsd, (product as any)?.local_prices ?? null);
+  const local = useLocalCurrency(effectiveUsd, (product as any)?.local_prices ?? null, (product as any)?.local_usd_prices ?? null);
 
   // Track ViewContent per SKU for every product (existing + new) in /admin/live
   // Se dispara solo una vez al cargar la ficha del producto.

@@ -293,11 +293,17 @@ export const formatPrice = (
   priceInUSD: number,
   currency: Currency,
   overrides?: Partial<Record<Currency, number>> | null,
+  localUsdPrices?: Partial<Record<Currency, number>> | null
 ): string => {
   const override = overrides && overrides[currency];
   const hasOverride = typeof override === "number" && override > 0;
+  
+  // New: use regional USD override if present
+  const regionalUsd = localUsdPrices && localUsdPrices[currency];
+  const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : priceInUSD;
+
   const rate = exchangeRates[currency];
-  const convertedPrice = hasOverride ? (override as number) : priceInUSD * rate;
+  const convertedPrice = hasOverride ? (override as number) : activeUsd * rate;
 
   return formatCurrencyAmount(convertedPrice, currency);
 };

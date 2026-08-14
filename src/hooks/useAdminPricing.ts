@@ -31,6 +31,8 @@ export interface AdminPricing {
   rating: number | null;
   /** Number of reviews from admin. Defaults to 120. */
   reviewCount: number | null;
+  /** Regional USD overrides for specific currencies. */
+  localUsdPrices: Record<string, number> | null;
 }
 
 const INITIAL: AdminPricing = {
@@ -48,6 +50,7 @@ const INITIAL: AdminPricing = {
   missing: false,
   rating: null,
   reviewCount: null,
+  localUsdPrices: null,
 };
 
 /**
@@ -81,11 +84,12 @@ export function useAdminPricing(sku: string): AdminPricing {
         active: boolean | null;
         rating: number | null;
         review_count: number | null;
+        local_usd_prices: Record<string, number> | null;
       } | null = null;
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count")
+          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices")
           .eq("sku", sku)
           .maybeSingle();
         data = result.data as typeof data;
@@ -116,6 +120,7 @@ export function useAdminPricing(sku: string): AdminPricing {
         active: (data as any).active !== false,
         rating: (data as any).rating != null ? Number((data as any).rating) : null,
         reviewCount: (data as any).review_count != null ? Number((data as any).review_count) : null,
+        localUsdPrices: (data as any).local_usd_prices ?? null,
         loaded: true,
         missing: false,
       });

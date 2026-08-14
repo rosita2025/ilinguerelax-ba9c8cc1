@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { User, Mail, CheckCircle2, AlertCircle, MapPin, Globe } from "lucide-react";
+import { User, Mail, CheckCircle2, AlertCircle, MapPin, Globe, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
@@ -164,7 +164,10 @@ export function BuyerInfoForm() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold">{t.yourDetails}</h2>
+          <h2 className="text-base font-bold flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-primary" />
+            {t.yourDetails}
+          </h2>
           <p className="text-xs text-muted-foreground">
             {t.yourDetailsHint}
           </p>

@@ -874,6 +874,7 @@ export type Database = {
           is_upsell: boolean
           learner_language: string
           local_prices: Json
+          local_usd_prices: Json | null
           mp_preference_template: Json | null
           name: string
           price_pen: number | null
@@ -916,6 +917,7 @@ export type Database = {
           is_upsell?: boolean
           learner_language?: string
           local_prices?: Json
+          local_usd_prices?: Json | null
           mp_preference_template?: Json | null
           name: string
           price_pen?: number | null
@@ -958,6 +960,7 @@ export type Database = {
           is_upsell?: boolean
           learner_language?: string
           local_prices?: Json
+          local_usd_prices?: Json | null
           mp_preference_template?: Json | null
           name?: string
           price_pen?: number | null

@@ -91,6 +91,8 @@ export interface PricedItem {
   localPrices?: Record<string, number> | null;
   /** Precio fijo en soles del catálogo (`digital_products.price_pen`). */
   pricePen?: number | null;
+  /** Regional USD overrides (`digital_products.local_usd_prices`). */
+  localUsdPrices?: Record<string, number> | null;
 }
 
 export interface ResolvedPricing {
@@ -162,7 +164,7 @@ export async function resolveServerPricing(opts: {
   const lookups = Array.from(new Set([...skus, ...wanted.map((i) => i.id)]));
   const { data: rows, error } = await supabase
     .from("digital_products")
-    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen")
+    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen, local_usd_prices")
     .or(`sku.in.(${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}),sku_aliases.ov.{${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}}`);
   if (error) throw new PricingError("No se pudo leer el catálogo");
 
@@ -240,6 +242,7 @@ export async function resolveServerPricing(opts: {
       quantity: item.quantity,
       unitUsd: unit,
       localPrices: (row.local_prices ?? null) as Record<string, number> | null,
+      localUsdPrices: (row.local_usd_prices ?? null) as Record<string, number> | null,
       pricePen: Number(row.price_pen) > 0 ? Number(row.price_pen) : null,
     });
   }
@@ -317,9 +320,13 @@ export function localTotalFromPricing(
     const override = code === "PEN" && !(Number(item.localPrices?.PEN) > 0)
       ? item.pricePen ?? undefined
       : item.localPrices?.[code];
+    
+    const regionalUsd = item.localUsdPrices?.[code];
+    const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : item.unitUsd;
+
     const perUnit = typeof override === "number" && override > 0
       ? override
-      : item.unitUsd * rate;
+      : activeUsd * rate;
     subtotal += perUnit * (item.quantity || 1);
   }
   

@@ -31,23 +31,35 @@ export function formatLocalAmount(
   usdAmount: number,
   country: string,
   overrides?: LocalPriceOverrides,
+  localUsdPrices?: LocalPriceOverrides
 ): { formatted: string; isUsd: boolean } {
   const currency = detectCurrency((country || "US").toUpperCase());
   const isUsd = currency === "USD";
-  return { formatted: formatPrice(usdAmount, currency, overrides ?? undefined), isUsd };
+  
+  const regionalUsd = localUsdPrices && localUsdPrices[currency];
+  const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : usdAmount;
+  
+  return { formatted: formatPrice(activeUsd, currency, overrides ?? undefined), isUsd };
 }
 
 /** Convierte un monto USD a la moneda local aproximada del visitante (por IP). */
-export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverrides): LocalPrice {
+export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverrides, localUsdPrices?: LocalPriceOverrides): LocalPrice {
   const { country, loading } = useRegionTier();
   const upper = (country || "").toUpperCase();
   const currency = detectCurrency(upper);
   const override = overrides && overrides[currency];
   const hasOverride = typeof override === "number" && override > 0;
+  
+  // New: Check for regional USD price override
+  const regionalUsdOverride = localUsdPrices && localUsdPrices[currency];
+  const activeUsdAmount = typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
+    ? regionalUsdOverride
+    : usdAmount;
+
   const rate = exchangeRates[currency] ?? 1;
-  const amount = hasOverride ? (override as number) : usdAmount * rate;
+  const amount = hasOverride ? (override as number) : activeUsdAmount * rate;
   const isUsd = currency === "USD";
-  const formatted = formatPrice(usdAmount, currency, overrides ?? undefined);
+  const formatted = formatPrice(activeUsdAmount, currency, overrides ?? undefined);
 
   return {
     country: upper,
@@ -84,12 +96,15 @@ export function useLocalCurrencyForSku(usdAmount: number, skuOrId?: string | nul
  * Returns a resolver `(idOrSku) => overrides` for use inside .map() loops
  * without breaking React hook rules. Backed by LivePricesProvider.
  */
-export function useSkuOverridesResolver(): (idOrSku?: string | null) => LocalPriceOverrides {
+export function useSkuOverridesResolver(): (idOrSku?: string | null) => { local_prices: LocalPriceOverrides; local_usd_prices: LocalPriceOverrides } {
   const { prices } = useLivePrices();
   return (idOrSku?: string | null) => {
     const sku = resolveAdminSku(idOrSku);
-    if (!sku) return null;
-    return (prices[sku]?.local_prices ?? null) as LocalPriceOverrides;
+    if (!sku) return { local_prices: null, local_usd_prices: null };
+    return {
+      local_prices: (prices[sku]?.local_prices ?? null) as LocalPriceOverrides,
+      local_usd_prices: (prices[sku]?.local_usd_prices ?? null) as LocalPriceOverrides,
+    };
   };
 }
 
@@ -111,16 +126,22 @@ export function formatLocalDirect(localAmount: number, country: string): string 
 export function sumItemsLocal(
   items: Array<{ id?: string; sku?: string; usd: number; quantity: number }>,
   country: string,
-  resolver: (idOrSku?: string | null) => LocalPriceOverrides,
-): { amount: number; currency: Currency; isUsd: boolean } {
+  resolver: (idOrSku?: string | null) => { local_prices: LocalPriceOverrides; local_usd_prices: LocalPriceOverrides }
+): { amount: number; currency: Currency; isUsd: boolean; usdReference: number } {
   const currency = detectCurrency((country || "US").toUpperCase());
   const rate = exchangeRates[currency] ?? 1;
   let amount = 0;
+  let usdReference = 0;
   for (const it of items) {
-    const ov = resolver(it.sku ?? it.id);
-    const override = ov && (ov as any)[currency];
-    const perUnit = typeof override === "number" && override > 0 ? override : it.usd * rate;
+    const { local_prices, local_usd_prices } = resolver(it.sku ?? it.id);
+    const override = local_prices && local_prices[currency];
+    const regionalUsd = local_usd_prices && local_usd_prices[currency];
+    
+    const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : it.usd;
+    const perUnit = typeof override === "number" && override > 0 ? override : activeUsd * rate;
+    
     amount += perUnit * (it.quantity || 1);
+    usdReference += activeUsd * (it.quantity || 1);
   }
-  return { amount, currency, isUsd: currency === "USD" };
+  return { amount, currency, isUsd: currency === "USD", usdReference };
 }

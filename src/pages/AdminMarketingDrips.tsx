@@ -120,7 +120,9 @@ export default function AdminMarketingDrips() {
           </Button>
           <Button onClick={loadData} disabled={loading} variant="ghost" size="sm">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span className="sr-only">Actualizar</span>
           </Button>
+          {loading && <span className="text-[10px] text-muted-foreground animate-pulse">Sincronizando...</span>}
         </div>
       </header>
 
@@ -204,8 +206,16 @@ export default function AdminMarketingDrips() {
                       </td>
                     </tr>
                   ))}
-                  {sends.length === 0 && (
-                    <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">No se encontraron registros.</td></tr>
+                  {sends.length === 0 && !loading && (
+                    <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">No se encontraron registros. Prueba a "Procesar Colas" o "Actualizar".</td></tr>
+                  )}
+                  {loading && sends.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-12 text-center">
+                        <RefreshCw className="w-8 h-8 animate-spin mx-auto text-muted-foreground opacity-20" />
+                        <p className="mt-2 text-xs text-muted-foreground">Cargando actividad...</p>
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>

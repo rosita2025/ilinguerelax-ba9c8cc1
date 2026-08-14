@@ -37,8 +37,11 @@ serve(async (req) => {
     const unifiedSends = [
       ...(mSends ?? []).map(s => ({ ...s, category: s.category || 'marketing' })),
       ...(nSends ?? []).map(s => ({ ...s, category: 'newsletter', step_name: `Paso ${s.step}` }))
-    ].sort((a, b) => new Date(b.sent_at || 0).getTime() - new Date(a.sent_at || 0).getTime())
-     .slice(0, limit);
+    ].sort((a, b) => {
+      const timeA = new Date(a.sent_at || a.created_at || 0).getTime();
+      const timeB = new Date(b.sent_at || b.created_at || 0).getTime();
+      return timeB - timeA;
+    }).slice(0, limit);
 
     // 4) Filter sends if search is present
     const filteredSends = s ? unifiedSends.filter(item => 
@@ -49,16 +52,19 @@ serve(async (req) => {
 
     // 5) Stats - Usamos zona horaria de Perú (UTC-5)
     const now = new Date();
-    // Offset para Perú (UTC-5)
-    const peruDate = new Date(now.getTime() - (5 * 60 * 60 * 1000));
-    const today = new Date(peruDate.getFullYear(), peruDate.getMonth(), peruDate.getDate()).toISOString();
-    const { count: mToday } = await admin.from('marketing_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', today);
-    const { count: nToday } = await admin.from('newsletter_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', today);
+    // UTC-5 (Peru)
+    const peruNow = new Date(now.getTime() - (5 * 60 * 60 * 1000));
+    // Start of today in Peru time, expressed as UTC for the DB query
+    const todayStartPeru = new Date(peruNow.getFullYear(), peruNow.getMonth(), peruNow.getDate());
+    const todayIso = new Date(todayStartPeru.getTime() + (5 * 60 * 60 * 1000)).toISOString();
+    
+    const { count: mToday } = await admin.from('marketing_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', todayIso);
+    const { count: nToday } = await admin.from('newsletter_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', todayIso);
     
     // 6) Abandoned Logs
     const { data: abLogs } = await admin.from('brevo_sync_logs')
       .select('*')
-      .in('event_type', ['tienda_abandoned', 'hotmart_abandoned'])
+      .in('event_type', ['tienda_abandoned', 'hotmart_abandoned', 'tienda_purchase', 'hotmart_purchase', 'tienda_pending', 'hotmart_pending', 'hotmart_refused'])
       .order('created_at', { ascending: false })
       .limit(limit);
 

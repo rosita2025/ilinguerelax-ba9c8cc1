@@ -210,13 +210,30 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: false })
         .limit(take);
 
-      for (const r of data ?? []) {
+      // Add Abandoned Checkout detection for Stripe/Global
+      const { data: abandoned } = await admin
+        .from("funnel_events")
+        .select("id, created_at, event_name, event_data, email, product_id, value, currency, country, referrer")
+        .in("event_name", ["InitiateCheckout", "BeginCheckout"])
+        .order("created_at", { ascending: false })
+        .limit(take);
+      
+      const allStripe = [...(data ?? []), ...(abandoned ?? [])];
+      
+      // Filter out InitiateCheckout events if a Purchase exists for the same session/email
+      // (This is a naive filter, but helps reduce noise)
+      const purchaseEmails = new Set((data ?? []).map(p => p.email).filter(Boolean));
+
+      for (const r of allStripe) {
         let d: any = r.event_data ?? {};
         if (Object.keys(d).length === 0 && r.referrer) {
           try { d = JSON.parse(r.referrer); } catch { d = {}; }
         }
         
-        const status = d.status || (r.event_name === "Purchase" ? "approved" : "pending");
+        const isAbandoned = r.event_name === "InitiateCheckout" || r.event_name === "BeginCheckout";
+        if (isAbandoned && r.email && purchaseEmails.has(r.email)) continue;
+
+        const status = d.status || (r.event_name === "Purchase" ? "approved" : isAbandoned ? "abandoned" : "pending");
         let mapped: Mapped = "unknown";
         if (status === "approved" || status === "succeeded") mapped = "approved";
         else if (status === "pending" || status === "processing") mapped = "pending";

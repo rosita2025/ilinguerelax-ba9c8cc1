@@ -332,10 +332,11 @@ export async function resolveServerPricing(opts: {
  *
  * Así el importe cobrado por la pasarela coincide con el que vio el comprador.
  */
-export function localTotalFromPricing(
+export async function localTotalFromPricing(
   pricing: ResolvedPricing,
   currency: string,
-): number | null {
+): Promise<number | null> {
+
   const code = String(currency || "").toUpperCase();
   if (code === "USD") return Number(pricing.totalUsd.toFixed(2));
   const rate = FX_USD_TO_LOCAL[code];
@@ -368,10 +369,11 @@ export function localTotalFromPricing(
   const totalLocal = withCoupon + shippingLocal;
 
   if (!Number.isFinite(totalLocal) || totalLocal <= 0) {
-    return localAmountFromUsd(pricing.totalUsd, code);
+    return await localAmountFromUsd(pricing.totalUsd, code);
   }
   return ZERO_DECIMAL_CURRENCIES.has(code)
     ? Math.round(totalLocal)
     : Number(totalLocal.toFixed(2));
+
 
 }

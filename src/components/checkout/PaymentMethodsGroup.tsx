@@ -349,6 +349,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const local = useLocalCurrency(total); // For overrides and loading state
 
   // Replicating exactly the logic from OrderSummary.tsx
+  // Replicating exactly the logic from OrderSummary.tsx
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     countryCode,
@@ -373,7 +374,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const localTotalLabel = formatLocalDirect(localTotalAmount, countryCode);
 
   const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shipping) : null;
-  const local = useLocalCurrency(total); // Keep for isUsd check
   const isActuallyShowingLocal = !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 

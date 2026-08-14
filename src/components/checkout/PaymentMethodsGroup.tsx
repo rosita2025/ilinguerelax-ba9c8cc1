@@ -2305,6 +2305,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   buyerPhone={buyer.phone || undefined}
                   buyerCountry={(region.country || "").toUpperCase() || undefined}
                   skus={items.map((i) => i.id)}
+                  couponCode={coupon ?? undefined}
                   onApproved={(orderId) => {
                     supabase.from("email_contacts").upsert({
                       email: buyer.email.trim().toLowerCase(),

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin, ShoppingBag, Truck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect } from "@/hooks/useLocalCurrency";
@@ -81,10 +82,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
 
 
   const handleApplyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
     setCouponError(null);
-    const ok = applyCoupon(couponInput);
-    if (!ok) setCouponError(t.invalidCoupon);
-    else setCouponInput("");
+    const ok = applyCoupon(code);
+    if (!ok) {
+      setCouponError(t.invalidCoupon);
+    } else {
+      setCouponInput("");
+      toast.success(language === "en" ? "Coupon applied!" : "¡Cupón aplicado!");
+    }
   };
 
   const itemCount = items.reduce((n, i) => n + (i.quantity || 1), 0);

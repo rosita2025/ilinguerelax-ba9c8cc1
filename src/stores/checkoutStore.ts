@@ -108,6 +108,7 @@ const VALID_COUPONS: Record<string, number> = {
   NEW10: 10,
   PRUEBA20: 20,
   RELAX15: 15,
+  PASCUA25: 25,
 };
 
 /**
@@ -118,6 +119,7 @@ const VALID_COUPONS: Record<string, number> = {
 const FIXED_TOTAL_COUPONS: Record<string, number> = {
   DLTEST1: 1,
   FIXED1: 1,
+  PRUEBA1: 1,
 };
 
 

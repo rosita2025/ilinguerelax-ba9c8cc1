@@ -332,9 +332,16 @@ export default function OrderStatus() {
                     Tu material digital ya está disponible
                   </h2>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Tu libro físico está en camino, pero puedes empezar a estudiar ahora mismo con la versión digital. Busca el correo de entrega para acceder.
-                </p>
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <strong>1. Digital:</strong> Se envió un correo con tus enlaces de descarga.
+                  </p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                    <strong>2. Físico:</strong> En preparación. Te avisaremos cuando se envíe.
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 h-8 gap-1.5">
                     <a href="/mi-descarga">
@@ -344,6 +351,7 @@ export default function OrderStatus() {
                 </div>
               </div>
             )}
+
             <div className="rounded-xl border bg-card p-5 space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -453,7 +461,17 @@ export default function OrderStatus() {
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground mt-0.5">{formatDate(t.createdAt)}</div>
-                        {t.detail && <div className="text-xs text-muted-foreground mt-1">{t.detail}</div>}
+                        {t.detail && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {t.detail}
+                            {t.detail.toLowerCase().includes("amazon") && (
+                              <div className="mt-2 p-2 rounded bg-primary/5 border border-primary/20">
+                                <span className="text-primary font-medium">Seguimiento de Amazon disponible</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {(t.method || t.reference) && (
                           <div className="text-[11px] text-muted-foreground mt-1 flex flex-wrap gap-x-3">
                             {t.method && <span>Método: {methodLabel(t.method)}</span>}

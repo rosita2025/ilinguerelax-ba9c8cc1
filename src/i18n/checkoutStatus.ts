@@ -35,6 +35,10 @@ export interface CheckoutStatusStrings {
   shippingEligibility: string;
   shippingEligibilityDesc: string;
   paymentMethodConfirmed: string;
+  digitalDeliveredFirst: string;
+  physicalInProgress: string;
+  trackingComingSoon: string;
+
 
   // Pending
   paymentPending: string;
@@ -89,6 +93,10 @@ const es: CheckoutStatusStrings = {
   shippingEligibility: "Elegibilidad de envío confirmada",
   shippingEligibilityDesc: "Tu pedido es elegible para envío internacional a Perú, Colombia, México, Argentina y más.",
   paymentMethodConfirmed: "Método de pago confirmado",
+  digitalDeliveredFirst: "Material digital enviado (inmediato)",
+  physicalInProgress: "Envío físico en preparación",
+  trackingComingSoon: "El código de seguimiento se enviará pronto",
+
 
   paymentPending: "Pago pendiente",
   pendingDesc:
@@ -142,6 +150,10 @@ const en: CheckoutStatusStrings = {
   shippingEligibility: "Shipping eligibility confirmed",
   shippingEligibilityDesc: "Your order is eligible for international shipping to Peru, Colombia, Mexico, Argentina, and more.",
   paymentMethodConfirmed: "Payment method confirmed",
+  digitalDeliveredFirst: "Digital material sent (immediate)",
+  physicalInProgress: "Physical shipping in preparation",
+  trackingComingSoon: "Tracking code will be sent soon",
+
 
   paymentPending: "Payment pending",
   pendingDesc:
@@ -195,6 +207,10 @@ const pt: CheckoutStatusStrings = {
   shippingEligibility: "Elegibilidade de envio confirmada",
   shippingEligibilityDesc: "Seu pedido é elegível para envio internacional para Peru, Colômbia, México, Argentina e mais.",
   paymentMethodConfirmed: "Método de pagamento confirmado",
+  digitalDeliveredFirst: "Material digital enviado (imediato)",
+  physicalInProgress: "Envio físico em preparação",
+  trackingComingSoon: "O código de rastreamento será enviado em breve",
+
 
   paymentPending: "Pagamento pendente",
   pendingDesc:
@@ -248,6 +264,10 @@ const fr: CheckoutStatusStrings = {
   shippingEligibility: "Éligibilité à la livraison confirmée",
   shippingEligibilityDesc: "Votre commande est éligible à la livraison internationale vers le Pérou, la Colombie, le Mexique, l'Argentine et plus.",
   paymentMethodConfirmed: "Mode de paiement confirmé",
+  digitalDeliveredFirst: "Matériel numérique envoyé (immédiat)",
+  physicalInProgress: "Envoi physique en préparation",
+  trackingComingSoon: "Le code de suivi sera envoyé bientôt",
+
 
   paymentPending: "Paiement en attente",
   pendingDesc:

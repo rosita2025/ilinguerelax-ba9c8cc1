@@ -335,6 +335,20 @@ export default function CheckoutSuccess() {
               <div>
                 <h2 className="font-semibold text-base">{t.shippingEligibility}</h2>
                 <p className="text-sm text-muted-foreground">{t.shippingEligibilityDesc}</p>
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {t.digitalDeliveredFirst}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-amber-600 font-medium animate-pulse">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                    {t.physicalInProgress}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+                    {t.trackingComingSoon}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -354,6 +368,7 @@ export default function CheckoutSuccess() {
             </div>
           </section>
         )}
+
 
         {/* Digital delivery — download links from admin/products */}
         {(deliveryLoading || delivery.length > 0) && (

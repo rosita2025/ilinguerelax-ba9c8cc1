@@ -24,8 +24,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Accción: Actualizar tracking
+    // Acción: Actualizar tracking
     if (action === "update_tracking" && orderId) {
+      if (!trackingNumber && !shippingProvider) {
+        throw new Error("Tracking number or provider is required");
+      }
+
       const table = source === "manual" ? "manual_payments" : 
                     source === "shopify" ? "shopify_sales" : null;
       
@@ -36,18 +40,23 @@ Deno.serve(async (req) => {
       const { error: updateError } = await admin
         .from(table)
         .update({ 
-          tracking_number: trackingNumber,
-          shipping_provider: shippingProvider 
+          tracking_number: trackingNumber || null,
+          shipping_provider: shippingProvider || null 
         })
         .eq(idField, orderId);
 
       if (updateError) throw updateError;
 
-      // Log event
+      // Log event with more metadata
       await admin.from("order_events").insert({
         order_id: orderId,
         event_type: "tracking_updated",
-        details: { trackingNumber, shippingProvider, source }
+        details: { 
+          trackingNumber, 
+          shippingProvider, 
+          source,
+          updated_at: new Date().toISOString()
+        }
       });
 
       return new Response(JSON.stringify({ ok: true }), {

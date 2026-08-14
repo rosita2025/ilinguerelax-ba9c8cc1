@@ -1706,9 +1706,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   return (
     <div id="payment-methods" ref={methodsAnchorRef} className="space-y-2 scroll-mt-24">
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {isFree ? (language === "en" ? "Free order" : language === "pt" ? "Pedido grátis" : language === "fr" ? "Commande gratuite" : "Pedido gratis") : t.choosePaymentMethod}
-      </h2>
+
 
       {isFree && (
         <div className="rounded-xl border border-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800 p-4 space-y-3">

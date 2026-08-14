@@ -975,9 +975,9 @@ const AdminProductEdit = () => {
 
             <div className="border-t pt-4 mt-2 space-y-3">
               <div>
-                <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (LATAM)</h3>
+                <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (Global)</h3>
                 <p className="text-[11px] text-muted-foreground">
-                  Fija el monto <b>exacto</b> (ej: 199.00). El sistema detecta el país por IP y muestra este valor sin errores de redondeo. Dejar vacío = conversión automática.
+                  Fija el monto <b>exacto</b> (ej: 199.00). El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde USD.
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">

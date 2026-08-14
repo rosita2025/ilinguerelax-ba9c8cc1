@@ -61,7 +61,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   );
 
   const penMode = penTotals !== null && !isGlobalGateway;
-  const showLocalRef = !penMode && !localTotal.loading && !isGlobalGateway;
+  const showLocalRef = !penMode && !localTotal.loading;
   // Local totals honoring per-sku overrides from /admin/products/:sku
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
@@ -126,7 +126,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </span>
             {showLocalRef && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                ≈ {formatCurrencyAmount(grandTotal, "USD")}
+                {localTotal.isUsd ? `≈ ${localTotalLabel}` : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
               </span>
             )}
           </span>

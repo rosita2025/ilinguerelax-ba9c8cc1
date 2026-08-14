@@ -3,6 +3,7 @@
 import type { Language } from "./index";
 
 export interface CheckoutUIStrings {
+  verifiedReviewNotice: string;
   // Header
   securePayment: string;
   stripeSSL: string;
@@ -217,7 +218,7 @@ const es: CheckoutUIStrings = {
 };
 
 const en: CheckoutUIStrings = {
-  securePayment: "Secure payment",
+  verifiedReviewNotice: "Verified reviews: ⭐⭐⭐⭐⭐ 5/5. Exactly fast digital delivery without delays.",
   stripeSSL: "Stripe SSL · Secure payment",
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
@@ -321,7 +322,7 @@ const en: CheckoutUIStrings = {
 };
 
 const pt: CheckoutUIStrings = {
-  securePayment: "Pagamento seguro",
+  verifiedReviewNotice: "Avaliações verificadas: ⭐⭐⭐⭐⭐ 5/5. Entrega digital exatamente rápida e sem atrasos.",
   stripeSSL: "Stripe SSL · Pagamento seguro",
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
@@ -425,7 +426,7 @@ const pt: CheckoutUIStrings = {
 };
 
 const fr: CheckoutUIStrings = {
-  securePayment: "Paiement sécurisé",
+  verifiedReviewNotice: "Avis vérifiés : ⭐⭐⭐⭐⭐ 5/5. Livraison numérique exactement rapide et sans délai.",
   stripeSSL: "Stripe SSL · Paiement sécurisé",
   stripeSslMP: "Stripe SSL · Mercado Pago",
 

@@ -121,11 +121,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex gap-2.5 items-start rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 mb-2">
             <Truck className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
             <p className="text-xs text-muted-foreground leading-snug">
-              <strong className="text-foreground font-semibold">Producto físico.</strong> Se solicita dirección de envío en el formulario de datos.
+              <strong className="text-foreground font-semibold">{t.physical}.</strong> Se solicita dirección de envío en el formulario de datos.
             </p>
           </div>
         ) : (
-          <DigitalProductNotice />
+          <div className="flex gap-2.5 items-start rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5 mb-2">
+            <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-xs text-muted-foreground leading-snug">
+              <strong className="text-foreground font-semibold">{t.digital}.</strong> Recibirás el acceso inmediato por correo tras el pago.
+            </p>
+          </div>
         )}
 
 

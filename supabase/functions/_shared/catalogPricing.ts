@@ -121,6 +121,7 @@ function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?
     const localUsdPrices = (row.local_usd_prices ?? null) as Record<string, number> | null;
     const regionalUsd = localUsdPrices?.[currency.toUpperCase()];
     if (typeof regionalUsd === "number" && regionalUsd > 0) {
+      console.log(`[Pricing] Regional USD override found for ${currency.toUpperCase()}: $${regionalUsd} (SKU: ${row.sku})`);
       return regionalUsd;
     }
   }
@@ -129,7 +130,12 @@ function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?
   const latam = row.price_usd_latam != null ? Number(row.price_usd_latam) : global;
   const tienda = row.price_usd_tienda != null ? Number(row.price_usd_tienda) : latam;
   const value = tier === "tienda" ? tienda : tier === "latam" ? latam : global;
-  return Number.isFinite(value) && value > 0 ? value : global;
+  
+  const finalPrice = Number.isFinite(value) && value > 0 ? value : global;
+  if (currency) {
+    console.log(`[Pricing] No regional USD override for ${currency.toUpperCase()}, using tier ${tier}: $${finalPrice} (SKU: ${row.sku})`);
+  }
+  return finalPrice;
 }
 
 function safeImage(url: unknown): string | undefined {

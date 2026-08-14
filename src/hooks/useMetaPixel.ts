@@ -326,12 +326,14 @@ export const useHotmartPixel = (params: ViewContentParams) => {
     const normalizedParams = { ...params };
     if (normalizedParams.value && normalizedParams.currency && normalizedParams.currency !== "USD") {
       try {
-        normalizedParams.value = convertToUSD(
+        normalizedParams.value = Math.round(convertToUSD(
           Number(normalizedParams.value),
           normalizedParams.currency as Currency
-        );
+        ) * 100) / 100;
         normalizedParams.currency = "USD";
       } catch {}
+    } else if (normalizedParams.value && normalizedParams.currency === "USD") {
+      normalizedParams.value = Math.round(Number(normalizedParams.value) * 100) / 100;
     }
 
     if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {

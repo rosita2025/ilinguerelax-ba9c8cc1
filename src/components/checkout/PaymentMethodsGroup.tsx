@@ -1408,7 +1408,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       sub: isFallingBackToUsd 
         ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : "Pagando en USD por compatibilidad (Transacción internacional).")
         : cardSubtitle, 
-      badge: isFallingBackToUsd ? `USD $${totalUsd}` : priceBadge 
+      badge: isFallingBackToUsd ? `USD $${totalUsd}` : finalPriceLabel 
     },
 
     ...dynamicStripeRows,

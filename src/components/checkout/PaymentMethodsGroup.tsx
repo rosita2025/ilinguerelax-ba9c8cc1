@@ -173,7 +173,7 @@ const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "meth
   stripe_oxxo: {
     icon: Banknote,
     title: "OXXO",
-    sub: "Paga en efectivo en tiendas OXXO dentro del formulario seguro de Stripe.",
+    sub: "Paga en tiendas OXXO (México) dentro del formulario seguro de Stripe.",
     badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
   },
   stripe_boleto: {

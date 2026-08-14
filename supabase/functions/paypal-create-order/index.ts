@@ -1,6 +1,10 @@
 // Create a PayPal order server-side. Returns { id } that the client passes to
 // PayPal Smart Buttons via createOrder.
-const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
+const corsHeaders = { 
+  "Access-Control-Allow-Origin": "*", 
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id", 
+  "Access-Control-Allow-Methods": "POST, OPTIONS" 
+};
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";

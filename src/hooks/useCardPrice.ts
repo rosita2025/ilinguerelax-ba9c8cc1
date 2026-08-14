@@ -53,12 +53,19 @@ async function fetchRows(): Promise<Rows> {
   }
   const map: Rows = {};
   for (const r of data ?? []) {
-    const raw = (r as any).local_prices;
+    const rawLocal = (r as any).local_prices;
     const local_prices =
-      raw && typeof raw === "object" && !Array.isArray(raw)
-        ? (raw as Record<string, number>)
+      rawLocal && typeof rawLocal === "object" && !Array.isArray(rawLocal)
+        ? (rawLocal as Record<string, number>)
         : null;
-    map[r.sku] = { ...r, local_prices };
+        
+    const rawLocalUsd = (r as any).local_usd_prices;
+    const local_usd_prices =
+      rawLocalUsd && typeof rawLocalUsd === "object" && !Array.isArray(rawLocalUsd)
+        ? (rawLocalUsd as Record<string, number>)
+        : null;
+        
+    map[r.sku] = { ...r, local_prices, local_usd_prices };
   }
   cache = map;
   return map;

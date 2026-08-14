@@ -1050,22 +1050,23 @@ const AdminProductEdit = () => {
                       </div>
                       <div className="relative">
                         <Input
-                          type="number" step="any" inputMode="decimal"
+                          type="text" 
+                          inputMode="decimal"
                           className={cn(
                             "h-9 text-xs pr-8",
                             product.local_prices?.[code] ? "border-primary bg-primary/5 font-semibold" : "border-dashed opacity-70"
                           )}
                           value={product.local_prices?.[code] ?? ""}
                           onChange={(e) => {
-                            const v = e.target.value;
+                            const rawValue = e.target.value.replace(/,/g, ".");
                             const next = { ...(product.local_prices || {}) };
-                            if (v === "" || Number(v) <= 0) {
+                            
+                            if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
                               delete next[code];
                             } else {
-                              const amount = Number(v);
+                              const amount = Number(rawValue);
                               const config = currencyConfig[code as Currency];
                               const decimals = config?.decimals ?? 2;
-                              // Round to the correct number of decimals immediately for UI consistency
                               next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
                             }
                             update("local_prices", next);
@@ -1073,14 +1074,17 @@ const AdminProductEdit = () => {
                           placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
                         />
                         {product.local_prices?.[code] && (
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                            <span className="text-[9px] text-muted-foreground font-mono">
+                              {formatCurrencyAmount(product.local_prices[code], code as Currency)}
+                            </span>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-[10px]">Precio fijo manual (Override)</p>
+                                  <p className="text-[10px]">Precio fijo manual (Muestra: {formatCurrencyAmount(product.local_prices[code], code as Currency)})</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -1095,26 +1099,27 @@ const AdminProductEdit = () => {
                               : "Auto"}
                           </p>
                           <p className="text-[9px] text-muted-foreground/70 italic">
-                            Ref: ${currentUsdValue} USD
+                            Ref: ${currentUsdValue.toFixed(2)} USD
                           </p>
                         </div>
                         
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Region:</span>
                           <Input
-                            type="number" step="any"
+                            type="text"
+                            inputMode="decimal"
                             className={cn(
                               "h-5 text-[9px] px-1 py-0 w-16",
                               product.local_usd_prices?.[code] ? "border-primary/40 bg-primary/5" : "border-muted/50"
                             )}
                             value={product.local_usd_prices?.[code] ?? ""}
                             onChange={(e) => {
-                              const v = e.target.value;
+                              const rawValue = e.target.value.replace(/,/g, ".");
                               const next = { ...(product.local_usd_prices || {}) };
-                              if (v === "" || Number(v) <= 0) {
+                              if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
                                 delete next[code];
                               } else {
-                                next[code] = Math.round(Number(v) * 100) / 100;
+                                next[code] = Math.round(Number(rawValue) * 100) / 100;
                               }
                               update("local_usd_prices", next);
                             }}

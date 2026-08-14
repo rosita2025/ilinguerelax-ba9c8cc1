@@ -305,9 +305,14 @@ Deno.serve(async (req) => {
       manual?.status === "verified" ||
       shopify?.status === "paid";
 
-    const stage: "pending" | "paid" | "shipped" | "delivered" = 
+    const isShipped = Boolean(manual?.tracking_number || shopify?.tracking_number);
+    const orderCreatedAt = manual?.created_at || shopify?.created_at;
+    const isPrep = orderCreatedAt && (Date.now() - new Date(orderCreatedAt).getTime() > 1000 * 60 * 60 * 12); // Show prep after 12h if not shipped
+
+    const stage: "pending" | "paid" | "prep" | "shipped" | "delivered" = 
       delivered ? "delivered" : 
-      (manual?.tracking_number || shopify?.tracking_number) ? "shipped" :
+      isShipped ? "shipped" :
+      (paid && isPrep) ? "prep" :
       paid ? "paid" : "pending";
 
     const rejected = !paid && (

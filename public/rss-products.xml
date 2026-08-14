@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Thu, 13 Aug 2026 23:51:51 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 14 Aug 2026 18:17:53 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</title>
+      <link>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</guid>
+      <pubDate>Fri, 14 Aug 2026 18:17:53 GMT</pubDate>
+      <description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</description>
+      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" type="image/jpeg" length="0" />
+      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" medium="image" />
+      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" />
+    </item>
     <item>
       <title>Inglés Relax - 8,000 Palabras Libro</title>
       <link>https://ilinguerelax.com/products/8-000-palabras-libro-fisico</link>
@@ -66,16 +76,6 @@
       <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
       <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
       <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
-    </item>
-    <item>
-      <title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</title>
-      <link>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</guid>
-      <pubDate>Mon, 10 Aug 2026 22:25:23 GMT</pubDate>
-      <description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</description>
-      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" type="image/jpeg" length="0" />
-      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" medium="image" />
-      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" />
     </item>
     <item>
       <title>1,000 palabras ingles más utilizadas en Ingeniería Civil</title>

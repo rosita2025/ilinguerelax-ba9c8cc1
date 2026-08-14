@@ -140,6 +140,9 @@ export function useCardPrice(): CardPriceFormatter {
   /** USD price for the visitor's tier, from admin data when available. */
   const tierUsd = useCallback(
     (row: Row | undefined, fallbackUsd: number): number => {
+      const regionalUsd = row?.local_usd_prices?.[displayCurrency];
+      if (typeof regionalUsd === "number" && regionalUsd > 0) return regionalUsd;
+
       if (isTiendaUsd) {
         return Number(row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
       }
@@ -148,7 +151,7 @@ export function useCardPrice(): CardPriceFormatter {
       }
       return Number(row?.price_usd ?? fallbackUsd);
     },
-    [isTiendaUsd, isLatamHotmart],
+    [isTiendaUsd, isLatamHotmart, displayCurrency],
   );
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {

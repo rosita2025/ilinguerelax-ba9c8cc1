@@ -346,6 +346,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const penTotals = calcTotalsPen(items, couponPercent, countryCode);
   const overridesFor = useSkuOverridesResolver();
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
+  const local = useLocalCurrency(total); // For overrides and loading state
 
   // Replicating exactly the logic from OrderSummary.tsx
   const localItemsSum = sumItemsLocal(

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, AlertTriangle, RefreshCw, Copy, Check, Info } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeWithRetry as invokeEdge } from "@/lib/invokeWithRetry";
 
 declare global {
   interface Window {
@@ -23,7 +23,11 @@ let loadedClientId: string | null = null;
 let loadedCurrency: string | null = null;
 
 async function loadPayPalSdk(currency: string): Promise<void> {
-  const { data, error } = await supabase.functions.invoke("paypal-config", { method: "GET" });
+  const { data, error } = await invokeEdge<{ clientId?: string }>(
+    "paypal-config",
+    { method: "GET" },
+    { attempts: 3 },
+  );
   if (error || !data?.clientId) throw new Error("PayPal no está configurado");
   const clientId = data.clientId as string;
   if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
@@ -120,11 +124,11 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
     let lastErr: unknown = null;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
-        const { data, error } = await supabase.functions.invoke(fnName, {
+        const { data, error } = await invokeEdge<T>(fnName, {
           body: { ...body, correlationId },
           headers: { "x-correlation-id": correlationId },
-        });
-        if (error) throw new Error(error.message || `Error en ${fnName}`);
+        }, { attempts: 2 });
+        if (error) throw new Error((error as Error)?.message || `Error en ${fnName}`);
         console.info(`[paypal] ${fnName} ok`, { correlationId, attempt });
         return data as T;
       } catch (e) {

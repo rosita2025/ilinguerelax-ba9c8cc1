@@ -19,7 +19,7 @@ const BodySchema = z.object({
   items: z.array(ItemSchema).min(1).max(20),
   couponPercent: z.number().min(0).max(100).optional(),
   country: z.string().length(2).optional(),
-  couponCode: z.string().max(20).optional(),
+  couponCode: z.string().max(30).optional(),
   payerEmail: z.string().email().optional(),
   payerName: z.string().max(120).optional(),
   payerPhone: z.string().max(30).optional(),

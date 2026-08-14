@@ -24,7 +24,7 @@ const BodySchema = z.object({
   orderId: z.string().min(1).max(80).optional(),
   items: z.array(ItemSchema).min(1).max(20),
   couponPercent: z.number().min(0).max(100).optional(),
-  couponCode: z.string().max(20).optional(),
+  couponCode: z.string().max(30).optional(),
   payerEmail: z.string().email(),
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),

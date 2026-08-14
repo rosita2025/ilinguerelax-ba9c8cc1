@@ -81,10 +81,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
 
 
   const handleApplyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
     setCouponError(null);
-    const ok = applyCoupon(couponInput);
-    if (!ok) setCouponError(t.invalidCoupon);
-    else setCouponInput("");
+    const ok = applyCoupon(code);
+    if (!ok) {
+      setCouponError(t.invalidCoupon);
+    } else {
+      setCouponInput("");
+      toast.success(language === "en" ? "Coupon applied!" : "¡Cupón aplicado!");
+    }
   };
 
   const itemCount = items.reduce((n, i) => n + (i.quantity || 1), 0);

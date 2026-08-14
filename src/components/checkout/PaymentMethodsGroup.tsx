@@ -157,7 +157,7 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 type MethodBadge = { label: string; bg: string; color: string };
 type PaymentMethodRow = { id: Method; methodKey?: string; icon: typeof CreditCard; title: string; sub: string; badge?: string; badges?: MethodBadge[] };
 
-const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> = {
+const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
   stripe_apple_pay: {
     icon: Smartphone,
     title: "Apple Pay",
@@ -320,7 +320,7 @@ const STRIPE_VISIBLE_METHODS: Record<string, Omit<PaymentMethodRow, "id" | "meth
     sub: language === "en" ? "Payment at convenience stores in Japan inside Stripe." : "Pago en tiendas de conveniencia de Japón dentro de Stripe.",
     badges: [{ label: "Konbini", bg: "#D32F2F", color: "#ffffff" }],
   },
-};
+});
 
 export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();

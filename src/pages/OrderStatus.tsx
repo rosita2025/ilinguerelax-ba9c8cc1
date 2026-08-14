@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
 import { Helmet } from "react-helmet-async";
 import {
   Clock,
@@ -186,6 +187,7 @@ function formatDate(value?: string | null) {
 export default function OrderStatus() {
   const [sp] = useSearchParams();
   const token = (sp.get("t") ?? "").trim();
+  const { language } = useI18n();
   const [orderNumber, setOrderNumber] = useState(sp.get("order") ?? "");
   const [email, setEmail] = useState(sp.get("email") ?? "");
   const [loading, setLoading] = useState(false);

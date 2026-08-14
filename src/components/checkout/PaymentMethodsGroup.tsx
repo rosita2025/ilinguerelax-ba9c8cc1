@@ -825,8 +825,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     const isAsia = ["CN", "JP", "KR", "IN", "SG", "MY", "TH", "VN", "PH", "ID"].includes(countryCode);
     if (hasPhysicalItems && isAsia) {
       toast({
-        title: language === "en" ? "Not available" : "No disponible",
-        description: t.shippingNoticeAsia,
+        title: language === "en" ? "Shipping Unavailable" : "Envío no disponible",
+        description: `${t.shippingNoticeAsia} ${t.digitalAlternativeSuggest}`,
         variant: "destructive",
       });
       return;

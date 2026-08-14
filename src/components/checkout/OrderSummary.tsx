@@ -139,7 +139,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="text-[10px] space-y-1 pl-6 opacity-90 italic">
               {isLatam && <p className="text-destructive">{t.shippingNoticeLatam}</p>}
               {isNorthAmericaEurope && <p className="text-destructive">{t.shippingNoticeGlobal}</p>}
-              {isAsia && <p className="text-destructive font-bold uppercase">{t.shippingNoticeAsia}</p>}
+              {isAsia && (
+                <div className="space-y-1">
+                  <p className="text-destructive font-bold uppercase">{t.shippingNoticeAsia}</p>
+                  <p className="text-destructive font-semibold text-[11px]">{t.digitalAlternativeSuggest}</p>
+                </div>
+              )}
               {!isLatam && !isNorthAmericaEurope && !isAsia && (
                 <p className="text-destructive">{t.shippingNoticeGlobal}</p>
               )}

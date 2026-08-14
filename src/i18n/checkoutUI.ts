@@ -33,6 +33,7 @@ export interface CheckoutUIStrings {
   shippingNoticeGlobal: string;
   shippingNoticeAsia: string;
   freeDigitalDelivery: string;
+  digitalAlternativeSuggest: string;
   standardShipping: string;
   freeShipping: string;
   digital: string;
@@ -138,6 +139,7 @@ const es: CheckoutUIStrings = {
   shippingNoticeGlobal: "Envío USA/CAN/UK: 3-5 días. Preparación: 5-7 días.",
   shippingNoticeAsia: "Asia: No disponible actualmente (próximamente).",
   freeDigitalDelivery: "Gratis (Entrega Digital)",
+  digitalAlternativeSuggest: "Considera comprar la versión digital disponible para todo el mundo.",
   standardShipping: "Envío Estándar",
   freeShipping: "Envío Gratis",
   digital: "Digital",
@@ -239,6 +241,7 @@ const en: CheckoutUIStrings = {
   shippingNoticeGlobal: "USA/CAN/UK Shipping: 3-5 days. Handling: 5-7 days.",
   shippingNoticeAsia: "Asia: Not available at the moment (coming soon).",
   freeDigitalDelivery: "Free (Digital Delivery)",
+  digitalAlternativeSuggest: "Consider purchasing the digital version available worldwide.",
   standardShipping: "Standard Shipping",
   freeShipping: "Free Shipping",
   digital: "Digital",
@@ -441,6 +444,7 @@ const fr: CheckoutUIStrings = {
   shippingNoticeGlobal: "Livraison USA/CAN/UK : 3-5 jours. Préparation : 5-7 jours.",
   shippingNoticeAsia: "Asie : Non disponible pour le moment (bientôt disponible).",
   freeDigitalDelivery: "Gratuit (Livraison numérique)",
+  digitalAlternativeSuggest: "Pensez à acheter la version numérique disponible dans le monde entier.",
   standardShipping: "Livraison standard",
   freeShipping: "Livraison gratuite",
   digital: "Numérique",

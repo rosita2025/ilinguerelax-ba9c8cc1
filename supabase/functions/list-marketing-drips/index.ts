@@ -52,11 +52,14 @@ serve(async (req) => {
 
     // 5) Stats - Usamos zona horaria de Perú (UTC-5)
     const now = new Date();
-    // Offset para Perú (UTC-5)
-    const peruDate = new Date(now.getTime() - (5 * 60 * 60 * 1000));
-    const today = new Date(peruDate.getFullYear(), peruDate.getMonth(), peruDate.getDate()).toISOString();
-    const { count: mToday } = await admin.from('marketing_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', today);
-    const { count: nToday } = await admin.from('newsletter_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', today);
+    // UTC-5 (Peru)
+    const peruNow = new Date(now.getTime() - (5 * 60 * 60 * 1000));
+    // Start of today in Peru time, expressed as UTC for the DB query
+    const todayStartPeru = new Date(peruNow.getFullYear(), peruNow.getMonth(), peruNow.getDate());
+    const todayIso = new Date(todayStartPeru.getTime() + (5 * 60 * 60 * 1000)).toISOString();
+    
+    const { count: mToday } = await admin.from('marketing_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', todayIso);
+    const { count: nToday } = await admin.from('newsletter_drip_sends').select('*', { count: 'exact', head: true }).gte('sent_at', todayIso);
     
     // 6) Abandoned Logs
     const { data: abLogs } = await admin.from('brevo_sync_logs')

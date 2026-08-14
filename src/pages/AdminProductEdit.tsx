@@ -940,7 +940,7 @@ const AdminProductEdit = () => {
             <div className="space-y-3">
               <div>
                 <p className="text-[11px] text-muted-foreground bg-primary/5 p-2 rounded border border-primary/10">
-                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base USD</b>.
+                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base USD</b> (Ref: Tasa actual). El usuario prefiere precios bajos en LATAM y altos en USA/EUR.
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -969,7 +969,7 @@ const AdminProductEdit = () => {
                   // Asia
                   { code: "JPY", flag: "🇯🇵", label: "Japón" },
                 ].map(({ code, flag, label }) => {
-                  const baseUsdRef = product.price_usd ?? 0;
+                  const baseUsdRef = Number(product.price_usd) || 0;
                   
                   const regionPrice = (() => {
                     if (baseUsdRef <= 0) return null;
@@ -978,7 +978,7 @@ const AdminProductEdit = () => {
                     if (!rate) return null;
 
                     const raw = baseUsdRef * rate;
-                    
+                    // El usuario prefiere precios más bajos en LATAM y más altos en USA/Europa
                     // Lógica de redondeo "bonito" según la moneda
                     if (code === "COP") return Math.round(raw / 100) * 100;
                     if (code === "CLP" || code === "PYG") return Math.round(raw / 10) * 10;
@@ -1009,7 +1009,7 @@ const AdminProductEdit = () => {
                       </div>
                       <div className="relative">
                         <Input
-                          type="number" step="1" inputMode="decimal"
+                          type="number" step="any" inputMode="decimal"
                           className={cn(
                             "h-9 text-xs pr-8",
                             product.local_prices?.[code] ? "border-primary bg-primary/5 font-semibold" : "border-dashed opacity-70"

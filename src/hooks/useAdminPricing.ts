@@ -50,6 +50,7 @@ const INITIAL: AdminPricing = {
   missing: false,
   rating: null,
   reviewCount: null,
+  localUsdPrices: null,
 };
 
 /**

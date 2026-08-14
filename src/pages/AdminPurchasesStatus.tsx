@@ -37,6 +37,7 @@ const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; 
   paypal:      { label: "PayPal",        icon: CreditCard,  color: "bg-blue-100 text-blue-800" },
   manual:      { label: "Yape / Plin",   icon: Banknote,    color: "bg-emerald-100 text-emerald-800" },
   hotmart:     { label: "Hotmart",       icon: ShoppingBag, color: "bg-orange-100 text-orange-800" },
+  shopify:     { label: "Shopify / Físico", icon: Box,      color: "bg-teal-100 text-teal-800" },
 };
 
 const STATUS_META: Record<Mapped, { label: string; className: string; icon: typeof CheckCircle2 }> = {
@@ -47,6 +48,7 @@ const STATUS_META: Record<Mapped, { label: string; className: string; icon: type
   refunded:   { label: "Reembolsado",  className: "bg-purple-100 text-purple-800", icon: AlertOctagon },
   chargeback: { label: "Chargeback",   className: "bg-fuchsia-100 text-fuchsia-800", icon: AlertOctagon },
   cancelled:  { label: "Cancelado",    className: "bg-gray-100 text-gray-800",     icon: XCircle },
+  abandoned:  { label: "Abandonado",   className: "bg-orange-100 text-orange-800", icon: UserMinus },
   unknown:    { label: "Desconocido",  className: "bg-muted text-foreground",       icon: Clock },
 };
 

@@ -239,7 +239,9 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
                     added ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  {added ? "✓ Añadido · toca para quitar" : "Toca para agregar"}
+                  {added 
+                    ? (language === "en" ? "✓ Added · tap to remove" : "✓ Añadido · toca para quitar")
+                    : (language === "en" ? "Tap to add" : "Toca para agregar")}
                 </p>
               </div>
 

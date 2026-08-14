@@ -28,10 +28,10 @@ export function isBuyerValid(buyer: {
   if (!hasPhysicalItems) return basicOk;
   return (
     basicOk &&
-    (buyer.address || "").trim().length > 5 &&
-    (buyer.city || "").trim().length > 2 &&
-    (buyer.zip || "").trim().length > 3 &&
-    (buyer.country || "").trim().length > 1
+    (buyer.address || "").trim().length >= 8 &&
+    (buyer.city || "").trim().length >= 3 &&
+    (buyer.zip || "").trim().length >= 4 &&
+    (buyer.country || "").trim().length >= 1
   );
 }
 
@@ -121,9 +121,9 @@ export function BuyerInfoForm() {
   const emailCheck = checkEmail(buyer.email);
   const emailInvalid = !emailCheck.ok;
   
-  const addressInvalid = hasPhysicalItems && (buyer.address || "").trim().length < 5;
-  const cityInvalid = hasPhysicalItems && (buyer.city || "").trim().length < 2;
-  const zipInvalid = hasPhysicalItems && (buyer.zip || "").trim().length < 3;
+  const addressInvalid = hasPhysicalItems && (buyer.address || "").trim().length < 8;
+  const cityInvalid = hasPhysicalItems && (buyer.city || "").trim().length < 3;
+  const zipInvalid = hasPhysicalItems && (buyer.zip || "").trim().length < 4;
   const countryInvalid = hasPhysicalItems && !(buyer.country || "").trim();
 
   useEffect(() => {

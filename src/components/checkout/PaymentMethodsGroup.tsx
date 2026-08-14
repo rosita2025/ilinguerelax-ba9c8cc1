@@ -1957,14 +1957,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  <Lock className="w-3.5 h-3.5" /> Securely processed by Stripe
+                  <Lock className="w-3.5 h-3.5" /> {language === "en" ? "Securely processed by Stripe" : t.processedBy}
                 </div>
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (
                     <Alert className="mb-4 bg-teal-50 border-teal-200 dark:bg-teal-950/30 dark:border-teal-900/50">
                       <AlertCircle className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                       <AlertTitle className="text-teal-800 dark:text-teal-300 font-semibold">
-                        Pago optimizado para {countryCode}
+                        {language === "en" ? `Optimized payment for ${countryCode}` : `Pago optimizado para ${countryCode}`}
                       </AlertTitle>
                       <AlertDescription className="text-teal-700 dark:text-teal-400 text-sm">
                         {language === "en" 

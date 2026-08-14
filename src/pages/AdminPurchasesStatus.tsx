@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner";
 
 type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
-type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
+type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {
   id: string;

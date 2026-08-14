@@ -85,14 +85,14 @@ Deno.serve(async (req) => {
     });
     const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
 
-    const localCurrency = body.currency || "USD";
+    const localCurrency = (body.currency || "USD").toUpperCase();
     const localAmount = localTotalFromPricing(pricing, localCurrency);
     const restricted = isRestrictedCurrency(body.country);
 
-    // Priorizamos moneda local si está disponible y NO es un país restringido.
-    // Si falla, los intentos posteriores (buildAttempts) probarán USD.
+    // Prioritize local currency if supported, NOT restricted, and we have a valid amount.
     const startCurrency = (!restricted && localAmount && localAmount > 0) ? localCurrency : "USD";
     const startAmount = startCurrency === "USD" ? calculatedUsd : localAmount!;
+
 
 
     const EXPIRATION_DAYS = 3;

@@ -22,6 +22,8 @@ import ProductLaunchPanel from "@/components/admin/ProductLaunchPanel";
 import GoogleDrivePreview from "@/components/admin/GoogleDrivePreview";
 import { normalizeDriveUrl } from "@/lib/googleDrive";
 import { exchangeRates, type Currency } from "@/i18n";
+import { cn } from "@/lib/utils";
+
 
 
 
@@ -1029,18 +1031,43 @@ const AdminProductEdit = () => {
                           </button>
                         )}
                       </div>
-                      <Input
-                        type="number" step="1" inputMode="decimal"
-                        value={product.local_prices?.[code] ?? ""}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          const next = { ...(product.local_prices || {}) };
-                          if (v === "" || Number(v) <= 0) delete next[code];
-                          else next[code] = Number(v);
-                          update("local_prices", next);
-                        }}
-                        placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
-                      />
+                      <div className="relative">
+                        <Input
+                          type="number" step="1" inputMode="decimal"
+                          className={cn(
+                            "h-9 text-xs pr-8",
+                            product.local_prices?.[code] ? "border-primary bg-primary/5 font-semibold" : "border-dashed opacity-70"
+                          )}
+                          value={product.local_prices?.[code] ?? ""}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            const next = { ...(product.local_prices || {}) };
+                            if (v === "" || Number(v) <= 0) delete next[code];
+                            else next[code] = Number(v);
+                            update("local_prices", next);
+                          }}
+                          placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
+                        />
+                        {product.local_prices?.[code] && (
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-[10px]">Precio fijo manual (Override)</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[9px] text-muted-foreground mt-1 px-0.5">
+                        {product.local_prices?.[code] 
+                          ? "✓ Precio fijo manual activo" 
+                          : "Auto: Conversión dinámica desde USD"}
+                      </p>
                     </div>
                   );
                 })}

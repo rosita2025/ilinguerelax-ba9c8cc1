@@ -187,16 +187,14 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
 };
 
 // Exchange rates from USD (updated August 2026 — exact)
-export const exchangeRates: Record<Currency, number> = {
+// These are fallback values. Use useLivePrices() or fetch from DB when possible.
+export let exchangeRates: Record<Currency, number> = {
   USD: 1,
   EUR: 0.90,
   BRL: 5.50,
   MXN: 20.5, 
   COP: 4500,
   ARS: 1000, 
-
-
-
   GBP: 0.78,
   CAD: 1.35,
   AUD: 1.50,
@@ -236,6 +234,15 @@ export const exchangeRates: Record<Currency, number> = {
   UGX: 3700,
   MAD: 10,
 };
+
+/**
+ * Updates the global exchange rates map with live data from the database.
+ * Used by LivePricesProvider to ensure frontend matches backend.
+ */
+export const updateExchangeRates = (newRates: Partial<Record<Currency, number>>) => {
+  exchangeRates = { ...exchangeRates, ...newRates };
+};
+
 
 // Detect currency from country
 export const detectCurrency = (countryCode: string): Currency => {

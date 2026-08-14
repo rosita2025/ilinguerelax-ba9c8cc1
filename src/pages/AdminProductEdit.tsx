@@ -57,6 +57,7 @@ interface Product {
   hotmart_excluded_countries: string[];
   sku_aliases: string[];
   local_prices: Record<string, number>;
+  local_usd_prices: Record<string, number>;
   is_physical: boolean;
   gallery_metadata: Record<string, any>;
   rating?: number | null;

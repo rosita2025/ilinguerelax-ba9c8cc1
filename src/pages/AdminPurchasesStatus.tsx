@@ -155,6 +155,7 @@ const AdminPurchasesStatus = () => {
     { label: "Bloqueados",  value: summary.blocked    ?? 0, className: STATUS_META.blocked.className },
     { label: "Reembolsos",  value: summary.refunded   ?? 0, className: STATUS_META.refunded.className },
     { label: "Chargebacks", value: summary.chargeback ?? 0, className: STATUS_META.chargeback.className },
+    { label: "Cancelados / Exp", value: summary.cancelled ?? 0, className: STATUS_META.cancelled.className },
   ]), [summary]);
 
   return (

@@ -23,7 +23,7 @@ let loadedClientId: string | null = null;
 let loadedCurrency: string | null = null;
 
 async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
-  const correlationId = `sdk-${Date.now()}`;
+  const sdkCorrId = `sdk-${Date.now()}`;
   
   // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
   document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
@@ -31,7 +31,6 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
   });
   window.paypal = undefined;
   sdkPromise = null;
-  const correlationId = `sdk-${Date.now()}`;
   
   let lastError: Error | null = null;
   
@@ -41,7 +40,7 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
         "paypal-config",
         { 
           method: "GET",
-          headers: { "x-correlation-id": correlationId }
+          headers: { "x-correlation-id": sdkCorrId }
         },
         { attempts: 2 },
       );

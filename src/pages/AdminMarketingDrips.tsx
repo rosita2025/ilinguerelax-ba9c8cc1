@@ -144,10 +144,14 @@ export default function AdminMarketingDrips() {
       </header>
 
       {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
           <Card className="p-3">
             <div className="text-[10px] uppercase text-muted-foreground">Envíos Hoy</div>
             <div className="text-xl font-bold text-primary">{stats.sentToday}</div>
+          </Card>
+          <Card className="p-3 border-emerald-100 bg-emerald-50/20">
+            <div className="text-[10px] uppercase text-muted-foreground">Newsletter Hoy</div>
+            <div className="text-xl font-bold text-emerald-600">{stats.newsletterToday || 0}</div>
           </Card>
           <Card className="p-3">
             <div className="text-[10px] uppercase text-muted-foreground">Estado Cron</div>
@@ -159,7 +163,7 @@ export default function AdminMarketingDrips() {
             <div className="text-[10px] uppercase text-muted-foreground">Configuraciones</div>
             <div className="text-xl font-bold">{configs.length} pasos</div>
           </Card>
-          <Card className="p-3">
+          <Card className="p-3 hidden lg:block">
             <div className="text-[10px] uppercase text-muted-foreground">Ult. Actividad</div>
             <div className="text-[10px] font-mono mt-1 truncate">{sends[0] ? new Date(sends[0].sent_at).toLocaleTimeString() : '—'}</div>
           </Card>

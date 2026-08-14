@@ -177,29 +177,37 @@ Deno.serve(async (req) => {
     if (!provider || provider === "stripe") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_type, event_data, email, product_id, value, currency")
-        .contains("event_data", { provider: "stripe" } as any)
+        .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
+        .or("event_data->>provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%")
         .order("created_at", { ascending: false })
         .limit(take);
 
       for (const r of data ?? []) {
-        const d: any = r.event_data ?? {};
-        // Stripe usually records status in metadata/event_data during our webhook
-        const status = d.status || "approved"; 
+        let d: any = r.event_data ?? {};
+        if (Object.keys(d).length === 0 && r.referrer) {
+          try { d = JSON.parse(r.referrer); } catch { d = {}; }
+        }
         
+        const status = d.status || (r.event_name === "Purchase" ? "approved" : "pending");
+        let mapped: Mapped = "unknown";
+        if (status === "approved" || status === "succeeded") mapped = "approved";
+        else if (status === "pending" || status === "processing") mapped = "pending";
+        else if (status === "failed" || status === "requires_payment_method") mapped = "refused";
+        else if (status === "canceled") mapped = "cancelled";
+
         rows.push({
           id: `st-${r.id}`, 
           provider: "stripe", 
           received_at: r.created_at,
-          email: r.email || d.customer_email || null,
+          email: r.email || d.customer_email || d.email || null,
           amount: r.value || d.amount || null,
           currency: r.currency || d.currency || null,
-          product: r.product_id || d.items_summary || null,
-          transaction: d.payment_intent_id || d.session_id || null,
+          product: r.product_id || d.items_summary || d.product_name || null,
+          transaction: d.payment_intent_id || d.session_id || d.id || null,
           raw_status: status,
-          mapped_status: status === "approved" ? "approved" : "unknown",
-          failure_reason: d.failure_message || null,
-          failed_step: null,
+          mapped_status: mapped,
+          failure_reason: d.failure_message || d.last_payment_error?.message || null,
+          failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Stripe)" : null,
           payload: d,
         });
       }

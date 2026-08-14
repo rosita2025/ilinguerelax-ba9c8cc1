@@ -325,6 +325,36 @@ export default function CheckoutSuccess() {
           </ul>
         </section>
 
+        {/* Physical items: show shipping eligibility and confirmed payment method */}
+        {items.some(i => i.isPhysical) && (
+          <section className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4">
+            <div className="flex items-center gap-3 text-left">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <ShoppingBag className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-base">{t.shippingEligibility}</h2>
+                <p className="text-sm text-muted-foreground">{t.shippingEligibilityDesc}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-t pt-4 text-left">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-base">{t.paymentMethodConfirmed}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {provider === "stripe" ? "Tarjeta / Stripe" : 
+                   provider === "paypal" ? "PayPal" : 
+                   provider === "mercadopago" ? "Mercado Pago" : 
+                   provider === "dlocalgo" ? "dLocal Go" : "Método seleccionado"}
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Digital delivery — download links from admin/products */}
         {(deliveryLoading || delivery.length > 0) && (
           <section className="rounded-xl border-2 border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5 p-5 space-y-4">

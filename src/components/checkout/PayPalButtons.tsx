@@ -23,7 +23,14 @@ let loadedClientId: string | null = null;
 let loadedCurrency: string | null = null;
 
 async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
-  const correlationId = `sdk-${Date.now()}`;
+  const sdkCorrId = `sdk-${Date.now()}`;
+  
+  // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
+  document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
+    try { s.parentNode?.removeChild(s); } catch { s.remove(); }
+  });
+  window.paypal = undefined;
+  sdkPromise = null;
   
   let lastError: Error | null = null;
   
@@ -33,7 +40,7 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
         "paypal-config",
         { 
           method: "GET",
-          headers: { "x-correlation-id": correlationId }
+          headers: { "x-correlation-id": sdkCorrId }
         },
         { attempts: 2 },
       );
@@ -86,6 +93,7 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
     }
   }
   
+  console.error("[paypal] loadPayPalSdk failed all attempts", lastError);
   throw lastError || new Error("PayPal no disponible");
 }
 
@@ -140,7 +148,7 @@ function friendlyMessage(phase: Phase, raw: string): string {
   return raw || "Ocurrió un error con PayPal.";
 }
 
-export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError, couponCode }: Props & { couponCode?: string }) {
+export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError, couponCode, items = [] }: Props & { couponCode?: string; items?: any[] }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<ErrState | null>(null);
@@ -219,7 +227,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
             try {
               const data = await invokeWithRetry<{ id: string }>(
                 "paypal-create-order",
-                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, couponCode, country: buyerCountry },
+                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, couponCode, country: buyerCountry, items },
                 "create",
               );
               if (!data?.id) throw new Error("No se pudo crear la orden");

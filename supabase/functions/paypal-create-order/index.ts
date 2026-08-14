@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Expose-Headers": "x-correlation-id, x-trace-id"
 };
-import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
+import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
@@ -60,22 +60,13 @@ Deno.serve(async (req) => {
     let finalAmount = amountReq;
     let finalCurrency = currencyReq;
 
+    let pricing;
     try {
-      const pricing = await resolveServerPricing({
+      pricing = await resolveServerPricing({
         items: bodyItems,
         country: country,
         couponCode: couponCode
       });
-      finalAmount = pricing.totalUsd;
-      finalCurrency = "USD"; // PayPal checkout usually USD for us
-      
-      // If client asked for supported currency, we can use it, but resolveServerPricing 
-      // is the authority on the total value.
-      if (PAYPAL_SUPPORTED.has(currencyReq)) {
-        finalCurrency = currencyReq;
-        // Re-calculate local total if needed, or stick to USD for simplicity in PayPal.
-        // For now, enforcing the catalog total USD.
-      }
     } catch (e) {
       if (e instanceof PricingError) {
         return new Response(JSON.stringify({ error: e.message, trace: traceId }), {
@@ -84,17 +75,37 @@ Deno.serve(async (req) => {
       }
       throw e;
     }
+    
+    const pricedItems = pricing.items;
+    finalAmount = pricing.totalUsd;
+    finalCurrency = "USD";
 
     let currency = finalCurrency;
     let amount = finalAmount;
     let fallbackApplied = false;
     let fallbackReason: string | null = null;
 
+    // Si resolveServerPricing devolvió USD pero el cliente pidió una moneda soportada por PayPal, 
+    // intentamos usar la moneda local para que el checkout sea más amigable.
+    if (finalCurrency === "USD" && PAYPAL_SUPPORTED.has(currencyReq)) {
+      const localTotal = localTotalFromPricing({
+        items: pricedItems, // pricedItems defined below
+        couponPercent: pricing.couponPercent,
+        couponCode: pricing.couponCode,
+        totalUsd: pricing.totalUsd
+      }, currencyReq);
+
+      if (localTotal && localTotal > 0) {
+        currency = currencyReq;
+        amount = localTotal;
+      }
+    }
+
     if (!PAYPAL_SUPPORTED.has(currency)) {
       fallbackApplied = true;
       fallbackReason = `currency_not_supported:${currency}`;
       currency = "USD";
-      // amount is already the catalog USD total from resolveServerPricing
+      amount = finalAmount;
     }
 
     console.log(JSON.stringify({

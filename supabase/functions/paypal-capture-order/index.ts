@@ -110,6 +110,7 @@ Deno.serve(async (req) => {
       ms: Date.now() - t0,
     }));
     if (status === "COMPLETED" && (payerEmail || checkoutEmail)) {
+      console.log(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "processing_completion", orderId }));
       const payerName = checkoutName || [data.payer?.name?.given_name, data.payer?.name?.surname].filter(Boolean).join(" ").trim() || undefined;
       const customerEmail = checkoutEmail || payerEmail;
       const customerCountry = checkoutCountry || payerCountry || undefined;

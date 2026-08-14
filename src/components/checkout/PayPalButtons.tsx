@@ -25,6 +25,14 @@ let loadedCurrency: string | null = null;
 async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
   const correlationId = `sdk-${Date.now()}`;
   
+  // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
+  document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
+    try { s.parentNode?.removeChild(s); } catch { s.remove(); }
+  });
+  window.paypal = undefined;
+  sdkPromise = null;
+  const correlationId = `sdk-${Date.now()}`;
+  
   let lastError: Error | null = null;
   
   for (let i = 1; i <= attempts; i++) {

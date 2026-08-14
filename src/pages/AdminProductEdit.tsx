@@ -1009,19 +1009,17 @@ const AdminProductEdit = () => {
                   { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa" },
                 ].map(({ code, flag, label, region }) => {
                   const baseUsdRef = Number(product.price_usd) || 0;
+                  const regionalUsdOverride = product.local_usd_prices?.[code];
+                  const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : baseUsdRef;
                   
                   const regionPrice = (() => {
-                    const regionalUsd = product.local_usd_prices?.[code];
-                    const activeBaseUsd = regionalUsd != null ? Number(regionalUsd) : baseUsdRef;
-
-                    if (activeBaseUsd <= 0) return null;
+                    if (currentUsdValue <= 0) return null;
                     
                     const rate = exchangeRates[code as Currency];
                     if (!rate) return null;
 
-                    const raw = activeBaseUsd * rate;
-                    // El usuario prefiere precios más bajos en LATAM y más altos en USA/Europa
-                    // Lógica de redondeo "bonito" según la moneda
+                    const raw = currentUsdValue * rate;
+                    // Rounding logic for specific currencies
                     if (code === "COP" || code === "TZS" || code === "UGX") return Math.round(raw / 100) * 100;
                     if (code === "CLP" || code === "PYG" || code === "NGN" || code === "KRW") return Math.round(raw / 10) * 10;
                     if (code === "MXN" || code === "ARS" || code === "UYU" || code === "JPY" || code === "INR") return Math.round(raw);
@@ -1029,7 +1027,6 @@ const AdminProductEdit = () => {
                     return Math.round(raw * 100) / 100;
                   })();
 
-                  const currentUsdValue = product.local_usd_prices?.[code] ?? baseUsdRef;
 
                   return (
                     <div key={code}>

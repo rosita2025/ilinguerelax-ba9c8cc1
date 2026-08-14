@@ -129,9 +129,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </span>
             {showLocalRef && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                {localTotal.isUsd 
-                  ? `≈ USD $${localItemsSum.usdReference.toFixed(2)}` 
-                  : `≈ USD $${localItemsSum.usdReference.toFixed(2)}`}
+                  ≈ USD ${localItemsSum.usdReference.toFixed(2)}
+
               </span>
             )}
           </span>

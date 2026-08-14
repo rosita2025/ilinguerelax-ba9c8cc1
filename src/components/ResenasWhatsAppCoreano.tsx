@@ -14,26 +14,27 @@ import r3 from "@/assets/resena-mapas-korea-3.webp.asset.json";
 const resenas = [
   {
     src: (r1 as any).url || r1,
-    contacto: "Compradora Verificada",
-    telefono: "+52 55 **** 1234",
-    pais: "México 🇲🇽",
-    resumen: "Exactamente fue rápido envío digital sin demoras. Los mapas mentales ayudan mucho a visualizar el idioma."
+    contacto: "Nouveau Apis",
+    telefono: "+54 9 11 **** 8822",
+    pais: "Argentina 🇦🇷",
+    resumen: "Exactamente fue rápido envío digital sin demoras. El material de coreano es increíblemente visual."
   },
   {
     src: (r2 as any).url || r2,
-    contacto: "Estudiante de Coreano",
-    telefono: "+54 11 **** 5678",
-    pais: "Argentina 🇦🇷",
-    resumen: "Excelente material. La atención de Rosa fue muy amable durante la compra."
+    contacto: "Compradora Verificada",
+    telefono: "+591 7 **** 4433",
+    pais: "Bolivia 🇧🇴",
+    resumen: "Excelente material. La atención de Rosa y Crady fue muy amable y el acceso fue inmediato."
   },
   {
     src: (r3 as any).url || r3,
-    contacto: "Compradora Verificada",
-    telefono: "+57 300 **** 9012",
-    pais: "Colombia 🇨🇴",
-    resumen: "Muy recomendado para quienes empezamos de cero. Recibí el acceso al instante en mi correo."
+    contacto: "Estudiante Verificada",
+    telefono: "+52 55 **** 9012",
+    pais: "México 🇲🇽",
+    resumen: "Muy recomendado. Los mapas mentales facilitan mucho el aprendizaje de este idioma tan complejo."
   }
 ];
+
 
 export const ResenasWhatsAppCoreano = () => {
   if (resenas.length === 0) return null;
@@ -53,7 +54,7 @@ export const ResenasWhatsAppCoreano = () => {
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
               ))}
-              <span className="ml-2 text-sm font-semibold text-foreground">5.0 · Reseñas verificadas</span>
+              <span className="ml-2 text-sm font-semibold text-foreground">5.0/5.0 · Reseñas verificadas</span>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto text-pretty text-sm md:text-base">
               Conversaciones auténticas atendidas por <strong>Supervisora Rosa</strong> y <strong>Asistente Crady</strong>. Desliza para ver más.
@@ -107,9 +108,15 @@ export const ResenasWhatsAppCoreano = () => {
                             <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                           ))}
                         </div>
-                        <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-medium">
-                          <MessageCircle className="w-3 h-3" /> WhatsApp verificado
-                        </span>
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">
+                            <MessageCircle className="w-3 h-3" /> WhatsApp verificado
+                          </span>
+                          <span className="text-[9px] text-muted-foreground italic leading-none">
+                            Supervisora Rosa & Asistente Crady
+                          </span>
+                        </div>
+
                       </div>
                     </div>
                   </div>

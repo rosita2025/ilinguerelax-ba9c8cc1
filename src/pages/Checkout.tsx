@@ -227,7 +227,7 @@ export default function Checkout() {
           try {
             return await supabase
               .from("digital_products")
-              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, is_physical")
+              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, is_physical, local_prices, local_usd_prices")
               .eq("sku", adminSku)
               .eq("active", true)
               .maybeSingle();
@@ -341,6 +341,8 @@ export default function Checkout() {
           global: priceGlobal,
           tienda: priceTienda ?? staticItem?.regionPrices?.tienda ?? priceLatam ?? priceGlobal,
         },
+        localPrices: data.local_prices,
+        localUsdPrices: data.local_usd_prices,
       } as CatalogItem);
       setDbMissing(false);
       setLoadingDb(false);

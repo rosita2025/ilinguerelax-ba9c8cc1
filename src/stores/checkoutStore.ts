@@ -17,8 +17,14 @@ export interface PruebaItem {
   /** Optional Peru local price (PEN). When set + country=PE, shown natively (no conversion). */
   pricePen?: number;
   /** Whether the product is physical (requires shipping address). */
+  /** Whether the product is physical (requires shipping address). */
   isPhysical?: boolean;
+  /** Optional per-currency manual prices (override automatic conversion). */
+  localPrices?: Record<string, number>;
+  /** Optional per-currency regional USD base overrides. */
+  localUsdPrices?: Record<string, number>;
 }
+
 
 /** Returns the effective USD unit price for an item, given the visitor's IP region tier. */
 export function itemPrice(item: PruebaItem, tier: RegionTier): number {
@@ -161,7 +167,11 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
                     description: item.description ?? i.description,
                     regionPrices: item.regionPrices ?? i.regionPrices,
                     pricePen: item.pricePen ?? i.pricePen,
+                    isPhysical: item.isPhysical ?? i.isPhysical,
+                    localPrices: item.localPrices ?? i.localPrices,
+                    localUsdPrices: item.localUsdPrices ?? i.localUsdPrices,
                     quantity: 1,
+
                   }
                 : i,
             ),
@@ -183,7 +193,11 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
                   // so switching a product from region-priced to flat works.
                   regionPrices: patch.regionPrices ?? undefined,
                   pricePen: patch.pricePen ?? undefined,
+                  isPhysical: patch.isPhysical ?? i.isPhysical,
+                  localPrices: patch.localPrices ?? i.localPrices,
+                  localUsdPrices: patch.localUsdPrices ?? i.localUsdPrices,
                 }
+
               : i,
           ),
         });

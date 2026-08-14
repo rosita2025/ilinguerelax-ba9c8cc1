@@ -1,36 +1,37 @@
 # Plan: Multi-Regional USD Pricing Support
 
-The user wants to define distinct USD base prices for different regions/currencies in the product administration panel, ensuring that the local currency prices are calculated from these specific USD values rather than just a single global USD price.
+Refine the regional pricing logic to ensure distinct USD base prices are applied correctly across different global regions (LATAM, Europe, Asia, Africa, etc.) and that these prices are reflected accurately in the local currency conversions.
+
+## Proposed Changes
+
+### Database
+- No schema changes needed (the `local_usd_prices` column already exists in `digital_products`).
+
+### Backend (Edge Functions)
+- Update `supabase/functions/_shared/catalogPricing.ts` to ensure the regional USD resolution logic correctly handles the new regional tiers.
+- Verify that conversion logic in edge functions uses the intended regional USD base before applying exchange rates.
+
+### Frontend
+#### Pricing Logic
+- Refine `src/i18n/index.ts` to ensure `exchangeRates` and `formatPrice` correctly utilize `local_usd_prices`.
+- Update `src/hooks/useLocalCurrency.ts` to prioritize the regional USD override for all calculations (subtotals, discounts, upsells).
+- Ensure `useCardPrice.ts` correctly fetches and applies regional USD overrides for product cards.
+
+#### UI Components
+- **Admin Panel**: In `AdminProductEdit.tsx`, ensure the pricing grid allows for easy entry of regional USD overrides and that "Suggested" local prices update in real-time based on the specific regional USD selected.
+- **Checkout**: In `OrderSummary.tsx` and `PaymentMethodsGroup.tsx`, ensure the "≈ USD $XX.XX" reference label always matches the regional USD base defined for that specific country/currency.
+- **Upsell Panel**: Ensure upsell prices in `UpsellPanel.tsx` also respect regional USD overrides.
 
 ## Technical Details
+- **Regional USD Resolution**: When a user visits from Mexico (MXN), the system should check:
+  1. `local_prices.MXN` (Manual local price, e.g., 540 MXN).
+  2. `local_usd_prices.MXN` (Regional USD base, e.g., $20 USD).
+  3. Tier-based USD (`price_usd_latam`, `price_usd`).
+- **Precision**: Use `Math.round(val * 100) / 100` for all USD values to prevent floating-point errors in Meta Pixel and checkout totals.
+- **Global Tiers**: Map Africa and Asia to specific tiers if they require lower USD bases as requested.
 
-### 1. Database Schema
-- Add a new `jsonb` column `local_usd_prices` to the `digital_products` table.
-- This column will store specific USD values for each currency code (e.g., `{"MXN": 15, "EUR": 25}`).
-
-### 2. Admin Interface (`src/pages/AdminProductEdit.tsx`)
-- Update the pricing grid to include a new "Regional USD Price" input field for each currency.
-- When this field is edited, the system will automatically:
-    - Update the corresponding "Local Price Override" using the exchange rate.
-    - Store the regional USD source in `local_usd_prices`.
-- Add a visual indicator showing if a region is using a "Distinct USD" base price.
-- Ensure validation (no negative values, correct rounding) applies to both USD and local inputs.
-
-### 3. Price Calculation Logic (`src/lib/catalogPricing.ts` / `src/i18n/index.ts`)
-- Update the regional pricing tiers to respect `local_usd_prices`.
-- Priority order for calculation:
-    1.  Manual Local Currency Override (`local_prices`).
-    2.  Regional USD Price (`local_usd_prices`) × Exchange Rate.
-    3.  Tiered USD Price (`price_usd_latam`, `price_usd_tienda`) × Exchange Rate.
-    4.  Global USD Price (`price_usd`) × Exchange Rate.
-
-### 4. Frontend Hooks (`src/hooks/useLocalCurrency.ts`, `src/hooks/useCardPrice.ts`)
-- Update hooks to fetch and apply the `local_usd_prices` overrides.
-- Ensure the "≈ $XX.XX USD" reference labels on the product page and checkout reflect the *regional* USD price when one is defined.
-
-## User Review Required
-
-> [!IMPORTANT]
-> This change introduces a new "Regional USD Price" field. If you set $15 USD for Mexico, the system will calculate the MXN price automatically. If the exchange rate in `src/i18n/index.ts` is updated later, the MXN price will stay the same unless you manually recalculate it or re-enter the USD value.
-
-- **Currency Tiers**: We will maintain the existing LATAM and Tienda (VE/CU/NI) tiers as quick presets, but the new per-currency USD setting will override them for maximum control.
+## Verification Plan
+- Use Playwright to simulate visitors from different regions (e.g., US, Mexico, Spain, Japan, Nigeria).
+- Verify that the USD reference label in the checkout matches the expected regional base for each.
+- Check that the Meta Pixel `Purchase` event reports the correct regional USD value.
+- Verify that changing the Base USD in Admin updates all regional suggestions correctly.

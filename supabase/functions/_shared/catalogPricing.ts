@@ -93,7 +93,9 @@ export interface PricedItem {
   pricePen?: number | null;
   /** Regional USD overrides (`digital_products.local_usd_prices`). */
   localUsdPrices?: Record<string, number> | null;
+  isPhysical?: boolean;
 }
+
 
 export interface ResolvedPricing {
   items: PricedItem[];
@@ -164,8 +166,9 @@ export async function resolveServerPricing(opts: {
   const lookups = Array.from(new Set([...skus, ...wanted.map((i) => i.id)]));
   const { data: rows, error } = await supabase
     .from("digital_products")
-    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen, local_usd_prices")
+    .select("sku, name, description, cover_image_url, price_usd, price_usd_latam, price_usd_tienda, active, sku_aliases, local_prices, price_pen, local_usd_prices, is_physical")
     .or(`sku.in.(${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}),sku_aliases.ov.{${lookups.map((s) => `"${s.replace(/"/g, "")}"`).join(",")}}`);
+
   if (error) throw new PricingError("No se pudo leer el catálogo");
 
   const bySku = new Map<string, Record<string, unknown>>();
@@ -244,7 +247,9 @@ export async function resolveServerPricing(opts: {
       localPrices: (row.local_prices ?? null) as Record<string, number> | null,
       localUsdPrices: (row.local_usd_prices ?? null) as Record<string, number> | null,
       pricePen: Number(row.price_pen) > 0 ? Number(row.price_pen) : null,
+      isPhysical: Boolean(row.is_physical),
     });
+
   }
 
   const fixedTotal = fixedTotalForCoupon(opts.couponCode);
@@ -331,10 +336,11 @@ export function localTotalFromPricing(
   }
   
   // Shipping logic must mirror OrderSummary.tsx / PaymentMethodsGroup.tsx
-  const isPhysical = pricing.items.some(i => (i as any).is_physical || (i as any).isPhysical);
+  const isPhysical = pricing.items.some(i => i.isPhysical);
   const isLatam = tierForCountry(code) === "latam";
   const shippingCost = isLatam ? 9 : 8;
   const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingCost) : 0;
+
   const shippingLocal = shippingUsd * rate;
 
   const withCoupon = subtotal * (1 - (pricing.couponPercent || 0) / 100);

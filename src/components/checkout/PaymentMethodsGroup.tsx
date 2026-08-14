@@ -1399,7 +1399,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const STRIPE_VISIBLE_METHODS = getStripeVisibleMethods(language);
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
-    .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));
+    .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 
       id: "card", 

@@ -53,8 +53,9 @@ export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverri
   // New: Check for regional USD price override
   const regionalUsdOverride = localUsdPrices && localUsdPrices[currency];
   const activeUsdAmount = typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
-    ? regionalUsdOverride
-    : usdAmount;
+    ? Math.round(regionalUsdOverride * 100) / 100
+    : Math.round(usdAmount * 100) / 100;
+
 
   const rate = exchangeRates[currency] ?? 1;
   const amount = hasOverride ? (override as number) : activeUsdAmount * rate;

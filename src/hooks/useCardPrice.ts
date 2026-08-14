@@ -32,6 +32,7 @@ interface Row {
   price_usd_tienda: number | null;
   price_pen: number | null;
   local_prices: Record<string, number> | null;
+  local_usd_prices: Record<string, number> | null;
 }
 
 type Rows = Record<string, Row>;

@@ -12,9 +12,10 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   USD: 1,
   EUR: 0.90,
   BRL: 5.50,
-  MXN: 20,
-  COP: 4300,
-  ARS: 990,
+  MXN: 20.5,
+  COP: 4500,
+  ARS: 1000,
+
 
   GBP: 0.78,
   CAD: 1.35,

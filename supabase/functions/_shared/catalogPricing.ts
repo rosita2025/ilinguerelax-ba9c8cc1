@@ -121,9 +121,11 @@ function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?
     const localUsdPrices = (row.local_usd_prices ?? null) as Record<string, number> | null;
     const regionalUsd = localUsdPrices?.[currency.toUpperCase()];
     if (typeof regionalUsd === "number" && regionalUsd > 0) {
-      console.log(`[Pricing] Regional USD override found for ${currency.toUpperCase()}: $${regionalUsd} (SKU: ${row.sku})`);
-      return regionalUsd;
+      const rounded = Math.round(regionalUsd * 100) / 100;
+      console.log(`[Pricing] Regional USD override found for ${currency.toUpperCase()}: $${rounded} (SKU: ${row.sku})`);
+      return rounded;
     }
+
   }
 
   const global = Number(row.price_usd) || 0;

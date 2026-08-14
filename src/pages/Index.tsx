@@ -67,9 +67,10 @@ const Index = () => {
 
       <CoreanoLaunchBanner />
       
-      <section className="py-12 px-4 bg-background relative overflow-hidden">
+      <section className="py-24 px-4 relative overflow-hidden bg-[#0a0a0a]">
         <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-top-left" />
-        <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-8">Rastreo de Pedidos</h2>
           <TrackingSearchBar />
         </div>
       </section>

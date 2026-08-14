@@ -1812,7 +1812,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           return (
             <div key={rowKey} className="flex items-center gap-2 pt-1 mt-1 border-t border-neutral-200/70 dark:border-neutral-800 pt-2.5">
               <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
-                {language === "en" ? "ACCEPTED PAYMENT METHODS:" : "MÉTODOS DE PAGO ACEPTADOS:"}
+                {t.acceptedMethods}
               </span>
             </div>
           );

@@ -102,6 +102,7 @@ export interface CheckoutUIStrings {
   total: string;
   inYourCurrency: string;
   acceptedMethods: string;
+  paymentMethod: string;
 
   // Footer
   sslEncryption: string;
@@ -206,6 +207,7 @@ const es: CheckoutUIStrings = {
   total: "Total",
   inYourCurrency: "en tu moneda",
   acceptedMethods: "MÉTODOS DE PAGO ACEPTADOS:",
+  paymentMethod: "Método de pago",
 
   sslEncryption: "Encriptación SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Perú",
@@ -309,6 +311,7 @@ const en: CheckoutUIStrings = {
   total: "Total",
   inYourCurrency: "in your currency",
   acceptedMethods: "ACCEPTED PAYMENT METHODS:",
+  paymentMethod: "Payment Method",
 
   sslEncryption: "SSL Stripe encryption",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -412,6 +415,7 @@ const pt: CheckoutUIStrings = {
   total: "Total",
   inYourCurrency: "na sua moeda",
   acceptedMethods: "MÉTODOS DE PAGAMENTO ACEITOS:",
+  paymentMethod: "Método de pagamento",
 
   sslEncryption: "Criptografia SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -515,6 +519,7 @@ const fr: CheckoutUIStrings = {
   total: "Total",
   inYourCurrency: "dans votre monnaie",
   acceptedMethods: "MODES DE PAIEMENT ACCEPTÉS :",
+  paymentMethod: "Mode de paiement",
 
   sslEncryption: "Chiffrement SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Pérou",

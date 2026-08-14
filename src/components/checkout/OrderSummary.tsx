@@ -120,7 +120,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{expanded ? t.hideSummary : t.showSummary}</span>
             {expanded ? <ChevronUp className="w-4 h-4 opacity-60" /> : <ChevronDown className="w-4 h-4 opacity-60" />}
           </span>
-          <span className="text-base font-bold">{penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}</span>
+          <span className="text-right flex flex-col items-end">
+            <span className="text-base font-bold leading-tight">
+              {penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}
+            </span>
+            {showLocalRef && (
+              <span className="text-[10px] font-normal text-muted-foreground leading-none">
+                ≈ {formatCurrencyAmount(grandTotal, "USD")}
+              </span>
+            )}
+          </span>
         </button>
       )}
 

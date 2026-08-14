@@ -363,10 +363,11 @@ const AdminProductEdit = () => {
             const normalizedLocalPrices: Record<string, number> = {};
             if (product.local_prices) {
               Object.entries(product.local_prices).forEach(([code, amount]) => {
-                if (typeof amount === 'number' && amount > 0) {
+                const numAmount = Number(amount);
+                if (!isNaN(numAmount) && numAmount > 0) {
                   const config = currencyConfig[code as Currency];
                   const decimals = config?.decimals ?? 2;
-                  normalizedLocalPrices[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                  normalizedLocalPrices[code] = Math.round(numAmount * Math.pow(10, decimals)) / Math.pow(10, decimals);
                 }
               });
             }

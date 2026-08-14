@@ -85,7 +85,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices, local_usd_prices")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;

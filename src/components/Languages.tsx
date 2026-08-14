@@ -396,15 +396,15 @@ export const Languages = () => {
                       <span className="text-2xl font-bold text-primary">
                         {product.price === 0
                           ? "GRATIS"
-                          : cardPrice.format(product.slug, product.price)}
+                          : cardPrice.format(product.slug || product.id, product.price)}
                       </span>
                       {product.originalPrice ? (
                         <span className="text-sm text-muted-foreground line-through">
-                          {cardPrice.formatOriginal(product.slug, product.originalPrice)}
+                          {cardPrice.formatOriginal(product.slug || product.id, product.originalPrice)}
                         </span>
                       ) : product.price > 0 ? (
                         <span className="text-sm text-muted-foreground line-through">
-                          {cardPrice.formatOriginal(product.slug, product.price)}
+                          {cardPrice.formatOriginal(product.slug || product.id, product.price * 2.5)}
                         </span>
                       ) : null}
                       {product.price > 0 && (

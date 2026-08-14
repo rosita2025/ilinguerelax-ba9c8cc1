@@ -214,7 +214,8 @@ Deno.serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
-      const alreadyOwned = (await getPurchasedSkus(supabase, email)).has(String(productType).toLowerCase());
+      const purchased = await getPurchasedSkus(supabase, email);
+      const alreadyOwned = purchased.has(String(productType).toLowerCase());
       if (recent) {
         console.log(`[dedupe] skipping Brevo push (already pushed <24h) for ${email}`);
       } else if (alreadyOwned) {

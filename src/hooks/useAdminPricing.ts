@@ -120,6 +120,7 @@ export function useAdminPricing(sku: string): AdminPricing {
         active: (data as any).active !== false,
         rating: (data as any).rating != null ? Number((data as any).rating) : null,
         reviewCount: (data as any).review_count != null ? Number((data as any).review_count) : null,
+        localUsdPrices: (data as any).local_usd_prices ?? null,
         loaded: true,
         missing: false,
       });

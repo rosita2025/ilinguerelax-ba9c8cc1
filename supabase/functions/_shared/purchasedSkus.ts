@@ -45,6 +45,33 @@ export async function getPurchasedSkus(admin: any, rawEmail: string): Promise<Se
     }
   } catch (_) { /* ignore */ }
 
+  // 3) shopify_sales (physical orders)
+  try {
+    const { data } = await admin
+      .from("shopify_sales")
+      .select("product_name")
+      .ilike("customer_email", email)
+      .limit(100);
+    for (const row of data ?? []) {
+      push(row?.product_name);
+    }
+  } catch (_) { /* ignore */ }
+
+  // 4) funnel_events (direct purchase events from Stripe/MP)
+  try {
+    const { data } = await admin
+      .from("funnel_events")
+      .select("product_id, event_data")
+      .ilike("email", email)
+      .in("event_name", ["Purchase", "purchase"])
+      .limit(100);
+    for (const row of data ?? []) {
+      push(row?.product_id);
+      const d = row?.event_data ?? {};
+      push(d?.product_sku || d?.sku || d?.product_id);
+    }
+  } catch (_) { /* ignore */ }
+
 
   return out;
 }

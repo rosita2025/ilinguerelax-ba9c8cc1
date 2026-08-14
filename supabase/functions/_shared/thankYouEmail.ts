@@ -72,16 +72,24 @@ export async function markAbandonedCartConverted(email?: string): Promise<void> 
     // 1. Marcar en persistent_carts (fuente actual)
     const { error: pErr } = await supabase
       .from("persistent_carts")
-      .update({ converted: true, last_activity: new Date().toISOString() })
-      .eq("email", cleanEmail)
+      .update({ 
+        converted: true, 
+        last_activity: new Date().toISOString(),
+        items: [] // Limpiar items para asegurar que no se envíen recordatorios
+      })
+      .ilike("email", cleanEmail)
       .eq("converted", false);
     if (pErr) console.error("[abandoned-cart] mark persistent converted failed:", pErr);
 
     // 2. Marcar en abandoned_carts (legacy fallback)
     const { error: aErr } = await supabase
       .from("abandoned_carts")
-      .update({ converted: true, is_completed: true, updated_at: new Date().toISOString() })
-      .eq("customer_email", cleanEmail)
+      .update({ 
+        converted: true, 
+        is_completed: true, 
+        updated_at: new Date().toISOString() 
+      })
+      .ilike("customer_email", cleanEmail)
       .eq("converted", false);
     if (aErr) console.error("[abandoned-cart] mark legacy converted failed:", aErr);
   } catch (e) {

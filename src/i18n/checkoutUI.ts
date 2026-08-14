@@ -136,7 +136,7 @@ const es: CheckoutUIStrings = {
   freeShipping: "Envío Gratis",
   digital: "Digital",
   physical: "Físico",
-  configureShipping: "Configurar envío",
+  configureShipping: "Configurar envío e ir al checkout",
 
   choosePaymentMethod: "Elige tu método de pago",
   cardPayment: "Pago con tarjeta",

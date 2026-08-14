@@ -31,6 +31,8 @@ export interface AdminPricing {
   rating: number | null;
   /** Number of reviews from admin. Defaults to 120. */
   reviewCount: number | null;
+  /** Regional USD overrides for specific currencies. */
+  localUsdPrices: Record<string, number> | null;
 }
 
 const INITIAL: AdminPricing = {

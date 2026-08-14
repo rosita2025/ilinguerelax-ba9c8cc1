@@ -60,7 +60,12 @@ const Product1000Verbos = () => {
   const clear = useCheckoutPruebaStore((s) => s.clear);
   const { country } = useRegionTier();
   const isPeru = tier.isPeru;
-  const cartItem = { ...CART_ITEM_BASE, price: currentPrice, pricePen: tier.pricePen ?? undefined };
+  const cartItem = { 
+    ...CART_ITEM_BASE, 
+    price: currentPrice, 
+    pricePen: tier.pricePen ?? undefined,
+    localUsdPrices: tier.localUsdPrices ?? undefined 
+  };
 
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 1,000 Verbos Esenciales",
@@ -332,6 +337,8 @@ const Product1000Verbos = () => {
         buyUrl={"/checkouts/1000-verbos"}
         ctaText={"Comprar ahora"}
         onBuyClick={handleBuy}
+        usdValue={currentPrice}
+        localUsdPrices={tier.localUsdPrices}
       />
 
       <div className="h-20 md:h-16" />

@@ -38,6 +38,8 @@ interface StickyBuyBarProps {
   flag?: string;
   /** The exact USD value for tracking (avoids string parsing errors). */
   usdValue?: number;
+  /** Regional USD overrides for specific currencies. */
+  localUsdPrices?: Record<string, number> | null;
 }
 
 export const StickyBuyBar = ({
@@ -67,6 +69,7 @@ export const StickyBuyBar = ({
   flag,
   sku,
   usdValue,
+  localUsdPrices,
 }: StickyBuyBarProps & { sku?: string }) => {
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
@@ -207,11 +210,18 @@ export const StickyBuyBar = ({
     // Hotmart has its own pixel 24959578143733255 embedded in its checkout.
     if (goesToInternalCheckout) {
       try {
+        // Detect current currency to find regional USD override
+        const currency = detectCurrency((flag ? currencyCode : "US").toUpperCase());
+        const regionalUsd = localUsdPrices && localUsdPrices[currency];
+        const finalUsdValue = typeof regionalUsd === "number" && regionalUsd > 0 
+          ? regionalUsd 
+          : (usdValue || parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")));
+
         trackHotmartEvent("AddToCart", {
           content_ids: sku ? [sku] : undefined,
           content_name: productName,
           content_type: "product",
-          value: usdValue || parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")) || undefined,
+          value: finalUsdValue || undefined,
           currency: "USD", // Forzado a USD para Ads
           product_id: sku,
         });

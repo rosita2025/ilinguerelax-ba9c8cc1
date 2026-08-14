@@ -151,6 +151,7 @@ const ProductPatronesEspeciales = () => {
       price: PRICE_USD,
       pricePen: pricingAdmin.pricePen ?? undefined,
       regionPrices: { latam: LATAM_USD, global: GLOBAL_USD, tienda: TIENDA_USD },
+      localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
       image: "/images/product-patrones-especiales.webp",
       description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
       quantity: 1,

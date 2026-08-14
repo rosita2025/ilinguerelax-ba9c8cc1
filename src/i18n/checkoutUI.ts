@@ -210,7 +210,7 @@ const en: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Your details",
-  yourDetailsHint: "You'll get access to the digital product by email.",
+  yourDetailsHint: "Your access will be sent by email. For physical books, address is mandatory.",
   ready: "Ready",
   required: "Required",
   fullName: "Full name *",

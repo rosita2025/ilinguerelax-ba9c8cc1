@@ -27,8 +27,8 @@ Deno.serve(async (req) => {
 
     // Acción: Actualizar tracking
     if (action === "update_tracking" && orderId) {
-      if (!trackingNumber && !shippingProvider) {
-        throw new Error("Tracking number or provider is required");
+      if (!trackingNumber && !shippingProvider && !shippingProofUrl) {
+        throw new Error("Tracking number, provider, or proof URL is required");
       }
 
       const table = source === "manual" ? "manual_payments" : 

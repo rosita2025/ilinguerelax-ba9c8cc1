@@ -179,6 +179,16 @@ Deno.serve(async (req) => {
         .select("id, event_id, event_type, correlation_id, resource_id, payload, created_at")
         .order("created_at", { ascending: false })
         .limit(take);
+
+      // Add Abandoned Checkout detection for Stripe
+      const { data: abandoned } = await admin
+        .from("funnel_events")
+        .select("id, created_at, event_name, event_data, email, product_id, value, currency, country, referrer")
+        .eq("event_name", "InitiateCheckout")
+        .order("created_at", { ascending: false })
+        .limit(take);
+      
+      const allStripe = [...(data ?? []), ...(abandoned ?? [])];
       for (const r of data ?? []) {
         const meta = PAYPAL_STEPS[r.event_type] ?? { step: r.event_type, mapped: "unknown" as Mapped };
         const p: any = r.payload ?? {};

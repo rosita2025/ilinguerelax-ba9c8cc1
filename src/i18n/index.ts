@@ -191,9 +191,9 @@ export const exchangeRates: Record<Currency, number> = {
   USD: 1,
   EUR: 0.90,
   BRL: 5.50,
-  MXN: 19, // Ajustado de 20 a 19 por el usuario (ej: 500 MXN ≈ 26 USD, 540 MXN ≈ 20 USD -> 27 USD es lo real, el usuario prefiere 19)
+  MXN: 19, 
   COP: 4000,
-  ARS: 950, // Argentina ≈ 19 USD para 15.000 (15000/19 = 789, se ajusta a 950 para mercado blue/referencia)
+  ARS: 950, 
   GBP: 0.78,
   CAD: 1.35,
   AUD: 1.50,
@@ -245,7 +245,7 @@ export const detectCurrency = (countryCode: string): Currency => {
  * with dollars. Must match the ambiguous set in `useLocalCurrency`.
  */
 const AMBIGUOUS_DOLLAR_CURRENCIES = new Set<Currency>([
-  "MXN", "ARS", "COP", "CLP", "BRL", "CRC",
+  "MXN", "ARS", "COP", "CLP", "BRL", "CRC", "CAD", "AUD", "NZD", "SGD", "HKD", "TWD",
 ] as unknown as Currency[]);
 
 /**

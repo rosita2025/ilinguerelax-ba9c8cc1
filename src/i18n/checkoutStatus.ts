@@ -35,6 +35,10 @@ export interface CheckoutStatusStrings {
   shippingEligibility: string;
   shippingEligibilityDesc: string;
   paymentMethodConfirmed: string;
+  digitalDeliveredFirst: string;
+  physicalInProgress: string;
+  trackingComingSoon: string;
+
 
   // Pending
   paymentPending: string;

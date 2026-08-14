@@ -239,12 +239,14 @@ Deno.serve(async (req) => {
           product: r.product_id || d.product_name || d.name || null,
           transaction: d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
-          mapped_status: status === "approved" ? "approved" : 
+          mapped_status: (status === "approved" || status === "complete") ? "approved" : 
                          (status === "pending" || status === "processing") ? "pending" :
-                         (status === "refunded") ? "refunded" : "unknown",
-          failure_reason: d.failure_reason || null,
+                         (status === "refunded") ? "refunded" : 
+                         (status === "chargeback") ? "chargeback" :
+                         (status === "expired" || status === "canceled") ? "cancelled" : "unknown",
+          failure_reason: d.failure_reason || d.status_detail || null,
           failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Hotmart)" : 
-                       isPurchase ? "Compra aprobada (Hotmart)" : null,
+                       isPurchase ? "Compra (Hotmart)" : null,
           payload: d,
         });
       }

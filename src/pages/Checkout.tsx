@@ -694,6 +694,12 @@ export default function Checkout() {
               </div>
             </div>
           )}
+          <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-3 flex gap-2.5 items-center mb-1">
+            <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <p className="text-[11px] sm:text-xs text-emerald-900 dark:text-emerald-100 font-medium leading-tight">
+              {t.verifiedReviewNotice}
+            </p>
+          </div>
           <BuyerInfoForm />
 
           {catalogItem?.upsells?.length ? (

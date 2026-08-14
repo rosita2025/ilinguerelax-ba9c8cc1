@@ -461,7 +461,17 @@ export default function OrderStatus() {
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground mt-0.5">{formatDate(t.createdAt)}</div>
-                        {t.detail && <div className="text-xs text-muted-foreground mt-1">{t.detail}</div>}
+                        {t.detail && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {t.detail}
+                            {t.detail.toLowerCase().includes("amazon") && (
+                              <div className="mt-2 p-2 rounded bg-primary/5 border border-primary/20">
+                                <span className="text-primary font-medium">Seguimiento de Amazon disponible</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {(t.method || t.reference) && (
                           <div className="text-[11px] text-muted-foreground mt-1 flex flex-wrap gap-x-3">
                             {t.method && <span>Método: {methodLabel(t.method)}</span>}

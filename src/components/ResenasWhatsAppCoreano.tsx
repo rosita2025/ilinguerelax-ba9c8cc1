@@ -14,26 +14,27 @@ import r3 from "@/assets/resena-mapas-korea-3.webp.asset.json";
 const resenas = [
   {
     src: (r1 as any).url || r1,
-    contacto: "Compradora Verificada",
-    telefono: "+52 55 **** 1234",
-    pais: "México 🇲🇽",
-    resumen: "Exactamente fue rápido envío digital sin demoras. Los mapas mentales ayudan mucho a visualizar el idioma."
+    contacto: "Nouveau Apis",
+    telefono: "+54 9 11 **** 8822",
+    pais: "Argentina 🇦🇷",
+    resumen: "Exactamente fue rápido envío digital sin demoras. El material de coreano es increíblemente visual."
   },
   {
     src: (r2 as any).url || r2,
-    contacto: "Estudiante de Coreano",
-    telefono: "+54 11 **** 5678",
-    pais: "Argentina 🇦🇷",
-    resumen: "Excelente material. La atención de Rosa fue muy amable durante la compra."
+    contacto: "Compradora Verificada",
+    telefono: "+591 7 **** 4433",
+    pais: "Bolivia 🇧🇴",
+    resumen: "Excelente material. La atención de Rosa y Crady fue muy amable y el acceso fue inmediato."
   },
   {
     src: (r3 as any).url || r3,
-    contacto: "Compradora Verificada",
-    telefono: "+57 300 **** 9012",
-    pais: "Colombia 🇨🇴",
-    resumen: "Muy recomendado para quienes empezamos de cero. Recibí el acceso al instante en mi correo."
+    contacto: "Estudiante Verificada",
+    telefono: "+52 55 **** 9012",
+    pais: "México 🇲🇽",
+    resumen: "Muy recomendado. Los mapas mentales facilitan mucho el aprendizaje de este idioma tan complejo."
   }
 ];
+
 
 export const ResenasWhatsAppCoreano = () => {
   if (resenas.length === 0) return null;

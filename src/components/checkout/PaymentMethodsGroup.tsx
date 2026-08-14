@@ -1786,6 +1786,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
 
 
+      {!isFree && !isInvalidZero && (
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <Smartphone className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h3 className="font-bold text-neutral-800 dark:text-neutral-100 uppercase tracking-tight">
+            {t.paymentMethod}
+          </h3>
+        </div>
+      )}
+
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;

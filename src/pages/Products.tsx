@@ -47,8 +47,8 @@ const Products = () => {
     // Static products keep their rich metadata, but admin's cover image wins
     // so edits made in /admin/productos show up here immediately.
     const merged = staticProducts.map((p) => {
-      const db = dbBySlug.get(p.slug);
-      return db && db.image && db.image !== "/placeholder.svg" ? { ...p, image: db.image } : p;
+      const db = dbBySlug.get(p.slug || p.id);
+      return db && db.image && db.image !== "/placeholder.svg" ? { ...p, image: db.image, active: db.active !== false } : { ...p, active: true };
     });
     const extra = dbProducts.filter((p) => !existing.has(p.id) && !staticSlugs.has(p.slug));
     return [...merged, ...extra];
@@ -160,7 +160,7 @@ const Products = () => {
         productList={products.map((product) => ({
           name: product.title,
           description: product.description,
-          price: product.price,
+          price: product.price || 0,
           image: `https://ilinguerelax.com${product.image}`,
           url: `https://ilinguerelax.com/products/${product.slug}`,
           rating: product.rating,

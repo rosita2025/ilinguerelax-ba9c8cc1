@@ -306,7 +306,7 @@ const App = () => (
                   <Route path="/admin/payment-errors" element={<AdminGate><AdminPaymentErrors /></AdminGate>} />
                   <Route path="/admin/email-rules" element={<AdminGate><AdminEmailRules /></AdminGate>} />
                   
-                  <Route path="/admin/brevo-abandoned" element={<AdminGate><AdminBrevoAbandoned /></AdminGate>} />
+                  
                   <Route path="/admin/newsletter-drip" element={<AdminGate><AdminNewsletterDrip /></AdminGate>} />
                   <Route path="/admin/lanzamientos" element={<AdminGate><AdminLaunches /></AdminGate>} />
                   <Route path="/admin/audiencias" element={<AdminGate><AdminAudiences /></AdminGate>} />

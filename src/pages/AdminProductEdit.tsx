@@ -95,6 +95,7 @@ const EMPTY: Product = {
   hotmart_excluded_countries: [],
   sku_aliases: [],
   local_prices: {},
+  local_usd_prices: {},
   is_physical: false,
   gallery_metadata: {},
   rating: 4.8,

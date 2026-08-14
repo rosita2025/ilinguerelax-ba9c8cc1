@@ -61,7 +61,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   );
 
   const penMode = penTotals !== null && !isGlobalGateway;
-  const showLocalRef = !penMode && !localTotal.loading;
+  const showLocalRef = !localTotal.loading; // Remove !penMode restriction to ensure USD ref always shows
   // Local totals honoring per-sku overrides from /admin/products/:sku
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
@@ -126,7 +126,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </span>
             {showLocalRef && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                {localTotal.isUsd ? `≈ ${localTotalLabel}` : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                {localTotal.isUsd 
+                  ? `≈ USD $${grandTotal.toFixed(2)}` 
+                  : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
               </span>
             )}
           </span>
@@ -318,7 +320,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
               <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
               {showLocalRef && (
                 <div className="text-[10px] text-muted-foreground font-normal">
-                  {localTotal.isUsd ? `≈ ${localTotalLabel}` : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                  {localTotal.isUsd 
+                    ? `≈ USD $${grandTotal.toFixed(2)}` 
+                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
                 </div>
               )}
             </div>

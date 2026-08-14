@@ -94,8 +94,9 @@ Deno.serve(async (req) => {
     // `price_pen`) en vez de dejar que MP aplique su propio tipo de cambio.
     // En el resto de países la cuenta solo admite USD, así que se mantiene USD.
     const buyerCountry = String(body.country ?? "PE").toUpperCase().slice(0, 2);
-    const penTotal = buyerCountry === "PE" ? localTotalFromPricing(pricing, "PEN") : null;
+    const penTotal = buyerCountry === "PE" ? await localTotalFromPricing(pricing, "PEN") : null;
     const useLocal = penTotal != null && penTotal > 0;
+
     const usdSubtotal = pricing.items.reduce(
       (sum, i) => sum + i.unitUsd * discountMultiplier * i.quantity,
       0,

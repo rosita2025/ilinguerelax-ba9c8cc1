@@ -89,12 +89,13 @@ Deno.serve(async (req) => {
     // Si resolveServerPricing devolvió USD pero el cliente pidió una moneda soportada por PayPal, 
     // intentamos usar la moneda local para que el checkout sea más amigable.
     if (finalCurrency === "USD" && PAYPAL_SUPPORTED.has(currencyReq)) {
-      const localTotal = localTotalFromPricing({
+      const localTotal = await localTotalFromPricing({
         items: pricedItems,
         couponPercent: pricing.couponPercent,
         couponCode: pricing.couponCode,
         totalUsd: pricing.totalUsd
       }, currencyReq);
+
 
       if (localTotal && localTotal > 0) {
         currency = currencyReq;

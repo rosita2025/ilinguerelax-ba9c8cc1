@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
       console.warn("cart total mismatch (ignorado)", { clientUsd, calculatedUsd });
     }
     const requestedCurrency = body.currency.toUpperCase();
-    const serverLocal = requestedCurrency === "USD" ? null : localTotalFromPricing(pricing, requestedCurrency);
+    const serverLocal = requestedCurrency === "USD" ? null : await localTotalFromPricing(pricing, requestedCurrency);
     const chargeCurrency = serverLocal == null ? "USD" : requestedCurrency;
     const chargeAmount = serverLocal == null ? calculatedUsd : serverLocal;
 

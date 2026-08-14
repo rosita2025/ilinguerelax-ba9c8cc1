@@ -1042,8 +1042,15 @@ const AdminProductEdit = () => {
                           onChange={(e) => {
                             const v = e.target.value;
                             const next = { ...(product.local_prices || {}) };
-                            if (v === "" || Number(v) <= 0) delete next[code];
-                            else next[code] = Number(v);
+                            if (v === "" || Number(v) <= 0) {
+                              delete next[code];
+                            } else {
+                              const amount = Number(v);
+                              const config = currencyConfig[code as Currency];
+                              const decimals = config?.decimals ?? 2;
+                              // Round to the correct number of decimals immediately for UI consistency
+                              next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                            }
                             update("local_prices", next);
                           }}
                           placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}

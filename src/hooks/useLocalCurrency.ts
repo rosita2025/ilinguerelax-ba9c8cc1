@@ -31,10 +31,15 @@ export function formatLocalAmount(
   usdAmount: number,
   country: string,
   overrides?: LocalPriceOverrides,
+  localUsdPrices?: LocalPriceOverrides
 ): { formatted: string; isUsd: boolean } {
   const currency = detectCurrency((country || "US").toUpperCase());
   const isUsd = currency === "USD";
-  return { formatted: formatPrice(usdAmount, currency, overrides ?? undefined), isUsd };
+  
+  const regionalUsd = localUsdPrices && localUsdPrices[currency];
+  const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : usdAmount;
+  
+  return { formatted: formatPrice(activeUsd, currency, overrides ?? undefined), isUsd };
 }
 
 /** Convierte un monto USD a la moneda local aproximada del visitante (por IP). */

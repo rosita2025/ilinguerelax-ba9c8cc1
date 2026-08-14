@@ -218,8 +218,8 @@ Deno.serve(async (req) => {
       const { data } = await admin
         .from("funnel_events")
         .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
-        .or("event_name.eq.Purchase,event_name.eq.purchase,event_name.eq.InitiateCheckout")
-        .or("event_data->>provider.eq.hotmart,referrer.eq.hotmart-webhook")
+        .or("event_name.ilike.purchase,event_name.ilike.InitiateCheckout")
+        .or("event_data->>provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%")
         .order("created_at", { ascending: false })
         .limit(take);
 

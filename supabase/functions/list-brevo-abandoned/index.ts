@@ -42,13 +42,27 @@ Deno.serve(async (req) => {
     const emails = Array.from(new Set((logs ?? []).map((l: any) => (l.email ?? "").toLowerCase()).filter(Boolean)));
     const cartsByEmail = new Map<string, any[]>();
     if (emails.length > 0) {
+      // Prioritize persistent_carts (current source of truth)
+      const { data: pCarts } = await admin
+        .from("persistent_carts")
+        .select("email, buyer, items, last_activity, converted")
+        .in("email", emails);
+      
+      for (const c of pCarts ?? []) {
+        const k = String(c.email || "").toLowerCase();
+        cartsByEmail.set(k, [c]);
+      }
+
+      // Fallback to legacy email_contacts if not in persistent_carts
       const { data: contacts } = await admin
         .from("email_contacts")
         .select("email, name, metadata")
         .in("email", emails);
       for (const c of contacts ?? []) {
         const k = String(c.email || "").toLowerCase();
-        cartsByEmail.set(k, [c]);
+        if (!cartsByEmail.has(k)) {
+          cartsByEmail.set(k, [c]);
+        }
       }
     }
 

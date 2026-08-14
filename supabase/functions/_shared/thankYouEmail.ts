@@ -66,14 +66,24 @@ async function invokeTemplate(
 
 export async function markAbandonedCartConverted(email?: string): Promise<void> {
   if (!email) return;
+  const cleanEmail = email.trim().toLowerCase();
   try {
     const supabase = getClient();
-    const { error } = await supabase
+    // 1. Marcar en persistent_carts (fuente actual)
+    const { error: pErr } = await supabase
+      .from("persistent_carts")
+      .update({ converted: true, last_activity: new Date().toISOString() })
+      .eq("email", cleanEmail)
+      .eq("converted", false);
+    if (pErr) console.error("[abandoned-cart] mark persistent converted failed:", pErr);
+
+    // 2. Marcar en abandoned_carts (legacy fallback)
+    const { error: aErr } = await supabase
       .from("abandoned_carts")
       .update({ converted: true, is_completed: true, updated_at: new Date().toISOString() })
-      .eq("customer_email", email.trim().toLowerCase())
+      .eq("customer_email", cleanEmail)
       .eq("converted", false);
-    if (error) console.error("[abandoned-cart] mark converted failed:", error);
+    if (aErr) console.error("[abandoned-cart] mark legacy converted failed:", aErr);
   } catch (e) {
     console.error("[abandoned-cart] mark converted exception:", e);
   }

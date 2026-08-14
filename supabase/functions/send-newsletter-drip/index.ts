@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
           .from('persistent_carts')
           .select('id, status, updated_at')
           .ilike('email', email)
-          .neq('status', 'converted')
+          .eq('converted', false)
           .gte('updated_at', holdCutoff)
           .limit(1)
           .maybeSingle();

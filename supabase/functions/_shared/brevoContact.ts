@@ -132,22 +132,33 @@ export async function upsertBrevoContact(a: Args): Promise<void> {
     console.warn(
       `[brevo-contact] ORIGEN ${originStatus} (recibido="${rawOrigin}", provider="${a.provider ?? ""}") → forzado a "${origin}"`,
     );
-    await logBrevoSync({
-      event_type: "origen_validation",
-      source: "brevo_contact",
-      origin,
-      email: (a.email || "").trim().toLowerCase(),
-      product_name: a.productName,
-      product_sku: a.tiendaSku ?? a.hotmartProductId ?? a.hotmartProductCode ?? (a.skus?.[0]),
-      order_ref: a.orderNumber,
-      status: "failed",
-      attributes: { received_origin: rawOrigin || null, provider: a.provider ?? null, forced_to: origin },
-      error: `ORIGEN ${originStatus}`,
-    });
   }
   attributes.ORIGEN = origin;
   attributes.LAST_ORIGIN = origin;
   attributes.ORIGEN_STATUS = originStatus;
+
+  // Actualizar también email_contacts para asegurar que send-marketing-drip lo encuentre
+  try {
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    await supabase.from("email_contacts").upsert({
+      email,
+      name: a.name || undefined,
+      source: "store_purchase",
+      origin: origin,
+      product_type: a.tiendaSku || (a.skus && a.skus[0]) || undefined,
+      metadata: {
+        order_number: a.orderNumber,
+        provider: a.provider,
+        amount: a.amount,
+        currency: a.currency,
+        phone: phone || undefined,
+        country: country.code || undefined,
+      },
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "email,source" });
+  } catch (e) {
+    console.warn("[brevo-contact] email_contacts sync failed:", e);
+  }
 
   // IDs exactos por canal para saber qué compró en cada plataforma.
   if (a.hotmartProductId) attributes.HOTMART_PRODUCT_ID = a.hotmartProductId;

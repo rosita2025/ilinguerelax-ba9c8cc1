@@ -313,6 +313,8 @@ Deno.serve(async (req) => {
       country: countryHint,
       productName: `newsletter:${source}`,
       provider: 'popup',
+      origin: 'tienda',
+      purchaseStatus: 'pendiente' as any, // Not a purchase but we use this to mark initial state
       ...({ language: lang } as Record<string, unknown>),
     } as Parameters<typeof upsertBrevoContact>[0]);
 

@@ -96,6 +96,22 @@ const AdminBrevoAbandoned = () => {
     } finally { setLoading(false); }
   }, [adminKey, origin, search]);
 
+  const processReminders = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await adminInvoke<any>("send-cart-reminders", { body: { adminKey } });
+      if (error) throw error;
+      toast.success("Recordatorios procesados", { 
+        description: `Enrolados: ${data.enrolled}, Enviados: ${data.sent}, Resueltos: ${data.resolved}` 
+      });
+      load();
+    } catch (e) {
+      toast.error("Error al procesar recordatorios", { description: (e as Error).message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => { void load(); }, [load]);
 
   return (
@@ -113,6 +129,10 @@ const AdminBrevoAbandoned = () => {
             <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-8" placeholder="Buscar por email, SKU o producto…" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void load(); }} />
           </div>
+          <Button variant="outline" size="sm" onClick={() => void processReminders()} disabled={loading} title="Procesar colas de recordatorios ahora">
+            <ShoppingCart className={`w-4 h-4 mr-2 ${loading ? "animate-pulse" : ""}`} />
+            Procesar Colas
+          </Button>
           <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </Button>

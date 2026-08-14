@@ -33,9 +33,27 @@ Deno.serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(BATCH_LIMIT);
 
-    if (pErr) throw pErr;
+    // Complementar con persistent_carts marcados como convertidos
+    const { data: cCarts } = await admin
+      .from('persistent_carts')
+      .select('email, last_activity, items')
+      .eq('converted', true)
+      .order('last_activity', { ascending: false })
+      .limit(BATCH_LIMIT);
 
-    for (const p of purchases || []) {
+    const merged = new Map<string, { email: string; created_at: string; product_type: string }>();
+    (purchases || []).forEach(p => merged.set(p.email, p));
+    (cCarts || []).forEach(c => {
+      if (!merged.has(c.email)) {
+        merged.set(c.email, {
+          email: c.email,
+          created_at: c.last_activity,
+          product_type: Array.isArray(c.items) && c.items[0]?.id ? String(c.items[0].id) : 'tienda'
+        });
+      }
+    });
+
+    for (const p of merged.values()) {
       stats.processed++;
       const email = p.email.toLowerCase().trim();
       const purchasedAt = new Date(p.created_at).getTime();
@@ -45,8 +63,10 @@ Deno.serve(async (req) => {
       let category = 'otro';
       const haystack = `${p.product_type}`.toLowerCase();
       if (haystack.includes('verbo') || haystack.includes('1000')) category = '1000_verbos';
-      else if (haystack.includes('5000')) category = '5000_palabras';
+      else if (haystack.includes('5000') || haystack.includes('palabras')) category = '5000_palabras';
       else if (haystack.includes('coreano')) category = 'coreano_mapas';
+      else if (haystack.includes('patron')) category = 'patrones';
+      else if (haystack.includes('fisico')) category = 'libros_fisicos';
 
       // 4. Buscar pasos que le tocan hoy
       const eligibleSteps = configs.filter(c => c.category === category && c.day_offset <= daysSince);

@@ -140,7 +140,7 @@ function friendlyMessage(phase: Phase, raw: string): string {
   return raw || "Ocurrió un error con PayPal.";
 }
 
-export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError }: Props) {
+export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError, couponCode }: Props & { couponCode?: string }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<ErrState | null>(null);
@@ -219,7 +219,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
             try {
               const data = await invokeWithRetry<{ id: string }>(
                 "paypal-create-order",
-                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail },
+                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, couponCode, country: buyerCountry },
                 "create",
               );
               if (!data?.id) throw new Error("No se pudo crear la orden");

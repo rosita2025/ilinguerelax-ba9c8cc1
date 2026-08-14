@@ -6,6 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Expose-Headers": "x-correlation-id, x-trace-id"
 };
+import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
@@ -46,6 +47,7 @@ Deno.serve(async (req) => {
     const rawDescription = String(body.description ?? "").trim();
     // Always show the public brand on the PayPal review screen.
     const description = (rawDescription ? `iLingue Relax · ${rawDescription}` : "iLingue Relax").slice(0, 127);
+    const bodyItems = body.items && Array.isArray(body.items) ? body.items : [{ id: "paypal-checkout", quantity: 1 }];
 
     const buyerEmail = body.buyerEmail ? String(body.buyerEmail).slice(0, 254) : undefined;
     // Client-supplied correlation id ties create + capture + client console.
@@ -53,18 +55,45 @@ Deno.serve(async (req) => {
     const correlationId = /^[A-Za-z0-9._:-]{6,64}$/.test(rawCorr) ? rawCorr : `srv-${traceId}`;
 
 
-    // Decide currency + amount with explicit fallback trace.
-    let currency = currencyReq;
-    let amount = amountReq;
+    // Decide currency + amount with server-side catalog validation.
+    let finalAmount = amountReq;
+    let finalCurrency = currencyReq;
+
+    try {
+      const pricing = await resolveServerPricing({
+        items: bodyItems,
+        country: country,
+        couponCode: couponCode
+      });
+      finalAmount = pricing.totalUsd;
+      finalCurrency = "USD"; // PayPal checkout usually USD for us
+      
+      // If client asked for supported currency, we can use it, but resolveServerPricing 
+      // is the authority on the total value.
+      if (PAYPAL_SUPPORTED.has(currencyReq)) {
+        finalCurrency = currencyReq;
+        // Re-calculate local total if needed, or stick to USD for simplicity in PayPal.
+        // For now, enforcing the catalog total USD.
+      }
+    } catch (e) {
+      if (e instanceof PricingError) {
+        return new Response(JSON.stringify({ error: e.message, trace: traceId }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+      throw e;
+    }
+
+    let currency = finalCurrency;
+    let amount = finalAmount;
     let fallbackApplied = false;
     let fallbackReason: string | null = null;
+
     if (!PAYPAL_SUPPORTED.has(currency)) {
       fallbackApplied = true;
       fallbackReason = `currency_not_supported:${currency}`;
       currency = "USD";
-      if (Number.isFinite(amountUsdHint) && (amountUsdHint as number) > 0) {
-        amount = amountUsdHint as number;
-      }
+      // amount is already the catalog USD total from resolveServerPricing
     }
 
     console.log(JSON.stringify({

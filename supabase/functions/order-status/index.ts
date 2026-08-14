@@ -125,12 +125,12 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: true }),
       supabase
         .from("manual_payments")
-        .select("order_number, buyer_email, status, method, amount_usd, amount_local, currency_local, created_at, verified_at, tracking_number, shipping_provider")
+        .select("order_number, buyer_email, status, method, amount_usd, amount_local, currency_local, created_at, verified_at, tracking_number, shipping_provider, shipping_proof_url")
         .eq("order_number", orderNumber)
         .maybeSingle(),
       supabase
         .from("shopify_sales")
-        .select("id, customer_email, status, amount, currency, created_at, tracking_number, shipping_provider")
+        .select("id, customer_email, status, amount, currency, created_at, tracking_number, shipping_provider, shipping_proof_url")
         .or(`order_number.eq.${orderNumber},id.eq.${orderNumber}`)
         .maybeSingle(),
       supabase
@@ -337,6 +337,7 @@ Deno.serve(async (req) => {
     // Tracking info
     const tracking_number = manual?.tracking_number ?? shopify?.tracking_number ?? null;
     const shipping_provider = manual?.shipping_provider ?? shopify?.shipping_provider ?? null;
+    const shipping_proof_url = manual?.shipping_proof_url ?? shopify?.shipping_proof_url ?? null;
 
     return json({
       found: true,
@@ -352,7 +353,8 @@ Deno.serve(async (req) => {
       deliveredAt: (sends ?? [])[0]?.created_at ?? timeline.find((t) => t.event === "delivery_sent")?.createdAt ?? null,
       timeline,
       tracking_number,
-      shipping_provider
+      shipping_provider,
+      shipping_proof_url
     });
   } catch (e) {
     console.error("order-status error:", e);

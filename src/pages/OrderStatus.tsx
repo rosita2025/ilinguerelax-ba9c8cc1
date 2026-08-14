@@ -49,6 +49,7 @@ interface OrderStatusResult {
   timeline?: TimelineItem[];
   tracking_number?: string | null;
   shipping_provider?: string | null;
+  shipping_proof_url?: string | null;
 }
 
 const EVENT_LABEL: Record<string, string> = {
@@ -369,8 +370,17 @@ export default function OrderStatus() {
                 </div>
                 {result.tracking_number && (
                   <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg p-3 flex-1 min-w-[240px]">
-                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm mb-1">
-                      <Truck className="w-4 h-4" /> Seguimiento de envío
+                    <div className="flex items-center justify-between gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm mb-2">
+                      <div className="flex items-center gap-2">
+                        <Truck className="w-4 h-4" /> Seguimiento de envío
+                      </div>
+                      {result.shipping_proof_url && (
+                        <Button asChild variant="outline" size="sm" className="h-7 text-[10px] bg-white dark:bg-black/20 border-emerald-500/30 text-emerald-700 hover:text-emerald-800">
+                          <a href={result.shipping_proof_url} target="_blank" rel="noopener noreferrer">
+                            <ImageIcon className="w-3 h-3 mr-1" /> Ver Comprobante
+                          </a>
+                        </Button>
+                      )}
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">

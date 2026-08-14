@@ -355,7 +355,7 @@ export function BuyerInfoForm() {
                     )}
                   >
                     <option value="">{t.selectCountry}</option>
-                    <option value="US">USA 🇺🇸</option>
+                    <option value="US">United States 🇺🇸</option>
                     <option value="CA">Canada 🇨🇦</option>
                     <option value="GB">United Kingdom 🇬🇧</option>
                     <option value="AU">Australia 🇦🇺</option>

@@ -47,6 +47,7 @@ const VALID_COUPONS: Record<string, number> = {
  */
 export const FIXED_TOTAL_COUPONS: Record<string, number> = {
   DLTEST1: 1,
+  FIXED1: 1,
 };
 
 export function fixedTotalForCoupon(code: string | null | undefined): number | null {

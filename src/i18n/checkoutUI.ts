@@ -343,6 +343,7 @@ const pt: CheckoutUIStrings = {
   shippingNoticeGlobal: "Envio EUA/CAN/UK: 3-5 dias. Preparação: 5-7 dias.",
   shippingNoticeAsia: "Ásia: Não disponível no momento (em breve).",
   freeDigitalDelivery: "Grátis (Entrega Digital)",
+  digitalAlternativeSuggest: "Considere comprar a versão digital disponível para todo o mundo.",
   standardShipping: "Envio Padrão",
   freeShipping: "Envio Grátis",
   digital: "Digital",

@@ -125,11 +125,11 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
     let lastErr: unknown = null;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
-        const { data, error } = await supabase.functions.invoke(fnName, {
+        const { data, error } = await invokeEdge<T>(fnName, {
           body: { ...body, correlationId },
           headers: { "x-correlation-id": correlationId },
-        });
-        if (error) throw new Error(error.message || `Error en ${fnName}`);
+        }, { attempts: 2 });
+        if (error) throw new Error((error as Error)?.message || `Error en ${fnName}`);
         console.info(`[paypal] ${fnName} ok`, { correlationId, attempt });
         return data as T;
       } catch (e) {

@@ -335,6 +335,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
         normalizedParams.currency = "USD";
       } catch {}
     } else if (normalizedParams.value !== undefined) {
+      // Forzado estricto a 2 decimales para evitar el error de precisión en el debugger
       normalizedParams.value = Number(Number(normalizedParams.value).toFixed(2));
     }
 

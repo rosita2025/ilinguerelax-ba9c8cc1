@@ -155,6 +155,7 @@ export async function resolveServerPricing(opts: {
   items: Array<{ id: string; quantity: number; price?: number | null }>;
   country?: string | null;
   couponCode?: string | null;
+  currency?: string | null;
 }): Promise<ResolvedPricing> {
   const tier = tierForCountry(opts.country);
   const supabase = serviceClient();

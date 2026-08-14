@@ -142,12 +142,24 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
                     .filter(([, v]) => Number.isFinite(v as number) && (v as number) > 0),
                 ) as Record<string, number>
               : null;
+
+          const rawLocalUsd = (row as any).local_usd_prices;
+          const local_usd_prices: Record<string, number> | null =
+            rawLocalUsd && typeof rawLocalUsd === "object" && !Array.isArray(rawLocalUsd)
+              ? Object.fromEntries(
+                  Object.entries(rawLocalUsd)
+                    .map(([k, v]) => [String(k).toUpperCase(), Number(v)])
+                    .filter(([, v]) => Number.isFinite(v as number) && (v as number) > 0),
+                ) as Record<string, number>
+              : null;
+
           const entry: LivePrice = {
             price_usd: Number(row.price_usd) || 0,
             price_usd_latam: row.price_usd_latam != null ? Number(row.price_usd_latam) : null,
             price_usd_tienda: row.price_usd_tienda != null ? Number(row.price_usd_tienda) : null,
             price_pen: row.price_pen != null ? Number(row.price_pen) : null,
             local_prices: local_prices && Object.keys(local_prices).length ? local_prices : null,
+            local_usd_prices: local_usd_prices && Object.keys(local_usd_prices).length ? local_usd_prices : null,
           };
           map[row.sku] = entry;
           for (const alias of row.sku_aliases ?? []) {

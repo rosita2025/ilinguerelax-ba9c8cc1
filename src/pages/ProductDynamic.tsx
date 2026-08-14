@@ -176,13 +176,13 @@ const ProductDynamic = () => {
   // (`digital_products`) + la moneda local del visitante. El hero y el sticky
   // bar leen exactamente el mismo par (etiqueta, moneda) para que nunca haya
   // dos precios distintos en la misma página.
-  const isPEN = local.country === "PE" && product.price_pen != null;
-  const displayPrice = isPEN ? Number(product.price_pen) : local.amount;
+  const isPEN = local.country === "PE" && product?.price_pen != null;
+  const displayPrice = isPEN ? Number(product.price_pen) : (local.amount || 0);
 
   const displayFormatted = isPEN
     ? formatCurrencyAmount(Number(product.price_pen), "PEN")
-    : local.formatted;
-  const displayCurrencyCode = isPEN ? "PEN" : local.currency;
+    : (local.formatted || "$0.00");
+  const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
   const originalFormatted = formatCurrencyAmount(displayPrice * 2.5, displayCurrencyCode as Currency);
   const reviewsCount = product.review_count != null ? Number(product.review_count) : 0;
   const reviewsRating = product.rating != null ? Number(product.rating) : 0;

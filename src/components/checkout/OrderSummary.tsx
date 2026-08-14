@@ -320,7 +320,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
               <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
               {showLocalRef && (
                 <div className="text-[10px] text-muted-foreground font-normal">
-                  {localTotal.isUsd ? `≈ ${localTotalLabel}` : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                  {localTotal.isUsd 
+                    ? `≈ USD $${grandTotal.toFixed(2)}` 
+                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
                 </div>
               )}
             </div>

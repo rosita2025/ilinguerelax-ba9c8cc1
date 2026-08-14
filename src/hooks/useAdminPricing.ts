@@ -89,7 +89,7 @@ export function useAdminPricing(sku: string): AdminPricing {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count")
+          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices")
           .eq("sku", sku)
           .maybeSingle();
         data = result.data as typeof data;

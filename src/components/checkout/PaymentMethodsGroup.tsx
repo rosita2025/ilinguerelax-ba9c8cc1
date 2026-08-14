@@ -363,14 +363,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     selectedMethod === "binance"
   );
   
-  const showUsdOnly = (isGlobalGateway && !["PE", "MX", "ES"].includes(countryCode)) || isFallingBackToUsd;
+  const showUsdOnly = isFallingBackToUsd;
   
-  const localFormatted = local.loading || local.isUsd || showUsdOnly 
+  const localFormatted = local.loading || showUsdOnly 
     ? `USD $${totalUsd}` 
     : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
 
   const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total) : null;
-  const isActuallyShowingLocal = !penBadge && !local.loading && !showUsdOnly;
+  const isActuallyShowingLocal = !penBadge && !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.

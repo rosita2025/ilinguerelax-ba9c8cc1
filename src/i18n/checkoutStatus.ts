@@ -32,6 +32,9 @@ export interface CheckoutStatusStrings {
   paymentRef: string;
   continueShopping: string;
   contactSupport: string;
+  shippingEligibility: string;
+  shippingEligibilityDesc: string;
+  paymentMethodConfirmed: string;
 
   // Pending
   paymentPending: string;

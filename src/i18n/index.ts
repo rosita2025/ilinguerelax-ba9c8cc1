@@ -263,14 +263,14 @@ const AMBIGUOUS_DOLLAR_CURRENCIES = new Set<Currency>([
  * comma for decimals (e.g. 1.889,25). Used everywhere a local-currency amount
  * is printed so cart, checkout and product pages never disagree.
  */
-export const formatAmountLocalized = (amount: number, decimals: number): string =>
-  amount.toLocaleString("es-ES", {
+export const formatAmountLocalized = (amount: number, decimals: number): string => {
+  const formatted = amount.toLocaleString("es-ES", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-    // es-ES omits grouping for 4-digit integers (1889 -> "1889"); force it so
-    // every amount reads the same way (1.889,25).
-    useGrouping: "always" as unknown as boolean,
+    useGrouping: true,
   });
+  return formatted;
+};
 
 /**
  * Formats an amount that is ALREADY in the target currency (no conversion),

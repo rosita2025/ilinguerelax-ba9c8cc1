@@ -1957,7 +1957,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </div>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  <Lock className="w-3.5 h-3.5" /> {language === "en" ? "Securely processed by Stripe" : t.processedBy}
+                  <Lock className="w-3.5 h-3.5" /> Securely processed by Stripe
                 </div>
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (

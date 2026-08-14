@@ -130,9 +130,9 @@ function sectionLabel(section: MethodSection, language: string) {
 
 
 
-const YAPE_PHONE = "972119741";
-const YAPE_NAME = "Carmen Aliaga";
-const WHATSAPP_URL = "https://wa.link/unpa9n";
+const YAPE_PHONE = "+51 972 119 741";
+const YAPE_NAME = "Carmen Rosa Aliaga Domínguez";
+const WHATSAPP_URL = "https://wa.me/12512724704";
 
 const CLABE_NUMBER = "646180546709905176";
 const CLABE_HOLDER = "Carmen Rosa Aliaga Domínguez";

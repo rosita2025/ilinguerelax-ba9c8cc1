@@ -100,25 +100,6 @@ export default function AdminMarketingDrips() {
     }
   }, [adminKey]);
 
-  const filteredSends = useMemo(() => {
-    if (!search) return sends;
-    const s = search.toLowerCase();
-    return sends.filter(item => 
-      item.email?.toLowerCase().includes(s) || 
-      item.category?.toLowerCase().includes(s) ||
-      item.metadata?.country?.toLowerCase().includes(s)
-    );
-  }, [sends, search]);
-
-  const filteredAbandoned = useMemo(() => {
-    if (!search) return abandonedLogs;
-    const s = search.toLowerCase();
-    return abandonedLogs.filter(item => 
-      item.email?.toLowerCase().includes(s) || 
-      item.product_name?.toLowerCase().includes(s) ||
-      item.attributes?.COUNTRY_CODE?.toLowerCase().includes(s)
-    );
-  }, [abandonedLogs, search]);
 
   return (
     <div className="space-y-6">

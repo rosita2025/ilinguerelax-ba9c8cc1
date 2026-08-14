@@ -1265,6 +1265,48 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_rate_history: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          rate: number
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          rate: number
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          rate?: number
+        }
+        Relationships: []
+      }
+      exchange_rates: {
+        Row: {
+          code: string
+          last_updated: string | null
+          markup_percent: number
+          rate: number
+        }
+        Insert: {
+          code: string
+          last_updated?: string | null
+          markup_percent?: number
+          rate: number
+        }
+        Update: {
+          code?: string
+          last_updated?: string | null
+          markup_percent?: number
+          rate?: number
+        }
+        Relationships: []
+      }
       funnel_events: {
         Row: {
           bot_reason: string | null

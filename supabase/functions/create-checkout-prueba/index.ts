@@ -135,9 +135,8 @@ Deno.serve(async (req) => {
     // Favor local currency if supported and not restricted.
     const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(body.contact.country);
     
-    // Stripe handle Adaptive Pricing better when the base currency matches the catalog (USD)
-    // but the final session can be shown in local. We prefer local currency processing 
-    // for non-restricted countries.
+    // Explicitly target the detected currency to help Stripe Adaptive Pricing 
+    // align with our displayed local badges, while maintaining USD as base.
     const targetCurrency = forceUsd ? "usd" : currency;
 
     console.log(`[Stripe] Creating session. TargetCurrency: ${targetCurrency}, ForceUSD: ${forceUsd}, Country: ${body.contact.country}`);
@@ -148,9 +147,11 @@ Deno.serve(async (req) => {
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
       // Adaptive Pricing allows Stripe to present local currency automatically if enabled.
+      // We pass the currency explicitly to encourage it to match our front-end sum.
       adaptive_pricing: { enabled: !forceUsd },
       currency: targetCurrency,
       customer_email: body.contact.email,
+
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",
         receipt_email: body.contact.email,

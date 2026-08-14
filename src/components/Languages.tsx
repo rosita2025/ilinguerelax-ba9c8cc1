@@ -433,9 +433,6 @@ export const Languages = () => {
             );
           })}
         </div>
-            );
-          })}
-        </div>
         )}
 
         {/* Coming Soon Languages */}

@@ -32,7 +32,7 @@ type Ctx = {
   version: number;
   prices: Record<string, LivePrice>;
   getLivePrice: (slugOrSku: string) => LivePrice | undefined;
-  getLocalOverrides: (slugOrSku?: string | null) => Record<string, number> | null;
+  getLocalOverrides: (slugOrSku?: string | null) => { local_prices: Record<string, number> | null; local_usd_prices: Record<string, number> | null };
 };
 
 const LivePricesContext = createContext<Ctx>({

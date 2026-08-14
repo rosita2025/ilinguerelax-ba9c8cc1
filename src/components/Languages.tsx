@@ -428,19 +428,11 @@ export const Languages = () => {
                     </Link>
                   </div>
                 </div>
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
-                      </>
-                    )}
-                  </div>
-                  <Button size="sm" className="gap-2" asChild>
-                    <Link to={getProductLink(product)}>
-                      <ShoppingCart className="w-4 h-4" />
-                      {product.price === 0 ? (language === 'en' ? 'Free' : 'Gratis') : c.buy}
-                    </Link>
-                  </Button>
-                </div>
               </div>
             </div>
+            );
+          })}
+        </div>
             );
           })}
         </div>

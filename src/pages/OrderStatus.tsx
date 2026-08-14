@@ -36,7 +36,7 @@ interface TimelineItem {
 interface OrderStatusResult {
   found: boolean;
   orderNumber?: string;
-  stage?: "pending" | "paid" | "delivered";
+  stage?: "pending" | "paid" | "shipped" | "delivered";
   outcome?: "approved" | "rejected" | "processing";
   abandoned?: boolean;
 
@@ -153,6 +153,7 @@ const OUTCOME_UI = {
 const STAGES = [
   { key: "pending", label: "Pendiente", icon: Clock },
   { key: "paid", label: "Pagado", icon: CheckCircle2 },
+  { key: "shipped", label: "Enviado", icon: Truck },
   { key: "delivered", label: "Entregado", icon: PackageCheck },
 ] as const;
 

@@ -325,7 +325,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                 <div className="text-[10px] text-muted-foreground font-normal">
                   {localTotal.isUsd 
                     ? `≈ USD $${grandTotal.toFixed(2)}` 
-                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                    : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`.replace("(", "").replace(")", "")}
                 </div>
               )}
             </div>

@@ -21,7 +21,7 @@ import ProductUpdateNoticePanel from "@/components/admin/ProductUpdateNoticePane
 import ProductLaunchPanel from "@/components/admin/ProductLaunchPanel";
 import GoogleDrivePreview from "@/components/admin/GoogleDrivePreview";
 import { normalizeDriveUrl } from "@/lib/googleDrive";
-import { exchangeRates, type Currency } from "@/i18n";
+import { exchangeRates, currencyConfig, type Currency } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 
@@ -358,8 +358,23 @@ const AdminProductEdit = () => {
           confirmDriveChange,
           product: (() => {
             const { bonus_titles, id, created_at, updated_at, ...cleanProduct } = product as any;
+            
+            // Normalize and round local prices before saving
+            const normalizedLocalPrices: Record<string, number> = {};
+            if (product.local_prices) {
+              Object.entries(product.local_prices).forEach(([code, amount]) => {
+                const numAmount = Number(amount);
+                if (!isNaN(numAmount) && numAmount > 0) {
+                  const config = currencyConfig[code as Currency];
+                  const decimals = config?.decimals ?? 2;
+                  normalizedLocalPrices[code] = Math.round(numAmount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                }
+              });
+            }
+
             return {
               ...cleanProduct,
+              local_prices: normalizedLocalPrices,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               gallery_metadata: product.gallery_metadata || {},
               upsells,
@@ -1028,8 +1043,15 @@ const AdminProductEdit = () => {
                           onChange={(e) => {
                             const v = e.target.value;
                             const next = { ...(product.local_prices || {}) };
-                            if (v === "" || Number(v) <= 0) delete next[code];
-                            else next[code] = Number(v);
+                            if (v === "" || Number(v) <= 0) {
+                              delete next[code];
+                            } else {
+                              const amount = Number(v);
+                              const config = currencyConfig[code as Currency];
+                              const decimals = config?.decimals ?? 2;
+                              // Round to the correct number of decimals immediately for UI consistency
+                              next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                            }
                             update("local_prices", next);
                           }}
                           placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}

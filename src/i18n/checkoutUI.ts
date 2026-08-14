@@ -148,7 +148,7 @@ const es: CheckoutUIStrings = {
   physical: "Físico",
   configureShipping: "Configurar envío e ir al checkout",
 
-  choosePaymentMethod: "Elige tu método de pago",
+  choosePaymentMethod: "Método de pago",
   cardPayment: "Pago con tarjeta",
   cardTitlePeru: "Tarjeta, Apple Pay o Link",
   cardTitleGlobal: "Tarjeta débito o crédito",

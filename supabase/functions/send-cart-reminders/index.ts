@@ -13,13 +13,15 @@ import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 
 const corsHeaders = adminCorsHeaders;
 // Steps are measured in MINUTES. 30 min, 1440 min (1 día), 7200 min (5 días).
-const STEPS = [30, 1440, 7200] as const;
+const STEPS = [30, 1440, 7200, 21600, 43200] as const; // Added 15 days and 30 days steps
 type Step = typeof STEPS[number];
 
 const SUBJECTS_ES: Record<Step, string> = {
   30: "👀 ¿Olvidaste algo? Tu carrito sigue esperándote",
   1440: "⏰ Tu carrito te está esperando — recupéralo hoy",
   7200: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
+  21600: "🎁 Tenemos un regalo para ti (Finaliza tu pedido)",
+  43200: "👋 ¿Sigues ahí? Tu carrito extraña su nuevo hogar",
 };
 
 interface ProductItem {
@@ -40,6 +42,8 @@ function buildHtml(opts: {
     30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tus productos siguen reservados — retómalos en 1 clic.",
     1440: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
     7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
+    21600: "Han pasado unos días desde que mostraste interés. Queremos que alcances tus metas de idiomas, por eso te guardamos este carrito.",
+    43200: "Esta es nuestra última comunicación sobre este carrito. Si aún quieres aprender con nosotros, este es el momento.",
   };
 
   const productsHtml = opts.products.map((p) => `
@@ -305,6 +309,8 @@ Deno.serve(async (req) => {
           30: 25 * 60 * 1000,
           1440: 20 * 3600 * 1000,
           7200: 4 * 24 * 3600 * 1000,
+          21600: 10 * 24 * 3600 * 1000,
+          43200: 10 * 24 * 3600 * 1000,
         };
         // NOTA: la tabla usa `sent_at` (no `created_at`); usar la columna
         // equivocada hacía que estos filtros fallaran y se desactivara el

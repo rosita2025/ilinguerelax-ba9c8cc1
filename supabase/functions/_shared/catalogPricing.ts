@@ -333,10 +333,11 @@ export function localTotalFromPricing(
   const withCoupon = subtotal * (1 - (pricing.couponPercent || 0) / 100);
   const totalLocal = withCoupon + shippingLocal;
 
-  if (!Number.isFinite(withCoupon) || withCoupon <= 0) {
+  if (!Number.isFinite(totalLocal) || totalLocal <= 0) {
     return localAmountFromUsd(pricing.totalUsd, code);
   }
   return ZERO_DECIMAL_CURRENCIES.has(code)
-    ? Math.round(withCoupon)
-    : Number(withCoupon.toFixed(2));
+    ? Math.round(totalLocal)
+    : Number(totalLocal.toFixed(2));
+
 }

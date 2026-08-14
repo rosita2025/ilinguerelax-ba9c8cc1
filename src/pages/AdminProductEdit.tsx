@@ -358,8 +358,22 @@ const AdminProductEdit = () => {
           confirmDriveChange,
           product: (() => {
             const { bonus_titles, id, created_at, updated_at, ...cleanProduct } = product as any;
+            
+            // Normalize and round local prices before saving
+            const normalizedLocalPrices: Record<string, number> = {};
+            if (product.local_prices) {
+              Object.entries(product.local_prices).forEach(([code, amount]) => {
+                if (typeof amount === 'number' && amount > 0) {
+                  const config = currencyConfig[code as Currency];
+                  const decimals = config?.decimals ?? 2;
+                  normalizedLocalPrices[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                }
+              });
+            }
+
             return {
               ...cleanProduct,
+              local_prices: normalizedLocalPrices,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               gallery_metadata: product.gallery_metadata || {},
               upsells,

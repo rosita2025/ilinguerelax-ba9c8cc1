@@ -126,7 +126,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </span>
             {showLocalRef && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                {localTotal.isUsd ? `≈ ${localTotalLabel}` : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
+                {localTotal.isUsd 
+                  ? `≈ USD $${grandTotal.toFixed(2)}` 
+                  : `≈ ${formatCurrencyAmount(grandTotal, "USD")}`}
               </span>
             )}
           </span>

@@ -326,12 +326,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div>{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
+              <div className="text-xl">{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
               {showLocalRef && (
-                <div className="text-[10px] text-muted-foreground font-normal">
-                  {localTotal.isUsd 
-                    ? `≈ USD $${localItemsSum.usdReference.toFixed(2)}` 
-                    : `≈ USD $${localItemsSum.usdReference.toFixed(2)}`}
+                <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
+                  ≈ USD ${localItemsSum.usdReference.toFixed(2)}
                 </div>
               )}
             </div>

@@ -57,7 +57,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     selectedMethod.startsWith("dlocal") || 
     selectedMethod === "card" || 
     selectedMethod === "paypal" || 
-    selectedMethod === "binance"
+    selectedMethod === "binance" ||
+    selectedMethod === "clabe" ||
+    selectedMethod === "yape" ||
+    selectedMethod === "transfer"
   );
 
   const penMode = penTotals !== null && !isGlobalGateway;

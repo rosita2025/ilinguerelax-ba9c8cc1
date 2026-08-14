@@ -897,7 +897,10 @@ const AdminProductEdit = () => {
                       type="number" step="0.01"
                       className="w-24 h-8 text-sm font-bold border-primary/30"
                       value={product.price_usd}
-                      onChange={(e) => update("price_usd", Number(e.target.value))}
+                      onChange={(e) => {
+                        const val = e.target.value === "" ? 0 : Number(e.target.value);
+                        update("price_usd", val);
+                      }}
                       placeholder="15.00"
                     />
                   </div>

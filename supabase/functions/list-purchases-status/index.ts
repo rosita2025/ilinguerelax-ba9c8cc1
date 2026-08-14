@@ -6,8 +6,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
-type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "unknown";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify";
+type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {
   id: string;

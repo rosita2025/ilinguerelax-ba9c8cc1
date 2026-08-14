@@ -1,7 +1,7 @@
 // Capture a PayPal order server-side after buyer approves in the popup.
 const corsHeaders = { 
   "Access-Control-Allow-Origin": "*", 
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id, x-trace-id", 
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa, x-correlation-id, x-trace-id, x-requested-with", 
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Expose-Headers": "x-correlation-id, x-trace-id"
 };

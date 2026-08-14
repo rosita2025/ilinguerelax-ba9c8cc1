@@ -116,6 +116,7 @@ async function directFetchFallback<T>(
       credentials: "omit", // Use omit for cross-origin apikey auth unless Supabase is on the same domain
       headers: {
         "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
         apikey: key,
         Authorization: `Bearer ${key}`,
         ...(invokeArgs.headers ?? {}),

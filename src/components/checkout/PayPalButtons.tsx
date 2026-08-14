@@ -47,7 +47,9 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
       if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
       if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
       
-      document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => s.remove());
+      document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => {
+        try { s.parentNode?.removeChild(s); } catch { s.remove(); }
+      });
       window.paypal = undefined;
       loadedClientId = clientId;
       loadedCurrency = currency;
@@ -121,8 +123,14 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function friendlyMessage(phase: Phase, raw: string): string {
   const r = (raw || "").toLowerCase();
-  if (r.includes("failed to fetch") || r.includes("network")) {
-    return "Problema de conexión. Verifica tu internet e intenta de nuevo.";
+  if (r.includes("failed to fetch") || r.includes("network") || r.includes("load failed")) {
+    return "Problema de conexión. Verifica tu internet o desactiva bloqueadores de anuncios.";
+  }
+  if (r.includes("403") || r.includes("forbidden")) {
+    return "Acceso denegado. Intenta recargar la página o usa otro navegador.";
+  }
+  if (r.includes("401") || r.includes("unauthorized")) {
+    return "Sesión expirada o error de configuración. Por favor, recarga.";
   }
   if (r.includes("no está configurado") || r.includes("clientid")) {
     return "PayPal no está disponible en este momento.";

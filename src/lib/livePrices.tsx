@@ -18,6 +18,8 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { supabase } from "@/integrations/supabase/client";
 import { products, type Product, type LangCode } from "@/data/products";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
+import { updateExchangeRates, type Currency } from "@/i18n";
+
 
 export type LivePrice = {
   price_usd: number;
@@ -124,12 +126,35 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
 
     const load = async () => {
       try {
-        const { data, error } = await supabase
-          .from("digital_products")
-          .select("sku, name, description, target_language, learner_language, cover_image_url, is_upsell, is_physical, price_usd, price_usd_latam, price_usd_tienda, price_pen, sku_aliases, local_prices, local_usd_prices")
-          .eq("active", true);
-        if (error || !data) return;
+        // Fetch products and exchange rates in parallel
+        const [productsResp, ratesResp] = await Promise.all([
+          supabase
+            .from("digital_products")
+            .select("sku, name, description, target_language, learner_language, cover_image_url, is_upsell, is_physical, price_usd, price_usd_latam, price_usd_tienda, price_pen, sku_aliases, local_prices, local_usd_prices")
+            .eq("active", true),
+          supabase
+            .from("exchange_rates")
+            .select("code, rate, markup_percent")
+        ]);
+
+        if (productsResp.error || !productsResp.data) return;
         if (cancelled) return;
+
+        // Update global exchange rates first
+        if (ratesResp.data) {
+          const newRates: Partial<Record<Currency, number>> = {};
+          for (const r of ratesResp.data) {
+            const code = r.code as Currency;
+            const baseRate = Number(r.rate);
+            const markup = Number(r.markup_percent || 0);
+            // Aplicar markup: PrecioLocal = PrecioUSD * (Tasa * (1 + markup/100))
+            newRates[code] = baseRate * (1 + markup / 100);
+          }
+          updateExchangeRates(newRates);
+        }
+
+        const data = productsResp.data;
+
 
         const map: Record<string, LivePrice> = {};
         for (const row of data) {

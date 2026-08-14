@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
     const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
 
     const localCurrency = (body.currency || "USD").toUpperCase();
-    const localAmount = localTotalFromPricing(pricing, localCurrency);
+    const localAmount = await localTotalFromPricing(pricing, localCurrency);
     const restricted = isRestrictedCurrency(body.country);
 
     // Prioritize local currency if supported, NOT restricted, and we have a valid amount.

@@ -332,14 +332,17 @@ export async function resolveServerPricing(opts: {
  *
  * Así el importe cobrado por la pasarela coincide con el que vio el comprador.
  */
-export function localTotalFromPricing(
+export async function localTotalFromPricing(
   pricing: ResolvedPricing,
   currency: string,
-): number | null {
+): Promise<number | null> {
+
   const code = String(currency || "").toUpperCase();
   if (code === "USD") return Number(pricing.totalUsd.toFixed(2));
-  const rate = FX_USD_TO_LOCAL[code];
-  if (!rate || !Number.isFinite(rate) || rate <= 0) return null;
+  const liveRate = await localAmountFromUsd(1, code);
+  if (!liveRate) return null;
+  const rate = liveRate; // liveRate is already adjusted with markup if it's from localAmountFromUsd(1, ...)
+
 
   let subtotal = 0;
   for (const item of pricing.items) {
@@ -362,16 +365,17 @@ export function localTotalFromPricing(
   const shippingCost = isLatam ? 9 : 8;
   const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingCost) : 0;
 
-  const shippingLocal = shippingUsd * rate;
+  const shippingLocal = await localAmountFromUsd(shippingUsd, code) || (shippingUsd * rate);
 
   const withCoupon = subtotal * (1 - (pricing.couponPercent || 0) / 100);
   const totalLocal = withCoupon + shippingLocal;
 
   if (!Number.isFinite(totalLocal) || totalLocal <= 0) {
-    return localAmountFromUsd(pricing.totalUsd, code);
+    return await localAmountFromUsd(pricing.totalUsd, code);
   }
   return ZERO_DECIMAL_CURRENCIES.has(code)
     ? Math.round(totalLocal)
     : Number(totalLocal.toFixed(2));
+
 
 }

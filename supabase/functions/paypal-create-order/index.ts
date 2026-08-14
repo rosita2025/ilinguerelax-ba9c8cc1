@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Expose-Headers": "x-correlation-id, x-trace-id"
 };
-import { resolveServerPricing, PricingError } from "../_shared/catalogPricing.ts";
+import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
 
 const PAYPAL_ENV = (Deno.env.get("PAYPAL_ENV") ?? "live").toLowerCase() === "sandbox" ? "sandbox" : "live";
 const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";

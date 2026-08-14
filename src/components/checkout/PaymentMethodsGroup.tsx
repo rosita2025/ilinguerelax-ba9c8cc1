@@ -64,10 +64,10 @@ const applePayLogo = "/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/appl
 function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
+      className="inline-flex items-center justify-center h-4 w-7 rounded border border-neutral-200 dark:border-neutral-700 shrink-0"
       style={{ background: bg }}
     >
-      <img src={src} alt={alt} className="max-h-3.5 max-w-[24px] object-contain" />
+      <img src={src} alt={alt} className="max-h-2.5 max-w-[20px] object-contain grayscale opacity-60" />
     </span>
   );
 }
@@ -75,13 +75,12 @@ function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?
 function GooglePayBadge() {
   return (
     <span
-      className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0 bg-white"
+      className="inline-flex items-center justify-center h-4 w-7 rounded border border-neutral-200 dark:border-neutral-700 shrink-0 bg-white"
       role="img"
       aria-label="Google Pay"
     >
-      <span className="text-[10px] font-bold leading-none tracking-tight" aria-hidden="true">
-        <span style={{ color: "#1A56C4" }}>G</span>
-        <span style={{ color: "#3C4043" }}> Pay</span>
+      <span className="text-[8px] font-bold leading-none tracking-tight opacity-60 grayscale" aria-hidden="true">
+        GPay
       </span>
     </span>
   );
@@ -91,10 +90,10 @@ function GooglePayBadge() {
 function LinkBadge() {
   return (
     <span
-      className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 dark:border-neutral-700 shadow-sm shrink-0"
-      style={{ background: "#00D66F" }}
+      className="inline-flex items-center justify-center h-4 w-7 rounded border border-neutral-200 dark:border-neutral-700 shrink-0"
+      style={{ background: "#f8fafc" }}
     >
-      <span className="text-[10px] font-bold tracking-tight leading-none" style={{ color: "#0A2540" }}>
+      <span className="text-[8px] font-bold tracking-tight leading-none text-neutral-400" aria-hidden="true">
         Link
       </span>
     </span>
@@ -103,8 +102,8 @@ function LinkBadge() {
 
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
-    <span className="inline-flex items-center gap-1 h-5 px-1.5 rounded-md border border-neutral-300 bg-neutral-50 text-neutral-800 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 text-[10px] font-semibold tracking-tight leading-none shrink-0">
-      <span className="w-1.5 h-1.5 rounded-full shrink-0 ring-1 ring-inset ring-black/10" style={{ background: bg }} aria-hidden="true" />
+    <span className="inline-flex items-center gap-1 h-4 px-1 rounded border border-neutral-200 bg-neutral-50/50 text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400 text-[8px] font-medium tracking-tight leading-none shrink-0">
+      <span className="w-1 h-1 rounded-full shrink-0 opacity-60" style={{ background: bg }} aria-hidden="true" />
       {label}
     </span>
   );

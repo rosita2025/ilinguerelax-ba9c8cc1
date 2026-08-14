@@ -28,6 +28,7 @@ export default function AdminMarketingDrips() {
   const [configs, setConfigs] = useState<DripConfig[]>([]);
   const [sends, setSends] = useState<DripSend[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -37,6 +38,10 @@ export default function AdminMarketingDrips() {
       
       if (configData) setConfigs(configData as any);
       if (sendsData) setSends(sendsData as any);
+
+      // Calculamos stats rápidos
+      const sentToday = sendsData?.filter(s => new Date(s.sent_at).toDateString() === new Date().toDateString()).length || 0;
+      setStats({ sentToday });
     } catch (e) {
       toast.error("Error al cargar datos");
     } finally {
@@ -74,8 +79,8 @@ export default function AdminMarketingDrips() {
     <div className="space-y-8">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold">Marketing Post-Compra</h1>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">Automatización de lanzamientos a los 7, 15 y 25 días.</p>
+            <h1 className="text-lg sm:text-xl font-bold">Marketing & Secuencias Automáticas</h1>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Automatización de lanzamientos post-compra y secuencias de bienvenida.</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={processDrips} disabled={loading} variant="outline" size="sm" className="h-8 sm:h-9 text-[10px] sm:text-xs">
@@ -86,6 +91,29 @@ export default function AdminMarketingDrips() {
             </Button>
           </div>
         </header>
+
+        {stats && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Card className="p-3">
+              <div className="text-[10px] uppercase text-muted-foreground">Envíos Hoy</div>
+              <div className="text-xl font-bold text-primary">{stats.sentToday}</div>
+            </Card>
+            <Card className="p-3">
+              <div className="text-[10px] uppercase text-muted-foreground">Estado Cron</div>
+              <div className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Activo (Auto)
+              </div>
+            </Card>
+            <Card className="p-3">
+              <div className="text-[10px] uppercase text-muted-foreground">Categorías</div>
+              <div className="text-xl font-bold">{new Set(configs.map(c => c.category)).size}</div>
+            </Card>
+            <Card className="p-3">
+              <div className="text-[10px] uppercase text-muted-foreground">Ult. Actividad</div>
+              <div className="text-[10px] font-mono mt-1 truncate">{sends[0] ? new Date(sends[0].sent_at).toLocaleTimeString() : '—'}</div>
+            </Card>
+          </div>
+        )}
 
         <section className="space-y-4">
           <h2 className="text-sm font-semibold flex items-center gap-2">

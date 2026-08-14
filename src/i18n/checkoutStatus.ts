@@ -93,6 +93,10 @@ const es: CheckoutStatusStrings = {
   shippingEligibility: "Elegibilidad de envío confirmada",
   shippingEligibilityDesc: "Tu pedido es elegible para envío internacional a Perú, Colombia, México, Argentina y más.",
   paymentMethodConfirmed: "Método de pago confirmado",
+  digitalDeliveredFirst: "Material digital enviado (inmediato)",
+  physicalInProgress: "Envío físico en preparación",
+  trackingComingSoon: "El código de seguimiento se enviará pronto",
+
 
   paymentPending: "Pago pendiente",
   pendingDesc:

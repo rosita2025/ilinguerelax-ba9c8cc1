@@ -22,11 +22,14 @@ export const PixelDebugger = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Check if we are in admin mode or have the debug flag
-    const isAdmin = localStorage.getItem("ilr_admin_key") || sessionStorage.getItem("ilr_admin_key");
+    // Solo visible en desarrollo (localhost/preview) o con flag manual
+    const isDev = window.location.hostname === "localhost" || 
+                  window.location.hostname.includes("lovable.app") ||
+                  window.location.hostname.includes("lovableproject.com");
+                  
     const isDebug = new URLSearchParams(window.location.search).get("pixel_debug") === "1";
     
-    if (isAdmin || isDebug) {
+    if (isDev || isDebug) {
       setIsVisible(true);
     } else {
       return;

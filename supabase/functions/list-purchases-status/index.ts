@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
     }
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const take = Math.min(Math.max(Number(limit) || 200, 1), 500);
+    const take = Math.min(Math.max(Number(limit) || 500, 1), 2000);
     const s = typeof search === "string" ? search.trim().toLowerCase() : "";
 
     const rows: Row[] = [];
@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
       const { data } = await admin
         .from("funnel_events")
         .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
-        .or("event_data->>provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%")
+        .or("event_data->>provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%,event_name.eq.Purchase")
         .order("created_at", { ascending: false })
         .limit(take);
 
@@ -218,7 +218,7 @@ Deno.serve(async (req) => {
       const { data } = await admin
         .from("funnel_events")
         .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
-        .or("event_name.ilike.purchase,event_name.ilike.InitiateCheckout")
+        .or("event_name.ilike.purchase,event_name.ilike.InitiateCheckout,event_name.ilike.Purchase")
         .or("event_data->>provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -239,11 +239,11 @@ Deno.serve(async (req) => {
           product: r.product_id || d.product_name || d.name || null,
           transaction: d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
-          mapped_status: (status === "approved" || status === "complete") ? "approved" : 
-                         (status === "pending" || status === "processing") ? "pending" :
+          mapped_status: (status === "approved" || status === "complete" || status === "succeeded" || status === "Purchase") ? "approved" : 
+                         (status === "pending" || status === "processing" || status === "InitiateCheckout") ? "pending" :
                          (status === "refunded") ? "refunded" : 
                          (status === "chargeback") ? "chargeback" :
-                         (status === "expired" || status === "canceled") ? "cancelled" : "unknown",
+                         (status === "expired" || status === "canceled" || status === "failed") ? "cancelled" : "unknown",
           failure_reason: d.failure_reason || d.status_detail || null,
           failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Hotmart)" : 
                        isPurchase ? "Compra (Hotmart)" : null,

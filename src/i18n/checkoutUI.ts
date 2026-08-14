@@ -112,7 +112,7 @@ const es: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Tus datos",
-  yourDetailsHint: "Recibirás el acceso al producto digital por correo.",
+  yourDetailsHint: "Tu acceso se enviará por email. Para libros físicos, la dirección es obligatoria.",
   ready: "Listo",
   required: "Requerido",
   fullName: "Nombre completo *",
@@ -210,7 +210,7 @@ const en: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Your details",
-  yourDetailsHint: "You'll get access to the digital product by email.",
+  yourDetailsHint: "Your access will be sent by email. For physical books, address is mandatory.",
   ready: "Ready",
   required: "Required",
   fullName: "Full name *",
@@ -308,7 +308,7 @@ const pt: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Seus dados",
-  yourDetailsHint: "Você receberá o acesso ao produto digital por e-mail.",
+  yourDetailsHint: "Seu acesso será enviado por e-mail. Para livros físicos, o endereço é obrigatório.",
   ready: "Pronto",
   required: "Obrigatório",
   fullName: "Nome completo *",
@@ -406,7 +406,7 @@ const fr: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Vos coordonnées",
-  yourDetailsHint: "Vous recevrez l'accès au produit numérique par e-mail.",
+  yourDetailsHint: "Votre accès sera envoyé par e-mail. Pour les livres physiques, l'adresse est obligatoire.",
   ready: "Prêt",
   required: "Requis",
   fullName: "Nom complet *",

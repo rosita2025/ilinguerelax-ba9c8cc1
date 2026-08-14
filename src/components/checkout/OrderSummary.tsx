@@ -120,10 +120,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <h2 className="hidden lg:block text-lg font-semibold">{t.yourOrder}</h2>
 
         {items.some(i => i.isPhysical) ? (
-          <div className="flex gap-2.5 items-start rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 mb-2">
-            <Truck className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
-            <p className="text-xs text-muted-foreground leading-snug">
-              <strong className="text-foreground font-semibold">{t.physical}.</strong> Se solicita dirección de envío en el formulario de datos.
+          <div className="flex gap-2.5 items-start rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2.5 mb-2 ring-1 ring-destructive/20 animate-pulse">
+            <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-xs text-destructive font-medium leading-snug">
+              <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> Se solicita dirección de envío obligatoria para continuar.
             </p>
           </div>
         ) : (

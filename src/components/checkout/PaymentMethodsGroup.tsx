@@ -890,6 +890,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried]);
 
   const handleManualPaid = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
     const s = useCheckoutPruebaStore.getState();
     const orderNumber = `ILR-YP-${Math.floor(1000 + Math.random() * 9000)}`;
     const amountText = penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted);
@@ -1000,6 +1001,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   };
 
   const handleBinancePaid = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
     const s = useCheckoutPruebaStore.getState();
     const orderNumber = `ILR-BN-${Math.floor(1000 + Math.random() * 9000)}`;
     const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
@@ -1101,6 +1103,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   };
 
   const handleClabePaid = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
     const s = useCheckoutPruebaStore.getState();
     const orderNumber = `ILR-MX-${Math.floor(1000 + Math.random() * 9000)}`;
     const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;

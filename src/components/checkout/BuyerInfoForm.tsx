@@ -28,10 +28,10 @@ export function isBuyerValid(buyer: {
   if (!hasPhysicalItems) return basicOk;
   return (
     basicOk &&
-    (buyer.address || "").trim().length > 5 &&
-    (buyer.city || "").trim().length > 2 &&
-    (buyer.zip || "").trim().length > 3 &&
-    (buyer.country || "").trim().length > 1
+    (buyer.address || "").trim().length >= 8 &&
+    (buyer.city || "").trim().length >= 3 &&
+    (buyer.zip || "").trim().length >= 4 &&
+    (buyer.country || "").trim().length >= 1
   );
 }
 
@@ -121,9 +121,9 @@ export function BuyerInfoForm() {
   const emailCheck = checkEmail(buyer.email);
   const emailInvalid = !emailCheck.ok;
   
-  const addressInvalid = hasPhysicalItems && (buyer.address || "").trim().length < 5;
-  const cityInvalid = hasPhysicalItems && (buyer.city || "").trim().length < 2;
-  const zipInvalid = hasPhysicalItems && (buyer.zip || "").trim().length < 3;
+  const addressInvalid = hasPhysicalItems && (buyer.address || "").trim().length < 8;
+  const cityInvalid = hasPhysicalItems && (buyer.city || "").trim().length < 3;
+  const zipInvalid = hasPhysicalItems && (buyer.zip || "").trim().length < 4;
   const countryInvalid = hasPhysicalItems && !(buyer.country || "").trim();
 
   useEffect(() => {
@@ -136,6 +136,9 @@ export function BuyerInfoForm() {
         if (nameInvalid) nameRef.current?.focus();
         else if (emailInvalid) emailRef.current?.focus();
         else if (addressInvalid) document.getElementById("shipping-address")?.focus();
+        else if (cityInvalid) document.getElementById("shipping-city")?.focus();
+        else if (zipInvalid) document.getElementById("shipping-zip")?.focus();
+        else if (countryInvalid) document.getElementById("shipping-country")?.focus();
       }, 350);
     };
     window.addEventListener(BUYER_ERRORS_EVENT, handler);
@@ -295,6 +298,7 @@ export function BuyerInfoForm() {
               <label className="block">
                 <span className="text-xs font-medium text-muted-foreground">{t.city} *</span>
                 <input
+                  id="shipping-city"
                   type="text"
                   required
                   value={buyer.city || ""}
@@ -310,6 +314,7 @@ export function BuyerInfoForm() {
               <label className="block">
                 <span className="text-xs font-medium text-muted-foreground">{t.postalCode} *</span>
                 <input
+                  id="shipping-zip"
                   type="text"
                   required
                   value={buyer.zip || ""}
@@ -339,6 +344,7 @@ export function BuyerInfoForm() {
                 <div className="relative mt-1">
                   <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <select
+                    id="shipping-country"
                     value={buyer.country || ""}
                     onChange={(e) => setBuyer({ country: e.target.value })}
                     className={cn(

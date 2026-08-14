@@ -2085,7 +2085,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 <button
                   type="button"
                   onClick={handleManualPaid}
-                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-4 rounded-xl transition-colors shadow-lg"
+                  className="w-full bg-[#742282] hover:bg-[#5e1b69] text-white font-bold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>
@@ -2241,7 +2241,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                 <button
                   type="button"
                   onClick={handleClabePaid}
-                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-4 rounded-xl transition-colors shadow-lg"
+                  className="w-full bg-[#0A2540] hover:bg-[#081e33] text-white font-bold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>
@@ -2311,7 +2311,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         </p>
       )}
 
-      {selected !== "yape" && selected !== "binance" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

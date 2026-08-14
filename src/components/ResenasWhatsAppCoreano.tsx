@@ -107,9 +107,15 @@ export const ResenasWhatsAppCoreano = () => {
                             <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                           ))}
                         </div>
-                        <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-medium">
-                          <MessageCircle className="w-3 h-3" /> WhatsApp verificado
-                        </span>
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">
+                            <MessageCircle className="w-3 h-3" /> WhatsApp verificado
+                          </span>
+                          <span className="text-[9px] text-muted-foreground italic leading-none">
+                            Supervisora Rosa & Asistente Crady
+                          </span>
+                        </div>
+
                       </div>
                     </div>
                   </div>

@@ -13,6 +13,9 @@ export interface Product {
   rating: number;
   reviews: number;
   price: number;
+  pricePen?: number | null;
+  priceUsdLatam?: number | null;
+  priceUsdTienda?: number | null;
   originalPrice: number | null;
   discount: number | null;
   badge: string;

@@ -234,7 +234,7 @@ const en: CheckoutUIStrings = {
   freeShipping: "Free Shipping",
   digital: "Digital",
   physical: "Physical",
-  configureShipping: "Configure shipping",
+  configureShipping: "Configure shipping & checkout",
 
   choosePaymentMethod: "Choose your payment method",
   cardPayment: "Card payment",
@@ -332,7 +332,7 @@ const pt: CheckoutUIStrings = {
   freeShipping: "Envio Grátis",
   digital: "Digital",
   physical: "Físico",
-  configureShipping: "Configurar envio",
+  configureShipping: "Configurar envio e checkout",
 
   choosePaymentMethod: "Escolha sua forma de pagamento",
   cardPayment: "Pagamento com cartão",
@@ -430,7 +430,7 @@ const fr: CheckoutUIStrings = {
   freeShipping: "Livraison gratuite",
   digital: "Numérique",
   physical: "Physique",
-  configureShipping: "Configurer la livraison",
+  configureShipping: "Configurer la livraison et commander",
 
   choosePaymentMethod: "Choisissez votre mode de paiement",
   cardPayment: "Paiement par carte",

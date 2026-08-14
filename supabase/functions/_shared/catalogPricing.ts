@@ -230,7 +230,7 @@ export async function resolveServerPricing(opts: {
     const isUpsell = item.id.toLowerCase().startsWith("upsell-");
 
     // Precio mínimo autoritativo del catálogo para este país.
-    let unit = pickTierPrice(row, tier);
+    let unit = pickTierPrice(row, tier, currencyHint);
 
     if (isUpsell) {
       const pct = maxDiscount.get(sku) ?? DEFAULT_UPSELL_DISCOUNT_PCT;

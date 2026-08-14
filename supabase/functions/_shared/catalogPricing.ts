@@ -320,9 +320,13 @@ export function localTotalFromPricing(
     const override = code === "PEN" && !(Number(item.localPrices?.PEN) > 0)
       ? item.pricePen ?? undefined
       : item.localPrices?.[code];
+    
+    const regionalUsd = item.localUsdPrices?.[code];
+    const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : item.unitUsd;
+
     const perUnit = typeof override === "number" && override > 0
       ? override
-      : item.unitUsd * rate;
+      : activeUsd * rate;
     subtotal += perUnit * (item.quantity || 1);
   }
   
